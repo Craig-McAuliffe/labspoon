@@ -1,0 +1,21 @@
+.content {
+    margin: auto;
+    width: 50%;
+    padding-top: 1em;
+}
+
+.tagline {
+    text-align: center;	
+    font-family: sans-serif;
+    font-size: 1.2em;
+}
+
+.updates {
+    text-align: center;	
+    font-family: sans-serif;
+}
+
+.logo {
+    margin: auto;
+    display: block;
+}
