@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import { BrowserRouter as Router, Switch, Route, Link, Redirect } from "react-router-dom";
+
 import firebase from './firebase.js'
-import logo from './labspoon_logo_banner.svg';
+
+import FeedPage from './pages/Feed/Feed';
+
 import './App.css';
 
 function App() {
@@ -42,12 +45,6 @@ function AuthRoute({user, children, ...rest}) {
       }
     />
   );
-}
-
-function FeedPage() {
-  return (
-    <p>You're authenticated and this is where the feed will be.</p>
-  )
 }
 
 function SignIn({user, setUser}) {
