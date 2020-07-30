@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
+import { BrowserRouter as Router, Switch, Route, Link, Redirect } from "react-router-dom";
 import firebase from './firebase.js'
 import logo from './labspoon_logo_banner.svg';
 import './App.css';
@@ -8,8 +9,44 @@ function App() {
   const [user, setUser] = useState({});
   return (
     <AuthContext.Provider value={{user, setUser}}>
-      <SignIn user={user} setUser={setUser}/>
+      <Router>
+        <Switch>
+          <AuthRoute user={user} exact path='/'>
+            <FeedPage />
+          </AuthRoute>
+          <Route path="/login">
+            <SignIn user={user} setUser={setUser}/>
+          </Route>
+        </Switch>
+      </Router>
     </AuthContext.Provider>
+  )
+}
+
+// Redirects to login screen if not authenticated
+function AuthRoute({user, children, ...rest}) {
+  return (
+    <Route
+      {...rest}
+      render={({ location }) =>
+        !!user ? (
+          children
+        ) : (
+          <Redirect
+            to={{
+              pathname: "/login",
+              state: { from: location }
+            }}
+          />
+        )
+      }
+    />
+  );
+}
+
+function FeedPage() {
+  return (
+    <p>You're authenticated and this is where the feed will be.</p>
   )
 }
 
