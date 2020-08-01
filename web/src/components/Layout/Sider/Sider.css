@@ -1,0 +1,14 @@
+.SiderContainer {
+  position: fixed;
+  width: 250px;
+  border-right: 1px solid black;
+  height: 100%;
+}
+
+@media screen and (max-width: 1007px) {
+  .SiderContainer {
+    position: fixed;
+    width: 100px;
+    border-right: 1px solid black;
+  }
+}

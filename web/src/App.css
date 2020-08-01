@@ -1,23 +1,60 @@
-.content {
-    margin: auto;
-    width: 50%;
-    padding-top: 1em;
+.Layout {
+  max-width: 100vw;
+  display: grid;
+  grid-template-rows: 65px 1fr;
+  grid-template-columns: 1fr;
 }
 
-p {
-    font-family: sans-serif;
+.Header {
+  grid-row: 1 / 2;
+  width: 100%;
+  padding: none;
+  margin: none;
+  position: fixed;
+  height: 65px;
 }
 
-.tagline {
-    text-align: center;	
-    font-size: 1.2em;
+.Main {
+  grid-row: 2/3;
+  display: grid;
+  grid-template-columns: 250px 4fr 250px;
+  justify-items: flex-start;
+  max-width: 100%;
 }
 
-.banner-logo {
-    margin: auto;
-    display: block;
+.Sider {
+  height: 100%;
+  grid-column: 1 / 2;
+  grid-row: 2 / 3;
+  display: inline-block;
 }
 
-.authentication-buttons {
-    text-align: center;
+.Content {
+  padding-top: 10px;
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+  justify-self: flex-start;
+  width: 100%;
+}
+
+@media screen and (max-width: 1007px) {
+  .Main {
+    grid-row: 2/3;
+    display: grid;
+    grid-template-columns: 100px 4fr 100px;
+    justify-items: flex-start;
+    max-width: 100%;
+  }
+}
+@media screen and (max-width: 664px) {
+  .Main {
+    grid-row: 2/3;
+    display: grid;
+    grid-template-columns: 0px 4fr 0px;
+    justify-items: flex-start;
+    max-width: 100%;
+  }
+  .Sider {
+    display: none;
+  }
 }

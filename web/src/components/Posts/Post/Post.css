@@ -1,0 +1,33 @@
+.text-post {
+  border: 1px darkgray solid;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.post-header {
+  border-bottom: 1px darkgray solid;
+}
+
+.post-header-profile {
+  display: flex;
+  align-items: center;
+}
+
+.post-header-type {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.post-header-avatar {
+  margin: 10px;
+}
+
+.post-type-text {
+  border-bottom: 1px darkgray solid;
+  width: 100%;
+}
+
+.post-topics {
+  border-bottom: 1px darkgray solid;
+}

@@ -1,0 +1,24 @@
+.MenuIcons {
+  display: inline-block;
+  width: 15%;
+}
+
+.DropDownHeader {
+  color: #00507c;
+  display: flex;
+  cursor: pointer;
+}
+
+.DropDownHeader p {
+  padding-left: 4px;
+}
+
+.DropDownMenu {
+  height: auto;
+}
+
+.LinkItem {
+  width: 100%;
+  display: inline-block;
+  height: 10px;
+}
