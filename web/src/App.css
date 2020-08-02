@@ -3,6 +3,7 @@
   display: grid;
   grid-template-rows: 65px 1fr;
   grid-template-columns: 1fr;
+  min-height: 100vh;
 }
 
 .Header {
@@ -18,12 +19,14 @@
   grid-row: 2/3;
   display: grid;
   grid-template-columns: 250px 4fr 250px;
+  grid-row: 1fr;
   justify-items: flex-start;
+  align-self: flex-start;
   max-width: 100%;
 }
 
 .Sider {
-  height: 100%;
+  min-height: 100%;
   grid-column: 1 / 2;
   grid-row: 2 / 3;
   display: inline-block;
@@ -34,7 +37,11 @@
   grid-column: 2 / 3;
   grid-row: 2 / 3;
   justify-self: flex-start;
+  align-self: flex-start;
   width: 100%;
+  /* display: grid;
+  grid-template-columns: 1fr;
+  grid-row: 1fr; */
 }
 
 @media screen and (max-width: 1007px) {

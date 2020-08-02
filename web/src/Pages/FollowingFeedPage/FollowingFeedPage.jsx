@@ -5,11 +5,7 @@ import PostList from '../../components/Posts/PostList/PostList';
 import './FollowingFeedPage.css';
 
 function FollowingFeedPage() {
-  return (
-    <div className="FeedContent">
-      <PostList />
-    </div>
-  );
+  return <PostList />;
 }
 
 export default FollowingFeedPage;

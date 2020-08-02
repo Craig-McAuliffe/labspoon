@@ -1,15 +1,14 @@
 import React, {useState} from 'react';
 import {BrowserRouter as Router} from 'react-router-dom';
-import {Layout} from 'antd';
-import Routes from './routes';
-// import logo from './labspoon_logo_banner.svg';
+// import {Layout} from 'antd';
+import Routes from './routes.jsx';
 
 import LabspoonHeader from './components/Layout/Header/Header';
 import LabspoonSider from './components/Layout/Sider/Sider';
 
 import './App.css';
 
-const {Header, Content, Sider, Footer} = Layout;
+// const {Header, Content, Sider, Footer} = Layout;
 
 function App() {
   const [user, setUser] = useState({});

@@ -21,4 +21,10 @@
   width: 100%;
   display: inline-block;
   height: 10px;
+  color: #00507c;
+  margin-left: 6px;
+}
+
+.dropdown-header {
+  color: #99999f;
 }

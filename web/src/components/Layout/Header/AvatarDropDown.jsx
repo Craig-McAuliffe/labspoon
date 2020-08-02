@@ -31,19 +31,19 @@ const AvatarDropDown = () => {
         <Dropdown.Menu>
           <Dropdown.Item>
             <Link to="/bookmarks">
-              <BookmarksMenuIcon className="MenuIcons" />
+              <BookmarksMenuIcon />
               <p className="LinkItem">Bookmarks</p>
             </Link>
           </Dropdown.Item>
           <Dropdown.Item>
             <Link to="/account">
-              <AccountMenuIcon className="MenuIcons" />
+              <AccountMenuIcon />
               <p className="LinkItem">Account</p>
             </Link>
           </Dropdown.Item>
           <Dropdown.Item>
             <Link to="/userprofile">
-              <UserProfileMenuIcon className="MenuIcons" />
+              <UserProfileMenuIcon />
               <p className="LinkItem">Profile</p>
             </Link>
           </Dropdown.Item>
@@ -86,19 +86,19 @@ export const AvatarDropDownSmall = () => {
         <Dropdown.Menu>
           <Dropdown.Item>
             <Link to="/bookmarks">
-              <BookmarksMenuIcon className="MenuIcons" />
+              <BookmarksMenuIcon />
               <p className="LinkItem">Bookmarks</p>
             </Link>
           </Dropdown.Item>
           <Dropdown.Item>
             <Link to="/account">
-              <AccountMenuIcon className="MenuIcons" />
+              <AccountMenuIcon />
               <p className="LinkItem">Account</p>
             </Link>
           </Dropdown.Item>
           <Dropdown.Item>
             <Link to="/userprofile">
-              <UserProfileMenuIcon className="MenuIcons" />
+              <UserProfileMenuIcon />
               <p className="LinkItem">Profile</p>
             </Link>
           </Dropdown.Item>
@@ -137,15 +137,15 @@ const CustomToggle = React.forwardRef(({children, onClick}, ref) => (
 // const menu = (
 //   <Menu>
 //     <Menu.Item key="0">
-//       <BookmarksMenuIcon className="MenuIcons" />
+//       <BookmarksMenuIcon />
 //       <Link to="/bookmarks">Bookmarks</Link>
 //     </Menu.Item>
 //     <Menu.Item key="1">
-//       <UserProfileMenuIcon className="MenuIcons" />
+//       <UserProfileMenuIcon />
 //       <Link to="/userprofile">Profile</Link>
 //     </Menu.Item>
 //     <Menu.Item key="2">
-//       <AccountMenuIcon className="MenuIcons" />
+//       <AccountMenuIcon />
 //       <Link to="/account">Account</Link>
 //     </Menu.Item>
 //     <Menu.Item key="3">

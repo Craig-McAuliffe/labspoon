@@ -43,7 +43,7 @@ function fetchTestData(skip, limit) {
 }
 
 export default function PostList() {
-  const limit = 5;
+  const limit = 8;
   const [hasMore, setHasMore] = useState(true);
   const [skip, setSkip] = useState(0);
   const [results, setResults] = useState(fetchTestData(skip, limit));

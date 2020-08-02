@@ -14,9 +14,9 @@ const LabspoonHeader = () => {
         </div>
       </Link>
       <div className="HeaderSearch">
-        <dov className="SearchIcon">
+        <div className="SearchIcon">
           <SearchIcon />
-        </dov>
+        </div>
         <div className="SearchIconSmall">
           <SearchIconSmall />
         </div>
