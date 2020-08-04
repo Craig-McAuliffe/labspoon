@@ -1,88 +1,44 @@
-import React, { useState, useEffect } from 'react';
-import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
-import { BrowserRouter as Router, Switch, Route, Link, Redirect } from "react-router-dom";
+import React, {useState} from 'react';
+import {BrowserRouter as Router} from 'react-router-dom';
+// import {Layout} from 'antd';
+import Routes from './routes.jsx';
 
-import firebase from './firebase.js'
-
-import FeedPage from './pages/Feed/Feed';
+import Header from './components/Layout/Header/Header';
+import Sider from './components/Layout/Sider/Sider';
 
 import './App.css';
+
+// const {Header, Content, Sider, Footer} = Layout;
 
 function App() {
   const [user, setUser] = useState({});
   return (
     <AuthContext.Provider value={{user, setUser}}>
       <Router>
-        <Switch>
-          <AuthRoute user={user} exact path='/'>
-            <FeedPage />
-          </AuthRoute>
-          <Route path="/login">
-            <SignIn user={user} setUser={setUser}/>
-          </Route>
-        </Switch>
+        <AppLayout>
+          <Routes />
+        </AppLayout>
       </Router>
     </AuthContext.Provider>
-  )
-}
-
-// Redirects to login screen if not authenticated
-function AuthRoute({user, children, ...rest}) {
-  return (
-    <Route
-      {...rest}
-      render={({ location }) =>
-        !!user ? (
-          children
-        ) : (
-          <Redirect
-            to={{
-              pathname: "/login",
-              state: { from: location }
-            }}
-          />
-        )
-      }
-    />
   );
 }
 
-function SignIn({user, setUser}) {
-  let UIConfig = {
-    signInFlow: 'popup',
-    signInOptions: [
-      firebase.auth.EmailAuthProvider.PROVIDER_ID,
-    ],
-    callbacks: {
-      signInSuccessWithAuthResult: () => false
-    },
-  }
-  useEffect(() => {
-    const unregisterAuthObserver = firebase.auth().onAuthStateChanged(
-      (user) => setUser(user)
-    );
-    return unregisterAuthObserver;
-  });
-  if (!user) {
-    return (
-      <div>
-        <p>not signed in</p>
-        <StyledFirebaseAuth uiConfig={UIConfig} firebaseAuth={firebase.auth()}/>
+const AppLayout = ({children}) => {
+  return (
+    <div className="Layout">
+      <div className="Header">
+        <Header />
       </div>
-    );
-  } else {
-    return (
-      <div>
-        <p>signed in</p>
-        <a onClick={() => {
-          console.log('clicked sign out')
-          firebase.auth().signOut();
-        }}>Sign out</a>
+      <div className="Main">
+        <div className="Sider">
+          <Sider />
+        </div>
+        <div className="Content">{children}</div>
       </div>
-    )
-  }
+    </div>
+  );
 };
 
-const AuthContext = React.createContext();
+export const AuthContext = React.createContext();
 
 export default App;

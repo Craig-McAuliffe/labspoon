@@ -1,0 +1,41 @@
+.MenuIcons {
+  display: inline-block;
+  width: 15%;
+}
+
+.DropDownHeader p {
+  padding-left: 4px;
+}
+
+.DropDownMenu {
+  height: auto;
+}
+
+.LinkItem {
+  width: 100%;
+  display: inline-block;
+  height: 10px;
+  color: #00507c;
+  margin-left: 6px;
+}
+
+.DropDownHeader {
+  color: #00507c;
+  display: flex;
+  cursor: pointer;
+}
+
+.DropDownHeaderSmall {
+  display: none;
+}
+
+@media screen and (max-width: 1007px) {
+  .DropDownHeader {
+    display: none;
+  }
+
+  .DropDownHeaderSmall {
+    display: flex;
+    cursor: pointer;
+  }
+}

@@ -1,0 +1,131 @@
+.HeaderContainer {
+  display: grid;
+  grid-template-columns: 250px 1fr 250px;
+  grid-template-rows: none;
+  align-items: center;
+  background: #eaf1f5;
+  padding: 0 0;
+  width: 100%;
+  height: 100%;
+}
+
+.HeaderSearch {
+  justify-self: center;
+  grid-column: 2 / 3;
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.HeaderLogo {
+  display: inline-block;
+  padding-left: 10px;
+  grid-column: 1 / 2;
+}
+
+.SearchIcon {
+  display: inline-block;
+}
+
+.SearchIconSmall {
+  display: none;
+}
+
+.HeaderSearch input {
+  display: inline-block;
+  width: 90%;
+  flex-grow: 1;
+  height: 38px;
+  border: 1px solid #00507c;
+  border-radius: 0%;
+}
+
+.HeaderDropDown {
+  display: inline-block;
+  justify-self: flex-end;
+  padding-right: 20px;
+  grid-column: 3 / 4;
+  max-height: 100%;
+}
+
+@media screen and (max-width: 1007px) {
+  .HeaderContainer {
+    display: grid;
+    grid-template-columns: 100px 1fr 100px;
+    grid-template-rows: none;
+    align-items: center;
+    background: #eaf1f5;
+    padding: 0 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .HeaderDropDown {
+    display: inline-block;
+    justify-self: flex-end;
+    padding-right: 15px;
+    grid-column: 3 / 4;
+    max-height: 100%;
+  }
+}
+
+@media screen and (max-width: 664px) {
+  .SearchIcon {
+    display: none;
+  }
+
+  .SearchIconSmall {
+    display: inline-block;
+  }
+
+  .HeaderContainer {
+    display: grid;
+    grid-template-columns: 80px 1fr 80px;
+    grid-template-rows: none;
+    align-items: center;
+    background: #eaf1f5;
+    padding: 0 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+@media screen and (max-width: 470px) {
+  .HeaderContainer {
+    display: grid;
+    grid-template-columns: 75px 1fr 80px;
+    grid-template-rows: none;
+    align-items: center;
+    background: #eaf1f5;
+    padding: 0 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+@media screen and (max-width: 368px) {
+  .SearchIcon {
+    display: none;
+  }
+
+  .SearchIconSmall {
+    display: none;
+  }
+  .HeaderContainer {
+    display: grid;
+    grid-template-columns: 60px 1fr 60px;
+    grid-template-rows: none;
+    align-items: center;
+    background: #eaf1f5;
+    padding: 0 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .HeaderDropDown {
+    display: inline-block;
+    justify-self: flex-end;
+    padding-right: 10px;
+    grid-column: 3 / 4;
+    max-height: 100%;
+  }
+}
