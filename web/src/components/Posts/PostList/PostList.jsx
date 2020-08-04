@@ -11,6 +11,7 @@ import Post from '../Post/Post';
  * @return {React.ReactElement}
 */
 export default function PostList({results, hasMore, fetchMore}) {
+  console.log('results', results);
   const posts = results.map(
       (result) => <Post key={result.id} post={result}/>,
   );

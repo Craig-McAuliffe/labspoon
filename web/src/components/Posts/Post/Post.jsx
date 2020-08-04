@@ -23,7 +23,7 @@ export default function Post({post}) {
       break;
   }
   return (
-    <Container key={post.id} className='text-post'>
+    <Container fluid key={post.id} className="text-post">
       {new PostHeader(post)}
       {contentBody}
       {new PostTopics(post)}
@@ -56,7 +56,7 @@ Post.propTypes = {
 */
 function PostTextContent({title, content}) {
   return (
-    <Row className='post-type-text'>
+    <Row className="post-type-text">
       <h2>{title}</h2>
       <p>{content.text}</p>
     </Row>
@@ -77,9 +77,9 @@ function PostActions() {
   return (
     <Row className="post-actions">
       <p>
-        <a href='/'>Re-Post to Group</a>
-        <a href='/'>Share</a>
-        <a href='/'>Bookmark</a>
+        <a href="/">Re-Post to Group</a>
+        <a href="/">Share</a>
+        <a href="/">Bookmark</a>
       </p>
     </Row>
   );
@@ -91,9 +91,14 @@ function PostActions() {
 function PostTopics({topics}) {
   return (
     <Row className="post-topics">
-      <p>Topics: {
-        topics.map((topic) => <a key={topic.id} href='/'>{topic.name} </a>)
-      }</p>
+      <p>
+        Topics:{' '}
+        {topics.map((topic) => (
+          <a key={topic.id} href="/">
+            {topic.name}{' '}
+          </a>
+        ))}
+      </p>
     </Row>
   );
 }
@@ -110,13 +115,13 @@ PostTopics.propTypes = {
 */
 function PostHeader({type, author}) {
   return (
-    <Row className='post-header'>
+    <Row className="post-header">
       <div className="post-header-profile">
         <Image
-          className='post-header-avatar'
+          className="post-header-avatar"
           src={author.avatar}
           roundedCircle
-          width='60px'
+          width="60px"
         />
         <h2>{author.name}</h2>
       </div>

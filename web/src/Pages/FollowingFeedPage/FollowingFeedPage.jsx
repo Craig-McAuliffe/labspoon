@@ -202,7 +202,7 @@ function fetchFeedData(skip, limit, filter) {
  * Renders the feed page, which contains both a feed and a filter menu
  * @return {React.ReactElement}
  */
-export default function FeedPage() {
+export default function FollowingFeedPage() {
   /**
    * Filter options has the following structure:
    * [{
@@ -251,7 +251,6 @@ export default function FeedPage() {
     setResults(fetchFeedData(0, limit, filterOptions));
     return filterOptions;
   }
-
   return (
     <div>
       <FilterMenu
