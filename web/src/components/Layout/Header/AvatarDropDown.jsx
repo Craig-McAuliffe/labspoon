@@ -27,6 +27,7 @@ const AvatarDropDown = () => {
       <Dropdown>
         <Dropdown.Toggle as={CustomToggle} id="dropdown-custom-components">
           <AvatarToggle />
+          <AvatarToggleSmall />
         </Dropdown.Toggle>
         <Dropdown.Menu>
           <Dropdown.Item>
@@ -69,54 +70,8 @@ const AvatarToggle = () => (
   </div>
 );
 
-export const AvatarDropDownSmall = () => {
-  const {user} = useContext(AuthContext);
-  if (!user) {
-    return (
-      <Dropdown variant="success" id="dropdown-basic">
-        <Link to="/signin">Sign In</Link>
-      </Dropdown>
-    );
-  } else {
-    return (
-      <Dropdown>
-        <Dropdown.Toggle as={CustomToggle} id="dropdown-custom-components">
-          <AvatarToggleSmall />
-        </Dropdown.Toggle>
-        <Dropdown.Menu>
-          <Dropdown.Item>
-            <Link to="/bookmarks">
-              <BookmarksMenuIcon />
-              <p className="LinkItem">Bookmarks</p>
-            </Link>
-          </Dropdown.Item>
-          <Dropdown.Item>
-            <Link to="/account">
-              <AccountMenuIcon />
-              <p className="LinkItem">Account</p>
-            </Link>
-          </Dropdown.Item>
-          <Dropdown.Item>
-            <Link to="/userprofile">
-              <UserProfileMenuIcon />
-              <p className="LinkItem">Profile</p>
-            </Link>
-          </Dropdown.Item>
-          <Dropdown.Header>
-            <GroupMenuIcon />
-            My Groups
-          </Dropdown.Header>
-          <Dropdown.Item>
-            <p className="LinkItem">The bla bla group</p>
-          </Dropdown.Item>
-        </Dropdown.Menu>
-      </Dropdown>
-    );
-  }
-};
-
 const AvatarToggleSmall = () => (
-  <div className="DropDownHeader">
+  <div className="DropDownHeaderSmall">
     <img src={NoUserIcon} alt="user icon" />
   </div>
 );
@@ -133,35 +88,5 @@ const CustomToggle = React.forwardRef(({children, onClick}, ref) => (
     {children}
   </a>
 ));
-
-// const menu = (
-//   <Menu>
-//     <Menu.Item key="0">
-//       <BookmarksMenuIcon />
-//       <Link to="/bookmarks">Bookmarks</Link>
-//     </Menu.Item>
-//     <Menu.Item key="1">
-//       <UserProfileMenuIcon />
-//       <Link to="/userprofile">Profile</Link>
-//     </Menu.Item>
-//     <Menu.Item key="2">
-//       <AccountMenuIcon />
-//       <Link to="/account">Account</Link>
-//     </Menu.Item>
-//     <Menu.Item key="3">
-//       <GroupMenuIcon />
-//       <p>Groups</p>
-//       <Link to="/group">My Group</Link>
-//     </Menu.Item>
-//   </Menu>
-// );
-
-// const signInMenu = (
-//   <Menu>
-//     <Menu.Item key="0">
-//       <Link to="/login">Sign in</Link>
-//     </Menu.Item>
-//   </Menu>
-// );
 
 export default AvatarDropDown;

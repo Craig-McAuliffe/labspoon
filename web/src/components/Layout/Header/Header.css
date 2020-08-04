@@ -48,10 +48,6 @@
   max-height: 100%;
 }
 
-.HeaderDropDownSmall {
-  display: none;
-}
-
 @media screen and (max-width: 1007px) {
   .HeaderContainer {
     display: grid;
@@ -65,10 +61,6 @@
   }
 
   .HeaderDropDown {
-    display: none;
-  }
-
-  .HeaderDropDownSmall {
     display: inline-block;
     justify-self: flex-end;
     padding-right: 15px;
@@ -129,7 +121,7 @@
     height: 100%;
   }
 
-  .HeaderDropDownSmall {
+  .HeaderDropDown {
     display: inline-block;
     justify-self: flex-end;
     padding-right: 10px;

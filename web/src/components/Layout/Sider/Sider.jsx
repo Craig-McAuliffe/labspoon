@@ -1,7 +1,7 @@
 import React from 'react';
 
 import './Sider.css';
-const LabspoonSider = () => {
+const Sider = () => {
   return (
     <div className="SiderContainer">
       <p>Hi There</p>
@@ -9,4 +9,4 @@ const LabspoonSider = () => {
   );
 };
 
-export default LabspoonSider;
+export default Sider;

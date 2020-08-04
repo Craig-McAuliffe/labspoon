@@ -1,11 +1,11 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
-import AvatarDropDown, {AvatarDropDownSmall} from './AvatarDropDown';
+import AvatarDropDown from './AvatarDropDown';
 import HeaderLogo from '../../../assets/HeaderLogo';
 import {SearchIcon, SearchIconSmall} from '../../../assets/HeaderIcons';
 import './Header.css';
 
-const LabspoonHeader = () => {
+const Header = () => {
   return (
     <div className="HeaderContainer">
       <Link to="/">
@@ -25,11 +25,8 @@ const LabspoonHeader = () => {
       <div className="HeaderDropDown">
         <AvatarDropDown />
       </div>
-      <div className="HeaderDropDownSmall">
-        <AvatarDropDownSmall />
-      </div>
     </div>
   );
 };
 
-export default LabspoonHeader;
+export default Header;

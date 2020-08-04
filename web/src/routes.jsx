@@ -1,14 +1,14 @@
 import React from 'react';
 
-import {Switch, Route, Link, Redirect} from 'react-router-dom';
-import AccountPage from './Pages/AccountPage';
+import {Switch, Route, Redirect} from 'react-router-dom';
+import SettingsPage from './Pages/SettingsPage';
 import BookmarksPage from './Pages/BookmarksPage';
 import FollowingFeedPage from './Pages/FollowingFeedPage';
 import GraphPage from './Pages/GraphPage';
 import GroupPage from './Pages/GroupPage';
-import ManageFollowsPage from './Pages/ManageFollowsPage';
+import FollowsPage from './Pages/FollowsPage';
 import SearchPage from './Pages/SearchPage';
-import UserProfilePage from './Pages/UserProfilePage';
+import ProfilePage from './Pages/ProfilePage';
 import LoginPage from './Pages/LoginPage';
 
 const Routes = (user, setUser) => {
@@ -20,8 +20,8 @@ const Routes = (user, setUser) => {
       <Route path="/login">
         <LoginPage user={user} setUser={setUser} />
       </Route>
-      <AuthRoute user={user} path="/account">
-        <AccountPage />
+      <AuthRoute user={user} path="/settings">
+        <SettingsPage />
       </AuthRoute>
       <AuthRoute user={user} path="/bookmarks">
         <BookmarksPage />
@@ -32,14 +32,14 @@ const Routes = (user, setUser) => {
       <Route path="/group">
         <GroupPage />
       </Route>
-      <AuthRoute user={user} path="/managefollows">
-        <ManageFollowsPage />
+      <AuthRoute user={user} path="/follows">
+        <FollowsPage />
       </AuthRoute>
       <Route path="/search">
         <SearchPage />
       </Route>
-      <AuthRoute user={user} path="/userprofile">
-        <UserProfilePage />
+      <AuthRoute user={user} path="/profile">
+        <ProfilePage />
       </AuthRoute>
     </Switch>
   );

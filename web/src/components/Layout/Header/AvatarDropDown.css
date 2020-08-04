@@ -3,12 +3,6 @@
   width: 15%;
 }
 
-.DropDownHeader {
-  color: #00507c;
-  display: flex;
-  cursor: pointer;
-}
-
 .DropDownHeader p {
   padding-left: 4px;
 }
@@ -25,6 +19,23 @@
   margin-left: 6px;
 }
 
-.dropdown-header {
-  color: #99999f;
+.DropDownHeader {
+  color: #00507c;
+  display: flex;
+  cursor: pointer;
+}
+
+.DropDownHeaderSmall {
+  display: none;
+}
+
+@media screen and (max-width: 1007px) {
+  .DropDownHeader {
+    display: none;
+  }
+
+  .DropDownHeaderSmall {
+    display: flex;
+    cursor: pointer;
+  }
 }
