@@ -2,15 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {Switch, Route, Redirect} from 'react-router-dom';
-import SettingsPage from './Pages/SettingsPage';
-import BookmarksPage from './Pages/BookmarksPage';
-import FollowingFeedPage from './Pages/FollowingFeedPage';
-import GraphPage from './Pages/GraphPage';
-import GroupPage from './Pages/GroupPage';
-import FollowsPage from './Pages/FollowsPage';
-import SearchPage from './Pages/SearchPage';
-import ProfilePage from './Pages/ProfilePage';
-import LoginPage from './Pages/LoginPage';
+import SettingsPage from './pages/SettingsPage';
+import BookmarksPage from './pages/BookmarksPage';
+import FollowingFeedPage from './pages/FollowingFeedPage';
+import GraphPage from './pages/GraphPage';
+import GroupPage from './pages/GroupPage';
+import FollowsPage from './pages/FollowsPage';
+import SearchPage from './pages/SearchPage';
+import ProfilePage from './pages/ProfilePage';
+import LoginPage from './pages/LoginPage';
 
 /**
  * Top level routing structure for the app.
