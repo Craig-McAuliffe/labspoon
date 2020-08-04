@@ -1,8 +1,9 @@
 import React, {useReducer, useState} from 'react';
 
+import FilterableResults from '../../components/FilterableResults/FilterableResults';
 import PostList from '../../components/Posts/PostList/PostList';
 import {
-  FilterMenu, getFilterGroupEnabledIDsSet
+  FilterMenu, getFilterCollectionEnabledIDsSet
 } from '../../components/Filter/Filter';
 import Sider from '../../components/Layout/Sider/Sider';
 
@@ -98,7 +99,7 @@ function getTestPosts(i) {
 }
 
 const peopleFilterData = {
-  groupName: 'People',
+  collectionName: 'People',
   options: [
     {
       enabled: false,
@@ -112,7 +113,7 @@ const peopleFilterData = {
 };
 
 const topicFilterData = {
-  groupName: 'Topics',
+  collectionName: 'Topics',
   options: [
     {
       enabled: false,
@@ -138,7 +139,7 @@ const topicFilterData = {
 };
 
 const typesFilterData = {
-  groupName: 'Types',
+  collectionName: 'Types',
   options: [
     {
       enabled: false,
@@ -173,10 +174,10 @@ function fetchFeedData(skip, limit, filter) {
   for (let i = 0; i < 10; i++) {
     repeatedTestPosts = repeatedTestPosts.concat(getTestPosts(i));
   }
-  filter.forEach((filterGroup) => {
-    const enabledIDs = getFilterGroupEnabledIDsSet(filterGroup);
+  filter.forEach((filterCollection) => {
+    const enabledIDs = getFilterCollectionEnabledIDsSet(filterCollection);
     if (enabledIDs.size === 0) return;
-    switch (filterGroup.groupName) {
+    switch (filterCollection.collectionName) {
       case 'People':
         repeatedTestPosts = repeatedTestPosts.filter(
             (post) => enabledIDs.has(post.author.id),
@@ -204,61 +205,24 @@ function fetchFeedData(skip, limit, filter) {
  * @return {React.ReactElement}
  */
 export default function FollowingFeedPage() {
-  /**
-   * Filter options has the following structure:
-   * [{
-   *   groupName: string,
-   *   options: [
-   *     {
-   *       enabled: boolean,
-   *       data: {
-   *         id: string
-   *         name: string
-   *       }
-   *     }, ...
-   *   ],
-   * }, ...]
-   */
-  const limit = 5;
-  const [hasMore, setHasMore] = useState(true);
-  const [skip, setSkip] = useState(0);
-  const [results, setResults] =
-    useState(fetchFeedData(skip, limit, filterOptionsData));
-  const fetchMore = () => {
-    const newSkip = skip + limit;
-    const newResults = fetchFeedData(newSkip, limit, filterOptions);
-    if (newResults.length < limit) {
-      setHasMore(false);
-    }
-    setResults(results.concat(newResults));
-    setSkip(newSkip);
-  };
+  return (
+    <FilterableResults
+      DisplayComponent={FeedComp}
+      fetchResults={fetchFeedData}
+      defaultFilter={filterOptionsData}
+      limit={5}
+    />
+  );
+}
 
-  const [
-    filterOptions, filterOptionsDispatch,
-  ] = useReducer(filterOptionsReducer, filterOptionsData);
-  /**
-   * Updates the filter options state with an action
-   * @param {Array} state - filter options state
-   * @param {object} action - action to update the state with
-   * @return {Array}
-  */
-  function filterOptionsReducer(state, action) {
-    const filterOptions = [...state];
-    filterOptions[action.groupIndex].options[action.optionIndex].enabled =
-        action.state;
-    setSkip(0);
-    setHasMore(true);
-    setResults(fetchFeedData(0, limit, filterOptions));
-    return filterOptions;
-  }
+function FeedComp({results, hasMore, fetchMore, filterOptions, updateFilterOption}) {
   return (
     <>
       <div className="Sider">
         <Sider>
           <FilterMenu
             options={filterOptions}
-            filterOptionsDispatch={filterOptionsDispatch}
+            updateFilterOption={updateFilterOption}
           />
         </Sider>
       </div>
