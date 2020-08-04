@@ -1,5 +1,10 @@
-.ScrollContainer {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+.feed-container {
+  display: grid;
+  grid-template-columns: 1fr 4fr 1fr;
+  justify-content: flex-start;
+}
+
+.feed-items {
+  grid-column: 2 / 3;
+  min-width: 100%;
 }

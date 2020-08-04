@@ -1,0 +1,36 @@
+.Container {
+  display: grid;
+  grid-template-columns: minmax(90px, 100px) minmax(460px, 4fr) 1fr;
+  align-items: center;
+  border-bottom: 1px solid #dcdce0;
+}
+
+.Avatar {
+  grid-column: 1/2;
+}
+
+.Name {
+  grid-column: 2/3;
+  overflow: hidden;
+}
+
+.Follow {
+  grid-column: 3/4;
+}
+
+@media screen and (max-width: 814px) {
+  .Container {
+    display: grid;
+    grid-template-columns: minmax(90px, 100px) minmax(360px, 4fr) 1fr;
+    align-items: center;
+    padding: 0px 10px;
+  }
+}
+@media screen and (max-width: 614px) {
+  .Container {
+    display: grid;
+    grid-template-columns: minmax(90px, 100px) minmax(260px, 4fr) 1fr;
+    align-items: center;
+    padding: 0px 10px;
+  }
+}

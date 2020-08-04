@@ -3,6 +3,7 @@ body {
   font-family: 'Roboto', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box;
 
   font-size: 16px;
 }
@@ -35,4 +36,8 @@ h3 {
 h4 {
   font-size: 1em;
   margin: 0;
+}
+
+a {
+  color: #00507c;
 }

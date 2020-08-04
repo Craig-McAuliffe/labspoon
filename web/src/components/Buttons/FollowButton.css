@@ -1,0 +1,96 @@
+.FollowButton {
+  display: inline-block;
+  border: none;
+  padding: 10px 15px 5px 15px;
+  border-radius: 4%;
+  text-decoration: none;
+  background: #00507c;
+  color: #ffffff;
+  cursor: pointer;
+  text-align: center;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  box-sizing: border-box;
+}
+
+.FollowButton:hover,
+.FollowButton:focus {
+  border: 2px solid #00507c;
+  display: inline-block;
+  padding: 8px 13px 3px 13px;
+  border-radius: 4%;
+  text-decoration: none;
+  background: #ffffff;
+  color: #00507c;
+  cursor: pointer;
+  text-align: center;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  outline: none;
+}
+
+.FollowButton:active {
+  border: 2px solid #00507c;
+  display: inline-block;
+  padding: 8px 13px 3px 13px;
+  border-radius: 4%;
+  text-decoration: none;
+  background: #ffffff;
+  color: #00507c;
+  cursor: pointer;
+  text-align: center;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  outline: none;
+}
+
+.UnfollowButton {
+  display: inline-block;
+  border: none;
+  padding: 10px 15px 5px 15px;
+  border-radius: 4%;
+  text-decoration: none;
+  background: #ffffff;
+  color: #99999f;
+  cursor: pointer;
+  text-align: center;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  outline: none;
+}
+
+.UnfollowButton:hover,
+.UnfollowButton:focus {
+  border: none;
+  display: inline-block;
+  padding: 10px 15px 5px 15px;
+  border-radius: 4%;
+  text-decoration: none;
+  background: #ffffff;
+  color: #00507c;
+  cursor: pointer;
+  text-align: center;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  outline: none;
+}
+
+.FollowButton:active {
+  border: none;
+  display: inline-block;
+  padding: 10px 15px 5px 15px;
+  border-radius: 4%;
+  text-decoration: none;
+  background: #ffffff;
+  color: #00507c;
+  cursor: pointer;
+  text-align: center;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  outline: none;
+}
+
+.TextContainer {
+  display: flex;
+  align-items: center;
+}

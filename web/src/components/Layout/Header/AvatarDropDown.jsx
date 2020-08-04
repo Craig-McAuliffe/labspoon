@@ -9,7 +9,7 @@ import {
 } from '../../../assets/MenuIcons';
 
 import {AuthContext} from '../../../App';
-import NoUserIcon from '../../../assets/NoUserIcon.svg';
+import DefaultUserIcon from '../../../assets/DefaultUserIcon.svg';
 import Dropdown from 'react-bootstrap/Dropdown';
 
 import './AvatarDropDown.css';
@@ -37,13 +37,13 @@ const AvatarDropDown = () => {
             </Link>
           </Dropdown.Item>
           <Dropdown.Item>
-            <Link to="/account">
+            <Link to="/settings">
               <AccountMenuIcon />
-              <p className="LinkItem">Account</p>
+              <p className="LinkItem">Account Settings</p>
             </Link>
           </Dropdown.Item>
           <Dropdown.Item>
-            <Link to="/userprofile">
+            <Link to="/profile">
               <UserProfileMenuIcon />
               <p className="LinkItem">Profile</p>
             </Link>
@@ -65,14 +65,14 @@ const AvatarDropDown = () => {
 
 const AvatarToggle = () => (
   <div className="DropDownHeader">
-    <img src={NoUserIcon} alt="user icon" />
+    <img src={DefaultUserIcon} alt="user icon" />
     <p>First Name</p>
   </div>
 );
 
 const AvatarToggleSmall = () => (
   <div className="DropDownHeaderSmall">
-    <img src={NoUserIcon} alt="user icon" />
+    <img src={DefaultUserIcon} alt="user icon" />
   </div>
 );
 

@@ -1,0 +1,26 @@
+.optional-tags {
+  padding: 15px 20px;
+}
+
+.optional-tag-container {
+  display: grid;
+  justify-content: flex-start;
+  grid-template-columns: 40px minmax(110px, 2fr) 11fr;
+  padding-left: 2vw;
+  border-left: 2px solid #3099d3;
+  border-right: 2px solid #3099d3;
+}
+
+.optional-tag-icon {
+  grid-column: 1 / 3;
+}
+
+.optional-tag-name {
+  text-transform: capitalize;
+  grid-column: 2 / 3;
+  align-self: center;
+}
+.optional-tag-content {
+  grid-column: 3 / 4;
+  align-self: center;
+}
