@@ -4,6 +4,7 @@ import PostList from '../../components/Posts/PostList/PostList';
 import {
   FilterMenu, getFilterGroupEnabledIDsSet
 } from '../../components/Filter/Filter';
+import Sider from '../../components/Layout/Sider/Sider';
 
 const patrickData = {
   'name': 'Patrick Leask',
@@ -252,16 +253,22 @@ export default function FollowingFeedPage() {
     return filterOptions;
   }
   return (
-    <div>
-      <FilterMenu
-        options={filterOptions}
-        filterOptionsDispatch={filterOptionsDispatch}
-      />
-      <PostList
-        results={results}
-        hasMore={hasMore}
-        fetchMore={fetchMore}
-      />
-    </div>
+    <>
+      <div className="Sider">
+        <Sider>
+          <FilterMenu
+            options={filterOptions}
+            filterOptionsDispatch={filterOptionsDispatch}
+          />
+        </Sider>
+      </div>
+      <div className="Content">
+        <PostList
+          results={results}
+          hasMore={hasMore}
+          fetchMore={fetchMore}
+        />
+      </div>
+    </>
   );
 }

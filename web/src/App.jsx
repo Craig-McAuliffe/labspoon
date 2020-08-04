@@ -3,7 +3,6 @@ import {BrowserRouter as Router} from 'react-router-dom';
 import Routes from './routes.jsx';
 
 import Header from './components/Layout/Header/Header';
-import Sider from './components/Layout/Sider/Sider';
 
 import './App.css';
 
@@ -31,10 +30,7 @@ const AppLayout = ({children}) => {
         <Header />
       </div>
       <div className="Main">
-        <div className="Sider">
-          <Sider />
-        </div>
-        <div className="Content">{children}</div>
+        {children}
       </div>
     </div>
   );
