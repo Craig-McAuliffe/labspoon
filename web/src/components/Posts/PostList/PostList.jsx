@@ -12,6 +12,8 @@ for (let i = 0; i < 20; i++) {
       title:
         'The National Lung Matrix Trial of personalized therapy in lung' +
         ' cancer ',
+      text:
+        'This is an example of a text post! And thus the old man said unto him, Such is the way of things. The boy, however, remained sulky, for he had not yet learned the fruitlessness of a pursuit of perfection.',
       type: 'open position',
       author: {
         name: 'Patrick Leask',
@@ -19,9 +21,7 @@ for (let i = 0; i < 20; i++) {
         avatar:
           'https://i.picsum.photos/id/804/200/200.jpg?hmac=73qw3Bnt67aOsdWd033BvfX9Gq0gIJ6FSL3Dp3gA97E',
       },
-      content: {
-        text: 'This is an example of a text post!',
-      },
+
       topics: [
         {
           id: 'slkdfjsfioef',
@@ -63,12 +63,16 @@ for (let i = 0; i < 20; i++) {
         },
         {
           type: 'researcher',
-          content: {
-            researcher: {
+          content: [
+            {
               name: 'Craig McAuliffe',
               id: '57ajf92',
             },
-          },
+            {
+              name: 'Patrick Leask',
+              id: 'yomamma',
+            },
+          ],
         },
       ],
     },

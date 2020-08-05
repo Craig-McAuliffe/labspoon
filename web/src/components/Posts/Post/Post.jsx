@@ -1,5 +1,5 @@
 import React from 'react';
-import Image from 'react-bootstrap/Image';
+
 import {
   LectureIcon,
   ProjectIcon,
@@ -15,6 +15,7 @@ import PostActions from './PostParts/PostActions';
 
 import './Post.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import UserAvatar from '../../Avatar/UserAvatar';
 
 export default function Post({content}) {
   const postTypeIcons = () => {
@@ -76,11 +77,10 @@ export default function Post({content}) {
     return (
       <div className="post-header">
         <div className="post-header-profile">
-          <Image
+          <UserAvatar
             className="post-header-avatar"
             src={content.author.avatar}
-            roundedCircle
-            width="60px"
+            width="80px"
           />
           <h2>{content.author.name}</h2>
         </div>

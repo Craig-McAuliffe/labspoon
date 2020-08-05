@@ -1,22 +1,41 @@
 import React from 'react';
 
+import {Link} from 'react-router-dom';
+
 import {
   FunderIcon,
   SalaryIcon,
   LocationIcon,
   MethodsIcon,
   CalendarIcon,
+  ResearcherIcon,
 } from '../../../../assets/PostOptionalTagsIcons';
-
-import {ResearcherTag} from '../../../ResultsLists/ResearcherListing';
 
 import './PostOptionalTags.css';
 const PostOptionalTags = ({optionalTags}) => {
   if (optionalTags.length > 0) {
     const optionalTagItems = optionalTags.map((optionalTag) => {
-      if (optionalTag.type == 'researcher')
-        return <ResearcherTag id={optionalTag.content.researcher.id} />;
-      else
+      if (optionalTag.type == 'researcher') {
+        return (
+          <div key={optionalTag.type} className="optional-tag-researcher">
+            <OptionalTagIcon
+              type={optionalTag.type}
+              className="optional-tag-icon"
+            />
+            <div className="optional-tag-researcher-container">
+              {optionalTag.content.map((researcher) => (
+                <Link
+                  to={`/profile/${researcher.id}`}
+                  key={researcher.id}
+                  className="optional-tag-researcher-name"
+                >
+                  {researcher.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        );
+      } else
         return (
           <div key={optionalTag.type} className="optional-tag">
             <OptionalTagIcon
@@ -53,7 +72,7 @@ const OptionalTagIcon = ({type}) => {
       return <SalaryIcon />;
       break;
     case 'researcher':
-      return <ResearcherTag />;
+      return <ResearcherIcon />;
       break;
     default:
       return <div></div>;

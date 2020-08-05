@@ -1,6 +1,6 @@
 .text-post {
-  margin: 2px 2px 0px 2px;
-  padding: 20px 4px;
+  margin: 2px 2px 20px 2px;
+  padding: 20px 16px;
   flex-grow: 1;
   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.3);
 }
@@ -10,11 +10,13 @@
   align-items: center;
   justify-content: space-between;
   flex-wrap: nowrap;
-  margin: 2px 0px 5px;
+  margin-bottom: 5px;
+  border-bottom: 1px solid #dcdce0;
 }
 
 .post-text-content {
   min-width: 100%;
+  margin: 10px 0px;
 }
 
 .post-header-profile {
@@ -43,7 +45,7 @@
 }
 
 .post-topics {
-  margin-bottom: 10px;
+  margin: 10px 0px 0px;
   display: grid;
   grid-template-columns: 30px 1fr;
 }

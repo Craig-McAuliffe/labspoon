@@ -23,7 +23,6 @@ const PostActions = () => {
 
   const actionTaken = (actionType) => {
     const switcheroo = !selectionState[actionType];
-    console.log(selectionState);
     changeSelectionState((selectionState) => ({
       ...selectionState,
       [actionType]: switcheroo,
