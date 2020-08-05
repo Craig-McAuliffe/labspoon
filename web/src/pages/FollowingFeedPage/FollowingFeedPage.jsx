@@ -62,7 +62,7 @@ export default function FollowingFeedPage() {
       DisplayComponent={FeedComp}
       fetchResults={fetchFeedData}
       defaultFilter={filterOptionsData}
-      limit={5}
+      limit={10}
     />
   );
 }
