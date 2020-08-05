@@ -31,8 +31,8 @@ const PostActions = () => {
   };
 
   return (
-    <Row className="post-actions">
-      <div>
+    <div className="post-actions">
+      <div className="button-container">
         <ToGroupIconSelector selectionState={selectionState} />
         <button
           className="action-button"
@@ -42,7 +42,7 @@ const PostActions = () => {
           Re-Post to Group
         </button>
       </div>
-      <div>
+      <div className="button-container">
         <ShareIconSelector selectionState={selectionState} />
         <button
           className="action-button"
@@ -52,7 +52,7 @@ const PostActions = () => {
           Share
         </button>
       </div>
-      <div>
+      <div className="button-container">
         <BookmarkIconSelector selectionState={selectionState} />
         <button
           className="action-button"
@@ -62,7 +62,7 @@ const PostActions = () => {
           Bookmark
         </button>
       </div>
-      <div>
+      <div className="button-container">
         <RecommendIconSelector selectionState={selectionState} />
         <button
           className="action-button"
@@ -72,7 +72,7 @@ const PostActions = () => {
           Recommend
         </button>
       </div>
-    </Row>
+    </div>
   );
 };
 

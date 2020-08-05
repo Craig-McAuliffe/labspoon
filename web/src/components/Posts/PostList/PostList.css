@@ -1,10 +1,20 @@
 .feed-container {
   display: grid;
-  grid-template-columns: 1fr 4fr 1fr;
-  justify-content: flex-start;
+  grid-template-columns: minmax(5px, 1fr) minmax(408px, 1070px) minmax(5px, 1fr);
 }
 
 .feed-items {
   grid-column: 2 / 3;
+  justify-self: flex-start;
+  min-width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.infinite-scroll-component__outerdiv {
+  min-width: 100%;
+}
+
+.infinite-scroll-component {
   min-width: 100%;
 }

@@ -1,12 +1,12 @@
-.optional-tags {
-  padding: 15px 20px;
+.optional-tag-container {
+  padding: 15px 10px;
 }
 
-.optional-tag-container {
+.optional-tag {
   display: grid;
   justify-content: flex-start;
   grid-template-columns: 40px minmax(110px, 2fr) 11fr;
-  padding-left: 2vw;
+  padding-left: 15px;
   border-left: 2px solid #3099d3;
   border-right: 2px solid #3099d3;
 }

@@ -180,6 +180,7 @@ export default function PostList() {
           next={fetchMore}
           loader={<p>Loading...</p>}
           endMessage={<p>No more results</p>}
+          style={{'min-width': '100%'}}
         >
           {results}
         </InfiniteScroll>

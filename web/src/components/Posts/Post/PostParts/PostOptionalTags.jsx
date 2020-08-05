@@ -8,17 +8,17 @@ import {
   CalendarIcon,
 } from '../../../../assets/PostOptionalTagsIcons';
 
-import ResearcherListing from '../../../ResultsLists/ResearcherListing';
+import {ResearcherTag} from '../../../ResultsLists/ResearcherListing';
 
 import './PostOptionalTags.css';
 const PostOptionalTags = ({optionalTags}) => {
   if (optionalTags.length > 0) {
     const optionalTagItems = optionalTags.map((optionalTag) => {
       if (optionalTag.type == 'researcher')
-        return <ResearcherListing id={optionalTag.content.researcher.id} />;
+        return <ResearcherTag id={optionalTag.content.researcher.id} />;
       else
         return (
-          <div key={optionalTag.type} className="optional-tag-container">
+          <div key={optionalTag.type} className="optional-tag">
             <OptionalTagIcon
               type={optionalTag.type}
               className="optional-tag-icon"
@@ -28,7 +28,7 @@ const PostOptionalTags = ({optionalTags}) => {
           </div>
         );
     });
-    return <div className="optional-tags">{optionalTagItems}</div>;
+    return <div className="optional-tag-container">{optionalTagItems}</div>;
   } else return null;
 };
 
@@ -53,7 +53,7 @@ const OptionalTagIcon = ({type}) => {
       return <SalaryIcon />;
       break;
     case 'researcher':
-      return <ResearcherListing />;
+      return <ResearcherTag />;
       break;
     default:
       return <div></div>;

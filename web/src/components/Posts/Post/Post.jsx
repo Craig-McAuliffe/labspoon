@@ -1,6 +1,4 @@
 import React from 'react';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
 import Image from 'react-bootstrap/Image';
 import {
   LectureIcon,
@@ -61,16 +59,16 @@ export default function Post({content}) {
 
   function postTopics() {
     return (
-      <Row className="post-topics">
-        <p>
-          <span className="topics-subTitle">Topics: </span>
+      <div className="post-topics">
+        <p className="topics-sub-title">Topics: </p>
+        <div className="topic-names-container">
           {content.topics.map((topic) => (
             <a key={topic.id} href="/" className="topic-names">
               {topic.name}{' '}
             </a>
           ))}
-        </p>
-      </Row>
+        </div>
+      </div>
     );
   }
 
@@ -96,12 +94,12 @@ export default function Post({content}) {
   }
 
   return (
-    <Container fluid key={content.id} className="text-post">
+    <div className="text-post">
       {postHeader()}
       {postTextContent()}
       <PostOptionalTags optionalTags={content.optionaltags} />
       {postTopics()}
       <PostActions />
-    </Container>
+    </div>
   );
 }

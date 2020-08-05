@@ -17,12 +17,4 @@ export const UnfollowButton = ({changeButtonState}) => (
   </button>
 );
 
-export const FollowButtonLarge = () => (
-  <button className="FollowButton">
-    <div className="TextContainer">
-      <h2>Follow</h2>
-    </div>
-  </button>
-);
-
 export default FollowButton;
