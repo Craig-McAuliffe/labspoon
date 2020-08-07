@@ -1,194 +1,38 @@
-import React, {useState} from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Post from '../Post/Post';
 
 import './PostList.css';
 
-const testData = [];
-for (let i = 0; i < 20; i++) {
-  testData.push(
-    {
-      id: 'o3bosfseself' + i,
-      title:
-        'The National Lung Matrix Trial of personalized therapy in lung' +
-        ' cancer ',
-      text:
-        'This is an example of a text post! And thus the old man said unto him, Such is the way of things. The boy, however, remained sulky, for he had not yet learned the fruitlessness of a pursuit of perfection.',
-      type: 'open position',
-      author: {
-        name: 'Patrick Leask',
-        id: '283h8wef8shef',
-        avatar:
-          'https://i.picsum.photos/id/804/200/200.jpg?hmac=73qw3Bnt67aOsdWd033BvfX9Gq0gIJ6FSL3Dp3gA97E',
-      },
-
-      topics: [
-        {
-          id: 'slkdfjsfioef',
-          name: 'Biology',
-        },
-        {
-          id: '283oiwef',
-          name: 'Physics',
-        },
-        {
-          id: 'zkjdf8oziow',
-          name: 'Astronomy',
-        },
-      ],
-      optionaltags: [
-        {
-          type: 'location',
-          content: 'London, United Kingdom',
-        },
-        {
-          type: 'methods',
-          content: 'Microsoft Excel',
-        },
-        {
-          type: 'start date',
-          content: '2nd January 2021',
-        },
-        {
-          type: 'salary',
-          content: '£0.01',
-        },
-        {
-          type: 'funder',
-          content: 'GSK',
-        },
-        {
-          type: 'amount',
-          content: '$1 Billion',
-        },
-        {
-          type: 'researcher',
-          content: [
-            {
-              name: 'Craig McAuliffe',
-              id: '57ajf92',
-            },
-            {
-              name: 'Patrick Leask',
-              id: 'yomamma',
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: 'o3bosfseself' + i,
-      title:
-        'The National Lung Matrix Trial of personalized therapy in lung' +
-        ' cancer ',
-      type: 'news',
-      author: {
-        name: 'Patrick Leask',
-        id: '283h8wef8shef',
-        avatar:
-          'https://i.picsum.photos/id/804/200/200.jpg?hmac=73qw3Bnt67aOsdWd033BvfX9Gq0gIJ6FSL3Dp3gA97E',
-      },
-      content: {
-        text: 'This is an example of a text post!',
-      },
-      topics: [
-        {
-          id: 'slkdfjsfioef',
-          name: 'Biology',
-        },
-        {
-          id: '283oiwef',
-          name: 'Physics',
-        },
-        {
-          id: 'zkjdf8oziow',
-          name: 'Astronomy',
-        },
-      ],
-      optionaltags: [],
-    },
-    {
-      id: 'o3bosfseself' + i,
-      title:
-        'The National Lung Matrix Trial of personalized therapy in lung' +
-        ' cancer ',
-      type: 'publication',
-      author: {
-        name: 'Patrick Leask',
-        id: '283h8wef8shef',
-        avatar:
-          'https://i.picsum.photos/id/804/200/200.jpg?hmac=73qw3Bnt67aOsdWd033BvfX9Gq0gIJ6FSL3Dp3gA97E',
-      },
-      content: {
-        text: 'This is an example of a text post!',
-      },
-      topics: [
-        {
-          id: 'slkdfjsfioef',
-          name: 'Biology',
-        },
-        {
-          id: '283oiwef',
-          name: 'Physics',
-        },
-        {
-          id: 'zkjdf8oziow',
-          name: 'Astronomy',
-        },
-      ],
-      optionaltags: [
-        {
-          type: 'start date',
-          content: '2nd January 2021',
-        },
-        {
-          type: 'salary',
-          content: '£0.01',
-        },
-        {
-          type: 'funder',
-          content: 'GSK',
-        },
-      ],
-    }
-  );
-}
-
-function fetchTestData(skip, limit) {
-  return testData
-    .slice(skip, skip + limit)
-    .map((val) => <Post key={val.id} content={val} />);
-}
-
-export default function PostList() {
-  const limit = 8;
-  const [hasMore, setHasMore] = useState(true);
-  const [skip, setSkip] = useState(0);
-  const [results, setResults] = useState(fetchTestData(skip, limit));
-
-  function fetchMore() {
-    setSkip(skip + limit);
-    const newResults = fetchTestData(skip + limit, limit);
-    if (newResults.length < limit) {
-      setHasMore(false);
-    }
-    setResults(results.concat(newResults));
-  }
-
+/**
+ * Displays an infinitely scrolling list of posts.
+ * @param {Array} results - results to render
+ * @param {Boolean} hasMore - whether there are more results that can be loaded
+ * @param {Function} fetchMore - when called returns the next page of results
+ * @return {React.ReactElement}
+ */
+export default function PostList({results, hasMore, fetchMore}) {
+  const posts = results.map((result) => <Post key={result.id} post={result} />);
   return (
     <div className="feed-container">
       <div className="feed-items">
         <InfiniteScroll
-          dataLength={results.length}
+          dataLength={posts.length}
           hasMore={hasMore}
           next={fetchMore}
           loader={<p>Loading...</p>}
           endMessage={<p>No more results</p>}
           style={{'min-width': '100%'}}
         >
-          {results}
+          {posts}
         </InfiniteScroll>
       </div>
     </div>
   );
 }
+PostList.propTypes = {
+  results: PropTypes.array.isRequired,
+  hasMore: PropTypes.bool.isRequired,
+  fetchMore: PropTypes.func.isRequired,
+};

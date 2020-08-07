@@ -12,8 +12,10 @@ import {
 } from '../../../../assets/PostOptionalTagsIcons';
 
 import './PostOptionalTags.css';
+
 const PostOptionalTags = ({optionalTags}) => {
-  if (optionalTags.length > 0) {
+  if (optionalTags.length == 0 || !optionalTags) return null;
+  else {
     const optionalTagItems = optionalTags.map((optionalTag) => {
       if (optionalTag.type == 'researcher') {
         return (
@@ -48,7 +50,7 @@ const PostOptionalTags = ({optionalTags}) => {
         );
     });
     return <div className="optional-tag-container">{optionalTagItems}</div>;
-  } else return null;
+  }
 };
 
 const OptionalTagIcon = ({type}) => {

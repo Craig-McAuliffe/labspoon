@@ -2,6 +2,12 @@ import React, {useEffect} from 'react';
 import firebase from '../../firebase.js';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 
+/**
+* Sign in page using the Firebase authentication handler
+* @param {Function} setUser - function that updates the auth context upon a
+* sign in event
+* @return {React.ReactElement}
+*/
 function LoginPage({user, setUser}) {
   let UIConfig = {
     signInFlow: 'popup',

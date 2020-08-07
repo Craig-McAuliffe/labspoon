@@ -3,11 +3,14 @@ import {BrowserRouter as Router} from 'react-router-dom';
 import Routes from './routes.jsx';
 
 import Header from './components/Layout/Header/Header';
-import Sider from './components/Layout/Sider/Sider';
 
 import './App.css';
 
-function App() {
+/**
+ * Primary entry point into the app
+ * @return {React.ReactElement}
+ */
+export default function App() {
   const [user, setUser] = useState({});
   return (
     <AuthContext.Provider value={{user, setUser}}>
@@ -26,17 +29,9 @@ const AppLayout = ({children}) => {
       <div className="Header">
         <Header />
       </div>
-      <div className="Main">
-        <div className="Sider">
-          <Sider />
-        </div>
-        <div className="Content">{children}</div>
-        <div className="right-sider">Adverts and such</div>
-      </div>
+      <div className="Main">{children}</div>
     </div>
   );
 };
 
 export const AuthContext = React.createContext();
-
-export default App;

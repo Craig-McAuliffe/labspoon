@@ -1,17 +1,21 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import {Switch, Route, Redirect} from 'react-router-dom';
-import SettingsPage from './Pages/SettingsPage';
-import BookmarksPage from './Pages/BookmarksPage';
-import FollowingFeedPage from './Pages/FollowingFeedPage';
-import GraphPage from './Pages/GraphPage';
-import GroupPage from './Pages/GroupPage';
-import FollowsPage from './Pages/FollowsPage';
-import SearchPage from './Pages/SearchPage';
-import ProfilePage from './Pages/ProfilePage';
-import LoginPage from './Pages/LoginPage';
+import SettingsPage from './pages/SettingsPage';
+import BookmarksPage from './pages/BookmarksPage';
+import FollowingFeedPage from './pages/FollowingFeedPage';
+import GraphPage from './pages/GraphPage';
+import GroupPage from './pages/GroupPage';
+import FollowsPage from './pages/FollowsPage';
+import SearchPage from './pages/SearchPage';
+import ProfilePage from './pages/ProfilePage';
+import LoginPage from './pages/LoginPage';
 
-const Routes = (user, setUser) => {
+/**
+ * Top level routing structure for the app.
+ */
+export default function Routes(user, setUser) {
   return (
     <Switch>
       <Route exact path="/">
@@ -43,8 +47,13 @@ const Routes = (user, setUser) => {
       </AuthRoute>
     </Switch>
   );
-};
+}
 
+/**
+ * Route wrapper that redirects to the login screen if the user is not
+ * authenticated
+ * @return {Route}
+ */
 function AuthRoute({user, children, ...rest}) {
   return (
     <Route
@@ -64,5 +73,7 @@ function AuthRoute({user, children, ...rest}) {
     />
   );
 }
-// Redirects to login screen if not authenticated
-export default Routes;
+AuthRoute.propTypes = {
+  user: PropTypes.any.isRequired,
+  children: PropTypes.element,
+};

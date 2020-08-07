@@ -1,12 +1,11 @@
 import React from 'react';
 
 import './Sider.css';
-const Sider = () => {
+
+export default function Sider({children}) {
   return (
     <div className="SiderContainer">
-      <p>Hi There</p>
+      {children}
     </div>
   );
 };
-
-export default Sider;

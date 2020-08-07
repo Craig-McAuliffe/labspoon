@@ -23,3 +23,7 @@
 /web/npm-debug.log*
 /web/yarn-debug.log*
 /web/yarn-error.log*
+
+*~
+*.swp
+*.swo
