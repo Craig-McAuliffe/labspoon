@@ -1,6 +1,6 @@
-.HeaderContainer {
+.header-container {
   display: grid;
-  grid-template-columns: 250px 1fr 250px;
+  grid-template-columns: 252px 1fr 252px;
   grid-template-rows: none;
   align-items: center;
   background: #eaf1f5;
@@ -9,38 +9,45 @@
   height: 100%;
 }
 
-.HeaderSearch {
-  justify-self: center;
-  grid-column: 2 / 3;
-  display: flex;
-  align-items: flex-start;
+.header-search {
+  grid-column: 2/3;
+  display: grid;
+  grid-template-columns: minmax(5px, 1fr) minmax(408px, 1070px) minmax(5px, 1fr);
+  justify-self: flex-start;
   width: 100%;
 }
 
-.HeaderLogo {
+.search-bar {
+  grid-column: 2 / 3;
+  display: flex;
+  align-items: center;
+  justify-self: center;
+  min-width: 100%;
+}
+
+.header-logo {
   display: inline-block;
   padding-left: 10px;
   grid-column: 1 / 2;
 }
 
-.SearchIcon {
+.search-icon {
   display: inline-block;
 }
 
-.SearchIconSmall {
+.search-icon-small {
   display: none;
 }
 
-.HeaderSearch input {
+.header-search input {
   display: inline-block;
-  width: 90%;
   flex-grow: 1;
   height: 38px;
   border: 1px solid #00507c;
   border-radius: 0%;
 }
 
-.HeaderDropDown {
+.header-drop-down {
   display: inline-block;
   justify-self: flex-end;
   padding-right: 20px;
@@ -49,7 +56,7 @@
 }
 
 @media screen and (max-width: 1007px) {
-  .HeaderContainer {
+  .header-container {
     display: grid;
     grid-template-columns: 100px 1fr 100px;
     grid-template-rows: none;
@@ -60,7 +67,7 @@
     height: 100%;
   }
 
-  .HeaderDropDown {
+  .header-drop-down {
     display: inline-block;
     justify-self: flex-end;
     padding-right: 15px;
@@ -70,15 +77,15 @@
 }
 
 @media screen and (max-width: 664px) {
-  .SearchIcon {
+  .search-icon {
     display: none;
   }
 
-  .SearchIconSmall {
+  .search-icon-small {
     display: inline-block;
   }
 
-  .HeaderContainer {
+  .header-container {
     display: grid;
     grid-template-columns: 80px 1fr 80px;
     grid-template-rows: none;
@@ -90,8 +97,8 @@
   }
 }
 
-@media screen and (max-width: 470px) {
-  .HeaderContainer {
+@media screen and (max-width: 780px) {
+  .header-container {
     display: grid;
     grid-template-columns: 75px 1fr 80px;
     grid-template-rows: none;
@@ -103,14 +110,14 @@
   }
 }
 @media screen and (max-width: 368px) {
-  .SearchIcon {
+  .search-icon {
     display: none;
   }
 
-  .SearchIconSmall {
+  .search-icon-small {
     display: none;
   }
-  .HeaderContainer {
+  .header-container {
     display: grid;
     grid-template-columns: 60px 1fr 60px;
     grid-template-rows: none;
@@ -121,7 +128,7 @@
     height: 100%;
   }
 
-  .HeaderDropDown {
+  .header-drop-down {
     display: inline-block;
     justify-self: flex-end;
     padding-right: 10px;

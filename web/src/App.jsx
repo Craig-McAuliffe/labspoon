@@ -8,9 +8,9 @@ import Header from './components/Layout/Header/Header';
 import './App.css';
 
 /**
-* Primary entry point into the app
-* @return {React.ReactElement}
-*/
+ * Primary entry point into the app
+ * @return {React.ReactElement}
+ */
 export default function App() {
   return (
     <AuthProvider>
@@ -29,9 +29,7 @@ const AppLayout = ({children}) => {
       <div className="Header">
         <Header />
       </div>
-      <div className="Main">
-        {children}
-      </div>
+      <div className="Main">{children}</div>
     </div>
   );
 };

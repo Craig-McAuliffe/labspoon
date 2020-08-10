@@ -1,9 +1,10 @@
-import React, {useReducer, useState} from 'react';
+import React from 'react';
 
 import FilterableResults from '../../components/FilterableResults/FilterableResults';
 import PostList from '../../components/Posts/PostList/PostList';
 import {
-  FilterMenu, getFilterCollectionEnabledIDsSet
+  FilterMenu,
+  getFilterCollectionEnabledIDsSet,
 } from '../../components/Filter/Filter';
 import Sider from '../../components/Layout/Sider/Sider';
 
@@ -20,7 +21,7 @@ const filterOptionsData = getPostFilters(getFilteredTestPosts([]));
  * @param {Array} filter - filter to apply to results, see FeedPage
  * documentation
  * @return {Array}
-*/
+ */
 function fetchFeedData(skip, limit, filter) {
   const repeatedTestPosts = getFilteredTestPosts(filter);
   return repeatedTestPosts.slice(skip, skip + limit);
@@ -38,5 +39,29 @@ export default function FollowingFeedPage() {
       limit={10}
       useTabs={false}
     />
+  );
+}
+
+function FeedAndFilterComp({
+  results,
+  hasMore,
+  fetchMore,
+  filterOptions,
+  updateFilterOption,
+}) {
+  return (
+    <>
+      <div className="Sider">
+        <Sider>
+          <FilterMenu
+            options={filterOptions}
+            updateFilterOption={updateFilterOption}
+          />
+        </Sider>
+      </div>
+      <div className="Content">
+        <PostList results={results} hasMore={hasMore} fetchMore={fetchMore} />
+      </div>
+    </>
   );
 }

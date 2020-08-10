@@ -7,22 +7,24 @@ import './Header.css';
 
 const Header = () => {
   return (
-    <div className="HeaderContainer">
+    <div className="header-container">
       <Link to="/">
-        <div className="HeaderLogo">
+        <div className="header-logo">
           <HeaderLogo />
         </div>
       </Link>
-      <div className="HeaderSearch">
-        <div className="SearchIcon">
-          <SearchIcon />
+      <div className="header-search">
+        <div className="search-bar">
+          <div className="search-icon">
+            <SearchIcon />
+          </div>
+          <div className="search-icon-small">
+            <SearchIconSmall />
+          </div>
+          <input placeholder=" Search" type="text" />
         </div>
-        <div className="SearchIconSmall">
-          <SearchIconSmall />
-        </div>
-        <input placeholder=" Search" type="text" />
       </div>
-      <div className="HeaderDropDown">
+      <div className="header-drop-down">
         <AvatarDropDown />
       </div>
     </div>

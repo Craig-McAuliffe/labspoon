@@ -7,12 +7,10 @@ function getPeopleFilter(posts) {
   posts.forEach((post) => {
     if (seenIDs.has(post.author.id)) return;
     seenIDs.add(post.author.id);
-    options.push(
-      {
-        enabled: false,
-        data: post.author,
-      }
-    );
+    options.push({
+      enabled: false,
+      data: post.author,
+    });
   });
   return {
     collectionName: 'People',
@@ -30,7 +28,7 @@ function getTopicFilter(posts) {
       seenIDs.add(topic.id);
       options.push({
         enabled: false,
-        data: topic
+        data: topic,
       });
     });
   });

@@ -1,16 +1,16 @@
 export default function postTypes() {
   return [
     {
-      id: 'text',
-      name: 'text'
+      id: 'default',
+      name: 'default',
     },
     {
       id: 'publication',
-      name: 'publication'
+      name: 'publication',
     },
     {
       id: 'news',
-      name: 'news'
+      name: 'news',
     },
   ];
-};
+}

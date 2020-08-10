@@ -10,7 +10,7 @@ export const DEFAULT_TAB_IDX = 0;
 
 /**
  * Renders a filter and the provided results component.
-*/
+ */
 export default function FilterableResults({
   fetchResults,
   defaultFilter,
@@ -19,7 +19,9 @@ export default function FilterableResults({
 }) {
   const [hasMore, setHasMore] = useState(true);
   const [skip, setSkip] = useState(0);
-  const [results, setResults] = useState(fetchResults(skip, limit, defaultFilter));
+  const [results, setResults] = useState(
+    fetchResults(skip, limit, defaultFilter)
+  );
   /**
    * Filter options has the following structure:
    * [{
@@ -40,7 +42,7 @@ export default function FilterableResults({
   /**
    * Fetches the next page of results. Attempts to retrieve an extra result to
    * determine whether there are more results available.
-  */
+   */
   function fetchMore() {
     const newResults = fetchResults(skip + limit, limit + 1, filterOptions);
     if (newResults.length <= limit) {
