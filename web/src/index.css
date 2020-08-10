@@ -3,15 +3,13 @@ body {
   font-family: 'Roboto', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box;
 
   font-size: 16px;
 }
 
 h1,
-h2 {
-  font-family: 'Lato';
-}
-
+h2,
 h3,
 h4,
 h5,
@@ -29,10 +27,13 @@ h2 {
 
 h3 {
   font-size: 1.2em;
-  font-weight: bold;
 }
 
 h4 {
   font-size: 1em;
   margin: 0;
+}
+
+a {
+  color: #00507c;
 }

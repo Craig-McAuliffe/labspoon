@@ -1,9 +1,12 @@
-import React from 'react'
+import React from 'react';
 
 const BookmarksPage = () => {
-    return (
-        <p>Bookmarks Page</p>
-    )
-}
+  return (
+    <>
+      <div className="Sider"></div>
+      <div className="Content"></div>
+    </>
+  );
+};
 
 export default BookmarksPage;

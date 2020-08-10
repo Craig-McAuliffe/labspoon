@@ -16,7 +16,7 @@ import LoginPage from './pages/LoginPage';
 
 /**
  * Top level routing structure for the app.
-*/
+ */
 export default function Routes({user, setUser}) {
   return (
     <Switch>
@@ -52,13 +52,13 @@ export default function Routes({user, setUser}) {
       </Route>
     </Switch>
   );
-};
+}
 
 /**
-* Route wrapper that redirects to the login screen if the user is not
-* authenticated
-* @return {Route}
-*/
+ * Route wrapper that redirects to the login screen if the user is not
+ * authenticated
+ * @return {Route}
+ */
 function AuthRoute({children, ...rest}) {
   const user = useContext(AuthContext);
   return (
@@ -83,4 +83,3 @@ AuthRoute.propTypes = {
   user: PropTypes.any.isRequired,
   children: PropTypes.element,
 };
-
