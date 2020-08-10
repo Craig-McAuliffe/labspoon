@@ -1,14 +1,17 @@
-# env:
-#   browser: true
-#   es2020: true
-# extends:
-#   - 'plugin:react/recommended'
-#   - google
-# parserOptions:
-#   ecmaFeatures:
-#     jsx: true
-#   ecmaVersion: 11
-#   sourceType: module
-# plugins:
-#   - react
+env:
+  browser: true
+  es2020: true
+extends:
+  - 'plugin:react/recommended'
+  - google
+parserOptions:
+  ecmaFeatures:
+    jsx: true
+  ecmaVersion: 11
+  sourceType: module
+plugins:
+  - react
 # rules: {}
+rules:
+  require-jsdoc: 0
+  react/prop-types 0

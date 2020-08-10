@@ -28,31 +28,28 @@ export default function Post({post}) {
     switch (post.type.name) {
       case 'default':
         return null;
-        break;
       case 'publication':
         return <PublicationIcon />;
-        break;
       case 'news':
         return <NewsIcon />;
-        break;
       case 'open position':
         return <OpenPositionIcon />;
-        break;
       case 'project':
         return <ProjectIcon />;
-        break;
       case 'funding':
         return <FundingIcon />;
-        break;
       case 'lecture':
         return <LectureIcon />;
-        break;
       case 'member change':
         return <MemberChangeIcon />;
-        break;
       default:
-        return <div></div>;
+        return null;
     }
+  };
+
+  const postTypeName = () => {
+    if (post.type.name == 'default') return null;
+    return <h2 className="post-type-name">{post.type.name}</h2>;
   };
 
   /**
@@ -118,7 +115,7 @@ export default function Post({post}) {
 
         <div className="post-type-container">
           <div className="post-type-icon">{postTypeIcons()}</div>
-          <h2 className="post-type-name">{post.type.name}</h2>
+          {postTypeName()}
         </div>
       </div>
     );

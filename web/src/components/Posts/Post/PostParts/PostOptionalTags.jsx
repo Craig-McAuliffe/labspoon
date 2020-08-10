@@ -15,7 +15,7 @@ import './PostOptionalTags.css';
 
 const PostOptionalTags = ({optionalTags}) => {
   if (optionalTags.length == 0 || !optionalTags) return null;
-  else {
+  {
     const optionalTagItems = optionalTags.map((optionalTag) => {
       if (optionalTag.type == 'researcher') {
         return (
@@ -37,17 +37,17 @@ const PostOptionalTags = ({optionalTags}) => {
             </div>
           </div>
         );
-      } else
-        return (
-          <div key={optionalTag.type} className="optional-tag">
-            <OptionalTagIcon
-              type={optionalTag.type}
-              className="optional-tag-icon"
-            />
-            <p className="optional-tag-name">{optionalTag.type}</p>
-            <p className="optional-tag-content">{optionalTag.content}</p>
-          </div>
-        );
+      }
+      return (
+        <div key={optionalTag.type} className="optional-tag">
+          <OptionalTagIcon
+            type={optionalTag.type}
+            className="optional-tag-icon"
+          />
+          <p className="optional-tag-name">{optionalTag.type}</p>
+          <p className="optional-tag-content">{optionalTag.content}</p>
+        </div>
+      );
     });
     return <div className="optional-tag-container">{optionalTagItems}</div>;
   }
