@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Post from '../Post/Post';
-
+import PublicationListing from '../../ResourceListing/PublicationListing';
 import './PostList.css';
 
 /**
@@ -13,19 +13,18 @@ import './PostList.css';
  * @return {React.ReactElement}
  */
 export default function PostList({results, hasMore, fetchMore}) {
-  const posts = results.map((result) => <Post key={result.id} post={result} />);
   return (
     <div className="feed-container">
       <div className="feed-items">
         <InfiniteScroll
-          dataLength={posts.length}
+          dataLength={results.length}
           hasMore={hasMore}
           next={fetchMore}
           loader={<p>Loading...</p>}
           endMessage={<p>No more results</p>}
-          style={{'min-width': '100%'}}
+          style={{minWidth: '100%'}}
         >
-          {posts}
+          <PostOrResource results={results} />
         </InfiniteScroll>
       </div>
     </div>
@@ -35,4 +34,13 @@ PostList.propTypes = {
   results: PropTypes.array.isRequired,
   hasMore: PropTypes.bool.isRequired,
   fetchMore: PropTypes.func.isRequired,
+};
+
+const PostOrResource = ({results}) => {
+  const Posts = results.map((result) => {
+    if (result.category === 'resource')
+      return <PublicationListing post={result} key={result.id} />;
+    else return <Post post={result} key={result.id} />;
+  });
+  return Posts;
 };

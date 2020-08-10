@@ -14,10 +14,10 @@ import {
 import './PostOptionalTags.css';
 
 const PostOptionalTags = ({optionalTags}) => {
-  if (optionalTags.length == 0 || !optionalTags) return null;
+  if (optionalTags.length === 0 || !optionalTags) return null;
   {
     const optionalTagItems = optionalTags.map((optionalTag) => {
-      if (optionalTag.type == 'researcher') {
+      if (optionalTag.type === 'researcher') {
         return (
           <div key={optionalTag.type} className="optional-tag-researcher">
             <OptionalTagIcon
@@ -57,25 +57,18 @@ const OptionalTagIcon = ({type}) => {
   switch (type) {
     case 'location':
       return <LocationIcon />;
-      break;
     case 'methods':
       return <MethodsIcon />;
-      break;
     case 'start date':
       return <CalendarIcon />;
-      break;
     case 'salary':
       return <SalaryIcon />;
-      break;
     case 'funder':
       return <FunderIcon />;
-      break;
     case 'amount':
       return <SalaryIcon />;
-      break;
     case 'researcher':
       return <ResearcherIcon />;
-      break;
     default:
       return <div></div>;
   }

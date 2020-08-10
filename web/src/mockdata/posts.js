@@ -6,6 +6,7 @@ export default function getTestPosts(uniqueID) {
   return [
     {
       id: 'o3bosfseself' + uniqueID,
+      category: 'post',
       title:
         'The National Lung Matrix Trial of personalized therapy in' +
         'lung cancer ',
@@ -19,6 +20,7 @@ export default function getTestPosts(uniqueID) {
     },
     {
       id: '83hisefoi' + uniqueID,
+      category: 'post',
       title: 'Today I overslept',
       type: postTypes()[1],
       author: users()[1],
@@ -68,6 +70,7 @@ export default function getTestPosts(uniqueID) {
     },
     {
       id: '09w03rin' + uniqueID,
+      category: 'post',
       title: 'I hate coming up with test data',
       type: postTypes()[2],
       author: users()[0],
@@ -86,6 +89,21 @@ export default function getTestPosts(uniqueID) {
           ],
         },
       ],
+    },
+    {
+      id: '0b7sya8' + uniqueID,
+      category: 'resource',
+      title: 'This is the title from the publication',
+      type: postTypes()[1],
+      author: users()[2],
+      journal: 'Journal Name',
+      content: {
+        abstract:
+          'This is the abstract that we have automatically captured from the publication which is stored somewhere in the internet. It is rather cool is it not? Yes indeed it is. What are we talking about? Science. What type of science? You wouldnt understand, it is the science of the gods.',
+        authors: 'Bobby McGee, Sally McDee, Joshua McLee, Xi McSee',
+      },
+      topics: [topics()[3], topics()[4]],
+      optionaltags: [],
     },
   ];
 }

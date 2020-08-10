@@ -39,7 +39,7 @@ Post.propTypes = {
   post: PropTypes.shape({
     id: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
+    type: PropTypes.object.isRequired,
     author: PropTypes.shape({
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
@@ -85,7 +85,7 @@ function PostHeader({post}) {
   };
 
   const postTypeName = () => {
-    if (post.type.name == 'default') return null;
+    if (post.type.name === 'default') return null;
     return <h2 className="post-type-name">{post.type.name}</h2>;
   };
 
