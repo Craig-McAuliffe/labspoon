@@ -15,7 +15,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import './AvatarDropDown.css';
 
 const AvatarDropDown = () => {
-  const {user} = useContext(AuthContext);
+  const user = useContext(AuthContext);
   if (!user) {
     return (
       <Dropdown variant="success" id="dropdown-basic">

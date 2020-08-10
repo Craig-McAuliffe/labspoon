@@ -1,6 +1,8 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useContext} from 'react';
 import firebase from '../../firebase.js';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
+
+import {AuthContext} from '../../App';
 
 /**
 * Sign in page using the Firebase authentication handler
@@ -8,7 +10,8 @@ import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 * sign in event
 * @return {React.ReactElement}
 */
-function LoginPage({user, setUser}) {
+function LoginPage() {
+  const user = useContext(AuthContext);
   let UIConfig = {
     signInFlow: 'popup',
     signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
@@ -16,12 +19,6 @@ function LoginPage({user, setUser}) {
       signInSuccessWithAuthResult: () => false,
     },
   };
-  useEffect(() => {
-    const unregisterAuthObserver = firebase
-      .auth()
-      .onAuthStateChanged((user) => setUser(user));
-    return unregisterAuthObserver;
-  });
   if (!user) {
     return (
       <div>
@@ -38,7 +35,6 @@ function LoginPage({user, setUser}) {
         <p>signed in</p>
         <a
           onClick={() => {
-            console.log('clicked sign out');
             firebase.auth().signOut();
           }}
         >

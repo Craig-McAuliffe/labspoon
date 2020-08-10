@@ -1,5 +1,7 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
+
+import {AuthContext} from './App';
 
 import {Switch, Route, Redirect} from 'react-router-dom';
 import SettingsPage from './pages/SettingsPage';
@@ -15,14 +17,14 @@ import LoginPage from './pages/LoginPage';
 /**
  * Top level routing structure for the app.
 */
-export default function Routes(user, setUser) {
+export default function Routes({user, setUser}) {
   return (
     <Switch>
       <Route exact path="/">
         <FollowingFeedPage />
       </Route>
       <Route path="/login">
-        <LoginPage user={user} setUser={setUser} />
+        <LoginPage />
       </Route>
       <AuthRoute user={user} path="/settings">
         <SettingsPage />
@@ -42,7 +44,7 @@ export default function Routes(user, setUser) {
       <Route path="/search">
         <SearchPage />
       </Route>
-      <AuthRoute user={user} path="/profile">
+      <AuthRoute user={user}path="/profile">
         <ProfilePage />
       </AuthRoute>
       <Route path="/">
@@ -57,7 +59,8 @@ export default function Routes(user, setUser) {
 * authenticated
 * @return {Route}
 */
-function AuthRoute({user, children, ...rest}) {
+function AuthRoute({children, ...rest}) {
+  const user = useContext(AuthContext);
   return (
     <Route
       {...rest}
