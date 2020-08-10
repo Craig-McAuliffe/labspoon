@@ -1,7 +1,54 @@
-import React from 'react';
+import React, {useState} from 'react';
+import {useRouteMatch, useHistory} from 'react-router-dom';
 
-const SearchPage = () => {
-    return (<p>Search Page drillable results here.</p>)
+import FilterableResults, {getTabFromTypeFilterCollection, DEFAULT_TAB_IDX} from '../../components/FilterableResults/FilterableResults';
+import {FilterMenu, getFilterCollectionEnabledIDsSet} from '../../components/Filter/Filter';
+import Sider from '../../components/Layout/Sider/Sider';
+
+import getFilteredTestPosts from '../../mockdata/posts';
+import {getSearchFilters} from '../../mockdata/filters';
+
+function fetchResults(skip, limit, filter) {
+  const type = getTabFromTypeFilterCollection(filter[DEFAULT_TAB_IDX]);
+  switch (type) {
+    case 'posts':
+      const repeatedTestPosts = getFilteredTestPosts(filter);
+      return repeatedTestPosts.slice(skip, skip + limit);
+    default:
+      return [];
+  };
 }
 
-export default SearchPage;
+const filterOptionsData = getSearchFilters();
+
+export default function SearchPage() {
+  const [query, setQuery] = useState(useRouteMatch().params.query);
+  return (
+    <>
+      <SearchForm query={query} setQuery={setQuery}/>
+      <FilterableResults
+        fetchResults={fetchResults}
+        defaultFilter={filterOptionsData}
+        limit={5}
+        useTabs={true}
+      />
+    </>
+  );
+}
+
+function SearchForm({query, setQuery}) {
+  let history = useHistory();
+  const handleSubmit = (event) => {
+    history.push("/search/" + query);
+    event.preventDefault();
+  };
+  const onChange = (event) => {
+    setQuery(event.target.value);
+  };
+  return (
+    <form onSubmit={handleSubmit}>
+      <input type="text" value={query} onChange={onChange} />
+      <input type="submit" value="Submit"/>
+    </form>
+  );
+}
