@@ -45,6 +45,9 @@ export default function Routes(user, setUser) {
       <AuthRoute user={user} path="/profile">
         <ProfilePage />
       </AuthRoute>
+      <Route path="/">
+        <Redirect to="/"/>
+      </Route>
     </Switch>
   );
 };

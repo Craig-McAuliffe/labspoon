@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom';
 import {
   BookmarksMenuIcon,
   GroupMenuIcon,
-  AccountMenuIcon,
+  SettingsMenuIcon,
   UserProfileMenuIcon,
 } from '../../../assets/MenuIcons';
 
@@ -37,15 +37,15 @@ const AvatarDropDown = () => {
             </Link>
           </Dropdown.Item>
           <Dropdown.Item>
-            <Link to="/account">
-              <AccountMenuIcon />
-              <p className="LinkItem">Account</p>
+            <Link to="/profile">
+              <UserProfileMenuIcon />
+              <p className="LinkItem">Profile</p>
             </Link>
           </Dropdown.Item>
           <Dropdown.Item>
-            <Link to="/userprofile">
-              <UserProfileMenuIcon />
-              <p className="LinkItem">Profile</p>
+            <Link to="/settings">
+              <SettingsMenuIcon />
+              <p className="LinkItem">Settings</p>
             </Link>
           </Dropdown.Item>
           <Dropdown.Header>
