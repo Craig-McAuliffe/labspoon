@@ -8,10 +8,10 @@ import {
 } from '../../components/Filter/Filter';
 import Sider from '../../components/Layout/Sider/Sider';
 
-import getTestPosts from '../../mockdata/posts';
-import getFilterOptions from '../../mockdata/filters';
+import getFilteredTestPosts from '../../mockdata/posts';
+import {getPostFilters} from '../../mockdata/filters';
 
-const filterOptionsData = getFilterOptions(getTestPosts());
+const filterOptionsData = getPostFilters(getFilteredTestPosts([]));
 
 /**
  * Fetches test data applying pagination and a filter
@@ -23,35 +23,7 @@ const filterOptionsData = getFilterOptions(getTestPosts());
  * @return {Array}
  */
 function fetchFeedData(skip, limit, filter) {
-  let repeatedTestPosts = [];
-
-  for (let i = 0; i < 10; i++) {
-    repeatedTestPosts = repeatedTestPosts.concat(getTestPosts(i));
-  }
-
-  filter.forEach((filterCollection) => {
-    const enabledIDs = getFilterCollectionEnabledIDsSet(filterCollection);
-    if (enabledIDs.size === 0) return;
-    switch (filterCollection.collectionName) {
-      case 'People':
-        repeatedTestPosts = repeatedTestPosts.filter((post) =>
-          enabledIDs.has(post.author.id)
-        );
-        break;
-      case 'Topics':
-        repeatedTestPosts = repeatedTestPosts.filter((post) =>
-          post.topics.some((topic) => enabledIDs.has(topic.id))
-        );
-        break;
-      case 'Types':
-        repeatedTestPosts = repeatedTestPosts.filter((post) =>
-          enabledIDs.has(post.type.id)
-        );
-        break;
-      default:
-        break;
-    }
-  });
+  const repeatedTestPosts = getFilteredTestPosts(filter);
   return repeatedTestPosts.slice(skip, skip + limit);
 }
 
@@ -62,14 +34,13 @@ function fetchFeedData(skip, limit, filter) {
 export default function FollowingFeedPage() {
   return (
     <FilterableResults
-      DisplayComponent={FeedAndFilterComp}
       fetchResults={fetchFeedData}
       defaultFilter={filterOptionsData}
-      limit={5}
+      limit={10}
+      useTabs={false}
     />
   );
 }
-/** */
 function FeedAndFilterComp({
   results,
   hasMore,

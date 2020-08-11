@@ -16,7 +16,7 @@ export const BookmarksMenuIcon = () => (
   </svg>
 );
 
-export const UserProfileMenuIcon = () => (
+export const SettingsMenuIcon = () => (
   <svg
     width="16"
     height="18"
@@ -37,7 +37,7 @@ export const UserProfileMenuIcon = () => (
   </svg>
 );
 
-export const AccountMenuIcon = () => (
+export const UserProfileMenuIcon = () => (
   <svg
     width="14"
     height="17"

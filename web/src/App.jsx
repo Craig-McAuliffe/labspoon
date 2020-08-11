@@ -1,6 +1,7 @@
-import React, {useState} from 'react';
+import React, {createContext, useState, useEffect} from 'react';
 import {BrowserRouter as Router} from 'react-router-dom';
 import Routes from './routes.jsx';
+import {auth} from './firebase';
 
 import Header from './components/Layout/Header/Header';
 
@@ -11,15 +12,14 @@ import './App.css';
  * @return {React.ReactElement}
  */
 export default function App() {
-  const [user, setUser] = useState({});
   return (
-    <AuthContext.Provider value={{user, setUser}}>
+    <AuthProvider>
       <Router>
         <AppLayout>
           <Routes />
         </AppLayout>
       </Router>
-    </AuthContext.Provider>
+    </AuthProvider>
   );
 }
 
@@ -34,4 +34,16 @@ const AppLayout = ({children}) => {
   );
 };
 
-export const AuthContext = React.createContext();
+export const AuthContext = createContext(null);
+
+function AuthProvider({children}) {
+  const [user, setUser] = useState({});
+  useEffect(() =>
+    auth.onAuthStateChanged((user) => setUser(user))
+  );
+  return (
+    <AuthContext.Provider value={user}>
+      {children}
+    </AuthContext.Provider>
+  );
+}

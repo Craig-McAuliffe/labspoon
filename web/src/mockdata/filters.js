@@ -1,6 +1,7 @@
 import postTypes from './postTypes';
+import types from './types';
 
-function peopleFilter(posts) {
+function getPeopleFilter(posts) {
   let seenIDs = new Set();
   let options = [];
   posts.forEach((post) => {
@@ -14,10 +15,11 @@ function peopleFilter(posts) {
   return {
     collectionName: 'People',
     options: options,
+    mutable: true,
   };
 }
 
-function topicFilter(posts) {
+function getTopicFilter(posts) {
   let seenIDs = new Set();
   let options = [];
   posts.forEach((post) => {
@@ -33,20 +35,63 @@ function topicFilter(posts) {
   return {
     collectionName: 'Topics',
     options: options,
+    mutable: true,
   };
 }
 
-function typesFilter() {
+function getPostTypesFilter() {
   let options = postTypes().map((postType) => ({
     enabled: false,
     data: postType,
   }));
   return {
-    collectionName: 'Types',
+    collectionName: 'Post Types',
     options: options,
+    mutable: true,
   };
 }
 
-export default function getFilterOptions(posts) {
-  return [peopleFilter(posts), topicFilter(posts), typesFilter()];
+function getTypesFilter() {
+  return {
+    collectionName: 'Types',
+    options: [
+      {
+        enabled: false,
+        data: {
+          id: 'posts',
+          name: 'Posts',
+        },
+      },
+    ],
+    mutable: false,
+  };
+}
+
+function getTypesFilterForPostsList() {
+  return {
+    collectionName: 'Types',
+    options: [
+      {
+        enabled: true,
+        data: {
+          id: 'posts',
+          name: 'Posts',
+        },
+      },
+    ],
+    mutable: false,
+  };
+}
+
+export function getPostFilters(posts) {
+  return [
+    getTypesFilterForPostsList(),
+    getPeopleFilter(posts),
+    getTopicFilter(posts),
+    getPostTypesFilter(),
+  ];
+}
+
+export function getSearchFilters() {
+  return [getTypesFilter(), getPostTypesFilter()];
 }

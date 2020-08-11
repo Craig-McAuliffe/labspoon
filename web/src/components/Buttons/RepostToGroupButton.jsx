@@ -5,25 +5,14 @@ import {
 } from '../../assets/PostActionIcons';
 
 const RepostToGroupButton = ({currentState}) => {
-  const [buttonState, changeButtonState] = useState(currentState);
-  return buttonState ? (
+  const [reposted, setReposted] = useState(currentState);
+  return (
     <div className="button-container">
-      <ToGroupIconSelected />
+      {reposted ? <ToGroupIconSelected /> : <ToGroupIconUnselected />}
       <button
         className="action-button"
         href="/"
-        onClick={() => changeButtonState(false)}
-      >
-        Repost to group
-      </button>
-    </div>
-  ) : (
-    <div className="button-container">
-      <ToGroupIconUnselected />
-      <button
-        className="action-button"
-        href="/"
-        onClick={() => changeButtonState(true)}
+        onClick={() => setReposted(!reposted)}
       >
         Repost to group
       </button>

@@ -5,6 +5,8 @@ import Post from '../Post/Post';
 import PublicationListing from '../../ResourceListing/PublicationListing';
 import './PostList.css';
 
+import './PostList.css';
+
 /**
  * Displays an infinitely scrolling list of posts.
  * @param {Array} results - results to render

@@ -5,25 +5,14 @@ import {
 } from '../../assets/PostActionIcons';
 
 const BookmarkButton = ({currentState}) => {
-  const [buttonState, changeButtonState] = useState(currentState);
-  return buttonState ? (
+  const [bookmarked, setBookmarked] = useState(currentState);
+  return (
     <div className="button-container">
-      <BookmarkIconSelected />
+      {bookmarked ? <BookmarkIconSelected /> : <BookmarkIconUnselected />}
       <button
         className="action-button"
         href="/"
-        onClick={() => changeButtonState(false)}
-      >
-        Bookmark
-      </button>
-    </div>
-  ) : (
-    <div className="button-container">
-      <BookmarkIconUnselected />
-      <button
-        className="action-button"
-        href="/"
-        onClick={() => changeButtonState(true)}
+        onClick={() => setBookmarked(!bookmarked)}
       >
         Bookmark
       </button>

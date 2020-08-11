@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom';
 import {
   BookmarksMenuIcon,
   GroupMenuIcon,
-  AccountMenuIcon,
+  SettingsMenuIcon,
   UserProfileMenuIcon,
 } from '../../../assets/MenuIcons';
 
@@ -15,7 +15,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import './AvatarDropDown.css';
 
 const AvatarDropDown = () => {
-  const {user} = useContext(AuthContext);
+  const user = useContext(AuthContext);
   if (!user) {
     return (
       <Dropdown variant="success" id="dropdown-basic">
@@ -37,15 +37,15 @@ const AvatarDropDown = () => {
             </Link>
           </Dropdown.Item>
           <Dropdown.Item>
-            <Link to="/settings">
-              <AccountMenuIcon />
-              <p className="LinkItem">Account Settings</p>
-            </Link>
-          </Dropdown.Item>
-          <Dropdown.Item>
             <Link to="/profile">
               <UserProfileMenuIcon />
               <p className="LinkItem">Profile</p>
+            </Link>
+          </Dropdown.Item>
+          <Dropdown.Item>
+            <Link to="/settings">
+              <SettingsMenuIcon />
+              <p className="LinkItem">Settings</p>
             </Link>
           </Dropdown.Item>
           <Dropdown.Header>

@@ -1,8 +1,10 @@
+import {getFilterCollectionEnabledIDsSet} from '../components/Filter/Filter';
+
 import postTypes from './postTypes';
 import topics from './topics';
 import users from './users';
 
-export default function getTestPosts(uniqueID) {
+function getTestPosts(uniqueID) {
   return [
     {
       id: 'o3bosfseself' + uniqueID,
@@ -106,4 +108,35 @@ export default function getTestPosts(uniqueID) {
       optionaltags: [],
     },
   ];
+}
+
+export default function getFilteredPosts(filter) {
+  let repeatedTestPosts = [];
+  for (let i = 0; i < 10; i++) {
+    repeatedTestPosts = repeatedTestPosts.concat(getTestPosts(i));
+  }
+  filter.forEach((filterCollection) => {
+    const enabledIDs = getFilterCollectionEnabledIDsSet(filterCollection);
+    if (enabledIDs.size === 0) return;
+    switch (filterCollection.collectionName) {
+      case 'People':
+        repeatedTestPosts = repeatedTestPosts.filter((post) =>
+          enabledIDs.has(post.author.id)
+        );
+        break;
+      case 'Topics':
+        repeatedTestPosts = repeatedTestPosts.filter((post) =>
+          post.topics.some((topic) => enabledIDs.has(topic.id))
+        );
+        break;
+      case 'Post Types':
+        repeatedTestPosts = repeatedTestPosts.filter((post) =>
+          enabledIDs.has(post.type.id)
+        );
+        break;
+      default:
+        break;
+    }
+  });
+  return repeatedTestPosts;
 }

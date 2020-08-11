@@ -5,25 +5,14 @@ import {
 } from '../../assets/PostActionIcons';
 
 const RecommendButton = ({currentState}) => {
-  const [buttonState, changeButtonState] = useState(currentState);
-  return buttonState ? (
+  const [recommending, setRecommending] = useState(currentState);
+  return (
     <div className="button-container">
-      <RecommendIconSelected />
+      {recommending ? <RecommendIconSelected /> : <RecommendIconUnselected />}
       <button
         className="action-button"
         href="/"
-        onClick={() => changeButtonState(false)}
-      >
-        Recommend
-      </button>
-    </div>
-  ) : (
-    <div className="button-container">
-      <RecommendIconUnselected />
-      <button
-        className="action-button"
-        href="/"
-        onClick={() => changeButtonState(true)}
+        onClick={() => setRecommending(!recommending)}
       >
         Recommend
       </button>

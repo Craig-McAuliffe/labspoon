@@ -10,16 +10,20 @@ import PropTypes from 'prop-types';
  * @param {func} filterOptionsDispatch - update the status of an option
  * @return {React.ReactElement}
  */
-export function FilterMenu({options, updateFilterOption}) {
-  const filterCollections = options.map((optionCollection, index) =>
-    <FilterCollection
-      key={optionCollection.collectionName}
-      index={index}
-      name={optionCollection.collectionName}
-      options={optionCollection.options}
-      updateFilterOption={updateFilterOption}
-    />,
-  );
+export function FilterMenu({options, updateFilterOption, resetFilterCollection}) {
+  const filterCollections = options.map((optionCollection, index) => {
+    if (!optionCollection.mutable) return <></>;
+    return (
+      <FilterCollection
+        key={optionCollection.collectionName}
+        index={index}
+        name={optionCollection.collectionName}
+        options={optionCollection.options}
+        updateFilterOption={updateFilterOption}
+        resetFilterCollection={resetFilterCollection}
+      />
+    );
+  });
   return (
     <div>
       {filterCollections}
@@ -38,7 +42,7 @@ FilterMenu.propTypes = {
  * @param {func} filterOptionsDispatch - update the status of an option
  * @return {React.ReactElement} - a collection of filter options
  */
-function FilterCollection({name, options, index, updateFilterOption}) {
+function FilterCollection({name, options, index, updateFilterOption, resetFilterCollection}) {
   /**
    * Callback used for updating the enabled status of an option within this
    * filter collection.
@@ -51,6 +55,9 @@ function FilterCollection({name, options, index, updateFilterOption}) {
   return (
     <div>
       <b>{name}</b>
+      <button onClick={() => resetFilterCollection(index)}>
+        Reset
+      </button>
       {options.map((option, index) =>
         <FilterOption
           key={name}
@@ -83,7 +90,7 @@ function FilterOption({data, index, enabled, setOption}) {
     <div>
       <label>
         {data.name}
-        <input type="checkbox" onChange={()=>setOption(index)}/>
+        <input type="checkbox" checked={enabled} onChange={()=>setOption(index)}/>
       </label>
     </div>
   );

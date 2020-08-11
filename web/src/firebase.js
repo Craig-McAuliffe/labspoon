@@ -1,4 +1,5 @@
 import firebase from 'firebase';
+import 'firebase/auth';
 const firebaseConfig = {
   apiKey: 'AIzaSyDfyZeoIcWLlTB61hpA_K5jr4i6VXX37D8',
   authDomain: 'labspoon-dev-266bc.firebaseapp.com',
@@ -10,4 +11,5 @@ const firebaseConfig = {
   measurementId: 'G-TTJY6H2QC2',
 };
 firebase.initializeApp(firebaseConfig);
+export const auth = firebase.auth();
 export default firebase;

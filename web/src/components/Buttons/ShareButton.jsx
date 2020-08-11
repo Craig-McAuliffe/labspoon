@@ -5,25 +5,14 @@ import {
 } from '../../assets/PostActionIcons';
 
 const ShareButton = ({currentState}) => {
-  const [buttonState, changeButtonState] = useState(currentState);
-  return buttonState ? (
+  const [shared, setShared] = useState(currentState);
+  return (
     <div className="button-container">
-      <ShareIconSelected />
+      {shared ? <ShareIconSelected /> : <ShareIconUnselected />}
       <button
         className="action-button"
         href="/"
-        onClick={() => changeButtonState(false)}
-      >
-        Share
-      </button>
-    </div>
-  ) : (
-    <div className="button-container">
-      <ShareIconUnselected />
-      <button
-        className="action-button"
-        href="/"
-        onClick={() => changeButtonState(true)}
+        onClick={() => setShared(!shared)}
       >
         Share
       </button>

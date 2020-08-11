@@ -2,17 +2,14 @@ import React, {useState} from 'react';
 import './FollowButton.css';
 
 const FollowButton = ({currentState}) => {
-  const [buttonState, changeButtonState] = useState(currentState);
-  return buttonState ? (
-    <button className="UnfollowButton" onClick={() => changeButtonState(false)}>
+  const [following, setFollowing] = useState(currentState);
+  return (
+    <button
+      className={following ? 'UnfollowButton' : 'FollowButton'}
+      onClick={() => setFollowing(false)}
+    >
       <div className="TextContainer">
-        <h2>Unfollow</h2>
-      </div>
-    </button>
-  ) : (
-    <button className="FollowButton" onClick={() => changeButtonState(true)}>
-      <div className="TextContainer">
-        <h2>Follow</h2>
+        <h2>{following ? Unfollow : Follow}</h2>
       </div>
     </button>
   );
