@@ -10,3 +10,15 @@ export default function types() {
     },
   ];
 };
+
+export function getTypesFilterOptions() {
+  const options = types().map((type) => ({
+    enabled: false,
+    data: type,
+  }));
+  return {
+    collectionName: 'Types',
+    options: options,
+    mutable: false,
+  };
+}
