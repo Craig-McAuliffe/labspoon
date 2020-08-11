@@ -7,7 +7,8 @@ import PropTypes from 'prop-types';
  * responsible for managing the state of the filter options.
  * @param {Array} options - an array of option collections that can be used in
  * filtering, such as people
- * @param {func} filterOptionsDispatch - update the status of an option
+ * @param {func} updateFilterOption - update the status of an option
+ * @param {func} resetFilterCollection - reset the state of a filter collection
  * @return {React.ReactElement}
  */
 export function FilterMenu({options, updateFilterOption, resetFilterCollection}) {
@@ -32,7 +33,8 @@ export function FilterMenu({options, updateFilterOption, resetFilterCollection})
 }
 FilterMenu.propTypes = {
   options: PropTypes.array.isRequired,
-  filterOptionsDispatch: PropTypes.func.isRequired,
+  updateFilterOption: PropTypes.func.isRequired,
+  resetFilterCollection: PropTypes.func.isRequired,
 };
 
 /**

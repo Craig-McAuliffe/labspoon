@@ -3,7 +3,7 @@ import update from 'immutability-helper';
 
 import {FilterMenu} from '../Filter/Filter';
 import Sider from '../Layout/Sider/Sider';
-import PostList from '../Posts/PostList/PostList';
+import ResultsList from '../Results/Results';
 
 const DEFAULT_TAB_ID = 'default';
 export const DEFAULT_TAB_IDX = 0;
@@ -183,17 +183,13 @@ function Tabs({tabFilter, setTabFilter}) {
 }
 
 function Results({results, hasMore, fetchMore, tab}) {
-  switch (tab) {
-    case 'posts':
-      return <PostList
-        results={results}
-        hasMore={hasMore}
-        fetchMore={fetchMore}
-      />
-      break;
-    default:
-      return <DefaultTab/>;
-  };
+  if (tab === 'default') return <DefaultTab />;
+  return <ResultsList
+    results={results}
+    hasMore={hasMore}
+    fetchMore={fetchMore}
+    resourceType={tab}
+  />;
 }
 
 function DefaultTab({results, hasMore, fetchMore}) {
