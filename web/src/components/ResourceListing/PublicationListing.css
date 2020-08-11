@@ -27,15 +27,21 @@
   display: flex;
 }
 
+.resource-type-name {
+  text-transform: capitalize;
+  padding: 0px 8px 0px 5px;
+  align-self: flex-end;
+  color: #5d5d65;
+}
 .resource-topics {
   display: flex;
 }
 
-.post-content-authors {
+.resource-content-authors {
   margin: 10px 0px;
 }
 
-.post-content-author {
+.resource-content-author {
   margin-right: 15px;
   /* color: #5d5d65; */
 }

@@ -33,9 +33,9 @@ function ResourceHeader({post}) {
     }
   };
 
-  const postTypeName = () => {
+  const resourceTypeName = () => {
     if (post.type.name === 'default') return null;
-    return <h2 className="post-type-name">{post.type.name}</h2>;
+    return <h2 className="resource-type-name">{post.type.name}</h2>;
   };
 
   return (
@@ -45,7 +45,7 @@ function ResourceHeader({post}) {
       </div>
       <div className="resource-type-container">
         <div className="resource-type-icon">{postTypeIcons()}</div>
-        {postTypeName()}
+        {resourceTypeName()}
       </div>
     </div>
   );
@@ -70,9 +70,9 @@ function ResourceTextContent({post}) {
   return (
     <div className="resource-text-content">
       <h3>{post.title}</h3>
-      <div className="post-content-authors">
+      <div className="resource-content-authors">
         {post.content.authors.map((author) => (
-          <Link to="/profile" className="post-content-author">
+          <Link to="/profile" className="resource-content-author">
             {author}
           </Link>
         ))}
