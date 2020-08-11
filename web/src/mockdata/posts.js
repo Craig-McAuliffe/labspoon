@@ -16,8 +16,8 @@ export function getTestPosts(uniqueID) {
       'content': {
         'text': 'This is an example of a text post!',
       },
-      topics: [topics()[0], topics()[1]],
-      optionaltags: [],
+      'topics': [topics()[0], topics()[1]],
+      'optionaltags': [],
     },
     {
       'id': '83hisefoi' + uniqueID,
@@ -28,8 +28,8 @@ export function getTestPosts(uniqueID) {
       'content': {
         'text': 'It was so crazy I woke up at like 8.30 I mean what the fuck',
       },
-      topics: [topics()[2], topics()[1]],
-      optionaltags: [
+      'topics': [topics()[2], topics()[1]],
+      'optionaltags': [
         {
           type: 'location',
           content: 'London, United Kingdom',
@@ -78,8 +78,8 @@ export function getTestPosts(uniqueID) {
       'content': {
         'text': 'It&apos;s literally the fucking worst thing ever',
       },
-      topics: [topics()[3], topics()[4]],
-      optionaltags: [
+      'topics': [topics()[3], topics()[4]],
+      'optionaltags': [
         {
           type: 'researcher',
           content: [

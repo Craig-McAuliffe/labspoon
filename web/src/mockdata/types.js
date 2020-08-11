@@ -2,11 +2,11 @@ export default function types() {
   return [
     {
       id: 'post',
-      name: 'post'
+      name: 'post',
     },
     {
       id: 'person',
-      name: 'person'
+      name: 'person',
     },
   ];
 };

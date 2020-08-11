@@ -44,9 +44,9 @@ export function getFilteredBookmarks(filters) {
     switch (filterCollection.collectionName) {
       case 'Content Type':
         bookmarks = bookmarks.filter(
-          (bookmark) => enabledIDs.has(bookmark.resource.type)
+            (bookmark) => enabledIDs.has(bookmark.resource.type),
         );
-        break
+        break;
       default:
         break;
     }
