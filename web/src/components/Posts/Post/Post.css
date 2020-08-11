@@ -1,7 +1,6 @@
 .text-post {
   margin: 2px 2px 20px 2px;
   padding: 20px 16px;
-  flex-grow: 1;
   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.3);
 }
 
@@ -34,6 +33,7 @@
   text-transform: capitalize;
   padding: 0px 8px 0px 5px;
   align-self: flex-end;
+  color: #5d5d65;
 }
 
 .post-type-icon {

@@ -95,14 +95,23 @@ function getTestPosts(uniqueID) {
     {
       id: '0b7sya8' + uniqueID,
       category: 'resource',
-      title: 'This is the title from the publication',
+      title:
+        'SARS-CoV-2 neutralization and serology testing of COVID-19 convalescent plasma from donors with non-severe disease',
       type: postTypes()[1],
       author: users()[2],
       journal: 'Journal Name',
       content: {
         abstract:
           'This is the abstract that we have automatically captured from the publication which is stored somewhere in the internet. It is rather cool is it not? Yes indeed it is. What are we talking about? Science. What type of science? You wouldnt understand, it is the science of the gods.',
-        authors: 'Bobby McGee, Sally McDee, Joshua McLee, Xi McSee',
+        authors: [
+          'Bobby McGee',
+          'Sally McDee',
+          'Joshua McLee',
+          'Xi McSee',
+          'Flee McWee',
+          'Cecelia McThee',
+          'Charly McVee',
+        ],
       },
       topics: [topics()[3], topics()[4]],
       optionaltags: [],
