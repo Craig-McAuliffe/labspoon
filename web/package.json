@@ -48,7 +48,8 @@
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-react": "^7.20.5",
     "husky": "^4.2.5",
-    "lint-staged": "^10.2.11"
+    "lint-staged": "^10.2.11",
+    "prettier": "^2.0.5"
   },
   "husky": {
     "hooks": {
@@ -56,6 +57,9 @@
     }
   },
   "lint-staged": {
-    "*.jsx?": ["eslint", "prettier --write"]
+    "*.{js,jsx}": [
+      "eslint",
+      "prettier --write"
+    ]
   }
 }
