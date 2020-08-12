@@ -78,6 +78,7 @@ export default function PublicationPage({search}) {
               <Link to="/profile">{author}</Link>
             </h3>
           ))}
+          <h3 className="publication-section-title">Abstract</h3>
           <p className="publication-body-abstract">
             {matchedPublication.content.abstract}
           </p>

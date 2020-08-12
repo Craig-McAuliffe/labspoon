@@ -38,3 +38,8 @@
   display: inline-block;
   margin-right: 10px;
 }
+
+.publication-section-title {
+  color: #5d5d65;
+  margin: 20px 0px 10px;
+}
