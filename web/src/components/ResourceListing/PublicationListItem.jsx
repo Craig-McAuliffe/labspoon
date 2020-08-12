@@ -18,8 +18,8 @@ const PublicationListItem = ({post}) => {
   return (
     <div className="resource-post">
       <ResourceHeader post={post} />
-      <ResourceTextContent post={post} />
-      <FeedItemTopics taggedItem={post} />
+      <ResourceTextContent publication={post.resource} />
+      <FeedItemTopics taggedItem={post.resource} />
       <PostActions />
     </div>
   );
@@ -53,14 +53,14 @@ function ResourceHeader({post}) {
   );
 }
 
-function ResourceTextContent({post}) {
+function ResourceTextContent({publication}) {
   return (
     <div className="resource-text-content">
-      <Link to={`/publication/${post.id}`}>
-        <h3>{post.title}</h3>
+      <Link to={`/publication/${publication.id}`}>
+        <h3>{publication.title}</h3>
       </Link>
       <div className="resource-content-authors">
-        {post.content.authors.map((author) => (
+        {publication.content.authors.map((author) => (
           <Link
             to={`/profile/${author.id}`}
             className="resource-content-author"

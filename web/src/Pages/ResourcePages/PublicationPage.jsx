@@ -1,6 +1,6 @@
 import React from 'react';
 
-import getFilteredPosts from '../../mockdata/posts';
+import publications from '../../mockdata/publications';
 import journals from '../../mockdata/journals';
 import {useParams} from 'react-router-dom';
 import FeedItemTopics from '../../components/FeedItems/FeedItemTopics';
@@ -10,8 +10,8 @@ import Sider from '../../components/Layout/Sider/Sider';
 import './PublicationPage.css';
 export default function PublicationPage({search}) {
   const publicationID = useParams().id;
-  const matchedPublication = getFilteredPosts([]).filter((post) =>
-    post.id.includes(publicationID)
+  const matchedPublication = publications().filter((publication) =>
+    publication.id.includes(publicationID)
   )[0];
 
   const topicIDs = matchedPublication.topics.map((topic) => topic.id);
@@ -19,8 +19,8 @@ export default function PublicationPage({search}) {
   const findSimilarPublications = () => {
     const uniquePosts = [];
     topicIDs.map((topicID) => {
-      const resourcePosts = getFilteredPosts([]).filter(
-        (post) => post.category === 'resource'
+      const resourcePosts = publications().filter(
+        (publication) => publication.category === 'resource'
       );
       const postsWithSameTopic = resourcePosts.filter((post) =>
         post.topics[0].id.includes(topicID)
@@ -40,7 +40,9 @@ export default function PublicationPage({search}) {
     );
     return journalName;
   };
-
+  // console.log(publicationID);
+  // console.log(publications());
+  // console.log(matchedPublication);
   return (
     <>
       <div className="sider-layout">

@@ -41,8 +41,8 @@ PostList.propTypes = {
 const PostOrResource = ({results}) => {
   const Posts = results.map((result) => {
     if (result.category === 'resource')
-      return <PublicationListItem post={result} key={result.id} />;
-    else return <Post post={result} key={result.id} />;
+      return <PublicationListItem post={result} key={result.resource.id} />;
+    return <Post post={result} key={result.id} />;
   });
   return Posts;
 };
