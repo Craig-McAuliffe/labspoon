@@ -50,7 +50,11 @@ export default function PublicationPage({search}) {
             <h3 className="sider-title">Other Publications from your Search</h3>
             <div className="suggested-publications-container">
               {findSimilarPublications().map((publication) => (
-                <div className="suggested-publication">{publication.title}</div>
+                <div className="suggested-publication">
+                  <Link to={`/publication/${publication.id}`}>
+                    {publication.title}
+                  </Link>
+                </div>
               ))}
             </div>
           </div>
