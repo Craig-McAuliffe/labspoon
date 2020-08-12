@@ -19,6 +19,9 @@ export default function App() {
           <Routes />
         </AppLayout>
       </Router>
+
+
+
     </AuthProvider>
   );
 }
