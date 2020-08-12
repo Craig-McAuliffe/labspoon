@@ -8,30 +8,33 @@ import {Link} from 'react-router-dom';
 import Sider from '../../components/Layout/Sider/Sider';
 
 import './PublicationPage.css';
-export default function PublicationPage({search}) {
-  const publicationID = useParams().id;
+export default function PublicationPage({context}) {
+  const thisPublicationID = useParams().id;
   const matchedPublication = publications().filter((publication) =>
-    publication.id.includes(publicationID)
+    publication.id.includes(thisPublicationID)
   )[0];
 
-  const topicIDs = matchedPublication.topics.map((topic) => topic.id);
+  const topicIDs = matchedPublication.topics
+    .map((topic) => topic.id)
+    .slice(0, 2);
 
   const findSimilarPublications = () => {
-    const uniquePosts = [];
+    const uniquePublications = [];
     topicIDs.map((topicID) => {
-      const resourcePosts = publications().filter(
-        (publication) => publication.category === 'resource'
-      );
-      const postsWithSameTopic = resourcePosts.filter((post) =>
-        post.topics[0].id.includes(topicID)
-      );
-
-      postsWithSameTopic.map((post) => {
-        if (uniquePosts.includes(post.id)) return;
-        uniquePosts.push(post);
+      publications().map((publication) => {
+        if (publication.id !== thisPublicationID)
+          publication.topics.map((topic) => {
+            if (
+              topic.id === topicID &&
+              uniquePublications.map(
+                (uniquePublication) => uniquePublication != topicID
+              )
+            )
+              uniquePublications.push(publication);
+          });
       });
     });
-    return uniquePosts.slice(0, 5);
+    return uniquePublications.slice(0, 5);
   };
 
   const detectJournal = () => {
@@ -40,19 +43,16 @@ export default function PublicationPage({search}) {
     );
     return journalName;
   };
-  // console.log(publicationID);
-  // console.log(publications());
-  // console.log(matchedPublication);
+
   return (
     <>
       <div className="sider-layout">
         <Sider>
-          <div className="publication-sider">
-            <h3 className="sider-title">Other Publications from your Search</h3>
-            <div className="suggested-publications-container">
-              <SimilarPublications publications={findSimilarPublications()} />
-            </div>
-          </div>
+          {context ? (
+            <FromContextPublications context={context} />
+          ) : (
+            <SimilarPublications publications={findSimilarPublications()} />
+          )}
         </Sider>
       </div>
       <div className="content-layout">
@@ -96,9 +96,22 @@ const PublicationAuthors = ({publicationAuthors}) =>
     </h3>
   ));
 
-const SimilarPublications = ({publications}) =>
-  publications.map((publication) => (
-    <div className="suggested-publication">
-      <Link to={`/publication/${publication.id}`}>{publication.title}</Link>
+const SimilarPublications = ({publications}) => (
+  <div className="publication-sider">
+    <h3 className="sider-title">Similar Publications to this one</h3>
+    <div className="suggested-publications-container">
+      {publications.map((publication) => (
+        <div className="suggested-publication">
+          <Link to={`/publication/${publication.id}`}>{publication.title}</Link>
+        </div>
+      ))}
     </div>
-  ));
+  </div>
+);
+
+const FromContextPublications = ({context}) => (
+  <div className="publication-sider">
+    <h3 className="sider-title">Other Publications from your Search</h3>
+    <div className="suggested-publications-container"> </div>
+  </div>
+);

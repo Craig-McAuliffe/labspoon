@@ -22,7 +22,7 @@ export default function topics() {
     },
     {
       id: 'dfhsjghjihf4443',
-      name: 'CSARS-CoV-2',
+      name: 'SARS-CoV-2',
     },
   ];
 }

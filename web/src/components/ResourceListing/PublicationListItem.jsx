@@ -17,7 +17,7 @@ import './PublicationListItem.css';
 const PublicationListItem = ({post}) => {
   return (
     <div className="resource-post">
-      <ResourceHeader post={post} />
+      <ResourceHeader postType={post.type} postAuthor={post.author} />
       <ResourceTextContent publication={post.resource} />
       <FeedItemTopics taggedItem={post.resource} />
       <PostActions />
@@ -25,9 +25,9 @@ const PublicationListItem = ({post}) => {
   );
 };
 
-function ResourceHeader({post}) {
+function ResourceHeader({postType, postAuthor}) {
   const postTypeIcons = () => {
-    switch (post.type.name) {
+    switch (postType.name) {
       case 'publication':
         return <PublicationIcon />;
       default:
@@ -36,14 +36,14 @@ function ResourceHeader({post}) {
   };
 
   const resourceTypeName = () => {
-    if (post.type.name === 'default') return null;
-    return <h2 className="resource-type-name">{post.type.name}</h2>;
+    if (postType.name === 'default') return null;
+    return <h2 className="resource-type-name">{postType.name}</h2>;
   };
 
   return (
     <div className="resource-header">
       <div className="resource-header-logo">
-        <img src={post.author.avatar} alt="Labspoon Logo" />
+        <img src={postAuthor.avatar} alt="Labspoon Logo" />
       </div>
       <div className="resource-type-container">
         <div className="resource-type-icon">{postTypeIcons()}</div>
