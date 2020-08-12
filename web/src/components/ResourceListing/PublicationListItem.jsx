@@ -12,9 +12,9 @@ import PostActions from '../Posts/Post/PostParts/PostActions';
 
 import FeedItemTopics from '../FeedItems/FeedItemTopics';
 
-import './PublicationListing.css';
+import './PublicationListItem.css';
 
-const PublicationListing = ({post}) => {
+const PublicationListItem = ({post}) => {
   return (
     <div className="resource-post">
       <ResourceHeader post={post} />
@@ -73,4 +73,4 @@ function ResourceTextContent({post}) {
   );
 }
 
-export default PublicationListing;
+export default PublicationListItem;

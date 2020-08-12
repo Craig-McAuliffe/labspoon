@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Post from '../Post/Post';
-import PublicationListing from '../../ResourceListing/PublicationListing';
+import PublicationListItem from '../../ResourceListing/PublicationListItem';
 import './PostList.css';
 
 import './PostList.css';
@@ -41,7 +41,7 @@ PostList.propTypes = {
 const PostOrResource = ({results}) => {
   const Posts = results.map((result) => {
     if (result.category === 'resource')
-      return <PublicationListing post={result} key={result.id} />;
+      return <PublicationListItem post={result} key={result.id} />;
     else return <Post post={result} key={result.id} />;
   });
   return Posts;
