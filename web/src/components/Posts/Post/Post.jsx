@@ -12,6 +12,7 @@ import {
 
 import PostOptionalTags from './PostParts/PostOptionalTags';
 import PostActions from './PostParts/PostActions';
+import FeedItemTopics from '../../FeedItems/FeedItemTopics';
 import PropTypes from 'prop-types';
 
 import './Post.css';
@@ -29,7 +30,7 @@ export default function Post({post}) {
       <PostHeader post={post} />
       <PostTextContent post={post} />
       <PostOptionalTags optionalTags={post.optionaltags} />
-      <PostTopics post={post} />
+      <FeedItemTopics taggedItem={post} />
       <PostActions />
     </div>
   );
@@ -113,32 +114,6 @@ PostHeader.propTypes = {
     name: PropTypes.string.isRequired,
     avatar: PropTypes.string.isRequired,
   }).isRequired,
-};
-
-/** Display the topics with which a post has been tagged
- * @return {React.ReactElement}
- */
-function PostTopics({post}) {
-  return (
-    <div className="post-topics">
-      <p className="topics-sub-title">Topics: </p>
-      <div className="topic-names-container">
-        {post.topics.map((topic) => (
-          <a key={topic.id} href="/" className="topic-names">
-            {topic.name}{' '}
-          </a>
-        ))}
-      </div>
-    </div>
-  );
-}
-PostTopics.propTypes = {
-  topics: PropTypes.arrayOf(
-    PropTypes.exact({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-    })
-  ),
 };
 
 /**

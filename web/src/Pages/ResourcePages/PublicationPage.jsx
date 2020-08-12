@@ -3,9 +3,8 @@ import React from 'react';
 import getFilteredPosts from '../../mockdata/posts';
 import journals from '../../mockdata/journals';
 import {useParams} from 'react-router-dom';
-import PropTypes from 'prop-types';
+import FeedItemTopics from '../../components/FeedItems/FeedItemTopics';
 import {Link} from 'react-router-dom';
-
 import Sider from '../../components/Layout/Sider/Sider';
 
 import './PublicationPage.css';
@@ -49,13 +48,7 @@ export default function PublicationPage({search}) {
           <div className="publication-sider">
             <h3 className="sider-title">Other Publications from your Search</h3>
             <div className="suggested-publications-container">
-              {findSimilarPublications().map((publication) => (
-                <div className="suggested-publication">
-                  <Link to={`/publication/${publication.id}`}>
-                    {publication.title}
-                  </Link>
-                </div>
-              ))}
+              <SimilarPublications publications={findSimilarPublications()} />
             </div>
           </div>
         </Sider>
@@ -69,49 +62,41 @@ export default function PublicationPage({search}) {
               alt={`${detectJournal()[0].name} journal logo`}
             />
           )}
-          {matchedPublication.url ? (
-            <a href={matchedPublication.url} target="_blank">
-              Go to full article
-            </a>
-          ) : null}
+          <PublicationLink publicationUrl={matchedPublication.url} />
         </div>
         <div className="publication-body">
           <h2>{matchedPublication.title}</h2>
-          {matchedPublication.content.authors.map((author) => (
-            <h3 className="publication-body-authors">
-              <Link to="/profile">{author}</Link>
-            </h3>
-          ))}
+          <PublicationAuthors
+            publicationAuthors={matchedPublication.content.authors}
+          />
           <h3 className="publication-section-title">Abstract</h3>
           <p className="publication-body-abstract">
             {matchedPublication.content.abstract}
           </p>
-          <PostTopics publication={matchedPublication} />
+          <FeedItemTopics taggedItem={matchedPublication} />
         </div>
       </div>
     </>
   );
 }
 
-function PostTopics({publication}) {
-  return (
-    <div className="post-topics">
-      <p className="topics-sub-title">Topics: </p>
-      <div className="topic-names-container">
-        {publication.topics.map((topic) => (
-          <a key={topic.id} href="/" className="topic-names">
-            {topic.name}{' '}
-          </a>
-        ))}
-      </div>
+const PublicationLink = ({publicationUrl}) =>
+  publicationUrl ? (
+    <a href={publicationUrl} target="_blank">
+      Go to full article
+    </a>
+  ) : null;
+
+const PublicationAuthors = ({publicationAuthors}) =>
+  publicationAuthors.map((author) => (
+    <h3 className="publication-body-authors">
+      <Link to={`/profile/${author.id}`}>{author.name}</Link>
+    </h3>
+  ));
+
+const SimilarPublications = ({publications}) =>
+  publications.map((publication) => (
+    <div className="suggested-publication">
+      <Link to={`/publication/${publication.id}`}>{publication.title}</Link>
     </div>
-  );
-}
-PostTopics.propTypes = {
-  topics: PropTypes.arrayOf(
-    PropTypes.exact({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-    })
-  ),
-};
+  ));

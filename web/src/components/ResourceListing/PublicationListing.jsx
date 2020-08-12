@@ -10,6 +10,8 @@ import {
 
 import PostActions from '../Posts/Post/PostParts/PostActions';
 
+import FeedItemTopics from '../FeedItems/FeedItemTopics';
+
 import './PublicationListing.css';
 
 const PublicationListing = ({post}) => {
@@ -17,7 +19,7 @@ const PublicationListing = ({post}) => {
     <div className="resource-post">
       <ResourceHeader post={post} />
       <ResourceTextContent post={post} />
-      <ResourceTopics post={post} />
+      <FeedItemTopics taggedItem={post} />
       <PostActions />
     </div>
   );
@@ -51,21 +53,6 @@ function ResourceHeader({post}) {
   );
 }
 
-function ResourceTopics({post}) {
-  return (
-    <div className="resource-topics">
-      <p className="topics-sub-title">Topics: </p>
-      <div className="topic-names-container">
-        {post.topics.map((topic) => (
-          <a key={topic.id} href="/" className="topic-names">
-            {topic.name}{' '}
-          </a>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function ResourceTextContent({post}) {
   return (
     <div className="resource-text-content">
@@ -74,8 +61,11 @@ function ResourceTextContent({post}) {
       </Link>
       <div className="resource-content-authors">
         {post.content.authors.map((author) => (
-          <Link to="/profile" className="resource-content-author">
-            {author}
+          <Link
+            to={`/profile/${author.id}`}
+            className="resource-content-author"
+          >
+            {author.name}
           </Link>
         ))}
       </div>

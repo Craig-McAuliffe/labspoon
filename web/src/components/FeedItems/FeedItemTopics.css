@@ -1,0 +1,20 @@
+.post-topics {
+  margin: 10px 0px 0px;
+  display: grid;
+  grid-template-columns: 30px 1fr;
+}
+
+.topics-sub-title {
+  color: #99999f;
+  grid-column: 1 /2;
+}
+
+.topic-names-container {
+  grid-column: 2/3;
+  display: flex;
+}
+
+.topic-names {
+  display: inline-block;
+  margin: 0px 30px;
+}
