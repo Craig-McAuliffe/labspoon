@@ -69,7 +69,9 @@ function ResourceTopics({post}) {
 function ResourceTextContent({post}) {
   return (
     <div className="resource-text-content">
-      <h3>{post.title}</h3>
+      <Link to={`/publication/${post.id}`}>
+        <h3>{post.title}</h3>
+      </Link>
       <div className="resource-content-authors">
         {post.content.authors.map((author) => (
           <Link to="/profile" className="resource-content-author">

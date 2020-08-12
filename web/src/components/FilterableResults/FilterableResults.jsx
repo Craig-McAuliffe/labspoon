@@ -110,7 +110,7 @@ export default function FilterableResults({
   };
   return (
     <>
-      <div className="Sider">
+      <div className="sider-layout">
         <Sider>
           <FilterMenu
             options={filterOptions}
@@ -119,7 +119,7 @@ export default function FilterableResults({
           />
         </Sider>
       </div>
-      <div className="Content">
+      <div className="content-layout">
         {useTabs && (
           <Tabs
             tabFilter={filterOptions[DEFAULT_TAB_IDX]}

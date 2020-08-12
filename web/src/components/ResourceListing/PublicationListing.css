@@ -10,7 +10,7 @@
   display: grid;
   grid-template-columns: 50px 1fr 50px;
   height: 60px;
-  margin: 20px 0px;
+  margin-top: 20px;
 }
 .resource-header-logo {
   align-self: flex-start;

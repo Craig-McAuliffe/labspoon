@@ -25,11 +25,11 @@ export default function App() {
 
 const AppLayout = ({children}) => {
   return (
-    <div className="Layout">
-      <div className="Header">
+    <div className="layout">
+      <div className="header-layout">
         <Header />
       </div>
-      <div className="Main">{children}</div>
+      <div className="main-layout">{children}</div>
     </div>
   );
 };
@@ -38,12 +38,6 @@ export const AuthContext = createContext(null);
 
 function AuthProvider({children}) {
   const [user, setUser] = useState({});
-  useEffect(() =>
-    auth.onAuthStateChanged((user) => setUser(user))
-  );
-  return (
-    <AuthContext.Provider value={user}>
-      {children}
-    </AuthContext.Provider>
-  );
+  useEffect(() => auth.onAuthStateChanged((user) => setUser(user)));
+  return <AuthContext.Provider value={user}>{children}</AuthContext.Provider>;
 }

@@ -41,26 +41,3 @@ export default function FollowingFeedPage() {
     />
   );
 }
-function FeedAndFilterComp({
-  results,
-  hasMore,
-  fetchMore,
-  filterOptions,
-  updateFilterOption,
-}) {
-  return (
-    <>
-      <div className="Sider">
-        <Sider>
-          <FilterMenu
-            options={filterOptions}
-            updateFilterOption={updateFilterOption}
-          />
-        </Sider>
-      </div>
-      <div className="Content">
-        <PostList results={results} hasMore={hasMore} fetchMore={fetchMore} />
-      </div>
-    </>
-  );
-}

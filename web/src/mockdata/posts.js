@@ -99,10 +99,33 @@ function getTestPosts(uniqueID) {
         'SARS-CoV-2 neutralization and serology testing of COVID-19 convalescent plasma from donors with non-severe disease',
       type: postTypes()[1],
       author: users()[2],
-      journal: 'Journal Name',
+      url: 'https://www.nature.com/articles/s41467-020-17708-1',
       content: {
         abstract:
-          'This is the abstract that we have automatically captured from the publication which is stored somewhere in the internet. It is rather cool is it not? Yes indeed it is. What are we talking about? Science. What type of science? You wouldnt understand, it is the science of the gods.',
+          'Aging is an inevitable course of life. Additionally, the risk of chronic diseases or cancer increases with age. The comprehensive identification of signs related to aging can be beneficial for the prevention and early diagnosis of geriatric diseases. The comparison of global modifications in the urine proteome is a means of multidimensional information mining. This approach is based on urine, in which changes from whole-body metabolism can accumulate. This study used the urine of healthy people at different ages (22 children, 10 young people, 6 senior people) as the research object and using high-resolution tandem mass spectrometry, label-free quantitation combined with non-limiting modification identification algorithms and random group test, compared the differences in protein chemical modifications among three groups. The results show that multi-sites oxidative modifications and amino acid substitutions are noticeable features that distinguish these three age groups of people. The proportion of multi-site oxidations in urine proteins of senior (29.76%) is significantly higher than the young group (13.71% and 12.97%), which affect the biological processes of various proteins. This study could provide a reference for studies of aging mechanisms and biomarkers of age-related disease.',
+        authors: [
+          'Bobby McGee',
+          'Sally McDee',
+          'Joshua McLee',
+          'Xi McSee',
+          'Flee McWee',
+          'Cecelia McThee',
+          'Charly McVee',
+        ],
+      },
+      topics: [topics()[5]],
+      optionaltags: [],
+    },
+    {
+      id: '890dsj57f' + uniqueID,
+      category: 'resource',
+      title: 'This is a non COVID publication.',
+      type: postTypes()[1],
+      author: users()[2],
+      url: 'https://www.nature.com/articles/s41467-020-17708-1',
+      content: {
+        abstract:
+          'Aging is an inevitable course of life. Additionally, the risk of chronic diseases or cancer increases with age. The comprehensive identification of signs related to aging can be beneficial for the prevention and early diagnosis of geriatric diseases. The comparison of global modifications in the urine proteome is a means of multidimensional information mining. This approach is based on urine, in which changes from whole-body metabolism can accumulate. This study used the urine of healthy people at different ages (22 children, 10 young people, 6 senior people) as the research object and using high-resolution tandem mass spectrometry, label-free quantitation combined with non-limiting modification identification algorithms and random group test, compared the differences in protein chemical modifications among three groups. The results show that multi-sites oxidative modifications and amino acid substitutions are noticeable features that distinguish these three age groups of people. The proportion of multi-site oxidations in urine proteins of senior (29.76%) is significantly higher than the young group (13.71% and 12.97%), which affect the biological processes of various proteins. This study could provide a reference for studies of aging mechanisms and biomarkers of age-related disease.',
         authors: [
           'Bobby McGee',
           'Sally McDee',
@@ -114,6 +137,53 @@ function getTestPosts(uniqueID) {
         ],
       },
       topics: [topics()[3], topics()[4]],
+      optionaltags: [],
+    },
+    {
+      id: '34ufihsd8' + uniqueID,
+      category: 'resource',
+      title: 'SARS CoV-2 RNA vaccine phase-2 clinical trial results',
+      type: postTypes()[1],
+      author: users()[2],
+      url: 'https://www.nature.com/articles/s41467-020-17708-1',
+      content: {
+        abstract:
+          'Aging is an inevitable course of life. Additionally, the risk of chronic diseases or cancer increases with age. The comprehensive identification of signs related to aging can be beneficial for the prevention and early diagnosis of geriatric diseases. The comparison of global modifications in the urine proteome is a means of multidimensional information mining. This approach is based on urine, in which changes from whole-body metabolism can accumulate. This study used the urine of healthy people at different ages (22 children, 10 young people, 6 senior people) as the research object and using high-resolution tandem mass spectrometry, label-free quantitation combined with non-limiting modification identification algorithms and random group test, compared the differences in protein chemical modifications among three groups. The results show that multi-sites oxidative modifications and amino acid substitutions are noticeable features that distinguish these three age groups of people. The proportion of multi-site oxidations in urine proteins of senior (29.76%) is significantly higher than the young group (13.71% and 12.97%), which affect the biological processes of various proteins. This study could provide a reference for studies of aging mechanisms and biomarkers of age-related disease.',
+        authors: [
+          'Bobby McGee',
+          'Sally McDee',
+          'Joshua McLee',
+          'Xi McSee',
+          'Flee McWee',
+          'Cecelia McThee',
+          'Charly McVee',
+        ],
+      },
+      topics: [topics()[5]],
+      optionaltags: [],
+    },
+    {
+      id: '48df92rh297f' + uniqueID,
+      category: 'resource',
+      title:
+        'SARS CoV-2 innate T Cell overreaction and chronic inflammation as explanation for male and age-related vulnerability.',
+      type: postTypes()[1],
+      author: users()[2],
+      url: 'https://www.nature.com/articles/s41467-020-17708-1',
+      content: {
+        abstract:
+          'Aging is an inevitable course of life. Additionally, the risk of chronic diseases or cancer increases with age. The comprehensive identification of signs related to aging can be beneficial for the prevention and early diagnosis of geriatric diseases. The comparison of global modifications in the urine proteome is a means of multidimensional information mining. This approach is based on urine, in which changes from whole-body metabolism can accumulate. This study used the urine of healthy people at different ages (22 children, 10 young people, 6 senior people) as the research object and using high-resolution tandem mass spectrometry, label-free quantitation combined with non-limiting modification identification algorithms and random group test, compared the differences in protein chemical modifications among three groups. The results show that multi-sites oxidative modifications and amino acid substitutions are noticeable features that distinguish these three age groups of people. The proportion of multi-site oxidations in urine proteins of senior (29.76%) is significantly higher than the young group (13.71% and 12.97%), which affect the biological processes of various proteins. This study could provide a reference for studies of aging mechanisms and biomarkers of age-related disease.',
+        authors: [
+          'Bobby McGee',
+          'Sally McDee',
+          'Joshua McLee',
+          'Xi McSee',
+          'Flee McWee',
+          'Cecelia McThee',
+          'Charly McVee',
+        ],
+      },
+      topics: [topics()[5]],
       optionaltags: [],
     },
   ];
