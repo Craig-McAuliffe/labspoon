@@ -92,8 +92,5 @@ export function getPostFilters(posts) {
 }
 
 export function getSearchFilters() {
-  return [
-    getTypesFilter(),
-    getPostTypesFilter(),
-  ];
+  return [getTypesFilter(), getPostTypesFilter()];
 }

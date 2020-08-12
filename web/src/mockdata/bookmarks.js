@@ -8,9 +8,9 @@ import {getTypesFilterOptions} from './types';
 function getBookmarks() {
   const posts = getTestPosts('1');
   return posts.map((post) => ({
-    'id': uuid(),
-    'type': 'bookmark',
-    'resource': post,
+    id: uuid(),
+    type: 'bookmark',
+    resource: post,
   }));
 }
 
@@ -43,8 +43,8 @@ export function getFilteredBookmarks(filters) {
     if (enabledIDs.size === 0) return;
     switch (filterCollection.collectionName) {
       case 'Content Type':
-        bookmarks = bookmarks.filter(
-            (bookmark) => enabledIDs.has(bookmark.resource.type),
+        bookmarks = bookmarks.filter((bookmark) =>
+          enabledIDs.has(bookmark.resource.type)
         );
         break;
       default:
@@ -53,4 +53,3 @@ export function getFilteredBookmarks(filters) {
   });
   return bookmarks;
 }
-

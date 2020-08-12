@@ -5,11 +5,11 @@ import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import {AuthContext} from '../../App';
 
 /**
-* Sign in page using the Firebase authentication handler
-* @param {Function} setUser - function that updates the auth context upon a
-* sign in event
-* @return {React.ReactElement}
-*/
+ * Sign in page using the Firebase authentication handler
+ * @param {Function} setUser - function that updates the auth context upon a
+ * sign in event
+ * @return {React.ReactElement}
+ */
 function LoginPage() {
   const user = useContext(AuthContext);
   let UIConfig = {

@@ -11,7 +11,11 @@ import PropTypes from 'prop-types';
  * @param {func} resetFilterCollection - reset the state of a filter collection
  * @return {React.ReactElement}
  */
-export function FilterMenu({options, updateFilterOption, resetFilterCollection}) {
+export function FilterMenu({
+  options,
+  updateFilterOption,
+  resetFilterCollection,
+}) {
   const filterCollections = options.map((optionCollection, index) => {
     if (!optionCollection.mutable) return <></>;
     return (
@@ -25,11 +29,7 @@ export function FilterMenu({options, updateFilterOption, resetFilterCollection})
       />
     );
   });
-  return (
-    <div>
-      {filterCollections}
-    </div>
-  );
+  return <div>{filterCollections}</div>;
 }
 FilterMenu.propTypes = {
   options: PropTypes.array.isRequired,
@@ -44,30 +44,35 @@ FilterMenu.propTypes = {
  * @param {func} filterOptionsDispatch - update the status of an option
  * @return {React.ReactElement} - a collection of filter options
  */
-function FilterCollection({name, options, index, updateFilterOption, resetFilterCollection}) {
+function FilterCollection({
+  name,
+  options,
+  index,
+  updateFilterOption,
+  resetFilterCollection,
+}) {
   /**
    * Callback used for updating the enabled status of an option within this
    * filter collection.
    * @param {Number} optionIndex - index of the option within this filter collection
    * @param {Boolean} state - new enabled status
-  */
+   */
   function updateFilterCollectionOption(optionIndex) {
     updateFilterOption(index, optionIndex);
   }
   return (
     <div>
       <b>{name}</b>
-      <button onClick={() => resetFilterCollection(index)}>
-        Reset
-      </button>
-      {options.map((option, index) =>
+      <button onClick={() => resetFilterCollection(index)}>Reset</button>
+      {options.map((option, index) => (
         <FilterOption
           key={name}
           index={index}
           data={option.data}
           enabled={option.enabled}
           setOption={updateFilterCollectionOption}
-        />)}
+        />
+      ))}
     </div>
   );
 }
@@ -92,7 +97,11 @@ function FilterOption({data, index, enabled, setOption}) {
     <div>
       <label>
         {data.name}
-        <input type="checkbox" checked={enabled} onChange={()=>setOption(index)}/>
+        <input
+          type="checkbox"
+          checked={enabled}
+          onChange={() => setOption(index)}
+        />
       </label>
     </div>
   );
@@ -109,11 +118,11 @@ FilterOption.propTypes = {
  * @param {Object} filterCollection - filter collection of the structure specified in
  * FeedPage
  * @return {Set}
-*/
+ */
 export function getFilterCollectionEnabledIDsSet(filterCollection) {
-  const enabledIDs = filterCollection.options.filter(
-      (option) => option.enabled).map((option) => option.data.id,
-  );
+  const enabledIDs = filterCollection.options
+    .filter((option) => option.enabled)
+    .map((option) => option.data.id);
   const enabledIDsSet = new Set(enabledIDs);
   return enabledIDsSet;
 }

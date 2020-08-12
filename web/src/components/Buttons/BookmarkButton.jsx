@@ -8,7 +8,7 @@ const BookmarkButton = ({currentState}) => {
   const [bookmarked, setBookmarked] = useState(currentState);
   return (
     <div className="button-container">
-      {bookmarked ? <BookmarkIconSelected />:<BookmarkIconUnselected />}
+      {bookmarked ? <BookmarkIconSelected /> : <BookmarkIconUnselected />}
       <button
         className="action-button"
         href="/"

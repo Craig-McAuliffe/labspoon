@@ -9,7 +9,7 @@ export default function types() {
       name: 'person',
     },
   ];
-};
+}
 
 export function getTypesFilterOptions() {
   const options = types().map((type) => ({

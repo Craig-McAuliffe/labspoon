@@ -44,11 +44,11 @@ export default function Routes({user, setUser}) {
       <Route path="/search/:query?">
         <SearchPage />
       </Route>
-      <AuthRoute user={user}path="/profile">
+      <AuthRoute user={user} path="/profile">
         <ProfilePage />
       </AuthRoute>
       <Route path="/">
-        <Redirect to="/"/>
+        <Redirect to="/" />
       </Route>
     </Switch>
   );

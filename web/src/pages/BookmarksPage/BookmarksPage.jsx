@@ -22,6 +22,6 @@ const BookmarksPage = () => {
       useTabs={false}
     />
   );
-}
+};
 
 export default BookmarksPage;

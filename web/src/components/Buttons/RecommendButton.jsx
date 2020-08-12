@@ -8,7 +8,7 @@ const RecommendButton = ({currentState}) => {
   const [recommending, setRecommending] = useState(currentState);
   return (
     <div className="button-container">
-      {recommending ? <RecommendIconSelected />:<RecommendIconUnselected />}
+      {recommending ? <RecommendIconSelected /> : <RecommendIconUnselected />}
       <button
         className="action-button"
         href="/"

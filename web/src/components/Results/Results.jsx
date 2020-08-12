@@ -15,7 +15,7 @@ import './Results.css';
  * @return {React.ReactElement}
  */
 export default function Results({results, hasMore, fetchMore}) {
-  const items = results.map((result) => <ListItem result={result}/>);
+  const items = results.map((result) => <ListItem result={result} />);
   return (
     <InfiniteScroll
       dataLength={items.length}
