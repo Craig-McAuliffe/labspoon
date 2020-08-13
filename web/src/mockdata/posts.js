@@ -1,20 +1,19 @@
 import {getFilterCollectionEnabledIDsSet} from '../components/Filter/Filter';
 
 import postTypes from './postTypes';
-import resourceTypes from './resourceTypes';
 import topics from './topics';
 import users from './users';
 import publications from './publications';
 
-function getTestPosts(uniqueID) {
+export function getTestPosts(uniqueID) {
   return [
     {
       id: 'o3bosfseself' + uniqueID,
-      category: 'post',
+      resourceType: 'post',
       title:
         'The National Lung Matrix Trial of personalized therapy in' +
         'lung cancer ',
-      type: postTypes()[0],
+      postType: postTypes()[0],
       author: users()[0],
       content: {
         text: 'This is an example of a text post!',
@@ -24,9 +23,9 @@ function getTestPosts(uniqueID) {
     },
     {
       id: '83hisefoi' + uniqueID,
-      category: 'post',
+      resourceType: 'post',
       title: 'Today I overslept',
-      type: postTypes()[1],
+      postType: postTypes()[1],
       author: users()[1],
       content: {
         text: 'It was so crazy I woke up at like 8.30 I mean what the fuck',
@@ -74,9 +73,9 @@ function getTestPosts(uniqueID) {
     },
     {
       id: '09w03rin' + uniqueID,
-      category: 'post',
+      resourceType: 'post',
       title: 'I hate coming up with test data',
-      type: postTypes()[2],
+      postType: postTypes()[2],
       author: users()[0],
       content: {
         text: 'It&apos;s literally the fucking worst thing ever',
@@ -96,38 +95,34 @@ function getTestPosts(uniqueID) {
     },
     {
       id: 'fdfd892hrn' + uniqueID,
-      category: 'resource',
+      resourceType: 'publication',
       author: users()[2],
       type: postTypes()[1],
       topics: [topics()[3], topics()[4]],
-      resourceType: resourceTypes()[0],
       resource: publications()[0],
     },
     {
       id: 'fdjsi93uhifh' + uniqueID,
-      category: 'resource',
+      resourceType: 'publication',
       author: users()[2],
       type: postTypes()[1],
       topics: [topics()[3], topics()[4]],
-      resourceType: resourceTypes()[0],
       resource: publications()[1],
     },
     {
       id: 'f8d9hu34huhfui' + uniqueID,
-      category: 'resource',
+      resourceType: 'publication',
       author: users()[2],
       type: postTypes()[1],
       topics: [topics()[3], topics()[4]],
-      resourceType: resourceTypes()[0],
       resource: publications()[2],
     },
     {
       id: '3829huoewrn' + uniqueID,
-      category: 'resource',
+      resourceType: 'publication',
       author: users()[2],
       type: postTypes()[1],
       topics: [topics()[3], topics()[4]],
-      resourceType: resourceTypes()[0],
       resource: publications()[3],
     },
   ];

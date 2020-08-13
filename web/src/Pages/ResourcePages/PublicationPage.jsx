@@ -84,14 +84,14 @@ export default function PublicationPage({context}) {
 
 const PublicationLink = ({publicationUrl}) =>
   publicationUrl ? (
-    <a href={publicationUrl} target="_blank">
+    <a href={publicationUrl} target="_blank" rel="noreferrer">
       Go to full article
     </a>
   ) : null;
 
 const PublicationAuthors = ({publicationAuthors}) =>
   publicationAuthors.map((author) => (
-    <h3 className="publication-body-authors">
+    <h3 className="publication-body-authors" key={author.id}>
       <Link to={`/profile/${author.id}`}>{author.name}</Link>
     </h3>
   ));
@@ -101,7 +101,7 @@ const SimilarPublications = ({publications}) => (
     <h3 className="sider-title">Similar Publications to this one</h3>
     <div className="suggested-publications-container">
       {publications.map((publication) => (
-        <div className="suggested-publication">
+        <div className="suggested-publication" key={publication.id}>
           <Link to={`/publication/${publication.id}`}>{publication.title}</Link>
         </div>
       ))}

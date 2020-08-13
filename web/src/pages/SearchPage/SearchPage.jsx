@@ -1,9 +1,10 @@
 import React, {useState} from 'react';
 import {useRouteMatch, useHistory} from 'react-router-dom';
 
-import FilterableResults, {getTabFromTypeFilterCollection, DEFAULT_TAB_IDX} from '../../components/FilterableResults/FilterableResults';
-import {FilterMenu, getFilterCollectionEnabledIDsSet} from '../../components/Filter/Filter';
-import Sider from '../../components/Layout/Sider/Sider';
+import FilterableResults, {
+  getTabFromTypeFilterCollection,
+  DEFAULT_TAB_IDX,
+} from '../../components/FilterableResults/FilterableResults';
 
 import getFilteredTestPosts from '../../mockdata/posts';
 import {getSearchFilters} from '../../mockdata/filters';
@@ -16,7 +17,7 @@ function fetchResults(skip, limit, filter) {
       return repeatedTestPosts.slice(skip, skip + limit);
     default:
       return [];
-  };
+  }
 }
 
 const filterOptionsData = getSearchFilters();
@@ -25,7 +26,7 @@ export default function SearchPage() {
   const [query, setQuery] = useState(useRouteMatch().params.query);
   return (
     <>
-      <SearchForm query={query} setQuery={setQuery}/>
+      <SearchForm query={query} setQuery={setQuery} />
       <FilterableResults
         fetchResults={fetchResults}
         defaultFilter={filterOptionsData}
@@ -37,9 +38,9 @@ export default function SearchPage() {
 }
 
 function SearchForm({query, setQuery}) {
-  let history = useHistory();
+  const history = useHistory();
   const handleSubmit = (event) => {
-    history.push("/search/" + query);
+    history.push('/search/' + query);
     event.preventDefault();
   };
   const onChange = (event) => {
@@ -48,7 +49,7 @@ function SearchForm({query, setQuery}) {
   return (
     <form onSubmit={handleSubmit}>
       <input type="text" value={query} onChange={onChange} />
-      <input type="submit" value="Submit"/>
+      <input type="submit" value="Submit" />
     </form>
   );
 }

@@ -3,7 +3,7 @@ import update from 'immutability-helper';
 
 import {FilterMenu} from '../Filter/Filter';
 import Sider from '../Layout/Sider/Sider';
-import PostList from '../Posts/PostList/PostList';
+import ResultsList from '../Results/Results';
 
 const DEFAULT_TAB_ID = 'default';
 export const DEFAULT_TAB_IDX = 0;
@@ -120,12 +120,12 @@ export default function FilterableResults({
         </Sider>
       </div>
       <div className="content-layout">
-        {useTabs && (
+        {useTabs ? (
           <Tabs
             tabFilter={filterOptions[DEFAULT_TAB_IDX]}
             setTabFilter={setTab}
           />
-        )}
+        ) : null}
         <Results
           results={results}
           hasMore={hasMore}
@@ -178,8 +178,8 @@ function updateFilterOption(filterOptions, collectionIndex, optionIndex) {
 
 function Tabs({tabFilter, setTabFilter}) {
   const selectedTab = getTabFromTypeFilterCollection(tabFilter);
-  let tabs = tabFilter.options.map((option) => (
-    <button onClick={() => setTabFilter(option.data.id)}>
+  const tabs = tabFilter.options.map((option) => (
+    <button onClick={() => setTabFilter(option.data.id)} key={option.data.id}>
       {option.data.name}
     </button>
   ));
@@ -195,15 +195,15 @@ function Tabs({tabFilter, setTabFilter}) {
 }
 
 function Results({results, hasMore, fetchMore, tab}) {
-  switch (tab) {
-    case 'posts':
-      return (
-        <PostList results={results} hasMore={hasMore} fetchMore={fetchMore} />
-      );
-      break;
-    default:
-      return <DefaultTab />;
-  }
+  if (tab === 'default') return <DefaultTab />;
+  return (
+    <ResultsList
+      results={results}
+      hasMore={hasMore}
+      fetchMore={fetchMore}
+      resourceType={tab}
+    />
+  );
 }
 
 function DefaultTab({results, hasMore, fetchMore}) {

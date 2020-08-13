@@ -1,9 +1,8 @@
 import postTypes from './postTypes';
-import types from './types';
 
 function getPeopleFilter(posts) {
-  let seenIDs = new Set();
-  let options = [];
+  const seenIDs = new Set();
+  const options = [];
   posts.forEach((post) => {
     if (seenIDs.has(post.author.id)) return;
     seenIDs.add(post.author.id);
@@ -20,8 +19,8 @@ function getPeopleFilter(posts) {
 }
 
 function getTopicFilter(posts) {
-  let seenIDs = new Set();
-  let options = [];
+  const seenIDs = new Set();
+  const options = [];
   posts.forEach((post) => {
     post.topics.forEach((topic) => {
       if (seenIDs.has(topic.id)) return;
@@ -40,7 +39,7 @@ function getTopicFilter(posts) {
 }
 
 function getPostTypesFilter() {
-  let options = postTypes().map((postType) => ({
+  const options = postTypes().map((postType) => ({
     enabled: false,
     data: postType,
   }));

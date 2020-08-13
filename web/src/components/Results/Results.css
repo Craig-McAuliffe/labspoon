@@ -3,13 +3,6 @@
   min-width: 100%;
 }
 
-.feed-items {
-  justify-self: flex-start;
-  min-width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
 .infinite-scroll-component__outerdiv {
   min-width: 100%;
 }

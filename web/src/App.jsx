@@ -13,13 +13,15 @@ import './App.css';
  */
 export default function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AppLayout>
-          <Routes />
-        </AppLayout>
-      </Router>
-    </AuthProvider>
+    <FeatureFlagsProvider>
+      <AuthProvider>
+        <Router>
+          <AppLayout>
+            <Routes />
+          </AppLayout>
+        </Router>
+      </AuthProvider>
+    </FeatureFlagsProvider>
   );
 }
 
@@ -40,4 +42,27 @@ function AuthProvider({children}) {
   const [user, setUser] = useState({});
   useEffect(() => auth.onAuthStateChanged((user) => setUser(user)));
   return <AuthContext.Provider value={user}>{children}</AuthContext.Provider>;
+}
+
+/**
+ * Simple implementation of feature flags
+ *
+ * Feature flags are used to toggle features on and off. They allow us to turn
+ * on features for development environments, without releasing those features
+ * to production, and without maintaining multiple branches of the repo. See
+ * https://en.wikipedia.org/wiki/Feature_toggle for details on their uses.
+ *
+ * If a feature flag is enabled, the corresponding feature is turned on, this
+ * should be implemented by conditional statements.
+ *
+ * In the future we will probably implement this using Firebase Remote Config
+ * https://firebase.google.com/products/remote-config
+ */
+export const FeatureFlags = createContext([]);
+
+function FeatureFlagsProvider({children}) {
+  const fflags = {cloudFirestore: false};
+  return (
+    <FeatureFlags.Provider value={fflags}>{children}</FeatureFlags.Provider>
+  );
 }

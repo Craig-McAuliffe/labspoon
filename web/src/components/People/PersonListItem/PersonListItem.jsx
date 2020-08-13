@@ -1,9 +1,9 @@
 import React from 'react';
 import UserAvatar from '../Avatar/UserAvatar';
 import SwitchButtonState from '../Utility/SwitchButtonState';
-import './ResearcherListing.css';
+import './PersonListItem.css';
 
-const ResearcherListing = ({id}) => (
+const PersonListItem = ({id}) => (
   <div className="Container">
     <div className="Avatar">
       <UserAvatar src="https://picsum.photos/200" width="60px" />
@@ -25,4 +25,4 @@ const ResearcherListing = ({id}) => (
   </div>
 );
 
-export default ResearcherListing;
+export default PersonListItem;

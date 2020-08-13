@@ -1,12 +1,6 @@
 import React from 'react';
 
 import FilterableResults from '../../components/FilterableResults/FilterableResults';
-import PostList from '../../components/Posts/PostList/PostList';
-import {
-  FilterMenu,
-  getFilterCollectionEnabledIDsSet,
-} from '../../components/Filter/Filter';
-import Sider from '../../components/Layout/Sider/Sider';
 
 import getFilteredTestPosts from '../../mockdata/posts';
 import {getPostFilters} from '../../mockdata/filters';

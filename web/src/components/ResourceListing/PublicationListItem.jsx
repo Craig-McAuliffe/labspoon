@@ -1,12 +1,7 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 
-import {
-  LectureIcon,
-  ProjectIcon,
-  OpenPositionIcon,
-  PublicationIcon,
-} from '../../assets/PostTypeIcons';
+import {PublicationIcon} from '../../assets/PostTypeIcons';
 
 import PostActions from '../Posts/Post/PostParts/PostActions';
 
@@ -17,7 +12,10 @@ import './PublicationListItem.css';
 const PublicationListItem = ({post}) => {
   return (
     <div className="resource-post">
-      <ResourceHeader postType={post.type} postAuthor={post.author} />
+      <ResourceHeader
+        resourceType={post.resourceType}
+        postAuthor={post.author}
+      />
       <ResourceTextContent publication={post.resource} />
       <FeedItemTopics taggedItem={post.resource} />
       <PostActions />
@@ -25,20 +23,22 @@ const PublicationListItem = ({post}) => {
   );
 };
 
-function ResourceHeader({postType, postAuthor}) {
+// If other resourceType posts use this design component, then we will swith here
+function ResourceHeader({resourceType, postAuthor}) {
   const postTypeIcons = () => {
-    switch (postType.name) {
+    switch (resourceType) {
       case 'publication':
         return <PublicationIcon />;
       default:
+        console.log('Error: needs resourceType');
         return null;
     }
   };
 
-  const resourceTypeName = () => {
-    if (postType.name === 'default') return null;
-    return <h2 className="resource-type-name">{postType.name}</h2>;
-  };
+  const resourceTypeName = () =>
+    resourceType ? (
+      <h2 className="resource-type-name">{resourceType}</h2>
+    ) : null;
 
   return (
     <div className="resource-header">
@@ -64,6 +64,7 @@ function ResourceTextContent({publication}) {
           <Link
             to={`/profile/${author.id}`}
             className="resource-content-author"
+            key={author.id}
           >
             {author.name}
           </Link>
