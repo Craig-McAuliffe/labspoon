@@ -83,3 +83,22 @@ export default function publications(uniqueID) {
     },
   ];
 }
+
+export const findSimilarPublications = (topicIDs, thisPublicationID) => {
+  const uniquePublications = [];
+  topicIDs.map((topicID) => {
+    publications().map((publication) => {
+      if (publication.id !== thisPublicationID)
+        publication.topics.map((topic) => {
+          if (
+            topic.id === topicID &&
+            uniquePublications.map(
+              (uniquePublication) => uniquePublication != topicID
+            )
+          )
+            uniquePublications.push(publication);
+        });
+    });
+  });
+  return uniquePublications.slice(0, 5);
+};

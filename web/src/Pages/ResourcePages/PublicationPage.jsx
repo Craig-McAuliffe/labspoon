@@ -1,6 +1,8 @@
 import React from 'react';
 
-import publications from '../../mockdata/publications';
+import publications, {
+  findSimilarPublications,
+} from '../../mockdata/publications';
 import journals from '../../mockdata/journals';
 import {useParams} from 'react-router-dom';
 import FeedItemTopics from '../../components/FeedItems/FeedItemTopics';
@@ -18,25 +20,6 @@ export default function PublicationPage({context}) {
     .map((topic) => topic.id)
     .slice(0, 2);
 
-  const findSimilarPublications = () => {
-    const uniquePublications = [];
-    topicIDs.map((topicID) => {
-      publications().map((publication) => {
-        if (publication.id !== thisPublicationID)
-          publication.topics.map((topic) => {
-            if (
-              topic.id === topicID &&
-              uniquePublications.map(
-                (uniquePublication) => uniquePublication != topicID
-              )
-            )
-              uniquePublications.push(publication);
-          });
-      });
-    });
-    return uniquePublications.slice(0, 5);
-  };
-
   const detectJournal = () => {
     const journalName = journals.filter((journal) =>
       matchedPublication.url.toLowerCase().includes(journal.name.toLowerCase())
@@ -51,7 +34,12 @@ export default function PublicationPage({context}) {
           {context ? (
             <FromContextPublications context={context} />
           ) : (
-            <SimilarPublications publications={findSimilarPublications()} />
+            <SimilarPublications
+              publications={findSimilarPublications(
+                topicIDs,
+                thisPublicationID
+              )}
+            />
           )}
         </Sider>
       </div>
