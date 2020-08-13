@@ -12,5 +12,40 @@ export default function users() {
       avatar:
         'https://i.picsum.photos/id/620/200/200.jpg?hmac=i-QlnBFXHK0SDe5o7B85DMYehiO7H-fZxsKLRrfFCcU',
     },
+    {
+      name: 'Labspoon',
+      id: 'GHJ4IS43R2FHU53252IFD',
+      avatar: 'https://i.ibb.co/4VbMRyv/Group-183-1.png',
+    },
+    {
+      name: 'Sally McDee',
+      id: 'gg7s98yr2u8hf',
+      avatar: 'https://picsum.photos/200/200',
+    },
+    {
+      name: 'Joshua McLee',
+      id: 'fyd7s89gr2uifur',
+      avatar: 'https://picsum.photos/200/200',
+    },
+    {
+      name: 'Xi McSee',
+      id: 'fdhsuifd78gyfe',
+      avatar: 'https://picsum.photos/200/200',
+    },
+    {
+      name: 'Flee McWee',
+      id: 'hdus97ruhfjkdfds',
+      avatar: 'https://picsum.photos/200/200',
+    },
+    {
+      name: 'Cecelia McThee',
+      id: '38ugifbjkdsnse52IFD',
+      avatar: 'https://picsum.photos/200/200',
+    },
+    {
+      name: 'Charly McVee',
+      id: 'u89hduihr32hfh',
+      avatar: 'https://picsum.photos/200/200',
+    },
   ];
 }

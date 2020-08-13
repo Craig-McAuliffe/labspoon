@@ -5,11 +5,6 @@ import FilterableResults, {
   getTabFromTypeFilterCollection,
   DEFAULT_TAB_IDX,
 } from '../../components/FilterableResults/FilterableResults';
-import {
-  FilterMenu,
-  getFilterCollectionEnabledIDsSet,
-} from '../../components/Filter/Filter';
-import Sider from '../../components/Layout/Sider/Sider';
 
 import getFilteredTestPosts from '../../mockdata/posts';
 import {getSearchFilters} from '../../mockdata/filters';
@@ -43,7 +38,7 @@ export default function SearchPage() {
 }
 
 function SearchForm({query, setQuery}) {
-  let history = useHistory();
+  const history = useHistory();
   const handleSubmit = (event) => {
     history.push('/search/' + query);
     event.preventDefault();

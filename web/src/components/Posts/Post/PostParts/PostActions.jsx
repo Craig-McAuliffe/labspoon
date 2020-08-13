@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import BookmarkButton from '../../../Buttons/BookmarkButton';
 import RecommendButton from '../../../Buttons/RecommendButton';
 import RepostToGroupButton from '../../../Buttons/RepostToGroupButton';

@@ -1,4 +1,4 @@
-import React, {useEffect, useContext} from 'react';
+import React, {useContext} from 'react';
 import firebase from '../../firebase.js';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 
@@ -12,7 +12,7 @@ import {AuthContext} from '../../App';
  */
 function LoginPage() {
   const user = useContext(AuthContext);
-  let UIConfig = {
+  const UIConfig = {
     signInFlow: 'popup',
     signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
     callbacks: {

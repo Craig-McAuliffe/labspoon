@@ -20,5 +20,9 @@ export default function topics() {
       id: '_(3rh3ir',
       name: 'Mathematics',
     },
+    {
+      id: 'dfhsjghjihf4443',
+      name: 'SARS-CoV-2',
+    },
   ];
 }

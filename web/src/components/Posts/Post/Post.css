@@ -1,8 +1,8 @@
-.text-post {
+.post-container {
   margin: 2px 2px 20px 2px;
   padding: 20px 16px;
-  flex-grow: 1;
   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.3);
+  max-width: 100%;
 }
 
 .post-header {
@@ -34,6 +34,7 @@
   text-transform: capitalize;
   padding: 0px 8px 0px 5px;
   align-self: flex-end;
+  color: #5d5d65;
 }
 
 .post-type-icon {
@@ -44,26 +45,6 @@
   margin: 10px;
 }
 
-.post-topics {
-  margin: 10px 0px 0px;
-  display: grid;
-  grid-template-columns: 30px 1fr;
-}
-
-.topics-sub-title {
-  color: #99999f;
-  grid-column: 1 /2;
-}
-
-.topic-names-container {
-  grid-column: 2/3;
-  display: flex;
-}
-
-.topic-names {
-  display: inline-block;
-  margin: 0px 30px;
-}
 @media screen and (max-width: 590px) {
   .post-type-name {
     font-size: 16px;

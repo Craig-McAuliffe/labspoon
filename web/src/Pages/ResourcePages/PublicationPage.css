@@ -1,0 +1,45 @@
+.publication-sider {
+  margin: 20px 20px;
+}
+.suggested-publications-container {
+}
+.suggested-publication {
+  border: 1px solid #dcdce0;
+  padding: 10px;
+}
+
+.publication-header {
+  min-width: 100%;
+  grid-column: 2/3;
+  display: flex;
+  justify-content: space-between;
+}
+
+.sider-title {
+  color: #5d5d65;
+  margin-top: 20px;
+}
+
+.publication-journal-logo {
+  min-width: 150px;
+  max-height: 50px;
+  object-fit: cover;
+}
+
+.publication-body {
+  grid-column: 2/3;
+}
+
+.publication-body h2 {
+  margin: 20px 0px;
+}
+
+.publication-body-authors {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.publication-section-title {
+  color: #5d5d65;
+  margin: 20px 0px 10px;
+}

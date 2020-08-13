@@ -12,6 +12,7 @@ import {
 
 import PostOptionalTags from './PostParts/PostOptionalTags';
 import PostActions from './PostParts/PostActions';
+import FeedItemTopics from '../../FeedItems/FeedItemTopics';
 import PropTypes from 'prop-types';
 
 import './Post.css';
@@ -25,11 +26,11 @@ import UserAvatar from '../../Avatar/UserAvatar';
  */
 export default function Post({post}) {
   return (
-    <div className="text-post">
-      <PostHeader post={post} />
+    <div className="post-container">
+      <PostHeader postType={post.postType} postAuthor={post.author} />
       <PostTextContent post={post} />
       <PostOptionalTags optionalTags={post.optionaltags} />
-      <PostTopics post={post} />
+      <FeedItemTopics taggedItem={post} />
       <PostActions />
     </div>
   );
@@ -39,7 +40,7 @@ Post.propTypes = {
   post: PropTypes.shape({
     id: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
+    type: PropTypes.object.isRequired,
     author: PropTypes.shape({
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
@@ -60,9 +61,9 @@ Post.propTypes = {
  * Display the header on a post
  * @return {React.ReactElement}
  */
-function PostHeader({post}) {
+function PostHeader({postType, postAuthor}) {
   const postTypeIcons = () => {
-    switch (post.type.name) {
+    switch (postType.name) {
       case 'default':
         return null;
       case 'publication':
@@ -85,8 +86,8 @@ function PostHeader({post}) {
   };
 
   const postTypeName = () => {
-    if (post.type.name == 'default') return null;
-    return <h2 className="post-type-name">{post.type.name}</h2>;
+    if (postType.name === 'default') return null;
+    return <h2 className="post-type-name">{postType.name}</h2>;
   };
 
   return (
@@ -94,10 +95,10 @@ function PostHeader({post}) {
       <div className="post-header-profile">
         <UserAvatar
           className="post-header-avatar"
-          src={post.author.avatar}
+          src={postAuthor.avatar}
           width="80px"
         />
-        <h2>{post.author.name}</h2>
+        <h2>{postAuthor.name}</h2>
       </div>
 
       <div className="post-type-container">
@@ -115,32 +116,6 @@ PostHeader.propTypes = {
   }).isRequired,
 };
 
-/** Display the topics with which a post has been tagged
- * @return {React.ReactElement}
- */
-function PostTopics({post}) {
-  return (
-    <div className="post-topics">
-      <p className="topics-sub-title">Topics: </p>
-      <div className="topic-names-container">
-        {post.topics.map((topic) => (
-          <a key={topic.id} href="/" className="topic-names">
-            {topic.name}{' '}
-          </a>
-        ))}
-      </div>
-    </div>
-  );
-}
-PostTopics.propTypes = {
-  topics: PropTypes.arrayOf(
-    PropTypes.exact({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-    })
-  ),
-};
-
 /**
  * Display content for a post text
  * @return {React.ReactElement}
@@ -148,7 +123,7 @@ PostTopics.propTypes = {
 function PostTextContent({post}) {
   return (
     <div className="post-text-content">
-      <h2>{post.title}</h2>
+      <h3>{post.title}</h3>
       <p>{post.content.text}</p>
     </div>
   );

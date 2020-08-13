@@ -13,6 +13,7 @@ import FollowsPage from './pages/FollowsPage';
 import SearchPage from './pages/SearchPage';
 import ProfilePage from './pages/ProfilePage';
 import LoginPage from './pages/LoginPage';
+import PublicationPage from './pages/ResourcePages/PublicationPage';
 
 /**
  * Top level routing structure for the app.
@@ -47,6 +48,9 @@ export default function Routes({user, setUser}) {
       <AuthRoute user={user} path="/profile">
         <ProfilePage />
       </AuthRoute>
+      <Route path="/publication/:id">
+        <PublicationPage />
+      </Route>
       <Route path="/">
         <Redirect to="/" />
       </Route>

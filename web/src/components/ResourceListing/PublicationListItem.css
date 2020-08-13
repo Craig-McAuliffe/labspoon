@@ -1,0 +1,47 @@
+.resource-post {
+  border: 1px solid #3099d3;
+  box-shadow: 0px 0px 4px rgba(48, 153, 211, 0.6);
+  margin: 2px 2px 20px 2px;
+  padding: 20px 16px;
+}
+
+.resource-header {
+  border-bottom: none;
+  display: grid;
+  grid-template-columns: 50px 1fr 50px;
+  height: 60px;
+  margin-top: 20px;
+}
+.resource-header-logo {
+  align-self: flex-start;
+}
+.resource-header-logo img {
+  width: 35px;
+  height: 30px;
+}
+
+.resource-type-container {
+  grid-column: 2 / 3;
+  justify-self: center;
+  align-self: flex-start;
+  display: flex;
+}
+
+.resource-type-name {
+  text-transform: capitalize;
+  padding: 0px 8px 0px 5px;
+  align-self: flex-end;
+  color: #5d5d65;
+}
+.resource-topics {
+  display: flex;
+}
+
+.resource-content-authors {
+  margin: 10px 0px;
+}
+
+.resource-content-author {
+  margin-right: 15px;
+  /* color: #5d5d65; */
+}

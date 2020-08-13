@@ -3,12 +3,13 @@ import {getFilterCollectionEnabledIDsSet} from '../components/Filter/Filter';
 import postTypes from './postTypes';
 import topics from './topics';
 import users from './users';
+import publications from './publications';
 
 export function getTestPosts(uniqueID) {
   return [
     {
       id: 'o3bosfseself' + uniqueID,
-      type: 'post',
+      resourceType: 'post',
       title:
         'The National Lung Matrix Trial of personalized therapy in' +
         'lung cancer ',
@@ -22,7 +23,7 @@ export function getTestPosts(uniqueID) {
     },
     {
       id: '83hisefoi' + uniqueID,
-      type: 'post',
+      resourceType: 'post',
       title: 'Today I overslept',
       postType: postTypes()[1],
       author: users()[1],
@@ -72,7 +73,7 @@ export function getTestPosts(uniqueID) {
     },
     {
       id: '09w03rin' + uniqueID,
-      type: 'post',
+      resourceType: 'post',
       title: 'I hate coming up with test data',
       postType: postTypes()[2],
       author: users()[0],
@@ -91,6 +92,38 @@ export function getTestPosts(uniqueID) {
           ],
         },
       ],
+    },
+    {
+      id: 'fdfd892hrn' + uniqueID,
+      resourceType: 'publication',
+      author: users()[2],
+      type: postTypes()[1],
+      topics: [topics()[3], topics()[4]],
+      resource: publications()[0],
+    },
+    {
+      id: 'fdjsi93uhifh' + uniqueID,
+      resourceType: 'publication',
+      author: users()[2],
+      type: postTypes()[1],
+      topics: [topics()[3], topics()[4]],
+      resource: publications()[1],
+    },
+    {
+      id: 'f8d9hu34huhfui' + uniqueID,
+      resourceType: 'publication',
+      author: users()[2],
+      type: postTypes()[1],
+      topics: [topics()[3], topics()[4]],
+      resource: publications()[2],
+    },
+    {
+      id: '3829huoewrn' + uniqueID,
+      resourceType: 'publication',
+      author: users()[2],
+      type: postTypes()[1],
+      topics: [topics()[3], topics()[4]],
+      resource: publications()[3],
     },
   ];
 }

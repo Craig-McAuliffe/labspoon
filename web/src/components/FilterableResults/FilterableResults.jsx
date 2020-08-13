@@ -110,7 +110,7 @@ export default function FilterableResults({
   };
   return (
     <>
-      <div className="Sider">
+      <div className="sider-layout">
         <Sider>
           <FilterMenu
             options={filterOptions}
@@ -119,13 +119,13 @@ export default function FilterableResults({
           />
         </Sider>
       </div>
-      <div className="Content">
-        {useTabs && (
+      <div className="content-layout">
+        {useTabs ? (
           <Tabs
             tabFilter={filterOptions[DEFAULT_TAB_IDX]}
             setTabFilter={setTab}
           />
-        )}
+        ) : null}
         <Results
           results={results}
           hasMore={hasMore}
@@ -178,8 +178,8 @@ function updateFilterOption(filterOptions, collectionIndex, optionIndex) {
 
 function Tabs({tabFilter, setTabFilter}) {
   const selectedTab = getTabFromTypeFilterCollection(tabFilter);
-  let tabs = tabFilter.options.map((option) => (
-    <button onClick={() => setTabFilter(option.data.id)}>
+  const tabs = tabFilter.options.map((option) => (
+    <button onClick={() => setTabFilter(option.data.id)} key={option.data.id}>
       {option.data.name}
     </button>
   ));

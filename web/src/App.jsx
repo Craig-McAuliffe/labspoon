@@ -27,11 +27,11 @@ export default function App() {
 
 const AppLayout = ({children}) => {
   return (
-    <div className="Layout">
-      <div className="Header">
+    <div className="layout">
+      <div className="header-layout">
         <Header />
       </div>
-      <div className="Main">{children}</div>
+      <div className="main-layout">{children}</div>
     </div>
   );
 };
