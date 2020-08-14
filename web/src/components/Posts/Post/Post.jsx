@@ -1,4 +1,5 @@
 import React from 'react';
+import {Link} from 'react-router-dom';
 
 import {
   LectureIcon,
@@ -98,7 +99,9 @@ function PostHeader({postType, postAuthor}) {
           src={postAuthor.avatar}
           width="80px"
         />
-        <h2>{postAuthor.name}</h2>
+        <h2>
+          <Link to={`/profile/${postAuthor.id}`}>{postAuthor.name}</Link>
+        </h2>
       </div>
 
       <div className="post-type-container">

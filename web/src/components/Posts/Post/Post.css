@@ -14,6 +14,14 @@
   border-bottom: 1px solid #dcdce0;
 }
 
+.post-header a {
+  color: black;
+}
+.post-header a:hover {
+  text-decoration: underline;
+  color: black;
+}
+
 .post-text-content {
   min-width: 100%;
   margin: 10px 0px;
