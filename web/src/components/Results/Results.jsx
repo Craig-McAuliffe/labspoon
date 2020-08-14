@@ -20,7 +20,7 @@ export default function Results({results, hasMore, fetchMore}) {
     <ListItem key={result.id} result={result} />
   ));
   return (
-    <div className="feed-container">
+    <div className="page-content-container">
       <InfiniteScroll
         dataLength={items.length}
         hasMore={hasMore}

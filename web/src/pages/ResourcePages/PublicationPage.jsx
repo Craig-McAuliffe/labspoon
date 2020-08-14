@@ -44,26 +44,28 @@ export default function PublicationPage({context}) {
         </Sider>
       </div>
       <div className="content-layout">
-        <div className="publication-header">
-          {detectJournal().length === 0 ? null : (
-            <img
-              className="publication-journal-logo"
-              src={detectJournal()[0].logo}
-              alt={`${detectJournal()[0].name} journal logo`}
+        <div className="page-content-container">
+          <div className="publication-header">
+            {detectJournal().length === 0 ? null : (
+              <img
+                className="publication-journal-logo"
+                src={detectJournal()[0].logo}
+                alt={`${detectJournal()[0].name} journal logo`}
+              />
+            )}
+            <PublicationLink publicationUrl={matchedPublication.url} />
+          </div>
+          <div className="publication-body">
+            <h2>{matchedPublication.title}</h2>
+            <PublicationAuthors
+              publicationAuthors={matchedPublication.content.authors}
             />
-          )}
-          <PublicationLink publicationUrl={matchedPublication.url} />
-        </div>
-        <div className="publication-body">
-          <h2>{matchedPublication.title}</h2>
-          <PublicationAuthors
-            publicationAuthors={matchedPublication.content.authors}
-          />
-          <h3 className="publication-section-title">Abstract</h3>
-          <p className="publication-body-abstract">
-            {matchedPublication.content.abstract}
-          </p>
-          <FeedItemTopics taggedItem={matchedPublication} />
+            <h3 className="publication-section-title">Abstract</h3>
+            <p className="publication-body-abstract">
+              {matchedPublication.content.abstract}
+            </p>
+            <FeedItemTopics taggedItem={matchedPublication} />
+          </div>
         </div>
       </div>
     </>
