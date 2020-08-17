@@ -1,0 +1,37 @@
+users:
+  MA1qq6qfbFfMER5HdlTa4X36Ly42:
+    name: Craig McAuliffe
+    avatar: https://i.picsum.photos/id/620/200/200.jpg?hmac=i-QlnBFXHK0SDe5o7B85DMYehiO7H-fZxsKLRrfFCcU
+  YdZkqyCThmUNhej0VXtqqWgD69s2:
+    name: Patrick Leask
+    avatar: https://i.picsum.photos/id/804/200/200.jpg?hmac=73qw3Bnt67aOsdWd033BvfX9Gq0gIJ6FSL3Dp3gA97E
+posts:
+  54765360-1728-41fb-8726-5c412a7b364d:
+    title: The National Lung Matrix Trial of personalized therapy in lung cancer
+    postType:
+      id: default
+      name: default
+    author:
+      id: YdZkqyCThmUNhej0VXtqqWgD69s2
+      name: Patrick Leask
+      avatar: https://i.picsum.photos/id/804/200/200.jpg?hmac=73qw3Bnt67aOsdWd033BvfX9Gq0gIJ6FSL3Dp3gA97E
+    content:
+      text: This is an example of a text post!
+    topics:
+      - id: b1a66949-0b46-428e-a47e-15b17499ba5a
+        name: Biology
+      - id: dbd6811f-8e7a-416b-a5cb-0bf564f89a39
+        name: Physics
+topics:
+  b1a66949-0b46-428e-a47e-15b17499ba5a:
+    name: Biology
+  dbd6811f-8e7a-416b-a5cb-0bf564f89a39:
+    name: Physics
+  91fef93e-7162-43f0-8c33-7c7857700672:
+    name: Astronomy
+  2390004e-2802-4a78-89dd-71cecd154b88:
+    name: Statistics
+  b3f68aa5-9388-4295-b451-75f48ff3deed:
+    name: Mathematics
+  34ca8f0c-0d6d-457d-8cfa-6935564acb6b:
+    name: SARS-CoV-2
