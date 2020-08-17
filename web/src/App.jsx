@@ -55,13 +55,13 @@ function AuthProvider({children}) {
  * If a feature flag is enabled, the corresponding feature is turned on, this
  * should be implemented by conditional statements.
  *
- * In the future we will probably implement this using Firebase Remote Config
- * https://firebase.google.com/products/remote-config
+ * The enabled feature flags for the environment are space separated in .env
+ * under the REACT_APP_ENABLED_FFLAGS field
  */
 export const FeatureFlags = createContext([]);
 
 function FeatureFlagsProvider({children}) {
-  const fflags = {cloudFirestore: false};
+  const fflags = new Set(process.env.REACT_APP_ENABLED_FFLAGS.split(' '));
   return (
     <FeatureFlags.Provider value={fflags}>{children}</FeatureFlags.Provider>
   );
