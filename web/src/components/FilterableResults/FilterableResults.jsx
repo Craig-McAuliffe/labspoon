@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import update from 'immutability-helper';
 
 import {FilterMenu} from '../Filter/Filter';
@@ -19,9 +19,16 @@ export default function FilterableResults({
 }) {
   const [hasMore, setHasMore] = useState(true);
   const [skip, setSkip] = useState(0);
-  const [results, setResults] = useState(
-    fetchResults(skip, limit, defaultFilter)
-  );
+  const [results, setResults] = useState([]);
+  useEffect(() => {
+    // fetchResults may return either a result set or a promise, so we convert
+    // it to always a promise here
+    Promise.resolve(fetchResults(skip, limit, defaultFilter)).then(
+      (results) => {
+        setResults(results);
+      }
+    );
+  }, [skip]);
   /**
    * Filter options has the following structure:
    * [{

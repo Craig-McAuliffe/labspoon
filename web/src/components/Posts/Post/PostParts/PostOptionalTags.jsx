@@ -14,7 +14,7 @@ import {
 import './PostOptionalTags.css';
 
 const PostOptionalTags = ({optionalTags}) => {
-  if (optionalTags.length === 0 || !optionalTags) return null;
+  if (!optionalTags || optionalTags.length === 0) return null;
   {
     const optionalTagItems = optionalTags.map((optionalTag) => {
       if (optionalTag.type === 'researcher') {

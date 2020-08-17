@@ -39,9 +39,13 @@ const AppLayout = ({children}) => {
 export const AuthContext = createContext(null);
 
 function AuthProvider({children}) {
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState();
   useEffect(() => auth.onAuthStateChanged((user) => setUser(user)));
-  return <AuthContext.Provider value={user}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={user}>
+      {user !== undefined ? children : <></>}
+    </AuthContext.Provider>
+  );
 }
 
 /**
