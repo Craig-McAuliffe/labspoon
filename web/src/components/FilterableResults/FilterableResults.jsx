@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import update from 'immutability-helper';
 
 import {FilterMenu} from '../Filter/Filter';
@@ -17,11 +17,9 @@ export default function FilterableResults({
   limit,
   useTabs,
 }) {
-  const [hasMore, setHasMore] = useState(true);
+  const [hasMore, setHasMore] = useState(false);
   const [skip, setSkip] = useState(0);
-  const [results, setResults] = useState(
-    fetchResults(skip, limit, defaultFilter)
-  );
+  const [results, setResults] = useState([]);
   /**
    * Filter options has the following structure:
    * [{
@@ -39,16 +37,23 @@ export default function FilterableResults({
    * }, ...]
    */
   const [filterOptions, setFilterOptions] = useState(defaultFilter);
+
+  useEffect(() => {
+    // fetchResults may return either a result set or a promise, so we convert
+    // it to always a promise here
+    Promise.resolve(fetchResults(skip, limit + 1, filterOptions)).then(
+      (newResults) => {
+        setHasMore(!(newResults.length <= limit));
+        setResults(results.concat(newResults.slice(0, limit)));
+      }
+    );
+  }, [skip]);
+
   /**
    * Fetches the next page of results. Attempts to retrieve an extra result to
    * determine whether there are more results available.
    */
   function fetchMore() {
-    const newResults = fetchResults(skip + limit, limit + 1, filterOptions);
-    if (newResults.length <= limit) {
-      setHasMore(false);
-    }
-    setResults(results.concat(newResults.slice(0, limit)));
     setSkip(skip + limit);
   }
   function resetFeedFromFilterUpdate(updatedFilterOptions) {

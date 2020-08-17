@@ -1,5 +1,6 @@
 import firebase from 'firebase';
 import 'firebase/auth';
+import 'firebase/firestore';
 const firebaseConfig = {
   apiKey: 'AIzaSyDfyZeoIcWLlTB61hpA_K5jr4i6VXX37D8',
   authDomain: 'labspoon-dev-266bc.firebaseapp.com',
@@ -12,4 +13,9 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 export const auth = firebase.auth();
+export const db = firebase.firestore();
+db.settings({
+  host: 'localhost:8080',
+  ssl: false,
+});
 export default firebase;

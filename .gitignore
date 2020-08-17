@@ -27,3 +27,8 @@
 *~
 *.swp
 *.swo
+
+# firebase logs
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
