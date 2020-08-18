@@ -20,9 +20,9 @@ const filterOptionsData = getPostFilters(getFilteredTestPosts([]));
  * documentation
  * @return {Array}
  */
-function fetchUserFeedData(uuid, skip, limit, filter) {
+function fetchUserFeedData(uuid, skip, limit, filter, last) {
   // TODO(patrick): update to use user's feed data
-  return fetchPublicFeedData(skip, limit, filter);
+  return fetchPublicFeedData(skip, limit, filter, last);
 }
 
 /**
@@ -31,11 +31,15 @@ function fetchUserFeedData(uuid, skip, limit, filter) {
  * @param {number} limit - number of results to return
  * @param {Array} filter - filter to apply to results, see FeedPage
  * documentation
+ * @param {Object} last - the last result from the previous set
  * @return {Array}
  */
-function fetchPublicFeedData(skip, limit, filter) {
-  return db
-    .collection('posts')
+function fetchPublicFeedData(skip, limit, filter, last) {
+  let results = db.collection('posts').orderBy('timestamp');
+  if (typeof last !== 'undefined') {
+    results = results.startAt(last.timestamp);
+  }
+  return results
     .limit(limit)
     .get()
     .then((qs) => {
@@ -75,8 +79,8 @@ export default function FollowingFeedPage() {
   let fetchResults;
   if (featureFlags.has('cloud-firestore')) {
     if (user) {
-      fetchResults = (skip, limit, filter) =>
-        fetchUserFeedData(user.uid, skip, limit, filter);
+      fetchResults = (skip, limit, filter, last) =>
+        fetchUserFeedData(user.uid, skip, limit, filter, last);
     } else {
       fetchResults = fetchPublicFeedData;
     }

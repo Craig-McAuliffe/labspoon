@@ -41,12 +41,12 @@ export default function FilterableResults({
   useEffect(() => {
     // fetchResults may return either a result set or a promise, so we convert
     // it to always a promise here
-    Promise.resolve(fetchResults(skip, limit + 1, filterOptions)).then(
-      (newResults) => {
-        setHasMore(!(newResults.length <= limit));
-        setResults(results.concat(newResults.slice(0, limit)));
-      }
-    );
+    Promise.resolve(
+      fetchResults(skip, limit + 1, filterOptions, results[results.length - 1])
+    ).then((newResults) => {
+      setHasMore(!(newResults.length <= limit));
+      setResults(results.concat(newResults.slice(0, limit)));
+    });
   }, [skip]);
 
   /**
@@ -57,7 +57,12 @@ export default function FilterableResults({
     setSkip(skip + limit);
   }
   function resetFeedFromFilterUpdate(updatedFilterOptions) {
-    const newResults = fetchResults(0, limit + 1, updatedFilterOptions);
+    const newResults = fetchResults(
+      0,
+      limit + 1,
+      updatedFilterOptions,
+      results[results.length - 1]
+    );
     setHasMore(newResults.length <= limit);
     setResults(newResults.slice(0, limit));
     setFilterOptions(updatedFilterOptions);
