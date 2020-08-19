@@ -3,10 +3,34 @@ users:
     id: MA1qq6qfbFfMER5HdlTa4X36Ly42
     name: Craig McAuliffe
     avatar: https://i.picsum.photos/id/620/200/200.jpg?hmac=i-QlnBFXHK0SDe5o7B85DMYehiO7H-fZxsKLRrfFCcU
+    followsUsers:
+      YdZkqyCThmUNhej0VXtqqWgD69s2:
+        id: YdZkqyCThmUNhej0VXtqqWgD69s2
+        name: Patrick Leask
+        avatar: https://i.picsum.photos/id/804/200/200.jpg?hmac=73qw3Bnt67aOsdWd033BvfX9Gq0gIJ6FSL3Dp3gA97E
+    followsTopics:
+      b1a66949-0b46-428e-a47e-15b17499ba5a:
+        id: b1a66949-0b46-428e-a47e-15b17499ba5a
+        name: Biology
+      dbd6811f-8e7a-416b-a5cb-0bf564f89a39:
+        id: dbd6811f-8e7a-416b-a5cb-0bf564f89a39
+        name: Physics
   YdZkqyCThmUNhej0VXtqqWgD69s2:
     id: YdZkqyCThmUNhej0VXtqqWgD69s2
     name: Patrick Leask
     avatar: https://i.picsum.photos/id/804/200/200.jpg?hmac=73qw3Bnt67aOsdWd033BvfX9Gq0gIJ6FSL3Dp3gA97E
+    followsUsers:
+      MA1qq6qfbFfMER5HdlTa4X36Ly42:
+        id: MA1qq6qfbFfMER5HdlTa4X36Ly42
+        name: Craig McAuliffe
+        avatar: https://i.picsum.photos/id/620/200/200.jpg?hmac=i-QlnBFXHK0SDe5o7B85DMYehiO7H-fZxsKLRrfFCcU
+    followsTopics:
+      b3f68aa5-9388-4295-b451-75f48ff3deed:
+        id: b3f68aa5-9388-4295-b451-75f48ff3deed
+        name: Mathematics
+      34ca8f0c-0d6d-457d-8cfa-6935564acb6b:
+        id: 34ca8f0c-0d6d-457d-8cfa-6935564acb6b
+        name: SARS-CoV-2
 posts:
   54765360-1728-41fb-8726-5c412a7b364d:
     id: 54765360-1728-41fb-8726-5c412a7b364d
@@ -264,14 +288,20 @@ posts:
         name: Astronomy
 topics:
   b1a66949-0b46-428e-a47e-15b17499ba5a:
+    id: b1a66949-0b46-428e-a47e-15b17499ba5a
     name: Biology
   dbd6811f-8e7a-416b-a5cb-0bf564f89a39:
+    id: dbd6811f-8e7a-416b-a5cb-0bf564f89a39
     name: Physics
   91fef93e-7162-43f0-8c33-7c7857700672:
+    id: 91fef93e-7162-43f0-8c33-7c7857700672
     name: Astronomy
   2390004e-2802-4a78-89dd-71cecd154b88:
+    id: 2390004e-2802-4a78-89dd-71cecd154b88
     name: Statistics
   b3f68aa5-9388-4295-b451-75f48ff3deed:
+    id: b3f68aa5-9388-4295-b451-75f48ff3deed
     name: Mathematics
   34ca8f0c-0d6d-457d-8cfa-6935564acb6b:
+    id: 34ca8f0c-0d6d-457d-8cfa-6935564acb6b
     name: SARS-CoV-2

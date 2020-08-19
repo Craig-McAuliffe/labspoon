@@ -14,10 +14,25 @@ import (
 
 const mockDataFile = "./mockData.yaml"
 
-type User struct {
+/*
+Used when referring to users from other types. Contains the necessary
+information to display a user with their name and avatar, such as in the
+header of a post or in a list.
+*/
+type UserRef struct {
 	ID     string `firestore:"id,omitempty"`
 	Name   string `firestore:"name,omitempty"`
 	Avatar string `firestore:"avatar,omitempty"`
+}
+
+// Used when the full details about a user a required, such as on their profile
+// page.
+type User struct {
+	ID            string             `firestore:"id,omitempty"`
+	Name          string             `firestore:"name,omitempty"`
+	Avatar        string             `firestore:"avatar,omitempty"`
+	FollowsUsers  map[string]UserRef `yaml:"followsUsers" firestore:"-"`
+	FollowsTopics map[string]Topic   `yaml:"followsTopics" firestore:"-"`
 }
 
 type Topic struct {
@@ -38,10 +53,10 @@ type Post struct {
 	ID        string      `firestore:"id,omitempty"`
 	Title     string      `firestore:"title,omitempty"`
 	PostType  PostType    `firestore:"postType" yaml:"postType"`
-	Author    User        `firestore:"author"`
+	Author    UserRef     `firestore:"author"`
 	Content   PostContent `firestore:"content"`
 	Topics    []Topic     `firestore:"topics"`
-  Timestamp *time.Time  `firestore:"timestamp"`
+	Timestamp *time.Time  `firestore:"timestamp"`
 }
 
 type Data struct {
@@ -63,11 +78,42 @@ func getDataFromFile(filePath string) (Data, error) {
 	return data, nil
 }
 
+func setFollowsTopics(ctx context.Context, client *firestore.Client, userDocumentRef *firestore.DocumentRef, followsTopics map[string]Topic) error {
+	followsTopicsDocumentRef := userDocumentRef.Collection("followsTopics")
+	for id, followTopic := range followsTopics {
+		_, err := followsTopicsDocumentRef.Doc(id).Set(ctx, followTopic)
+		if err != nil {
+			return fmt.Errorf("Failed to add following relationship to topic with ID %v: %w", id, err)
+		}
+	}
+	return nil
+}
+
+func setFollowsUsers(ctx context.Context, client *firestore.Client, userDocumentRef *firestore.DocumentRef, followsUsers map[string]UserRef) error {
+	followsUsersDocumentRef := userDocumentRef.Collection("followsUsers")
+	for id, followUser := range followsUsers {
+		_, err := followsUsersDocumentRef.Doc(id).Set(ctx, followUser)
+		if err != nil {
+			return fmt.Errorf("Failed to add following relationship to user with ID %v: %w", id, err)
+		}
+	}
+	return nil
+}
+
 func setUsers(ctx context.Context, client *firestore.Client, users map[string]User) error {
 	for id, user := range users {
-		_, err := client.Collection("users").Doc(id).Set(ctx, user)
+		userDocumentRef := client.Collection("users").Doc(id)
+		_, err := userDocumentRef.Set(ctx, user)
 		if err != nil {
 			return fmt.Errorf("Failed to add user with ID %v: %w", id, err)
+		}
+		err = setFollowsUsers(ctx, client, userDocumentRef, user.FollowsUsers)
+		if err != nil {
+			return fmt.Errorf("Failed to add follows users relationships for user with ID %v: %w", id, err)
+		}
+		err = setFollowsTopics(ctx, client, userDocumentRef, user.FollowsTopics)
+		if err != nil {
+			return fmt.Errorf("Failed to add follows topics relationships for user with ID %v: %w", id, err)
 		}
 	}
 	return nil
