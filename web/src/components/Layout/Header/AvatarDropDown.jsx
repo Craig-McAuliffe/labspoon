@@ -37,7 +37,7 @@ const AvatarDropDown = () => {
             </Link>
           </Dropdown.Item>
           <Dropdown.Item>
-            <Link to="/profile">
+            <Link to={`/user/${user.uid}`}>
               <UserProfileMenuIcon />
               <p className="LinkItem">Profile</p>
             </Link>
@@ -90,3 +90,5 @@ const CustomToggle = React.forwardRef(({children, onClick}, ref) => (
 ));
 
 export default AvatarDropDown;
+
+CustomToggle.displayName = CustomToggle;
