@@ -19,6 +19,7 @@ export default function FilterableResults({
 }) {
   const [hasMore, setHasMore] = useState(false);
   const [skip, setSkip] = useState(0);
+  const [last, setLast] = useState(undefined);
   const [results, setResults] = useState([]);
   /**
    * Filter options has the following structure:
@@ -41,12 +42,12 @@ export default function FilterableResults({
   useEffect(() => {
     // fetchResults may return either a result set or a promise, so we convert
     // it to always a promise here
-    Promise.resolve(
-      fetchResults(skip, limit + 1, filterOptions, results[results.length - 1])
-    ).then((newResults) => {
-      setHasMore(!(newResults.length <= limit));
-      setResults(results.concat(newResults.slice(0, limit)));
-    });
+    Promise.resolve(fetchResults(skip, limit + 1, filterOptions, last)).then(
+      (newResults) => {
+        setHasMore(!(newResults.length <= limit));
+        setResults(results.concat(newResults.slice(0, limit)));
+      }
+    );
   }, [skip]);
 
   /**
@@ -54,19 +55,19 @@ export default function FilterableResults({
    * determine whether there are more results available.
    */
   function fetchMore() {
+    setLast(results[results.length - 1]);
     setSkip(skip + limit);
   }
   function resetFeedFromFilterUpdate(updatedFilterOptions) {
-    const newResults = fetchResults(
-      0,
-      limit + 1,
-      updatedFilterOptions,
-      results[results.length - 1]
-    );
-    setHasMore(newResults.length <= limit);
-    setResults(newResults.slice(0, limit));
-    setFilterOptions(updatedFilterOptions);
-    setSkip(0);
+    Promise.resolve(
+      fetchResults(0, limit + 1, updatedFilterOptions, last)
+    ).then((newResults) => {
+      setHasMore(newResults.length <= limit);
+      setResults(newResults.slice(0, limit));
+      setFilterOptions(updatedFilterOptions);
+      setLast(undefined);
+      setSkip(0);
+    });
   }
   /**
    * Used by option components to update the filter when toggled.
