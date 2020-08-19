@@ -65,7 +65,10 @@ function AuthProvider({children}) {
 export const FeatureFlags = createContext([]);
 
 function FeatureFlagsProvider({children}) {
-  const fflags = new Set(process.env.REACT_APP_ENABLED_FFLAGS.split(' '));
+  let fflags = new Set();
+  if ('REACT_APP_ENABLED_FFLAGS' in process.env) {
+    fflags = new Set(process.env.REACT_APP_ENABLED_FFLAGS.split(' '));
+  }
   return (
     <FeatureFlags.Provider value={fflags}>{children}</FeatureFlags.Provider>
   );
