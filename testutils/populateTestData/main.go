@@ -28,11 +28,12 @@ type UserRef struct {
 // Used when the full details about a user a required, such as on their profile
 // page.
 type User struct {
-	ID            string             `firestore:"id,omitempty"`
-	Name          string             `firestore:"name,omitempty"`
-	Avatar        string             `firestore:"avatar,omitempty"`
-	FollowsUsers  map[string]UserRef `yaml:"followsUsers" firestore:"-"`
-	FollowsTopics map[string]Topic   `yaml:"followsTopics" firestore:"-"`
+	ID              string             `firestore:"id,omitempty"`
+	Name            string             `firestore:"name,omitempty"`
+	Avatar          string             `firestore:"avatar,omitempty"`
+	FollowsUsers    map[string]UserRef `yaml:"followsUsers" firestore:"-"`
+	FollowsTopics   map[string]Topic   `yaml:"followsTopics" firestore:"-"`
+	FollowedByUsers map[string]UserRef `yaml:"followedByUsers" firestore:"-"`
 }
 
 type Topic struct {
@@ -100,6 +101,17 @@ func setFollowsUsers(ctx context.Context, client *firestore.Client, userDocument
 	return nil
 }
 
+func setFollowedByUsers(ctx context.Context, client *firestore.Client, userDocumentRef *firestore.DocumentRef, followedByUsers map[string]UserRef) error {
+	followedByUsersDocumentRef := userDocumentRef.Collection("followedByUsers")
+	for id, followedByUser := range followedByUsers {
+		_, err := followedByUsersDocumentRef.Doc(id).Set(ctx, followedByUser)
+		if err != nil {
+			return fmt.Errorf("Failed to add followed by relationship to user with ID %v: %w", id, err)
+		}
+	}
+	return nil
+}
+
 func setUsers(ctx context.Context, client *firestore.Client, users map[string]User) error {
 	for id, user := range users {
 		userDocumentRef := client.Collection("users").Doc(id)
@@ -114,6 +126,10 @@ func setUsers(ctx context.Context, client *firestore.Client, users map[string]Us
 		err = setFollowsTopics(ctx, client, userDocumentRef, user.FollowsTopics)
 		if err != nil {
 			return fmt.Errorf("Failed to add follows topics relationships for user with ID %v: %w", id, err)
+		}
+		err = setFollowedByUsers(ctx, client, userDocumentRef, user.FollowedByUsers)
+		if err != nil {
+			return fmt.Errorf("Failed to add followed by users relationships for user with ID %v: %w", id, err)
 		}
 	}
 	return nil
