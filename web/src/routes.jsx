@@ -36,7 +36,7 @@ export default function Routes({user, setUser}) {
       <Route path="/graph">
         <GraphPage />
       </Route>
-      <Route path="/group">
+      <Route path="/group/:groupID">
         <GroupPage />
       </Route>
       <AuthRoute user={user} path="/follows">
