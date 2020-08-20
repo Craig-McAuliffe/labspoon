@@ -9,7 +9,7 @@ const FollowButton = ({currentState}) => {
       onClick={() => setFollowing(false)}
     >
       <div className="TextContainer">
-        <h2>{following ? Unfollow : Follow}</h2>
+        <h2>{following ? 'Unfollow' : 'Follow'}</h2>
       </div>
     </button>
   );

@@ -1,23 +1,13 @@
-.publication-sider {
-  margin: 20px 20px;
-}
-.suggested-publications-container {
-}
 .suggested-publication {
   border: 1px solid #dcdce0;
   padding: 10px;
 }
 
-.publication-header {
+.publication-meta {
   min-width: 100%;
   grid-column: 2/3;
   display: flex;
   justify-content: space-between;
-}
-
-.sider-title {
-  color: #5d5d65;
-  margin-top: 20px;
 }
 
 .publication-journal-logo {

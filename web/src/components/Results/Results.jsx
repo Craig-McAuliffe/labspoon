@@ -4,7 +4,8 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 
 import Post from '../Posts/Post/Post';
 import BookmarkListItem from '../Bookmarks/BookmarkListItem/BookmarkListItem';
-import PublicationListItem from '../ResourceListing/PublicationListItem';
+import PublicationListItem from '../Publication/PublicationListItem';
+import UserListItem from '../User/UserListItem';
 
 import './Results.css';
 
@@ -16,8 +17,8 @@ import './Results.css';
  * @return {React.ReactElement}
  */
 export default function Results({results, hasMore, fetchMore}) {
-  const items = results.map((result) => (
-    <ListItem key={result.id} result={result} />
+  const items = results.map((result, i) => (
+    <GenericListItem key={result.id + i} result={result} />
   ));
   return (
     <div className="page-content-container">
@@ -40,15 +41,24 @@ Results.propTypes = {
   fetchMore: PropTypes.func.isRequired,
 };
 
-export function ListItem({key, result}) {
+export function GenericListItem({result}) {
   switch (result.resourceType) {
     case 'post':
-      return <Post key={key} post={result} />;
+      return <Post post={result} key={result.id + 'post'} />;
     case 'bookmark':
-      return <BookmarkListItem key={key} bookmark={result} />;
+      return (
+        <BookmarkListItem bookmark={result} key={result.id + 'bookmark'} />
+      );
     case 'publication':
-      return <PublicationListItem key={key} post={result} />;
+      return (
+        <PublicationListItem
+          publication={result}
+          key={result.id + 'publication'}
+        />
+      );
+    case 'user':
+      return <UserListItem user={result} key={result.id + 'user'} />;
     default:
-      return <></>;
+      return null;
   }
 }
