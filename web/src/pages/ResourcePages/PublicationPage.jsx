@@ -7,7 +7,6 @@ import journals from '../../mockdata/journals';
 import {useParams} from 'react-router-dom';
 import FeedItemTopics from '../../components/FeedItems/FeedItemTopics';
 import {Link} from 'react-router-dom';
-import Sider from '../../components/Layout/Sider/Sider';
 
 import './PublicationPage.css';
 export default function PublicationPage({context}) {
@@ -30,18 +29,13 @@ export default function PublicationPage({context}) {
   return (
     <>
       <div className="sider-layout">
-        <Sider>
-          {context ? (
-            <FromContextPublications context={context} />
-          ) : (
-            <SimilarPublications
-              publications={findSimilarPublications(
-                topicIDs,
-                thisPublicationID
-              )}
-            />
-          )}
-        </Sider>
+        {context ? (
+          <FromContextPublications context={context} />
+        ) : (
+          <SimilarPublications
+            publications={findSimilarPublications(topicIDs, thisPublicationID)}
+          />
+        )}
       </div>
       <div className="content-layout">
         <div className="page-content-container">
