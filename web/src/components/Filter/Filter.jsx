@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {SearchIconGrey} from '../../assets/HeaderIcons';
+import './Filter.css';
 
 /**
  * Filter menu that allows the users to refine what is displayed in the feed
@@ -29,7 +31,12 @@ export function FilterMenu({
       />
     );
   });
-  return <div>{filterCollections}</div>;
+  return (
+    <div className="filter-container">
+      <FilterSearch />
+      {filterCollections}
+    </div>
+  );
 }
 FilterMenu.propTypes = {
   options: PropTypes.array.isRequired,
@@ -61,9 +68,16 @@ function FilterCollection({
     updateFilterOption(index, optionIndex);
   }
   return (
-    <div>
-      <b>{name}</b>
-      <button onClick={() => resetFilterCollection(index)}>Reset</button>
+    <div className="filter-collection">
+      <div className="filter-collection-header">
+        <h3 className="filter-collection-title">{name}</h3>
+        <button
+          onClick={() => resetFilterCollection(index)}
+          className="filter-collection-reset"
+        >
+          Reset
+        </button>
+      </div>
       {options.map((option, index) => (
         <FilterOption
           key={name}
@@ -94,15 +108,22 @@ FilterCollection.propTypes = {
  */
 function FilterOption({data, index, enabled, setOption}) {
   return (
-    <div>
-      <label>
+    <div className="filter-options-container">
+      <label
+        htmlFor={`fitlerOption ${data.name}`}
+        className="filter-option-name"
+      >
         {data.name}
-        <input
-          type="checkbox"
-          checked={enabled}
-          onChange={() => setOption(index)}
-        />
       </label>
+      <input
+        type="checkbox"
+        name={data.name}
+        id={`fitlerOption ${data.name}`}
+        checked={enabled}
+        onChange={() => setOption(index)}
+        className="filter-checkbox"
+      />
+      <div className="checkbox-design"></div>
     </div>
   );
 }
@@ -125,4 +146,13 @@ export function getFilterCollectionEnabledIDsSet(filterCollection) {
     .map((option) => option.data.id);
   const enabledIDsSet = new Set(enabledIDs);
   return enabledIDsSet;
+}
+
+function FilterSearch() {
+  return (
+    <div className="filter-search">
+      <SearchIconGrey />
+      <input type="text" placeholder="Filter Feed By" />
+    </div>
+  );
 }

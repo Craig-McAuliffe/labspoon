@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react';
 import update from 'immutability-helper';
 
 import {FilterMenu} from '../Filter/Filter';
-import Sider from '../Layout/Sider/Sider';
 import ResultsList from '../Results/Results';
 
 const DEFAULT_TAB_ID = 'default';
@@ -122,13 +121,11 @@ export default function FilterableResults({
   return (
     <>
       <div className="sider-layout">
-        <Sider>
-          <FilterMenu
-            options={filterOptions}
-            updateFilterOption={updateFilterOptionToState}
-            resetFilterCollection={resetFilterCollectionToState}
-          />
-        </Sider>
+        <FilterMenu
+          options={filterOptions}
+          updateFilterOption={updateFilterOptionToState}
+          resetFilterCollection={resetFilterCollectionToState}
+        />
       </div>
       <div className="content-layout">
         {useTabs ? (
