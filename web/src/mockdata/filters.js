@@ -68,7 +68,7 @@ function getTypesFilter() {
 
 function getTypesFilterForPostsList() {
   return {
-    collectionName: 'Types',
+    collectionName: 'Resource Types',
     options: [
       {
         enabled: true,

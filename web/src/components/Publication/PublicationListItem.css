@@ -1,0 +1,12 @@
+.resource-topics {
+  display: flex;
+}
+
+.resource-content-authors {
+  margin: 10px 0px;
+}
+
+.resource-content-author {
+  margin-right: 15px;
+  /* color: #5d5d65; */
+}

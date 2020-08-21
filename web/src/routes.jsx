@@ -11,9 +11,9 @@ import GraphPage from './pages/GraphPage';
 import GroupPage from './pages/GroupPage';
 import FollowsPage from './pages/FollowsPage';
 import SearchPage from './pages/SearchPage';
-import ProfilePage from './pages/ProfilePage';
+import UserPage from './pages/ResourcePages/UserPage';
 import LoginPage from './pages/LoginPage';
-import PublicationPage from './pages/ResourcePages/PublicationPage';
+import PublicationPage from './pages/ResourcePages/PublicationPage/PublicationPage';
 
 /**
  * Top level routing structure for the app.
@@ -45,9 +45,9 @@ export default function Routes({user, setUser}) {
       <Route path="/search/:query?">
         <SearchPage />
       </Route>
-      <AuthRoute user={user} path="/profile">
-        <ProfilePage />
-      </AuthRoute>
+      <Route user={user} path="/user/:userId">
+        <UserPage />
+      </Route>
       <Route path="/publication/:id">
         <PublicationPage />
       </Route>
