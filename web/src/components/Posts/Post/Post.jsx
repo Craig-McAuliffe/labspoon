@@ -167,9 +167,16 @@ export function PinnedPost({post}) {
   return (
     <div className="pinned-post">
       <h3>{post.title}</h3>
-      {post.topics
-        .map((postTopic) => <p key={postTopic.id}>{postTopic.name}</p>)
-        .slice(0, 3)}
+      <div>
+        {post.topics
+          .map((postTopic) => (
+            <h4 key={postTopic.id} className="pinned-post-topic">
+              {postTopic.name}
+            </h4>
+          ))
+          .slice(0, 3)}
+      </div>
+      <p className="pinned-post-more-info">Click for more info</p>
     </div>
   );
 }

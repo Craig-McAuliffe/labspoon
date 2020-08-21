@@ -46,7 +46,10 @@
   margin: 20px 0px;
   min-width: 100%;
   display: grid;
-  grid-template-columns: minmax(5px, 1fr) minmax(408px, 1070px) minmax(5px, 1fr);
+  grid-template-columns: minmax(10px, 1fr) minmax(408px, 1070px) minmax(
+      10px,
+      1fr
+    );
 }
 
 .page-content-container {
@@ -74,9 +77,12 @@
 
 .vertical-breadcrumb {
   grid-column: 2/3;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
-@media screen and (max-width: 1007px) {
+@media screen and (max-width: 1017px) {
   .sider-layout {
     display: none;
   }

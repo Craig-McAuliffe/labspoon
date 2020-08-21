@@ -53,6 +53,34 @@
   margin: 10px;
 }
 
+.pinned-post {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  border: 1px solid #3099d3;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0px 0px 4px #3099d3;
+}
+
+.pinned-post div {
+  display: flex;
+  justify-content: center;
+}
+
+.pinned-post h3 {
+  margin: 0px 0px 15px;
+  color: #00507c;
+}
+
+.pinned-post-topic {
+  margin: 0px 20px;
+}
+
+.pinned-post-more-info {
+  margin: 20px 0px 0px;
+  color: #99999f;
+}
 @media screen and (max-width: 590px) {
   .post-type-name {
     font-size: 16px;

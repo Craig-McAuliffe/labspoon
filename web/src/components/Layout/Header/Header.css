@@ -12,7 +12,10 @@
 .header-search {
   grid-column: 2/3;
   display: grid;
-  grid-template-columns: minmax(5px, 1fr) minmax(408px, 1070px) minmax(5px, 1fr);
+  grid-template-columns: minmax(10px, 1fr) minmax(408px, 1070px) minmax(
+      10px,
+      1fr
+    );
   justify-self: flex-start;
   width: 100%;
   margin: 0px 2px;
@@ -56,7 +59,7 @@
   max-height: 100%;
 }
 
-@media screen and (max-width: 1007px) {
+@media screen and (max-width: 1017px) {
   .header-container {
     display: grid;
     grid-template-columns: 100px 1fr 100px;
