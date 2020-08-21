@@ -16,6 +16,7 @@
 .Avatar {
   grid-column: 1/2;
   display: block;
+  margin: 10px;
 }
 
 .AvatarSmall {
@@ -61,6 +62,7 @@
   }
   .AvatarSmall {
     display: block;
+    margin: 5px;
   }
 
   .tag-container {

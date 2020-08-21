@@ -1,0 +1,19 @@
+.suggested-group-container {
+  margin: 20px 0px;
+}
+
+.suggested-group-link {
+  display: flex;
+  align-items: center;
+}
+
+.suggested-group-link div {
+  margin-left: 10px;
+}
+
+.group-details {
+  grid-column: 2/3;
+}
+.group-details {
+  grid-column: 2/3;
+}

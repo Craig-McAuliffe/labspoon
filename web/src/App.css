@@ -33,6 +33,8 @@
   border-right: 1px solid #dcdce0;
   position: fixed;
   width: 250px;
+  padding: 30px 10px 0px 10px;
+  overflow-x: hidden;
 }
 
 .content-layout {
@@ -59,7 +61,7 @@
 }
 
 .resource-sider {
-  margin: 20px 20px;
+  max-width: 100%;
 }
 
 .suggested-resources-container {
@@ -67,7 +69,11 @@
 
 .resource-sider-title {
   color: #5d5d65;
-  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.vertical-breadcrumb {
+  grid-column: 2/3;
 }
 
 @media screen and (max-width: 1007px) {

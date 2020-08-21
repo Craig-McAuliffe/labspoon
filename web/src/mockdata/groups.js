@@ -1,3 +1,6 @@
+import topics from './topics';
+import getTestPosts from './posts';
+
 export default function groups() {
   return [
     {
@@ -7,7 +10,9 @@ export default function groups() {
       location: 'London',
       Website: 'https://lab.gilest.ro/',
       avatar:
-        'https://i.picsum.photos/id/966/400/400.jpg?hmac=vTfdl7XUAXbnfiOQraT_4rOs-cUPhso7ZM6TihvkFhk',
+        'https://i.picsum.photos/id/724/1000/1000.jpg?hmac=AjG__UYhipFTMFDl2NTzRv3uA_EM-dPnwHlWxIiS-mQ',
+      taggedTopics: [topics()[0], topics()[1]],
+      pinnedPost: getTestPosts([])[0],
     },
     {
       name: 'Neuro Genomics Group',
@@ -16,7 +21,9 @@ export default function groups() {
       location: 'London',
       Website: 'null',
       avatar:
-        'https://i.picsum.photos/id/806/400/400.jpg?hmac=VeG2sErI6YRzsbOA4DRntIdRi0UWSuEwv-mhVl-5fH4',
+        'https://i.picsum.photos/id/941/1000/1000.jpg?hmac=L--8SZt-e5UBl9D214iij56CLomx8sVGhhwMKBveVOg',
+      taggedTopics: [topics()[2], topics()[3]],
+      pinnedPost: getTestPosts([])[1],
     },
     {
       name: 'Glycoproteins Group',
@@ -25,7 +32,9 @@ export default function groups() {
       Location: 'Evanston',
       Website: 'null',
       avatar:
-        'https://i.picsum.photos/id/74/400/400.jpg?hmac=bDtryDbES_9o6a51PQtx9RcTIxxrPQm-_c7yZjHkL2Q',
+        'https://i.picsum.photos/id/872/1000/1000.jpg?hmac=8XFELRvUfURgTA5P0ORHCQDp3NXRQVezJkBnCH4lD8U',
+      taggedTopics: [topics()[4], topics()[5]],
+      pinnedPost: getTestPosts([])[2],
     },
   ];
 }
