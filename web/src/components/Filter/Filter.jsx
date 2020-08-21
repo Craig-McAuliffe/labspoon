@@ -109,21 +109,18 @@ FilterCollection.propTypes = {
 function FilterOption({data, index, enabled, setOption}) {
   return (
     <div className="filter-options-container">
-      <label
-        htmlFor={`fitlerOption ${data.name}`}
-        className="filter-option-name"
-      >
-        {data.name}
+      <div className="filter-option-name">{data.name}</div>
+      <label className="filter-checkbox-container">
+        <input
+          type="checkbox"
+          name={data.name}
+          id={`fitlerOption ${data.name}`}
+          checked={enabled}
+          onChange={() => setOption(index)}
+          className="filter-checkbox"
+        />
+        <span className="filter-checkbox-design"></span>
       </label>
-      <input
-        type="checkbox"
-        name={data.name}
-        id={`fitlerOption ${data.name}`}
-        checked={enabled}
-        onChange={() => setOption(index)}
-        className="filter-checkbox"
-      />
-      <div className="checkbox-design"></div>
     </div>
   );
 }

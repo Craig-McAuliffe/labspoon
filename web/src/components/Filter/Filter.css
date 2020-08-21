@@ -47,19 +47,15 @@
 }
 
 .filter-collection-reset {
-  border: 1px solid #3099d3;
-}
-
-.filter-collection-reset {
   grid-column: 2/3;
   justify-self: flex-end;
   display: inline-block;
   border: none;
-  padding: 2px 6px;
+  padding: 2px 0px;
   border-radius: 4%;
   text-decoration: none;
-  background: #dcdce0;
-  color: #302f2f;
+  background: none;
+  color: #00507c;
   cursor: pointer;
   text-align: center;
   -webkit-appearance: none;
@@ -69,11 +65,11 @@
 .filter-collection-reset:hover,
 .filter-collection-reset:focus {
   display: inline-block;
-  padding: 2px 6px;
+  padding: 2px 0px;
   border-radius: 4%;
-  text-decoration: none;
-  background: #e5e5e9;
-  color: #000000;
+  text-decoration: underline;
+  background: none;
+  color: #00507c;
   cursor: pointer;
   text-align: center;
   -webkit-appearance: none;
@@ -87,52 +83,66 @@
   align-items: center;
   grid-template-rows: none;
   color: #287fad;
-}
-
-.filter-options-container:hover {
-  display: grid;
-  grid-template-columns: 1fr 20px;
-  align-items: center;
-  grid-template-rows: none;
-  border-top: 1px solid #3099d3;
-  border-bottom: 1px solid #3099d3;
-  color: #3099d3;
+  height: 40px;
 }
 
 .filter-option-name {
   grid-column: 1/2;
   padding-top: 4px;
+  align-self: center;
 }
 
-.filter-checkbox {
+.filter-checkbox-container {
   grid-column: 2/3;
   justify-self: flex-end;
-  opacity: 0;
-  position: absolute;
+  align-items: center;
+  cursor: pointer;
+  min-width: 100%;
+  min-height: 100%;
+  position: relative;
 }
 
-.checkbox-design {
-  grid-column: 2/3;
-  height: 15px;
-  width: 15px;
+.filter-checkbox:not(:checked),
+.filter-checkbox:checked {
+  top: 15px;
+  opacity: 0;
+  position: absolute;
+  height: 20px;
+  width: 20px;
+  cursor: pointer;
+}
+
+.filter-checkbox:not(:checked) + .filter-checkbox-design,
+.filter-checkbox:checked + .filter-checkbox-design {
+  top: 15px;
+  position: absolute;
+  height: 20px;
+  width: 20px;
   border-radius: 10%;
   border: 1px solid #00507c;
   cursor: pointer;
+  background: transparent;
 }
-.checkbox-design:hover {
-  grid-column: 2/3;
-  height: 15px;
-  width: 15px;
+.filter-checkbox + .filter-checkbox-design:hover {
+  height: 20px;
+  width: 20px;
   border-radius: 10%;
   border: 2px solid #00507c;
   cursor: pointer;
 }
-.checkbox-design:focus {
-  grid-column: 2/3;
+.filter-checkbox + .filter-checkbox-design:focus {
   height: 15px;
   width: 15px;
   border-radius: 10%;
   border: 1px solid #00507c;
+  background: #00507c;
+  cursor: pointer;
+}
+
+.filter-checkbox:checked + .filter-checkbox-design {
+  height: 20px;
+  width: 20px;
+  border-radius: 10%;
   background: #00507c;
   cursor: pointer;
 }

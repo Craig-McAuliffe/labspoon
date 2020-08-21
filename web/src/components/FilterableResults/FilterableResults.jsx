@@ -4,6 +4,8 @@ import update from 'immutability-helper';
 import {FilterMenu} from '../Filter/Filter';
 import ResultsList from '../Results/Results';
 
+import './FilterableResults.css';
+
 const DEFAULT_TAB_ID = 'default';
 export const DEFAULT_TAB_IDX = 0;
 
@@ -15,11 +17,16 @@ export default function FilterableResults({
   defaultFilter,
   limit,
   useTabs,
+  useFilterSider,
 }) {
   const [hasMore, setHasMore] = useState(false);
   const [skip, setSkip] = useState(0);
-  const [last, setLast] = useState(undefined);
   const [results, setResults] = useState([]);
+
+  const [fetchResultsState, setFetchResultsState] = useState(
+    () => fetchResults
+  );
+  const [last, setLast] = useState(undefined);
   /**
    * Filter options has the following structure:
    * [{
@@ -38,35 +45,40 @@ export default function FilterableResults({
    */
   const [filterOptions, setFilterOptions] = useState(defaultFilter);
 
+  if (fetchResultsState !== fetchResults) {
+    setFetchResultsState(() => fetchResults);
+    setSkip(0);
+    setFilterOptions(defaultFilter);
+  }
+
   useEffect(() => {
     // fetchResults may return either a result set or a promise, so we convert
     // it to always a promise here
     Promise.resolve(fetchResults(skip, limit + 1, filterOptions, last)).then(
       (newResults) => {
         setHasMore(!(newResults.length <= limit));
-        setResults(results.concat(newResults.slice(0, limit)));
+        if (skip === 0) {
+          setResults(newResults);
+        } else {
+          setResults(results.concat(newResults.slice(0, limit)));
+        }
       }
     );
-  }, [skip]);
+  }, [skip, fetchResultsState, filterOptions]);
 
   /**
    * Fetches the next page of results. Attempts to retrieve an extra result to
    * determine whether there are more results available.
    */
   function fetchMore() {
-    setLast(results[results.length - 1]);
+    setLast(results[results.length] - 1);
     setSkip(skip + limit);
   }
+
   function resetFeedFromFilterUpdate(updatedFilterOptions) {
-    Promise.resolve(
-      fetchResults(0, limit + 1, updatedFilterOptions, last)
-    ).then((newResults) => {
-      setHasMore(newResults.length <= limit);
-      setResults(newResults.slice(0, limit));
-      setFilterOptions(updatedFilterOptions);
-      setLast(undefined);
-      setSkip(0);
-    });
+    setFilterOptions(updatedFilterOptions);
+    setLast(undefined);
+    setSkip(0);
   }
   /**
    * Used by option components to update the filter when toggled.
@@ -106,9 +118,11 @@ export default function FilterableResults({
     );
     resetFeedFromFilterUpdate(updatedFilterOptions);
   }
+
   const tabIDToIdx = new Map(
     filterOptions[DEFAULT_TAB_IDX].options.map((opt, i) => [opt.data.id, i])
   );
+
   const setTab = (tabID) => {
     if (tabID === DEFAULT_TAB_ID) {
       return resetFilterCollectionToState(DEFAULT_TAB_IDX);
@@ -118,7 +132,25 @@ export default function FilterableResults({
       tabIDToIdx.get(tabID)
     );
   };
-  return (
+
+  const feedAndTabs = () => (
+    <div className="feed-container">
+      {useTabs ? (
+        <Tabs
+          tabFilter={filterOptions[DEFAULT_TAB_IDX]}
+          setTabFilter={setTab}
+        />
+      ) : null}
+      <Results
+        results={results}
+        hasMore={hasMore}
+        fetchMore={fetchMore}
+        tab={getTabFromTypeFilterCollection(filterOptions[DEFAULT_TAB_IDX])}
+      />
+    </div>
+  );
+
+  return useFilterSider ? (
     <>
       <div className="sider-layout">
         <FilterMenu
@@ -127,21 +159,10 @@ export default function FilterableResults({
           resetFilterCollection={resetFilterCollectionToState}
         />
       </div>
-      <div className="content-layout">
-        {useTabs ? (
-          <Tabs
-            tabFilter={filterOptions[DEFAULT_TAB_IDX]}
-            setTabFilter={setTab}
-          />
-        ) : null}
-        <Results
-          results={results}
-          hasMore={hasMore}
-          fetchMore={fetchMore}
-          tab={getTabFromTypeFilterCollection(filterOptions[DEFAULT_TAB_IDX])}
-        />
-      </div>
+      <div className="content-layout">{feedAndTabs()}</div>
     </>
+  ) : (
+    feedAndTabs()
   );
 }
 FilterableResults.defaultProps = {
@@ -185,37 +206,29 @@ function updateFilterOption(filterOptions, collectionIndex, optionIndex) {
 }
 
 function Tabs({tabFilter, setTabFilter}) {
-  const selectedTab = getTabFromTypeFilterCollection(tabFilter);
+  // const selectedTab = getTabFromTypeFilterCollection(tabFilter);
   const tabs = tabFilter.options.map((option) => (
     <button onClick={() => setTabFilter(option.data.id)} key={option.data.id}>
       {option.data.name}
     </button>
   ));
   tabs.unshift(
-    <button onClick={() => setTabFilter(DEFAULT_TAB_ID)}>Most Relevant</button>
+    <button onClick={() => setTabFilter(DEFAULT_TAB_ID)} key="defaultTab">
+      Most Relevant
+    </button>
   );
-  return (
-    <div>
-      {tabs}
-      <p>current tab: {selectedTab}</p>
-    </div>
-  );
+  return <div className="tabs">{tabs}</div>;
 }
 
 function Results({results, hasMore, fetchMore, tab}) {
-  if (tab === 'default') return <DefaultTab />;
-  return (
-    <ResultsList
-      results={results}
-      hasMore={hasMore}
-      fetchMore={fetchMore}
-      resourceType={tab}
-    />
-  );
-}
-
-function DefaultTab({results, hasMore, fetchMore}) {
-  return <p>These results are currently unimplemented.</p>;
+  if (Array.isArray(results) && results.length > 0) {
+    return (
+      <ResultsList results={results} hasMore={hasMore} fetchMore={fetchMore} />
+    );
+  } else {
+    console.log('no data returned');
+    return <h3>{`Looks like there's nothing here!`}</h3>;
+  }
 }
 
 /**

@@ -56,6 +56,18 @@
   border-left: 1px solid #dcdce0;
 }
 
+.resource-sider {
+  margin: 20px 20px;
+}
+
+.suggested-resources-container {
+}
+
+.resource-sider-title {
+  color: #5d5d65;
+  margin-top: 20px;
+}
+
 @media screen and (max-width: 1007px) {
   .sider-layout {
     display: none;

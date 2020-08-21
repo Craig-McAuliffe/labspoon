@@ -32,6 +32,8 @@ export default function SearchPage() {
         defaultFilter={filterOptionsData}
         limit={5}
         useTabs={true}
+        useFilterSider={true}
+        resourceInfo={undefined}
       />
     </>
   );

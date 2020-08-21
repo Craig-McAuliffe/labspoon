@@ -34,7 +34,7 @@ function fetchUserFeedData(uuid, skip, limit, filter, last) {
  * @param {Object} last - the last result from the previous set
  * @return {Array}
  */
-function fetchPublicFeedData(skip, limit, filter, last) {
+function fetchPublicFeedData(skip, limit, filter, resourceInfo, last) {
   let results = db.collection('posts').orderBy('timestamp');
   if (typeof last !== 'undefined') {
     results = results.startAt(last.timestamp);
@@ -94,6 +94,8 @@ export default function FollowingFeedPage() {
       defaultFilter={filterOptionsData}
       limit={10}
       useTabs={false}
+      useFilterSider={true}
+      resourceInfo={undefined}
     />
   );
 }
