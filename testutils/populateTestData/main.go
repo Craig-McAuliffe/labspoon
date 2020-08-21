@@ -9,6 +9,7 @@ import (
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
+	"google.golang.org/api/iterator"
 	"gopkg.in/yaml.v3"
 )
 
@@ -112,6 +113,15 @@ func setFollowedByUsers(ctx context.Context, client *firestore.Client, userDocum
 	return nil
 }
 
+func instantiateFeeds(ctx context.Context, client *firestore.Client, userDocumentRef *firestore.DocumentRef, followedByUsers map[string]UserRef) error {
+	feedRef := userDocumentRef.Collection("feeds")
+	_, err := feedRef.Doc("followingFeed").Set(ctx, map[string]string{"id": "followingFeed"})
+	if err != nil {
+		return fmt.Errorf("Failed to create following feed document: %w", err)
+	}
+	return nil
+}
+
 func setUsers(ctx context.Context, client *firestore.Client, users map[string]User) error {
 	for id, user := range users {
 		userDocumentRef := client.Collection("users").Doc(id)
@@ -130,6 +140,10 @@ func setUsers(ctx context.Context, client *firestore.Client, users map[string]Us
 		err = setFollowedByUsers(ctx, client, userDocumentRef, user.FollowedByUsers)
 		if err != nil {
 			return fmt.Errorf("Failed to add followed by users relationships for user with ID %v: %w", id, err)
+		}
+		err = instantiateFeeds(ctx, client, userDocumentRef, user.FollowedByUsers)
+		if err != nil {
+			return fmt.Errorf("Failed to add feeds for user with ID %v: %w", id, err)
 		}
 	}
 	return nil
@@ -162,7 +176,24 @@ func setPosts(ctx context.Context, client *firestore.Client, posts map[string]Po
 			}
 		}
 		// add to following feeds of relevant users
-		// TODO(patrick)
+		followedByUsersIter := client.Collection("users").Doc(authorID).Collection("followedByUsers").Documents(ctx)
+		for {
+			followedByUserDoc, err := followedByUsersIter.Next()
+			if err == iterator.Done {
+				break
+			}
+			if err != nil {
+				return fmt.Errorf("Failed to get followed by user document for user %v: %w", authorID, err)
+			}
+			var followedByUser UserRef
+			followedByUserDoc.DataTo(&followedByUser)
+			followedByUserRef := client.Collection("users").Doc(followedByUser.ID)
+			followingFeedRef := followedByUserRef.Collection("feeds").Doc("followingFeed")
+			_, err = followingFeedRef.Collection("posts").Doc(id).Set(ctx, post)
+			if err != nil {
+				return fmt.Errorf("Failed to set post on following feed for user %v: %w", followedByUser.ID, err)
+			}
+		}
 	}
 	return nil
 }
