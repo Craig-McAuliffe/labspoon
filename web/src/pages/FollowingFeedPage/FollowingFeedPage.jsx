@@ -21,8 +21,26 @@ const filterOptionsData = getPostFilters(getFilteredTestPosts([]));
  * @return {Array}
  */
 function fetchUserFeedData(uuid, skip, limit, filter, last) {
-  // TODO(patrick): update to use user's feed data
-  return fetchPublicFeedData(skip, limit, filter, last);
+  let results = db
+    .collection(`users/${uuid}/feeds/followingFeed/posts`)
+    .orderBy('timestamp');
+  if (typeof last !== 'undefined') {
+    results = results.startAt(last.timestamp);
+  }
+  return results
+    .limit(limit)
+    .get()
+    .then((qs) => {
+      const posts = [];
+      qs.forEach((doc) => {
+        const post = doc.data();
+        post.id = doc.id;
+        post.resourceType = 'post';
+        posts.push(post);
+      });
+      return posts;
+    })
+    .catch((err) => console.log(err));
 }
 
 /**

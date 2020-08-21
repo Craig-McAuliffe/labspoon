@@ -59,7 +59,7 @@ function AuthProvider({children}) {
  * If a feature flag is enabled, the corresponding feature is turned on, this
  * should be implemented by conditional statements.
  *
- * The enabled feature flags for the environment are space separated in .env
+ * The enabled feature flags for the environment are space separated in ../.env
  * under the REACT_APP_ENABLED_FFLAGS field
  */
 export const FeatureFlags = createContext([]);
