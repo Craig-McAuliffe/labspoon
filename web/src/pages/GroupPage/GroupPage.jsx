@@ -1,5 +1,4 @@
 import React from 'react';
-import Sider from '../../components/Layout/Sider/Sider';
 import groups from '../../mockdata/groups';
 import {useParams} from 'react-router-dom';
 import GroupPageSider from './GroupPageSider';
@@ -67,16 +66,14 @@ export default function GroupPage() {
   return (
     <>
       <div className="sider-layout">
-        <Sider>
-          <div className="resource-sider">
-            <h3 className="resource-sider-title">
-              {search ? siderTitleChoice[0] : siderTitleChoice[1]}
-            </h3>
-            <div className="suggested-resources-container">
-              <GroupPageSider currentGroup={groupID} />
-            </div>
+        <div className="resource-sider">
+          <h3 className="resource-sider-title">
+            {search ? siderTitleChoice[0] : siderTitleChoice[1]}
+          </h3>
+          <div className="suggested-resources-container">
+            <GroupPageSider currentGroup={groupID} />
           </div>
-        </Sider>
+        </div>
       </div>
       <div className="content-layout">
         <div className="details-container">{groupDetails()}</div>
