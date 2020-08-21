@@ -15,7 +15,12 @@ users:
       dbd6811f-8e7a-416b-a5cb-0bf564f89a39:
         id: dbd6811f-8e7a-416b-a5cb-0bf564f89a39
         name: Physics
+    # users follow themselves to see their own posts in their feed
     followedByUsers:
+      MA1qq6qfbFfMER5HdlTa4X36Ly42:
+        id: MA1qq6qfbFfMER5HdlTa4X36Ly42
+        name: Craig McAuliffe
+        avatar: https://i.picsum.photos/id/620/200/200.jpg?hmac=i-QlnBFXHK0SDe5o7B85DMYehiO7H-fZxsKLRrfFCcU
       YdZkqyCThmUNhej0VXtqqWgD69s2:
         id: YdZkqyCThmUNhej0VXtqqWgD69s2
         name: Patrick Leask
@@ -37,6 +42,10 @@ users:
         id: 34ca8f0c-0d6d-457d-8cfa-6935564acb6b
         name: SARS-CoV-2
     followedByUsers:
+      YdZkqyCThmUNhej0VXtqqWgD69s2:
+        id: YdZkqyCThmUNhej0VXtqqWgD69s2
+        name: Patrick Leask
+        avatar: https://i.picsum.photos/id/804/200/200.jpg?hmac=73qw3Bnt67aOsdWd033BvfX9Gq0gIJ6FSL3Dp3gA97E
       MA1qq6qfbFfMER5HdlTa4X36Ly42:
         id: MA1qq6qfbFfMER5HdlTa4X36Ly42
         name: Craig McAuliffe
