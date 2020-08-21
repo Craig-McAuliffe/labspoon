@@ -4,7 +4,6 @@ import userPageFeedData from './UserPageFeedData';
 import UserPageSider from './UserPageSider';
 import users from '../../../mockdata/users';
 import FilterableResults from '../../../components/FilterableResults/FilterableResults';
-import Sider from '../../../components/Layout/Sider/Sider';
 
 import './UserPage.css';
 
@@ -73,16 +72,14 @@ export default function UserPage() {
   return (
     <>
       <div className="sider-layout">
-        <Sider>
-          <div className="resource-sider">
-            <h3 className="resource-sider-title">
-              {search ? siderTitleChoice[0] : siderTitleChoice[1]}
-            </h3>
-            <div className="suggested-resources-container">
-              <UserPageSider currentUserID={userID} />
-            </div>
+        <div className="resource-sider">
+          <h3 className="resource-sider-title">
+            {search ? siderTitleChoice[0] : siderTitleChoice[1]}
+          </h3>
+          <div className="suggested-resources-container">
+            <UserPageSider currentUserID={userID} />
           </div>
-        </Sider>
+        </div>
       </div>
       <div className="content-layout">
         <div className="details-container">{userDetails()}</div>
