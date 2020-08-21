@@ -8,10 +8,18 @@ const UserListItem = ({user}) => {
   return (
     <div className="Container">
       <div className="Avatar">
-        <UserAvatar src="https://picsum.photos/200" width="60px" />
+        <UserAvatar
+          src="https://picsum.photos/200"
+          width="60px"
+          height="60px"
+        />
       </div>
       <div className="AvatarSmall">
-        <UserAvatar src="https://picsum.photos/200" width="40px" />
+        <UserAvatar
+          src="https://picsum.photos/200"
+          width="40px"
+          height="40px"
+        />
       </div>
       <div className="Name">
         <h2>

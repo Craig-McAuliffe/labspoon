@@ -33,6 +33,8 @@
   border-right: 1px solid #dcdce0;
   position: fixed;
   width: 250px;
+  padding: 30px 10px 0px 10px;
+  overflow-x: hidden;
 }
 
 .content-layout {
@@ -44,7 +46,10 @@
   margin: 20px 0px;
   min-width: 100%;
   display: grid;
-  grid-template-columns: minmax(5px, 1fr) minmax(408px, 1070px) minmax(5px, 1fr);
+  grid-template-columns: minmax(10px, 1fr) minmax(408px, 1070px) minmax(
+      10px,
+      1fr
+    );
 }
 
 .page-content-container {
@@ -59,7 +64,7 @@
 }
 
 .resource-sider {
-  margin: 20px 20px;
+  max-width: 100%;
 }
 
 .suggested-resources-container {
@@ -67,10 +72,17 @@
 
 .resource-sider-title {
   color: #5d5d65;
-  margin-top: 20px;
+  margin-bottom: 10px;
 }
 
-@media screen and (max-width: 1007px) {
+.vertical-breadcrumb {
+  grid-column: 2/3;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+@media screen and (max-width: 1017px) {
   .sider-layout {
     display: none;
   }

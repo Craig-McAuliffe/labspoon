@@ -79,11 +79,9 @@ function PostHeader({postType, postAuthor}) {
   return (
     <div className="post-header">
       <div className="post-header-profile">
-        <UserAvatar
-          className="post-header-avatar"
-          src={postAuthor.avatar}
-          width="80px"
-        />
+        <div className="post-header-avatar">
+          <UserAvatar src={postAuthor.avatar} width="80px" height="80px" />
+        </div>
         <h2>
           <Link to={`/user/${postAuthor.id}`}>{postAuthor.name}</Link>
         </h2>
@@ -163,4 +161,22 @@ function postTypeIcons(postTypeName) {
     default:
       return null;
   }
+}
+
+export function PinnedPost({post}) {
+  return (
+    <div className="pinned-post">
+      <h3>{post.title}</h3>
+      <div>
+        {post.topics
+          .map((postTopic) => (
+            <h4 key={postTopic.id} className="pinned-post-topic">
+              {postTopic.name}
+            </h4>
+          ))
+          .slice(0, 3)}
+      </div>
+      <p className="pinned-post-more-info">Click for more info</p>
+    </div>
+  );
 }

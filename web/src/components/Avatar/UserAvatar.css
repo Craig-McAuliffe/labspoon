@@ -1,3 +1,6 @@
-.UserAvatar {
+.user-avatar {
   box-shadow: 0px 1px 4px rgba(29, 89, 255, 0.2);
+  margin-left: none;
+  margin-right: none;
+  padding: none;
 }
