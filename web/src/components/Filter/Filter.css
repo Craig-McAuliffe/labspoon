@@ -1,6 +1,6 @@
 .filter-container {
-  min-width: 100%;
   padding: 30px 10px 0px 10px;
+  top: 65px;
 }
 
 .filter-search {
