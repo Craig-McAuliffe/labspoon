@@ -52,6 +52,7 @@ export default function FilterableResults({
   }
 
   useEffect(() => {
+    console.log('aaa last', last, 'results', results);
     // fetchResults may return either a result set or a promise, so we convert
     // it to always a promise here
     Promise.resolve(fetchResults(skip, limit + 1, filterOptions, last)).then(
@@ -71,7 +72,7 @@ export default function FilterableResults({
    * determine whether there are more results available.
    */
   function fetchMore() {
-    setLast(results[results.length] - 1);
+    setLast(results[results.length - 1]);
     setSkip(skip + limit);
   }
 
