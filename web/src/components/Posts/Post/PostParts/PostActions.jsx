@@ -21,8 +21,8 @@ function BookmarkPostButton({post}) {
   useEffect(() => {
     if (featureFlags.has('cloud-firestore')) {
       db.collection(`users/${user.uid}/bookmarks`)
-        .where('type', '==', 'post')
-        .where('resourceID', '==', post.id)
+        .where('bookmarkedResourceType', '==', 'post')
+        .where('bookmarkedResourceID', '==', post.id)
         .get()
         .then((qs) => {
           if (!qs.empty) {
@@ -45,9 +45,10 @@ function BookmarkPostButton({post}) {
         if (bookmarked) {
           bookmarkCollection
             .add({
-              type: 'post',
-              resourceID: post.id,
-              resource: post,
+              resourceType: 'bookmark',
+              bookmarkedResourceType: 'post',
+              bookmarkedResourceID: post.id,
+              bookmarkedResourceData: post,
             })
             .then((docRef) => {
               setBookmarked(true);

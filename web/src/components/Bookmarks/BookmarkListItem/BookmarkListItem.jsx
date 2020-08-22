@@ -7,7 +7,7 @@ export default function BookmarkListItem({bookmark}) {
   return (
     <div className="bookmark-list-item">
       <BookmarkButton />
-      <GenericListItem result={bookmark.resource} />
+      <GenericListItem result={bookmark.bookmarkedResourceData} />
     </div>
   );
 }

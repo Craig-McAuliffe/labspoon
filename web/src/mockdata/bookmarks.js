@@ -9,8 +9,10 @@ function getBookmarks() {
   const posts = getTestPosts('1');
   return posts.map((post) => ({
     id: uuid(),
-    type: 'bookmark',
-    resource: post,
+    resourceType: 'bookmark',
+    bookmarkedResourceID: posts.id,
+    bookmarkedResourceData: post,
+    bookmarkedResourceType: 'post',
   }));
 }
 

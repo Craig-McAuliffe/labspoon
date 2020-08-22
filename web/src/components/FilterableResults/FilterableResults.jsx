@@ -52,7 +52,6 @@ export default function FilterableResults({
   }
 
   useEffect(() => {
-    console.log('aaa last', last, 'results', results);
     // fetchResults may return either a result set or a promise, so we convert
     // it to always a promise here
     Promise.resolve(fetchResults(skip, limit + 1, filterOptions, last)).then(
@@ -227,7 +226,6 @@ function Results({results, hasMore, fetchMore, tab}) {
       <ResultsList results={results} hasMore={hasMore} fetchMore={fetchMore} />
     );
   } else {
-    console.log('no data returned');
     return <h3>{`Looks like there's nothing here!`}</h3>;
   }
 }
