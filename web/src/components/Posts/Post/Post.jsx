@@ -32,7 +32,7 @@ export default function Post({post}) {
       <GeneratedPostHeader postType={post.postType} postAuthor={post.author} />
       <ResourceTextContent publication={post.resource} />
       <FeedItemTopics taggedItem={post} />
-      <PostActions />
+      <PostActions post={post} />
     </div>
   ) : (
     <div className="post-container">
@@ -40,7 +40,7 @@ export default function Post({post}) {
       <PostTextContent post={post} />
       <PostOptionalTags optionalTags={post.optionaltags} />
       <FeedItemTopics taggedItem={post} />
-      <PostActions />
+      <PostActions post={post} />
     </div>
   );
 }

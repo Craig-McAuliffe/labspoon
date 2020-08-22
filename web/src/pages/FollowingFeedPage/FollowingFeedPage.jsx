@@ -1,8 +1,7 @@
 import React, {useContext} from 'react';
 
 import {db} from '../../firebase';
-import {FeatureFlags} from '../../App';
-import {AuthContext} from '../../App';
+import {AuthContext, FeatureFlags} from '../../App';
 
 import FilterableResults from '../../components/FilterableResults/FilterableResults';
 
