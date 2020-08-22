@@ -165,9 +165,10 @@ export const findCoAuthors = (userID) => {
     )
     .slice(0, 20);
   const countingCoAuthors = [];
-  publicationsOfUser.map((publication) => {
+  publicationsOfUser.forEach((publication) => {
     if (publication) {
       publication.content.authors.map((author) => {
+        if (author.id === userID) return;
         let countingIndex;
         let alreadyCounted = false;
         for (let i = 0; i < countingCoAuthors.length; i++) {
@@ -177,7 +178,7 @@ export const findCoAuthors = (userID) => {
             break;
           }
         }
-        alreadyCounted || author.id === userID
+        alreadyCounted
           ? (countingCoAuthors[countingIndex].count += 1)
           : countingCoAuthors.push({id: author.id, count: 1});
       });
@@ -190,8 +191,8 @@ export const findCoAuthors = (userID) => {
     return 0;
   });
 
-  const mostCommonCoAuthors = countedOrderedCoAuthors.map(
+  const mostCommonCoAuthorUsers = countedOrderedCoAuthors.map(
     (coAuthor) => users().filter((user) => user.id === coAuthor.id)[0]
   );
-  return mostCommonCoAuthors;
+  return mostCommonCoAuthorUsers;
 };

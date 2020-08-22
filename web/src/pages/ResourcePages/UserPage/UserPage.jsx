@@ -4,7 +4,9 @@ import userPageFeedData from './UserPageFeedData';
 import UserPageSider from './UserPageSider';
 import users from '../../../mockdata/users';
 import FilterableResults from '../../../components/FilterableResults/FilterableResults';
-import {MessageIcon} from '../../../assets/ResourceIcons';
+import MessageButton from '../../../components/Buttons/MessageButton';
+import {UserPageAvatar} from '../../../components/Avatar/UserAvatar';
+import FollowButton from '../../../components/Buttons/FollowButton';
 
 import './UserPage.css';
 
@@ -26,12 +28,18 @@ export default function UserPage() {
             className="user-cover-photo"
           />
         </div>
-        <div className="user-name-institution"></div>
+        <div className="user-headline">
+          <div className="user-page-avatar-container">
+            <UserPageAvatar src={user.avatar} width="100px" height="100px" />
+          </div>
+          <div className="user-headline-text">
+            <h2>{user.name}</h2>
+            <h3>{user.institution}</h3>
+          </div>
+        </div>
         <div className="user-message-follow">
-          <button>
-            <MessageIcon />
-            Message
-          </button>
+          <MessageButton />
+          <FollowButton />
         </div>
       </div>
     );

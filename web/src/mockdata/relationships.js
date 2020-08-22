@@ -26,7 +26,7 @@ export default function relationships() {
         getTestPosts()[4],
         getTestPosts()[5],
         getTestPosts()[6],
-        getTestPosts()[7],
+        getTestPosts()[4],
       ],
       recommends: [
         getTestPosts()[4],
@@ -61,10 +61,10 @@ export default function relationships() {
         getTestPosts()[2],
       ],
       recommends: [
-        getTestPosts()[12],
+        getTestPosts()[2],
         getTestPosts()[3],
-        getTestPosts()[14],
-        getTestPosts()[15],
+        getTestPosts()[4],
+        getTestPosts()[5],
       ],
     },
     {
@@ -112,7 +112,7 @@ export default function relationships() {
         getTestPosts()[4],
         getTestPosts()[5],
         getTestPosts()[6],
-        getTestPosts()[7],
+        getTestPosts()[3],
       ],
     },
     {

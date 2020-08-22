@@ -16,4 +16,16 @@ const UserAvatar = ({src, width, height}) => {
   );
 };
 
+export const UserPageAvatar = ({src, width, height}) => {
+  return (
+    <Image
+      className="userPage-avatar"
+      src={src}
+      roundedCircle
+      width={width}
+      height={height}
+    />
+  );
+};
+
 export default UserAvatar;

@@ -5,8 +5,8 @@ import GroupPageSider from './GroupPageSider';
 import groupPageFeedData from './GroupPageFeedData';
 import FilterableResults from '../../components/FilterableResults/FilterableResults';
 import UserAvatar from '../../components/Avatar/UserAvatar';
-import {MessageIcon} from '../../assets/ResourceIcons';
 import FollowButton from '../../components/Buttons/FollowButton';
+import MessageButton from '../../components/Buttons/MessageButton';
 import {PinnedPost} from '../../components/Posts/Post/Post';
 
 import './GroupPage.css';
@@ -40,10 +40,7 @@ export default function GroupPage() {
         <div className="group-header">
           <div className="group-icon-and-message">
             <UserAvatar src={group.avatar} height="120px" width="120px" />
-            <button>
-              <MessageIcon />
-              <p>Message</p>
-            </button>
+            <MessageButton />
           </div>
           <div className="group-header-info">
             <div className="group-header-info-headline">
