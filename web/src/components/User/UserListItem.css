@@ -1,9 +1,16 @@
-.Container {
+.user-listItem-container {
   display: grid;
-  grid-template-columns: 1fr 4fr 1fr;
+  grid-template-columns: 3fr 2.5fr 1fr;
   align-items: center;
   border-bottom: 1px solid #dcdce0;
 }
+
+.user-listItem-link {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  align-items: center;
+}
+
 .tag-container {
   display: grid;
   grid-template-columns: 90px 4fr 1fr;
@@ -23,16 +30,21 @@
   display: none;
 }
 
-.Name {
-  grid-column: 2/3;
-}
-
-.Name h4 {
+.user-listItem-name h4 {
   display: none;
 }
 
-.Name h2 {
-  display: block;
+.user-listItem-link:hover h2 {
+  text-decoration: underline;
+}
+.user-listItem-name h2 {
+  display: inline-block;
+  grid-column: 1/2;
+}
+
+.user-listItem-institution {
+  color: #5d5d65;
+  grid-column: 2/3;
 }
 
 .Follow {
@@ -48,15 +60,25 @@
   line-height: 0px;
   color: #99999f;
 }
+
 @media screen and (max-width: 560px) {
-  .Name h4 {
-    display: block;
+  .user-listItem-institution {
+    color: #5d5d65;
+    font-size: 14px;
   }
 
-  .Name h2 {
+  .user-listItem-name h4 {
+    display: inline-block;
+    grid-column: 1/2;
+  }
+
+  .user-listItem-name h2 {
     display: none;
   }
 
+  .user-listItem-link:hover h4 {
+    text-decoration: underline;
+  }
   .Avatar {
     display: none;
   }

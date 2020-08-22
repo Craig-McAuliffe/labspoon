@@ -4,6 +4,9 @@ import userPageFeedData from './UserPageFeedData';
 import UserPageSider from './UserPageSider';
 import users from '../../../mockdata/users';
 import FilterableResults from '../../../components/FilterableResults/FilterableResults';
+import MessageButton from '../../../components/Buttons/MessageButton';
+import {UserPageAvatar} from '../../../components/Avatar/UserAvatar';
+import FollowButton from '../../../components/Buttons/FollowButton';
 
 import './UserPage.css';
 
@@ -15,8 +18,31 @@ export default function UserPage() {
   const fetchResults = (skip, limit, filterOptions, last) =>
     userPageFeedData(skip, limit, filterOptions, userID, last);
 
-  const userDetails = () => {
-    return <div>{user.name} info here</div>;
+  const UserDetails = () => {
+    return (
+      <div>
+        <div className="user-cover-photo-container">
+          <img
+            src={user.coverPhoto}
+            alt="user cover"
+            className="user-cover-photo"
+          />
+        </div>
+        <div className="user-headline">
+          <div className="user-page-avatar-container">
+            <UserPageAvatar src={user.avatar} width="100px" height="100px" />
+          </div>
+          <div className="user-headline-text">
+            <h2>{user.name}</h2>
+            <h3>{user.institution}</h3>
+          </div>
+        </div>
+        <div className="user-message-follow">
+          <MessageButton />
+          <FollowButton />
+        </div>
+      </div>
+    );
   };
 
   const siderTitleChoice = [
@@ -82,7 +108,9 @@ export default function UserPage() {
         </div>
       </div>
       <div className="content-layout">
-        <div className="details-container">{userDetails()}</div>
+        <div className="details-container">
+          <UserDetails />
+        </div>
 
         <FilterableResults
           fetchResults={fetchResults}

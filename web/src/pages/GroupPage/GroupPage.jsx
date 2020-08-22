@@ -5,8 +5,8 @@ import GroupPageSider from './GroupPageSider';
 import groupPageFeedData from './GroupPageFeedData';
 import FilterableResults from '../../components/FilterableResults/FilterableResults';
 import UserAvatar from '../../components/Avatar/UserAvatar';
-import {MessageIcon} from '../../assets/ResourceIcons';
 import FollowButton from '../../components/Buttons/FollowButton';
+import MessageButton from '../../components/Buttons/MessageButton';
 import {PinnedPost} from '../../components/Posts/Post/Post';
 
 import './GroupPage.css';
@@ -24,17 +24,23 @@ export default function GroupPage() {
   );
 
   const GroupDetails = () => {
-    const [bigDescription, changeBigDescription] = useState(false);
+    const [bigDescription, changeBigDescription] = useState({
+      display: false,
+      size: 100,
+    });
+
     console.log(bigDescription);
+
+    const descriptionSize = {
+      height: `${bigDescription.size}px`,
+    };
+
     return (
       <>
         <div className="group-header">
           <div className="group-icon-and-message">
             <UserAvatar src={group.avatar} height="120px" width="120px" />
-            <button>
-              <MessageIcon />
-              <p>Message</p>
-            </button>
+            <MessageButton />
           </div>
           <div className="group-header-info">
             <div className="group-header-info-headline">
@@ -47,11 +53,8 @@ export default function GroupPage() {
               </div>
             </div>
             <div
-              className={
-                bigDescription
-                  ? 'group-description-big'
-                  : 'group-description-small'
-              }
+              className={'group-description'}
+              style={descriptionSize}
               ref={groupDescriptionRef}
             >
               <p>{group.about}</p>
@@ -79,23 +82,29 @@ export default function GroupPage() {
       );
     });
 
-    if (displaySeeMore && bigDescription)
+    if (displaySeeMore && bigDescription.display)
       return (
         <div className="group-description-see-more">
           <button
             className="see-more-button"
-            onClick={() => changeBigDescription(false)}
+            onClick={() => changeBigDescription({display: false, size: 100})}
           >
             See less
           </button>
         </div>
       );
-    if (displaySeeMore && !bigDescription)
+    if (displaySeeMore && !bigDescription.display)
       return (
         <div className="group-description-see-more">
           <button
             className="see-more-button"
-            onClick={() => changeBigDescription(true)}
+            onClick={() =>
+              changeBigDescription({
+                display: true,
+                size:
+                  groupDescriptionRef.current.firstElementChild.scrollHeight,
+              })
+            }
           >
             See more
           </button>
