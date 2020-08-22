@@ -11,9 +11,9 @@ export default function UserPageSider({currentUserID}) {
   ) : (
     getSimilarUsers(currentUserID).map((similarUser) => (
       <div key={similarUser.id} className="suggested-user">
-        <Link to={`/user/${similarUser.id}`}>
-          <UserAvatar src={similarUser.avatar} width="60px" />
-          <h4>{similarUser.name} </h4>
+        <Link to={`/user/${similarUser.id}`} className="suggested-user-link">
+          <UserAvatar src={similarUser.avatar} width="60px" height="60px" />
+          <div>{similarUser.name} </div>
         </Link>
       </div>
     ))

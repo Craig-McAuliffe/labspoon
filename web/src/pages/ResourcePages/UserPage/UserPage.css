@@ -1,3 +1,61 @@
+.user-cover-photo-container {
+  height: 200px;
+  width: 100%;
+}
+
+.user-cover-photo {
+  display: inline-block;
+  height: 100%;
+  width: 100%;
+}
+
+.user-headline {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  grid-template-rows: none;
+  min-width: 100%;
+}
+
+.user-page-avatar-container {
+  grid-column: 1/2;
+  justify-self: flex-end;
+  height: 80px;
+  background: transparent;
+  position: relative;
+}
+/* .user-page-avatar {
+  position: absolute;
+  
+} */
+
+.user-headline-text {
+  padding-top: 10px;
+  grid-column: 2/3;
+  width: 98%;
+  margin-left: 2%;
+  justify-self: flex-start;
+}
+
+.user-headline-text h3 {
+  color: #5d5d65;
+}
+
+.user-message-follow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
 .suggested-user {
-  padding: 10px 0px 20px;
+  padding: 12px 0px;
+}
+
+.suggested-user-link {
+  display: flex;
+  align-items: center;
+  min-width: 100%;
+}
+
+.suggested-user div {
+  margin-left: 10px;
 }

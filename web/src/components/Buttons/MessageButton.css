@@ -1,0 +1,32 @@
+.message-button {
+  margin-top: 10px;
+  background: none;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-decoration: none;
+  color: #00507c;
+}
+.message-button:hover,
+.message-button:focus {
+  margin-top: 10px;
+  background: none;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-decoration: underline;
+  color: #3099d3;
+}
+
+.message-button:hover svg path {
+  fill: #3099d3;
+}
+
+.message-button p {
+  display: inline-block;
+  margin-left: 5px;
+}

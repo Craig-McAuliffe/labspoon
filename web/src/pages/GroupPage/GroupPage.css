@@ -1,0 +1,78 @@
+.suggested-group-container {
+  margin: 20px 0px;
+}
+
+.suggested-group-link {
+  display: flex;
+  align-items: center;
+}
+
+.suggested-group-link div {
+  margin-left: 10px;
+}
+
+.group-details {
+  grid-column: 2/3;
+}
+.group-details {
+  grid-column: 2/3;
+}
+
+.group-header {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  grid-template-rows: none;
+  min-width: 100%;
+}
+
+.group-icon-and-message {
+  grid-column: 1/2;
+  display: flex;
+  flex-direction: column;
+}
+
+.group-header-info {
+  grid-column: 2/3;
+  margin-left: 5px;
+}
+
+.group-header-info-headline {
+  display: flex;
+  justify-content: space-between;
+}
+
+.group-header-info-headline h3 {
+  color: #5d5d65;
+}
+
+.group-headline-name-institution {
+}
+
+.group-description {
+  margin: 10px 0px 0px;
+  overflow-x: none;
+  overflow-y: hidden;
+}
+
+.group-description-see-more {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.see-more-button {
+  border: none;
+  background: none;
+  outline: none;
+  color: #00507c;
+}
+
+.see-more-button:hover,
+.see-more-button:focus {
+  border: none;
+  background: none;
+  outline: none;
+}
+
+.pinned-post-container {
+  margin: 10px 0px;
+}
