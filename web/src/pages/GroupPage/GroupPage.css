@@ -75,16 +75,8 @@
 .group-headline-name-institution {
 }
 
-.group-description-small {
+.group-description {
   margin: 10px 0px 0px;
-  height: 100px;
-  overflow-x: none;
-  overflow-y: hidden;
-}
-
-.group-description-big {
-  margin: 10px 0px 0px;
-  height: 300px;
   overflow-x: none;
   overflow-y: hidden;
 }

@@ -4,6 +4,7 @@ import userPageFeedData from './UserPageFeedData';
 import UserPageSider from './UserPageSider';
 import users from '../../../mockdata/users';
 import FilterableResults from '../../../components/FilterableResults/FilterableResults';
+import {MessageIcon} from '../../../assets/ResourceIcons';
 
 import './UserPage.css';
 
@@ -15,8 +16,25 @@ export default function UserPage() {
   const fetchResults = (skip, limit, filterOptions, last) =>
     userPageFeedData(skip, limit, filterOptions, userID, last);
 
-  const userDetails = () => {
-    return <div>{user.name} info here</div>;
+  const UserDetails = () => {
+    return (
+      <div>
+        <div className="user-cover-photo-container">
+          <img
+            src={user.coverPhoto}
+            alt="user cover"
+            className="user-cover-photo"
+          />
+        </div>
+        <div className="user-name-institution"></div>
+        <div className="user-message-follow">
+          <button>
+            <MessageIcon />
+            Message
+          </button>
+        </div>
+      </div>
+    );
   };
 
   const siderTitleChoice = [
@@ -82,7 +100,9 @@ export default function UserPage() {
         </div>
       </div>
       <div className="content-layout">
-        <div className="details-container">{userDetails()}</div>
+        <div className="details-container">
+          <UserDetails />
+        </div>
 
         <FilterableResults
           fetchResults={fetchResults}

@@ -24,8 +24,17 @@ export default function GroupPage() {
   );
 
   const GroupDetails = () => {
-    const [bigDescription, changeBigDescription] = useState(false);
+    const [bigDescription, changeBigDescription] = useState({
+      display: false,
+      size: 100,
+    });
+
     console.log(bigDescription);
+
+    const descriptionSize = {
+      height: `${bigDescription.size}px`,
+    };
+
     return (
       <>
         <div className="group-header">
@@ -47,11 +56,8 @@ export default function GroupPage() {
               </div>
             </div>
             <div
-              className={
-                bigDescription
-                  ? 'group-description-big'
-                  : 'group-description-small'
-              }
+              className={'group-description'}
+              style={descriptionSize}
               ref={groupDescriptionRef}
             >
               <p>{group.about}</p>
@@ -79,23 +85,29 @@ export default function GroupPage() {
       );
     });
 
-    if (displaySeeMore && bigDescription)
+    if (displaySeeMore && bigDescription.display)
       return (
         <div className="group-description-see-more">
           <button
             className="see-more-button"
-            onClick={() => changeBigDescription(false)}
+            onClick={() => changeBigDescription({display: false, size: 100})}
           >
             See less
           </button>
         </div>
       );
-    if (displaySeeMore && !bigDescription)
+    if (displaySeeMore && !bigDescription.display)
       return (
         <div className="group-description-see-more">
           <button
             className="see-more-button"
-            onClick={() => changeBigDescription(true)}
+            onClick={() =>
+              changeBigDescription({
+                display: true,
+                size:
+                  groupDescriptionRef.current.firstElementChild.scrollHeight,
+              })
+            }
           >
             See more
           </button>
