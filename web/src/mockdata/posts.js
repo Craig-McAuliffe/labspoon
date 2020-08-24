@@ -103,7 +103,7 @@ export function getTestPosts(uniqueID) {
       type: postTypes()[1],
       postType: postTypes()[1],
       generated: true,
-      topics: [topics()[3], topics()[4]],
+      topics: [topics()[3], topics()[5]],
       resource: publications()[0],
     },
     {

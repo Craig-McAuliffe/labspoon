@@ -1,7 +1,7 @@
 import topics from './topics';
 import users from './users';
 
-export default function publications(uniqueID) {
+export default function publications() {
   return [
     {
       resourceType: 'publication',
@@ -23,7 +23,6 @@ export default function publications(uniqueID) {
         ],
       },
       topics: [topics()[5]],
-      optionaltags: [],
     },
     {
       resourceType: 'publication',
@@ -44,7 +43,6 @@ export default function publications(uniqueID) {
         ],
       },
       topics: [topics()[3], topics()[4]],
-      optionaltags: [],
     },
     {
       resourceType: 'publication',
@@ -64,7 +62,6 @@ export default function publications(uniqueID) {
         ],
       },
       topics: [topics()[5]],
-      optionaltags: [],
     },
     {
       resourceType: 'publication',
@@ -85,7 +82,6 @@ export default function publications(uniqueID) {
         ],
       },
       topics: [topics()[5]],
-      optionaltags: [],
     },
     {
       resourceType: 'publication',
@@ -100,6 +96,7 @@ export default function publications(uniqueID) {
       topics: [topics()[5], topics()[3]],
       optionaltags: [],
     },
+
     {
       resourceType: 'publication',
       id: 'g8934hf8hf2',
@@ -112,8 +109,8 @@ export default function publications(uniqueID) {
         authors: [users()[1], users()[5], users()[3]],
       },
       topics: [topics()[3], topics()[2]],
-      optionaltags: [],
     },
+
     {
       resourceType: 'publication',
       id: 'gr8943y894rhof',
@@ -132,7 +129,6 @@ export default function publications(uniqueID) {
         ],
       },
       topics: [topics()[5]],
-      optionaltags: [],
     },
   ];
 }
@@ -153,7 +149,7 @@ export const findSimilarPublications = (topicIDs, thisPublicationID) => {
         });
     });
   });
-  return uniquePublications.slice(0, 5);
+  return uniquePublications;
 };
 
 export const findCoAuthors = (userID) => {

@@ -1,4 +1,4 @@
-import getTestPosts from '../../../mockdata/posts';
+import getFilteredPosts from '../../../mockdata/posts';
 import publications, {findCoAuthors} from '../../../mockdata/publications';
 import relationships from '../../../mockdata/relationships';
 
@@ -10,7 +10,7 @@ export default function userPageFeedData(skip, limit, filterOptions, userID) {
   let resultsList = [];
 
   const postsByUser = () => {
-    const getPostsByUser = getTestPosts([])
+    const getPostsByUser = getFilteredPosts([])
       .filter((post) => post.author.id === userID)
       .slice(skip, skip + limit);
     resultsList = [...resultsList, ...getPostsByUser];

@@ -20,7 +20,7 @@ export default function PublicationPage({}) {
   const search = false;
 
   const fetchResults = (skip, limit, filterOptions) =>
-    publicationPageFeedData(skip, limit, filterOptions, thisPublicationID);
+    publicationPageFeedData(skip, limit, filterOptions, matchedPublication);
 
   const siderTitleChoice = [
     'Other Publications from your Search',
@@ -74,7 +74,7 @@ export default function PublicationPage({}) {
   const PublicationAuthors = ({publicationAuthors}) =>
     publicationAuthors.map((author) => (
       <h3 className="publication-body-authors" key={author.id}>
-        <Link to={`/profile/${author.id}`}>{author.name}</Link>
+        <Link to={`/user/${author.id}`}>{author.name}</Link>
       </h3>
     ));
 
@@ -82,6 +82,13 @@ export default function PublicationPage({}) {
     {
       collectionName: 'Relationship Types',
       options: [
+        {
+          enabled: false,
+          data: {
+            id: 'similarPublications',
+            name: 'Similar Publications',
+          },
+        },
         {
           enabled: false,
           data: {

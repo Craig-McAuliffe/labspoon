@@ -1,5 +1,6 @@
 import users from './users';
 import {getTestPosts} from './posts';
+import publications from './publications';
 
 export default function relationships() {
   return [
@@ -145,6 +146,116 @@ export default function relationships() {
         getTestPosts()[3],
         getTestPosts()[4],
         getTestPosts()[5],
+      ],
+    },
+  ];
+}
+
+export function publicationRelationships() {
+  return [
+    {
+      publication: publications()[0],
+      cites: [
+        publications()[1],
+        publications()[2],
+        publications()[3],
+        publications()[5],
+      ],
+      citedBy: [
+        publications()[0],
+        publications()[2],
+        publications()[3],
+        publications()[5],
+      ],
+    },
+    {
+      publication: publications()[1],
+      cites: [
+        publications()[0],
+        publications()[2],
+        publications()[3],
+        publications()[5],
+      ],
+      citedBy: [
+        publications()[1],
+        publications()[2],
+        publications()[3],
+        publications()[5],
+      ],
+    },
+    {
+      publication: publications()[2],
+      cites: [
+        publications()[1],
+        publications()[0],
+        publications()[3],
+        publications()[5],
+      ],
+      citedBy: [
+        publications()[1],
+        publications()[4],
+        publications()[0],
+        publications()[5],
+      ],
+    },
+    {
+      publication: publications()[3],
+      cites: [
+        publications()[1],
+        publications()[4],
+        publications()[0],
+        publications()[5],
+      ],
+      citedBy: [
+        publications()[1],
+        publications()[0],
+        publications()[3],
+        publications()[5],
+      ],
+    },
+    {
+      publication: publications()[4],
+      cites: [
+        publications()[1],
+        publications()[2],
+        publications()[3],
+        publications()[6],
+      ],
+      citedBy: [
+        publications()[0],
+        publications()[2],
+        publications()[3],
+        publications()[6],
+      ],
+    },
+    {
+      publication: publications()[5],
+      cites: [
+        publications()[0],
+        publications()[2],
+        publications()[3],
+        publications()[6],
+      ],
+      citedBy: [
+        publications()[1],
+        publications()[2],
+        publications()[3],
+        publications()[6],
+      ],
+    },
+    {
+      publication: publications()[6],
+      cites: [
+        publications()[1],
+        publications()[0],
+        publications()[4],
+        publications()[5],
+      ],
+      citedBy: [
+        publications()[1],
+        publications()[2],
+        publications()[3],
+        publications()[0],
       ],
     },
   ];
