@@ -57,8 +57,43 @@ function getTypesFilter() {
       {
         enabled: false,
         data: {
+          id: 'mostRelevant',
+          name: 'Most Relevant',
+        },
+      },
+      {
+        enabled: false,
+        data: {
+          id: 'publications',
+          name: 'Publications',
+        },
+      },
+      {
+        enabled: false,
+        data: {
           id: 'posts',
           name: 'Posts',
+        },
+      },
+      {
+        enabled: false,
+        data: {
+          id: 'researchers',
+          name: 'Researchers',
+        },
+      },
+      {
+        enabled: false,
+        data: {
+          id: 'groups',
+          name: 'Groups',
+        },
+      },
+      {
+        enabled: false,
+        data: {
+          id: 'topics',
+          name: 'Topics',
         },
       },
     ],
