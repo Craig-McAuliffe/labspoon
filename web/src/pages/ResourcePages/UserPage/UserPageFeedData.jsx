@@ -3,7 +3,6 @@ import publications, {findCoAuthors} from '../../../mockdata/publications';
 import relationships from '../../../mockdata/relationships';
 
 export default function userPageFeedData(skip, limit, filterOptions, userID) {
-  console.log('skip:', skip);
   const userRelationships = relationships().filter(
     (userRelationships) => userRelationships.user.id === userID
   )[0];
@@ -54,30 +53,30 @@ export default function userPageFeedData(skip, limit, filterOptions, userID) {
     const activeTabID = activeTab[0].data.id;
     switch (activeTabID) {
       case filterOptions[0].options[0].data.id:
+        userCoAuthors();
+        userRecommends();
+        userFollowing();
+        publicationsByUser();
         postsByUser();
         break;
       case filterOptions[0].options[1].data.id:
-        publicationsByUser();
+        postsByUser();
         break;
       case filterOptions[0].options[2].data.id:
-        userFollowing();
+        publicationsByUser();
         break;
       case filterOptions[0].options[3].data.id:
-        userRecommends();
+        userFollowing();
         break;
       case filterOptions[0].options[4].data.id:
+        userRecommends();
+        break;
+      case filterOptions[0].options[5].data.id:
         userCoAuthors();
         break;
       default:
         resultsList = [];
     }
-  } else {
-    console.log('fetching all');
-    userCoAuthors();
-    userRecommends();
-    userFollowing();
-    publicationsByUser();
-    postsByUser();
   }
   return resultsList;
 }
