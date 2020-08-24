@@ -1,0 +1,5 @@
+Set this environment variable to automatically connect to the backend.
+```
+export FIRESTORE_EMULATOR_HOST="localhost:8080"
+```
+
