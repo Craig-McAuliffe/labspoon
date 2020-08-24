@@ -122,3 +122,27 @@ export const ShareIconSelected = () => (
     />
   </svg>
 );
+
+export const Expand = () => (
+  <svg
+    width="24"
+    height="13"
+    viewBox="0 0 24 13"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M1 1L12 11L23 1" stroke="#5D5D65" strokeWidth="2" />
+  </svg>
+);
+
+export const Hide = () => (
+  <svg
+    width="24"
+    height="13"
+    viewBox="0 0 24 13"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M1 12L12 2L23 12" stroke="#5D5D65" strokeWidth="2" />
+  </svg>
+);

@@ -15,6 +15,7 @@ export default function publications() {
         authors: [users()[3], users()[0], users()[4], users()[5], users()[8]],
       },
       topics: [topics()[5]],
+      datePublished: '2020-07-22',
     },
     {
       resourceType: 'publication',
@@ -27,6 +28,7 @@ export default function publications() {
         authors: [users()[4], users()[5], users()[6], users()[7], users()[8]],
       },
       topics: [topics()[3], topics()[4]],
+      datePublished: '2020-07-22',
     },
     {
       resourceType: 'publication',
@@ -39,6 +41,7 @@ export default function publications() {
         authors: [users()[3], users()[4], users()[7], users()[8]],
       },
       topics: [topics()[5]],
+      datePublished: '2020-07-22',
     },
     {
       resourceType: 'publication',
@@ -52,6 +55,7 @@ export default function publications() {
         authors: [users()[3], users()[4], users()[5], users()[6]],
       },
       topics: [topics()[5]],
+      datePublished: '2020-07-22',
     },
     {
       resourceType: 'publication',
@@ -65,6 +69,7 @@ export default function publications() {
       },
       topics: [topics()[5], topics()[3]],
       optionaltags: [],
+      datePublished: '2020-07-22',
     },
 
     {
@@ -79,6 +84,7 @@ export default function publications() {
         authors: [users()[1], users()[5], users()[3]],
       },
       topics: [topics()[3], topics()[2]],
+      datePublished: '2020-07-22',
     },
 
     {
@@ -92,6 +98,7 @@ export default function publications() {
         authors: [users()[3], users()[4], users()[5]],
       },
       topics: [topics()[5]],
+      datePublished: '2020-07-22',
     },
   ];
 }

@@ -1,12 +1,79 @@
-.resource-topics {
+.publication-listItem-container {
+  border: 1px solid #99999f;
+  margin: 2px 2px 20px 2px;
+  padding: 0px 14px 10px;
+}
+
+.publication-listItem-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.publication-listItem-journal-container {
+  margin: 20px 0px;
+}
+
+.publication-listItem-journal-logo {
+  min-width: 150px;
+  max-height: 50px;
+  object-fit: cover;
+}
+
+.publication-listItem-date {
+  color: #5d5d65;
+}
+
+.publication-listItem-content a:hover {
+  text-decoration-color: black;
+}
+
+.publication-listItem-content-authors {
+  margin: 10px 5px 0px;
   display: flex;
 }
 
-.resource-content-authors {
+.publication-listItem-content-author {
+  margin-right: 15px;
+  /* color: #5d5d65; */
+}
+
+.publication-listItem-title {
+  color: #000000;
+  margin-bottom: 10px;
+  background: #ececec;
+  padding: 10px 5px;
+  margin-bottom: 20px;
+}
+
+.publication-listItem-expand-button {
+  background: none;
+  border: none;
+  color: none;
+}
+
+.publication-listItem-expand-button:hover div {
+  color: #000000;
+  text-decoration: underline;
+  text-decoration-color: #000000;
+}
+
+.publication-listItem-expand-button:hover path {
+  stroke: #000000;
+}
+
+.publication-listItem-expand-button:focus {
+  outline: none;
+}
+
+.publication-listItem-expand {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
   margin: 10px 0px;
 }
 
-.resource-content-author {
-  margin-right: 15px;
-  /* color: #5d5d65; */
+.publication-listItem-expand div {
+  margin-left: 10px;
+  color: #5d5d65;
 }

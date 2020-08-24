@@ -14,7 +14,6 @@ import {
 import PostOptionalTags from './PostParts/PostOptionalTags';
 import PostActions from './PostParts/PostActions';
 import FeedItemTopics from '../../FeedItems/FeedItemTopics';
-import {ResourceTextContent} from '../../Publication/PublicationListItem';
 import PropTypes from 'prop-types';
 
 import './Post.css';
@@ -27,10 +26,34 @@ import UserAvatar from '../../Avatar/UserAvatar';
  * @return {React.ReactElement}
  */
 export default function Post({post}) {
+  function GeneratedPostContent({publication}) {
+    return (
+      <>
+        <div className="generated-post-content">
+          <Link to={`/publication/${publication.id}`}>
+            <h3 className="generated-post-title">{publication.title}</h3>
+          </Link>
+          <div className="generated-post-content-authors">
+            {publication.content.authors.map((author) => (
+              <h4 key={author.id}>
+                <Link
+                  to={`/user/${author.id}`}
+                  className="generated-post-content-author"
+                >
+                  {author.name}
+                </Link>
+              </h4>
+            ))}
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return post.generated ? (
-    <div className="post-container">
+    <div className="generated-post-container">
       <GeneratedPostHeader postType={post.postType} postAuthor={post.author} />
-      <ResourceTextContent publication={post.resource} />
+      <GeneratedPostContent publication={post.resource} />
       <FeedItemTopics taggedItem={post} />
       <PostActions post={post} />
     </div>
@@ -124,16 +147,20 @@ PostTextContent.propTypes = {
 function GeneratedPostHeader({postType, postAuthor}) {
   const postTypeName = () =>
     postType.name ? (
-      <h2 className="resource-type-name">{postType.name}</h2>
+      <h2 className="generated-post-type-name">{postType.name}</h2>
     ) : null;
 
   return (
-    <div className="resource-header">
-      <div className="resource-header-logo">
-        <img src={postAuthor.avatar} alt="Labspoon Logo" />
+    <div className="generated-post-header">
+      <div>
+        <img
+          className="generated-post-header-logo"
+          src={postAuthor.avatar}
+          alt="Labspoon Logo"
+        />
       </div>
-      <div className="resource-type-container">
-        <div className="resource-type-icon">{postTypeIcons(postType.name)}</div>
+      <div className="generated-post-type-container">
+        <div>{postTypeIcons(postType.name)}</div>
         {postTypeName()}
       </div>
     </div>
