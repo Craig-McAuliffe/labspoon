@@ -9,14 +9,12 @@ export default function userPageFeedData(skip, limit, filterOptions, userID) {
 
   let resultsList = [];
 
-  const postsByUser = () => {
-    const getPostsByUser = getFilteredPosts([])
+  const postsByUser = () =>
+    getFilteredPosts([])
       .filter((post) => post.author.id === userID)
       .slice(skip, skip + limit);
-    resultsList = [...resultsList, ...getPostsByUser];
-  };
-  const publicationsByUser = () => {
-    const getPublicationsByUser = publications()
+  const publicationsByUser = () =>
+    publications()
       .filter(
         (publication) =>
           publication.content.authors.filter((author) =>
@@ -24,26 +22,13 @@ export default function userPageFeedData(skip, limit, filterOptions, userID) {
           ).length > 0
       )
       .slice(skip, skip + limit);
-    resultsList = [...resultsList, ...getPublicationsByUser];
-  };
-  const userFollowing = () => {
-    const getUserFollows = userRelationships.followsUsers.slice(
-      skip,
-      skip + limit
-    );
-    resultsList = [...resultsList, ...getUserFollows];
-  };
-  const userRecommends = () => {
-    const getUserRecommends = userRelationships.recommends.slice(
-      skip,
-      skip + limit
-    );
-    resultsList = [...resultsList, ...getUserRecommends];
-  };
-  const userCoAuthors = () => {
-    const getUserCoAuthors = findCoAuthors(userID).slice(skip, skip + limit);
-    resultsList = [...resultsList, ...getUserCoAuthors];
-  };
+  const userFollowing = () =>
+    userRelationships.followsUsers.slice(skip, skip + limit);
+
+  const userRecommends = () =>
+    userRelationships.recommends.slice(skip, skip + limit);
+
+  const userCoAuthors = () => findCoAuthors(userID).slice(skip, skip + limit);
 
   const activeTab = filterOptions[0].options.filter(
     (filterOption) => filterOption.enabled === true
@@ -53,26 +38,29 @@ export default function userPageFeedData(skip, limit, filterOptions, userID) {
     const activeTabID = activeTab[0].data.id;
     switch (activeTabID) {
       case filterOptions[0].options[0].data.id:
-        userCoAuthors();
-        userRecommends();
-        userFollowing();
-        publicationsByUser();
-        postsByUser();
+        resultsList = [
+          ...resultsList,
+          ...userCoAuthors(),
+          ...userRecommends(),
+          ...userFollowing(),
+          ...publicationsByUser(),
+          ...postsByUser(),
+        ];
         break;
       case filterOptions[0].options[1].data.id:
-        postsByUser();
+        resultsList = [...resultsList, ...postsByUser()];
         break;
       case filterOptions[0].options[2].data.id:
-        publicationsByUser();
+        resultsList = [...resultsList, ...publicationsByUser()];
         break;
       case filterOptions[0].options[3].data.id:
-        userFollowing();
+        resultsList = [...resultsList, ...userFollowing()];
         break;
       case filterOptions[0].options[4].data.id:
-        userRecommends();
+        resultsList = [...resultsList, ...userRecommends()];
         break;
       case filterOptions[0].options[5].data.id:
-        userCoAuthors();
+        resultsList = [...resultsList, ...userCoAuthors()];
         break;
       default:
         resultsList = [];
