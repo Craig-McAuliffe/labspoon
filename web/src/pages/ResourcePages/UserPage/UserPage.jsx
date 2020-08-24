@@ -57,6 +57,13 @@ export default function UserPage() {
         {
           enabled: false,
           data: {
+            id: 'relevant',
+            name: 'Relevant To You',
+          },
+        },
+        {
+          enabled: false,
+          data: {
             id: 'createdPosts',
             name: 'Posts',
           },
