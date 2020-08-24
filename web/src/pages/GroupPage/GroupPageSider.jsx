@@ -5,7 +5,7 @@ import UserAvatar from '../../components/Avatar/UserAvatar';
 
 import './GroupPage.css';
 
-export default function ({groupID}) {
+export default function ({group}) {
   const search = false;
 
   const groupsFromSearch = () => {
@@ -13,7 +13,7 @@ export default function ({groupID}) {
   };
 
   const suggestedGroups = () => {
-    return findSimilarGroups(groupID).map((similarGroup) => (
+    return findSimilarGroups(group.topics, group.id).map((similarGroup) => (
       <div key={similarGroup.id} className="suggested-group-container">
         <Link to={`/group/${similarGroup.id}`} className="suggested-group-link">
           <UserAvatar src={similarGroup.avatar} width="60px" height="60px" />

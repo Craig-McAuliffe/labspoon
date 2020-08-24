@@ -29,8 +29,6 @@ export default function GroupPage() {
       size: 100,
     });
 
-    console.log(bigDescription);
-
     const descriptionSize = {
       height: `${bigDescription.size}px`,
     };
@@ -174,7 +172,7 @@ export default function GroupPage() {
             {search ? siderTitleChoice[0] : siderTitleChoice[1]}
           </h3>
           <div className="suggested-resources-container">
-            <GroupPageSider currentGroup={groupID} />
+            <GroupPageSider group={group} />
           </div>
         </div>
       </div>

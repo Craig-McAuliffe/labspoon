@@ -58,6 +58,8 @@ export function GenericListItem({result}) {
       );
     case 'user':
       return <UserListItem user={result} key={result.id + 'user'} />;
+    case 'group':
+      return <div>{result.name}</div>;
     default:
       return null;
   }

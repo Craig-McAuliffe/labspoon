@@ -1,5 +1,5 @@
-import getTestPosts from './posts';
-import {findCoAuthors} from './publications';
+import getFilteredPosts from './posts';
+import publications, {findCoAuthors} from './publications';
 
 export default function users() {
   return [
@@ -107,7 +107,7 @@ export default function users() {
 // The posts that we use to retrieve topics related to user should be limited to an amount
 // by date created.
 export function getSimilarUsers(userID) {
-  const postsList = getTestPosts([]);
+  const postsList = getFilteredPosts([]);
 
   const getMostCommonTopics = () => {
     const taggedTopicIDs = [];
@@ -174,4 +174,37 @@ export function getSimilarUsers(userID) {
     return [...matchedAuthors, ...commonCoAuthors].slice(0, 5);
   };
   return similarAuthors();
+}
+
+export function getUserRelatedToResource(resource) {
+  const matchingPublications = () => {
+    const matchedPublications = [];
+
+    resource.topics.forEach((resourceTopic) => {
+      publications().forEach((publication) => {
+        if (
+          matchedPublications.some(
+            (matchedPublication) => matchedPublication === publication
+          )
+        )
+          return;
+        if (publication.topics.some((topic) => topic.id === resourceTopic.id)) {
+          matchedPublications.push(publication);
+        }
+      });
+    });
+    return matchedPublications;
+  };
+
+  const similarUsers = [];
+
+  matchingPublications().forEach((matchedPublication) => {
+    matchedPublication.content.authors.forEach((author) => {
+      if (similarUsers.some((similarUser) => similarUser.id === author.id))
+        return;
+      similarUsers.push(author);
+    });
+  });
+
+  return similarUsers;
 }

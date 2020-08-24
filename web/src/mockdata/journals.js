@@ -9,6 +9,11 @@ const journals = [
     logo:
       'https://publons.com/media/thumbs/publishers/logos/613fa6f5-fea2-4e4a-a934-ba44a1e85f21.png.200x200_q95_detail_letterbox_upscale.png',
   },
+  {
+    name: 'Science Direct',
+    logo:
+      'https://tukuz.com/wp-content/uploads/2020/01/sciencedirect-logo-vector.png',
+  },
 ];
 
 export default journals;
