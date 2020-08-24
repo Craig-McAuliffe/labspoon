@@ -206,17 +206,13 @@ function updateFilterOption(filterOptions, collectionIndex, optionIndex) {
 }
 
 function Tabs({tabFilter, setTabFilter}) {
-  // const selectedTab = getTabFromTypeFilterCollection(tabFilter);
+  const selectedTab = getTabFromTypeFilterCollection(tabFilter);
   const tabs = tabFilter.options.map((option) => (
     <button onClick={() => setTabFilter(option.data.id)} key={option.data.id}>
       {option.data.name}
     </button>
   ));
-  tabs.unshift(
-    <button onClick={() => setTabFilter(DEFAULT_TAB_ID)} key="defaultTab">
-      Most Relevant
-    </button>
-  );
+  if (selectedTab === 'default') setTabFilter(tabFilter.options[0].data.id);
   return <div className="tabs">{tabs}</div>;
 }
 
