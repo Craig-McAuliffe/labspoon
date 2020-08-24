@@ -15,24 +15,17 @@ export default function publicationPageFeedData(
 
   let resultsList = [];
 
-  const similarPublications = () => {
-    const getSimilarPublications = findSimilarPublications(
-      publicationID,
-      publicationTopics
-    ).slice(skip, skip + limit);
-    resultsList = [...resultsList, ...getSimilarPublications];
-  };
-
-  const relatedGroups = () => {
-    const getSimilarGroups = findSimilarGroups(publicationTopics).slice(
+  const similarPublications = () =>
+    findSimilarPublications(publicationID, publicationTopics).slice(
       skip,
       skip + limit
     );
-    resultsList = [...resultsList, ...getSimilarGroups];
-  };
 
-  const relatedPosts = () => {
-    const getRelatedPosts = getFilteredPosts([
+  const relatedGroups = () =>
+    findSimilarGroups(publicationTopics).slice(skip, skip + limit);
+
+  const relatedPosts = () =>
+    getFilteredPosts([
       {
         collectionName: 'Topics',
         options: publicationTopics.map((publicationTopic) => ({
@@ -45,41 +38,26 @@ export default function publicationPageFeedData(
         mutable: false,
       },
     ]).slice(skip, skip + limit);
-    resultsList = [...resultsList, ...getRelatedPosts];
-  };
 
   const citations = (direction) => {
     const thisPublicationRelationships = publicationRelationships().filter(
       (publication) => publication.publication.id === publicationID
     )[0];
-    let getCitationPublications;
+
     switch (direction) {
       case 'cites':
-        getCitationPublications = thisPublicationRelationships.cites.slice(
-          skip,
-          skip + limit
-        );
+        return thisPublicationRelationships.cites.slice(skip, skip + limit);
         break;
       case 'citedBy':
-        getCitationPublications = thisPublicationRelationships.citedBy.slice(
-          skip,
-          skip + limit
-        );
+        return thisPublicationRelationships.citedBy.slice(skip, skip + limit);
         break;
       default:
         return;
     }
-    resultsList = [...resultsList, ...getCitationPublications];
   };
 
-  const relatedUsers = () => {
-    const getRelatedUsers = getUserRelatedToResource(publication).slice(
-      skip,
-      skip + limit
-    );
-
-    resultsList = [...resultsList, ...getRelatedUsers];
-  };
+  const relatedUsers = () =>
+    getUserRelatedToResource(publication).slice(skip, skip + limit);
 
   const activeTab = filterOptions[0].options.filter(
     (filterOption) => filterOption.enabled === true
@@ -89,21 +67,21 @@ export default function publicationPageFeedData(
     const activeTabID = activeTab[0].data.id;
     switch (activeTabID) {
       case filterOptions[0].options[0].data.id:
-        similarPublications();
+        resultsList = [...resultsList, ...similarPublications()];
       case filterOptions[0].options[1].data.id:
-        relatedPosts();
+        resultsList = [...resultsList, ...relatedPosts()];
         break;
       case filterOptions[0].options[2].data.id:
-        citations('cites');
+        resultsList = [...resultsList, ...citations('cites')];
         break;
       case filterOptions[0].options[3].data.id:
-        citations('citedBy');
+        resultsList = [...resultsList, ...citations('citedBy')];
         break;
       case filterOptions[0].options[4].data.id:
-        relatedUsers();
+        resultsList = [...resultsList, ...relatedUsers()];
         break;
       case filterOptions[0].options[5].data.id:
-        relatedGroups();
+        resultsList = [...resultsList, ...relatedGroups()];
         break;
       default:
         resultsList = [];
