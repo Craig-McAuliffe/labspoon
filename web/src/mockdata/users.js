@@ -31,6 +31,7 @@ export default function users() {
       name: 'Labspoon',
       id: 'GHJ4IS43R2FHU53252IFD',
       avatar: 'https://i.ibb.co/4VbMRyv/Group-183-1.png',
+      memberOfGroup: '',
       coverPhoto:
         'https://i.picsum.photos/id/911/1070/200.jpg?hmac=VZ6jy5-zkbVgmSnlLZhEchqoFa0uKs9u4XBbKszPgRc',
       institution: '',

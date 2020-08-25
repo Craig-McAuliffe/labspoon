@@ -5,3 +5,12 @@
 .infinite-scroll-component {
   min-width: 100%;
 }
+
+.image-feedItem-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 100%;
+  padding: 10px;
+  flex-wrap: wrap;
+}

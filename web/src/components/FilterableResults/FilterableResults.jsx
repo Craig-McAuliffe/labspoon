@@ -226,7 +226,12 @@ function Tabs({tabFilter, setTabFilter}) {
 function Results({results, hasMore, fetchMore, tab}) {
   if (Array.isArray(results) && results.length > 0) {
     return (
-      <ResultsList results={results} hasMore={hasMore} fetchMore={fetchMore} />
+      <ResultsList
+        results={results}
+        hasMore={hasMore}
+        fetchMore={fetchMore}
+        activeTab={tab}
+      />
     );
   } else {
     return <h3>{`Looks like there's nothing here!`}</h3>;

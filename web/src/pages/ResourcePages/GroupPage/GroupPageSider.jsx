@@ -1,7 +1,7 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
-import {findSimilarGroups} from '../../mockdata/groups';
-import UserAvatar from '../../components/Avatar/UserAvatar';
+import {findSimilarGroups} from '../../../mockdata/groups';
+import UserAvatar from '../../../components/Avatar/UserAvatar';
 
 import './GroupPage.css';
 

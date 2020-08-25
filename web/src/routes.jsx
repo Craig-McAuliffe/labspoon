@@ -8,7 +8,7 @@ import SettingsPage from './pages/SettingsPage';
 import BookmarksPage from './pages/BookmarksPage';
 import FollowingFeedPage from './pages/FollowingFeedPage';
 import GraphPage from './pages/GraphPage';
-import GroupPage from './pages/GroupPage';
+import GroupPage from './pages/ResourcePages/GroupPage';
 import FollowsPage from './pages/FollowsPage';
 import SearchPage from './pages/SearchPage';
 import UserPage from './pages/ResourcePages/UserPage';

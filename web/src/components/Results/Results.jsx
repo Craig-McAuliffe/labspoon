@@ -6,6 +6,7 @@ import Post from '../Posts/Post/Post';
 import BookmarkListItem from '../Bookmarks/BookmarkListItem/BookmarkListItem';
 import PublicationListItem from '../Publication/PublicationListItem';
 import UserListItem from '../User/UserListItem';
+import ImageFeedItem from '../Media/ImageFeedItem';
 
 import './Results.css';
 
@@ -16,7 +17,7 @@ import './Results.css';
  * @param {Function} fetchMore - when called returns the next page of results
  * @return {React.ReactElement}
  */
-export default function Results({results, hasMore, fetchMore}) {
+export default function Results({results, hasMore, fetchMore, activeTab}) {
   const items = results.map((result, i) => (
     <GenericListItem key={result.id + i} result={result} />
   ));
@@ -30,7 +31,11 @@ export default function Results({results, hasMore, fetchMore}) {
         endMessage={<p>No more results</p>}
         style={{minWidth: '100%'}}
       >
-        {items}
+        {activeTab === 'media' ? (
+          <div className="image-feedItem-container">{items}</div>
+        ) : (
+          items
+        )}
       </InfiniteScroll>
     </div>
   );
@@ -60,6 +65,14 @@ export function GenericListItem({result}) {
       return <UserListItem user={result} key={result.id + 'user'} />;
     case 'group':
       return <div>{result.name}</div>;
+    case 'image':
+      return (
+        <ImageFeedItem
+          src={result.src}
+          alt={result.alt}
+          key={result.id + 'image'}
+        />
+      );
     default:
       return null;
   }
