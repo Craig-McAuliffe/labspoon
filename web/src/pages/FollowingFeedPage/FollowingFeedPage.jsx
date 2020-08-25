@@ -8,7 +8,7 @@ import FilterableResults from '../../components/FilterableResults/FilterableResu
 import getFilteredTestPosts from '../../mockdata/posts';
 import {getPostFilters} from '../../mockdata/filters';
 
-const filterOptionsData = getPostFilters(getFilteredTestPosts([]));
+const getDefaultFilter = () => getPostFilters(getFilteredTestPosts([]));
 
 /**
  * Fetches a user's feed data applying pagination and a filter
@@ -108,7 +108,7 @@ export default function FollowingFeedPage() {
   return (
     <FilterableResults
       fetchResults={fetchResults}
-      defaultFilter={filterOptionsData}
+      getDefaultFilter={getDefaultFilter}
       limit={10}
       useTabs={false}
       useFilterSider={true}

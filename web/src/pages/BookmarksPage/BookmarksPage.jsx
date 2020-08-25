@@ -36,7 +36,7 @@ function fetchBookmarks(uuid, skip, limit, filter, last) {
     .catch((err) => console.log(err));
 }
 
-const filterOptionsData = getBookmarkFilters();
+const getDefaultFilter = getBookmarkFilters;
 
 const BookmarksPage = () => {
   const featureFlags = useContext(FeatureFlags);
@@ -52,7 +52,7 @@ const BookmarksPage = () => {
   return (
     <FilterableResults
       fetchResults={fetchResults}
-      defaultFilter={filterOptionsData}
+      getDefaultFilter={getDefaultFilter}
       limit={10}
       useTabs={false}
     />

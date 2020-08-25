@@ -30,9 +30,14 @@ export default function userPageFeedData(skip, limit, filterOptions, userID) {
 
   const userCoAuthors = () => findCoAuthors(userID).slice(skip, skip + limit);
 
-  const activeTab = filterOptions[0].options.filter(
-    (filterOption) => filterOption.enabled === true
-  );
+  let activeTab;
+  if (filterOptions.length === 0) {
+    activeTab = [];
+  } else {
+    activeTab = filterOptions[0].options.filter(
+      (filterOption) => filterOption.enabled === true
+    );
+  }
 
   if (activeTab.length > 0) {
     const activeTabID = activeTab[0].data.id;

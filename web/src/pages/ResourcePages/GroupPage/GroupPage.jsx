@@ -163,6 +163,7 @@ export default function GroupPage() {
       mutable: false,
     },
   ];
+  const getDefaultFilter = () => relationshipFilter;
 
   return (
     <>
@@ -183,7 +184,7 @@ export default function GroupPage() {
         </div>
         <FilterableResults
           fetchResults={fetchResults}
-          defaultFilter={relationshipFilter}
+          getDefaultFilter={getDefaultFilter}
           limit={10}
           useTabs={true}
           useFilterSider={false}

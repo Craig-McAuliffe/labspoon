@@ -14,7 +14,7 @@ export const DEFAULT_TAB_IDX = 0;
  */
 export default function FilterableResults({
   fetchResults,
-  defaultFilter,
+  getDefaultFilter,
   limit,
   useTabs,
   useFilterSider,
@@ -43,12 +43,18 @@ export default function FilterableResults({
    *   ],
    * }, ...]
    */
-  const [filterOptions, setFilterOptions] = useState(defaultFilter);
+  const [filterOptions, setFilterOptions] = useState([]);
+
   if (fetchResultsState !== fetchResults) {
     setFetchResultsState(() => fetchResults);
     setSkip(0);
-    setFilterOptions(defaultFilter);
   }
+
+  useEffect(() => {
+    Promise.resolve(getDefaultFilter()).then((filter) =>
+      setFilterOptions(filter)
+    );
+  }, []);
 
   useEffect(() => {
     // fetchResults may return either a result set or a promise, so we convert
@@ -118,9 +124,10 @@ export default function FilterableResults({
     resetFeedFromFilterUpdate(updatedFilterOptions);
   }
 
-  const tabIDToIdx = new Map(
-    filterOptions[DEFAULT_TAB_IDX].options.map((opt, i) => [opt.data.id, i])
-  );
+  const getTabIDToIdx = () =>
+    new Map(
+      filterOptions[DEFAULT_TAB_IDX].options.map((opt, i) => [opt.data.id, i])
+    );
 
   const setTab = (tabID) => {
     if (tabID === DEFAULT_TAB_ID) {
@@ -128,7 +135,7 @@ export default function FilterableResults({
     }
     return resetThenSetFilterCollectionToState(
       DEFAULT_TAB_IDX,
-      tabIDToIdx.get(tabID)
+      getTabIDToIdx().get(tabID)
     );
   };
 
@@ -205,6 +212,7 @@ function updateFilterOption(filterOptions, collectionIndex, optionIndex) {
 }
 
 function Tabs({tabFilter, setTabFilter}) {
+  if (!tabFilter) return <div className="tabs"></div>;
   const selectedTab = getTabFromTypeFilterCollection(tabFilter);
   const tabs = tabFilter.options.map((option) => (
     <button onClick={() => setTabFilter(option.data.id)} key={option.data.id}>
@@ -242,6 +250,7 @@ function Results({results, hasMore, fetchMore, tab}) {
  * default tab (Most Relevant) is used.
  */
 export function getTabFromTypeFilterCollection(filterCollection) {
+  if (!filterCollection) return 'default';
   const enabledTypes = filterCollection.options.filter(
     (option) => option.enabled
   );

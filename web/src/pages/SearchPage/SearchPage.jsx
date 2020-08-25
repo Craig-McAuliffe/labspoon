@@ -20,7 +20,7 @@ function fetchResults(skip, limit, filter) {
   }
 }
 
-const filterOptionsData = getSearchFilters();
+const getDefaultFilter = getSearchFilters;
 
 export default function SearchPage() {
   const [query, setQuery] = useState(useRouteMatch().params.query);
@@ -29,7 +29,7 @@ export default function SearchPage() {
       <SearchForm query={query} setQuery={setQuery} />
       <FilterableResults
         fetchResults={fetchResults}
-        defaultFilter={filterOptionsData}
+        getDefaultFilter={getDefaultFilter}
         limit={5}
         useTabs={true}
         useFilterSider={true}

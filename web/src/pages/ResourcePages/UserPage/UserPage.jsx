@@ -101,6 +101,7 @@ export default function UserPage() {
       mutable: false,
     },
   ];
+  const getDefaultFilter = () => relationshipFilter;
 
   return (
     <>
@@ -121,7 +122,7 @@ export default function UserPage() {
 
         <FilterableResults
           fetchResults={fetchResults}
-          defaultFilter={relationshipFilter}
+          getDefaultFilter={getDefaultFilter}
           limit={10}
           useTabs={true}
           useFilterSider={false}
