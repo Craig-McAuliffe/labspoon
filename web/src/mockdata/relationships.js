@@ -148,6 +148,22 @@ export default function relationships() {
         getTestPosts()[5],
       ],
     },
+    {
+      user: users()[9],
+      followsUsers: [users()[7], users()[0], users()[1]],
+      bookmarks: [
+        getTestPosts()[0],
+        getTestPosts()[3],
+        getTestPosts()[1],
+        getTestPosts()[2],
+      ],
+      recommends: [
+        getTestPosts()[2],
+        getTestPosts()[3],
+        getTestPosts()[4],
+        getTestPosts()[5],
+      ],
+    },
   ];
 }
 

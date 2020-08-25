@@ -71,9 +71,11 @@ function BookmarkPostButton({post}) {
   );
 }
 
-const PostActions = ({post}) => {
+const PostActions = ({post, dedicatedPage}) => {
   return (
-    <div className="post-actions">
+    <div
+      className={dedicatedPage ? 'post-actions-dedicated-page' : 'post-actions'}
+    >
       <RepostToGroupButton />
       <ShareButton />
       <RecommendButton />

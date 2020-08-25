@@ -6,6 +6,13 @@
   border-top: 1px solid #dcdce0;
 }
 
+.post-actions-dedicated-page {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
 .action-button {
   border: none;
   /* color: #00507c; */
