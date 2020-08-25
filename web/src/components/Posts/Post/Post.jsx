@@ -1,5 +1,6 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 import {
   LectureIcon,
@@ -10,38 +11,68 @@ import {
   MemberChangeIcon,
   PublicationIcon,
 } from '../../../assets/PostTypeIcons';
-
 import PostOptionalTags from './PostParts/PostOptionalTags';
 import PostActions from './PostParts/PostActions';
 import FeedItemTopics from '../../FeedItems/FeedItemTopics';
-import {ResourceTextContent} from '../../Publication/PublicationListItem';
-import PropTypes from 'prop-types';
+import PublicationListItem from '../../Publication/PublicationListItem';
+import UserAvatar from '../../Avatar/UserAvatar';
+import publications from '../../../mockdata/publications';
+
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 import './Post.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import UserAvatar from '../../Avatar/UserAvatar';
-
 /**
  * Generic entry point for display any type of post within a feed or search
  * result
  * @return {React.ReactElement}
  */
 export default function Post({post}) {
-  return post.generated ? (
+  const referencedResource = () => {
+    if (post.url)
+      return publications().filter(
+        (publication) => publication.url === post.url
+      )[0];
+  };
+
+  const postContent = () => (
     <div className="post-container">
-      <GeneratedPostHeader postType={post.postType} postAuthor={post.author} />
-      <ResourceTextContent publication={post.resource} />
-      <FeedItemTopics taggedItem={post} />
-      <PostActions post={post} />
-    </div>
-  ) : (
-    <div className="post-container">
-      <PostHeader postType={post.postType} postAuthor={post.author} />
+      <PostHeader
+        postType={post.postType}
+        postAuthor={post.author}
+        postCreationDate={post.createdAt}
+      />
       <PostTextContent post={post} />
       <PostOptionalTags optionalTags={post.optionaltags} />
       <FeedItemTopics taggedItem={post} />
       <PostActions post={post} />
     </div>
+  );
+
+  return post.generated ? (
+    <div className="post-referenced-resource-container">
+      <PublicationListItem
+        publication={post.referencedResource}
+        removeBorder={true}
+      />
+      <div className="post-container">
+        <PostHeader
+          postType={post.postType}
+          postAuthor={post.author}
+          postCreationDate={post.createdAt}
+        />
+        <PostTextContent post={post} />
+      </div>
+    </div>
+  ) : post.url ? (
+    <div className="post-referenced-resource-container">
+      <PublicationListItem
+        publication={referencedResource()}
+        removeBorder={true}
+      />
+      {postContent()}
+    </div>
+  ) : (
+    postContent()
   );
 }
 
@@ -70,7 +101,7 @@ Post.propTypes = {
  * Display the header on a post
  * @return {React.ReactElement}
  */
-function PostHeader({postType, postAuthor}) {
+function PostHeader({postType, postAuthor, postCreationDate}) {
   const postTypeName = () => {
     if (postType.name === 'default') return null;
     return <h2 className="post-type-name">{postType.name}</h2>;
@@ -82,9 +113,12 @@ function PostHeader({postType, postAuthor}) {
         <div className="post-header-avatar">
           <UserAvatar src={postAuthor.avatar} width="80px" height="80px" />
         </div>
-        <h2>
-          <Link to={`/user/${postAuthor.id}`}>{postAuthor.name}</Link>
-        </h2>
+        <div>
+          <h2>
+            <Link to={`/user/${postAuthor.id}`}>{postAuthor.name}</Link>
+          </h2>
+          <p>{postCreationDate}</p>
+        </div>
       </div>
 
       <div className="post-type-container">
@@ -120,25 +154,6 @@ PostTextContent.propTypes = {
     text: PropTypes.string.isRequired,
   }).isRequired,
 };
-
-function GeneratedPostHeader({postType, postAuthor}) {
-  const postTypeName = () =>
-    postType.name ? (
-      <h2 className="resource-type-name">{postType.name}</h2>
-    ) : null;
-
-  return (
-    <div className="resource-header">
-      <div className="resource-header-logo">
-        <img src={postAuthor.avatar} alt="Labspoon Logo" />
-      </div>
-      <div className="resource-type-container">
-        <div className="resource-type-icon">{postTypeIcons(postType.name)}</div>
-        {postTypeName()}
-      </div>
-    </div>
-  );
-}
 
 function postTypeIcons(postTypeName) {
   switch (postTypeName) {

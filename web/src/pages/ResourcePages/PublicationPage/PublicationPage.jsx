@@ -2,12 +2,12 @@ import React from 'react';
 import {Link} from 'react-router-dom';
 
 import publications from '../../../mockdata/publications';
-import journals from '../../../mockdata/journals';
 import {useParams} from 'react-router-dom';
 import FeedItemTopics from '../../../components/FeedItems/FeedItemTopics';
 import FilterableResults from '../../../components/FilterableResults/FilterableResults';
 import publicationPageFeedData from './PublicationPageFeedData';
 import PublicationSider from './PublicationPageSider';
+import detectJournal from '../../../components/Publication/DetectJournal';
 
 import './PublicationPage.css';
 
@@ -28,24 +28,16 @@ export default function PublicationPage({}) {
   ];
 
   const publicationDetails = () => {
-    const detectJournal = () => {
-      const journalName = journals.filter((journal) =>
-        matchedPublication.url
-          .toLowerCase()
-          .includes(journal.name.toLowerCase())
-      );
-      return journalName;
-    };
     return (
       <>
         <div className="publication-meta">
-          {detectJournal().length === 0 ? (
+          {detectJournal(matchedPublication).length === 0 ? (
             <div></div>
           ) : (
             <img
               className="publication-journal-logo"
-              src={detectJournal()[0].logo}
-              alt={`${detectJournal()[0].name} journal logo`}
+              src={detectJournal(matchedPublication)[0].logo}
+              alt={`${detectJournal(matchedPublication)[0].name} journal logo`}
             />
           )}
           <PublicationLink publicationUrl={matchedPublication.url} />
