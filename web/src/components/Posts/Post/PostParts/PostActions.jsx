@@ -77,7 +77,11 @@ const PostActions = ({post}) => {
       <RepostToGroupButton />
       <ShareButton />
       <RecommendButton />
-      <BookmarkPostButton post={post} />
+      {post ? (
+        <BookmarkPostButton post={post} />
+      ) : (
+        <BookmarkButton bookmarked={false} setBookmarked={() => {}} />
+      )}
     </div>
   );
 };

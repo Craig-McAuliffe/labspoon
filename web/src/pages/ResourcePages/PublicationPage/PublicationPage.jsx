@@ -129,6 +129,7 @@ export default function PublicationPage({}) {
       mutable: false,
     },
   ];
+  const getDefaultFilter = () => relationshipFilter;
 
   return (
     <>
@@ -147,7 +148,7 @@ export default function PublicationPage({}) {
 
         <FilterableResults
           fetchResults={fetchResults}
-          defaultFilter={relationshipFilter}
+          getDefaultFilter={getDefaultFilter}
           limit={10}
           useTabs={true}
           useFilterSider={false}
