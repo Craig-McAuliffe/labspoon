@@ -61,6 +61,7 @@ export default function GroupPage() {
             <SeeMore
               bigDescription={bigDescription}
               changeBigDescription={changeBigDescription}
+              groupDescriptionRef={groupDescriptionRef}
             />
           </div>
         </div>
@@ -69,46 +70,6 @@ export default function GroupPage() {
         </div>
       </>
     );
-  };
-
-  const SeeMore = ({bigDescription, changeBigDescription}) => {
-    const [displaySeeMore, setDisplaySeeMore] = useState();
-
-    useEffect(() => {
-      setDisplaySeeMore(
-        groupDescriptionRef.current.firstElementChild.scrollHeight > 100
-      );
-    });
-
-    if (displaySeeMore && bigDescription.display)
-      return (
-        <div className="group-description-see-more">
-          <button
-            className="see-more-button"
-            onClick={() => changeBigDescription({display: false, size: 100})}
-          >
-            See less
-          </button>
-        </div>
-      );
-    if (displaySeeMore && !bigDescription.display)
-      return (
-        <div className="group-description-see-more">
-          <button
-            className="see-more-button"
-            onClick={() =>
-              changeBigDescription({
-                display: true,
-                size:
-                  groupDescriptionRef.current.firstElementChild.scrollHeight,
-              })
-            }
-          >
-            See more
-          </button>
-        </div>
-      );
-    else return null;
   };
 
   const siderTitleChoice = [
@@ -193,3 +154,46 @@ export default function GroupPage() {
     </>
   );
 }
+
+export const SeeMore = ({
+  bigDescription,
+  changeBigDescription,
+  groupDescriptionRef,
+}) => {
+  const [displaySeeMore, setDisplaySeeMore] = useState();
+
+  useEffect(() => {
+    setDisplaySeeMore(
+      groupDescriptionRef.current.firstElementChild.scrollHeight > 100
+    );
+  });
+
+  if (displaySeeMore && bigDescription.display)
+    return (
+      <div className="group-description-see-more">
+        <button
+          className="see-more-button"
+          onClick={() => changeBigDescription({display: false, size: 100})}
+        >
+          See less
+        </button>
+      </div>
+    );
+  if (displaySeeMore && !bigDescription.display)
+    return (
+      <div className="group-description-see-more">
+        <button
+          className="see-more-button"
+          onClick={() =>
+            changeBigDescription({
+              display: true,
+              size: groupDescriptionRef.current.firstElementChild.scrollHeight,
+            })
+          }
+        >
+          See more
+        </button>
+      </div>
+    );
+  else return null;
+};

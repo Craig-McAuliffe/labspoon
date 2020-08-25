@@ -7,6 +7,7 @@ import BookmarkListItem from '../Bookmarks/BookmarkListItem/BookmarkListItem';
 import PublicationListItem from '../Publication/PublicationListItem';
 import UserListItem from '../User/UserListItem';
 import ImageFeedItem from '../Media/ImageFeedItem';
+import GroupFeedItem from '../Group/GroupFeedItem';
 
 import './Results.css';
 
@@ -64,7 +65,7 @@ export function GenericListItem({result}) {
     case 'user':
       return <UserListItem user={result} key={result.id + 'user'} />;
     case 'group':
-      return <div key={result.id + 'group'}>{result.name}</div>;
+      return <GroupFeedItem key={result.id + 'group'} group={result} />;
     case 'topic':
       return <div key={result.id + 'topic'}>{result.name}</div>;
     case 'image':

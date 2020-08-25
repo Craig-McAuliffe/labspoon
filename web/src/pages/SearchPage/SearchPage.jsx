@@ -21,6 +21,7 @@ function fetchResults(skip, limit, filter) {
         ...getFilteredTestPosts(filter).slice(skip, skip + limit),
         ...publications().slice(skip, skip + limit),
         ...users().slice(skip, skip + limit),
+        ...groups().slice(skip, skip + limit),
       ];
     case 'publications':
       return publications().slice(skip, skip + limit);
