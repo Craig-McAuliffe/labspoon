@@ -2,11 +2,12 @@ import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
 import {Expand, Hide} from '../../assets/PostActionIcons';
 import PostActions from '../Posts/Post/PostParts/PostActions';
-import detectJournal from '../../components/Publication/DetectJournal';
+import detectJournal from '../Publication/DetectJournal';
+import FeedItemTopics from '../FeedItems/FeedItemTopics';
 
 import './PublicationListItem.css';
 
-export default function PublicationListItem({publication}) {
+export default function PublicationListItem({publication, removeBorder}) {
   const [displayAbstract, setDisplayAbstract] = useState(false);
   const expandedView = () =>
     displayAbstract ? (
@@ -15,7 +16,13 @@ export default function PublicationListItem({publication}) {
       </p>
     ) : null;
   return (
-    <div className="publication-listItem-container">
+    <div
+      className={
+        removeBorder
+          ? 'publication-listItem-container-noBorder'
+          : 'publication-listItem-container'
+      }
+    >
       <div className="publication-listItem-header">
         <div className="publication-listItem-journal-container">
           {detectJournal(publication).length > 0 ? (
@@ -45,6 +52,9 @@ export default function PublicationListItem({publication}) {
               </Link>
             </h4>
           ))}
+        </div>
+        <div className="publication-listItem-topics-container">
+          <FeedItemTopics taggedItem={publication} />
         </div>
       </div>
       <button

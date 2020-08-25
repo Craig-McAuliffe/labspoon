@@ -35,6 +35,7 @@ export default function users() {
         'https://i.picsum.photos/id/911/1070/200.jpg?hmac=VZ6jy5-zkbVgmSnlLZhEchqoFa0uKs9u4XBbKszPgRc',
       institution: '',
     },
+
     {
       resourceType: 'user',
       name: 'Sally McDee',
@@ -90,6 +91,7 @@ export default function users() {
         'https://i.picsum.photos/id/277/1070/200.jpg?hmac=5Q7cdTNBgOxi_s2rf6bejfAOjD0eYSRROlXQNn80hIs',
       institution: 'Oxford University',
     },
+
     {
       resourceType: 'user',
       name: 'Charly McVee',
@@ -100,6 +102,16 @@ export default function users() {
       coverPhoto:
         'https://i.picsum.photos/id/591/1070/200.jpg?hmac=6wwNGQVsvvCTVbLvbsF9u-HSjyW9r_x6LGW-rhIyt_Y',
       institution: 'Oxford University',
+    },
+
+    {
+      resourceType: 'user',
+      name: 'Labspoon Bot',
+      id: 'hug40h3rguroehiojif',
+      avatar: 'https://i.ibb.co/ryKXcFr/Frame-373.png',
+      coverPhoto:
+        'https://i.picsum.photos/id/911/1070/200.jpg?hmac=VZ6jy5-zkbVgmSnlLZhEchqoFa0uKs9u4XBbKszPgRc',
+      institution: '',
     },
   ];
 }

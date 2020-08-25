@@ -4,6 +4,11 @@
   padding: 0px 14px 10px;
 }
 
+.publication-listItem-container-noBorder {
+  margin: 2px 2px 20px 2px;
+  padding: 0px 14px 10px;
+}
+
 .publication-listItem-header {
   display: flex;
   justify-content: space-between;
@@ -22,6 +27,9 @@
 
 .publication-listItem-date {
   color: #5d5d65;
+}
+
+.publication-listItem-content {
 }
 
 .publication-listItem-content a:hover {
@@ -76,4 +84,8 @@
 .publication-listItem-expand div {
   margin-left: 10px;
   color: #5d5d65;
+}
+
+.publication-listItem-topics-container {
+  margin-left: 5px;
 }
