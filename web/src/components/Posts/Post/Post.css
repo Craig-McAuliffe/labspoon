@@ -35,6 +35,14 @@
   margin-bottom: 5px;
 }
 
+.post-header-dedicated-page a {
+  color: black;
+}
+
+.post-header-dedicated-page a:hover {
+  text-decoration-color: black;
+}
+
 .post-header a {
   color: black;
 }
