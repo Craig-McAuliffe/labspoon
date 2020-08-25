@@ -8,21 +8,19 @@ import FilterableResults from '../../components/FilterableResults/FilterableResu
 import getFilteredTestPosts from '../../mockdata/posts';
 import {getPostFilters} from '../../mockdata/filters';
 
-const getDefaultFilter = () => getPostFilters(getFilteredTestPosts([]));
-
-/**
- * Fetches a user's feed data applying pagination and a filter
- * @param {String} uuid - user's unique ID
- * @param {number} skip - number of results to skip
- * @param {number} limit - number of results to return
- * @param {Array} filter - filter to apply to results, see FeedPage
- * documentation
- * @return {Array}
- */
 function fetchUserFeedData(uuid, skip, limit, filter, last) {
-  let results = db
+  const results = db
     .collection(`users/${uuid}/feeds/followingFeed/posts`)
     .orderBy('timestamp');
+  return sortAndPaginateFeedData(results, last, limit);
+}
+
+function fetchPublicFeedData(skip, limit, filter, last) {
+  const results = db.collection('posts').orderBy('timestamp');
+  return sortAndPaginateFeedData(results, last, limit);
+}
+
+function sortAndPaginateFeedData(results, last, limit) {
   if (typeof last !== 'undefined') {
     results = results.startAt(last.timestamp);
   }
@@ -42,67 +40,73 @@ function fetchUserFeedData(uuid, skip, limit, filter, last) {
     .catch((err) => console.log(err));
 }
 
-/**
- * Fetches the public feed data that will be shown when no user is signed in
- * @param {number} skip - number of results to skip
- * @param {number} limit - number of results to return
- * @param {Array} filter - filter to apply to results, see FeedPage
- * documentation
- * @param {Object} last - the last result from the previous set
- * @return {Array}
- */
-function fetchPublicFeedData(skip, limit, filter, resourceInfo, last) {
-  let results = db.collection('posts').orderBy('timestamp');
-  if (typeof last !== 'undefined') {
-    results = results.startAt(last.timestamp);
-  }
-  return results
-    .limit(limit)
-    .get()
-    .then((qs) => {
-      const posts = [];
-      qs.forEach((doc) => {
-        const post = doc.data();
-        post.id = doc.id;
-        post.resourceType = 'post';
-        posts.push(post);
-      });
-      return posts;
-    })
-    .catch((err) => console.log(err));
-}
-
-/**
- * Fetches test data applying pagination and a filter
- * @param {number} skip - number of results to skip
- * @param {number} limit - number of results to return
- * @param {Array} filter - filter to apply to results, see FeedPage
- * documentation
- * @return {Array}
- */
 function fetchTestFeedData(skip, limit, filter) {
   const repeatedTestPosts = getFilteredTestPosts(filter);
   return repeatedTestPosts.slice(skip, skip + limit);
 }
 
-/**
- * Renders the feed page, which contains both a feed and a filter menu
- * @return {React.ReactElement}
- */
+function fetchUserFeedFilters(uuid) {
+  const results = db
+    .collection(`users/${uuid}/feeds/followingFeed/filterCollections`)
+    .get()
+    .then((fcqs) => {
+      const filterCollections = [];
+      fcqs.forEach((filterCollectionDoc) => {
+        const filterCollectionData = filterCollectionDoc.data();
+        const filterOptionsPromise = filterCollectionDoc.ref
+          .collection('filterOptions')
+          .orderBy('rank')
+          .limit(10)
+          .get()
+          .then((qs) => {
+            const filterCollection = {
+              collectionName: filterCollectionData.resourceName,
+              options: [],
+              mutable: true,
+            };
+            qs.forEach((doc) => {
+              const filterOptionData = doc.data();
+              filterCollection.options.push({
+                data: {
+                  id: filterOptionData.resourceID,
+                  name: filterOptionData.name,
+                },
+                enabled: false,
+              });
+            });
+            return filterCollection;
+          })
+          .catch((err) => console.log('filter err', err));
+        filterCollections.push(filterOptionsPromise);
+      });
+      return Promise.all(filterCollections);
+    })
+    .catch((err) => console.log(err));
+  return results;
+}
+
+function fetchPublicFeedFilters() {
+  return [];
+}
+
 export default function FollowingFeedPage() {
   const featureFlags = useContext(FeatureFlags);
   const user = useContext(AuthContext);
 
   let fetchResults;
+  let getDefaultFilter;
   if (featureFlags.has('cloud-firestore')) {
     if (user) {
       fetchResults = (skip, limit, filter, last) =>
         fetchUserFeedData(user.uid, skip, limit, filter, last);
+      getDefaultFilter = () => fetchUserFeedFilters(user.uid);
     } else {
       fetchResults = fetchPublicFeedData;
+      getDefaultFilter = fetchPublicFeedFilters;
     }
   } else {
     fetchResults = fetchTestFeedData;
+    getDefaultFilter = () => getPostFilters(getFilteredTestPosts([]));
   }
 
   return (
@@ -112,7 +116,6 @@ export default function FollowingFeedPage() {
       limit={10}
       useTabs={false}
       useFilterSider={true}
-      resourceInfo={undefined}
     />
   );
 }

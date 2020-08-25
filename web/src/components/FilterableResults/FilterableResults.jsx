@@ -27,22 +27,6 @@ export default function FilterableResults({
     () => fetchResults
   );
   const [last, setLast] = useState(undefined);
-  /**
-   * Filter options has the following structure:
-   * [{
-   *   collectionName: string,
-   *   options: [
-   *     {
-   *       enabled: boolean,
-   *       mutable: boolean,
-   *       data: {
-   *         id: string
-   *         name: string
-   *       }
-   *     }, ...
-   *   ],
-   * }, ...]
-   */
   const [filterOptions, setFilterOptions] = useState([]);
 
   if (fetchResultsState !== fetchResults) {
