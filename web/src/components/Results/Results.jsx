@@ -64,7 +64,9 @@ export function GenericListItem({result}) {
     case 'user':
       return <UserListItem user={result} key={result.id + 'user'} />;
     case 'group':
-      return <div>{result.name}</div>;
+      return <div key={result.id + 'group'}>{result.name}</div>;
+    case 'topic':
+      return <div key={result.id + 'topic'}>{result.name}</div>;
     case 'image':
       return (
         <ImageFeedItem
