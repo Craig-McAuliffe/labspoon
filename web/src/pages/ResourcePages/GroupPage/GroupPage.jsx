@@ -1,13 +1,13 @@
 import React, {useRef, useEffect, useState} from 'react';
-import groups from '../../mockdata/groups';
+import groups from '../../../mockdata/groups';
 import {Link, useParams} from 'react-router-dom';
 import GroupPageSider from './GroupPageSider';
 import groupPageFeedData from './GroupPageFeedData';
-import FilterableResults from '../../components/FilterableResults/FilterableResults';
-import UserAvatar from '../../components/Avatar/UserAvatar';
-import FollowButton from '../../components/Buttons/FollowButton';
-import MessageButton from '../../components/Buttons/MessageButton';
-import {PinnedPost} from '../../components/Posts/Post/Post';
+import FilterableResults from '../../../components/FilterableResults/FilterableResults';
+import UserAvatar from '../../../components/Avatar/UserAvatar';
+import FollowButton from '../../../components/Buttons/FollowButton';
+import MessageButton from '../../../components/Buttons/MessageButton';
+import {PinnedPost} from '../../../components/Posts/Post/Post';
 
 import './GroupPage.css';
 
@@ -117,7 +117,7 @@ export default function GroupPage() {
   ];
 
   const fetchResults = (skip, limit, filterOptions, last) =>
-    groupPageFeedData(skip, limit, filterOptions, groupID, last);
+    groupPageFeedData(skip, limit, filterOptions, group);
 
   const relationshipFilter = [
     {
