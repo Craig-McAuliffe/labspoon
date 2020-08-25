@@ -11,7 +11,7 @@ export default function PublicationListItem({publication, removeBorder}) {
   const [displayAbstract, setDisplayAbstract] = useState(false);
   const expandedView = () =>
     displayAbstract ? (
-      <p className="publication-listItem-abstract">
+      <p className="publication-list-item-abstract">
         {publication.content.abstract}
       </p>
     ) : null;
@@ -19,49 +19,51 @@ export default function PublicationListItem({publication, removeBorder}) {
     <div
       className={
         removeBorder
-          ? 'publication-listItem-container-noBorder'
-          : 'publication-listItem-container'
+          ? 'publication-list-item-container-noBorder'
+          : 'publication-list-item-container'
       }
     >
-      <div className="publication-listItem-header">
-        <div className="publication-listItem-journal-container">
+      <div className="publication-list-item-header">
+        <div className="publication-list-item-journal-container">
           {detectJournal(publication).length > 0 ? (
             <img
-              className="publication-listItem-journal-logo"
+              className="publication-list-item-journal-logo"
               src={detectJournal(publication)[0].logo}
               alt={`${detectJournal(publication)[0].name} journal logo`}
             />
           ) : (
-            <div className="publication-listItem-journal-container"></div>
+            <div className="publication-list-item-journal-container"></div>
           )}
         </div>
-        <p className="publication-listItem-date">{publication.datePublished}</p>
+        <p className="publication-list-item-date">
+          {publication.datePublished}
+        </p>
       </div>
-      <div className="publication-listItem-content">
+      <div className="publication-list-item-content">
         <Link to={`/publication/${publication.id}`}>
-          <h3 className="publication-listItem-title">{publication.title}</h3>
+          <h3 className="publication-list-item-title">{publication.title}</h3>
         </Link>
-        <div className="publication-listItem-content-authors">
+        <div className="publication-list-item-content-authors">
           {publication.content.authors.map((author) => (
             <h4 key={author.id}>
               <Link
                 to={`/user/${author.id}`}
-                className="publication-listItem-content-author"
+                className="publication-list-item-content-author"
               >
                 {author.name}
               </Link>
             </h4>
           ))}
         </div>
-        <div className="publication-listItem-topics-container">
+        <div className="publication-list-item-topics-container">
           <FeedItemTopics taggedItem={publication} />
         </div>
       </div>
       <button
-        className="publication-listItem-expand-button"
+        className="publication-list-item-expand-button"
         onClick={() => setDisplayAbstract((current) => !current)}
       >
-        <div className="publication-listItem-expand">
+        <div className="publication-list-item-expand">
           {!displayAbstract ? (
             <>
               <Expand /> <div>Read Abstract</div>

@@ -1,52 +1,52 @@
-.publication-listItem-container {
+.publication-list-item-container {
   border: 1px solid #99999f;
   margin: 2px 2px 20px 2px;
   padding: 0px 14px 10px;
 }
 
-.publication-listItem-container-noBorder {
+.publication-list-item-container-noBorder {
   margin: 2px 2px 20px 2px;
   padding: 0px 14px 10px;
 }
 
-.publication-listItem-header {
+.publication-list-item-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.publication-listItem-journal-container {
+.publication-list-item-journal-container {
   margin: 20px 0px;
 }
 
-.publication-listItem-journal-logo {
+.publication-list-item-journal-logo {
   min-width: 150px;
   max-height: 50px;
   object-fit: cover;
 }
 
-.publication-listItem-date {
+.publication-list-item-date {
   color: #5d5d65;
 }
 
-.publication-listItem-content {
+.publication-list-item-content {
 }
 
-.publication-listItem-content a:hover {
+.publication-list-item-content a:hover {
   text-decoration-color: black;
 }
 
-.publication-listItem-content-authors {
+.publication-list-item-content-authors {
   margin: 10px 5px 0px;
   display: flex;
 }
 
-.publication-listItem-content-author {
+.publication-list-item-content-author {
   margin-right: 15px;
   /* color: #5d5d65; */
 }
 
-.publication-listItem-title {
+.publication-list-item-title {
   color: #000000;
   margin-bottom: 10px;
   background: #ececec;
@@ -54,38 +54,38 @@
   margin-bottom: 20px;
 }
 
-.publication-listItem-expand-button {
+.publication-list-item-expand-button {
   background: none;
   border: none;
   color: none;
 }
 
-.publication-listItem-expand-button:hover div {
+.publication-list-item-expand-button:hover div {
   color: #000000;
   text-decoration: underline;
   text-decoration-color: #000000;
 }
 
-.publication-listItem-expand-button:hover path {
+.publication-list-item-expand-button:hover path {
   stroke: #000000;
 }
 
-.publication-listItem-expand-button:focus {
+.publication-list-item-expand-button:focus {
   outline: none;
 }
 
-.publication-listItem-expand {
+.publication-list-item-expand {
   display: flex;
   justify-content: flex-start;
   align-items: center;
   margin: 10px 0px;
 }
 
-.publication-listItem-expand div {
+.publication-list-item-expand div {
   margin-left: 10px;
   color: #5d5d65;
 }
 
-.publication-listItem-topics-container {
+.publication-list-item-topics-container {
   margin-left: 5px;
 }
