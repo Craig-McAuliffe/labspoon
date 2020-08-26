@@ -108,7 +108,7 @@ function fetchUserFeedFilters(uuid) {
             const filterCollection = {
               collectionName: filterCollectionData.resourceName,
               options: [],
-              mutable: filterCollectionData.mutable,
+              mutable: true,
             };
             qs.forEach((doc) => {
               const filterOptionData = doc.data();
