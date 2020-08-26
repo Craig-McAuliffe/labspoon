@@ -14,6 +14,7 @@ type FilterCollection struct {
 	ResourceName string         `firestore:"resourceName"`
 	ResourceType string         `firestore:"resourceType"`
 	Options      []FilterOption `firestore:"-"`
+	Mutable      bool           `firestore:"mutable"`
 	// descending ranking of the filter collections used to order display of
 	// filter collections on front end
 	Rank int `firestore:"rank"`
