@@ -1,8 +1,8 @@
-import findSimilarPublications from '../../../mockdata/publications';
-import findSimilarGroups from '../../../mockdata/groups';
+import {findSimilarPublications} from '../../../mockdata/publications';
+import {findSimilarGroups} from '../../../mockdata/groups';
 import getFilteredPosts from '../../../mockdata/posts';
 import {publicationRelationships} from '../../../mockdata/relationships';
-import {getUserRelatedToResource} from '../../../mockdata/users';
+import {getUsersRelatedToResource} from '../../../mockdata/users';
 
 export default function publicationPageFeedData(
   skip,
@@ -12,11 +12,14 @@ export default function publicationPageFeedData(
 ) {
   const publicationID = publication.id;
   const publicationTopics = publication.topics;
+  const publicationTopicsIDs = publicationTopics
+    .map((topic) => topic.id)
+    .slice(0, 2);
 
   let resultsList = [];
 
   const similarPublications = () =>
-    findSimilarPublications(publicationID, publicationTopics).slice(
+    findSimilarPublications(publicationTopicsIDs, publicationID).slice(
       skip,
       skip + limit
     );
@@ -57,7 +60,7 @@ export default function publicationPageFeedData(
   };
 
   const relatedUsers = () =>
-    getUserRelatedToResource(publication).slice(skip, skip + limit);
+    getUsersRelatedToResource(publication).slice(skip, skip + limit);
 
   let activeTab;
   if (filterOptions.length === 0) {
@@ -73,6 +76,7 @@ export default function publicationPageFeedData(
     switch (activeTabID) {
       case filterOptions[0].options[0].data.id:
         resultsList = [...resultsList, ...similarPublications()];
+        break;
       case filterOptions[0].options[1].data.id:
         resultsList = [...resultsList, ...relatedPosts()];
         break;
@@ -92,5 +96,6 @@ export default function publicationPageFeedData(
         resultsList = [];
     }
   }
+
   return resultsList;
 }

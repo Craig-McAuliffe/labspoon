@@ -11,7 +11,7 @@ import detectJournal from '../../../components/Publication/DetectJournal';
 import './PublicationPage.css';
 
 export default function PublicationPage({}) {
-  const thisPublicationID = useParams().id;
+  const thisPublicationID = useParams().publicationID;
   const matchedPublication = publications().filter((publication) =>
     publication.id.includes(thisPublicationID)
   )[0];
@@ -120,6 +120,7 @@ export default function PublicationPage({}) {
       mutable: false,
     },
   ];
+
   const getDefaultFilter = () => relationshipFilter;
 
   return (

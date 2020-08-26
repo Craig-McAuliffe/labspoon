@@ -1,0 +1,7 @@
+.topic-list-item-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0px;
+  border-bottom: 1px solid #dcdce0;
+}

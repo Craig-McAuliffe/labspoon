@@ -15,6 +15,7 @@ import UserPage from './pages/ResourcePages/UserPage';
 import LoginPage from './pages/LoginPage';
 import PublicationPage from './pages/ResourcePages/PublicationPage/PublicationPage';
 import PostPage from './pages/ResourcePages/PostPage';
+import TopicPage from './pages/TopicPage';
 
 /**
  * Top level routing structure for the app.
@@ -46,14 +47,17 @@ export default function Routes({user, setUser}) {
       <Route path="/search/:query?">
         <SearchPage />
       </Route>
-      <Route user={user} path="/user/:userId">
+      <Route user={user} path="/user/:userID">
         <UserPage />
       </Route>
-      <Route path="/publication/:id">
+      <Route path="/publication/:publicationID">
         <PublicationPage />
       </Route>
-      <Route path="/post/:postId">
+      <Route path="/post/:postID">
         <PostPage />
+      </Route>
+      <Route path="/topic/:topicID">
+        <TopicPage />
       </Route>
       <Route path="/">
         <Redirect to="/" />

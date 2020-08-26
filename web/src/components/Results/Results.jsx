@@ -8,6 +8,7 @@ import PublicationListItem from '../Publication/PublicationListItem';
 import UserListItem from '../User/UserListItem';
 import ImageFeedItem from '../Media/ImageFeedItem';
 import GroupFeedItem from '../Group/GroupFeedItem';
+import TopicListItem from '../Topics/TopicListItem';
 
 import './Results.css';
 
@@ -67,7 +68,7 @@ export function GenericListItem({result}) {
     case 'group':
       return <GroupFeedItem key={result.id + 'group'} group={result} />;
     case 'topic':
-      return <div key={result.id + 'topic'}>{result.name}</div>;
+      return <TopicListItem key={result.id + 'topic'} topic={result} />;
     case 'image':
       return (
         <ImageFeedItem

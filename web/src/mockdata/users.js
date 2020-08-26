@@ -189,7 +189,7 @@ export function getSimilarUsers(userID) {
   return similarAuthors();
 }
 
-export function getUserRelatedToResource(resource) {
+export function getUsersRelatedToResource(resource) {
   const matchingPublications = () => {
     const matchedPublications = [];
 
