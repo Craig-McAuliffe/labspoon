@@ -6,7 +6,7 @@ import UserAvatar from '../Avatar/UserAvatar';
 
 import './GroupFeedItem.css';
 export default function GroupFeedItem({group}) {
-  const [bigDescription, changeBigDescription] = useState({
+  const [displayFullDescription, setDisplayFullDescription] = useState({
     display: false,
     size: 100,
   });
@@ -14,7 +14,7 @@ export default function GroupFeedItem({group}) {
   const groupDescriptionRef = useRef();
 
   const descriptionSize = {
-    height: `${bigDescription.size}px`,
+    height: `${displayFullDescription.size}px`,
   };
 
   return (
@@ -37,8 +37,8 @@ export default function GroupFeedItem({group}) {
           <p>{group.about}</p>
         </div>
         <SeeMore
-          bigDescription={bigDescription}
-          changeBigDescription={changeBigDescription}
+          displayFullDescription={displayFullDescription}
+          setDisplayFullDescription={setDisplayFullDescription}
           groupDescriptionRef={groupDescriptionRef}
         />
       </div>
