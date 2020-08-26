@@ -24,13 +24,13 @@ export default function GroupPage() {
   );
 
   const GroupDetails = () => {
-    const [bigDescription, changeBigDescription] = useState({
+    const [displayFullDescription, setDisplayFullDescription] = useState({
       display: false,
       size: 100,
     });
 
     const descriptionSize = {
-      height: `${bigDescription.size}px`,
+      height: `${displayFullDescription.size}px`,
     };
 
     return (
@@ -59,8 +59,9 @@ export default function GroupPage() {
             </div>
 
             <SeeMore
-              bigDescription={bigDescription}
-              changeBigDescription={changeBigDescription}
+              displayFullDescription={displayFullDescription}
+              setDisplayFullDescription={setDisplayFullDescription}
+              groupDescriptionRef={groupDescriptionRef}
             />
           </div>
         </div>
@@ -69,46 +70,6 @@ export default function GroupPage() {
         </div>
       </>
     );
-  };
-
-  const SeeMore = ({bigDescription, changeBigDescription}) => {
-    const [displaySeeMore, setDisplaySeeMore] = useState();
-
-    useEffect(() => {
-      setDisplaySeeMore(
-        groupDescriptionRef.current.firstElementChild.scrollHeight > 100
-      );
-    });
-
-    if (displaySeeMore && bigDescription.display)
-      return (
-        <div className="group-description-see-more">
-          <button
-            className="see-more-button"
-            onClick={() => changeBigDescription({display: false, size: 100})}
-          >
-            See less
-          </button>
-        </div>
-      );
-    if (displaySeeMore && !bigDescription.display)
-      return (
-        <div className="group-description-see-more">
-          <button
-            className="see-more-button"
-            onClick={() =>
-              changeBigDescription({
-                display: true,
-                size:
-                  groupDescriptionRef.current.firstElementChild.scrollHeight,
-              })
-            }
-          >
-            See more
-          </button>
-        </div>
-      );
-    else return null;
   };
 
   const siderTitleChoice = [
@@ -193,3 +154,37 @@ export default function GroupPage() {
     </>
   );
 }
+
+export const SeeMore = ({
+  displayFullDescription,
+  setDisplayFullDescription,
+  groupDescriptionRef,
+}) => {
+  const [displaySeeMore, setDisplaySeeMore] = useState();
+
+  useEffect(() => {
+    setDisplaySeeMore(
+      groupDescriptionRef.current.firstElementChild.scrollHeight > 100
+    );
+  });
+
+  if (!displaySeeMore) return null;
+  return (
+    <div className="group-description-see-more">
+      <button
+        className="see-more-button"
+        onClick={() =>
+          displayFullDescription.display
+            ? setDisplayFullDescription({display: false, size: 100})
+            : setDisplayFullDescription({
+                display: true,
+                size:
+                  groupDescriptionRef.current.firstElementChild.scrollHeight,
+              })
+        }
+      >
+        {displayFullDescription.display ? <>See less</> : <>See more</>}
+      </button>
+    </div>
+  );
+};
