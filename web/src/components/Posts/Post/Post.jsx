@@ -26,25 +26,41 @@ import './Post.css';
  * result
  * @return {React.ReactElement}
  */
-export default function Post({post}) {
+export default function Post({post, dedicatedPage}) {
   const referencedResource = () => {
-    if (post.url)
-      return publications().filter(
-        (publication) => publication.url === post.url
-      )[0];
+    const matchedResource = publications().filter(
+      (publication) => publication.url === post.url
+    )[0];
+
+    return matchedResource ? (
+      <div className="post-referenced-resource-container">
+        <PublicationListItem
+          publication={matchedResource}
+          removeBorder={true}
+        />
+        {postContent()}
+      </div>
+    ) : (
+      postContent()
+    );
   };
 
   const postContent = () => (
-    <div className="post-container">
+    <div
+      className={
+        dedicatedPage ? 'post-container-dedicated-page' : 'post-container'
+      }
+    >
       <PostHeader
         postType={post.postType}
         postAuthor={post.author}
         postCreationDate={post.createdAt}
+        dedicatedPage={dedicatedPage}
       />
       <PostTextContent post={post} />
       <PostOptionalTags optionalTags={post.optionaltags} />
       <FeedItemTopics taggedItem={post} />
-      <PostActions post={post} />
+      <PostActions post={post} dedicatedPage={dedicatedPage} />
     </div>
   );
 
@@ -63,14 +79,8 @@ export default function Post({post}) {
         <PostTextContent post={post} />
       </div>
     </div>
-  ) : post.url ? (
-    <div className="post-referenced-resource-container">
-      <PublicationListItem
-        publication={referencedResource()}
-        removeBorder={true}
-      />
-      {postContent()}
-    </div>
+  ) : post.url && !dedicatedPage ? (
+    referencedResource()
   ) : (
     postContent()
   );
@@ -101,14 +111,16 @@ Post.propTypes = {
  * Display the header on a post
  * @return {React.ReactElement}
  */
-function PostHeader({postType, postAuthor, postCreationDate}) {
+function PostHeader({postType, postAuthor, postCreationDate, dedicatedPage}) {
   const postTypeName = () => {
     if (postType.name === 'default') return null;
     return <h2 className="post-type-name">{postType.name}</h2>;
   };
 
   return (
-    <div className="post-header">
+    <div
+      className={dedicatedPage ? 'post-header-dedicated-page' : 'post-header'}
+    >
       <div className="post-header-profile">
         <div className="post-header-avatar">
           <UserAvatar src={postAuthor.avatar} width="80px" height="80px" />
@@ -143,7 +155,9 @@ PostHeader.propTypes = {
 function PostTextContent({post}) {
   return (
     <div className="post-text-content">
-      <h3>{post.title}</h3>
+      <Link to={`/post/${post.id}`}>
+        <h3>{post.title}</h3>
+      </Link>
       <p>{post.content.text}</p>
     </div>
   );

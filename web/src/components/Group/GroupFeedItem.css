@@ -1,0 +1,60 @@
+.group-feed-item-container {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  grid-template-rows: none;
+  margin: 2px 2px 30px 2px;
+  padding: 20px 16px 10px 0px;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.6);
+  max-width: 100%;
+}
+
+.group-feed-item-container a:hover {
+  text-decoration: none;
+}
+
+.group-feed-item-description {
+  margin: 10px 0px 0px;
+  overflow-x: none;
+  overflow-y: hidden;
+}
+
+.group-feed-item-icon-and-name {
+  grid-column: 1/2;
+  display: flex;
+  flex-direction: column;
+  margin-right: 10px;
+}
+
+.group-feed-item-icon-and-name img {
+  align-self: center;
+}
+
+.group-feed-item-icon-and-name p {
+  text-align: center;
+  color: #99999f;
+  margin-top: 4px;
+}
+
+.group-feed-item-icon-and-name:hover p {
+  color: #000000;
+}
+
+.group-feed-item-text-container {
+  grid-column: 2/3;
+}
+
+.group-feed-item-text-container a:hover {
+  text-decoration: none;
+}
+
+.group-feed-item-text-container h3:hover {
+  color: #99999f;
+}
+
+.group-feed-item-text-container h3 {
+  color: #000000;
+}
+
+.group-feed-item-text-container h3 {
+  margin-bottom: 5px;
+}

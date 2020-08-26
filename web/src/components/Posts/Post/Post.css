@@ -5,6 +5,12 @@
   max-width: 100%;
 }
 
+.post-container-dedicated-page {
+  margin: 2px 2px 0px 2px;
+  padding: 20px 16px 0px;
+  max-width: 100%;
+}
+
 .post-referenced-resource-container {
   border: 1px solid #99999f;
   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.6);
@@ -21,6 +27,22 @@
   border-bottom: 1px solid #dcdce0;
 }
 
+.post-header-dedicated-page {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  margin-bottom: 5px;
+}
+
+.post-header-dedicated-page a {
+  color: black;
+}
+
+.post-header-dedicated-page a:hover {
+  text-decoration-color: black;
+}
+
 .post-header a {
   color: black;
 }
@@ -32,6 +54,14 @@
 .post-text-content {
   min-width: 100%;
   margin: 10px 0px;
+}
+
+.post-text-content a {
+  color: #000000;
+}
+
+.post-text-content a:hover {
+  text-decoration-color: #000000;
 }
 
 .post-header-profile {

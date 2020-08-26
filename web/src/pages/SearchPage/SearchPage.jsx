@@ -8,13 +8,31 @@ import FilterableResults, {
 
 import getFilteredTestPosts from '../../mockdata/posts';
 import {getSearchFilters} from '../../mockdata/filters';
+import publications from '../../mockdata/publications';
+import groups from '../../mockdata/groups';
+import users from '../../mockdata/users';
+import topics from '../../mockdata/topics';
 
 function fetchResults(skip, limit, filter) {
   const type = getTabFromTypeFilterCollection(filter[DEFAULT_TAB_IDX]);
   switch (type) {
+    case 'mostRelevant':
+      return [
+        ...getFilteredTestPosts(filter).slice(skip, skip + limit),
+        ...publications().slice(skip, skip + limit),
+        ...users().slice(skip, skip + limit),
+        ...groups().slice(skip, skip + limit),
+      ];
+    case 'publications':
+      return publications().slice(skip, skip + limit);
     case 'posts':
-      const repeatedTestPosts = getFilteredTestPosts(filter);
-      return repeatedTestPosts.slice(skip, skip + limit);
+      return getFilteredTestPosts(filter).slice(skip, skip + limit);
+    case 'researchers':
+      return users().slice(skip, skip + limit);
+    case 'groups':
+      return groups().slice(skip, skip + limit);
+    case 'topics':
+      return topics().slice(skip, skip + limit);
     default:
       return [];
   }
