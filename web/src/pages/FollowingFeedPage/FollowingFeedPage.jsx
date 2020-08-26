@@ -10,7 +10,7 @@ import {getPostFilters} from '../../mockdata/filters';
 
 function getEnabledIDsFromFilter(filter) {
   const IDsMap = new Map();
-  filter.slice(1).forEach((filterCollection) => {
+  filter.forEach((filterCollection) => {
     IDsMap.set(
       filterCollection.collectionName,
       filterCollection.options
@@ -31,8 +31,21 @@ function fetchUserFeedData(uuid, skip, limit, filter, last) {
   let results = db
     .collection(`users/${uuid}/feeds/followingFeed/posts`)
     .orderBy('timestamp');
+  console.log('enabledIDs ', enabledIDs);
 
   if (enabledIDs.size !== 0) {
+    const enabledPostTypeIDs = enabledIDs.get('Post Type');
+    if (enabledPostTypeIDs.length === 1) {
+      results = results.where(
+        'filter_postType_id',
+        '==',
+        enabledPostTypeIDs[0]
+      );
+    }
+    if (enabledPostTypeIDs.length > 1) {
+      results = results.where('filter_PostType_id', 'in', enabledAuthorIDs);
+    }
+
     const enabledAuthorIDs = enabledIDs.get('Author');
     if (enabledAuthorIDs.length === 1) {
       results = results.where('filter_author_id', '==', enabledAuthorIDs[0]);
