@@ -1,7 +1,7 @@
 .tabs {
   grid-column: 2/3;
   grid-row: 3/4;
-  padding: 20px 0px 30px;
+  padding: 40px 0px 30px;
   border-top: 1px solid #dcdce0;
 }
 

@@ -1,10 +1,13 @@
 import React from 'react';
 import Post from '../../../components/Posts/Post/Post';
 import PostPageSider from './PostPageSider';
-import {useParams} from 'react-router-dom';
+import {useParams, Link} from 'react-router-dom';
 import {getTestPosts} from '../../../mockdata/posts';
 import FilterableResults from '../../../components/FilterableResults/FilterableResults';
 import postPageFeedData from './PostPageFeedData';
+import publications from '../../../mockdata/publications';
+
+import './PostPage.css';
 
 export default function PostPage() {
   const thisPostID = useParams().postId;
@@ -12,6 +15,30 @@ export default function PostPage() {
   const matchedPost = getTestPosts().filter((post) =>
     post.id.includes(slicedPostID)
   )[0];
+
+  const referencedResource = () => {
+    const matchedResource = publications().filter(
+      (publication) => publication.url === matchedPost.url
+    )[0];
+    if (matchedResource) {
+      switch (matchedResource.resourceType) {
+        case 'publication':
+          return (
+            <div className="post-page-resource-container">
+              <p>Referenced Publication:</p>
+              <Link to={`/publication/${matchedResource.id}`}>
+                <h4 className="post-page-resource-link">
+                  {matchedResource.title}
+                </h4>
+              </Link>
+            </div>
+          );
+        default:
+          return null;
+      }
+    }
+    return null;
+  };
 
   const siderTitleChoice = [
     'Other Posts from your Search',
@@ -22,7 +49,6 @@ export default function PostPage() {
     postPageFeedData(skip, limit, filterOptions, matchedPost);
 
   const search = false;
-  const postDetails = () => <Post post={matchedPost} dedicatedPage={true} />;
 
   const relationshipFilter = [
     {
@@ -75,7 +101,10 @@ export default function PostPage() {
         </div>
       </div>
       <div className="content-layout">
-        <div className="details-container">{postDetails()}</div>
+        <div className="post-page-details-container">
+          <Post post={matchedPost} dedicatedPage={true} />
+          {referencedResource()}
+        </div>
 
         <FilterableResults
           fetchResults={fetchResults}

@@ -2,3 +2,35 @@
   border: 1px solid #dcdce0;
   padding: 10px;
 }
+
+.post-page-details-container {
+  grid-column: 2/3;
+  min-width: 100%;
+}
+
+.post-page-resource-container {
+  display: flex;
+  margin-top: 40px;
+  flex-wrap: nowrap;
+}
+
+.post-page-resource-container p {
+  color: #99999f;
+  margin-right: 10px;
+}
+
+.post-page-resource-container h4 {
+  color: #5d5d65;
+}
+
+.post-page-resource-container h4:hover {
+  color: #000000;
+}
+
+.post-page-resource-container a {
+  color: #000000;
+}
+
+.post-page-resource-container a:hover {
+  text-decoration: none;
+}

@@ -28,10 +28,21 @@ import './Post.css';
  */
 export default function Post({post, dedicatedPage}) {
   const referencedResource = () => {
-    if (post.url)
-      return publications().filter(
-        (publication) => publication.url === post.url
-      )[0];
+    const matchedResource = publications().filter(
+      (publication) => publication.url === post.url
+    )[0];
+
+    return matchedResource ? (
+      <div className="post-referenced-resource-container">
+        <PublicationListItem
+          publication={matchedResource}
+          removeBorder={true}
+        />
+        {postContent()}
+      </div>
+    ) : (
+      postContent()
+    );
   };
 
   const postContent = () => (
@@ -68,14 +79,8 @@ export default function Post({post, dedicatedPage}) {
         <PostTextContent post={post} />
       </div>
     </div>
-  ) : post.url ? (
-    <div className="post-referenced-resource-container">
-      <PublicationListItem
-        publication={referencedResource()}
-        removeBorder={true}
-      />
-      {postContent()}
-    </div>
+  ) : post.url && !dedicatedPage ? (
+    referencedResource()
   ) : (
     postContent()
   );

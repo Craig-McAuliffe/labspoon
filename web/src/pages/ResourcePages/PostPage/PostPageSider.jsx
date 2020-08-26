@@ -14,7 +14,10 @@ export default function PostPageSider({currentPost}) {
 
     topicIDs.forEach((topicID) => {
       getTestPosts().forEach((post) => {
-        if (post.topics.some((relatedTopic) => relatedTopic.id === topicID))
+        if (
+          post.topics.some((relatedTopic) => relatedTopic.id === topicID) &&
+          !similarPostSet.some((matchedPost) => matchedPost.id === post.id)
+        )
           similarPostSet.push(post);
       });
     });
