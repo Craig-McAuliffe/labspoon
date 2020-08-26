@@ -3,7 +3,3 @@ Set this environment variable to automatically connect to the backend.
 export FIRESTORE_EMULATOR_HOST="localhost:8080"
 ```
 
-# Running
-
-To install the script use `go install` and then run the binary with `HOME/go/bin/populateFirestore`
-

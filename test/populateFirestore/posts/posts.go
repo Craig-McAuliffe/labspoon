@@ -107,7 +107,6 @@ func updateFiltersByPost(ctx context.Context, feedRef *firestore.DocumentRef, po
 		&filters.FilterCollection{
 			ResourceName: "Post Type",
 			ResourceType: "postType",
-			Mutable:      false,
 		},
 		&filters.FilterOption{
 			Name:       post.PostType.Name,
@@ -123,7 +122,6 @@ func updateFiltersByPost(ctx context.Context, feedRef *firestore.DocumentRef, po
 		&filters.FilterCollection{
 			ResourceName: "Author",
 			ResourceType: "user",
-			Mutable:      true,
 		},
 		&filters.FilterOption{
 			Name:       post.Author.Name,
@@ -141,7 +139,6 @@ func updateFiltersByPost(ctx context.Context, feedRef *firestore.DocumentRef, po
 			&filters.FilterCollection{
 				ResourceName: "Topics",
 				ResourceType: "topic",
-				Mutable:      true,
 			},
 			&filters.FilterOption{
 				Name:       topic.Name,
