@@ -32,9 +32,14 @@ export default function GroupPageFeedData(
     ]).slice(skip, skip + limit);
   };
 
-  const activeTab = filterOptions[0].options.filter(
-    (filterOption) => filterOption.enabled === true
-  );
+  let activeTab;
+  if (filterOptions.length === 0) {
+    activeTab = [];
+  } else {
+    activeTab = filterOptions[0].options.filter(
+      (filterOption) => filterOption.enabled === true
+    );
+  }
 
   const groupMedia = () => {
     return groups()
