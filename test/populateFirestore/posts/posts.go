@@ -14,13 +14,16 @@ import (
 )
 
 type Post struct {
-	ID        string         `firestore:"id,omitempty"`
-	Title     string         `firestore:"title,omitempty"`
-	PostType  PostType       `firestore:"postType" yaml:"postType"`
-	Author    users.UserRef  `firestore:"author"`
-	Content   PostContent    `firestore:"content"`
-	Topics    []topics.Topic `firestore:"topics"`
-	Timestamp *time.Time     `firestore:"timestamp"`
+	ID               string         `firestore:"id,omitempty"`
+	Title            string         `firestore:"title,omitempty"`
+	PostType         PostType       `firestore:"postType" yaml:"postType"`
+	Author           users.UserRef  `firestore:"author"`
+	Content          PostContent    `firestore:"content"`
+	Topics           []topics.Topic `firestore:"topics"`
+	Timestamp        *time.Time     `firestore:"timestamp"`
+	FilterPostTypeID string         `firestore:"filter_postType_id"`
+	FilterAuthorID   string         `firestore:"filter_author_id"`
+	FilterTopicIDs   []string       `firestore:"filter_topic_ids"`
 }
 
 type PostType struct {
@@ -36,6 +39,7 @@ type PostContent struct {
 func SetPosts(ctx context.Context, client *firestore.Client, posts map[string]Post) error {
 	for id, post := range posts {
 		authorID := post.Author.ID
+		populatePostIDFields(&post)
 		_, err := client.Collection("posts").Doc(id).Set(ctx, post)
 		if err != nil {
 			return fmt.Errorf("Failed to add post %v to posts collection: %w", id, authorID, err)
@@ -57,8 +61,16 @@ func SetPosts(ctx context.Context, client *firestore.Client, posts map[string]Po
 			return fmt.Errorf("Failed to add post %v to author %v 's follower's following feeds: %w", id, authorID, err)
 		}
 	}
-
 	return nil
+}
+
+func populatePostIDFields(post *Post) {
+	post.FilterPostTypeID = post.PostType.ID
+	post.FilterAuthorID = post.Author.ID
+	post.FilterTopicIDs = make([]string, len(post.Topics))
+	for i, topic := range post.Topics {
+		post.FilterTopicIDs[i] = topic.ID
+	}
 }
 
 func setPostToFollowedByUsers(ctx context.Context, client *firestore.Client, authorID string, post Post) error {

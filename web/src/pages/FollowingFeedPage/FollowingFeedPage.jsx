@@ -8,10 +8,56 @@ import FilterableResults from '../../components/FilterableResults/FilterableResu
 import getFilteredTestPosts from '../../mockdata/posts';
 import {getPostFilters} from '../../mockdata/filters';
 
+function getEnabledIDsFromFilter(filter) {
+  const IDsMap = new Map();
+  filter.slice(1).forEach((filterCollection) => {
+    IDsMap.set(
+      filterCollection.collectionName,
+      filterCollection.options
+        .filter((option) => option.enabled)
+        .map((option) => option.data.id)
+    );
+  });
+  return IDsMap;
+}
+
+// Due to the limitations in firestore filters described in
+// https://firebase.google.com/docs/firestore/query-data/queries it is not
+// possible to use multiple many-to-many filters (ie. `array-contains-any` and
+// `in`).
 function fetchUserFeedData(uuid, skip, limit, filter, last) {
-  const results = db
+  const enabledIDs = getEnabledIDsFromFilter(filter);
+
+  let results = db
     .collection(`users/${uuid}/feeds/followingFeed/posts`)
     .orderBy('timestamp');
+
+  if (enabledIDs.size !== 0) {
+    const enabledAuthorIDs = enabledIDs.get('Author');
+    if (enabledAuthorIDs.length === 1) {
+      results = results.where('filter_author_id', '==', enabledAuthorIDs[0]);
+    }
+    if (enabledAuthorIDs.length > 1) {
+      results = results.where('filter_author_id', 'in', enabledAuthorIDs);
+    }
+
+    const enabledTopicIDs = enabledIDs.get('Topics');
+    if (enabledTopicIDs.length === 1) {
+      results = results.where(
+        'filter_topic_ids',
+        'array-contains',
+        enabledTopicIDs[0]
+      );
+    }
+    if (enabledTopicIDs.length > 1) {
+      results = results.where(
+        'filter_topic_ids',
+        'array-contains-any',
+        enabledTopicIDs
+      );
+    }
+  }
+
   return sortAndPaginateFeedData(results, last, limit);
 }
 
