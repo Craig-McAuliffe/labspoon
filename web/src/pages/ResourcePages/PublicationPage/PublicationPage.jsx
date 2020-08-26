@@ -1,8 +1,7 @@
 import React from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useParams} from 'react-router-dom';
 
 import publications from '../../../mockdata/publications';
-import {useParams} from 'react-router-dom';
 import FeedItemTopics from '../../../components/FeedItems/FeedItemTopics';
 import FilterableResults from '../../../components/FilterableResults/FilterableResults';
 import publicationPageFeedData from './PublicationPageFeedData';
@@ -144,7 +143,6 @@ export default function PublicationPage({}) {
           limit={10}
           useTabs={true}
           useFilterSider={false}
-          resourceID={thisPublicationID}
         />
       </div>
     </>
