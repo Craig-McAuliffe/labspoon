@@ -11,7 +11,7 @@ import FollowButton from '../../../components/Buttons/FollowButton';
 import './UserPage.css';
 
 export default function UserPage() {
-  const userID = useParams().userId;
+  const userID = useParams().userID;
   const user = users().filter((user) => user.id === userID)[0];
   const search = false;
 

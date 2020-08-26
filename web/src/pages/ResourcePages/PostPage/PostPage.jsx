@@ -10,7 +10,7 @@ import publications from '../../../mockdata/publications';
 import './PostPage.css';
 
 export default function PostPage() {
-  const thisPostID = useParams().postId;
+  const thisPostID = useParams().postID;
   const slicedPostID = thisPostID.slice(0, thisPostID.length - 2);
   const matchedPost = getTestPosts().filter((post) =>
     post.id.includes(slicedPostID)

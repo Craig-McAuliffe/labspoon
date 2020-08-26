@@ -105,20 +105,22 @@ export default function publications() {
 
 export const findSimilarPublications = (topicIDs, thisPublicationID) => {
   const uniquePublications = [];
-  topicIDs.map((topicID) => {
-    publications().map((publication) => {
-      if (publication.id !== thisPublicationID)
-        publication.topics.map((topic) => {
-          if (
-            topic.id === topicID &&
-            uniquePublications.map(
-              (uniquePublication) => uniquePublication != topicID
-            )
+  topicIDs.forEach((topicID) => {
+    publications().forEach((publication) => {
+      if (
+        publication.id !== thisPublicationID &&
+        publication.topics.some((topic) => topic.id === topicID)
+      ) {
+        if (
+          !uniquePublications.some(
+            (uniquePublication) => uniquePublication.id === publication.id
           )
-            uniquePublications.push(publication);
-        });
+        )
+          uniquePublications.push(publication);
+      }
     });
   });
+
   return uniquePublications;
 };
 
