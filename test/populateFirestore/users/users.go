@@ -23,12 +23,19 @@ type UserRef struct {
 // Used when the full details about a user a required, such as on their profile
 // page.
 type User struct {
-	ID              string                  `firestore:"id,omitempty"`
-	Name            string                  `firestore:"name,omitempty"`
-	Avatar          string                  `firestore:"avatar,omitempty"`
-	FollowsUsers    map[string]UserRef      `yaml:"followsUsers" firestore:"-"`
-	FollowsTopics   map[string]topics.Topic `yaml:"followsTopics" firestore:"-"`
-	FollowedByUsers map[string]UserRef      `yaml:"followedByUsers" firestore:"-"`
+	ID         string `firestore:"id,omitempty"`
+	Name       string `firestore:"name,omitempty"`
+	Avatar     string `firestore:"avatar,omitempty"`
+	CoverPhoto string `firestore:"coverPhoto,omitempty" yaml:"coverPhoto"`
+	// TODO: Should embed a group ref
+	MemberOfGroup string `firestore:"memberOfGroup,omitempty"`
+	// TODO: Should embed a institution ref
+	Institution string `firestore:"institution,omitempty"`
+	// Outgoing relationships
+	FollowsUsers  map[string]UserRef      `yaml:"followsUsers" firestore:"-"`
+	FollowsTopics map[string]topics.Topic `yaml:"followsTopics" firestore:"-"`
+	// Incoming relationships
+	FollowedByUsers map[string]UserRef `yaml:"followedByUsers" firestore:"-"`
 }
 
 // SetUsers creates the user collection, and sets users within it based on the

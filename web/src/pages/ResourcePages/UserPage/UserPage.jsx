@@ -1,8 +1,13 @@
-import React from 'react';
+import React, {useContext, useState, useEffect} from 'react';
 import {useParams} from 'react-router-dom';
+import {FeatureFlags} from '../../../App';
+
+import {db} from '../../../firebase';
+
 import userPageFeedData from './UserPageFeedData';
 import UserPageSider from './UserPageSider';
 import users from '../../../mockdata/users';
+
 import FilterableResults from '../../../components/FilterableResults/FilterableResults';
 import MessageButton from '../../../components/Buttons/MessageButton';
 import {UserPageAvatar} from '../../../components/Avatar/UserAvatar';
@@ -10,40 +15,43 @@ import FollowButton from '../../../components/Buttons/FollowButton';
 
 import './UserPage.css';
 
+function fetchUserDetailsFromDB(uuid) {
+  return db
+    .doc(`users/${uuid}`)
+    .get()
+    .then((userDetails) => userDetails.data())
+    .catch((err) => console.log(err));
+}
+
 export default function UserPage() {
-  const userID = useParams().userID;
-  const user = users().filter((user) => user.id === userID)[0];
+  const featureFlags = useContext(FeatureFlags);
+  const [userID, setUserID] = useState(undefined);
+  const [userDetails, setUserDetails] = useState(undefined);
+
+  const userIDParam = useParams().userID;
+  if (userID !== userIDParam) {
+    setUserID(userIDParam);
+  }
+
+  let fetchUserDetails;
+  if (featureFlags.has('cloud-firestore')) {
+    fetchUserDetails = () => fetchUserDetailsFromDB(userID);
+  } else {
+    fetchUserDetails = () => users().filter((user) => user.id === userID)[0];
+  }
+
+  useEffect(() => {
+    Promise.resolve(fetchUserDetails())
+      .then((userDetails) => {
+        setUserDetails(userDetails);
+      })
+      .catch((err) => console.log(err));
+  }, [userID]);
+
   const search = false;
 
   const fetchResults = (skip, limit, filterOptions, last) =>
     userPageFeedData(skip, limit, filterOptions, userID, last);
-
-  const UserDetails = () => {
-    return (
-      <div>
-        <div className="user-cover-photo-container">
-          <img
-            src={user.coverPhoto}
-            alt="user cover"
-            className="user-cover-photo"
-          />
-        </div>
-        <div className="user-headline">
-          <div className="user-page-avatar-container">
-            <UserPageAvatar src={user.avatar} width="100px" height="100px" />
-          </div>
-          <div className="user-headline-text">
-            <h2>{user.name}</h2>
-            <h3>{user.institution}</h3>
-          </div>
-        </div>
-        <div className="user-message-follow">
-          <MessageButton />
-          <FollowButton />
-        </div>
-      </div>
-    );
-  };
 
   const siderTitleChoice = [
     'Other People from your Search',
@@ -117,7 +125,7 @@ export default function UserPage() {
       </div>
       <div className="content-layout">
         <div className="details-container">
-          <UserDetails />
+          <UserDetails user={userDetails} />
         </div>
 
         <FilterableResults
@@ -129,5 +137,33 @@ export default function UserPage() {
         />
       </div>
     </>
+  );
+}
+
+function UserDetails({user}) {
+  if (user === undefined) return <></>;
+  return (
+    <div>
+      <div className="user-cover-photo-container">
+        <img
+          src={user.coverPhoto}
+          alt="user cover"
+          className="user-cover-photo"
+        />
+      </div>
+      <div className="user-headline">
+        <div className="user-page-avatar-container">
+          <UserPageAvatar src={user.avatar} width="100px" height="100px" />
+        </div>
+        <div className="user-headline-text">
+          <h2>{user.name}</h2>
+          <h3>{user.institution}</h3>
+        </div>
+      </div>
+      <div className="user-message-follow">
+        <MessageButton />
+        <FollowButton />
+      </div>
+    </div>
   );
 }

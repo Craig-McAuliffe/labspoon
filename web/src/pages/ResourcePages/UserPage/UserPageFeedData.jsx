@@ -3,6 +3,7 @@ import publications, {findCoAuthors} from '../../../mockdata/publications';
 import relationships from '../../../mockdata/relationships';
 
 export default function userPageFeedData(skip, limit, filterOptions, userID) {
+  if (!userID) return [];
   const userRelationships = relationships().filter(
     (userRelationships) => userRelationships.user.id === userID
   )[0];
@@ -73,12 +74,3 @@ export default function userPageFeedData(skip, limit, filterOptions, userID) {
   }
   return resultsList;
 }
-
-// const followedByUsers = relationships()
-//   .filter(
-//     (userRelations) =>
-//       userRelations.followsUsers.filter(
-//         (followsUser) => followsUser.id === userID
-//       ).length > 0
-//   )
-//   .map((followedByUser) => followedByUser.user);

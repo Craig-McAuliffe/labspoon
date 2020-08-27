@@ -3,6 +3,10 @@ users:
     id: MA1qq6qfbFfMER5HdlTa4X36Ly42
     name: Craig McAuliffe
     avatar: https://i.picsum.photos/id/620/200/200.jpg?hmac=i-QlnBFXHK0SDe5o7B85DMYehiO7H-fZxsKLRrfFCcU
+    memberOfGroup: Gilestro Lab,
+    coverPhoto:
+      https://i.picsum.photos/id/508/1070/200.jpg?hmac=zuoVvRij5oaspEYUA-r6XWUDuHQXigbUHUfhCaCIuqc
+    institution: University College London,
     followsUsers:
       YdZkqyCThmUNhej0VXtqqWgD69s2:
         id: YdZkqyCThmUNhej0VXtqqWgD69s2
@@ -29,6 +33,10 @@ users:
     id: YdZkqyCThmUNhej0VXtqqWgD69s2
     name: Patrick Leask
     avatar: https://i.picsum.photos/id/804/200/200.jpg?hmac=73qw3Bnt67aOsdWd033BvfX9Gq0gIJ6FSL3Dp3gA97E
+    memberOfGroup: Neuro Genomics Group,
+    coverPhoto:
+      https://i.picsum.photos/id/638/1070/200.jpg?hmac=IgJ8dCBUGLoANdgkRMzDCfWKbbrys26pcX69SKhB950
+    institution: Imperial College London,
     followsUsers:
       MA1qq6qfbFfMER5HdlTa4X36Ly42:
         id: MA1qq6qfbFfMER5HdlTa4X36Ly42
