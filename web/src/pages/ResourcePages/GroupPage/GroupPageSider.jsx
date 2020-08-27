@@ -6,6 +6,7 @@ import UserAvatar from '../../../components/Avatar/UserAvatar';
 import './GroupPage.css';
 
 export default function ({group}) {
+  if (group === undefined || group.topics === undefined) return <></>;
   const search = false;
 
   const groupsFromSearch = () => {

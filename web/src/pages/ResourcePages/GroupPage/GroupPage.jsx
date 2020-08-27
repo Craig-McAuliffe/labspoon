@@ -1,4 +1,7 @@
-import React, {useRef, useEffect, useState} from 'react';
+import React, {useRef, useEffect, useState, useContext} from 'react';
+import {FeatureFlags} from '../../../App';
+import {db} from '../../../firebase';
+
 import groups from '../../../mockdata/groups';
 import {Link, useParams} from 'react-router-dom';
 import GroupPageSider from './GroupPageSider';
@@ -11,9 +14,45 @@ import {PinnedPost} from '../../../components/Posts/Post/Post';
 
 import './GroupPage.css';
 
+function fetchGroupDetailsFromDB(id) {
+  return db
+    .doc(`groups/${id}`)
+    .get()
+    .then((groupDetails) => {
+      const data = groupDetails.data();
+      data.id = groupDetails.id;
+      return data;
+    })
+    .catch((err) => console.log(err));
+}
+
 export default function GroupPage() {
-  const groupID = useParams().groupID;
-  const group = groups().filter((group) => group.id === groupID)[0];
+  const featureFlags = useContext(FeatureFlags);
+  const [groupID, setGroupID] = useState(undefined);
+  const [groupDetails, setGroupDetails] = useState(undefined);
+
+  const groupIDParam = useParams().groupID;
+  if (groupID !== groupIDParam) {
+    setGroupID(groupIDParam);
+  }
+
+  let fetchGroupDetails;
+  if (featureFlags.has('cloud-firestore')) {
+    fetchGroupDetails = () => fetchGroupDetailsFromDB(groupID);
+  } else {
+    fetchGroupDetails = () =>
+      groups().filter((group) => group.id === groupID)[0];
+  }
+
+  useEffect(() => {
+    Promise.resolve(fetchGroupDetails())
+      .then((groupDetails) => {
+        console.log('setting group details', groupDetails);
+        setGroupDetails(groupDetails);
+      })
+      .catch((err) => console.log(err));
+  }, [groupID]);
+
   const search = false;
   const groupDescriptionRef = useRef();
 
@@ -23,62 +62,13 @@ export default function GroupPage() {
     </Link>
   );
 
-  const GroupDetails = () => {
-    const [displayFullDescription, setDisplayFullDescription] = useState({
-      display: false,
-      size: 100,
-    });
-
-    const descriptionSize = {
-      height: `${displayFullDescription.size}px`,
-    };
-
-    return (
-      <>
-        <div className="group-header">
-          <div className="group-icon-and-message">
-            <UserAvatar src={group.avatar} height="120px" width="120px" />
-            <MessageButton />
-          </div>
-          <div className="group-header-info">
-            <div className="group-header-info-headline">
-              <div className="group-headline-name-insitution">
-                <h2>{group.name}</h2>
-                <h3>{group.institution}</h3>
-              </div>
-              <div className="group-follow-container">
-                <FollowButton />
-              </div>
-            </div>
-            <div
-              className={'group-description'}
-              style={descriptionSize}
-              ref={groupDescriptionRef}
-            >
-              <p>{group.about}</p>
-            </div>
-
-            <SeeMore
-              displayFullDescription={displayFullDescription}
-              setDisplayFullDescription={setDisplayFullDescription}
-              groupDescriptionRef={groupDescriptionRef}
-            />
-          </div>
-        </div>
-        <div className="pinned-post-container">
-          <PinnedPost post={group.pinnedPost} />
-        </div>
-      </>
-    );
-  };
-
   const siderTitleChoice = [
     'Other Groups from your Search',
     'Suggested Groups ',
   ];
 
   const fetchResults = (skip, limit, filterOptions, last) =>
-    groupPageFeedData(skip, limit, filterOptions, group);
+    groupPageFeedData(skip, limit, filterOptions, groupDetails);
 
   const relationshipFilter = [
     {
@@ -134,14 +124,17 @@ export default function GroupPage() {
             {search ? siderTitleChoice[0] : siderTitleChoice[1]}
           </h3>
           <div className="suggested-resources-container">
-            <GroupPageSider group={group} />
+            <GroupPageSider group={groupDetails} />
           </div>
         </div>
       </div>
       <div className="content-layout">
         {previousPage()}
         <div className="group-details">
-          <GroupDetails />
+          <GroupDetails
+            group={groupDetails}
+            groupDescriptionRef={groupDescriptionRef}
+          />
         </div>
         <FilterableResults
           fetchResults={fetchResults}
@@ -186,5 +179,56 @@ export const SeeMore = ({
         {displayFullDescription.display ? <>See less</> : <>See more</>}
       </button>
     </div>
+  );
+};
+
+const GroupDetails = ({group, groupDescriptionRef}) => {
+  const [displayFullDescription, setDisplayFullDescription] = useState({
+    display: false,
+    size: 100,
+  });
+
+  if (group === undefined) return <></>;
+
+  const descriptionSize = {
+    height: `${displayFullDescription.size}px`,
+  };
+
+  return (
+    <>
+      <div className="group-header">
+        <div className="group-icon-and-message">
+          <UserAvatar src={group.avatar} height="120px" width="120px" />
+          <MessageButton />
+        </div>
+        <div className="group-header-info">
+          <div className="group-header-info-headline">
+            <div className="group-headline-name-insitution">
+              <h2>{group.name}</h2>
+              <h3>{group.institution}</h3>
+            </div>
+            <div className="group-follow-container">
+              <FollowButton />
+            </div>
+          </div>
+          <div
+            className={'group-description'}
+            style={descriptionSize}
+            ref={groupDescriptionRef}
+          >
+            <p>{group.about}</p>
+          </div>
+
+          <SeeMore
+            displayFullDescription={displayFullDescription}
+            setDisplayFullDescription={setDisplayFullDescription}
+            groupDescriptionRef={groupDescriptionRef}
+          />
+        </div>
+      </div>
+      <div className="pinned-post-container">
+        <PinnedPost post={group.pinnedPost} />
+      </div>
+    </>
   );
 };

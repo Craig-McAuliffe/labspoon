@@ -11,6 +11,10 @@ export default function GroupPageFeedData(
 ) {
   let resultsList = [];
 
+  if (currentGroup === undefined) {
+    return resultsList;
+  }
+
   const groupMembers = () =>
     users()
       .filter((user) => user.memberOfGroup === currentGroup.name)

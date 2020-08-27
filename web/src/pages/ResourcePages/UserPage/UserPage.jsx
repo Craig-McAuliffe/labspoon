@@ -1,7 +1,6 @@
 import React, {useContext, useState, useEffect} from 'react';
 import {useParams} from 'react-router-dom';
 import {FeatureFlags} from '../../../App';
-
 import {db} from '../../../firebase';
 
 import userPageFeedData from './UserPageFeedData';
