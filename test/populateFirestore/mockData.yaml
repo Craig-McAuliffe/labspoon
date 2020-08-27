@@ -332,3 +332,82 @@ topics:
   34ca8f0c-0d6d-457d-8cfa-6935564acb6b:
     id: 34ca8f0c-0d6d-457d-8cfa-6935564acb6b
     name: SARS-CoV-2
+groups:
+  e9b325a1-e1b4-472c-bf8f-20ef34881a5c:
+    name: Gilestro Lab
+    institution: Imperial College London
+    location: London, UK
+    website: https://lab.gilest.ro/
+    avatar: https://i.picsum.photos/id/724/1000/1000.jpg?hmac=AjG__UYhipFTMFDl2NTzRv3uA_EM-dPnwHlWxIiS-mQ
+    about: Thus he said unto him, that the brightness shall come forth from the fruit that bears the sinner, and only he shall be able to set right the woes of the undying
+    topics:
+      - id: dbd6811f-8e7a-416b-a5cb-0bf564f89a39
+        name: Physics
+      - id: 91fef93e-7162-43f0-8c33-7c7857700672
+        name: Astronomy
+      - id: 2390004e-2802-4a78-89dd-71cecd154b88
+        name: Statistics
+    pinnedPost:
+      id: 54765360-1728-41fb-8726-5c412a7b364d
+      timestamp: 2006-01-02T15:04:05Z
+      title: Short Text Post
+      postType:
+        id: default
+        name: default
+      author:
+        id: YdZkqyCThmUNhej0VXtqqWgD69s2
+        name: Patrick Leask
+        avatar: https://i.picsum.photos/id/804/200/200.jpg?hmac=73qw3Bnt67aOsdWd033BvfX9Gq0gIJ6FSL3Dp3gA97E
+      content:
+        text: This is an example of a text post!
+      topics:
+        - id: b1a66949-0b46-428e-a47e-15b17499ba5a
+          name: Biology
+        - id: dbd6811f-8e7a-416b-a5cb-0bf564f89a39
+          name: Physics
+    photos:
+      - src: https://i.picsum.photos/id/458/200/300.jpg?hmac=2d4QALnxYzzYD8DSwuNsa7lutkdOxLsKojuxbNfd31I
+        alt: Blurb about the image
+        id: 8329y54389hf
+      - src: https://i.picsum.photos/id/219/200/400.jpg?hmac=ypT1DkFo0coBGy7X-nWl-hvYpseivA7xi-FlNxhXL8Y
+        alt: Blurb about the image
+        id: 8329y54389hf
+  0d1da84c-3046-479c-922f-89d120c09749:
+    name: Neurogenomics Group
+    institution: Imperial College London
+    location: London, UK
+    website: https://lab.gilest.ro/
+    avatar: https://i.picsum.photos/id/941/1000/1000.jpg?hmac=L--8SZt-e5UBl9D214iij56CLomx8sVGhhwMKBveVOg
+    about: Thus he said unto him, that the brightness shall come forth from the fruit that bears the sinner, and only he shall be able to set right the woes of the undying
+    topics:
+      - id: dbd6811f-8e7a-416b-a5cb-0bf564f89a39
+        name: Physics
+      - id: 91fef93e-7162-43f0-8c33-7c7857700672
+        name: Astronomy
+      - id: 2390004e-2802-4a78-89dd-71cecd154b88
+        name: Statistics
+    pinnedPost:
+      id: 54765360-1728-41fb-8726-5c412a7b364d
+      timestamp: 2006-01-02T15:04:05Z
+      title: Short Text Post
+      postType:
+        id: default
+        name: default
+      author:
+        id: YdZkqyCThmUNhej0VXtqqWgD69s2
+        name: Patrick Leask
+        avatar: https://i.picsum.photos/id/804/200/200.jpg?hmac=73qw3Bnt67aOsdWd033BvfX9Gq0gIJ6FSL3Dp3gA97E
+      content:
+        text: This is an example of a text post!
+      topics:
+        - id: b1a66949-0b46-428e-a47e-15b17499ba5a
+          name: Biology
+        - id: dbd6811f-8e7a-416b-a5cb-0bf564f89a39
+          name: Physics
+    photos:
+      - src: https://i.picsum.photos/id/458/200/300.jpg?hmac=2d4QALnxYzzYD8DSwuNsa7lutkdOxLsKojuxbNfd31I
+        alt: Blurb about the image
+        id: 8329y54389hf
+      - src: https://i.picsum.photos/id/219/200/400.jpg?hmac=ypT1DkFo0coBGy7X-nWl-hvYpseivA7xi-FlNxhXL8Y
+        alt: Blurb about the image
+        id: 8329y54389hf

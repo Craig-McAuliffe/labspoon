@@ -10,6 +10,7 @@ import (
 	firebase "firebase.google.com/go"
 	"gopkg.in/yaml.v3"
 
+	"labspoon.com/test/populateFirestore/groups"
 	"labspoon.com/test/populateFirestore/posts"
 	"labspoon.com/test/populateFirestore/topics"
 	"labspoon.com/test/populateFirestore/users"
@@ -21,6 +22,7 @@ type Data struct {
 	Users  map[string]users.User
 	Topics map[string]topics.Topic
 	Posts  map[string]posts.Post
+	Groups map[string]groups.Group
 }
 
 func getDataFromFile(filePath string) (Data, error) {
@@ -44,6 +46,10 @@ func populate(ctx context.Context, client *firestore.Client, data Data) error {
 	err = topics.SetTopics(ctx, client, data.Topics)
 	if err != nil {
 		return fmt.Errorf("Failed to set topics: %w", err)
+	}
+	err = groups.SetGroups(ctx, client, data.Groups)
+	if err != nil {
+		return fmt.Errorf("Failed to set groups: %w", err)
 	}
 	err = posts.SetPosts(ctx, client, data.Posts)
 	if err != nil {
