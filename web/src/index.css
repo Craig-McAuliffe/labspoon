@@ -37,3 +37,14 @@ h4 {
 a {
   color: #00507c;
 }
+
+button,
+input {
+  background: none;
+  border: none;
+}
+
+button:focus,
+input:focus {
+  outline: none;
+}

@@ -1,8 +1,11 @@
-.tabs {
+.feed-tabs-container {
   grid-column: 2/3;
   grid-row: 3/4;
   padding: 40px 0px 30px;
   border-top: 1px solid #dcdce0;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 .content-layout {
@@ -25,4 +28,24 @@
 .details-container {
   grid-column: 2/3;
   min-width: 100%;
+}
+
+.feed-tab,
+.feed-tab-active {
+  border: 1px solid #99999f;
+  margin: 0px 10px 10px;
+  color: #99999f;
+  flex-shrink: 0;
+  flex: 0 0 auto;
+  padding-top: 6px;
+}
+
+.feed-tab-active {
+  border: 1px solid #000000;
+  color: #000000;
+}
+
+.feed-tab:hover {
+  border: 1px solid #5d5d65;
+  color: #5d5d65;
 }
