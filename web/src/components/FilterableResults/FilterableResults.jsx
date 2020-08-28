@@ -196,15 +196,26 @@ function updateFilterOption(filterOptions, collectionIndex, optionIndex) {
 }
 
 function Tabs({tabFilter, setTabFilter}) {
-  if (!tabFilter) return <div className="tabs"></div>;
+  if (!tabFilter) return <div></div>;
   const selectedTab = getTabFromTypeFilterCollection(tabFilter);
+
   const tabs = tabFilter.options.map((option) => (
-    <button onClick={() => setTabFilter(option.data.id)} key={option.data.id}>
-      {option.data.name}
+    <button
+      onClick={() => setTabFilter(option.data.id)}
+      key={option.data.id}
+      className={
+        option.data.id === selectedTab ? 'feed-tab-active' : 'feed-tab'
+      }
+    >
+      <h3>{option.data.name}</h3>
     </button>
   ));
   if (selectedTab === 'default') setTabFilter(tabFilter.options[0].data.id);
-  return <div className="tabs">{tabs}</div>;
+  return (
+    <div className="feed-tabs-container">
+      <div className="feed-tabs-layout">{tabs}</div>
+    </div>
+  );
 }
 
 function Results({results, hasMore, fetchMore, tab}) {
