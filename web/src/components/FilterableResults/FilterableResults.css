@@ -3,9 +3,13 @@
   grid-row: 3/4;
   padding: 40px 0px 30px;
   border-top: 1px solid #dcdce0;
+}
+
+.feed-tabs-layout {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
+  margin: 0px -10px;
 }
 
 .content-layout {

@@ -211,7 +211,11 @@ function Tabs({tabFilter, setTabFilter}) {
     </button>
   ));
   if (selectedTab === 'default') setTabFilter(tabFilter.options[0].data.id);
-  return <div className="feed-tabs-container">{tabs}</div>;
+  return (
+    <div className="feed-tabs-container">
+      <div className="feed-tabs-layout">{tabs}</div>
+    </div>
+  );
 }
 
 function Results({results, hasMore, fetchMore, tab}) {
