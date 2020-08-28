@@ -90,15 +90,15 @@ export default function PublicationPage({}) {
         {
           enabled: false,
           data: {
-            id: 'cites',
-            name: 'Cites',
+            id: 'citesPublications',
+            name: 'Cites Publications',
           },
         },
         {
           enabled: false,
           data: {
-            id: 'citedBy',
-            name: 'Cited By',
+            id: 'citedByPublications',
+            name: 'Cited By Publications',
           },
         },
         {

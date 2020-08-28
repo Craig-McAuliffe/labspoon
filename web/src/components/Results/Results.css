@@ -6,11 +6,24 @@
   min-width: 100%;
 }
 
-.image-feedItem-container {
-  display: flex;
-  justify-content: space-between;
+.feed-images-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  row-gap: 20px;
+  column-gap: 20px;
+  grid-template-rows: auto;
+  justify-items: center;
   align-items: center;
-  max-width: 100%;
-  padding: 10px;
-  flex-wrap: wrap;
+}
+
+.mixed-tab-section {
+  padding-bottom: 50px;
+}
+
+.mixed-tab-section h3 {
+  color: #5d5d65;
+}
+
+.image-mixed-item-container {
+  object-fit: none;
 }

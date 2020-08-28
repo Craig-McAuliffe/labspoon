@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {useRouteMatch, useHistory} from 'react-router-dom';
 
 import FilterableResults, {
-  getTabFromTypeFilterCollection,
+  getActiveTabIDFromTypeFilterCollection,
   DEFAULT_TAB_IDX,
 } from '../../components/FilterableResults/FilterableResults';
 
@@ -14,7 +14,7 @@ import users from '../../mockdata/users';
 import topics from '../../mockdata/topics';
 
 function fetchResults(skip, limit, filter) {
-  const type = getTabFromTypeFilterCollection(filter[DEFAULT_TAB_IDX]);
+  const type = getActiveTabIDFromTypeFilterCollection(filter[DEFAULT_TAB_IDX]);
   switch (type) {
     case 'mostRelevant':
       return [

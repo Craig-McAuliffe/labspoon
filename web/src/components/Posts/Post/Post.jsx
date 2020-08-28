@@ -27,15 +27,16 @@ import './Post.css';
  * @return {React.ReactElement}
  */
 export default function Post({post, dedicatedPage}) {
-  const referencedResource = () => {
-    const matchedResource = publications().filter(
+  const referencedResourceWrapper = () => {
+    if (dedicatedPage || post.url === undefined) return postContent();
+
+    const referencedPublication = publications().filter(
       (publication) => publication.url === post.url
     )[0];
-
-    return matchedResource ? (
+    return referencedPublication ? (
       <div className="post-referenced-resource-container">
         <PublicationListItem
-          publication={matchedResource}
+          publication={referencedPublication}
           removeBorder={true}
         />
         {postContent()}
@@ -64,26 +65,24 @@ export default function Post({post, dedicatedPage}) {
     </div>
   );
 
-  return post.generated ? (
-    <div className="post-referenced-resource-container">
-      <PublicationListItem
-        publication={post.referencedResource}
-        removeBorder={true}
-      />
-      <div className="post-container">
-        <PostHeader
-          postType={post.postType}
-          postAuthor={post.author}
-          postCreationDate={post.createdAt}
+  if (post.generated)
+    return (
+      <div className="post-referenced-resource-container">
+        <PublicationListItem
+          publication={post.referencedResource}
+          removeBorder={true}
         />
-        <PostTextContent post={post} />
+        <div className="post-container">
+          <PostHeader
+            postType={post.postType}
+            postAuthor={post.author}
+            postCreationDate={post.createdAt}
+          />
+          <PostTextContent post={post} />
+        </div>
       </div>
-    </div>
-  ) : post.url && !dedicatedPage ? (
-    referencedResource()
-  ) : (
-    postContent()
-  );
+    );
+  return referencedResourceWrapper();
 }
 
 Post.propTypes = {
