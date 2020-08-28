@@ -7,7 +7,11 @@ import FeedItemTopics from '../FeedItems/FeedItemTopics';
 
 import './PublicationListItem.css';
 
-export default function PublicationListItem({publication, removeBorder}) {
+export default function PublicationListItem({
+  publication,
+  removeBorder,
+  mixedResults,
+}) {
   const [displayAbstract, setDisplayAbstract] = useState(false);
   const expandedView = () =>
     displayAbstract ? (
@@ -55,9 +59,11 @@ export default function PublicationListItem({publication, removeBorder}) {
             </h4>
           ))}
         </div>
-        <div className="publication-list-item-topics-container">
-          <FeedItemTopics taggedItem={publication} />
-        </div>
+        {mixedResults ? null : (
+          <div className="publication-list-item-topics-container">
+            <FeedItemTopics taggedItem={publication} />
+          </div>
+        )}
       </div>
       <button
         className="publication-list-item-expand-button"
@@ -77,7 +83,7 @@ export default function PublicationListItem({publication, removeBorder}) {
         </div>
       </button>
       {expandedView()}
-      <PostActions />
+      {mixedResults ? null : <PostActions />}
     </div>
   );
 }

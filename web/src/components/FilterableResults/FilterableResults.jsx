@@ -135,7 +135,9 @@ export default function FilterableResults({
         results={results}
         hasMore={hasMore}
         fetchMore={fetchMore}
-        tab={getTabFromTypeFilterCollection(filterOptions[DEFAULT_TAB_IDX])}
+        activeTabID={getActiveTabIDFromTypeFilterCollection(
+          filterOptions[DEFAULT_TAB_IDX]
+        )}
       />
     </div>
   );
@@ -197,20 +199,20 @@ function updateFilterOption(filterOptions, collectionIndex, optionIndex) {
 
 function Tabs({tabFilter, setTabFilter}) {
   if (!tabFilter) return <div></div>;
-  const selectedTab = getTabFromTypeFilterCollection(tabFilter);
+  const selectedTabID = getActiveTabIDFromTypeFilterCollection(tabFilter);
 
   const tabs = tabFilter.options.map((option) => (
     <button
       onClick={() => setTabFilter(option.data.id)}
       key={option.data.id}
       className={
-        option.data.id === selectedTab ? 'feed-tab-active' : 'feed-tab'
+        option.data.id === selectedTabID ? 'feed-tab-active' : 'feed-tab'
       }
     >
       <h3>{option.data.name}</h3>
     </button>
   ));
-  if (selectedTab === 'default') setTabFilter(tabFilter.options[0].data.id);
+  if (selectedTabID === 'default') setTabFilter(tabFilter.options[0].data.id);
   return (
     <div className="feed-tabs-container">
       <div className="feed-tabs-layout">{tabs}</div>
@@ -218,14 +220,14 @@ function Tabs({tabFilter, setTabFilter}) {
   );
 }
 
-function Results({results, hasMore, fetchMore, tab}) {
+function Results({results, hasMore, fetchMore, activeTabID}) {
   if (Array.isArray(results) && results.length > 0) {
     return (
       <ResultsList
         results={results}
         hasMore={hasMore}
         fetchMore={fetchMore}
-        activeTab={tab}
+        activeTabID={activeTabID}
       />
     );
   } else {
@@ -244,13 +246,13 @@ function Results({results, hasMore, fetchMore, tab}) {
  * selected. If multiple filters are applied, or if no filters are applied, the
  * default tab (Most Relevant) is used.
  */
-export function getTabFromTypeFilterCollection(filterCollection) {
+export function getActiveTabIDFromTypeFilterCollection(filterCollection) {
   if (!filterCollection) return 'default';
   const enabledTypes = filterCollection.options.filter(
     (option) => option.enabled
   );
   if (enabledTypes.length === 1) {
-    return enabledTypes[DEFAULT_TAB_IDX].data.id;
+    return enabledTypes[0].data.id;
   }
   return 'default';
 }
