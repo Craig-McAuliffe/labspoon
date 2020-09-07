@@ -1,7 +1,7 @@
-import users from '../../../mockdata/users';
 import publications from '../../../mockdata/publications';
 import getFilteredPosts from '../../../mockdata/posts';
 import groups from '../../../mockdata/groups';
+import relationships from '../../../mockdata/relationships';
 
 export default function GroupPageFeedData(
   skip,
@@ -16,8 +16,14 @@ export default function GroupPageFeedData(
   }
 
   const groupMembers = () =>
-    users()
-      .filter((user) => user.memberOfGroup === currentGroup.name)
+    relationships()
+      .filter((userRelationships) =>
+        userRelationships.memberOfGroups.some(
+          (groupConnectedToUser) =>
+            groupConnectedToUser.name === currentGroup.name
+        )
+      )
+      .map((userRelationships) => userRelationships.user)
       .slice(skip, skip + limit);
 
   const groupPosts = () => {
