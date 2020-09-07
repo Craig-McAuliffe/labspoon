@@ -31,23 +31,17 @@ const AvatarDropDown = () => {
           <AvatarToggleSmall />
         </Dropdown.Toggle>
         <Dropdown.Menu>
-          <Dropdown.Item>
-            <Link to="/bookmarks">
-              <BookmarksMenuIcon />
-              <p className="LinkItem">Bookmarks</p>
-            </Link>
+          <Dropdown.Item href="/bookmarks">
+            <BookmarksMenuIcon />
+            <p className="LinkItem">Bookmarks</p>
           </Dropdown.Item>
-          <Dropdown.Item>
-            <Link to={`/user/${user.uid}`}>
-              <UserProfileMenuIcon />
-              <p className="LinkItem">Profile</p>
-            </Link>
+          <Dropdown.Item href={`/user/${user.uid}`}>
+            <UserProfileMenuIcon />
+            <p className="LinkItem">Profile</p>
           </Dropdown.Item>
-          <Dropdown.Item>
-            <Link to="/settings">
-              <SettingsMenuIcon />
-              <p className="LinkItem">Settings</p>
-            </Link>
+          <Dropdown.Item href="/settings">
+            <SettingsMenuIcon />
+            <p className="LinkItem">Settings</p>
           </Dropdown.Item>
           <Dropdown.Header>
             <GroupMenuIcon />
@@ -64,10 +58,8 @@ function UserGroups({userID}) {
   return relationships()
     .filter((userRelationships) => userRelationships.user.id === userID)[0]
     .memberOfGroups.map((group) => (
-      <Dropdown.Item key={group.id}>
-        <Link to={`/group/${group.id}`}>
-          <p className="LinkItem">{group.name}</p>
-        </Link>
+      <Dropdown.Item key={group.id} href={`/group/${group.id}`}>
+        <p className="LinkItem">{group.name}</p>
       </Dropdown.Item>
     ));
 }
