@@ -52,8 +52,6 @@ export default function userPageFeedData(skip, limit, filterOptions, userID) {
         resultsList = [
           ...resultsList,
           ...userCoAuthors(),
-          ...userRecommends(),
-          ...userFollowing(),
           ...publicationsByUser(),
           ...postsByUser(),
         ];
