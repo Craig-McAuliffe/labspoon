@@ -34,7 +34,9 @@ function fetchUserFeedData(uuid, skip, limit, filter, last) {
   console.log('enabledIDs ', enabledIDs);
 
   if (enabledIDs.size !== 0) {
+    const enabledAuthorIDs = enabledIDs.get('Author');
     const enabledPostTypeIDs = enabledIDs.get('Post Type');
+
     if (enabledPostTypeIDs.length === 1) {
       results = results.where(
         'filter_postType_id',
@@ -46,7 +48,6 @@ function fetchUserFeedData(uuid, skip, limit, filter, last) {
       results = results.where('filter_PostType_id', 'in', enabledAuthorIDs);
     }
 
-    const enabledAuthorIDs = enabledIDs.get('Author');
     if (enabledAuthorIDs.length === 1) {
       results = results.where('filter_author_id', '==', enabledAuthorIDs[0]);
     }

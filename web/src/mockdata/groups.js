@@ -120,7 +120,7 @@ export default function groups() {
       Website: 'null',
       avatar:
         'https://i.picsum.photos/id/872/1000/1000.jpg?hmac=8XFELRvUfURgTA5P0ORHCQDp3NXRQVezJkBnCH4lD8U',
-      topics: [topics()[4], topics()[5], topics()[3], , topics()[0]],
+      topics: [topics()[4], topics()[5], topics()[3], topics()[0]],
       media: {
         photos: [
           {

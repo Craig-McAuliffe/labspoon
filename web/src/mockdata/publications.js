@@ -135,7 +135,7 @@ export const findCoAuthors = (userID) => {
   const countingCoAuthors = [];
   publicationsOfUser.forEach((publication) => {
     if (publication) {
-      publication.content.authors.map((author) => {
+      publication.content.authors.forEach((author) => {
         if (author.id === userID) return;
         let countingIndex;
         let alreadyCounted = false;

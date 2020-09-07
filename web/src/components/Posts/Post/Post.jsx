@@ -89,7 +89,7 @@ Post.propTypes = {
   post: PropTypes.shape({
     id: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
-    type: PropTypes.object.isRequired,
+    postType: PropTypes.object.isRequired,
     author: PropTypes.shape({
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
@@ -100,6 +100,7 @@ Post.propTypes = {
       PropTypes.exact({
         id: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
+        resourceType: PropTypes.string.isRequired,
       })
     ),
     optionaltags: PropTypes.arrayOf(PropTypes.object.isRequired),
@@ -139,13 +140,6 @@ function PostHeader({postType, postAuthor, postCreationDate, dedicatedPage}) {
     </div>
   );
 }
-PostHeader.propTypes = {
-  type: PropTypes.string.isRequired,
-  author: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    avatar: PropTypes.string.isRequired,
-  }).isRequired,
-};
 
 /**
  * Display content for a post text
@@ -161,12 +155,6 @@ function PostTextContent({post}) {
     </div>
   );
 }
-PostTextContent.propTypes = {
-  title: PropTypes.string.isRequired,
-  content: PropTypes.shape({
-    text: PropTypes.string.isRequired,
-  }).isRequired,
-};
 
 function postTypeIcons(postTypeName) {
   switch (postTypeName) {

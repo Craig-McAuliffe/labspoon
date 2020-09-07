@@ -33,13 +33,13 @@ function LoginPage() {
     return (
       <div>
         <p>signed in</p>
-        <a
+        <button
           onClick={() => {
             firebase.auth().signOut();
           }}
         >
           Sign out
-        </a>
+        </button>
       </div>
     );
   }

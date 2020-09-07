@@ -19,7 +19,7 @@ export function FilterMenu({
   resetFilterCollection,
 }) {
   const filterCollections = options.map((optionCollection, index) => {
-    if (!optionCollection.mutable) return <></>;
+    if (!optionCollection.mutable) return null;
     return (
       <FilterCollection
         key={optionCollection.collectionName}
@@ -80,7 +80,7 @@ function FilterCollection({
       </div>
       {options.map((option, index) => (
         <FilterOption
-          key={name}
+          key={name + option.data.id}
           index={index}
           data={option.data}
           enabled={option.enabled}
@@ -94,7 +94,6 @@ FilterCollection.propTypes = {
   name: PropTypes.string.isRequired,
   options: PropTypes.array.isRequired,
   index: PropTypes.number.isRequired,
-  filterOptionsDispatch: PropTypes.func.isRequired,
 };
 
 /**

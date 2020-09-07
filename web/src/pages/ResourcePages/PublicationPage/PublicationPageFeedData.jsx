@@ -50,10 +50,8 @@ export default function publicationPageFeedData(
     switch (direction) {
       case 'cites':
         return thisPublicationRelationships.cites.slice(skip, skip + limit);
-        break;
       case 'citedBy':
         return thisPublicationRelationships.citedBy.slice(skip, skip + limit);
-        break;
       default:
         return;
     }

@@ -35,7 +35,7 @@ function BookmarkPostButton({post}) {
         })
         .catch((err) => console.log(err));
     }
-  }, []);
+  });
 
   // update the status of the bookmark
   useEffect(() => {
@@ -64,7 +64,7 @@ function BookmarkPostButton({post}) {
         }
       }
     }
-  }, [bookmarked]);
+  }, [bookmarked, user.uid, firstRender, post, bookmarkID, featureFlags]);
 
   return (
     <BookmarkButton bookmarked={bookmarked} setBookmarked={setBookmarked} />
