@@ -38,7 +38,7 @@ export default function FilterableResults({
     Promise.resolve(getDefaultFilter()).then((filter) =>
       setFilterOptions(filter)
     );
-  }, []);
+  }, [getDefaultFilter]);
 
   useEffect(() => {
     // fetchResults may return either a result set or a promise, so we convert

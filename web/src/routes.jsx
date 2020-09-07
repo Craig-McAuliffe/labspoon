@@ -92,6 +92,5 @@ function AuthRoute({children, ...rest}) {
   );
 }
 AuthRoute.propTypes = {
-  user: PropTypes.any.isRequired,
   children: PropTypes.element,
 };

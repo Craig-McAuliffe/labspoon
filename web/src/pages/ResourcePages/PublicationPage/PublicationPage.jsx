@@ -10,7 +10,7 @@ import detectJournal from '../../../components/Publication/DetectJournal';
 
 import './PublicationPage.css';
 
-export default function PublicationPage({}) {
+export default function PublicationPage() {
   const thisPublicationID = useParams().publicationID;
   const matchedPublication = publications().filter((publication) =>
     publication.id.includes(thisPublicationID)
@@ -57,7 +57,7 @@ export default function PublicationPage({}) {
   };
   const PublicationLink = ({publicationUrl}) =>
     publicationUrl ? (
-      <a href={publicationUrl} target="_blank" rel="noreferrer">
+      <a href={publicationUrl} target="_blank" rel="noopener noreferrer">
         Go to full article
       </a>
     ) : null;
