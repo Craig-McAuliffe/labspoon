@@ -184,7 +184,7 @@ export default function getFilteredPosts(filter) {
         break;
       case 'Post Types':
         repeatedTestPosts = repeatedTestPosts.filter((post) =>
-          enabledIDs.has(post.type.id)
+          enabledIDs.has(post.postType.id)
         );
         break;
       default:

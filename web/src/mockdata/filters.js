@@ -50,7 +50,7 @@ function getPostTypesFilter() {
   };
 }
 
-function getTypesFilter() {
+function getFeedTypesFilter() {
   return {
     collectionName: 'Types',
     options: [
@@ -127,5 +127,5 @@ export function getPostFilters(posts) {
 }
 
 export function getSearchFilters() {
-  return [getTypesFilter(), getPostTypesFilter()];
+  return [getFeedTypesFilter(), getPostTypesFilter()];
 }
