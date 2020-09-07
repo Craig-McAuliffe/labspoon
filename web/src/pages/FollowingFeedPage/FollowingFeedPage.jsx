@@ -31,7 +31,6 @@ function fetchUserFeedData(uuid, skip, limit, filter, last) {
   let results = db
     .collection(`users/${uuid}/feeds/followingFeed/posts`)
     .orderBy('timestamp');
-  console.log('enabledIDs ', enabledIDs);
 
   if (enabledIDs.size !== 0) {
     const enabledPostTypeIDs = enabledIDs.get('Post Type');
@@ -71,7 +70,31 @@ function fetchUserFeedData(uuid, skip, limit, filter, last) {
     }
   }
 
-  return sortAndPaginateFeedData(results, last, limit);
+  const sortedAndPaginatedResults = sortAndPaginateFeedData(
+    results,
+    last,
+    limit
+  );
+  return sortedAndPaginatedResults.then((results) => {
+    const mappedResults = results.map((result) => {
+      Object.entries(result.content).forEach((value) => {
+        let [type, content] = value;
+        if (type === 'text') return;
+        if (type === 'researchers') type = 'researcher';
+        if (
+          !result.hasOwnProperty('optionaltags') ||
+          result.optionaltags.length === 0
+        )
+          result.optionaltags = [];
+        result.optionaltags.push({
+          type: type,
+          content: content,
+        });
+      });
+      return result;
+    });
+    return mappedResults;
+  });
 }
 
 function fetchPublicFeedData(skip, limit, filter, last) {

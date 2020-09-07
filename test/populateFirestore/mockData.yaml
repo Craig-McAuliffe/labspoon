@@ -100,7 +100,7 @@ posts:
   358c11d9-ba02-4cfb-a9ee-4db8e0638621:
     id: 358c11d9-ba02-4cfb-a9ee-4db8e0638621
     timestamp: 2006-01-02T15:06:05Z
-    title: Short Text Post
+    title: Short Text Post with additional fields
     postType:
       id: default
       name: default
@@ -110,6 +110,19 @@ posts:
       avatar: https://i.picsum.photos/id/804/200/200.jpg?hmac=73qw3Bnt67aOsdWd033BvfX9Gq0gIJ6FSL3Dp3gA97E
     content:
       text: This is an example of a text post!
+      location: London, United Kingdom
+      methods:
+        - Microsoft Excel
+      startDate: 2021-01-02T09:00:00Z
+      salary: £0.01
+      funder: GSK
+      researchers:
+        - id: YdZkqyCThmUNhej0VXtqqWgD69s2
+          name: Patrick Leask
+          avatar: https://i.picsum.photos/id/804/200/200.jpg?hmac=73qw3Bnt67aOsdWd033BvfX9Gq0gIJ6FSL3Dp3gA97E
+        - id: MA1qq6qfbFfMER5HdlTa4X36Ly42
+          name: Craig McAuliffe
+          avatar: https://i.picsum.photos/id/620/200/200.jpg?hmac=i-QlnBFXHK0SDe5o7B85DMYehiO7H-fZxsKLRrfFCcU
     topics:
       - id: b1a66949-0b46-428e-a47e-15b17499ba5a
         name: Biology
