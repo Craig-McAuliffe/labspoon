@@ -1,6 +1,6 @@
 import React, {useRef, useState} from 'react';
 import {Link} from 'react-router-dom';
-import {SeeMore} from '../../pages/ResourcePages/GroupPage/GroupPage';
+import SeeMore from '../SeeMore';
 
 import UserAvatar from '../Avatar/UserAvatar';
 
@@ -40,6 +40,7 @@ export default function GroupFeedItem({group}) {
           displayFullDescription={displayFullDescription}
           setDisplayFullDescription={setDisplayFullDescription}
           groupDescriptionRef={groupDescriptionRef}
+          id={group.id}
         />
       </div>
     </div>

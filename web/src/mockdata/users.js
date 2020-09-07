@@ -153,26 +153,25 @@ export function getSimilarUsers(userID) {
     const matchedAuthors = [];
     const refinedCommonTopics = getMostCommonTopics().slice(0, 3);
 
-    let matchingPost;
-    for (let i = 0; i < 4; i++) {
-      if (matchedAuthors.length < 10 && refinedCommonTopics[i]) {
-        for (let n = 0; n < postsList.length; n++) {
-          if (matchedAuthors.length < 10) {
-            matchingPost = postsList[n];
-            let isMatched = false;
-            matchingPost.topics.forEach((topic) => {
-              if (topic.id === refinedCommonTopics[i].id) isMatched = true;
-            });
-            if (
-              isMatched &&
-              matchingPost.author.id !== userID &&
-              matchedAuthors.filter(
-                (matchedAuthor) => matchedAuthor.id === matchingPost.author.id
-              ).length === 0
-            ) {
-              matchedAuthors.push(matchingPost.author);
-            }
-          }
+    if (matchedAuthors.length < 10) {
+      for (let n = 0; n < postsList.length; n++) {
+        let isMatched = false;
+        for (let m = 0; m < postsList[n].topics.length - 1; m++) {
+          if (
+            refinedCommonTopics.some(
+              (refinedTopic) => refinedTopic === postsList[n].topics[m]
+            )
+          )
+            isMatched = true;
+        }
+        if (
+          isMatched &&
+          postsList[n].author.id !== userID &&
+          !matchedAuthors.some(
+            (matchedAuthor) => matchedAuthor.id === postsList[n].author.id
+          )
+        ) {
+          matchedAuthors.push(postsList[n].author);
         }
       }
     }

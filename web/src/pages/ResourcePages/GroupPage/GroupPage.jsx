@@ -11,6 +11,7 @@ import UserAvatar from '../../../components/Avatar/UserAvatar';
 import FollowButton from '../../../components/Buttons/FollowButton';
 import MessageButton from '../../../components/Buttons/MessageButton';
 import {PinnedPost} from '../../../components/Posts/Post/Post';
+import SeeMore from '../../../components/SeeMore';
 
 import './GroupPage.css';
 
@@ -153,40 +154,6 @@ export default function GroupPage() {
   );
 }
 
-export const SeeMore = ({
-  displayFullDescription,
-  setDisplayFullDescription,
-  groupDescriptionRef,
-}) => {
-  const [displaySeeMore, setDisplaySeeMore] = useState();
-
-  useEffect(() => {
-    setDisplaySeeMore(
-      groupDescriptionRef.current.firstElementChild.scrollHeight > 100
-    );
-  });
-
-  if (!displaySeeMore) return null;
-  return (
-    <div className="group-description-see-more">
-      <button
-        className="see-more-button"
-        onClick={() =>
-          displayFullDescription.display
-            ? setDisplayFullDescription({display: false, size: 100})
-            : setDisplayFullDescription({
-                display: true,
-                size:
-                  groupDescriptionRef.current.firstElementChild.scrollHeight,
-              })
-        }
-      >
-        {displayFullDescription.display ? <>See less</> : <>See more</>}
-      </button>
-    </div>
-  );
-};
-
 const GroupDetails = ({group, groupDescriptionRef}) => {
   const [displayFullDescription, setDisplayFullDescription] = useState({
     display: false,
@@ -228,6 +195,7 @@ const GroupDetails = ({group, groupDescriptionRef}) => {
             displayFullDescription={displayFullDescription}
             setDisplayFullDescription={setDisplayFullDescription}
             groupDescriptionRef={groupDescriptionRef}
+            id={group.id}
           />
         </div>
       </div>

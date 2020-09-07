@@ -112,7 +112,7 @@ function MixedResultsPage({results}) {
     <div>
       {imageResults.length > 0 ? (
         <div className="mixed-tab-section">
-          <h3>Images</h3>
+          <h3 className="mixed-tab-section-header">Images</h3>
           <div className="feed-images-container">
             {imageResults.map((image) => (
               <ImageFeedItem
@@ -126,7 +126,7 @@ function MixedResultsPage({results}) {
       ) : null}
       {publicationResults.length > 0 ? (
         <div className="mixed-tab-section">
-          <h3>Publications</h3>
+          <h3 className="mixed-tab-section-header">Publications</h3>
           {publicationResults.map((publication) => (
             <PublicationListItem
               key={publication.id + 'publication'}
@@ -138,7 +138,7 @@ function MixedResultsPage({results}) {
       ) : null}
       {userResults.length > 0 ? (
         <div className="mixed-tab-section">
-          <h3>Researchers</h3>
+          <h3 className="mixed-tab-section-header">Researchers</h3>
           {userResults.map((user) => (
             <UserListItem key={user.id + 'user'} user={user} />
           ))}
@@ -146,7 +146,7 @@ function MixedResultsPage({results}) {
       ) : null}
       {postResults.length > 0 ? (
         <div className="mixed-tab-section">
-          <h3>Posts</h3>
+          <h3 className="mixed-tab-section-header">Posts</h3>
           {postResults.map((post) => (
             <Post key={post.id + 'post'} post={post} />
           ))}
