@@ -64,7 +64,7 @@ function BookmarkPostButton({post}) {
         }
       }
     }
-  }, [bookmarked, user.uid, firstRender, post, bookmarkID, featureFlags]);
+  }, [bookmarked]);
 
   return (
     <BookmarkButton bookmarked={bookmarked} setBookmarked={setBookmarked} />

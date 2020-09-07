@@ -14,14 +14,6 @@ import FollowButton from '../../../components/Buttons/FollowButton';
 
 import './UserPage.css';
 
-function fetchUserDetailsFromDB(uuid) {
-  return db
-    .doc(`users/${uuid}`)
-    .get()
-    .then((userDetails) => userDetails.data())
-    .catch((err) => console.log(err));
-}
-
 export default function UserPage() {
   const featureFlags = useContext(FeatureFlags);
   const [userID, setUserID] = useState(undefined);
@@ -51,7 +43,8 @@ export default function UserPage() {
 
   let fetchFeedData;
   if (featureFlags.has('cloud-firestore')) {
-    fetchFeedData = () => [];
+    fetchFeedData = (skip, limit, filterOptions, last) =>
+      userPageFeedDataFromDB(skip, limit, filterOptions, userID, last);
   } else {
     fetchFeedData = (skip, limit, filterOptions, last) =>
       userPageFeedData(skip, limit, filterOptions, userID, last);
@@ -76,21 +69,21 @@ export default function UserPage() {
         {
           enabled: false,
           data: {
-            id: 'createdPosts',
+            id: 'posts',
             name: 'Posts',
           },
         },
         {
           enabled: false,
           data: {
-            id: 'authoredPublications',
+            id: 'publications',
             name: 'Publications',
           },
         },
         {
           enabled: false,
           data: {
-            id: 'followsUsers',
+            id: 'follows',
             name: 'Follows',
           },
         },
@@ -104,7 +97,7 @@ export default function UserPage() {
         {
           enabled: false,
           data: {
-            id: 'coAuthorUsers',
+            id: 'coauthors',
             name: 'Co-Authors',
           },
         },
@@ -177,4 +170,73 @@ function UserDetails({user}) {
       </div>
     </div>
   );
+}
+
+function fetchUserDetailsFromDB(uuid) {
+  return db
+    .doc(`users/${uuid}`)
+    .get()
+    .then((userDetails) => userDetails.data())
+    .catch((err) => console.log(err));
+}
+
+function userPageFeedDataFromDB(skip, limit, filterOptions, userID, last) {
+  // defaults to undefined when no tab is selected
+  let activeTab;
+  if (filterOptions.length === 0) {
+    activeTab = undefined;
+  } else {
+    const activeTabObj = filterOptions[0].options.filter(
+      (filterOption) => filterOption.enabled === true
+    )[0];
+    if (activeTabObj === undefined) {
+      activeTab = undefined;
+    } else {
+      activeTab = activeTabObj.data.id;
+    }
+  }
+
+  let results;
+  switch (activeTab) {
+    case 'relevant':
+      results = [];
+      break;
+    case 'posts':
+      let postsQuery = db.collection(`users/${userID}/posts`);
+      if (typeof last !== 'undefined') {
+        postsQuery = postsQuery.startAt(last.timestamp);
+      }
+      return postsQuery
+        .limit(limit)
+        .get()
+        .then((qs) => {
+          const posts = [];
+          qs.forEach((doc) => {
+            const post = doc.data();
+            post.id = doc.id;
+            post.resourceType = 'post';
+            posts.push(post);
+          });
+          return posts;
+        })
+        .catch((err) => console.log(err));
+    case 'publications':
+      results = [];
+      break;
+    case 'follows':
+      results = [];
+      break;
+    case 'recommends':
+      results = [];
+      break;
+    case 'coauthors':
+      results = [];
+      break;
+    case 'groups':
+      results = [];
+      break;
+    default:
+      results = [];
+  }
+  return results;
 }
