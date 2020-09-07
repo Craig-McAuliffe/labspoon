@@ -3,6 +3,8 @@ import {Link} from 'react-router-dom';
 import {findSimilarPublications} from '../../../mockdata/publications';
 
 export default function PublicationSider({currentPublication}) {
+  if (currentPublication === undefined) return <></>;
+
   const search = false;
 
   const topicIDs = currentPublication.topics

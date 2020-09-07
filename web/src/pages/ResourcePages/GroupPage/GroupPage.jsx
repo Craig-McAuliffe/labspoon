@@ -67,8 +67,13 @@ export default function GroupPage() {
     'Suggested Groups ',
   ];
 
-  const fetchResults = (skip, limit, filterOptions, last) =>
-    groupPageFeedData(skip, limit, filterOptions, groupDetails);
+  let fetchFeedData;
+  if (featureFlags.has('cloud-firestore')) {
+    fetchFeedData = () => [];
+  } else {
+    fetchFeedData = (skip, limit, filterOptions, last) =>
+      groupPageFeedData(skip, limit, filterOptions, groupDetails);
+  }
 
   const relationshipFilter = [
     {
@@ -137,7 +142,7 @@ export default function GroupPage() {
           />
         </div>
         <FilterableResults
-          fetchResults={fetchResults}
+          fetchResults={fetchFeedData}
           getDefaultFilter={getDefaultFilter}
           limit={10}
           useTabs={true}

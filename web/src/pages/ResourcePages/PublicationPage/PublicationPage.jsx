@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {useContext, useEffect, useState} from 'react';
+import {FeatureFlags} from '../../../App';
 import {Link, useParams} from 'react-router-dom';
 
 import publications from '../../../mockdata/publications';
@@ -11,63 +12,46 @@ import detectJournal from '../../../components/Publication/DetectJournal';
 import './PublicationPage.css';
 
 export default function PublicationPage({}) {
-  const thisPublicationID = useParams().publicationID;
-  const matchedPublication = publications().filter((publication) =>
-    publication.id.includes(thisPublicationID)
-  )[0];
+  const featureFlags = useContext(FeatureFlags);
+  const [publicationID, setPublicationID] = useState(undefined);
+  const [publicationDetails, setPublicationDetails] = useState(undefined);
 
   const search = false;
 
-  const fetchResults = (skip, limit, filterOptions) =>
-    publicationPageFeedData(skip, limit, filterOptions, matchedPublication);
+  const publicationIDParam = useParams().publicationID;
+  if (publicationID !== publicationIDParam) {
+    setPublicationID(publicationIDParam);
+  }
+
+  let fetchPublicationDetails;
+  if (featureFlags.has('cloud-firestore')) {
+    fetchPublicationDetails = () => {};
+  } else {
+    fetchPublicationDetails = publications().filter((publication) =>
+      publication.id.includes(publicationID)
+    )[0];
+  }
+
+  useEffect(() => {
+    Promise.resolve(fetchPublicationDetails())
+      .then((PublicationDetails) => {
+        setPublicationDetails(publicationDetails);
+      })
+      .catch((err) => console.log(err));
+  }, [publicationID]);
+
+  let fetchFeedData;
+  if (featureFlags.has('cloud-firestore')) {
+    fetchFeedData = () => [];
+  } else {
+    fetchFeedData = (skip, limit, filterOptions) =>
+      publicationPageFeedData(skip, limit, filterOptions, publicationDetails);
+  }
 
   const siderTitleChoice = [
     'Other Publications from your Search',
     'Similar Publications to this one',
   ];
-
-  const publicationDetails = () => {
-    return (
-      <>
-        <div className="publication-meta">
-          {detectJournal(matchedPublication).length === 0 ? (
-            <div></div>
-          ) : (
-            <img
-              className="publication-journal-logo"
-              src={detectJournal(matchedPublication)[0].logo}
-              alt={`${detectJournal(matchedPublication)[0].name} journal logo`}
-            />
-          )}
-          <PublicationLink publicationUrl={matchedPublication.url} />
-        </div>
-        <div className="publication-body">
-          <h2>{matchedPublication.title}</h2>
-          <PublicationAuthors
-            publicationAuthors={matchedPublication.content.authors}
-          />
-          <h3 className="publication-section-title">Abstract</h3>
-          <p className="publication-body-abstract">
-            {matchedPublication.content.abstract}
-          </p>
-          <FeedItemTopics taggedItem={matchedPublication} />
-        </div>
-      </>
-    );
-  };
-  const PublicationLink = ({publicationUrl}) =>
-    publicationUrl ? (
-      <a href={publicationUrl} target="_blank" rel="noreferrer">
-        Go to full article
-      </a>
-    ) : null;
-
-  const PublicationAuthors = ({publicationAuthors}) =>
-    publicationAuthors.map((author) => (
-      <h3 className="publication-body-authors" key={author.id}>
-        <Link to={`/user/${author.id}`}>{author.name}</Link>
-      </h3>
-    ));
 
   const relationshipFilter = [
     {
@@ -131,15 +115,16 @@ export default function PublicationPage({}) {
             {search ? siderTitleChoice[0] : siderTitleChoice[1]}
           </h3>
           <div className="suggested-resources-container">
-            <PublicationSider currentPublication={matchedPublication} />
+            <PublicationSider currentPublication={publicationDetails} />
           </div>
         </div>
       </div>
       <div className="content-layout">
-        <div className="details-container">{publicationDetails()}</div>
-
+        <div className="details-container">
+          <PublicationDetails publicationDetails={publicationDetails} />
+        </div>
         <FilterableResults
-          fetchResults={fetchResults}
+          fetchResults={fetchFeedData}
           getDefaultFilter={getDefaultFilter}
           limit={10}
           useTabs={true}
@@ -148,4 +133,52 @@ export default function PublicationPage({}) {
       </div>
     </>
   );
+}
+
+const PublicationDetails = ({publicationDetails}) => {
+  if (publicationDetails === undefined) return <></>;
+  return (
+    <>
+      <div className="publication-meta">
+        {detectJournal(publicationDetails).length === 0 ? (
+          <div></div>
+        ) : (
+          <img
+            className="publication-journal-logo"
+            src={detectJournal(publicationDetails)[0].logo}
+            alt={`${detectJournal(publicationDetails)[0].name} journal logo`}
+          />
+        )}
+        <PublicationLink publicationUrl={publicationDetails.url} />
+      </div>
+      <div className="publication-body">
+        <h2>{publicationDetails.title}</h2>
+        <PublicationAuthors
+          publicationAuthors={publicationDetails.content.authors}
+        />
+        <h3 className="publication-section-title">Abstract</h3>
+        <p className="publication-body-abstract">
+          {publicationDetails.content.abstract}
+        </p>
+        <FeedItemTopics taggedItem={publicationDetails} />
+      </div>
+    </>
+  );
+};
+
+function PublicationLink({publicationURL}) {
+  if (!publicationURL) return <></>;
+  return (
+    <a href={publicationURL} target="_blank" rel="noreferrer">
+      Go to full article
+    </a>
+  );
+}
+
+function PublicationAuthors({publicationAuthors}) {
+  return publicationAuthors.map((author) => (
+    <h3 className="publication-body-authors" key={author.id}>
+      <Link to={`/user/${author.id}`}>{author.name}</Link>
+    </h3>
+  ));
 }

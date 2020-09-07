@@ -49,8 +49,13 @@ export default function UserPage() {
 
   const search = false;
 
-  const fetchResults = (skip, limit, filterOptions, last) =>
-    userPageFeedData(skip, limit, filterOptions, userID, last);
+  let fetchFeedData;
+  if (featureFlags.has('cloud-firestore')) {
+    fetchFeedData = () => [];
+  } else {
+    fetchFeedData = (skip, limit, filterOptions, last) =>
+      userPageFeedData(skip, limit, filterOptions, userID, last);
+  }
 
   const siderTitleChoice = [
     'Other People from your Search',
@@ -135,7 +140,7 @@ export default function UserPage() {
         </div>
 
         <FilterableResults
-          fetchResults={fetchResults}
+          fetchResults={fetchFeedData}
           getDefaultFilter={getDefaultFilter}
           limit={10}
           useTabs={true}
