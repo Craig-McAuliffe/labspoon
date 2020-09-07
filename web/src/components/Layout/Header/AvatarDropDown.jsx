@@ -11,6 +11,7 @@ import {
 import {AuthContext} from '../../../App';
 import DefaultUserIcon from '../../../assets/DefaultUserIcon.svg';
 import Dropdown from 'react-bootstrap/Dropdown';
+import relationships from '../../../mockdata/relationships';
 
 import './AvatarDropDown.css';
 
@@ -52,16 +53,24 @@ const AvatarDropDown = () => {
             <GroupMenuIcon />
             My Groups
           </Dropdown.Header>
-          <Dropdown.Item>
-            <Link to="/group">
-              <p className="LinkItem">The bla bla group</p>
-            </Link>
-          </Dropdown.Item>
+          <UserGroups userID={user.uid} />
         </Dropdown.Menu>
       </Dropdown>
     );
   }
 };
+
+function UserGroups({userID}) {
+  return relationships()
+    .filter((userRelationships) => userRelationships.user.id === userID)[0]
+    .memberOfGroups.map((group) => (
+      <Dropdown.Item key={group.id}>
+        <Link to={`/group/${group.id}`}>
+          <p className="LinkItem">{group.name}</p>
+        </Link>
+      </Dropdown.Item>
+    ));
+}
 
 const AvatarToggle = () => (
   <div className="DropDownHeader">
@@ -77,7 +86,8 @@ const AvatarToggleSmall = () => (
 );
 
 const CustomToggle = React.forwardRef(({children, onClick}, ref) => (
-  <button
+  <a
+    href=""
     ref={ref}
     onClick={(e) => {
       e.preventDefault();
@@ -85,7 +95,7 @@ const CustomToggle = React.forwardRef(({children, onClick}, ref) => (
     }}
   >
     {children}
-  </button>
+  </a>
 ));
 
 export default AvatarDropDown;
