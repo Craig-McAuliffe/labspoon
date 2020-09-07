@@ -1,6 +1,7 @@
 import users from './users';
 import {getTestPosts} from './posts';
 import publications from './publications';
+import groups from './groups';
 
 export default function relationships() {
   return [
@@ -19,6 +20,7 @@ export default function relationships() {
         getTestPosts()[2],
         getTestPosts()[3],
       ],
+      memberOfGroups: [groups()[0]],
     },
     {
       user: users()[1],
@@ -35,6 +37,7 @@ export default function relationships() {
         getTestPosts()[6],
         getTestPosts()[1],
       ],
+      memberOfGroups: [groups()[1]],
     },
     {
       user: users()[2],
@@ -51,6 +54,7 @@ export default function relationships() {
         getTestPosts()[4],
         getTestPosts()[5],
       ],
+      memberOfGroups: [''],
     },
     {
       user: users()[3],
@@ -67,6 +71,7 @@ export default function relationships() {
         getTestPosts()[4],
         getTestPosts()[5],
       ],
+      memberOfGroups: [groups()[0]],
     },
     {
       user: users()[4],
@@ -83,6 +88,7 @@ export default function relationships() {
         getTestPosts()[0],
         getTestPosts()[6],
       ],
+      memberOfGroups: [groups()[2]],
     },
     {
       user: users()[5],
@@ -99,6 +105,7 @@ export default function relationships() {
         getTestPosts()[2],
         getTestPosts()[3],
       ],
+      memberOfGroups: [groups()[1]],
     },
     {
       user: users()[6],
@@ -115,6 +122,7 @@ export default function relationships() {
         getTestPosts()[6],
         getTestPosts()[3],
       ],
+      memberOfGroups: [groups()[0]],
     },
     {
       user: users()[7],
@@ -131,6 +139,7 @@ export default function relationships() {
         getTestPosts()[1],
         getTestPosts()[5],
       ],
+      memberOfGroups: [groups()[2]],
     },
     {
       user: users()[8],
@@ -147,6 +156,7 @@ export default function relationships() {
         getTestPosts()[4],
         getTestPosts()[5],
       ],
+      memberOfGroups: [groups()[2]],
     },
     {
       user: users()[9],
@@ -163,6 +173,7 @@ export default function relationships() {
         getTestPosts()[4],
         getTestPosts()[5],
       ],
+      memberOfGroups: [''],
     },
   ];
 }

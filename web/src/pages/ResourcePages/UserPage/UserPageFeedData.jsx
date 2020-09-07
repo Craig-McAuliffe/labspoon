@@ -31,6 +31,11 @@ export default function userPageFeedData(skip, limit, filterOptions, userID) {
 
   const userCoAuthors = () => findCoAuthors(userID).slice(skip, skip + limit);
 
+  const userGroups = () =>
+    relationships().filter(
+      (userRelationships) => userRelationships.user.id === userID
+    )[0].memberOfGroups;
+
   let activeTab;
   if (filterOptions.length === 0) {
     activeTab = [];
@@ -67,6 +72,9 @@ export default function userPageFeedData(skip, limit, filterOptions, userID) {
         break;
       case filterOptions[0].options[5].data.id:
         resultsList = [...resultsList, ...userCoAuthors()];
+        break;
+      case filterOptions[0].options[6].data.id:
+        resultsList = [...resultsList, ...userGroups()];
         break;
       default:
         resultsList = [];
