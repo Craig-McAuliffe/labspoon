@@ -103,6 +103,13 @@ export default function UserPage() {
             name: 'Co-Authors',
           },
         },
+        {
+          enabled: false,
+          data: {
+            id: 'groups',
+            name: 'Groups',
+          },
+        },
       ],
 
       mutable: false,
