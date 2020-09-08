@@ -251,8 +251,23 @@ function userPageFeedDataFromDB(skip, limit, filterOptions, userID, last) {
       results = [];
       break;
     case 'groups':
-      results = [];
-      break;
+      let groupsQuery = db.collection(`users/${userID}/groups`);
+      if (typeof last !== 'undefined') {
+        groupsQuery = groupsQuery.startAt(last.timestamp);
+      }
+      return groupsQuery
+        .limit(limit)
+        .get()
+        .then((qs) => {
+          const groups = [];
+          qs.forEach((doc) => {
+            const group = doc.data();
+            group.resourceType = 'group';
+            groups.push(group);
+          });
+          return groups;
+        })
+        .catch((err) => console.log(err));
     default:
       results = [];
   }
