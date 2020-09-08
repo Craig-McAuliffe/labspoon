@@ -35,7 +35,7 @@ function BookmarkPostButton({post}) {
         })
         .catch((err) => console.log(err));
     }
-  });
+  }, []);
 
   // update the status of the bookmark
   useEffect(() => {

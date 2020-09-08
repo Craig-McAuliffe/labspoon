@@ -10,7 +10,7 @@ import users from '../../../mockdata/users';
 import FilterableResults from '../../../components/FilterableResults/FilterableResults';
 import MessageButton from '../../../components/Buttons/MessageButton';
 import {UserPageAvatar} from '../../../components/Avatar/UserAvatar';
-import FollowButton from '../../../components/Buttons/FollowButton';
+import FollowUserButton from '../../../components/User/FollowUserButton/FollowUserButton';
 
 import './UserPage.css';
 
@@ -166,7 +166,7 @@ function UserDetails({user}) {
       </div>
       <div className="user-message-follow">
         <MessageButton />
-        <FollowButton />
+        <FollowUserButton pageUser={user} />
       </div>
     </div>
   );
