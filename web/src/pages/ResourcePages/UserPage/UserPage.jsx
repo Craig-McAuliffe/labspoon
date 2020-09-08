@@ -221,8 +221,26 @@ function userPageFeedDataFromDB(skip, limit, filterOptions, userID, last) {
         })
         .catch((err) => console.log(err));
     case 'publications':
-      results = [];
-      break;
+      let publicationsQuery = db.collection(`users/${userID}/publications`);
+      if (typeof last !== 'undefined') {
+        publicationsQuery = publicationsQuery.startAt(last.timestamp);
+      }
+      return publicationsQuery
+        .limit(limit)
+        .get()
+        .then((qs) => {
+          const publications = [];
+          qs.forEach((doc) => {
+            const publication = doc.data();
+            publication.resourceType = 'publication';
+            publication.content = {};
+            publication.content.authors = publication.authors;
+            publication.content.abstract = publication.abstract;
+            publications.push(publication);
+          });
+          return publications;
+        })
+        .catch((err) => console.log(err));
     case 'follows':
       results = [];
       break;
