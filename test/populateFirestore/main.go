@@ -12,6 +12,7 @@ import (
 
 	"labspoon.com/test/populateFirestore/groups"
 	"labspoon.com/test/populateFirestore/posts"
+	"labspoon.com/test/populateFirestore/publications"
 	"labspoon.com/test/populateFirestore/topics"
 	"labspoon.com/test/populateFirestore/users"
 )
@@ -19,10 +20,11 @@ import (
 const mockDataFile = "./mockData.yaml"
 
 type Data struct {
-	Users  map[string]users.User
-	Topics map[string]topics.Topic
-	Posts  map[string]posts.Post
-	Groups map[string]groups.Group
+	Users        map[string]users.User
+	Topics       map[string]topics.Topic
+	Posts        map[string]posts.Post
+	Groups       map[string]groups.Group
+	Publications map[string]publications.Publication
 }
 
 func getDataFromFile(filePath string) (Data, error) {
@@ -52,6 +54,10 @@ func populate(ctx context.Context, client *firestore.Client, data Data) error {
 		return fmt.Errorf("Failed to set groups: %w", err)
 	}
 	err = posts.SetPosts(ctx, client, data.Posts)
+	if err != nil {
+		return fmt.Errorf("Failed to set topics: %w", err)
+	}
+	err = publications.SetPublications(ctx, client, data.Publications)
 	if err != nil {
 		return fmt.Errorf("Failed to set topics: %w", err)
 	}

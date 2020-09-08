@@ -424,3 +424,39 @@ groups:
       - src: https://i.picsum.photos/id/219/200/400.jpg?hmac=ypT1DkFo0coBGy7X-nWl-hvYpseivA7xi-FlNxhXL8Y
         alt: Blurb about the image
         id: 8329y54389hf
+publications:
+  0585f743-f76f-43c4-a644-ac496596a455:
+    id: 0585f743-f76f-43c4-a644-ac496596a455
+    title: SARS-CoV-2 neutralization and serology testing of COVID-19 convalescent plasma from donors with non-severe disease
+    url: https://www.nature.com/articles/s41467-020-17708-1
+    abstract: >
+      Aging is an inevitable course of life. Additionally, the risk of chronic
+      diseases or cancer increases with age. The comprehensive identification of
+      signs related to aging can be beneficial for the prevention and early
+      diagnosis of geriatric diseases. The comparison of global modifications in
+      the urine proteome is a means of multidimensional information mining. This
+      approach is based on urine, in which changes from whole-body metabolism can
+      accumulate. This study used the urine of healthy people at different ages
+      (22 children, 10 young people, 6 senior people) as the research object and
+      using high-resolution tandem mass spectrometry, label-free quantitation
+      combined with non-limiting modification identification algorithms and
+      random group test, compared the differences in protein chemical
+      modifications among three groups. The results show that multi-sites
+      oxidative modifications and amino acid substitutions are noticeable
+      features that distinguish these three age groups of people. The proportion
+      of multi-site oxidations in urine proteins of senior (29.76%) is
+      significantly higher than the young group (13.71% and 12.97%), which affect
+      the biological processes of various proteins. This study could provide
+      a reference for studies of aging mechanisms and biomarkers of age-related
+      disease.
+    authors:
+        - id: MA1qq6qfbFfMER5HdlTa4X36Ly42
+          name: Craig McAuliffe
+          avatar: https://i.picsum.photos/id/620/200/200.jpg?hmac=i-QlnBFXHK0SDe5o7B85DMYehiO7H-fZxsKLRrfFCcU
+        - id: YdZkqyCThmUNhej0VXtqqWgD69s2
+          name: Patrick Leask
+          avatar: https://i.picsum.photos/id/804/200/200.jpg?hmac=73qw3Bnt67aOsdWd033BvfX9Gq0gIJ6FSL3Dp3gA97E
+    topics:
+      - id: b1a66949-0b46-428e-a47e-15b17499ba5a
+        name: Biology
+    timestamp: 2006-01-02T15:04:05Z

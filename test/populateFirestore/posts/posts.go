@@ -47,15 +47,15 @@ type PostContent struct {
 func SetPosts(ctx context.Context, client *firestore.Client, posts map[string]Post) error {
 	for id, post := range posts {
 		authorID := post.Author.ID
-		populatePostIDFields(&post)
+		populatePostFilterFields(&post)
 		_, err := client.Collection("posts").Doc(id).Set(ctx, post)
 		if err != nil {
-			return fmt.Errorf("Failed to add post %v to posts collection: %w", id, authorID, err)
+			return fmt.Errorf("Failed to add post %v to posts collection: %w", id, err)
 		}
 
 		_, err = client.Collection("users").Doc(post.Author.ID).Collection("posts").Doc(id).Set(ctx, post)
 		if err != nil {
-			return fmt.Errorf("Failed to add post %v to author %v 's posts: %w", id, authorID, err)
+			return fmt.Errorf("Failed to add post %v to author %v's posts: %w", id, authorID, err)
 		}
 
 		for _, topic := range post.Topics {
@@ -72,7 +72,7 @@ func SetPosts(ctx context.Context, client *firestore.Client, posts map[string]Po
 	return nil
 }
 
-func populatePostIDFields(post *Post) {
+func populatePostFilterFields(post *Post) {
 	post.FilterPostTypeID = post.PostType.ID
 	post.FilterAuthorID = post.Author.ID
 	post.FilterTopicIDs = make([]string, len(post.Topics))
