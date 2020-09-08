@@ -242,8 +242,23 @@ function userPageFeedDataFromDB(skip, limit, filterOptions, userID, last) {
         })
         .catch((err) => console.log(err));
     case 'follows':
-      results = [];
-      break;
+      let followsQuery = db.collection(`/users/${userID}/followsUsers`);
+      if (typeof last !== 'undefined') {
+        followsQuery = followsQuery.startAt(last.timestamp);
+      }
+      return followsQuery
+        .limit(limit)
+        .get()
+        .then((qs) => {
+          const users = [];
+          qs.forEach((doc) => {
+            const user = doc.data();
+            user.resourceType = 'user';
+            users.push(user);
+          });
+          return users;
+        })
+        .catch((err) => console.log(err));
     case 'recommends':
       results = [];
       break;
