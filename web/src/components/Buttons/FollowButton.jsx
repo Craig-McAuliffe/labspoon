@@ -1,9 +1,8 @@
-import React, {useState} from 'react';
+import React from 'react';
 
 import './Buttons.css';
 
-const FollowButton = ({currentState}) => {
-  const [following, setFollowing] = useState(currentState);
+const FollowButton = ({following, setFollowing}) => {
   return (
     <button
       className={following ? 'primary-button-clicked' : 'primary-button'}

@@ -35,7 +35,7 @@ function BookmarkPostButton({post}) {
         })
         .catch((err) => console.log(err));
     }
-  });
+  }, []);
 
   // update the status of the bookmark
   useEffect(() => {
@@ -64,7 +64,7 @@ function BookmarkPostButton({post}) {
         }
       }
     }
-  }, [bookmarked, user.uid, firstRender, post, bookmarkID, featureFlags]);
+  }, [bookmarked]);
 
   return (
     <BookmarkButton bookmarked={bookmarked} setBookmarked={setBookmarked} />
@@ -72,13 +72,14 @@ function BookmarkPostButton({post}) {
 }
 
 const PostActions = ({post, dedicatedPage}) => {
+  const featureFlags = useContext(FeatureFlags);
   return (
     <div
       className={dedicatedPage ? 'post-actions-dedicated-page' : 'post-actions'}
     >
       <RepostToGroupButton />
       <ShareButton />
-      <RecommendButton />
+      {featureFlags.has('recommendations') ? <RecommendButton /> : <></>}
       {post ? (
         <BookmarkPostButton post={post} />
       ) : (
