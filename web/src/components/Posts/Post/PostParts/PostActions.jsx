@@ -72,13 +72,14 @@ function BookmarkPostButton({post}) {
 }
 
 const PostActions = ({post, dedicatedPage}) => {
+  const featureFlags = useContext(FeatureFlags);
   return (
     <div
       className={dedicatedPage ? 'post-actions-dedicated-page' : 'post-actions'}
     >
       <RepostToGroupButton />
       <ShareButton />
-      <RecommendButton />
+      {featureFlags.has('recommendations') ? <RecommendButton /> : <></>}
       {post ? (
         <BookmarkPostButton post={post} />
       ) : (

@@ -90,13 +90,6 @@ export default function UserPage() {
         {
           enabled: false,
           data: {
-            id: 'recommends',
-            name: 'Recommends',
-          },
-        },
-        {
-          enabled: false,
-          data: {
             id: 'coauthors',
             name: 'Co-Authors',
           },
@@ -113,6 +106,17 @@ export default function UserPage() {
       mutable: false,
     },
   ];
+
+  if (featureFlags.has('recommendations')) {
+    relationshipFilter[0].options.push({
+      enabled: false,
+      data: {
+        id: 'recommends',
+        name: 'Recommends',
+      },
+    });
+  }
+
   const getDefaultFilter = () => relationshipFilter;
 
   return (
