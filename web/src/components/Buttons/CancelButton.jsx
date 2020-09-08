@@ -2,10 +2,14 @@ import React from 'react';
 
 import './Buttons.css';
 
-export default function CancelButton({CancelAction}) {
+export default function CancelButton({cancelAction}) {
   return (
-    <button className="cancel-button">
-      <h2 className="primary-button-text">Cancel</h2>
+    <button
+      className="cancel-button"
+      type="button"
+      onClick={() => cancelAction()}
+    >
+      <h3 className="primary-button-text">Cancel</h3>
     </button>
   );
 }

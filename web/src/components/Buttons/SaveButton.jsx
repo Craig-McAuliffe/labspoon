@@ -1,21 +1,13 @@
-import React, {useState} from 'react';
+import React from 'react';
 
 import './Buttons.css';
 
-export default function SaveButton({currentState, submit}) {
-  const [saved, setSaved] = useState(currentState);
+export default function SaveButton({...props}) {
   return (
     <div className="save-button-container">
-      <button
-        type="submit"
-        className={saved ? 'primary-button-clicked' : 'primary-button'}
-        onClick={() => {
-          if (submit !== undefined) submit();
-          setSaved(true);
-        }}
-      >
+      <button type="submit" className="primary-button">
         <div className="primary-button-text">
-          <h2>{saved ? 'Saved' : 'Save'}</h2>
+          <h2>Save</h2>
         </div>
       </button>
     </div>

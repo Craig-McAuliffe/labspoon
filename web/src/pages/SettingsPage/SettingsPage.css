@@ -43,3 +43,9 @@
   display: grid;
   grid-template-columns: 100px 1fr;
 }
+
+.password-tip {
+  margin-top: 20px;
+  margin-bottom: -20px;
+  color: #5d5d65;
+}

@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react';
-
+import firebase from 'firebase';
 import {AuthContext} from '../../App';
 import {Form, Formik} from 'formik';
 import * as Yup from 'yup';
@@ -17,24 +17,78 @@ const SettingsPage = () => {
   const mockUser = users().filter((mockUser) => mockUser.id === user.uid)[0];
   const [editState, setEditState] = useState(false);
 
-  const submitChanges = (cancel) => {
+  const cancelChanges = () => {
     setEditState(false);
-    if (cancel !== true) {
-    }
+  };
+
+  const reauthenticate = (currentPassword) => {
+    const userCred = firebase.auth.EmailAuthProvider.credential(
+      user.email,
+      currentPassword
+    );
+    return user.reauthenticateWithCredential(userCred);
+  };
+
+  const submitChanges = (values, ...props) => {
+    reauthenticate(values.currentPassword).then(() => {
+      if ('newEmail' in values) {
+        user.updateEmail(values.newEmail).then(function () {
+          alert(
+            'Email successfully updated. This change should appear on your account page shortly.'
+          );
+          user
+            .sendEmailVerification()
+            .then(function () {
+              console.log('veritifcation email sent');
+            })
+            .catch((error) => {
+              console.log(error);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        });
+      } else {
+        user.updatePassword(values.newPassword).then(function () {
+          alert(
+            'Password successfully updated. This change should appear on your account page shortly.'
+          );
+          user
+            .sendEmailVerification()
+            .then(function () {
+              console.log('veritifcation email sent');
+            })
+            .catch((error) => {
+              console.log(error);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        });
+      }
+    });
+
+    setEditState(false);
   };
 
   const editDetailsDisplay = () => (
     <>
       {editState === 'email' ? (
-        <ChangeEmailForm user={user} submitChanges={submitChanges} />
+        <ChangeEmailForm
+          user={user}
+          submitChanges={submitChanges}
+          cancelChanges={cancelChanges}
+        />
       ) : editState === 'password' ? (
-        <ChangePasswordForm user={user} submitChanges={submitChanges} />
+        <ChangePasswordForm
+          user={user}
+          submitChanges={submitChanges}
+          cancelChanges={cancelChanges}
+        />
       ) : (
         <>
-          <GeneralError />{' '}
-          <CancelButton onClick={() => setEditState(false)}>
-            Cancel
-          </CancelButton>
+          <GeneralError />
+          <CancelButton cancelAction={cancelChanges} />
         </>
       )}
     </>
@@ -71,12 +125,22 @@ const SettingsPage = () => {
 
 export default SettingsPage;
 
-function ChangeEmailForm({user, submitChanges}) {
+function ChangeEmailForm({user, submitChanges, cancelChanges}) {
   const initialValues = {
     newEmail: '',
   };
 
-  const validationSchema = Yup.string().email().required('Email is required');
+  const validationSchema = Yup.object({
+    currentPassword: Yup.string().required('Current Password is required'),
+    newEmail: Yup.string()
+      .email('Please enter a valid email address')
+      .required('Email is required')
+      .test('same-email', 'This is your current email address ', function (
+        value
+      ) {
+        return user.email !== value;
+      }),
+  });
 
   return (
     <Formik
@@ -85,18 +149,23 @@ function ChangeEmailForm({user, submitChanges}) {
       onSubmit={submitChanges}
     >
       <Form className="signin-form">
+        <FormTextInput
+          name="currentPassword"
+          autoComplete="current-password"
+          label="Current Password"
+          passwordInput={true}
+        />
         <FormTextInput name="newEmail" label="New Email" />
         <div className="cancel-or-submit">
-          <CancelButton onClick={() => submitChanges(true)}>
-            Cancel
-          </CancelButton>
-          <SaveButton currentState={false} submit={submitChanges} />
+          <CancelButton cancelAction={cancelChanges} />
+          <SaveButton />
         </div>
       </Form>
     </Formik>
   );
 }
-function ChangePasswordForm({user, submitChanges}) {
+
+function ChangePasswordForm({user, submitChanges, cancelChanges}) {
   const initialValues = {
     currentPassword: '',
     newPassword: '',
@@ -104,11 +173,7 @@ function ChangePasswordForm({user, submitChanges}) {
   };
 
   const validationSchema = Yup.object({
-    currentPassword: Yup.string()
-      .required('Current Password is required')
-      .test('correct-password', 'incorrect password', function (value) {
-        return user.password === value;
-      }),
+    currentPassword: Yup.string().required('Current Password is required'),
     newPassword: Yup.string()
       .required('Password is required')
       .min(8, 'Password must be at least 8 characters long.')
@@ -129,18 +194,26 @@ function ChangePasswordForm({user, submitChanges}) {
       onSubmit={submitChanges}
     >
       <Form className="signin-form">
+        <p className="password-tip">{`Tip: Don't forget to make your password at least 8 digits long and include a number.`}</p>
         <FormTextInput
           name="currentPassword"
           autoComplete="current-password"
           label="Current Password"
+          passwordInput={true}
         />
-        <FormTextInput name="newPassword" label="New Password" />
-        <FormTextInput name="confirmNewPassword" label="Confirm New Password" />
+        <FormTextInput
+          name="newPassword"
+          label="New Password"
+          passwordInput={true}
+        />
+        <FormTextInput
+          name="confirmNewPassword"
+          label="Confirm New Password"
+          passwordInput={true}
+        />
         <div className="cancel-or-submit">
-          <CancelButton onClick={() => submitChanges(true)}>
-            Cancel
-          </CancelButton>
-          <SaveButton currentState={false} submit={submitChanges} />
+          <CancelButton cancelAction={cancelChanges} />
+          <SaveButton />
         </div>
       </Form>
     </Formik>
