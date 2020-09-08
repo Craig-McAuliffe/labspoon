@@ -3,7 +3,14 @@
   width: 15%;
 }
 
-.DropDownHeader p {
+.dropdown-header {
+  color: #00507c;
+  display: flex;
+  cursor: pointer;
+  align-items: flex-end;
+}
+
+.dropdown-header p {
   padding-left: 4px;
 }
 
@@ -19,23 +26,21 @@
   margin-left: 6px;
 }
 
-.DropDownHeader {
-  color: #00507c;
-  display: flex;
-  cursor: pointer;
-}
-
 .DropDownHeaderSmall {
   display: none;
 }
 
+.dropdown-group-subtitle {
+  color: #5d5d65;
+}
+
 @media screen and (max-width: 1007px) {
-  .DropDownHeader {
+  .dropdown-name {
     display: none;
+    padding: none;
   }
 
-  .DropDownHeaderSmall {
-    display: flex;
-    cursor: pointer;
+  .dropdown-header {
+    max-width: 100%;
   }
 }

@@ -10,13 +10,17 @@ import {
 
 import {AuthContext} from '../../../App';
 import DefaultUserIcon from '../../../assets/DefaultUserIcon.svg';
+import UserAvatar from '../../Avatar/UserAvatar';
 import Dropdown from 'react-bootstrap/Dropdown';
 import relationships from '../../../mockdata/relationships';
+import users from '../../../mockdata/users';
 
 import './AvatarDropDown.css';
 
 const AvatarDropDown = () => {
   const user = useContext(AuthContext);
+  const mockUser = users().filter((mockUser) => mockUser.id === user.uid)[0];
+  console.log(mockUser);
   if (!user) {
     return (
       <Dropdown variant="success" id="dropdown-basic">
@@ -27,8 +31,7 @@ const AvatarDropDown = () => {
     return (
       <Dropdown>
         <Dropdown.Toggle as={CustomToggle} id="dropdown-custom-components">
-          <AvatarToggle />
-          <AvatarToggleSmall />
+          <AvatarToggle user={user} mockUser={mockUser} />
         </Dropdown.Toggle>
         <Dropdown.Menu>
           <Dropdown.Item href="/bookmarks">
@@ -45,7 +48,7 @@ const AvatarDropDown = () => {
           </Dropdown.Item>
           <Dropdown.Header>
             <GroupMenuIcon />
-            My Groups
+            <span className="dropdown-group-subtitle">My Groups</span>
           </Dropdown.Header>
           <UserGroups userID={user.uid} />
         </Dropdown.Menu>
@@ -64,16 +67,14 @@ function UserGroups({userID}) {
     ));
 }
 
-const AvatarToggle = () => (
-  <div className="DropDownHeader">
-    <img src={DefaultUserIcon} alt="user icon" />
-    <p>First Name</p>
-  </div>
-);
-
-const AvatarToggleSmall = () => (
-  <div className="DropDownHeaderSmall">
-    <img src={DefaultUserIcon} alt="user icon" />
+const AvatarToggle = ({user, mockUser}) => (
+  <div className="dropdown-header">
+    {mockUser.avatar ? (
+      <UserAvatar src={mockUser.avatar} width="50" height="50" />
+    ) : (
+      <img src={DefaultUserIcon} alt="user icon" />
+    )}
+    <p className="dropdown-name">{user.displayName}</p>
   </div>
 );
 
