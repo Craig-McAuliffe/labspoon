@@ -25,16 +25,24 @@
   max-width: 100%;
 }
 
-.sider-layout {
+.sider-layout,
+.sider-layout-no-border {
   min-height: 100%;
   grid-column: 1 / 2;
   grid-row: 1 / 2;
   display: inline-block;
-  border-right: 1px solid #dcdce0;
   position: fixed;
   width: 250px;
   padding: 30px 10px 0px 10px;
   overflow-x: hidden;
+}
+
+.sider-layout {
+  border-right: 1px solid #dcdce0;
+}
+
+.sider-layout-no-border {
+  border: none;
 }
 
 .content-layout {
