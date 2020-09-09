@@ -1,5 +1,6 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {useParams} from 'react-router-dom';
+import {FeatureFlags} from '../../App';
 
 import TopicListItem from '../../components/Topics/TopicListItem';
 import topics from '../../mockdata/topics';
@@ -10,6 +11,7 @@ import TopicPageSider from './TopicPageSider';
 import './TopicPage.css';
 
 export default function TopicPage() {
+  const featureFlags = useContext(FeatureFlags);
   const topicID = useParams().topicID;
   const matchedTopic = topics().filter((topic) => topic.id === topicID)[0];
 
@@ -27,13 +29,6 @@ export default function TopicPage() {
     {
       collectionName: 'Relationship Types',
       options: [
-        {
-          enabled: false,
-          data: {
-            id: 'mostRelevant',
-            name: 'Most Relevant',
-          },
-        },
         {
           enabled: false,
           data: {
@@ -67,6 +62,16 @@ export default function TopicPage() {
       mutable: false,
     },
   ];
+
+  if (featureFlags.has('overview')) {
+    relationshipFilter[0].options.push({
+      enabled: false,
+      data: {
+        id: 'overview',
+        name: 'Overview',
+      },
+    });
+  }
 
   const getDefaultFilter = () => relationshipFilter;
 

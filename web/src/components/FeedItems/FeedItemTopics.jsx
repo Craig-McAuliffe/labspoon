@@ -10,7 +10,11 @@ export default function FeedItemTopics({taggedItem}) {
       <p className="topics-sub-title">Topics: </p>
       <div className="topic-names-container">
         {taggedItem.topics.map((topic) => (
-          <Link to="/" key={topic.id} className="topic-names">
+          <Link
+            to={`/topic/${topic.id}`}
+            key={topic.id}
+            className="topic-names"
+          >
             {topic.name}{' '}
           </Link>
         ))}

@@ -40,7 +40,7 @@ export default function topicPageFeedData(skip, limit, filterOptions, topic) {
   if (activeTab.length > 0) {
     const activeTabID = activeTab[0].data.id;
     switch (activeTabID) {
-      case filterOptions[0].options[0].data.id:
+      case 'overview':
         resultsList = [
           ...resultsList,
           ...relatedPosts(),
@@ -50,16 +50,16 @@ export default function topicPageFeedData(skip, limit, filterOptions, topic) {
           ...relatedGroups(),
         ];
         break;
-      case filterOptions[0].options[1].data.id:
+      case 'posts':
         resultsList = [...resultsList, ...relatedPosts()];
         break;
-      case filterOptions[0].options[2].data.id:
+      case 'publications':
         resultsList = [...resultsList, ...relatedPublications()];
         break;
-      case filterOptions[0].options[3].data.id:
+      case 'researchers':
         resultsList = [...resultsList, ...relatedUsers()];
         break;
-      case filterOptions[0].options[4].data.id:
+      case 'groups':
         resultsList = [...resultsList, ...relatedGroups()];
         break;
       default:
