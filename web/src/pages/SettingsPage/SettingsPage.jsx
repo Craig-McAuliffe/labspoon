@@ -29,61 +29,21 @@ const SettingsPage = () => {
     return user.reauthenticateWithCredential(userCred);
   };
 
-  const submitChanges = (values, ...props) => {
-    reauthenticate(values.currentPassword).then(() => {
-      if ('newEmail' in values) {
-        user.updateEmail(values.newEmail).then(function () {
-          alert(
-            'Email successfully updated. This change should appear on your account page shortly.'
-          );
-          user
-            .sendEmailVerification()
-            .then(function () {
-              console.log('veritifcation email sent');
-            })
-            .catch((error) => {
-              console.log(error);
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-        });
-      } else {
-        user.updatePassword(values.newPassword).then(function () {
-          alert(
-            'Password successfully updated. This change should appear on your account page shortly.'
-          );
-          user
-            .sendEmailVerification()
-            .then(function () {
-              console.log('veritifcation email sent');
-            })
-            .catch((error) => {
-              console.log(error);
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-        });
-      }
-    });
-
-    setEditState(false);
-  };
-
   const editDetailsDisplay = () => (
     <>
       {editState === 'email' ? (
         <ChangeEmailForm
           user={user}
-          submitChanges={submitChanges}
           cancelChanges={cancelChanges}
+          reauthenticate={reauthenticate}
+          setEditState={setEditState}
         />
       ) : editState === 'password' ? (
         <ChangePasswordForm
           user={user}
-          submitChanges={submitChanges}
           cancelChanges={cancelChanges}
+          reauthenticate={reauthenticate}
+          setEditState={setEditState}
         />
       ) : (
         <>
@@ -125,13 +85,14 @@ const SettingsPage = () => {
 
 export default SettingsPage;
 
-function ChangeEmailForm({user, submitChanges, cancelChanges}) {
+function ChangeEmailForm({user, cancelChanges, reauthenticate, setEditState}) {
   const initialValues = {
     newEmail: '',
   };
-
   const validationSchema = Yup.object({
-    currentPassword: Yup.string().required('Current Password is required'),
+    currentPassword: Yup.string()
+      .required('Current Password is required')
+      .min(8, 'Password must be at least 8 characters long.'),
     newEmail: Yup.string()
       .email('Please enter a valid email address')
       .required('Email is required')
@@ -141,7 +102,33 @@ function ChangeEmailForm({user, submitChanges, cancelChanges}) {
         return user.email !== value;
       }),
   });
-
+  const submitChanges = (values) => {
+    reauthenticate(values.currentPassword)
+      .then(() => {
+        user
+          .verifyBeforeUpdateEmail(values.newEmail)
+          .then(function () {
+            alert(
+              `Verification email sent to ${values.newEmail}. You need to click on the link in that email before your account changes will be saved.`
+            );
+            setEditState(false);
+          })
+          .catch(function (error) {
+            alert(
+              `We could not updated your email at this time, please try again later.`
+            );
+            setEditState(false);
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.message.toLowerCase().includes('too many'))
+          alert(
+            'You have entered too many incorrect passwords. Please try again later.'
+          );
+        else alert('The current password that you entered is incorrect');
+      });
+  };
   return (
     <Formik
       initialValues={initialValues}
@@ -165,15 +152,21 @@ function ChangeEmailForm({user, submitChanges, cancelChanges}) {
   );
 }
 
-function ChangePasswordForm({user, submitChanges, cancelChanges}) {
+function ChangePasswordForm({
+  user,
+  cancelChanges,
+  reauthenticate,
+  setEditState,
+}) {
   const initialValues = {
     currentPassword: '',
     newPassword: '',
     confirmNewPassword: '',
   };
-
   const validationSchema = Yup.object({
-    currentPassword: Yup.string().required('Current Password is required'),
+    currentPassword: Yup.string()
+      .required('Current Password is required')
+      .min(8, 'Password must be at least 8 characters long.'),
     newPassword: Yup.string()
       .required('Password is required')
       .min(8, 'Password must be at least 8 characters long.')
@@ -186,7 +179,32 @@ function ChangePasswordForm({user, submitChanges, cancelChanges}) {
         return this.parent.newPassword === value;
       }),
   });
-
+  const submitChanges = (values) => {
+    reauthenticate(values.currentPassword)
+      .then(() => {
+        user
+          .updatePassword(values.newPassword)
+          .then(function () {
+            alert('Password successfully updated.');
+            setEditState(false);
+          })
+          .catch((error) => {
+            alert(
+              `We couldn't update your passowrd at this time. Please try again later.`
+            );
+            console.log(error);
+            setEditState(false);
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.message.toLowerCase().includes('too many'))
+          alert(
+            'You have entered too many incorrect passwords. Please try again later.'
+          );
+        else alert('The current password that you entered is incorrect');
+      });
+  };
   return (
     <Formik
       initialValues={initialValues}
