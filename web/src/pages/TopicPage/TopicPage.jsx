@@ -1,6 +1,10 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {FeatureFlags} from '../../App';
+import {db} from '../../firebase';
+
+import {getActiveTabID} from '../../helpers/filters';
+import {getPaginatedPostsFromCollectionRef} from '../../helpers/posts';
 
 import TopicListItem from '../../components/Topics/TopicListItem';
 import topics from '../../mockdata/topics';
@@ -10,20 +14,78 @@ import TopicPageSider from './TopicPageSider';
 
 import './TopicPage.css';
 
+function fetchTopicDetailsFromDB(topicID) {
+  return db
+    .doc(`topics/${topicID}`)
+    .get()
+    .then((topicDetails) => topicDetails.data())
+    .catch((err) => console.log(err));
+}
+
+function topicPageFeedDataFromDB(skip, limit, filterOptions, topicID, last) {
+  const activeTab = getActiveTabID(filterOptions);
+  let results = [];
+  switch (activeTab) {
+    case 'posts':
+      const postsCollection = db.collection(`topics/${topicID}/posts`);
+      return getPaginatedPostsFromCollectionRef(postsCollection, limit, last);
+    case 'publications':
+      results = [];
+      break;
+    case 'researchers':
+      results = [];
+      break;
+    case 'groups':
+      results = [];
+      break;
+    case 'overview':
+      results = [];
+      break;
+  }
+  return results;
+}
+
 export default function TopicPage() {
   const featureFlags = useContext(FeatureFlags);
-  const topicID = useParams().topicID;
-  const matchedTopic = topics().filter((topic) => topic.id === topicID)[0];
+  const [topicID, setTopicID] = useState(undefined);
+  const [topicDetails, setTopicDetails] = useState(undefined);
+
+  const topicIDParam = useParams().topicID;
+  if (topicID !== topicIDParam) {
+    setTopicID(topicIDParam);
+  }
+
+  let fetchTopicDetails;
+  if (featureFlags.has('cloud-firestore')) {
+    fetchTopicDetails = () => fetchTopicDetailsFromDB(topicID);
+  } else {
+    fetchTopicDetails = () =>
+      topics().filter((topic) => topic.id === topicID)[0];
+  }
+
+  useEffect(() => {
+    Promise.resolve(fetchTopicDetails())
+      .then((topicDetails) => {
+        setTopicDetails(topicDetails);
+      })
+      .catch((err) => console.log(err));
+  }, [topicID]);
 
   const search = false;
+
+  let fetchFeedData;
+  if (featureFlags.has('cloud-firestore')) {
+    fetchFeedData = (skip, limit, filterOptions, last) =>
+      topicPageFeedDataFromDB(skip, limit, filterOptions, topicID, last);
+  } else {
+    fetchFeedData = (skip, limit, filterOptions, last) =>
+      topicPageFeedData(skip, limit, filterOptions, topicID, last);
+  }
 
   const siderTitleChoice = [
     'Other Topics from your Search',
     'Similar Topics to this one',
   ];
-
-  const fetchResults = (skip, limit, filterOptions) =>
-    topicPageFeedData(skip, limit, filterOptions, matchedTopic);
 
   const relationshipFilter = [
     {
@@ -32,7 +94,7 @@ export default function TopicPage() {
         {
           enabled: false,
           data: {
-            id: 'post',
+            id: 'posts',
             name: 'Posts',
           },
         },
@@ -83,17 +145,16 @@ export default function TopicPage() {
             {search ? siderTitleChoice[0] : siderTitleChoice[1]}
           </h3>
           <div className="suggested-resources-container">
-            <TopicPageSider currentTopic={matchedTopic} />
+            <TopicPageSider currentTopic={topicDetails} />
           </div>
         </div>
       </div>
       <div className="content-layout">
         <div className="details-container">
-          <TopicListItem topic={matchedTopic} dedicatedPage={true} />
+          <TopicListItem topic={topicDetails} dedicatedPage={true} />
         </div>
-
         <FilterableResults
-          fetchResults={fetchResults}
+          fetchResults={fetchFeedData}
           getDefaultFilter={getDefaultFilter}
           limit={10}
           useTabs={true}

@@ -6,6 +6,9 @@ import FollowButton from '../Buttons/FollowButton';
 import './TopicListItem.css';
 
 export default function TopicListItem({topic, dedicatedPage}) {
+  if (!topic) {
+    return <></>;
+  }
   return (
     <div className="topic-list-item-container">
       {dedicatedPage ? (

@@ -6,6 +6,8 @@ import {db} from '../../../firebase';
 import userPageFeedData from './UserPageFeedData';
 import UserPageSider from './UserPageSider';
 import users from '../../../mockdata/users';
+import {getActiveTabID} from '../../../helpers/filters';
+import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
 
 import FilterableResults from '../../../components/FilterableResults/FilterableResults';
 import MessageButton from '../../../components/Buttons/MessageButton';
@@ -191,45 +193,15 @@ function fetchUserDetailsFromDB(uuid) {
 }
 
 function userPageFeedDataFromDB(skip, limit, filterOptions, userID, last) {
-  // defaults to undefined when no tab is selected
-  let activeTab;
-  if (filterOptions.length === 0) {
-    activeTab = undefined;
-  } else {
-    const activeTabObj = filterOptions[0].options.filter(
-      (filterOption) => filterOption.enabled === true
-    )[0];
-    if (activeTabObj === undefined) {
-      activeTab = undefined;
-    } else {
-      activeTab = activeTabObj.data.id;
-    }
-  }
-
+  const activeTab = getActiveTabID(filterOptions);
   let results;
   switch (activeTab) {
     case 'overview':
       results = [];
       break;
     case 'posts':
-      let postsQuery = db.collection(`users/${userID}/posts`);
-      if (typeof last !== 'undefined') {
-        postsQuery = postsQuery.startAt(last.timestamp);
-      }
-      return postsQuery
-        .limit(limit)
-        .get()
-        .then((qs) => {
-          const posts = [];
-          qs.forEach((doc) => {
-            const post = doc.data();
-            post.id = doc.id;
-            post.resourceType = 'post';
-            posts.push(post);
-          });
-          return posts;
-        })
-        .catch((err) => console.log(err));
+      const postsCollection = db.collection(`users/${userID}/posts`);
+      return getPaginatedPostsFromCollectionRef(postsCollection, limit, last);
     case 'publications':
       let publicationsQuery = db.collection(`users/${userID}/publications`);
       if (typeof last !== 'undefined') {
