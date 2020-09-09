@@ -90,13 +90,6 @@ export default function UserPage() {
         {
           enabled: false,
           data: {
-            id: 'coauthors',
-            name: 'Co-Authors',
-          },
-        },
-        {
-          enabled: false,
-          data: {
             id: 'groups',
             name: 'Groups',
           },
@@ -106,6 +99,16 @@ export default function UserPage() {
       mutable: false,
     },
   ];
+
+  if (featureFlags.has('coauthors')) {
+    relationshipFilter[0].options.push({
+      enabled: false,
+      data: {
+        id: 'coauthors',
+        name: 'Co-Authors',
+      },
+    });
+  }
 
   if (featureFlags.has('recommendations')) {
     relationshipFilter[0].options.push({
