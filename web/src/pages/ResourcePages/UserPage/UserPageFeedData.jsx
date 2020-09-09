@@ -48,7 +48,7 @@ export default function userPageFeedData(skip, limit, filterOptions, userID) {
   if (activeTab.length > 0) {
     const activeTabID = activeTab[0].data.id;
     switch (activeTabID) {
-      case filterOptions[0].options[0].data.id:
+      case 'relevant':
         resultsList = [
           ...resultsList,
           ...userCoAuthors(),
@@ -56,22 +56,22 @@ export default function userPageFeedData(skip, limit, filterOptions, userID) {
           ...postsByUser(),
         ];
         break;
-      case filterOptions[0].options[1].data.id:
+      case 'posts':
         resultsList = [...resultsList, ...postsByUser()];
         break;
-      case filterOptions[0].options[2].data.id:
+      case 'publications':
         resultsList = [...resultsList, ...publicationsByUser()];
         break;
-      case filterOptions[0].options[3].data.id:
+      case 'follows':
         resultsList = [...resultsList, ...userFollowing()];
         break;
-      case filterOptions[0].options[4].data.id:
+      case 'recommends':
         resultsList = [...resultsList, ...userRecommends()];
         break;
-      case filterOptions[0].options[5].data.id:
+      case 'coauthors':
         resultsList = [...resultsList, ...userCoAuthors()];
         break;
-      case filterOptions[0].options[6].data.id:
+      case 'groups':
         resultsList = [...resultsList, ...userGroups()];
         break;
       default:
