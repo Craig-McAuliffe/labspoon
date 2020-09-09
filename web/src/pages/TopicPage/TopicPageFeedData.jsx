@@ -5,6 +5,7 @@ import users from '../../mockdata/users';
 
 export default function topicPageFeedData(skip, limit, filterOptions, topic) {
   let resultsList = [];
+  if (topic === undefined) return resultsList;
 
   const relatedPosts = () =>
     getFilteredPosts([

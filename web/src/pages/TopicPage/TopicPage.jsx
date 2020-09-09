@@ -79,7 +79,7 @@ export default function TopicPage() {
       topicPageFeedDataFromDB(skip, limit, filterOptions, topicID, last);
   } else {
     fetchFeedData = (skip, limit, filterOptions, last) =>
-      topicPageFeedData(skip, limit, filterOptions, topicID, last);
+      topicPageFeedData(skip, limit, filterOptions, topicDetails, last);
   }
 
   const siderTitleChoice = [
