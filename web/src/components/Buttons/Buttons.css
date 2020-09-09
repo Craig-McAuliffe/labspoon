@@ -1,0 +1,88 @@
+.save-button-container {
+  display: flex;
+  min-width: 100%;
+  justify-content: flex-end;
+}
+
+.cancel-button {
+  color: #5d5d65;
+}
+
+.cancel-button:hover {
+  color: #000000;
+}
+
+.primary-button-text {
+  display: flex;
+  align-items: center;
+}
+
+.primary-button {
+  display: inline-block;
+  border: none;
+  padding: 10px 15px 5px 15px;
+  border-radius: 4%;
+  text-decoration: none;
+  background: #00507c;
+  color: #ffffff;
+  cursor: pointer;
+  text-align: center;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.primary-button:hover,
+.primary-button:focus {
+  background: #023b5a;
+}
+
+.primary-button-clicked {
+  display: inline-block;
+  border: none;
+  padding: 10px 15px 5px 15px;
+  border-radius: 4%;
+  text-decoration: none;
+  background: #ffffff;
+  color: #99999f;
+  cursor: pointer;
+  text-align: center;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  outline: none;
+}
+
+.primary-button-clicked:hover,
+.primary-button-clicked:focus {
+  border: none;
+  display: inline-block;
+  padding: 10px 15px 5px 15px;
+  border-radius: 4%;
+  text-decoration: none;
+  background: #ffffff;
+  color: #00507c;
+  cursor: pointer;
+  text-align: center;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  outline: none;
+}
+
+@media screen and (max-width: 560px) {
+  .primary-button-text h2 {
+    font-size: 1.2em;
+  }
+
+  .primary-button,
+  .primary-button:hover,
+  .FollowButton:hover h2 {
+    padding: 6px 11px 1px 11px;
+    border-radius: 3%;
+  }
+
+  .primary-button-clicked,
+  .primary-button-clicked:hover,
+  .primary-button-clicked:focus h2 {
+    padding: 6px 11px 1px 11px;
+    border-radius: 3%;
+  }
+}

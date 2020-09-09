@@ -1,13 +1,14 @@
 import React from 'react';
-import './FollowButton.css';
+
+import './Buttons.css';
 
 const FollowButton = ({following, setFollowing}) => {
   return (
     <button
-      className={following ? 'UnfollowButton' : 'FollowButton'}
-      onClick={() => setFollowing(false)}
+      className={following ? 'primary-button-clicked' : 'primary-button'}
+      onClick={() => setFollowing(!following)}
     >
-      <div className="TextContainer">
+      <div className="primary-button-text">
         <h2>{following ? 'Unfollow' : 'Follow'}</h2>
       </div>
     </button>
