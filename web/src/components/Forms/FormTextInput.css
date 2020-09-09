@@ -1,0 +1,14 @@
+.form-text-input {
+  border: 1px solid #99999f;
+  line-height: 40px;
+  width: 100%;
+}
+
+.form-text-input-container {
+  margin: 40px 0px;
+}
+
+.form-text-input-container label {
+  font-family: 'Roboto', 'Helvetica Neue', sans-serif;
+  font-size: 1.1em;
+}

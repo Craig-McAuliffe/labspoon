@@ -1,0 +1,51 @@
+.settings-page-content {
+  grid-column: 2/3;
+  margin-top: 40px;
+}
+
+.settings-page-header {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  align-items: center;
+}
+
+.settings-page-header h2 {
+  grid-column: 2/3;
+  justify-self: flex-start;
+}
+
+.setting-page-user-details {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  row-gap: 40px;
+  align-items: center;
+  justify-items: flex-start;
+}
+
+.edit-user-detail div {
+  margin: 40px 0px;
+}
+
+.edit-user-detail + div {
+  min-height: 100%;
+}
+
+.setting-page-user-details span {
+  color: #99999f;
+}
+
+.setting-page-user-details button {
+  color: #00507c;
+}
+
+.cancel-or-submit {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+}
+
+.password-tip {
+  margin-top: 20px;
+  margin-bottom: -20px;
+  color: #5d5d65;
+}

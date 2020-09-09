@@ -1,5 +1,5 @@
 import React from 'react';
-import errorIcon from './assets/errorIcon.svg';
+import GeneralError from './components/GeneralError';
 
 import './ErrorBoundary.css';
 
@@ -23,19 +23,7 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       // You can render any custom fallback UI
-      return (
-        <div className="error-container">
-          <img
-            style={{maxWidth: '20%', height: 'auto'}}
-            src={errorIcon}
-            alt="Bug fixing illustration"
-          />
-          <h2>
-            Oops, something went wrong. Patrick and Craig personally apologise
-            for the inconvenience.
-          </h2>
-        </div>
-      );
+      return <GeneralError />;
     }
 
     return this.props.children;
