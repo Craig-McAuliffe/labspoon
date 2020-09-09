@@ -22,7 +22,7 @@ const AvatarDropDown = () => {
   if (!user) {
     return (
       <Dropdown variant="success" id="dropdown-basic">
-        <Link to="/signin">Sign In</Link>
+        <Link to="/login">Sign In</Link>
       </Dropdown>
     );
   } else {
