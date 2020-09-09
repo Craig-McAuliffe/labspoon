@@ -1,6 +1,9 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {FeatureFlags} from '../../../App';
 import {Link, useParams} from 'react-router-dom';
+import {db} from '../../../firebase';
+
+import {dbPublicationToJSPublication} from '../../../helpers/publications';
 
 import publications from '../../../mockdata/publications';
 import FeedItemTopics from '../../../components/FeedItems/FeedItemTopics';
@@ -10,6 +13,14 @@ import PublicationSider from './PublicationPageSider';
 import detectJournal from '../../../components/Publication/DetectJournal';
 
 import './PublicationPage.css';
+
+function fetchPublicationDetailsFromDB(publicationID) {
+  return db
+    .doc(`publications/${publicationID}`)
+    .get()
+    .then((doc) => dbPublicationToJSPublication(doc.data()))
+    .catch((err) => console.log(err));
+}
 
 export default function PublicationPage({}) {
   const featureFlags = useContext(FeatureFlags);
@@ -25,7 +36,8 @@ export default function PublicationPage({}) {
 
   let fetchPublicationDetails;
   if (featureFlags.has('cloud-firestore')) {
-    fetchPublicationDetails = () => {};
+    fetchPublicationDetails = () =>
+      fetchPublicationDetailsFromDB(publicationID);
   } else {
     fetchPublicationDetails = () =>
       publications().filter((publication) =>
@@ -157,20 +169,27 @@ const PublicationDetails = ({publicationDetails}) => {
         )}
         <PublicationLink publicationUrl={publicationDetails.url} />
       </div>
-      <div className="publication-body">
-        <h2>{publicationDetails.title}</h2>
-        <PublicationAuthors
-          publicationAuthors={publicationDetails.content.authors}
-        />
-        <h3 className="publication-section-title">Abstract</h3>
-        <p className="publication-body-abstract">
-          {publicationDetails.content.abstract}
-        </p>
-        <FeedItemTopics taggedItem={publicationDetails} />
-      </div>
+      <PublicationBody publicationDetails={publicationDetails} />
     </>
   );
 };
+
+function PublicationBody({publicationDetails}) {
+  if (publicationDetails === undefined) return <></>;
+  return (
+    <div className="publication-body">
+      <h2>{publicationDetails.title}</h2>
+      <PublicationAuthors
+        publicationAuthors={publicationDetails.content.authors}
+      />
+      <h3 className="publication-section-title">Abstract</h3>
+      <p className="publication-body-abstract">
+        {publicationDetails.content.abstract}
+      </p>
+      <FeedItemTopics taggedItem={publicationDetails} />
+    </div>
+  );
+}
 
 function PublicationLink({publicationURL}) {
   if (!publicationURL) return <></>;

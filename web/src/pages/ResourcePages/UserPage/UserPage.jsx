@@ -6,8 +6,10 @@ import {db} from '../../../firebase';
 import userPageFeedData from './UserPageFeedData';
 import UserPageSider from './UserPageSider';
 import users from '../../../mockdata/users';
+
 import {getActiveTabID} from '../../../helpers/filters';
 import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
+import {dbPublicationToJSPublication} from '../../../helpers/publications';
 
 import FilterableResults from '../../../components/FilterableResults/FilterableResults';
 import MessageButton from '../../../components/Buttons/MessageButton';
@@ -213,11 +215,7 @@ function userPageFeedDataFromDB(skip, limit, filterOptions, userID, last) {
         .then((qs) => {
           const publications = [];
           qs.forEach((doc) => {
-            const publication = doc.data();
-            publication.resourceType = 'publication';
-            publication.content = {};
-            publication.content.authors = publication.authors;
-            publication.content.abstract = publication.abstract;
+            const publication = dbPublicationToJSPublication(doc.data());
             publications.push(publication);
           });
           return publications;
