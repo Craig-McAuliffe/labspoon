@@ -27,15 +27,16 @@ export default function PublicationPage({}) {
   if (featureFlags.has('cloud-firestore')) {
     fetchPublicationDetails = () => {};
   } else {
-    fetchPublicationDetails = publications().filter((publication) =>
-      publication.id.includes(publicationID)
-    )[0];
+    fetchPublicationDetails = () =>
+      publications().filter((publication) =>
+        publication.id.includes(publicationID)
+      )[0];
   }
 
   useEffect(() => {
     Promise.resolve(fetchPublicationDetails())
-      .then((PublicationDetails) => {
-        setPublicationDetails(publicationDetails);
+      .then((newPublicationDetails) => {
+        setPublicationDetails(newPublicationDetails);
       })
       .catch((err) => console.log(err));
   }, [publicationID]);
@@ -45,7 +46,12 @@ export default function PublicationPage({}) {
     fetchFeedData = () => [];
   } else {
     fetchFeedData = (skip, limit, filterOptions) =>
-      publicationPageFeedData(skip, limit, filterOptions, publicationDetails);
+      publicationPageFeedData(
+        skip,
+        limit,
+        filterOptions,
+        fetchPublicationDetails()
+      );
   }
 
   const siderTitleChoice = [
