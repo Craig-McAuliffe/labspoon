@@ -50,17 +50,10 @@ function getPostTypesFilter() {
   };
 }
 
-function getFeedTypesFilter() {
-  return {
+function getFeedTypesFilter(fflags) {
+  const filters = {
     collectionName: 'Types',
     options: [
-      {
-        enabled: false,
-        data: {
-          id: 'mostRelevant',
-          name: 'Most Relevant',
-        },
-      },
       {
         enabled: false,
         data: {
@@ -99,6 +92,17 @@ function getFeedTypesFilter() {
     ],
     mutable: false,
   };
+
+  if (fflags.has('overview')) {
+    filters.options.unshift({
+      enabled: false,
+      data: {
+        id: 'mostRelevant',
+        name: 'Most Relevant',
+      },
+    });
+  }
+  return filters;
 }
 
 function getTypesFilterForPostsList() {
@@ -126,6 +130,6 @@ export function getPostFilters(posts) {
   ];
 }
 
-export function getSearchFilters() {
-  return [getFeedTypesFilter(), getPostTypesFilter()];
+export function getSearchFilters(fflags) {
+  return [getFeedTypesFilter(fflags), getPostTypesFilter()];
 }

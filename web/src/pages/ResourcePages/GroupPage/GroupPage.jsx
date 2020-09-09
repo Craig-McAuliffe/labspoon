@@ -83,13 +83,6 @@ export default function GroupPage() {
         {
           enabled: false,
           data: {
-            id: 'overview',
-            name: 'Overview',
-          },
-        },
-        {
-          enabled: false,
-          data: {
             id: 'posts',
             name: 'Posts',
           },
@@ -121,6 +114,16 @@ export default function GroupPage() {
     },
   ];
   const getDefaultFilter = () => relationshipFilter;
+
+  if (featureFlags.has('overview')) {
+    relationshipFilter[0].options.push({
+      enabled: false,
+      data: {
+        id: 'overview',
+        name: 'Overview',
+      },
+    });
+  }
 
   return (
     <>

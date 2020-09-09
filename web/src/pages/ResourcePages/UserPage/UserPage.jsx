@@ -62,13 +62,6 @@ export default function UserPage() {
         {
           enabled: false,
           data: {
-            id: 'relevant',
-            name: 'Relevant To You',
-          },
-        },
-        {
-          enabled: false,
-          data: {
             id: 'posts',
             name: 'Posts',
           },
@@ -116,6 +109,16 @@ export default function UserPage() {
       data: {
         id: 'recommends',
         name: 'Recommends',
+      },
+    });
+  }
+
+  if (featureFlags.has('overview')) {
+    relationshipFilter[0].options.push({
+      enabled: false,
+      data: {
+        id: 'overview',
+        name: 'Overview',
       },
     });
   }
@@ -205,7 +208,7 @@ function userPageFeedDataFromDB(skip, limit, filterOptions, userID, last) {
 
   let results;
   switch (activeTab) {
-    case 'relevant':
+    case 'overview':
       results = [];
       break;
     case 'posts':

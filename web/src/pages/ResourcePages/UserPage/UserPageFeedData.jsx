@@ -48,7 +48,7 @@ export default function userPageFeedData(skip, limit, filterOptions, userID) {
   if (activeTab.length > 0) {
     const activeTabID = activeTab[0].data.id;
     switch (activeTabID) {
-      case 'relevant':
+      case 'overview':
         resultsList = [
           ...resultsList,
           ...userCoAuthors(),

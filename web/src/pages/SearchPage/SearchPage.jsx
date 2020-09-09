@@ -1,5 +1,6 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {useRouteMatch, useHistory} from 'react-router-dom';
+import {FeatureFlags} from '../../App';
 
 import FilterableResults, {
   getActiveTabIDFromTypeFilterCollection,
@@ -38,10 +39,10 @@ function fetchResults(skip, limit, filter) {
   }
 }
 
-const getDefaultFilter = getSearchFilters;
-
 export default function SearchPage() {
+  const featureFlags = useContext(FeatureFlags);
   const [query, setQuery] = useState(useRouteMatch().params.query);
+  const getDefaultFilter = () => getSearchFilters(featureFlags);
   return (
     <>
       <SearchForm query={query} setQuery={setQuery} />
