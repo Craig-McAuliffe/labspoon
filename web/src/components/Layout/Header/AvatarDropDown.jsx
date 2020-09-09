@@ -19,8 +19,6 @@ import './AvatarDropDown.css';
 
 const AvatarDropDown = () => {
   const user = useContext(AuthContext);
-  const mockUser = users().filter((mockUser) => mockUser.id === user.uid)[0];
-  console.log(mockUser);
   if (!user) {
     return (
       <Dropdown variant="success" id="dropdown-basic">
@@ -28,6 +26,7 @@ const AvatarDropDown = () => {
       </Dropdown>
     );
   } else {
+    const mockUser = users().filter((mockUser) => mockUser.id === user.uid)[0];
     return (
       <Dropdown>
         <Dropdown.Toggle as={CustomToggle} id="dropdown-custom-components">
