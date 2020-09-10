@@ -10,7 +10,7 @@ import users from '../../../mockdata/users';
 import {getActiveTabID} from '../../../helpers/filters';
 import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
 import {getPaginatedTopicsFromCollectionRef} from '../../../helpers/topics';
-import {dbPublicationToJSPublication} from '../../../helpers/publications';
+import {getPaginatedPublicationsFromCollectionRef} from '../../../helpers/publications';
 
 import FilterableResults from '../../../components/FilterableResults/FilterableResults';
 import MessageButton from '../../../components/Buttons/MessageButton';
@@ -213,22 +213,14 @@ function userPageFeedDataFromDB(skip, limit, filterOptions, userID, last) {
       const postsCollection = db.collection(`users/${userID}/posts`);
       return getPaginatedPostsFromCollectionRef(postsCollection, limit, last);
     case 'publications':
-      let publicationsQuery = db.collection(`users/${userID}/publications`);
-      if (typeof last !== 'undefined') {
-        publicationsQuery = publicationsQuery.startAt(last.timestamp);
-      }
-      return publicationsQuery
-        .limit(limit)
-        .get()
-        .then((qs) => {
-          const publications = [];
-          qs.forEach((doc) => {
-            const publication = dbPublicationToJSPublication(doc.data());
-            publications.push(publication);
-          });
-          return publications;
-        })
-        .catch((err) => console.log(err));
+      const publicationsCollection = db.collection(
+        `users/${userID}/publications`
+      );
+      return getPaginatedPublicationsFromCollectionRef(
+        publicationsCollection,
+        limit,
+        last
+      );
     case 'follows':
       let followsQuery = db.collection(`/users/${userID}/followsUsers`);
       if (typeof last !== 'undefined') {

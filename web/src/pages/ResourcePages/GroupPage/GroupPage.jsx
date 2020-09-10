@@ -2,6 +2,9 @@ import React, {useRef, useEffect, useState, useContext} from 'react';
 import {FeatureFlags} from '../../../App';
 import {db} from '../../../firebase';
 
+import {getActiveTabID} from '../../../helpers/filters';
+import {getPaginatedUserReferencesFromCollectionRef} from '../../../helpers/users';
+
 import groups from '../../../mockdata/groups';
 import {Link, useParams} from 'react-router-dom';
 import GroupPageSider from './GroupPageSider';
@@ -27,6 +30,41 @@ function fetchGroupDetailsFromDB(id) {
     .catch((err) => console.log(err));
 }
 
+function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions) {
+  const activeTab = getActiveTabID(filterOptions);
+  let results;
+  switch (activeTab) {
+    case 'overview':
+      results = [];
+      break;
+    case 'posts':
+      results = [];
+      break;
+    case 'media':
+      results = [];
+      break;
+    case 'publications':
+      results = [];
+      break;
+    case 'members':
+      const usersCollection = db.collection(`groups/${groupID}/members`);
+      return getPaginatedUserReferencesFromCollectionRef(
+        usersCollection,
+        limit,
+        last
+      );
+    case 'topics':
+      results = [];
+      break;
+    case 'overview':
+      results = [];
+      break;
+    default:
+      results = [];
+  }
+  return results;
+}
+
 export default function GroupPage() {
   const featureFlags = useContext(FeatureFlags);
   const [groupID, setGroupID] = useState(undefined);
@@ -48,7 +86,6 @@ export default function GroupPage() {
   useEffect(() => {
     Promise.resolve(fetchGroupDetails())
       .then((groupDetails) => {
-        console.log('setting group details', groupDetails);
         setGroupDetails(groupDetails);
       })
       .catch((err) => console.log(err));
@@ -70,7 +107,8 @@ export default function GroupPage() {
 
   let fetchFeedData;
   if (featureFlags.has('cloud-firestore')) {
-    fetchFeedData = () => [];
+    fetchFeedData = (skip, limit, filterOptions, last) =>
+      fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions);
   } else {
     fetchFeedData = (skip, limit, filterOptions, last) =>
       groupPageFeedData(skip, limit, filterOptions, groupDetails);
@@ -106,6 +144,13 @@ export default function GroupPage() {
           data: {
             id: 'members',
             name: 'Members',
+          },
+        },
+        {
+          enabled: false,
+          data: {
+            id: 'topics',
+            name: 'Topics',
           },
         },
       ],
