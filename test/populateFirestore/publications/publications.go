@@ -33,6 +33,23 @@ func SetPublications(ctx context.Context, client *firestore.Client, publications
 				return fmt.Errorf("Failed to add publication %v to author %v's publications: %w", id, author.ID, err)
 			}
 		}
+		err = setPublicationTopics(ctx, client, publication)
+		if err != nil {
+			return fmt.Errorf("Failed to set topics for user with ID %v: %w", id, err)
+		}
+	}
+	return nil
+}
+
+func setPublicationTopics(ctx context.Context, client *firestore.Client, publication Publication) error {
+	for _, topic := range publication.Topics {
+		batch := client.Batch()
+		batch.Set(client.Collection("publications").Doc(publication.ID).Collection("topics").Doc(topic.ID), topic)
+		batch.Set(client.Collection("topics").Doc(topic.ID).Collection("publications").Doc(publication.ID), publication)
+		_, err := batch.Commit(ctx)
+		if err != nil {
+			return fmt.Errorf("Failed to add publication topic relation for topic %v: %w", topic.ID, err)
+		}
 	}
 	return nil
 }
