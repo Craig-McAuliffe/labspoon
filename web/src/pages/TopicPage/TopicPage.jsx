@@ -5,6 +5,7 @@ import {db} from '../../firebase';
 
 import {getActiveTabID} from '../../helpers/filters';
 import {getPaginatedPostsFromCollectionRef} from '../../helpers/posts';
+import {getPaginatedUserReferencesFromCollectionRef} from '../../helpers/users';
 
 import TopicListItem from '../../components/Topics/TopicListItem';
 import topics from '../../mockdata/topics';
@@ -33,8 +34,12 @@ function topicPageFeedDataFromDB(skip, limit, filterOptions, topicID, last) {
       results = [];
       break;
     case 'researchers':
-      results = [];
-      break;
+      const usersCollection = db.collection(`topics/${topicID}/users`);
+      return getPaginatedUserReferencesFromCollectionRef(
+        usersCollection,
+        limit,
+        last
+      );
     case 'groups':
       results = [];
       break;

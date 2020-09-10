@@ -9,6 +9,7 @@ import users from '../../../mockdata/users';
 
 import {getActiveTabID} from '../../../helpers/filters';
 import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
+import {getPaginatedTopicsFromCollectionRef} from '../../../helpers/topics';
 import {dbPublicationToJSPublication} from '../../../helpers/publications';
 
 import FilterableResults from '../../../components/FilterableResults/FilterableResults';
@@ -89,6 +90,13 @@ export default function UserPage() {
           data: {
             id: 'groups',
             name: 'Groups',
+          },
+        },
+        {
+          enabled: false,
+          data: {
+            id: 'topics',
+            name: 'Topics',
           },
         },
       ],
@@ -263,6 +271,9 @@ function userPageFeedDataFromDB(skip, limit, filterOptions, userID, last) {
           return groups;
         })
         .catch((err) => console.log(err));
+    case 'topics':
+      const topicsCollection = db.collection(`users/${userID}/groups`);
+      return getPaginatedTopicsFromCollectionRef(topicsCollection, limit, last);
     default:
       results = [];
   }
