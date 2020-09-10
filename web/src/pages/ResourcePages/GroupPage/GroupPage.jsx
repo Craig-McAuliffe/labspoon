@@ -136,13 +136,6 @@ export default function GroupPage() {
         {
           enabled: false,
           data: {
-            id: 'media',
-            name: 'Media',
-          },
-        },
-        {
-          enabled: false,
-          data: {
             id: 'publications',
             name: 'Publications',
           },
@@ -167,6 +160,16 @@ export default function GroupPage() {
     },
   ];
   const getDefaultFilter = () => relationshipFilter;
+
+  if (featureFlags.has('group-media')) {
+    relationshipFilter[0].options.push({
+      enabled: false,
+      data: {
+        id: 'media',
+        name: 'Media',
+      },
+    });
+  }
 
   if (featureFlags.has('overview')) {
     relationshipFilter[0].options.push({
