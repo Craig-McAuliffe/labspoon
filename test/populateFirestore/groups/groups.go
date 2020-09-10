@@ -46,6 +46,10 @@ func SetGroups(ctx context.Context, client *firestore.Client, groups map[string]
 		if err != nil {
 			return fmt.Errorf("Failed to set members for group with ID %v: %w", id, err)
 		}
+    err = setGroupTopics(ctx, client, id, group)
+		if err != nil {
+			return fmt.Errorf("Failed to set topics for group with ID %v: %w", id, err)
+		}
 	}
 	return nil
 }
@@ -64,6 +68,24 @@ func setGroupMembers(ctx context.Context, client *firestore.Client, groupID stri
 		_, err = client.Collection("users").Doc(member.ID).Collection("groups").Doc(groupID).Set(ctx, groupRef)
 		if err != nil {
 			return fmt.Errorf("Failed to add member with ID %v to group with ID %v: %w", member.ID, groupID, err)
+		}
+	}
+	return nil
+}
+
+func setGroupTopics(ctx context.Context, client *firestore.Client, groupID string, group Group) error {
+	for _, topic := range group.Topics {
+		batch := client.Batch()
+		batch.Set(client.Collection("groups").Doc(groupID).Collection("topics").Doc(topic.ID), topic)
+		groupRef := GroupRef{
+			Name:   group.Name,
+			Avatar: group.Avatar,
+      About:  group.About,
+		}
+		batch.Set(client.Collection("topics").Doc(topic.ID).Collection("groups").Doc(groupID), groupRef)
+		_, err := batch.Commit(ctx)
+		if err != nil {
+			return fmt.Errorf("Failed to add group topic relation for topic %v: %w", topic.ID, err)
 		}
 	}
 	return nil
