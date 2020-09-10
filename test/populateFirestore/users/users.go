@@ -30,12 +30,11 @@ type User struct {
 	// TODO: Should embed a group ref
 	MemberOfGroup string `firestore:"memberOfGroup,omitempty"`
 	// TODO: Should embed a institution ref
-	Institution string `firestore:"institution,omitempty"`
-	// Outgoing relationships
-	FollowsUsers  map[string]UserRef      `yaml:"followsUsers" firestore:"-"`
-	FollowsTopics map[string]topics.Topic `yaml:"followsTopics" firestore:"-"`
-	// Incoming relationships
-	FollowedByUsers map[string]UserRef `yaml:"followedByUsers" firestore:"-"`
+	Institution     string                  `firestore:"institution,omitempty"`
+	Topics          map[string]topics.Topic `yaml:"topics" firestore:"-"`
+	FollowsUsers    map[string]UserRef      `yaml:"followsUsers" firestore:"-"`
+	FollowsTopics   map[string]topics.Topic `yaml:"followsTopics" firestore:"-"`
+	FollowedByUsers map[string]UserRef      `yaml:"followedByUsers" firestore:"-"`
 }
 
 // SetUsers creates the user collection, and sets users within it based on the
@@ -47,6 +46,10 @@ func SetUsers(ctx context.Context, client *firestore.Client, users map[string]Us
 		_, err := userDocumentRef.Set(ctx, user)
 		if err != nil {
 			return fmt.Errorf("Failed to add user with ID %v: %w", id, err)
+		}
+		err = setUserTopics(ctx, client, user)
+		if err != nil {
+			return fmt.Errorf("Failed to set topics for user with ID %v: %w", id, err)
 		}
 		err = setFollowsUsers(ctx, client, userDocumentRef, user.FollowsUsers)
 		if err != nil {
@@ -68,10 +71,28 @@ func SetUsers(ctx context.Context, client *firestore.Client, users map[string]Us
 	return nil
 }
 
+func setUserTopics(ctx context.Context, client *firestore.Client, user User) error {
+	for id, topic := range user.Topics {
+		batch := client.Batch()
+		batch.Set(client.Collection("users").Doc(user.ID).Collection("topics").Doc(id), topic)
+		userRef := UserRef{
+			ID:     user.ID,
+			Name:   user.Name,
+			Avatar: user.Avatar,
+		}
+		batch.Set(client.Collection("topics").Doc(id).Collection("users").Doc(user.ID), userRef)
+		_, err := batch.Commit(ctx)
+		if err != nil {
+			return fmt.Errorf("Failed to add user topic relation for topic %v: %w", id, err)
+		}
+	}
+	return nil
+}
+
 func setFollowsTopics(ctx context.Context, client *firestore.Client, userDocumentRef *firestore.DocumentRef, followsTopics map[string]topics.Topic) error {
-	followsTopicsDocumentRef := userDocumentRef.Collection("followsTopics")
+	followsTopicsCollectionRef := userDocumentRef.Collection("followsTopics")
 	for id, followTopic := range followsTopics {
-		_, err := followsTopicsDocumentRef.Doc(id).Set(ctx, followTopic)
+		_, err := followsTopicsCollectionRef.Doc(id).Set(ctx, followTopic)
 		if err != nil {
 			return fmt.Errorf("Failed to add following relationship to topic with ID %v: %w", id, err)
 		}

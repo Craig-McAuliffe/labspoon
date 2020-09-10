@@ -7,6 +7,13 @@ users:
     coverPhoto:
       https://i.picsum.photos/id/508/1070/200.jpg?hmac=zuoVvRij5oaspEYUA-r6XWUDuHQXigbUHUfhCaCIuqc
     institution: University College London,
+    topics:
+      b1a66949-0b46-428e-a47e-15b17499ba5a:
+        id: b1a66949-0b46-428e-a47e-15b17499ba5a
+        name: Biology
+      dbd6811f-8e7a-416b-a5cb-0bf564f89a39:
+        id: dbd6811f-8e7a-416b-a5cb-0bf564f89a39
+        name: Physics
     followsUsers:
       YdZkqyCThmUNhej0VXtqqWgD69s2:
         id: YdZkqyCThmUNhej0VXtqqWgD69s2
@@ -37,6 +44,13 @@ users:
     coverPhoto:
       https://i.picsum.photos/id/638/1070/200.jpg?hmac=IgJ8dCBUGLoANdgkRMzDCfWKbbrys26pcX69SKhB950
     institution: University College London
+    topics:
+      b1a66949-0b46-428e-a47e-15b17499ba5a:
+        id: b1a66949-0b46-428e-a47e-15b17499ba5a
+        name: Biology
+      dbd6811f-8e7a-416b-a5cb-0bf564f89a39:
+        id: dbd6811f-8e7a-416b-a5cb-0bf564f89a39
+        name: Physics
     followsUsers:
       MA1qq6qfbFfMER5HdlTa4X36Ly42:
         id: MA1qq6qfbFfMER5HdlTa4X36Ly42
