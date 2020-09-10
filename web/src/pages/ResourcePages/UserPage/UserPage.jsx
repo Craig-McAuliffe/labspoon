@@ -272,7 +272,7 @@ function userPageFeedDataFromDB(skip, limit, filterOptions, userID, last) {
         })
         .catch((err) => console.log(err));
     case 'topics':
-      const topicsCollection = db.collection(`users/${userID}/groups`);
+      const topicsCollection = db.collection(`users/${userID}/topics`);
       return getPaginatedTopicsFromCollectionRef(topicsCollection, limit, last);
     default:
       results = [];
