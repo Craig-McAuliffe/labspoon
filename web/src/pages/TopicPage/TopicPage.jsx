@@ -7,6 +7,7 @@ import {getActiveTabID} from '../../helpers/filters';
 import {getPaginatedPostsFromCollectionRef} from '../../helpers/posts';
 import {getPaginatedPublicationsFromCollectionRef} from '../../helpers/publications';
 import {getPaginatedUserReferencesFromCollectionRef} from '../../helpers/users';
+import {getPaginatedGroupReferencesFromCollectionRef} from '../../helpers/groups';
 
 import TopicListItem from '../../components/Topics/TopicListItem';
 import topics from '../../mockdata/topics';
@@ -48,8 +49,12 @@ function topicPageFeedDataFromDB(skip, limit, filterOptions, topicID, last) {
         last
       );
     case 'groups':
-      results = [];
-      break;
+      const groupsCollection = db.collection(`topics/${topicID}/groups`);
+      return getPaginatedGroupReferencesFromCollectionRef(
+        groupsCollection,
+        limit,
+        last
+      );
     case 'overview':
       results = [];
       break;
