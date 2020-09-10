@@ -5,6 +5,7 @@ import {db} from '../../../firebase';
 import {getActiveTabID} from '../../../helpers/filters';
 import {getPaginatedUserReferencesFromCollectionRef} from '../../../helpers/users';
 import {getPaginatedTopicsFromCollectionRef} from '../../../helpers/topics';
+import {getPaginatedPublicationsFromCollectionRef} from '../../../helpers/publications';
 
 import groups from '../../../mockdata/groups';
 import {Link, useParams} from 'react-router-dom';
@@ -45,8 +46,14 @@ function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions) {
       results = [];
       break;
     case 'publications':
-      results = [];
-      break;
+      const publicationsCollection = db.collection(
+        `groups/${groupID}/publications`
+      );
+      return getPaginatedPublicationsFromCollectionRef(
+        publicationsCollection,
+        limit,
+        last
+      );
     case 'members':
       const usersCollection = db.collection(`groups/${groupID}/members`);
       return getPaginatedUserReferencesFromCollectionRef(
