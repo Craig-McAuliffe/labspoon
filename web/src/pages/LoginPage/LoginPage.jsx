@@ -21,12 +21,13 @@ function LoginPage() {
   };
   if (!user) {
     return (
-      <div>
-        <p>not signed in</p>
-        <StyledFirebaseAuth
-          uiConfig={UIConfig}
-          firebaseAuth={firebase.auth()}
-        />
+      <div className="content-layout">
+        <div className="page-content-container">
+          <StyledFirebaseAuth
+            uiConfig={UIConfig}
+            firebaseAuth={firebase.auth()}
+          />
+        </div>
       </div>
     );
   } else {
