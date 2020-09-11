@@ -14,6 +14,7 @@ import UserAvatar from '../../Avatar/UserAvatar';
 import Dropdown from 'react-bootstrap/Dropdown';
 import relationships from '../../../mockdata/relationships';
 import users from '../../../mockdata/users';
+import firebase from '../../../firebase';
 
 import './AvatarDropDown.css';
 
@@ -45,9 +46,20 @@ const AvatarDropDown = () => {
             <SettingsMenuIcon />
             <p className="LinkItem">Settings</p>
           </Dropdown.Item>
+          <div className="log-out-container">
+            <button
+              onClick={() => {
+                firebase.auth().signOut();
+              }}
+              className="log-out-button"
+            >
+              Log out
+            </button>
+          </div>
+          <div className="dropdown-divider"></div>
           <Dropdown.Header>
             <GroupMenuIcon />
-            <span className="dropdown-group-subtitle">My Groups</span>
+            <div className="dropdown-group-subtitle">My Groups</div>
           </Dropdown.Header>
           <UserGroups userID={user.uid} />
         </Dropdown.Menu>

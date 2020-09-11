@@ -7,11 +7,8 @@
   color: #00507c;
   display: flex;
   cursor: pointer;
-  align-items: flex-end;
-}
-
-.dropdown-header p {
-  padding-left: 4px;
+  align-content: center;
+  justify-content: center;
 }
 
 .DropDownMenu {
@@ -30,8 +27,24 @@
   display: none;
 }
 
+.dropdown-divider {
+  width: 100%;
+  height: 1px;
+  background: #99999f;
+}
+
 .dropdown-group-subtitle {
   color: #5d5d65;
+  font-size: 1.1em;
+  margin: -5px 0px 0px 5px;
+}
+
+.log-out-container {
+  margin-left: 40px;
+}
+
+.log-out-button {
+  color: #99999f;
 }
 
 @media screen and (max-width: 1007px) {
