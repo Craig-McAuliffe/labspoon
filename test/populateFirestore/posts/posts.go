@@ -84,27 +84,10 @@ func populatePostFilterFields(post *Post) {
 }
 
 func setPostToFollowedByUsers(ctx context.Context, client *firestore.Client, authorID string, post Post) error {
-	followedByUsersIter := client.Collection("users").Doc(authorID).Collection("followedByUsers").Documents(ctx)
-	for {
-		followedByUserDoc, err := followedByUsersIter.Next()
-		if err == iterator.Done {
-			break
-		}
-		if err != nil {
-			return fmt.Errorf("Failed to get followed by user document for user %v: %w", authorID, err)
-		}
-		var followedByUser users.UserRef
-		followedByUserDoc.DataTo(&followedByUser)
-		followedByUserRef := client.Collection("users").Doc(followedByUser.ID)
-		followingFeedRef := followedByUserRef.Collection("feeds").Doc("followingFeed")
-		_, err = followingFeedRef.Collection("posts").Doc(post.ID).Set(ctx, post)
-		if err != nil {
-			return fmt.Errorf("Failed to set post on following feed for user %v: %w", followedByUser.ID, err)
-		}
-		err = updateFiltersByPost(ctx, followingFeedRef, post)
-		if err != nil {
-			return fmt.Errorf("Failed to update filters on following feed for user %v: %w", followedByUser.ID, err)
-		}
+	authorDocRef := client.Collection("users").Doc(authorID)
+	err := updateFollowersFollowingFeedsWithPost(ctx, client, authorDocRef, post)
+	if err != nil {
+		return fmt.Errorf("Failed to update followers of user with ID %v: %w", authorID, err)
 	}
 	return nil
 }
