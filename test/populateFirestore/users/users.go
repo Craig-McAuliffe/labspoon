@@ -55,7 +55,7 @@ func SetUsers(ctx context.Context, client *firestore.Client, users map[string]Us
 		if err != nil {
 			return fmt.Errorf("Failed to add follows users relationships for user with ID %v: %w", id, err)
 		}
-		err = setFollowsTopics(ctx, client, userDocumentRef, user.FollowsTopics)
+		err = setFollowsTopics(ctx, client, user, user.FollowsTopics)
 		if err != nil {
 			return fmt.Errorf("Failed to add follows topics relationships for user with ID %v: %w", id, err)
 		}
@@ -75,12 +75,7 @@ func setUserTopics(ctx context.Context, client *firestore.Client, user User) err
 	for id, topic := range user.Topics {
 		batch := client.Batch()
 		batch.Set(client.Collection("users").Doc(user.ID).Collection("topics").Doc(id), topic)
-		userRef := UserRef{
-			ID:     user.ID,
-			Name:   user.Name,
-			Avatar: user.Avatar,
-		}
-		batch.Set(client.Collection("topics").Doc(id).Collection("users").Doc(user.ID), userRef)
+		batch.Set(client.Collection("topics").Doc(id).Collection("users").Doc(user.ID), userToUserRef(user))
 		_, err := batch.Commit(ctx)
 		if err != nil {
 			return fmt.Errorf("Failed to add user topic relation for topic %v: %w", id, err)
@@ -89,12 +84,14 @@ func setUserTopics(ctx context.Context, client *firestore.Client, user User) err
 	return nil
 }
 
-func setFollowsTopics(ctx context.Context, client *firestore.Client, userDocumentRef *firestore.DocumentRef, followsTopics map[string]topics.Topic) error {
-	followsTopicsCollectionRef := userDocumentRef.Collection("followsTopics")
-	for id, followTopic := range followsTopics {
-		_, err := followsTopicsCollectionRef.Doc(id).Set(ctx, followTopic)
+func setFollowsTopics(ctx context.Context, client *firestore.Client, user User, topics map[string]topics.Topic) error {
+	for topicID, topic := range topics {
+		batch := client.Batch()
+		batch.Set(client.Collection("users").Doc(user.ID).Collection("followsTopics").Doc(topicID), topic)
+		batch.Set(client.Collection("topics").Doc(topicID).Collection("followedByUsers").Doc(user.ID), userToUserRef(user))
+		_, err := batch.Commit(ctx)
 		if err != nil {
-			return fmt.Errorf("Failed to add following relationship to topic with ID %v: %w", id, err)
+			return fmt.Errorf("Failed to add following relationship to topic with ID %v: %w", topicID, err)
 		}
 	}
 	return nil
@@ -129,4 +126,12 @@ func instantiateFeeds(ctx context.Context, client *firestore.Client, userDocumen
 		return fmt.Errorf("Failed to create following feed document: %w", err)
 	}
 	return nil
+}
+
+func userToUserRef(user User) UserRef {
+	return UserRef{
+		ID:     user.ID,
+		Name:   user.Name,
+		Avatar: user.Avatar,
+	}
 }

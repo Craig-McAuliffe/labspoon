@@ -73,6 +73,24 @@ users:
         name: Craig McAuliffe
         avatar: https://i.picsum.photos/id/620/200/200.jpg?hmac=i-QlnBFXHK0SDe5o7B85DMYehiO7H-fZxsKLRrfFCcU
 posts:
+  topic-only:
+    id: topic-only
+    timestamp: 2006-01-02T15:04:05Z
+    title: This is only associated with a topic, the user does not exist
+    postType:
+      id: default
+      name: default
+    author:
+      id: YdZkqyCThmUNhej0VXtqqWgD6
+      name: I Don't Exist
+      avatar: https://i.picsum.photos/id/804/200/200.jpg?hmac=73qw3Bnt67aOsdWd033BvfX9Gq0gIJ6FSL3Dp3gA97E
+    content:
+      text: This is an example of a text post!
+    topics:
+      - id: b1a66949-0b46-428e-a47e-15b17499ba5a
+        name: Biology
+      - id: dbd6811f-8e7a-416b-a5cb-0bf564f89a39
+        name: Physics
   54765360-1728-41fb-8726-5c412a7b364d:
     id: 54765360-1728-41fb-8726-5c412a7b364d
     timestamp: 2006-01-02T15:04:05Z

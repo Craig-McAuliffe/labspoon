@@ -61,6 +61,10 @@ func SetPosts(ctx context.Context, client *firestore.Client, posts map[string]Po
 			if err != nil {
 				return fmt.Errorf("Failed to add post %v to topic %v posts: %w", postID, topic.ID, err)
 			}
+			err = setPostToTopicFollowedBy(ctx, client, topic.ID, post)
+			if err != nil {
+				return fmt.Errorf("Failed to add post %v to topic %v's followers' posts: %w", postID, topic.ID, err)
+			}
 		}
 		err = setPostToFollowedByUsers(ctx, client, authorID, post)
 		if err != nil {
@@ -93,6 +97,40 @@ func setPostToFollowedByUsers(ctx context.Context, client *firestore.Client, aut
 		followedByUserDoc.DataTo(&followedByUser)
 		followedByUserRef := client.Collection("users").Doc(followedByUser.ID)
 		followingFeedRef := followedByUserRef.Collection("feeds").Doc("followingFeed")
+		_, err = followingFeedRef.Collection("posts").Doc(post.ID).Set(ctx, post)
+		if err != nil {
+			return fmt.Errorf("Failed to set post on following feed for user %v: %w", followedByUser.ID, err)
+		}
+		err = updateFiltersByPost(ctx, followingFeedRef, post)
+		if err != nil {
+			return fmt.Errorf("Failed to update filters on following feed for user %v: %w", followedByUser.ID, err)
+		}
+	}
+	return nil
+}
+
+func setPostToTopicFollowedBy(ctx context.Context, client *firestore.Client, topicID string, post Post) error {
+	topicDocRef := client.Collection("topics").Doc(topicID)
+	err := updateFollowersFollowingFeedsWithPost(ctx, client, topicDocRef, post)
+	if err != nil {
+		return fmt.Errorf("Failed to update followers of topic with ID %v: %w", topicID, err)
+	}
+	return nil
+}
+
+func updateFollowersFollowingFeedsWithPost(ctx context.Context, client *firestore.Client, following *firestore.DocumentRef, post Post) error {
+	followedByUsersIter := following.Collection("followedByUsers").Documents(ctx)
+	for {
+		followedByUserDoc, err := followedByUsersIter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return fmt.Errorf("Failed to get followed by user document: %w", err)
+		}
+		var followedByUser users.UserRef
+		followedByUserDoc.DataTo(&followedByUser)
+		followingFeedRef := client.Collection("users").Doc(followedByUser.ID).Collection("feeds").Doc("followingFeed")
 		_, err = followingFeedRef.Collection("posts").Doc(post.ID).Set(ctx, post)
 		if err != nil {
 			return fmt.Errorf("Failed to set post on following feed for user %v: %w", followedByUser.ID, err)
