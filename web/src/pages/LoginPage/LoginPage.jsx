@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import firebase from '../../firebase.js';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
-
+import {Redirect} from 'react-router';
 import {AuthContext} from '../../App';
 
 /**
@@ -21,27 +21,17 @@ function LoginPage() {
   };
   if (!user) {
     return (
-      <div>
-        <p>not signed in</p>
-        <StyledFirebaseAuth
-          uiConfig={UIConfig}
-          firebaseAuth={firebase.auth()}
-        />
+      <div className="content-layout">
+        <div className="page-content-container">
+          <StyledFirebaseAuth
+            uiConfig={UIConfig}
+            firebaseAuth={firebase.auth()}
+          />
+        </div>
       </div>
     );
   } else {
-    return (
-      <div>
-        <p>signed in</p>
-        <button
-          onClick={() => {
-            firebase.auth().signOut();
-          }}
-        >
-          Sign out
-        </button>
-      </div>
-    );
+    return <Redirect to="/" />;
   }
 }
 
