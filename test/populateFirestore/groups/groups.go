@@ -18,16 +18,17 @@ type GroupRef struct {
 }
 
 type Group struct {
-	Name        string          `firestore:"name,omitempty"`
-	Location    string          `firestore:"location,omitempty"`
-	Institution string          `firestore:"institution,omitempty"`
-	Website     string          `firestore:"website,omitempty"`
-	Avatar      string          `firestore:"avatar,omitempty"`
-	About       string          `firestore:"about,omitempty"`
-	PinnedPost  posts.Post      `firestore:"pinnedPost" yaml:"pinnedPost"`
-	Members     []users.UserRef `firestore:"-"`
-	Topics      []topics.Topic  `firestore:"-"`
-	Photos      []Photo         `firestore:"-"`
+	Name        string                `firestore:"name,omitempty"`
+	Location    string                `firestore:"location,omitempty"`
+	Institution string                `firestore:"institution,omitempty"`
+	Website     string                `firestore:"website,omitempty"`
+	Avatar      string                `firestore:"avatar,omitempty"`
+	About       string                `firestore:"about,omitempty"`
+	PinnedPost  posts.Post            `firestore:"pinnedPost" yaml:"pinnedPost"`
+	Members     []users.UserRef       `firestore:"-"`
+	Topics      []topics.Topic        `firestore:"-"`
+	Photos      []Photo               `firestore:"-"`
+	Posts       map[string]posts.Post `firestore:"-"`
 }
 
 type Photo struct {
@@ -46,9 +47,31 @@ func SetGroups(ctx context.Context, client *firestore.Client, groups map[string]
 		if err != nil {
 			return fmt.Errorf("Failed to set members for group with ID %v: %w", id, err)
 		}
-    err = setGroupTopics(ctx, client, id, group)
+		err = setGroupTopics(ctx, client, id, group)
 		if err != nil {
 			return fmt.Errorf("Failed to set topics for group with ID %v: %w", id, err)
+		}
+		err = setGroupPosts(ctx, client, id, group)
+		if err != nil {
+			return fmt.Errorf("Failed to set posts for group with ID %v: %w", id, err)
+		}
+	}
+	return nil
+}
+
+func setGroupPosts(ctx context.Context, client *firestore.Client, groupID string, group Group) error {
+	for postID, post := range group.Posts {
+		batch := client.Batch()
+		batch.Set(client.Collection("groups").Doc(groupID).Collection("posts").Doc(postID), post)
+		groupRef := GroupRef{
+			Name:   group.Name,
+			Avatar: group.Avatar,
+			About:  group.About,
+		}
+		batch.Set(client.Collection("posts").Doc(postID).Collection("groups").Doc(groupID), groupRef)
+		_, err := batch.Commit(ctx)
+		if err != nil {
+			return fmt.Errorf("Failed to add post with ID %v to group: %w", postID, err)
 		}
 	}
 	return nil
@@ -80,7 +103,7 @@ func setGroupTopics(ctx context.Context, client *firestore.Client, groupID strin
 		groupRef := GroupRef{
 			Name:   group.Name,
 			Avatar: group.Avatar,
-      About:  group.About,
+			About:  group.About,
 		}
 		batch.Set(client.Collection("topics").Doc(topic.ID).Collection("groups").Doc(groupID), groupRef)
 		_, err := batch.Commit(ctx)

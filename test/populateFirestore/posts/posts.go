@@ -45,28 +45,26 @@ type PostContent struct {
 
 // SetPosts sets posts to all relevant collections of posts.
 func SetPosts(ctx context.Context, client *firestore.Client, posts map[string]Post) error {
-	for id, post := range posts {
+	for postID, post := range posts {
 		authorID := post.Author.ID
 		populatePostFilterFields(&post)
-		_, err := client.Collection("posts").Doc(id).Set(ctx, post)
+		_, err := client.Collection("posts").Doc(postID).Set(ctx, post)
 		if err != nil {
-			return fmt.Errorf("Failed to add post %v to posts collection: %w", id, err)
+			return fmt.Errorf("Failed to add post %v to posts collection: %w", postID, err)
 		}
-
-		_, err = client.Collection("users").Doc(post.Author.ID).Collection("posts").Doc(id).Set(ctx, post)
+		_, err = client.Collection("users").Doc(post.Author.ID).Collection("posts").Doc(postID).Set(ctx, post)
 		if err != nil {
-			return fmt.Errorf("Failed to add post %v to author %v's posts: %w", id, authorID, err)
+			return fmt.Errorf("Failed to add post %v to author %v's posts: %w", postID, authorID, err)
 		}
-
 		for _, topic := range post.Topics {
-			_, err := client.Collection("topics").Doc(topic.ID).Collection("posts").Doc(id).Set(ctx, post)
+			_, err := client.Collection("topics").Doc(topic.ID).Collection("posts").Doc(postID).Set(ctx, post)
 			if err != nil {
-				return fmt.Errorf("Failed to add post %v to topic %v posts: %w", id, topic.ID, err)
+				return fmt.Errorf("Failed to add post %v to topic %v posts: %w", postID, topic.ID, err)
 			}
 		}
 		err = setPostToFollowedByUsers(ctx, client, authorID, post)
 		if err != nil {
-			return fmt.Errorf("Failed to add post %v to author %v 's follower's following feeds: %w", id, authorID, err)
+			return fmt.Errorf("Failed to add post %v to author %v 's follower's following feeds: %w", postID, authorID, err)
 		}
 	}
 	return nil
