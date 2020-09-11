@@ -6,6 +6,7 @@ import {getActiveTabID} from '../../../helpers/filters';
 import {getPaginatedUserReferencesFromCollectionRef} from '../../../helpers/users';
 import {getPaginatedTopicsFromCollectionRef} from '../../../helpers/topics';
 import {getPaginatedPublicationsFromCollectionRef} from '../../../helpers/publications';
+import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
 
 import groups from '../../../mockdata/groups';
 import {Link, useParams} from 'react-router-dom';
@@ -40,8 +41,8 @@ function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions) {
       results = [];
       break;
     case 'posts':
-      results = [];
-      break;
+      const postsCollection = db.collection(`groups/${groupID}/posts`);
+      return getPaginatedPostsFromCollectionRef(postsCollection, limit, last);
     case 'media':
       results = [];
       break;
