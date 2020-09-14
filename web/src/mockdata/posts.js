@@ -11,14 +11,16 @@ export function getTestPosts(uniqueID) {
       id: 'o3bosfseself' + uniqueID,
       resourceType: 'post',
       title:
-        'The National Lung Matrix Trial of personalized therapy in' +
-        'lung cancer ',
+        'Possible reason for the long term infections of some COVID patients',
       postType: postTypes()[0],
       generated: false,
       author: users()[0],
       createdAt: 'July 15, 2020 09:35:32',
       content: {
-        text: 'This is an example of a text post!',
+        text:
+          'After reading a few publications on the matter, I think the tendency' +
+          'for some people to develop long-lasting symptoms from SARS-CoV2 stems from the' +
+          'B149a gene (T Cell innate immunity)',
       },
       topics: [topics()[0], topics()[1]],
       optionaltags: [],
@@ -26,14 +28,16 @@ export function getTestPosts(uniqueID) {
     {
       id: '83hisefoi' + uniqueID,
       resourceType: 'post',
-      title: 'Today I overslept',
+      title:
+        'The National Lung Matrix Trial of personalized therapy in' +
+        'lung cancer ',
       postType: postTypes()[1],
       generated: false,
       author: users()[1],
       createdAt: 'July 15, 2020 09:35:32',
       url: 'https://www.nature.com/articles/s41467-020-17708-1',
       content: {
-        text: 'It was so crazy I woke up at like 8.30 I mean what the fuck',
+        text: 'We wrote a paper on personalised therapy in lung cancer',
       },
       topics: [topics()[2], topics()[1]],
       optionaltags: [
@@ -79,13 +83,14 @@ export function getTestPosts(uniqueID) {
     {
       id: '09w03rin' + uniqueID,
       resourceType: 'post',
-      title: 'I hate coming up with test data',
+      title:
+        'Interview with BBC news on the consequences of air pollution for brain development',
       postType: postTypes()[2],
       generated: false,
       author: users()[3],
       createdAt: 'July 15, 2020 09:35:32',
       content: {
-        text: 'It&apos;s literally the fucking worst thing ever',
+        text: 'I was interviewed for BBC news!',
       },
       topics: [topics()[3], topics()[4]],
       optionaltags: [
