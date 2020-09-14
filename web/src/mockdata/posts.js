@@ -19,8 +19,8 @@ export function getTestPosts(uniqueID) {
       content: {
         text:
           'After reading a few publications on the matter, I think the tendency' +
-          'for some people to develop long-lasting symptoms from SARS-CoV2 stems from the' +
-          'B149a gene (T Cell innate immunity)',
+          ' for some people to develop long-lasting symptoms from SARS-CoV2 stems from the' +
+          ' B149a gene (T Cell innate immunity)',
       },
       topics: [topics()[0], topics()[1]],
       optionaltags: [],
@@ -30,7 +30,7 @@ export function getTestPosts(uniqueID) {
       resourceType: 'post',
       title:
         'The National Lung Matrix Trial of personalized therapy in' +
-        'lung cancer ',
+        ' lung cancer ',
       postType: postTypes()[1],
       generated: false,
       author: users()[1],
