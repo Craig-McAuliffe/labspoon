@@ -11,6 +11,8 @@ import {getActiveTabID} from '../../../helpers/filters';
 import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
 import {getPaginatedTopicsFromCollectionRef} from '../../../helpers/topics';
 import {getPaginatedPublicationsFromCollectionRef} from '../../../helpers/publications';
+import {getPaginatedGroupReferencesFromCollectionRef} from '../../../helpers/groups';
+import {getPaginatedUserReferencesFromCollectionRef} from '../../../helpers/users';
 
 import FilterableResults from '../../../components/FilterableResults/FilterableResults';
 import MessageButton from '../../../components/Buttons/MessageButton';
@@ -223,23 +225,12 @@ function userPageFeedDataFromDB(skip, limit, filterOptions, userID, last) {
         last
       );
     case 'follows':
-      let followsQuery = db.collection(`/users/${userID}/followsUsers`);
-      if (typeof last !== 'undefined') {
-        followsQuery = followsQuery.startAt(last.timestamp);
-      }
-      return followsQuery
-        .limit(limit)
-        .get()
-        .then((qs) => {
-          const users = [];
-          qs.forEach((doc) => {
-            const user = doc.data();
-            user.resourceType = 'user';
-            users.push(user);
-          });
-          return users;
-        })
-        .catch((err) => console.log(err));
+      const followsQuery = db.collection(`/users/${userID}/followsUsers`);
+      return getPaginatedUserReferencesFromCollectionRef(
+        followsQuery,
+        limit,
+        last
+      );
     case 'recommends':
       results = [];
       break;
@@ -247,23 +238,12 @@ function userPageFeedDataFromDB(skip, limit, filterOptions, userID, last) {
       results = [];
       break;
     case 'groups':
-      let groupsQuery = db.collection(`users/${userID}/groups`);
-      if (typeof last !== 'undefined') {
-        groupsQuery = groupsQuery.startAt(last.timestamp);
-      }
-      return groupsQuery
-        .limit(limit)
-        .get()
-        .then((qs) => {
-          const groups = [];
-          qs.forEach((doc) => {
-            const group = doc.data();
-            group.resourceType = 'group';
-            groups.push(group);
-          });
-          return groups;
-        })
-        .catch((err) => console.log(err));
+      const groupsCollection = db.collection(`users/${userID}/groups`);
+      return getPaginatedGroupReferencesFromCollectionRef(
+        groupsCollection,
+        limit,
+        last
+      );
     case 'topics':
       const topicsCollection = db.collection(`users/${userID}/topics`);
       return getPaginatedTopicsFromCollectionRef(topicsCollection, limit, last);
