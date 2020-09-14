@@ -27,8 +27,6 @@ export default function PublicationPage({}) {
   const [publicationID, setPublicationID] = useState(undefined);
   const [publicationDetails, setPublicationDetails] = useState(undefined);
 
-  const search = false;
-
   const publicationIDParam = useParams().publicationID;
   if (publicationID !== publicationIDParam) {
     setPublicationID(publicationIDParam);
@@ -65,11 +63,6 @@ export default function PublicationPage({}) {
         fetchPublicationDetails()
       );
   }
-
-  const siderTitleChoice = [
-    'Other Publications from your Search',
-    'Similar Publications to this one',
-  ];
 
   const relationshipFilter = [
     {
@@ -127,16 +120,11 @@ export default function PublicationPage({}) {
 
   return (
     <>
-      <div className="sider-layout">
-        <div className="resource-sider">
-          <h3 className="resource-sider-title">
-            {search ? siderTitleChoice[0] : siderTitleChoice[1]}
-          </h3>
-          <div className="suggested-resources-container">
-            <PublicationSider currentPublication={publicationDetails} />
-          </div>
-        </div>
-      </div>
+      {featureFlags.has('related-resources') ? (
+        <SuggestedPublications publicationDetails={publicationDetails} />
+      ) : (
+        <></>
+      )}
       <div className="content-layout">
         <div className="details-container">
           <PublicationDetails publicationDetails={publicationDetails} />
@@ -150,6 +138,21 @@ export default function PublicationPage({}) {
         />
       </div>
     </>
+  );
+}
+
+function SuggestedPublications({publicationDetails}) {
+  return (
+    <div className="sider-layout">
+      <div className="resource-sider">
+        <h3 className="resource-sider-title">
+          Similar Publications to this one
+        </h3>
+        <div className="suggested-resources-container">
+          <PublicationSider currentPublication={publicationDetails} />
+        </div>
+      </div>
+    </div>
   );
 }
 

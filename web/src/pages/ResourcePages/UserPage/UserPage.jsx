@@ -44,8 +44,6 @@ export default function UserPage() {
       .catch((err) => console.log(err));
   }, [userID]);
 
-  const search = false;
-
   let fetchFeedData;
   if (featureFlags.has('cloud-firestore')) {
     fetchFeedData = (skip, limit, filterOptions, last) =>
@@ -54,11 +52,6 @@ export default function UserPage() {
     fetchFeedData = (skip, limit, filterOptions, last) =>
       userPageFeedData(skip, limit, filterOptions, userID, last);
   }
-
-  const siderTitleChoice = [
-    'Other People from your Search',
-    'Suggested Researchers (people also follow)',
-  ];
 
   const relationshipFilter = [
     {
@@ -139,17 +132,12 @@ export default function UserPage() {
 
   return (
     <>
-      <div className="sider-layout">
-        <div className="resource-sider">
-          <h3 className="resource-sider-title">
-            {search ? siderTitleChoice[0] : siderTitleChoice[1]}
-          </h3>
-          <div className="suggested-resources-container">
-            <UserPageSider currentUserID={userID} />
-          </div>
-        </div>
-      </div>
       <div className="content-layout">
+        {featureFlags.has('related-resources') ? (
+          <SuggestedUsers userID={userID} />
+        ) : (
+          <></>
+        )}
         <div className="details-container">
           <UserDetails user={userDetails} />
         </div>
@@ -163,6 +151,19 @@ export default function UserPage() {
         />
       </div>
     </>
+  );
+}
+
+function SuggestedUsers({userID}) {
+  return (
+    <div className="sider-layout">
+      <div className="resource-sider">
+        <h3 className="resource-sider-title">Suggested Researchers</h3>
+        <div className="suggested-resources-container">
+          <UserPageSider currentUserID={userID} />
+        </div>
+      </div>
+    </div>
   );
 }
 

@@ -100,7 +100,6 @@ export default function GroupPage() {
       .catch((err) => console.log(err));
   }, [groupID]);
 
-  const search = false;
   const groupDescriptionRef = useRef();
 
   const previousPage = () => (
@@ -108,11 +107,6 @@ export default function GroupPage() {
       Search Results
     </Link>
   );
-
-  const siderTitleChoice = [
-    'Other Groups from your Search',
-    'Suggested Groups ',
-  ];
 
   let fetchFeedData;
   if (featureFlags.has('cloud-firestore')) {
@@ -184,16 +178,11 @@ export default function GroupPage() {
 
   return (
     <>
-      <div className="sider-layout">
-        <div className="resource-sider">
-          <h3 className="resource-sider-title">
-            {search ? siderTitleChoice[0] : siderTitleChoice[1]}
-          </h3>
-          <div className="suggested-resources-container">
-            <GroupPageSider group={groupDetails} />
-          </div>
-        </div>
-      </div>
+      {featureFlags.has('related-resources') ? (
+        <SuggestedGroups groupDetails={groupDetails} />
+      ) : (
+        <></>
+      )}
       <div className="content-layout">
         {previousPage()}
         <div className="group-details">
@@ -211,6 +200,19 @@ export default function GroupPage() {
         />
       </div>
     </>
+  );
+}
+
+function SuggestedGroups({groupDetails}) {
+  return (
+    <div className="sider-layout">
+      <div className="resource-sider">
+        <h3 className="resource-sider-title">Suggested Groups</h3>
+        <div className="suggested-resources-container">
+          <GroupPageSider group={groupDetails} />
+        </div>
+      </div>
+    </div>
   );
 }
 

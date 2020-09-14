@@ -88,8 +88,6 @@ export default function TopicPage() {
       .catch((err) => console.log(err));
   }, [topicID]);
 
-  const search = false;
-
   let fetchFeedData;
   if (featureFlags.has('cloud-firestore')) {
     fetchFeedData = (skip, limit, filterOptions, last) =>
@@ -98,11 +96,6 @@ export default function TopicPage() {
     fetchFeedData = (skip, limit, filterOptions, last) =>
       topicPageFeedData(skip, limit, filterOptions, topicDetails, last);
   }
-
-  const siderTitleChoice = [
-    'Other Topics from your Search',
-    'Similar Topics to this one',
-  ];
 
   const relationshipFilter = [
     {
@@ -156,16 +149,11 @@ export default function TopicPage() {
 
   return (
     <>
-      <div className="sider-layout">
-        <div className="resource-sider">
-          <h3 className="resource-sider-title">
-            {search ? siderTitleChoice[0] : siderTitleChoice[1]}
-          </h3>
-          <div className="suggested-resources-container">
-            <TopicPageSider currentTopic={topicDetails} />
-          </div>
-        </div>
-      </div>
+      {featureFlags.has('related-resources') ? (
+        <SuggestedTopics topicDetails={topicDetails} />
+      ) : (
+        <></>
+      )}
       <div className="content-layout">
         <div className="details-container">
           <TopicListItem topic={topicDetails} dedicatedPage={true} />
@@ -179,5 +167,18 @@ export default function TopicPage() {
         />
       </div>
     </>
+  );
+}
+
+function SuggestedTopics({topicDetails}) {
+  return (
+    <div className="sider-layout">
+      <div className="resource-sider">
+        <h3 className="resource-sider-title">Similar Topics to this one</h3>
+        <div className="suggested-resources-container">
+          <TopicPageSider currentTopic={topicDetails} />
+        </div>
+      </div>
+    </div>
   );
 }
