@@ -33,7 +33,7 @@ export default function PublicationPage({}) {
   }
 
   let fetchPublicationDetails;
-  if (featureFlags.has('cloud-firestore')) {
+  if (!featureFlags.has('disable-cloud-firestore')) {
     fetchPublicationDetails = () =>
       fetchPublicationDetailsFromDB(publicationID);
   } else {
@@ -52,7 +52,7 @@ export default function PublicationPage({}) {
   }, [publicationID]);
 
   let fetchFeedData;
-  if (featureFlags.has('cloud-firestore')) {
+  if (!featureFlags.has('disable-cloud-firestore')) {
     fetchFeedData = () => [];
   } else {
     fetchFeedData = (skip, limit, filterOptions) =>

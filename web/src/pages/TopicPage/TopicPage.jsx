@@ -73,7 +73,7 @@ export default function TopicPage() {
   }
 
   let fetchTopicDetails;
-  if (featureFlags.has('cloud-firestore')) {
+  if (!featureFlags.has('disable-cloud-firestore')) {
     fetchTopicDetails = () => fetchTopicDetailsFromDB(topicID);
   } else {
     fetchTopicDetails = () =>
@@ -89,7 +89,7 @@ export default function TopicPage() {
   }, [topicID]);
 
   let fetchFeedData;
-  if (featureFlags.has('cloud-firestore')) {
+  if (!featureFlags.has('disable-cloud-firestore')) {
     fetchFeedData = (skip, limit, filterOptions, last) =>
       topicPageFeedDataFromDB(skip, limit, filterOptions, topicID, last);
   } else {

@@ -43,7 +43,7 @@ const BookmarksPage = () => {
   const user = useContext(AuthContext);
 
   let fetchResults;
-  if (featureFlags.has('cloud-firestore')) {
+  if (!featureFlags.has('disable-cloud-firestore')) {
     fetchResults = (skip, limit, filter, last) =>
       fetchBookmarks(user.uid, skip, limit, filter, last);
   } else {

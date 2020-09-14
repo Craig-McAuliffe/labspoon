@@ -32,7 +32,7 @@ export default function UserPage() {
   }
 
   let fetchUserDetails;
-  if (featureFlags.has('cloud-firestore')) {
+  if (!featureFlags.has('disable-cloud-firestore')) {
     fetchUserDetails = () => fetchUserDetailsFromDB(userID);
   } else {
     fetchUserDetails = () => users().filter((user) => user.id === userID)[0];
@@ -47,7 +47,7 @@ export default function UserPage() {
   }, [userID]);
 
   let fetchFeedData;
-  if (featureFlags.has('cloud-firestore')) {
+  if (!featureFlags.has('disable-cloud-firestore')) {
     fetchFeedData = (skip, limit, filterOptions, last) =>
       userPageFeedDataFromDB(skip, limit, filterOptions, userID, last);
   } else {

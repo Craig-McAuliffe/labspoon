@@ -85,7 +85,7 @@ export default function GroupPage() {
   }
 
   let fetchGroupDetails;
-  if (featureFlags.has('cloud-firestore')) {
+  if (!featureFlags.has('disable-cloud-firestore')) {
     fetchGroupDetails = () => fetchGroupDetailsFromDB(groupID);
   } else {
     fetchGroupDetails = () =>
@@ -109,7 +109,7 @@ export default function GroupPage() {
   );
 
   let fetchFeedData;
-  if (featureFlags.has('cloud-firestore')) {
+  if (!featureFlags.has('disable-cloud-firestore')) {
     fetchFeedData = (skip, limit, filterOptions, last) =>
       fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions);
   } else {

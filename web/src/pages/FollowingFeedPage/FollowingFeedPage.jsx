@@ -178,7 +178,7 @@ export default function FollowingFeedPage() {
 
   let fetchResults;
   let getDefaultFilter;
-  if (featureFlags.has('cloud-firestore')) {
+  if (!featureFlags.has('disable-cloud-firestore')) {
     if (user) {
       fetchResults = (skip, limit, filter, last) =>
         fetchUserFeedData(user.uid, skip, limit, filter, last);
