@@ -3,6 +3,7 @@ import update from 'immutability-helper';
 
 import {FilterMenu} from '../Filter/Filter';
 import ResultsList from '../Results/Results';
+import CreatePost from '../Posts/Post/CreatePost/CreatePost';
 
 import './FilterableResults.css';
 
@@ -18,6 +19,7 @@ export default function FilterableResults({
   limit,
   useTabs,
   useFilterSider,
+  createPost,
 }) {
   const [hasMore, setHasMore] = useState(false);
   const [skip, setSkip] = useState(0);
@@ -125,6 +127,7 @@ export default function FilterableResults({
 
   const feedAndTabs = () => (
     <div className="feed-container">
+      {createPost ? <CreatePost /> : null}
       {useTabs ? (
         <Tabs
           tabFilter={filterOptions[DEFAULT_TAB_IDX]}

@@ -12,6 +12,7 @@ import {AuthContext} from '../../../App';
 import DefaultUserIcon from '../../../assets/DefaultUserIcon.svg';
 import UserAvatar from '../../Avatar/UserAvatar';
 import Dropdown from 'react-bootstrap/Dropdown';
+import CustomToggle from '../../CustomToggle';
 import relationships from '../../../mockdata/relationships';
 import users from '../../../mockdata/users';
 import firebase from '../../../firebase';
@@ -89,19 +90,4 @@ const AvatarToggle = ({user, mockUser}) => (
   </div>
 );
 
-const CustomToggle = React.forwardRef(({children, onClick}, ref) => (
-  <a
-    href=""
-    ref={ref}
-    onClick={(e) => {
-      e.preventDefault();
-      onClick(e);
-    }}
-  >
-    {children}
-  </a>
-));
-
 export default AvatarDropDown;
-
-CustomToggle.displayName = CustomToggle;

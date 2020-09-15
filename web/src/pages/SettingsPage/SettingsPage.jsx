@@ -5,7 +5,7 @@ import {Form, Formik} from 'formik';
 import * as Yup from 'yup';
 import UserAvatar from '../../components/Avatar/UserAvatar';
 import users from '../../mockdata/users';
-import SaveButton from '../../components/Buttons/SaveButton';
+import SubmitButton from '../../components/Buttons/SubmitButton';
 import CancelButton from '../../components/Buttons/CancelButton';
 import FormTextInput from '../../components/Forms/FormTextInput';
 import GeneralError from '../../components/GeneralError';
@@ -145,7 +145,9 @@ function ChangeEmailForm({user, cancelChanges, reauthenticate, setEditState}) {
         <FormTextInput name="newEmail" label="New Email" />
         <div className="cancel-or-submit">
           <CancelButton cancelAction={cancelChanges} />
-          <SaveButton />
+          <div className="submit-button-container">
+            <SubmitButton inputText={'Save'} />
+          </div>
         </div>
       </Form>
     </Formik>
@@ -231,7 +233,9 @@ function ChangePasswordForm({
         />
         <div className="cancel-or-submit">
           <CancelButton cancelAction={cancelChanges} />
-          <SaveButton />
+          <div className="submit-button-container">
+            <SubmitButton inputText={'Save'} />
+          </div>
         </div>
       </Form>
     </Formik>
