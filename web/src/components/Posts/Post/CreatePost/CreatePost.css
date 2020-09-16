@@ -30,6 +30,7 @@
   display: grid;
   grid-template-columns: 100px 1fr;
   align-items: center;
+  margin-top: 20px;
 }
 
 .create-post-cancel-container {
