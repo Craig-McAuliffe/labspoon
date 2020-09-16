@@ -17,12 +17,10 @@ export default function CreatePost() {
 
   if (!user) return null;
   return creatingPost ? (
-    <div>
-      <PostTypeSpecificForm
-        cancelPost={cancelPost}
-        setCreatingPost={setCreatingPost}
-      />
-    </div>
+    <PostTypeSpecificForm
+      cancelPost={cancelPost}
+      setCreatingPost={setCreatingPost}
+    />
   ) : (
     <div className="not-creating-post-container">
       <button onClick={() => setCreatingPost(true)}>

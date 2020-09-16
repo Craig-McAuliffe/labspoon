@@ -4,7 +4,8 @@ import SubmitButton from '../../../Buttons/SubmitButton';
 import PostTypeDropDown from './PostTypeDropDown';
 import * as Yup from 'yup';
 import {Form, Formik} from 'formik';
-import FormTextInput from '../../../Forms/FormTextInput';
+import FormTextInput, {FormTextArea} from '../../../Forms/FormTextInput';
+import FormDateInput from '../../../Forms/FormDateInput';
 
 import './CreatePost.css';
 
@@ -38,17 +39,21 @@ export default function OpenPositionPostForm({
         validationSchema={validationSchema}
         onSubmit={submitChanges}
       >
-        <Form className="signin-form">
-          <input
-            name="mainContent"
-            type="text"
-            className="create-post-main-text"
-          />
-          <FormTextInput name="position" label="Position" />
-          <FormTextInput name="location" label="Location" />
-          <FormTextInput name="salary" label="Salary" />
-          <FormTextInput name="methods" label="Methods" />
-          <input type="date" name="startDate" label="Start Date" />
+        <Form>
+          <div className="creating-post-main-text-container">
+            <FormTextArea name="mainContent" />
+          </div>
+          <div className="creating-post-tags">
+            <FormTextInput sideLabel={true} name="position" label="Position" />
+            <FormTextInput sideLabel={true} name="location" label="Location" />
+            <FormTextInput sideLabel={true} name="salary" label="Salary" />
+            <FormTextInput sideLabel={true} name="methods" label="Methods" />
+            <FormDateInput
+              sideLabel={true}
+              name="startDate"
+              label="Start Date"
+            />
+          </div>
           <div className="create-post-actions">
             <div className="create-post-cancel-container">
               <CancelButton cancelAction={cancelPost} />

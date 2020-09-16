@@ -146,7 +146,7 @@ function ChangeEmailForm({user, cancelChanges, reauthenticate, setEditState}) {
         <div className="cancel-or-submit">
           <CancelButton cancelAction={cancelChanges} />
           <div className="submit-button-container">
-            <SubmitButton inputText={'Save'} />
+            <SubmitButton inputText="Save" />
           </div>
         </div>
       </Form>
@@ -234,7 +234,7 @@ function ChangePasswordForm({
         <div className="cancel-or-submit">
           <CancelButton cancelAction={cancelChanges} />
           <div className="submit-button-container">
-            <SubmitButton inputText={'Save'} />
+            <SubmitButton inputText="Save" />
           </div>
         </div>
       </Form>
