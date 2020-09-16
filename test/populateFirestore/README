@@ -3,3 +3,14 @@ Set this environment variable to automatically connect to the backend.
 export FIRESTORE_EMULATOR_HOST="localhost:8080"
 ```
 
+To index the dataset on Algolia, which should only be done when making permanent changes to the test data or for testing Algolia, labspoon/functions/.runtimeconfig.json must have the following values set, which can be retrieved from the Algolia dashboard:
+
+```
+{
+  "algolia": {
+    "admin_key": "",
+    "app_id": "",
+    "search_key": ""
+  }
+}
+```
