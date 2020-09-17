@@ -4,6 +4,8 @@ import React, {useState} from 'react';
 import {InstantSearch, SearchBox, Hits, Index} from 'react-instantsearch-dom';
 
 import {searchClient} from '../../algolia';
+import {abbrEnv} from '../../config';
+console.log(abbrEnv);
 
 import {dbPublicationToJSPublication} from '../../helpers/publications';
 
@@ -16,8 +18,6 @@ const POSTS = 'posts';
 const USERS = 'users';
 const GROUPS = 'groups';
 const TOPICS = 'topics';
-
-const abbrEnv = 'dev';
 
 export default function SearchPage() {
   const [tab, setTab] = useState('publications');
