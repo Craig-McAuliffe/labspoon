@@ -66,7 +66,12 @@ export default function SearchPage() {
         )}
         {tab === GROUPS ? (
           <Index indexName={abbrEnv + '_GROUPS'}>
-            <Hits hitComponent={({hit}) => <GenericListItem result={hit} />} />
+            <Hits
+              hitComponent={({hit}) => {
+                hit.id = hit.objectID;
+                return <GenericListItem result={hit} />;
+              }}
+            />
           </Index>
         ) : (
           <></>
