@@ -26,44 +26,58 @@ function getEnabledIDsFromFilter(filter) {
 // possible to use multiple many-to-many filters (ie. `array-contains-any` and
 // `in`).
 function fetchUserFeedData(uuid, skip, limit, filter, last) {
-  const enabledIDs = getEnabledIDsFromFilter(filter);
-
-  let results = db
+  const collection = db
     .collection(`users/${uuid}/feeds/followingFeed/posts`)
     .orderBy('timestamp');
+  return filterFeedData(collection, skip, limit, filter, last);
+}
 
+function fetchPublicFeedData(skip, limit, filter, last) {
+  const collection = db.collection('feeds/newsFeed/posts').orderBy('timestamp');
+  return filterFeedData(collection, skip, limit, filter, last);
+}
+function filterFeedData(collection, skip, limit, filter, last) {
+  const enabledIDs = getEnabledIDsFromFilter(filter);
   if (enabledIDs.size !== 0) {
     const enabledAuthorIDs = enabledIDs.get('Author');
     const enabledPostTypeIDs = enabledIDs.get('Post Type');
 
     if (enabledPostTypeIDs.length === 1) {
-      results = results.where(
+      collection = collection.where(
         'filter_postType_id',
         '==',
         enabledPostTypeIDs[0]
       );
     }
     if (enabledPostTypeIDs.length > 1) {
-      results = results.where('filter_PostType_id', 'in', enabledAuthorIDs);
+      collection = collection.where(
+        'filter_PostType_id',
+        'in',
+        enabledAuthorIDs
+      );
     }
 
     if (enabledAuthorIDs.length === 1) {
-      results = results.where('filter_author_id', '==', enabledAuthorIDs[0]);
+      collection = collection.where(
+        'filter_author_id',
+        '==',
+        enabledAuthorIDs[0]
+      );
     }
     if (enabledAuthorIDs.length > 1) {
-      results = results.where('filter_author_id', 'in', enabledAuthorIDs);
+      collection = collection.where('filter_author_id', 'in', enabledAuthorIDs);
     }
 
     const enabledTopicIDs = enabledIDs.get('Topics');
     if (enabledTopicIDs.length === 1) {
-      results = results.where(
+      collection = collection.where(
         'filter_topic_ids',
         'array-contains',
         enabledTopicIDs[0]
       );
     }
     if (enabledTopicIDs.length > 1) {
-      results = results.where(
+      collection = collection.where(
         'filter_topic_ids',
         'array-contains-any',
         enabledTopicIDs
@@ -72,7 +86,7 @@ function fetchUserFeedData(uuid, skip, limit, filter, last) {
   }
 
   const sortedAndPaginatedResults = sortAndPaginateFeedData(
-    results,
+    collection,
     last,
     limit
   );
@@ -98,9 +112,13 @@ function fetchUserFeedData(uuid, skip, limit, filter, last) {
   });
 }
 
-function fetchPublicFeedData(skip, limit, filter, last) {
-  const results = db.collection('posts').orderBy('timestamp');
-  return sortAndPaginateFeedData(results, last, limit);
+function fetchPublicFeedFilters() {
+  const results = db
+    .collection(`feeds/newsFeed/filterCollections`)
+    .get()
+    .then((fcqs) => getFiltersFromFilterCollection(fcqs))
+    .catch((err) => console.log(err));
+  return results;
 }
 
 function sortAndPaginateFeedData(results, last, limit) {
@@ -128,48 +146,46 @@ function fetchTestFeedData(skip, limit, filter) {
   return repeatedTestPosts.slice(skip, skip + limit);
 }
 
+function getFiltersFromFilterCollection(filterCollection) {
+  const filterCollections = [];
+  filterCollection.forEach((filterCollectionDoc) => {
+    const filterCollectionData = filterCollectionDoc.data();
+    const filterOptionsPromise = filterCollectionDoc.ref
+      .collection('filterOptions')
+      .orderBy('rank')
+      .limit(10)
+      .get()
+      .then((qs) => {
+        const filterCollection = {
+          collectionName: filterCollectionData.resourceName,
+          options: [],
+          mutable: true,
+        };
+        qs.forEach((doc) => {
+          const filterOptionData = doc.data();
+          filterCollection.options.push({
+            data: {
+              id: filterOptionData.resourceID,
+              name: filterOptionData.name,
+            },
+            enabled: false,
+          });
+        });
+        return filterCollection;
+      })
+      .catch((err) => console.log('filter err', err));
+    filterCollections.push(filterOptionsPromise);
+  });
+  return Promise.all(filterCollections);
+}
+
 function fetchUserFeedFilters(uuid) {
   const results = db
     .collection(`users/${uuid}/feeds/followingFeed/filterCollections`)
     .get()
-    .then((fcqs) => {
-      const filterCollections = [];
-      fcqs.forEach((filterCollectionDoc) => {
-        const filterCollectionData = filterCollectionDoc.data();
-        const filterOptionsPromise = filterCollectionDoc.ref
-          .collection('filterOptions')
-          .orderBy('rank')
-          .limit(10)
-          .get()
-          .then((qs) => {
-            const filterCollection = {
-              collectionName: filterCollectionData.resourceName,
-              options: [],
-              mutable: true,
-            };
-            qs.forEach((doc) => {
-              const filterOptionData = doc.data();
-              filterCollection.options.push({
-                data: {
-                  id: filterOptionData.resourceID,
-                  name: filterOptionData.name,
-                },
-                enabled: false,
-              });
-            });
-            return filterCollection;
-          })
-          .catch((err) => console.log('filter err', err));
-        filterCollections.push(filterOptionsPromise);
-      });
-      return Promise.all(filterCollections);
-    })
+    .then((fcqs) => getFiltersFromFilterCollection(fcqs))
     .catch((err) => console.log(err));
   return results;
-}
-
-function fetchPublicFeedFilters() {
-  return [];
 }
 
 export default function FollowingFeedPage() {

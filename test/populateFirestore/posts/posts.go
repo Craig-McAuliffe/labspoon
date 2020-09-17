@@ -45,6 +45,10 @@ type PostContent struct {
 
 // SetPosts sets posts to all relevant collections of posts.
 func SetPosts(ctx context.Context, client *firestore.Client, posts map[string]Post) error {
+  _, err := client.Collection("feeds").Doc("newsFeed").Set(ctx, map[string]string{"id": "newsFeed"})
+  if err != nil {
+		return fmt.Errorf("Failed to create following feed document: %w", err)
+  }
 	for postID, post := range posts {
 		authorID := post.Author.ID
 		populatePostFilterFields(&post)
@@ -52,6 +56,10 @@ func SetPosts(ctx context.Context, client *firestore.Client, posts map[string]Po
 		if err != nil {
 			return fmt.Errorf("Failed to add post %v to posts collection: %w", postID, err)
 		}
+    err = setPostsToNewsFeed(ctx, client, postID, post)
+    if err != nil {
+      return fmt.Errorf("Failed to add post %v to home page feed: %w", postID, err)
+    }
 		_, err = client.Collection("users").Doc(post.Author.ID).Collection("posts").Doc(postID).Set(ctx, post)
 		if err != nil {
 			return fmt.Errorf("Failed to add post %v to author %v's posts: %w", postID, authorID, err)
@@ -81,6 +89,19 @@ func populatePostFilterFields(post *Post) {
 	for i, topic := range post.Topics {
 		post.FilterTopicIDs[i] = topic.ID
 	}
+}
+
+func setPostsToNewsFeed(ctx context.Context, client *firestore.Client, postID string, post Post) error {
+  followingFeedRef := client.Collection("feeds").Doc("newsFeed")
+  _, err := followingFeedRef.Collection("posts").Doc(postID).Set(ctx, post)
+  if err != nil {
+    fmt.Errorf("Failed to add post with ID %v to news feed: %w", postID, err)
+  }
+  err = updateFiltersByPost(ctx, followingFeedRef, post)
+  if err != nil {
+    return fmt.Errorf("Failed to update filters on news feed: %w", err)
+  }
+  return nil
 }
 
 func setPostToFollowedByUsers(ctx context.Context, client *firestore.Client, authorID string, post Post) error {
