@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
+	"google.golang.org/api/option"
 	"gopkg.in/yaml.v3"
 
 	"labspoon.com/test/populateFirestore/groups"
@@ -16,6 +18,8 @@ import (
 	"labspoon.com/test/populateFirestore/topics"
 	"labspoon.com/test/populateFirestore/users"
 )
+
+var envFlag = flag.String("environment", "local", "Environment to target the populate script at; either local or dev.")
 
 const mockDataFile = "./mockData.yaml"
 
@@ -65,11 +69,24 @@ func populate(ctx context.Context, client *firestore.Client, data Data) error {
 }
 
 func main() {
+	flag.Parse()
+	fmt.Println(*envFlag)
 	ctx := context.Background()
-	config := &firebase.Config{
-		ProjectID: "labspoon-dev-266bc",
+	var app *firebase.App
+	var err error
+	if *envFlag == "dev" {
+		fmt.Println("dev")
+		sa := option.WithCredentialsFile("./serviceAccount.json")
+		app, err = firebase.NewApp(ctx, nil, sa)
+	} else if *envFlag == "local" {
+		fmt.Println("local")
+		config := &firebase.Config{
+			ProjectID: "labspoon-dev-266bc",
+		}
+		app, err = firebase.NewApp(ctx, config)
+	} else {
+		log.Fatalln("Invalid environment flag")
 	}
-	app, err := firebase.NewApp(ctx, config)
 	if err != nil {
 		log.Fatalln(err)
 	}
