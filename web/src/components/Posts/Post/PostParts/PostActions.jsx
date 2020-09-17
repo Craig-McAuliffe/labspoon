@@ -19,7 +19,7 @@ function BookmarkPostButton({post}) {
 
   // set the initial state of the bookmark
   useEffect(() => {
-    if (!featureFlags.has('disable-cloud-firestore')) {
+    if (user && !featureFlags.has('disable-cloud-firestore')) {
       db.collection(`users/${user.uid}/bookmarks`)
         .where('bookmarkedResourceType', '==', 'post')
         .where('bookmarkedResourceID', '==', post.id)
@@ -40,7 +40,7 @@ function BookmarkPostButton({post}) {
   // update the status of the bookmark
   useEffect(() => {
     if (!featureFlags.has('disable-cloud-firestore')) {
-      if (!firstRender) {
+      if (user && !firstRender) {
         const bookmarkCollection = db.collection(`users/${user.uid}/bookmarks`);
         if (bookmarked) {
           bookmarkCollection
