@@ -1,76 +1,83 @@
-import React, {useContext, useState} from 'react';
-import {useRouteMatch, useHistory} from 'react-router-dom';
-import {FeatureFlags} from '../../App';
+// custom search logic removed after 9ebf31106b04400309e7266010aca27f9ae96342
+// in favour of algolia
+import React, {useState} from 'react';
+import {InstantSearch, SearchBox, Hits, Index} from 'react-instantsearch-dom';
 
-import FilterableResults, {
-  getActiveTabIDFromTypeFilterCollection,
-  DEFAULT_TAB_IDX,
-} from '../../components/FilterableResults/FilterableResults';
+import {searchClient} from '../../algolia';
+import {abbrEnv} from '../../config';
 
-import getFilteredTestPosts from '../../mockdata/posts';
-import {getSearchFilters} from '../../mockdata/filters';
-import publications from '../../mockdata/publications';
-import groups from '../../mockdata/groups';
-import users from '../../mockdata/users';
-import topics from '../../mockdata/topics';
+import {dbPublicationToJSPublication} from '../../helpers/publications';
 
-function fetchResults(skip, limit, filter) {
-  const type = getActiveTabIDFromTypeFilterCollection(filter[DEFAULT_TAB_IDX]);
-  switch (type) {
-    case 'mostRelevant':
-      return [
-        ...getFilteredTestPosts(filter).slice(skip, skip + limit),
-        ...publications().slice(skip, skip + limit),
-        ...users().slice(skip, skip + limit),
-        ...groups().slice(skip, skip + limit),
-      ];
-    case 'publications':
-      return publications().slice(skip, skip + limit);
-    case 'posts':
-      return getFilteredTestPosts(filter).slice(skip, skip + limit);
-    case 'researchers':
-      return users().slice(skip, skip + limit);
-    case 'groups':
-      return groups().slice(skip, skip + limit);
-    case 'topics':
-      return topics().slice(skip, skip + limit);
-    default:
-      return [];
-  }
-}
+import {GenericListItem} from '../../components/Results/Results';
+
+import 'instantsearch.css/themes/algolia.css';
+
+const PUBLICATIONS = 'publications';
+const POSTS = 'posts';
+const USERS = 'users';
+const GROUPS = 'groups';
+const TOPICS = 'topics';
 
 export default function SearchPage() {
-  const featureFlags = useContext(FeatureFlags);
-  const [query, setQuery] = useState(useRouteMatch().params.query);
-  const getDefaultFilter = () => getSearchFilters(featureFlags);
+  const [tab, setTab] = useState('publications');
+
+  const tabs = [PUBLICATIONS, POSTS, USERS, GROUPS, TOPICS].map((tabName) => (
+    <button
+      onClick={() => setTab(tabName)}
+      key={tabName}
+      className={tabName === tab ? 'feed-tab-active' : 'feed-tab'}
+    >
+      <h3>{tabName}</h3>
+    </button>
+  ));
+
   return (
     <>
-      <SearchForm query={query} setQuery={setQuery} />
-      <FilterableResults
-        fetchResults={fetchResults}
-        getDefaultFilter={getDefaultFilter}
-        limit={5}
-        useTabs={true}
-        useFilterSider={true}
-        resourceInfo={undefined}
-      />
+      <div className="feed-tabs-container">
+        <div>{tabs}</div>
+      </div>
+      <InstantSearch searchClient={searchClient} indexName={abbrEnv + '_USERS'}>
+        <SearchBox />
+        {tab === PUBLICATIONS ? (
+          <Index indexName={abbrEnv + '_PUBLICATIONS'}>
+            <Hits
+              hitComponent={({hit}) => (
+                <GenericListItem result={dbPublicationToJSPublication(hit)} />
+              )}
+            />
+          </Index>
+        ) : (
+          <></>
+        )}
+        {tab === POSTS ? (
+          <Index indexName={abbrEnv + '_POSTS'}>
+            <Hits hitComponent={({hit}) => <GenericListItem result={hit} />} />
+          </Index>
+        ) : (
+          <></>
+        )}
+        {tab === USERS ? (
+          <Index indexName={abbrEnv + '_USERS'}>
+            <Hits hitComponent={({hit}) => <GenericListItem result={hit} />} />
+          </Index>
+        ) : (
+          <></>
+        )}
+        {tab === GROUPS ? (
+          <Index indexName={abbrEnv + '_GROUPS'}>
+            <Hits hitComponent={({hit}) => <GenericListItem result={hit} />} />
+          </Index>
+        ) : (
+          <></>
+        )}
+        {tab === TOPICS ? (
+          <Index indexName={abbrEnv + '_TOPICS'}>
+            <Hits hitComponent={({hit}) => <GenericListItem result={hit} />} />
+          </Index>
+        ) : (
+          <></>
+        )}
+      </InstantSearch>
     </>
-  );
-}
-
-function SearchForm({query, setQuery}) {
-  const history = useHistory();
-  const handleSubmit = (event) => {
-    history.push('/search/' + query);
-    event.preventDefault();
-  };
-  const onChange = (event) => {
-    setQuery(event.target.value);
-  };
-  return (
-    <form onSubmit={handleSubmit}>
-      <input type="text" value={query} onChange={onChange} />
-      <input type="submit" value="Submit" />
-    </form>
   );
 }
