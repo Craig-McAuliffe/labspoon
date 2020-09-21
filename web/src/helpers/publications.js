@@ -1,13 +1,15 @@
 export function dbPublicationToJSPublication(dbPublication) {
   const JSPublication = dbPublication;
-  JSPublication.resourceType = 'publication';
+  if (JSPublication.resourceType === undefined) {
+    JSPublication.resourceType = 'publication';
+  }
   JSPublication.content = {};
   JSPublication.content.authors = dbPublication.authors;
   JSPublication.content.abstract = dbPublication.abstract;
   return JSPublication;
 }
 
-// Retrieves paginated publicationss from the passed publications collection
+// Retrieves paginated publications from the passed publications collection
 // using the last // publications of the previous page as a cursor. Returns
 // a promise that returns an array of results when resolved. If there are no
 // results, or the collection does not exist, an empty array of results is
