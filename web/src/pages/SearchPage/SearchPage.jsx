@@ -1,15 +1,19 @@
 // custom search logic removed after 9ebf31106b04400309e7266010aca27f9ae96342
 // in favour of algolia
 import React, {useState} from 'react';
+import qs from 'qs';
 import {InstantSearch, SearchBox, Hits, Index} from 'react-instantsearch-dom';
 
 import {searchClient} from '../../algolia';
+import {searchStateToURL, createURL} from '../../helpers/search';
 
 import {dbPublicationToJSPublication} from '../../helpers/publications';
 
 import {GenericListItem} from '../../components/Results/Results';
 
 import 'instantsearch.css/themes/algolia.css';
+import {useLocation, useHistory} from 'react-router-dom';
+import {useEffect} from 'react';
 
 import './SearchPage.css';
 
@@ -21,8 +25,34 @@ const TOPICS = 'Topics';
 
 const abbrEnv = 'dev';
 
+const DEBOUNCE_TIME = 700;
+
 export default function SearchPage() {
+  const location = useLocation();
+  const history = useHistory();
   const [tab, setTab] = useState(PUBLICATIONS);
+  const [searchState, setSearchState] = useState(urlToSearchState(location));
+  const setStateId = React.useRef();
+
+  useEffect(() => {
+    const nextSearchState = urlToSearchState(location);
+    if (JSON.stringify(searchState) !== JSON.stringify(nextSearchState)) {
+      setSearchState(nextSearchState);
+    }
+  }, [location]);
+
+  function onSearchStateChange(nextSearchState) {
+    clearTimeout(setStateId.current);
+
+    setStateId.current = setTimeout(() => {
+      history.push(
+        searchStateToURL(location, nextSearchState),
+        nextSearchState
+      );
+    }, DEBOUNCE_TIME);
+
+    setSearchState(nextSearchState);
+  }
 
   const tabs = [PUBLICATIONS, POSTS, USERS, GROUPS, TOPICS].map((tabName) => (
     <button
@@ -41,6 +71,9 @@ export default function SearchPage() {
           <InstantSearch
             searchClient={searchClient}
             indexName={abbrEnv + '_USERS'}
+            searchState={searchState}
+            onSearchStateChange={onSearchStateChange}
+            createURL={createURL}
           >
             <SearchBox />
             <div className="feed-tabs-container">
@@ -104,3 +137,5 @@ export default function SearchPage() {
     </>
   );
 }
+
+const urlToSearchState = (location) => qs.parse(location.search.slice(1));

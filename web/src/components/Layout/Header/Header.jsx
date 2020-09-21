@@ -1,9 +1,12 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Link, useHistory} from 'react-router-dom';
+
+import {searchStateToURL} from '../../../helpers/search';
+
 import AvatarDropDown from './AvatarDropDown';
 import HeaderLogo from '../../../assets/HeaderLogo';
-import {useState} from 'react';
 import SearchDiagram from '../../../assets/searchIcon.svg';
+
 import './Header.css';
 
 const Header = () => {
@@ -27,7 +30,9 @@ function SearchBar() {
   const history = useHistory();
   function onSubmit(event) {
     event.preventDefault();
-    history.push('search/' + query);
+    history.push(
+      searchStateToURL({pathname: '/search'}, {query: query, page: 1})
+    );
   }
   return (
     <div className="header-search">
