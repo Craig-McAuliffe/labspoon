@@ -1,0 +1,21 @@
+.ais-SearchBox-input {
+  min-width: 100%;
+  border-radius: 0%;
+}
+
+.ais-Hits-list {
+  display: block;
+  flex-wrap: nowrap;
+  margin-top: 20px;
+  margin-left: 0px;
+}
+
+.ais-Hits-item {
+  min-width: 100%;
+  width: 100%;
+  padding: 0px;
+  margin-left: 0px;
+  margin-top: 0px;
+  border: none;
+  box-shadow: none;
+}

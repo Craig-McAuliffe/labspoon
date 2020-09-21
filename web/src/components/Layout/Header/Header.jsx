@@ -2,9 +2,9 @@ import React from 'react';
 import {Link, useHistory} from 'react-router-dom';
 import AvatarDropDown from './AvatarDropDown';
 import HeaderLogo from '../../../assets/HeaderLogo';
-import {SearchIcon, SearchIconSmall} from '../../../assets/HeaderIcons';
-import './Header.css';
 import {useState} from 'react';
+import SearchDiagram from '../../../assets/searchIcon.svg';
+import './Header.css';
 
 const Header = () => {
   return (
@@ -32,21 +32,20 @@ function SearchBar() {
   return (
     <div className="header-search">
       <div className="search-bar">
-        <form onSubmit={onSubmit}>
-          <button type="submit" value="Submit">
-            <div className="search-icon">
-              <SearchIcon />
-            </div>
-            <div className="search-icon-small">
-              <SearchIconSmall />
-            </div>
-          </button>
+        <form onSubmit={onSubmit} className="search-form">
           <input
-            placeholder="Search"
+            placeholder=" Search"
             type="text"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
+            className="search-input"
           />
+          <button
+            type="submit"
+            value="Submit"
+            className="search-icon-container"
+            style={{backgroundImage: `url(${SearchDiagram})`}}
+          ></button>
         </form>
       </div>
     </div>
