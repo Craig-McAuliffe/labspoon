@@ -123,7 +123,7 @@ export const ShareIconSelected = () => (
   </svg>
 );
 
-export const Expand = () => (
+export const ExpandIcon = () => (
   <svg
     width="24"
     height="13"
@@ -135,7 +135,7 @@ export const Expand = () => (
   </svg>
 );
 
-export const Hide = () => (
+export const HideIcon = () => (
   <svg
     width="24"
     height="13"

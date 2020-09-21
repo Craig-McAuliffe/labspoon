@@ -1,0 +1,20 @@
+.form-date-input-container-side-label {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  margin: 40px 0px 40px 8px;
+  align-items: center;
+}
+
+.form-date-input-container-side-label label {
+  grid-column: 1/2;
+  color: #5d5d65;
+  flex-shrink: 0;
+  margin-right: 15px;
+  font-size: 1.1em;
+}
+
+.form-date-input-container-side-label input {
+  grid-column: 2/3;
+  width: 150px;
+  color: #5d5d65;
+}

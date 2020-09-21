@@ -49,3 +49,9 @@
   margin-bottom: -20px;
   color: #5d5d65;
 }
+
+.submit-button-container {
+  display: flex;
+  min-width: 100%;
+  justify-content: flex-end;
+}
