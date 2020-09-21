@@ -38,14 +38,14 @@ export default function SearchPage() {
     <>
       <div className="content-layout">
         <div className="feed-container">
-          <div className="feed-tabs-container">
-            <div className="feed-tabs-layout">{tabs}</div>
-          </div>
           <InstantSearch
             searchClient={searchClient}
             indexName={abbrEnv + '_USERS'}
           >
             <SearchBox />
+            <div className="feed-tabs-container">
+              <div className="feed-tabs-layout">{tabs}</div>
+            </div>
             {tab === PUBLICATIONS ? (
               <Index indexName={abbrEnv + '_PUBLICATIONS'}>
                 <Hits
