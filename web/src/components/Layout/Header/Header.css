@@ -37,24 +37,11 @@
 }
 
 .search-icon-container{
-  display: flex;
-  padding: none;
-  align-items: flex-start;
-  justify-content: flex-start;
-  justify-items: flex-start;
   width: 50px;
   height: 40px;
   background-repeat: none;
   background-position-x: center;
   background-size: cover;
-}
-
-.search-icon {
-  min-height: 100%;
-}
-
-.search-icon-small {
-  display: none;
 }
 
 .header-logo {
@@ -104,12 +91,8 @@
 }
 
 @media screen and (max-width: 664px) {
-  .search-icon {
-    display: none;
-  }
-
-  .search-icon-small {
-    display: inline-block;
+  .search-icon-container{
+    width: 30px;
   }
 
   .header-container {
@@ -162,13 +145,10 @@
     margin: 0px 2px;
   }
 
-  .search-icon {
-    display: none;
+  .search-icon-container{
+    width: 30px;
   }
 
-  .search-icon-small {
-    display: none;
-  }
   .header-container {
     display: grid;
     grid-template-columns: 60px 1fr 60px;
