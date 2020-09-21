@@ -11,11 +11,13 @@ import {GenericListItem} from '../../components/Results/Results';
 
 import 'instantsearch.css/themes/algolia.css';
 
-const PUBLICATIONS = 'publications';
-const POSTS = 'posts';
-const USERS = 'users';
-const GROUPS = 'groups';
-const TOPICS = 'topics';
+import './SearchPage.css';
+
+const PUBLICATIONS = 'Publications';
+const POSTS = 'Posts';
+const USERS = 'Users';
+const GROUPS = 'Groups';
+const TOPICS = 'Topics';
 
 const abbrEnv = 'dev';
 
@@ -34,56 +36,71 @@ export default function SearchPage() {
 
   return (
     <>
-      <div className="feed-tabs-container">
-        <div>{tabs}</div>
+      <div className="content-layout">
+        <div className="feed-container">
+          <div className="feed-tabs-container">
+            <div className="feed-tabs-layout">{tabs}</div>
+          </div>
+          <InstantSearch
+            searchClient={searchClient}
+            indexName={abbrEnv + '_USERS'}
+          >
+            <SearchBox />
+            {tab === PUBLICATIONS ? (
+              <Index indexName={abbrEnv + '_PUBLICATIONS'}>
+                <Hits
+                  hitComponent={({hit}) => (
+                    <GenericListItem
+                      result={dbPublicationToJSPublication(hit)}
+                    />
+                  )}
+                />
+              </Index>
+            ) : (
+              <></>
+            )}
+            {tab === POSTS ? (
+              <Index indexName={abbrEnv + '_POSTS'}>
+                <Hits
+                  hitComponent={({hit}) => <GenericListItem result={hit} />}
+                />
+              </Index>
+            ) : (
+              <></>
+            )}
+            {tab === USERS ? (
+              <Index indexName={abbrEnv + '_USERS'}>
+                <Hits
+                  hitComponent={({hit}) => <GenericListItem result={hit} />}
+                />
+              </Index>
+            ) : (
+              <></>
+            )}
+            {tab === GROUPS ? (
+              <Index indexName={abbrEnv + '_GROUPS'}>
+                <Hits
+                  hitComponent={({hit}) => {
+                    hit.id = hit.objectID;
+                    return <GenericListItem result={hit} />;
+                  }}
+                />
+              </Index>
+            ) : (
+              <></>
+            )}
+            {tab === TOPICS ? (
+              <Index indexName={abbrEnv + '_TOPICS'}>
+                <Hits
+                  hitComponent={({hit}) => <GenericListItem result={hit} />}
+                />
+              </Index>
+            ) : (
+              <></>
+            )}
+          </InstantSearch>
+        </div>
       </div>
-      <InstantSearch searchClient={searchClient} indexName={abbrEnv + '_USERS'}>
-        <SearchBox />
-        {tab === PUBLICATIONS ? (
-          <Index indexName={abbrEnv + '_PUBLICATIONS'}>
-            <Hits
-              hitComponent={({hit}) => (
-                <GenericListItem result={dbPublicationToJSPublication(hit)} />
-              )}
-            />
-          </Index>
-        ) : (
-          <></>
-        )}
-        {tab === POSTS ? (
-          <Index indexName={abbrEnv + '_POSTS'}>
-            <Hits hitComponent={({hit}) => <GenericListItem result={hit} />} />
-          </Index>
-        ) : (
-          <></>
-        )}
-        {tab === USERS ? (
-          <Index indexName={abbrEnv + '_USERS'}>
-            <Hits hitComponent={({hit}) => <GenericListItem result={hit} />} />
-          </Index>
-        ) : (
-          <></>
-        )}
-        {tab === GROUPS ? (
-          <Index indexName={abbrEnv + '_GROUPS'}>
-            <Hits
-              hitComponent={({hit}) => {
-                hit.id = hit.objectID;
-                return <GenericListItem result={hit} />;
-              }}
-            />
-          </Index>
-        ) : (
-          <></>
-        )}
-        {tab === TOPICS ? (
-          <Index indexName={abbrEnv + '_TOPICS'}>
-            <Hits hitComponent={({hit}) => <GenericListItem result={hit} />} />
-          </Index>
-        ) : (
-          <></>
-        )}
-      </InstantSearch>
     </>
   );
 }
