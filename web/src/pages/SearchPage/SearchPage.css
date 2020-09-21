@@ -1,6 +1,7 @@
 .ais-SearchBox-input {
   min-width: 100%;
   border-radius: 0%;
+  border: none;
 }
 
 .ais-Hits-list {
