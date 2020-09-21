@@ -75,7 +75,12 @@ export default function SearchPage() {
             onSearchStateChange={onSearchStateChange}
             createURL={createURL}
           >
-            <SearchBox />
+            <SearchBox
+              translations={{
+                placeholder: 'Edit your query',
+              }}
+              submit={<img src="" alt="" />}
+            />
             <div className="feed-tabs-container">
               <div className="feed-tabs-layout">{tabs}</div>
             </div>
