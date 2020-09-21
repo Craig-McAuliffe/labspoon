@@ -20,7 +20,7 @@ const TOPICS = 'topics';
 const abbrEnv = 'dev';
 
 export default function SearchPage() {
-  const [tab, setTab] = useState('publications');
+  const [tab, setTab] = useState(PUBLICATIONS);
 
   const tabs = [PUBLICATIONS, POSTS, USERS, GROUPS, TOPICS].map((tabName) => (
     <button
