@@ -4,7 +4,6 @@ import {db} from '../../firebase';
 import {AuthContext, FeatureFlags} from '../../App';
 
 import FilterableResults from '../../components/FilterableResults/FilterableResults';
-
 import getFilteredTestPosts from '../../mockdata/posts';
 import {getPostFilters} from '../../mockdata/filters';
 
@@ -215,6 +214,7 @@ export default function FollowingFeedPage() {
       limit={10}
       useTabs={false}
       useFilterSider={true}
+      createPost={true}
     />
   );
 }

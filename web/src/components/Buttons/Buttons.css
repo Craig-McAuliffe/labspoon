@@ -1,11 +1,6 @@
-.save-button-container {
-  display: flex;
-  min-width: 100%;
-  justify-content: flex-end;
-}
-
 .cancel-button {
   color: #5d5d65;
+  padding-top: 10px;
 }
 
 .cancel-button:hover {

@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
-import {Expand, Hide} from '../../assets/PostActionIcons';
+import {ExpandIcon, HideIcon} from '../../assets/PostActionIcons';
 import PostActions from '../Posts/Post/PostParts/PostActions';
 import detectJournal from '../Publication/DetectJournal';
 import FeedItemTopics from '../FeedItems/FeedItemTopics';
@@ -72,11 +72,11 @@ export default function PublicationListItem({
         <div className="publication-list-item-expand">
           {!displayAbstract ? (
             <>
-              <Expand /> <div>Read Abstract</div>
+              <ExpandIcon /> <div>Read Abstract</div>
             </>
           ) : (
             <>
-              <Hide />
+              <HideIcon />
               <div>Hide Abstract</div>
             </>
           )}
