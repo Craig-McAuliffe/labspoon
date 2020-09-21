@@ -53,6 +53,7 @@ const BookmarksPage = () => {
     <FilterableResults
       fetchResults={fetchResults}
       getDefaultFilter={getDefaultFilter}
+      useFilterSider={true}
       limit={10}
       useTabs={false}
     />
