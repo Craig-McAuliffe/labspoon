@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"cloud.google.com/go/firestore"
-	"google.golang.org/api/iterator"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -47,24 +46,10 @@ func CheckFilterCollectionExistsOrCreate(ctx context.Context, feedRef *firestore
 // CheckFilterOptionExistsOrCreate checks whether there is a specific filter
 // option in the corresponding filter collection, and, if not, creates it.
 func CheckFilterOptionExistsOrCreate(ctx context.Context, filterCollectionRef *firestore.DocumentRef, filterOption *FilterOption) (*firestore.DocumentRef, error) {
-	var filterOptionRef *firestore.DocumentRef
-	filterOptionsCollectionRef := filterCollectionRef.Collection("filterOptions")
-	filterOptionsIter := filterOptionsCollectionRef.
-		Where("resourceID", "==", filterOption.ResourceID).
-		Limit(1).
-		Documents(ctx)
-	filterOptionDS, err := filterOptionsIter.Next()
-	if err == iterator.Done {
-		// filter option does not exist
-		filterOption.Rank = 1
-		filterOptionRef, _, err = filterOptionsCollectionRef.Add(ctx, filterOption)
-		if err != nil {
-			return nil, fmt.Errorf("Unable to add filter option for %v %v: %w", filterOption.Name, filterOption.Name, err)
-		}
-	} else if err != nil {
-		return nil, fmt.Errorf("Unable to retrieve filter option for %v %v: %w", filterOption.Name, filterOption.Name, err)
-	} else {
-		filterOptionRef = filterOptionDS.Ref
+	var filterOptionsDocRef = filterCollectionRef.Collection("filterOptions").Doc(filterOption.ResourceID)
+	_, err := filterOptionsDocRef.Set(ctx, filterOption)
+	if err != nil {
+		return nil, fmt.Errorf("Unable to set filter option: %w", err)
 	}
-	return filterOptionRef, nil
+	return filterOptionsDocRef, nil
 }

@@ -1,9 +1,10 @@
 import * as functions from 'firebase-functions';
 import {v4 as uuid} from 'uuid';
 
-import {admin} from './config';
+import {admin, ResourceTypes} from './config';
+import { firestore } from 'firebase-admin';
 
-const db = admin.firestore();
+const db: firestore.Firestore = admin.firestore();
 
 export const createPost = functions.https.onCall(async (data, context) => {
   if (context.auth === undefined) {
@@ -45,6 +46,77 @@ export const createPost = functions.https.onCall(async (data, context) => {
   batch.set(db.collection('users').doc(userID).collection('posts').doc(postID), post);
   await batch.commit();
 });
+
+export const addPostToUserFollowingFeeds = functions.firestore.document(`posts/{postID}`)
+    .onCreate(async (change, context) => {
+        const postID = change.id;
+        const post = change.data() as Post;
+        const authorID = post.author.id;
+        const followers = await db.collection(`users/${authorID}/followedByUsers`).get();
+        if (followers.empty) {
+            return;
+        }
+        followers.forEach(async (followerSnapshot) => {
+            const follower = followerSnapshot.data() as UserRef;
+            const followingFeedRef = db.doc(`users/${follower.id}/feeds/followingFeed`);
+            await followingFeedRef.collection('posts').doc(postID).set(post);
+            await updateFiltersByPost(followingFeedRef, post);
+        });
+    });
+
+async function updateFiltersByPost(followingFeedRef: firestore.DocumentReference<firestore.DocumentData>, post: Post) {
+    await updateFilterCollection(
+        followingFeedRef,
+        {
+            resourceName: 'Post Type',
+            resourceType: ResourceTypes.POST_TYPE,
+        },
+        {
+            name: post.postType.name,
+            resourceID: post.postType.id,
+        },
+    );
+    await updateFilterCollection(
+        followingFeedRef,
+        {
+            resourceName: 'Author',
+            resourceType: ResourceTypes.USER,
+        },
+        {
+            name: post.author.name,
+            resourceID: post.author.id,
+            avatar: post.author.avatar,
+        },
+    );
+    // TODO(#146): Add topics to the filter 
+}
+
+async function updateFilterCollection(feedRef: firestore.DocumentReference<firestore.DocumentData>, filterCollection: FilterCollection, filterOption: FilterOption) {
+  const filterCollectionDocRef = feedRef.collection("filterCollections").doc(filterCollection.resourceType);
+  // create the filter collection if it doesn't exist
+  await filterCollectionDocRef.set(filterCollection, {merge: true});
+  
+  const filterOptionDocRef = filterCollectionDocRef.collection("filterOptions").doc(filterOption.resourceID);
+  // create the filter option if it doesn't exist
+  await filterOptionDocRef.set(filterOption, {merge: true});
+
+  // increment the rank of the filter collection and option
+  await filterCollectionDocRef.update({rank: firestore.FieldValue.increment(1)});
+  await filterOptionDocRef.update({rank: firestore.FieldValue.increment(1)});
+}
+
+interface FilterOption {
+    name: string,
+    avatar?: string,
+    resourceID: string,
+    rank?: number,
+}
+
+interface FilterCollection {
+    resourceName: string,
+    resourceType: ResourceTypes,
+    rank?: number,
+}
 
 interface Post {
   title: string;
