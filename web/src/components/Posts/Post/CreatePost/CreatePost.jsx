@@ -1,11 +1,11 @@
 import React, {useState, useContext} from 'react';
 import {AuthContext} from '../../../../App';
-import PublicationPostForm from './PublicationPostForm';
-import OpenPositionPostForm from './OpenPostitionPostForm';
 import DefaultPost from './DefaultPost';
 import {WriteIcon} from '../../../../assets/GeneralActionIcons';
 
 import './CreatePost.css';
+
+const DEFAULT_POST = 'Default';
 
 export default function CreatePost() {
   const user = useContext(AuthContext);
@@ -32,29 +32,11 @@ export default function CreatePost() {
 }
 
 function PostTypeSpecificForm({cancelPost, setCreatingPost}) {
-  const [postType, setPostType] = useState('Default');
+  const [postType, setPostType] = useState(DEFAULT_POST);
   switch (postType) {
-    case 'Default':
+    case DEFAULT_POST:
       return (
         <DefaultPost
-          cancelPost={cancelPost}
-          setCreatingPost={setCreatingPost}
-          setPostType={setPostType}
-          postType={postType}
-        />
-      );
-    case 'Publication':
-      return (
-        <PublicationPostForm
-          cancelPost={cancelPost}
-          setCreatingPost={setCreatingPost}
-          setPostType={setPostType}
-          postType={postType}
-        />
-      );
-    case 'Open Position':
-      return (
-        <OpenPositionPostForm
           cancelPost={cancelPost}
           setCreatingPost={setCreatingPost}
           setPostType={setPostType}

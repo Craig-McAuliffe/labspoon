@@ -213,7 +213,9 @@ function userPageFeedDataFromDB(skip, limit, filterOptions, userID, last) {
       results = [];
       break;
     case 'posts':
-      const postsCollection = db.collection(`users/${userID}/posts`);
+      const postsCollection = db
+        .collection(`users/${userID}/posts`)
+        .orderBy('timestamp', 'desc');
       return getPaginatedPostsFromCollectionRef(postsCollection, limit, last);
     case 'publications':
       const publicationsCollection = db.collection(

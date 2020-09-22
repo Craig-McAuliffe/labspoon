@@ -1,12 +1,13 @@
 import React from 'react';
-import CancelButton from '../../../Buttons/CancelButton';
-import SubmitButton from '../../../Buttons/SubmitButton';
-import PostTypeDropDown from './PostTypeDropDown';
-import {Form, Formik} from 'formik';
+import firebase from '../../../../firebase';
+
+import PostForm from './PostForm';
 import {FormTextArea} from '../../../Forms/FormTextInput';
 import * as Yup from 'yup';
 
 import './CreatePost.css';
+
+const createPost = firebase.functions().httpsCallable('posts-createPost');
 
 export default function DefaultPost({
   cancelPost,
@@ -14,38 +15,27 @@ export default function DefaultPost({
   postType,
   setCreatingPost,
 }) {
-  const submitChanges = () => {
-    setCreatingPost(false);
+  const submitChanges = (res) => {
+    createPost(res)
+      .then(() => setCreatingPost(false))
+      .catch((err) => alert(err));
   };
   const initialValues = {
-    mainContent: '',
+    title: '',
   };
   const validationSchema = Yup.object({
-    mainContent: Yup.string().required('You need to write something!'),
+    title: Yup.string().required('You need to write something!'),
   });
-
   return (
-    <div className="creating-post-container">
-      <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={submitChanges}
-      >
-        <Form>
-          <div className="creating-post-main-text-container">
-            <FormTextArea name="mainContent" />
-          </div>
-          <div className="create-post-actions">
-            <div className="create-post-cancel-container">
-              <CancelButton cancelAction={cancelPost} />
-            </div>
-            <div className="create-post-actions-positive">
-              <PostTypeDropDown setPostType={setPostType} postType={postType} />
-              <SubmitButton inputText="Submit" />
-            </div>
-          </div>
-        </Form>
-      </Formik>
-    </div>
+    <PostForm
+      onSubmit={submitChanges}
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+      cancelPost={cancelPost}
+      postType={postType}
+      setPostType={setPostType}
+    >
+      <FormTextArea name="title" />
+    </PostForm>
   );
 }
