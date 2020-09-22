@@ -148,9 +148,9 @@ function PostHeader({postType, postAuthor, postCreationDate, dedicatedPage}) {
 function PostTextContent({post}) {
   return (
     <div className="post-text-content">
-      <Link to={`/post/${post.id}`}>
-        <h3>{post.title}</h3>
-      </Link>
+      {/* <Link to={`/post/${post.id}`}> */}
+      <h3>{post.title}</h3>
+      {/* </Link> */}
       <p>{post.content.text}</p>
     </div>
   );
