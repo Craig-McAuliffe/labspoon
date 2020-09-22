@@ -1,6 +1,8 @@
 import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
 
+import Spinner from 'react-bootstrap/Spinner';
+
 import {AuthContext} from './App';
 
 import {Switch, Route, Redirect} from 'react-router-dom';
@@ -73,23 +75,18 @@ export default function Routes({user, setUser}) {
  */
 function AuthRoute({children, ...rest}) {
   const user = useContext(AuthContext);
-  return (
-    <Route
-      {...rest}
-      render={({location}) =>
-        !!user ? (
-          children
-        ) : (
-          <Redirect
-            to={{
-              pathname: '/login',
-              state: {from: location},
-            }}
-          />
-        )
-      }
-    />
-  );
+
+  function render({location}) {
+    if (!!user) {
+      return children;
+    } else if (localStorage.getItem('labspoon.expectSignIn')) {
+      return <Spinner animation="border" role="status" />;
+    } else {
+      return <Redirect to={{pathname: '/login', state: {from: location}}} />;
+    }
+  }
+
+  return <Route {...rest} render={render} />;
 }
 AuthRoute.propTypes = {
   children: PropTypes.element,

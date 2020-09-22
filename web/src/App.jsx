@@ -39,8 +39,14 @@ const AppLayout = ({children}) => {
 export const AuthContext = createContext(null);
 
 function AuthProvider({children}) {
-  const [user, setUser] = useState();
-  useEffect(() => auth.onAuthStateChanged((user) => setUser(user)));
+  const [user, setUser] = useState(null);
+  useEffect(() =>
+    auth.onAuthStateChanged((user) => {
+      setUser(user);
+      if (user) localStorage.setItem('labspoon.expectSignIn', '1');
+      else localStorage.removeItem('labspoon.expectSignIn');
+    })
+  );
   return <AuthContext.Provider value={user}>{children}</AuthContext.Provider>;
 }
 
