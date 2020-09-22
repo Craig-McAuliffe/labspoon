@@ -8,13 +8,13 @@ const ShareButton = ({currentState}) => {
   const [shared, setShared] = useState(currentState);
   return (
     <div className="button-container">
-      {shared ? <ShareIconSelected /> : <ShareIconUnselected />}
       <button
         className="action-button"
         href="/"
         onClick={() => setShared(!shared)}
       >
-        Share
+        {shared ? <ShareIconSelected /> : <ShareIconUnselected />}
+        <span className="action-button-text">Share</span>
       </button>
     </div>
   );

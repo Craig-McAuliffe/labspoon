@@ -21,7 +21,7 @@ import './Results.css';
  */
 export default function Results({results, hasMore, fetchMore, activeTabID}) {
   const items = results.map((result, i) => (
-    <GenericListItem key={result.id + i} result={result} />
+    <GenericListItem key={result.id + i} result={result} bookmarkedVariation />
   ));
 
   const resultTypes = [];
@@ -60,10 +60,16 @@ Results.propTypes = {
   fetchMore: PropTypes.func.isRequired,
 };
 
-export function GenericListItem({result}) {
+export function GenericListItem({result, onBookmarkPage}) {
   switch (result.resourceType) {
     case 'post':
-      return <Post post={result} key={result.id + 'post'} />;
+      return (
+        <Post
+          post={result}
+          key={result.id + 'post'}
+          bookmarkedVariation={onBookmarkPage}
+        />
+      );
     case 'bookmark':
       return (
         <BookmarkListItem bookmark={result} key={result.id + 'bookmark'} />
@@ -73,6 +79,7 @@ export function GenericListItem({result}) {
         <PublicationListItem
           publication={result}
           key={result.id + 'publication'}
+          bookmarkedVariation={onBookmarkPage}
         />
       );
     case 'user':
