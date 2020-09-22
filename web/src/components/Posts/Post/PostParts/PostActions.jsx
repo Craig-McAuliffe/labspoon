@@ -89,4 +89,12 @@ const PostActions = ({post, dedicatedPage}) => {
   );
 };
 
+export function BookmarkedPostSymbol({post}) {
+  return (
+    <div className="bookmark-page-post-bookmark">
+      {post ? <BookmarkPostButton post={post} /> : null}
+    </div>
+  );
+}
+
 export default PostActions;

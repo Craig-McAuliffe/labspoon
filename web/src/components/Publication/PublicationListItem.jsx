@@ -1,9 +1,10 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {Link} from 'react-router-dom';
 import {ExpandIcon, HideIcon} from '../../assets/PostActionIcons';
 import PostActions from '../Posts/Post/PostParts/PostActions';
 import detectJournal from '../Publication/DetectJournal';
 import FeedItemTopics from '../FeedItems/FeedItemTopics';
+import {FeatureFlags} from '../../App';
 
 import './PublicationListItem.css';
 
@@ -11,7 +12,9 @@ export default function PublicationListItem({
   publication,
   removeBorder,
   mixedResults,
+  bookmarkedVariation,
 }) {
+  const featureFlags = useContext(FeatureFlags);
   const [displayAbstract, setDisplayAbstract] = useState(false);
   const expandedView = () =>
     displayAbstract ? (
@@ -83,7 +86,11 @@ export default function PublicationListItem({
         </div>
       </button>
       {expandedView()}
-      {mixedResults ? null : <PostActions />}
+      {mixedResults ||
+      !featureFlags.has('bookmark-publications') ||
+      bookmarkedVariation ? (
+        <PostActions />
+      ) : null}
     </div>
   );
 }

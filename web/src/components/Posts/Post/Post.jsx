@@ -12,7 +12,7 @@ import {
   PublicationIcon,
 } from '../../../assets/PostTypeIcons';
 import PostOptionalTags from './PostParts/PostOptionalTags';
-import PostActions from './PostParts/PostActions';
+import PostActions, {BookmarkedPostSymbol} from './PostParts/PostActions';
 import FeedItemTopics from '../../FeedItems/FeedItemTopics';
 import PublicationListItem from '../../Publication/PublicationListItem';
 import UserAvatar from '../../Avatar/UserAvatar';
@@ -26,7 +26,7 @@ import './Post.css';
  * result
  * @return {React.ReactElement}
  */
-export default function Post({post, dedicatedPage}) {
+export default function Post({post, dedicatedPage, bookmarkedVariation}) {
   const referencedResourceWrapper = () => {
     if (dedicatedPage || post.url === undefined) return postContent();
 
@@ -52,6 +52,7 @@ export default function Post({post, dedicatedPage}) {
         dedicatedPage ? 'post-container-dedicated-page' : 'post-container'
       }
     >
+      {bookmarkedVariation ? <BookmarkedPostSymbol post={post} /> : null}
       <PostHeader
         postType={post.postType}
         postAuthor={post.author}
@@ -61,7 +62,9 @@ export default function Post({post, dedicatedPage}) {
       <PostTextContent post={post} />
       <PostOptionalTags optionalTags={post.optionaltags} />
       <FeedItemTopics taggedItem={post} />
-      <PostActions post={post} dedicatedPage={dedicatedPage} />
+      {bookmarkedVariation ? null : (
+        <PostActions post={post} dedicatedPage={dedicatedPage} />
+      )}
     </div>
   );
 

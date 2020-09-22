@@ -37,3 +37,8 @@
   padding: 10px 30px 10px 0px;
   border-radius: 4px;
 }
+
+.bookmark-page-post-bookmark {
+  display: flex;
+  justify-content: flex-end;
+}
