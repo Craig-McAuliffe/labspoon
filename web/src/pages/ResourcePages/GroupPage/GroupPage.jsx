@@ -232,7 +232,11 @@ const GroupDetails = ({group, groupDescriptionRef}) => {
     <>
       <div className="group-header">
         <div className="group-icon-and-message">
-          <UserAvatar src={group.avatar} height="120px" width="120px" />
+          <UserAvatar
+            src={group.avatar || 'https://picsum.photos/id/1/200/200'}
+            height="120px"
+            width="120px"
+          />
           <MessageButton />
         </div>
         <div className="group-header-info">

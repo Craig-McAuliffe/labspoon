@@ -62,6 +62,11 @@ const AvatarDropDown = () => {
             <GroupMenuIcon />
             <div className="dropdown-group-subtitle">My Groups</div>
           </Dropdown.Header>
+          <Dropdown.Item>
+            <Link to="/group/create">
+              <p className="LinkItem">Create Group</p>
+            </Link>
+          </Dropdown.Item>
           <UserGroups userID={user.uid} />
         </Dropdown.Menu>
       </Dropdown>

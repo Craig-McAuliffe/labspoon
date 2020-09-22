@@ -11,6 +11,7 @@ import BookmarksPage from './pages/BookmarksPage';
 import FollowingFeedPage from './pages/FollowingFeedPage';
 import GraphPage from './pages/GraphPage';
 import GroupPage from './pages/ResourcePages/GroupPage';
+import CreateGroupPage from './pages/Groups/CreateGroupPage/CreateGroupPage';
 import FollowsPage from './pages/FollowsPage';
 import SearchPage from './pages/SearchPage';
 import UserPage from './pages/ResourcePages/UserPage';
@@ -40,6 +41,9 @@ export default function Routes({user, setUser}) {
       <Route path="/graph">
         <GraphPage />
       </Route>
+      <AuthRoute user={user} path="/group/create">
+        <CreateGroupPage />
+      </AuthRoute>
       <Route path="/group/:groupID">
         <GroupPage />
       </Route>

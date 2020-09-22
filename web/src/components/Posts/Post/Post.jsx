@@ -183,6 +183,7 @@ function postTypeIcons(postTypeName) {
 }
 
 export function PinnedPost({post}) {
+  if (post === undefined) return <></>;
   return (
     <div className="pinned-post">
       <h3>{post.title}</h3>
