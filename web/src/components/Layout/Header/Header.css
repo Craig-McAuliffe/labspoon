@@ -26,7 +26,6 @@
   align-items: center;
   justify-self: center;
   min-width: 100%;
-  
 }
 
 .search-form {
@@ -36,7 +35,7 @@
   justify-content: flex-start;
 }
 
-.search-icon-container{
+.search-icon-container {
   width: 50px;
   height: 40px;
   background-repeat: none;
@@ -50,7 +49,6 @@
   grid-column: 1 / 2;
 }
 
-
 .search-input {
   display: inline-block;
   flex-grow: 1;
@@ -63,7 +61,6 @@
 .header-drop-down {
   display: inline-block;
   justify-self: flex-end;
-  padding-right: 20px;
   grid-column: 3 / 4;
   max-height: 100%;
   max-width: 100%;
@@ -91,7 +88,7 @@
 }
 
 @media screen and (max-width: 664px) {
-  .search-icon-container{
+  .search-icon-container {
     width: 30px;
   }
 
@@ -145,7 +142,7 @@
     margin: 0px 2px;
   }
 
-  .search-icon-container{
+  .search-icon-container {
     width: 30px;
   }
 

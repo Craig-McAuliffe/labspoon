@@ -1,21 +1,21 @@
 .cancel-button {
   color: #5d5d65;
   padding-top: 10px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.cancel-button h3 {
+  margin-left: -6px;
 }
 
 .cancel-button:hover {
   color: #000000;
 }
 
-.primary-button-text {
-  display: flex;
-  align-items: center;
-}
-
 .primary-button {
-  display: inline-block;
   border: none;
-  padding: 10px 15px 5px 15px;
+  padding: 10px 10px 5px 10px;
   border-radius: 4%;
   text-decoration: none;
   background: #00507c;
@@ -32,9 +32,7 @@
 }
 
 .primary-button-clicked {
-  display: inline-block;
-  border: none;
-  padding: 10px 15px 5px 15px;
+  padding: 10px 5px 5px 5px;
   border-radius: 4%;
   text-decoration: none;
   background: #ffffff;
@@ -48,18 +46,8 @@
 
 .primary-button-clicked:hover,
 .primary-button-clicked:focus {
-  border: none;
-  display: inline-block;
-  padding: 10px 15px 5px 15px;
-  border-radius: 4%;
-  text-decoration: none;
-  background: #ffffff;
   color: #00507c;
   cursor: pointer;
-  text-align: center;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  outline: none;
 }
 
 @media screen and (max-width: 560px) {

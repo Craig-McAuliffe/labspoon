@@ -9,6 +9,16 @@
   cursor: pointer;
   align-content: center;
   justify-content: center;
+  padding-right: 20px;
+  font-size: inherit;
+}
+
+.sign-in {
+  padding-right: 40px;
+}
+
+.dropdown {
+  margin-right: 0px;
 }
 
 .DropDownMenu {
@@ -44,7 +54,7 @@
 }
 
 .dropdown-name {
-  font-size: 1.2em;
+  margin-left: 4px;
 }
 
 .log-out-button {
@@ -55,9 +65,5 @@
   .dropdown-name {
     display: none;
     padding: none;
-  }
-
-  .dropdown-header {
-    max-width: 100%;
   }
 }
