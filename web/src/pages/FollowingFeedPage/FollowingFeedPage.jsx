@@ -27,7 +27,7 @@ function getEnabledIDsFromFilter(filter) {
 function fetchUserFeedData(uuid, skip, limit, filter, last) {
   const collection = db
     .collection(`users/${uuid}/feeds/followingFeed/posts`)
-    .orderBy('timestamp');
+    .orderBy('timestamp', 'desc');
   return filterFeedData(collection, skip, limit, filter, last);
 }
 
