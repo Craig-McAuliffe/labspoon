@@ -159,7 +159,7 @@ export default function FilterableResults({
       <div className="content-layout">{feedAndTabs()}</div>
     </>
   ) : (
-    <div className="content-layout">{feedAndTabs()}</div>
+    feedAndTabs()
   );
 }
 FilterableResults.defaultProps = {
