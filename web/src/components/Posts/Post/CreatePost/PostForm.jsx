@@ -1,6 +1,6 @@
 import React from 'react';
 import CancelButton from '../../../Buttons/CancelButton';
-import SubmitButton from '../../../Buttons/SubmitButton';
+import PrimaryButton from '../../../Buttons/PrimaryButton';
 import PostTypeDropDown from './PostTypeDropDown';
 import {Form, Formik} from 'formik';
 
@@ -28,7 +28,7 @@ export default function PostForm({
             </div>
             <div className="create-post-actions-positive">
               <PostTypeDropDown setPostType={setPostType} postType={postType} />
-              <SubmitButton inputText="Submit" />
+              <PrimaryButton submit={true}>Post</PrimaryButton>
             </div>
           </div>
         </Form>

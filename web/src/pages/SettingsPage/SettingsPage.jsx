@@ -5,7 +5,7 @@ import {Form, Formik} from 'formik';
 import * as Yup from 'yup';
 import UserAvatar from '../../components/Avatar/UserAvatar';
 import users from '../../mockdata/users';
-import SubmitButton from '../../components/Buttons/SubmitButton';
+import PrimaryButton from '../../components/Buttons/PrimaryButton';
 import CancelButton from '../../components/Buttons/CancelButton';
 import FormTextInput from '../../components/Forms/FormTextInput';
 import GeneralError from '../../components/GeneralError';
@@ -146,7 +146,7 @@ function ChangeEmailForm({user, cancelChanges, reauthenticate, setEditState}) {
         <div className="cancel-or-submit">
           <CancelButton cancelAction={cancelChanges} />
           <div className="submit-button-container">
-            <SubmitButton inputText="Save" />
+            <PrimaryButton submit={true}>Save</PrimaryButton>
           </div>
         </div>
       </Form>
@@ -172,7 +172,10 @@ function ChangePasswordForm({
     newPassword: Yup.string()
       .required('Password is required')
       .min(8, 'Password must be at least 8 characters long.')
-      .matches(/(?=.*[0-9])/, 'Password must contain a number.'),
+      .matches(
+        /^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/,
+        'Password must contain a mixture of numbers and letters.'
+      ),
     confirmNewPassword: Yup.string()
       .required('Password confirmation is required')
       .label('Confirm password')
@@ -234,7 +237,7 @@ function ChangePasswordForm({
         <div className="cancel-or-submit">
           <CancelButton cancelAction={cancelChanges} />
           <div className="submit-button-container">
-            <SubmitButton inputText="Save" />
+            <PrimaryButton submit={true}>Save</PrimaryButton>
           </div>
         </div>
       </Form>

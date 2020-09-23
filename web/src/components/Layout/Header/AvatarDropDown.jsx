@@ -24,7 +24,9 @@ const AvatarDropDown = () => {
   if (!user) {
     return (
       <Dropdown variant="success" id="dropdown-basic">
-        <Link to="/login">Sign In</Link>
+        <Link to="/login" className="sign-in">
+          <h3>Sign In</h3>
+        </Link>
       </Dropdown>
     );
   } else {
@@ -75,18 +77,20 @@ const AvatarDropDown = () => {
 };
 
 function UserGroups({userID}) {
-  return relationships()
-    .filter((userRelationships) => userRelationships.user.id === userID)[0]
-    .memberOfGroups.map((group) => (
-      <Dropdown.Item key={group.id} href={`/group/${group.id}`}>
-        <p className="LinkItem">{group.name}</p>
-      </Dropdown.Item>
-    ));
+  const matchedUserRelationships = relationships().filter(
+    (userRelationships) => userRelationships.user.id === userID
+  )[0];
+  if (matchedUserRelationships === undefined) return null;
+  return matchedUserRelationships.memberOfGroups.map((group) => (
+    <Dropdown.Item key={group.id} href={`/group/${group.id}`}>
+      <p className="LinkItem">{group.name}</p>
+    </Dropdown.Item>
+  ));
 }
 
 const AvatarToggle = ({user, mockUser}) => (
   <div className="dropdown-header">
-    {mockUser.avatar ? (
+    {mockUser ? (
       <UserAvatar src={mockUser.avatar} width="50" height="50" />
     ) : (
       <img src={DefaultUserIcon} alt="user icon" />

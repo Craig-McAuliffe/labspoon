@@ -9,7 +9,7 @@ export default function CancelButton({cancelAction}) {
       type="button"
       onClick={() => cancelAction()}
     >
-      <h3 className="primary-button-text">Cancel</h3>
+      <h3>Cancel</h3>
     </button>
   );
 }
