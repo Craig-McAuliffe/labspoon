@@ -1,0 +1,9 @@
+.page-form-footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #eaf1f5;
+    padding: 10px;
+    margin-left: auto;
+}

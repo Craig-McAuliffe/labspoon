@@ -1,7 +1,7 @@
 import React, {createContext, useState, useEffect} from 'react';
 import {BrowserRouter as Router} from 'react-router-dom';
 import Routes from './routes.jsx';
-import {auth} from './firebase';
+import {auth, db} from './firebase';
 
 import Header from './components/Layout/Header/Header';
 
@@ -40,14 +40,27 @@ export const AuthContext = createContext(null);
 
 function AuthProvider({children}) {
   const [user, setUser] = useState(null);
-  useEffect(() =>
-    auth.onAuthStateChanged((user) => {
-      setUser(user);
-      if (user) localStorage.setItem('labspoon.expectSignIn', '1');
-      else localStorage.removeItem('labspoon.expectSignIn');
-    })
+  const [userProfile, setUserProfile] = useState(null);
+  useEffect(
+    () =>
+      auth.onAuthStateChanged((user) => {
+        setUser(user);
+        if (user) localStorage.setItem('labspoon.expectSignIn', '1');
+        else localStorage.removeItem('labspoon.expectSignIn');
+      }),
+    []
   );
-  return <AuthContext.Provider value={user}>{children}</AuthContext.Provider>;
+  useEffect(() => {
+    if (user === null || user === undefined) return setUserProfile(undefined);
+    db.doc(`users/${user.uid}`)
+      .get()
+      .then((profile) => setUserProfile(profile.data()));
+  }, [user]);
+  return (
+    <AuthContext.Provider value={{user, userProfile}}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 /**

@@ -20,7 +20,7 @@ import firebase from '../../../firebase';
 import './AvatarDropDown.css';
 
 const AvatarDropDown = () => {
-  const user = useContext(AuthContext);
+  const {user} = useContext(AuthContext);
   if (!user) {
     return (
       <Dropdown variant="success" id="dropdown-basic">
@@ -64,12 +64,12 @@ const AvatarDropDown = () => {
             <GroupMenuIcon />
             <div className="dropdown-group-subtitle">My Groups</div>
           </Dropdown.Header>
+          <UserGroups userID={user.uid} />
           <Dropdown.Item>
             <Link to="/group/create">
               <p className="LinkItem">Create Group</p>
             </Link>
           </Dropdown.Item>
-          <UserGroups userID={user.uid} />
         </Dropdown.Menu>
       </Dropdown>
     );

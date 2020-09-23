@@ -40,7 +40,7 @@ const getDefaultFilter = getBookmarkFilters;
 
 const BookmarksPage = () => {
   const featureFlags = useContext(FeatureFlags);
-  const user = useContext(AuthContext);
+  const {user} = useContext(AuthContext);
 
   let fetchResults;
   if (!featureFlags.has('disable-cloud-firestore')) {

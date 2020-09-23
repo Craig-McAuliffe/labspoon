@@ -17,9 +17,9 @@ import './LoginPage.css';
  * @return {React.ReactElement}
  */
 function LoginPage() {
+  const {user} = useContext(AuthContext);
   const [signUpFlow, setSignUpFlow] = useState(false);
   const history = useHistory();
-  const user = useContext(AuthContext);
   const UIConfig = {
     signInFlow: 'popup',
     signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],

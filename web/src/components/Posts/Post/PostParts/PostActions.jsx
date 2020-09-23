@@ -15,7 +15,7 @@ function BookmarkPostButton({post}) {
   // don't toggle when setting the current value
   const [firstRender, setFirstRender] = useState(true);
   const featureFlags = useContext(FeatureFlags);
-  const user = useContext(AuthContext);
+  const {user} = useContext(AuthContext);
 
   // set the initial state of the bookmark
   useEffect(() => {
