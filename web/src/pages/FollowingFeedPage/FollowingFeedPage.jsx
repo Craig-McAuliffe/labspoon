@@ -189,7 +189,7 @@ function fetchUserFeedFilters(uuid) {
 
 export default function FollowingFeedPage() {
   const featureFlags = useContext(FeatureFlags);
-  const user = useContext(AuthContext);
+  const {user} = useContext(AuthContext);
 
   let fetchResults;
   let getDefaultFilter;
