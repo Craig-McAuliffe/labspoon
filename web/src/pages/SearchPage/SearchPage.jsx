@@ -1,6 +1,7 @@
 // custom search logic removed after 9ebf31106b04400309e7266010aca27f9ae96342
 // in favour of algolia
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
+import {useLocation, useHistory} from 'react-router-dom';
 import qs from 'qs';
 import {InstantSearch, SearchBox, Hits, Index} from 'react-instantsearch-dom';
 
@@ -12,8 +13,6 @@ import {dbPublicationToJSPublication} from '../../helpers/publications';
 import {GenericListItem} from '../../components/Results/Results';
 
 import 'instantsearch.css/themes/algolia.css';
-import {useLocation, useHistory} from 'react-router-dom';
-import {useEffect} from 'react';
 
 import './SearchPage.css';
 

@@ -4,7 +4,7 @@ import UserAvatar from '../Avatar/UserAvatar';
 import FollowButton from '../Buttons/FollowButton';
 import './UserListItem.css';
 
-const UserListItem = ({user}) => {
+export default function UserListItem({user}) {
   return (
     <div className="user-listItem-container">
       <Link to={`/user/${user.id}`}>
@@ -29,6 +29,32 @@ const UserListItem = ({user}) => {
       </div>
     </div>
   );
-};
+}
 
-export default UserListItem;
+export function UserSmallResultItem({user, selectUser}) {
+  const select = () => selectUser(user);
+  return (
+    <div className="user-listItem-container">
+      <div className="user-listItem-link">
+        <UserAvatar src={user.avatar} width="40px" height="40px" />
+        <h4>{user.name}</h4>
+      </div>
+      <div className="user-listItem-institution">
+        <h4>{user.institution}</h4>
+      </div>
+      <div className="Follow">
+        <SelectButton select={select} />
+      </div>
+    </div>
+  );
+}
+
+function SelectButton({select}) {
+  return (
+    <button type="button" className="primary-button" onClick={select}>
+      <div className="primary-button-text">
+        <h4>Select</h4>
+      </div>
+    </button>
+  );
+}

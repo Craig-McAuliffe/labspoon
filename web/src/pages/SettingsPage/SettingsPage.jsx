@@ -13,7 +13,7 @@ import GeneralError from '../../components/GeneralError';
 import './SettingsPage.css';
 
 const SettingsPage = () => {
-  const user = useContext(AuthContext);
+  const {user} = useContext(AuthContext);
   const mockUser = users().filter((mockUser) => mockUser.id === user.uid)[0];
   const [editState, setEditState] = useState(false);
 

@@ -7,7 +7,7 @@ import FollowButton from '../../Buttons/FollowButton';
 export default function FollowUserButton({pageUser}) {
   const [following, setFollowing] = useState(false);
   const featureFlags = useContext(FeatureFlags);
-  const authUser = useContext(AuthContext);
+  const {user: authUser} = useContext(AuthContext);
 
   useEffect(() => {
     if (!featureFlags.has('disable-cloud-firestore') && authUser) {

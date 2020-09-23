@@ -78,7 +78,7 @@ export default function Routes({user, setUser}) {
  * @return {Route}
  */
 function AuthRoute({children, ...rest}) {
-  const user = useContext(AuthContext);
+  const {user} = useContext(AuthContext);
 
   function render({location}) {
     if (!!user) {

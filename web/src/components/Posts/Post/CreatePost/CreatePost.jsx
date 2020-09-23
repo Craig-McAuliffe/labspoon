@@ -8,7 +8,7 @@ import './CreatePost.css';
 const DEFAULT_POST = 'Default';
 
 export default function CreatePost() {
-  const user = useContext(AuthContext);
+  const {user} = useContext(AuthContext);
   const [creatingPost, setCreatingPost] = useState(false);
 
   const cancelPost = () => {
