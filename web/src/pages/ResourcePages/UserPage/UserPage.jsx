@@ -1,6 +1,6 @@
 import React, {useContext, useState, useEffect} from 'react';
 import {useParams} from 'react-router-dom';
-import {FeatureFlags} from '../../../App';
+import {FeatureFlags, AuthContext} from '../../../App';
 import {db} from '../../../firebase';
 
 import userPageFeedData from './UserPageFeedData';
@@ -170,6 +170,8 @@ function SuggestedUsers({userID}) {
 }
 
 function UserDetails({user}) {
+  const {userProfile} = useContext(AuthContext);
+  const ownProfile = userProfile && userProfile.id == user.id;
   if (user === undefined) return <></>;
   return (
     <div>
@@ -191,7 +193,7 @@ function UserDetails({user}) {
       </div>
       <div className="user-message-follow">
         <MessageButton />
-        <FollowUserButton pageUser={user} />
+        {!ownProfile ? <FollowUserButton pageUser={user} /> : <></>}
       </div>
     </div>
   );
