@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import {useLocation} from 'react-router-dom';
-import BigSearchPrompt from '../BigSearchPrompt';
+import SearchBar from '../SearchBar';
 import Post from '../Posts/Post/Post';
 import BookmarkListItem from '../Bookmarks/BookmarkListItem/BookmarkListItem';
 import PublicationListItem from '../Publication/PublicationListItem';
@@ -45,7 +45,7 @@ export default function Results({results, hasMore, fetchMore, activeTabID}) {
           loader={<p>Loading...</p>}
           endMessage={
             currentLocation === '/' ? (
-              <BigSearchPrompt />
+              <SearchBar bigSearchPrompt={true} />
             ) : (
               <p className="end-result">No more results</p>
             )

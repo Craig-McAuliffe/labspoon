@@ -1,0 +1,115 @@
+.big-search-prompt-text {
+  text-align: center;
+  margin: 200px 0px 20px;
+  color: #5d5d65;
+}
+
+.big-search-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.big-search-input {
+  display: inline-block;
+  flex-grow: 1;
+  height: 60px;
+  border: 1px solid #00507c;
+  border-radius: 0%;
+  background: white;
+  min-width: 80%;
+  max-width: 80%;
+  margin-bottom: 200px;
+  padding-left: 10px;
+}
+
+.big-search-icon-container {
+  width: 55px;
+  height: 60px;
+  background-repeat: none;
+  background-position-x: center;
+  background-size: cover;
+  display: inline-block;
+}
+
+.search-input {
+  display: inline-block;
+  flex-grow: 1;
+  height: 40px;
+  border: 1px solid #00507c;
+  border-radius: 0%;
+  background: white;
+  padding-left: 10px;
+}
+
+.header-search {
+  grid-column: 2/3;
+  display: grid;
+  grid-template-columns: minmax(10px, 1fr) minmax(408px, 1070px) minmax(
+      10px,
+      1fr
+    );
+  justify-self: flex-start;
+  width: 100%;
+  margin: 0px 2px;
+}
+
+.search-bar {
+  grid-column: 2 / 3;
+  align-items: center;
+  justify-self: center;
+  min-width: 100%;
+}
+
+.search-form {
+  min-width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.search-icon-container {
+  width: 50px;
+  height: 40px;
+  background-repeat: none;
+  background-position-x: center;
+  background-size: cover;
+}
+
+@media screen and (max-width: 664px) {
+  .search-icon-container {
+    width: 30px;
+  }
+}
+
+@media screen and (max-width: 592px) {
+  .header-search {
+    grid-column: 2/3;
+    display: grid;
+    grid-template-columns: minmax(5px, 1fr) minmax(200px, 1070px) minmax(
+        5px,
+        1fr
+      );
+    justify-self: flex-start;
+    width: 100%;
+    margin: 0px 2px;
+  }
+}
+
+@media screen and (max-width: 460px) {
+  .header-search {
+    grid-column: 2/3;
+    display: grid;
+    grid-template-columns: minmax(5px, 1fr) minmax(100px, 1070px) minmax(
+        5px,
+        1fr
+      );
+    justify-self: flex-start;
+    width: 100%;
+    margin: 0px 2px;
+  }
+
+  .search-icon-container {
+    width: 30px;
+  }
+}
