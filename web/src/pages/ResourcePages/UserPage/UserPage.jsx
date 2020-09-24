@@ -1,5 +1,5 @@
 import React, {useContext, useState, useEffect} from 'react';
-import {useParams} from 'react-router-dom';
+import {useParams, useHistory} from 'react-router-dom';
 import {FeatureFlags, AuthContext} from '../../../App';
 import {db} from '../../../firebase';
 
@@ -25,6 +25,7 @@ export default function UserPage() {
   const featureFlags = useContext(FeatureFlags);
   const [userID, setUserID] = useState(undefined);
   const [userDetails, setUserDetails] = useState(undefined);
+  const history = useHistory();
 
   const userIDParam = useParams().userID;
   if (userID !== userIDParam) {
@@ -41,6 +42,9 @@ export default function UserPage() {
   useEffect(() => {
     Promise.resolve(fetchUserDetails())
       .then((userDetails) => {
+        if (!userDetails) {
+          history.push('/notfound');
+        }
         setUserDetails(userDetails);
       })
       .catch((err) => console.log(err));

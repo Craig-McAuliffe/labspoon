@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {useParams} from 'react-router-dom';
+import {useParams, useHistory} from 'react-router-dom';
 import {FeatureFlags} from '../../App';
 import {db} from '../../firebase';
 
@@ -66,6 +66,7 @@ export default function TopicPage() {
   const featureFlags = useContext(FeatureFlags);
   const [topicID, setTopicID] = useState(undefined);
   const [topicDetails, setTopicDetails] = useState(undefined);
+  const history = useHistory();
 
   const topicIDParam = useParams().topicID;
   if (topicID !== topicIDParam) {
@@ -83,6 +84,9 @@ export default function TopicPage() {
   useEffect(() => {
     Promise.resolve(fetchTopicDetails())
       .then((topicDetails) => {
+        if (!topicDetails) {
+          history.push('/notfound');
+        }
         setTopicDetails(topicDetails);
       })
       .catch((err) => console.log(err));

@@ -1,5 +1,5 @@
 import React, {useRef, useEffect, useState, useContext} from 'react';
-import {Link, useParams} from 'react-router-dom';
+import {Link, useParams, useHistory} from 'react-router-dom';
 
 import {FeatureFlags} from '../../../App';
 import {db} from '../../../firebase';
@@ -79,6 +79,7 @@ export default function GroupPage() {
   const featureFlags = useContext(FeatureFlags);
   const [groupID, setGroupID] = useState(undefined);
   const [groupDetails, setGroupDetails] = useState(undefined);
+  const history = useHistory();
 
   const groupIDParam = useParams().groupID;
   if (groupID !== groupIDParam) {
@@ -96,6 +97,9 @@ export default function GroupPage() {
   useEffect(() => {
     Promise.resolve(fetchGroupDetails())
       .then((groupDetails) => {
+        if (!groupDetails) {
+          history.push('/notfound');
+        }
         setGroupDetails(groupDetails);
       })
       .catch((err) => console.log(err));
