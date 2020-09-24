@@ -5,7 +5,7 @@ import {searchStateToURL} from '../../../helpers/search';
 
 import AvatarDropDown from './AvatarDropDown';
 import HeaderLogo from '../../../assets/HeaderLogo';
-import SearchDiagram from '../../../assets/searchIcon.svg';
+import SearchIcon from '../../../assets/searchIcon.svg';
 
 import './Header.css';
 
@@ -39,7 +39,7 @@ function SearchBar() {
       <div className="search-bar">
         <form onSubmit={onSubmit} className="search-form">
           <input
-            placeholder=" Search"
+            placeholder="  Search"
             type="text"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -49,7 +49,7 @@ function SearchBar() {
             type="submit"
             value="Submit"
             className="search-icon-container"
-            style={{backgroundImage: `url(${SearchDiagram})`}}
+            style={{backgroundImage: `url(${SearchIcon})`}}
           ></button>
         </form>
       </div>
