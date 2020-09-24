@@ -65,7 +65,10 @@ export default function FrontierPage() {
             <div className="frontier-page-headline-item-container">
               <div className="frontier-page-headline-item-header">
                 <div className="frontier-headline-article-author-container">
-                  <Link to={`/user/${topTenPosts[0].author.id}`}>
+                  <Link
+                    to={`/user/${topTenPosts[0].author.id}`}
+                    className="frontier-article-author-link"
+                  >
                     <div className="frontier-headline-article-avatar-container">
                       <UserAvatar
                         src={topTenPosts[0].author.avatar}
@@ -106,7 +109,10 @@ export default function FrontierPage() {
                     />
                   </Link>
                   <div>
-                    <Link to={`/user/${topTenPosts[1].author.id}`}>
+                    <Link
+                      to={`/user/${topTenPosts[1].author.id}`}
+                      className="frontier-article-author-link"
+                    >
                       <h4>{topTenPosts[1].author.name}</h4>
                     </Link>
                     <p className="frontier-author-attribute-secondary-article-date">
@@ -177,7 +183,7 @@ function QuaternaryArticles({articles}) {
 function AuthorAttributes({article}) {
   return (
     <div className="frontier-tertiary-article-author-attributes">
-      <Link to={`/user/${article.id}`}>
+      <Link to={`/user/${article.id}`} className="frontier-article-author-link">
         <h4>{article.author.name}</h4>
       </Link>
       <p className="frontier-author-attribute-tertiary-article-date">

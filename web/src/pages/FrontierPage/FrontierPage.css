@@ -26,8 +26,16 @@
 
 .frontier-headline-article-author-name {
   text-align: center;
+  color: #000000;
 }
 
+.frontier-article-author-link:hover {
+  text-decoration-color: #000000;
+}
+
+.frontier-article-author-link h4 {
+  color: #000000;
+}
 .frontier-page-headline-item-container h3 {
   padding-left: 10px;
 }
