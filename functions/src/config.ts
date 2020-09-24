@@ -1,10 +1,11 @@
 import * as functions from 'firebase-functions';
+import * as adminNS from 'firebase-admin';
 
-export const admin = require('firebase-admin');
-admin.initializeApp();
+export const admin = adminNS.initializeApp();
 
 export const config = functions.config();
 export const environment = config.env.name;
+export const projectURL = 'labspoon-dev-266bc.appspot.com';
 
 export enum ResourceTypes {
     USER = 'user',

@@ -9,8 +9,9 @@ import {
   Hits,
   Configure,
 } from 'react-instantsearch-dom';
+import ImageUploader from 'react-images-upload';
 
-import {db} from '../../../firebase';
+import firebase, {db, storage, projectURL} from '../../../firebase';
 import {searchClient} from '../../../algolia';
 
 import {FeatureFlags, AuthContext} from '../../../App';
@@ -29,6 +30,7 @@ export default function CreateGroupPage() {
   const history = useHistory();
   const {user, userProfile} = useContext(AuthContext);
   const [selectedUsers, setSelectedUsers] = useState([]);
+  const [avatar, setAvatar] = useState([]);
 
   if (!featureFlags.has('create-group')) {
     return <></>;
@@ -39,7 +41,6 @@ export default function CreateGroupPage() {
     location: '',
     institution: '',
     website: '',
-    avatar: '',
     about: '',
   };
   const validationSchema = Yup.object({
@@ -47,41 +48,65 @@ export default function CreateGroupPage() {
     location: Yup.string(),
     institution: Yup.string(),
     website: Yup.string(),
-    avatar: Yup.string(),
     about: Yup.string(),
   });
   function onSubmit(values) {
     const groupID = uuid();
-    const batch = db.batch();
-    const groupDocRef = db.doc(`groups/${groupID}`);
-    const groupRef = {
-      name: values.name,
-      avatar: values.avatar,
-      about: values.about,
-    };
-    batch.set(groupDocRef, values);
-    batch.set(groupDocRef.collection('members').doc(user.uid), {
-      id: userProfile.id,
-      name: userProfile.name,
-      avatar: userProfile.avatar,
-    });
-    batch.set(db.doc(`users/${user.uid}/groups/${groupID}`), groupRef);
-    selectedUsers.forEach((member) => {
-      batch.set(groupDocRef.collection('members').doc(member.id), {
-        id: member.id,
-        name: member.name,
-        avatar: member.avatar,
+
+    const avatarStorageRef = storage.ref(`groups/${groupID}/avatar_fullSize`);
+    const writeToDB = () => {
+      console.log('writing to db');
+      const batch = db.batch();
+      const groupDocRef = db.doc(`groups/${groupID}`);
+      const groupRef = {
+        name: values.name,
+        about: values.about,
+        avatar: `https://storage.googleapis.com/${projectURL}/groups/${groupID}/avatar`,
+      };
+      values.avatar = `https://storage.googleapis.com/${projectURL}/groups/${groupID}/avatar`;
+      batch.set(groupDocRef, values);
+      console.log(userProfile);
+      batch.set(groupDocRef.collection('members').doc(user.uid), {
+        id: userProfile.id,
+        name: userProfile.name,
+        avatar: userProfile.avatar,
       });
-      batch.set(db.doc(`users/${member.id}/groups/${groupID}`), groupRef);
-    });
-    batch
-      .commit()
-      .then((docRef) => history.push(`/group/${groupID}`))
-      .catch((err) => alert(err));
+      batch.set(db.doc(`users/${user.uid}/groups/${groupID}`), groupRef);
+      selectedUsers.forEach((member) => {
+        batch.set(groupDocRef.collection('members').doc(member.id), {
+          id: member.id,
+          name: member.name,
+          avatar: member.avatar,
+        });
+        batch.set(db.doc(`users/${member.id}/groups/${groupID}`), groupRef);
+      });
+      batch
+        .commit()
+        .catch((err) => alert('batch failed to commit'))
+        .then(() => history.push(`/group/${groupID}`));
+    };
+    if (avatar.length > 0) {
+      return avatarStorageRef.put(avatar[0], {contentType: avatar[0].type}).on(
+        firebase.storage.TaskEvent.STATE_CHANGED,
+        (snapshot) => {
+          // TODO: implement loading symbol
+          console.log('snapshot', snapshot);
+        },
+        (err) => {
+          alert(`failed to write avatar ${err}`);
+        },
+        writeToDB
+      );
+    }
+    return writeToDB();
   }
 
   // TODO: Prevent duplicate entries and the current user being added.
   const selectUser = (user) => setSelectedUsers([...selectedUsers, user]);
+
+  const onAvatarSelect = (selectedAvatar) => {
+    setAvatar(selectedAvatar);
+  };
 
   return (
     <>
@@ -96,7 +121,6 @@ export default function CreateGroupPage() {
           <FormTextInput label="Location" name="location" sideLabel />
           <FormTextInput label="Institution" name="institution" sideLabel />
           <FormTextInput label="Website" name="website" sideLabel />
-          <FormTextInput label="Avatar" name="avatar" sideLabel />
           {/* TODO: Align FormTextArea with the design and replace this.*/}
           <FormTextInput label="About" name="about" sideLabel />
           <div className="page-form-footer">
@@ -104,6 +128,13 @@ export default function CreateGroupPage() {
           </div>
         </Form>
       </Formik>
+      <ImageUploader
+        onChange={onAvatarSelect}
+        imgExtension={['.jpg', '.png']}
+        singleImage
+        withPreview
+        withIcon={false}
+      />
       <SelectUsers selectedUsers={selectedUsers} selectUser={selectUser} />
     </>
   );

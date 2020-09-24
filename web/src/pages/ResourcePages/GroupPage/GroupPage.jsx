@@ -1,4 +1,6 @@
 import React, {useRef, useEffect, useState, useContext} from 'react';
+import {Link, useParams} from 'react-router-dom';
+
 import {FeatureFlags} from '../../../App';
 import {db} from '../../../firebase';
 
@@ -9,7 +11,6 @@ import {getPaginatedPublicationsFromCollectionRef} from '../../../helpers/public
 import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
 
 import groups from '../../../mockdata/groups';
-import {Link, useParams} from 'react-router-dom';
 import GroupPageSider from './GroupPageSider';
 import groupPageFeedData from './GroupPageFeedData';
 import FilterableResults from '../../../components/FilterableResults/FilterableResults';
@@ -232,11 +233,7 @@ const GroupDetails = ({group, groupDescriptionRef}) => {
     <>
       <div className="group-header">
         <div className="group-icon-and-message">
-          <UserAvatar
-            src={group.avatar || 'https://picsum.photos/id/1/200/200'}
-            height="120px"
-            width="120px"
-          />
+          <UserAvatar src={group.avatar} height="120px" width="120px" />
           <MessageButton />
         </div>
         <div className="group-header-info">

@@ -12,6 +12,7 @@ const UserAvatar = ({src, width, height}) => {
       roundedCircle
       width={width}
       height={height}
+      onError={(img) => (img.target.src = 'https://picsum.photos/id/1/200/200')}
     />
   );
 };

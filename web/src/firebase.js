@@ -17,6 +17,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 export const auth = firebase.auth();
 export const db = firebase.firestore();
+export const storage = firebase.storage();
 if (abbrEnv == 'dev') {
   db.settings({
     host: 'localhost:8080',
@@ -24,4 +25,5 @@ if (abbrEnv == 'dev') {
   });
   firebase.functions().useFunctionsEmulator('http://localhost:5001');
 }
+export const projectURL = 'labspoon-dev-266bc.appspot.com';
 export default firebase;
