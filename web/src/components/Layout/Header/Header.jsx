@@ -39,7 +39,7 @@ function SearchBar() {
       <div className="search-bar">
         <form onSubmit={onSubmit} className="search-form">
           <input
-            placeholder="  Search"
+            placeholder="Search"
             type="text"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
