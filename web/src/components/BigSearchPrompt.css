@@ -1,0 +1,32 @@
+.big-search-prompt-text {
+  text-align: center;
+  margin: 200px 0px 20px;
+  color: #5d5d65;
+}
+
+.big-search-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.big-search-input {
+  display: inline-block;
+  flex-grow: 1;
+  height: 60px;
+  border: 1px solid #00507c;
+  border-radius: 0%;
+  background: white;
+  min-width: 80%;
+  max-width: 80%;
+  margin-bottom: 200px;
+}
+
+.big-search-icon-container {
+  width: 55px;
+  height: 60px;
+  background-repeat: none;
+  background-position-x: center;
+  background-size: cover;
+  display: inline-block;
+}
