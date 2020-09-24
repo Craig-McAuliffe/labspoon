@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useContext} from 'react';
 import {useLocation} from 'react-router-dom';
-import BigSearchPrompt from '../BigSearchPrompt';
+import SearchBar from '../SearchBar';
 import update from 'immutability-helper';
 import {FeatureFlags} from '../../App';
 import HomePageTabs from '../HomePageTabs';
@@ -243,7 +243,7 @@ function Results({results, hasMore, fetchMore, activeTabID}) {
     );
   } else {
     return currentLocation === '/' ? (
-      <BigSearchPrompt />
+      <SearchBar bigSearchPrompt={true} />
     ) : (
       <h3>{`Looks like there's nothing here!`}</h3>
     );
