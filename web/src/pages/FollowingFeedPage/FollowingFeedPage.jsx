@@ -215,6 +215,7 @@ export default function FollowingFeedPage() {
       useTabs={false}
       useFilterSider={true}
       createPost={true}
+      homePageTabs={true}
     />
   );
 }
