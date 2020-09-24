@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react';
-import firebase from '../../firebase.js';
+import firebase, {db} from '../../firebase.js';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import {Redirect, useHistory} from 'react-router';
 import {AuthContext} from '../../App';
@@ -10,6 +10,7 @@ import FormTextInput from '../../components/Forms/FormTextInput';
 import * as Yup from 'yup';
 
 import './LoginPage.css';
+
 /**
  * Sign in page using the Firebase authentication handler
  * @param {Function} setUser - function that updates the auth context upon a
@@ -36,6 +37,12 @@ function LoginPage() {
         .then((result) => {
           result.user
             .updateProfile({displayName: values.userName})
+            .then(() =>
+              db.doc(`users/${result.user.uid}`).set({
+                id: result.user.uid,
+                name: result.user.displayName,
+              })
+            )
             .then(() => {
               alert(`Welcome to Labspoon!`);
               history.push('/');

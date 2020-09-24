@@ -68,19 +68,21 @@ function filterFeedData(collection, skip, limit, filter, last) {
     }
 
     const enabledTopicIDs = enabledIDs.get('Topics');
-    if (enabledTopicIDs.length === 1) {
-      collection = collection.where(
-        'filter_topic_ids',
-        'array-contains',
-        enabledTopicIDs[0]
-      );
-    }
-    if (enabledTopicIDs.length > 1) {
-      collection = collection.where(
-        'filter_topic_ids',
-        'array-contains-any',
-        enabledTopicIDs
-      );
+    if (enabledTopicIDs != undefined) {
+      if (enabledTopicIDs.length === 1) {
+        collection = collection.where(
+          'filter_topic_ids',
+          'array-contains',
+          enabledTopicIDs[0]
+        );
+      }
+      if (enabledTopicIDs.length > 1) {
+        collection = collection.where(
+          'filter_topic_ids',
+          'array-contains-any',
+          enabledTopicIDs
+        );
+      }
     }
   }
 

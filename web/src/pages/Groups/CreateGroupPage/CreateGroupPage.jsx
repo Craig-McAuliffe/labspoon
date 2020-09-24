@@ -55,7 +55,6 @@ export default function CreateGroupPage() {
 
     const avatarStorageRef = storage.ref(`groups/${groupID}/avatar_fullSize`);
     const writeToDB = () => {
-      console.log('writing to db');
       const batch = db.batch();
       const groupDocRef = db.doc(`groups/${groupID}`);
       const groupRef = {
