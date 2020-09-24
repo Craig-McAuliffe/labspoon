@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import InfiniteScroll from 'react-infinite-scroll-component';
-
+import {useLocation} from 'react-router-dom';
+import BigSearchPrompt from '../BigSearchPrompt';
 import Post from '../Posts/Post/Post';
 import BookmarkListItem from '../Bookmarks/BookmarkListItem/BookmarkListItem';
 import PublicationListItem from '../Publication/PublicationListItem';
@@ -20,6 +21,7 @@ import './Results.css';
  * @return {React.ReactElement}
  */
 export default function Results({results, hasMore, fetchMore, activeTabID}) {
+  const currentLocation = useLocation().pathname;
   const items = results.map((result, i) => (
     <GenericListItem key={result.id + i} result={result} bookmarkedVariation />
   ));
@@ -41,7 +43,13 @@ export default function Results({results, hasMore, fetchMore, activeTabID}) {
           hasMore={hasMore}
           next={fetchMore}
           loader={<p>Loading...</p>}
-          endMessage={<p>No more results</p>}
+          endMessage={
+            currentLocation === '/' ? (
+              <BigSearchPrompt />
+            ) : (
+              <p className="end-result">No more results</p>
+            )
+          }
           style={{minWidth: '100%'}}
         >
           {activeTabID === 'media' ? (

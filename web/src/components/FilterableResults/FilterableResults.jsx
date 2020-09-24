@@ -1,4 +1,6 @@
 import React, {useState, useEffect, useContext} from 'react';
+import {useLocation} from 'react-router-dom';
+import BigSearchPrompt from '../BigSearchPrompt';
 import update from 'immutability-helper';
 import {FeatureFlags} from '../../App';
 import HomePageTabs from '../HomePageTabs';
@@ -229,6 +231,7 @@ function Tabs({tabFilter, setTabFilter}) {
 }
 
 function Results({results, hasMore, fetchMore, activeTabID}) {
+  const currentLocation = useLocation().pathname;
   if (Array.isArray(results) && results.length > 0) {
     return (
       <ResultsList
@@ -239,7 +242,11 @@ function Results({results, hasMore, fetchMore, activeTabID}) {
       />
     );
   } else {
-    return <h3>{`Looks like there's nothing here!`}</h3>;
+    return currentLocation === '/' ? (
+      <BigSearchPrompt />
+    ) : (
+      <h3>{`Looks like there's nothing here!`}</h3>
+    );
   }
 }
 

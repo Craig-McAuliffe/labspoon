@@ -63,64 +63,10 @@ export default function FrontierPage() {
           <HomePageTabs />
           <div className="frontier-page-highlights-container">
             <div className="frontier-page-headline-item-container">
-              <div className="frontier-page-headline-item-header">
-                <div className="frontier-headline-article-author-container">
-                  <Link
-                    to={`/user/${topTenPosts[0].author.id}`}
-                    className="frontier-article-author-link"
-                  >
-                    <div className="frontier-headline-article-avatar-container">
-                      <UserAvatar
-                        src={topTenPosts[0].author.avatar}
-                        height="80"
-                        width="80"
-                      />
-                    </div>
-                    <h4 className="frontier-headline-article-author-name">
-                      {topTenPosts[0].author.name}
-                    </h4>
-                  </Link>
-                  <p className="frontier-headline-article-date">
-                    {topTenPosts[0].createdAt}
-                  </p>
-                </div>
-                <div>
-                  <Link to={`/post/${topTenPosts[0].id}`}>
-                    <h3>{topTenPosts[0].title}</h3>
-                  </Link>
-                  <p>{topTenPosts[0].content.text}</p>
-                </div>
-              </div>
+              <HeadlineArticle article={topTenPosts[0]} />
             </div>
-            <div className="frontier-page-secondary-items-container">
-              <div className="frontier-page-secondary-article">
-                <div className="frontier-page-secondary-article-text">
-                  <Link to={`/post/${topTenPosts[1].id}`}>
-                    <h4>{topTenPosts[1].title}</h4>
-                  </Link>
-                  <p>{topTenPosts[1].content.text}</p>
-                </div>
-                <div className="frontier-secondary-article-author-attributes">
-                  <Link to={`/user/${topTenPosts[1].author.id}`}>
-                    <UserAvatar
-                      src={topTenPosts[1].author.avatar}
-                      height="50"
-                      width="50"
-                    />
-                  </Link>
-                  <div>
-                    <Link
-                      to={`/user/${topTenPosts[1].author.id}`}
-                      className="frontier-article-author-link"
-                    >
-                      <h4>{topTenPosts[1].author.name}</h4>
-                    </Link>
-                    <p className="frontier-author-attribute-secondary-article-date">
-                      {topTenPosts[1].createdAt}
-                    </p>
-                  </div>
-                </div>
-              </div>
+            <div className="frontier-page-secondary-tertiary-items-container">
+              <SecondaryArticle article={topTenPosts[1]} />
               <div className="frontier-page-tertiary-articles-container">
                 <TertiaryArticles articles={topTenPosts.slice(2, 5)} />
               </div>
@@ -141,6 +87,62 @@ export default function FrontierPage() {
         </div>
       </div>
     </>
+  );
+}
+
+function HeadlineArticle({article}) {
+  return (
+    <div className="frontier-page-headline-item-header">
+      <div className="frontier-headline-article-author-container">
+        <Link
+          to={`/user/${article.author.id}`}
+          className="frontier-article-author-link"
+        >
+          <div className="frontier-headline-article-avatar-container">
+            <UserAvatar src={article.author.avatar} height="80" width="80" />
+          </div>
+          <h4 className="frontier-headline-article-author-name">
+            {article.author.name}
+          </h4>
+        </Link>
+        <p className="frontier-headline-article-date">{article.createdAt}</p>
+      </div>
+      <div>
+        <Link to={`/post/${article.id}`}>
+          <h3>{article.title}</h3>
+        </Link>
+        <p>{article.content.text}</p>
+      </div>
+    </div>
+  );
+}
+
+function SecondaryArticle({article}) {
+  return (
+    <div className="frontier-page-secondary-article">
+      <div className="frontier-page-secondary-article-text">
+        <Link to={`/post/${article.id}`}>
+          <h4>{article.title}</h4>
+        </Link>
+        <p>{article.content.text}</p>
+      </div>
+      <div className="frontier-secondary-article-author-attributes">
+        <Link to={`/user/${article.author.id}`}>
+          <UserAvatar src={article.author.avatar} height="50" width="50" />
+        </Link>
+        <div>
+          <Link
+            to={`/user/${article.author.id}`}
+            className="frontier-article-author-link"
+          >
+            <h4>{article.author.name}</h4>
+          </Link>
+          <p className="frontier-author-attribute-secondary-article-date">
+            {article.createdAt}
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
 
