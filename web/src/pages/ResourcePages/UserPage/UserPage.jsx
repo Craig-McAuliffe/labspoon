@@ -171,8 +171,8 @@ function SuggestedUsers({userID}) {
 
 function UserDetails({user}) {
   const {userProfile} = useContext(AuthContext);
-  const ownProfile = userProfile && userProfile.id == user.id;
   if (user === undefined) return <></>;
+  const ownProfile = userProfile && userProfile.id == user.id;
   return (
     <div>
       <div className="user-cover-photo-container">
