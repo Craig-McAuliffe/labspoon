@@ -19,7 +19,9 @@ export default function FormTextInput({
           : 'form-text-input-container'
       }
     >
-      <label htmlFor={props.name}>{label}</label>
+      <label htmlFor={props.name} className="form-input-label">
+        {label}
+      </label>
       <input
         className="form-text-input"
         type={passwordInput ? 'password' : 'text'}
@@ -33,7 +35,7 @@ export default function FormTextInput({
   );
 }
 
-export function FormTextArea({...props}) {
+export function CreatePostTextArea({...props}) {
   const [field, meta] = useField(props);
   return (
     <>
@@ -43,6 +45,27 @@ export function FormTextArea({...props}) {
         placeholder="...What's happening?"
         {...field}
         {...props}
+      />
+      <div className="error-container">
+        {meta.touched && meta.error ? <InputError error={meta.error} /> : null}
+      </div>
+    </>
+  );
+}
+
+export function FormTextArea({height, label, bigLabel, ...props}) {
+  const [field, meta] = useField(props);
+  return (
+    <>
+      <label htmlFor={props.name} className="form-input-label">
+        {bigLabel ? <h3>{label}</h3> : label}
+      </label>
+      <textarea
+        className="form-text-area"
+        autoFocus
+        {...field}
+        {...props}
+        style={{height: `${height}px`}}
       />
       <div className="error-container">
         {meta.touched && meta.error ? <InputError error={meta.error} /> : null}

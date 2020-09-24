@@ -13,9 +13,9 @@
   color: #000000;
 }
 
-.primary-button {
+.primary-button,
+.primary-button-small {
   border: none;
-  padding: 10px 10px 5px 10px;
   border-radius: 4%;
   text-decoration: none;
   background: #00507c;
@@ -26,8 +26,36 @@
   -moz-appearance: none;
 }
 
+.primary-button {
+  padding: 10px 10px 5px 10px;
+}
+
+.negative-button {
+  padding: 10px 10px 5px 10px;
+  border: none;
+  border-radius: 4%;
+  text-decoration: none;
+  background: #dcdce0;
+  color: #000000;
+  cursor: pointer;
+  text-align: center;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.negative-button:hover,
+.negative-button:focus {
+  background: #99999f;
+}
+
+.primary-button-small {
+  padding: 8px 10px 7px 10px;
+}
+
 .primary-button:hover,
-.primary-button:focus {
+.primary-button:focus,
+.primary-button-small:hover,
+.primary-button-small:focus {
   background: #023b5a;
 }
 

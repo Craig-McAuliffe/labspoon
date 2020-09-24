@@ -4,7 +4,7 @@ import SubmitButton from '../../../Buttons/SubmitButton';
 import PostTypeDropDown from './PostTypeDropDown';
 import * as Yup from 'yup';
 import {Form, Formik} from 'formik';
-import FormTextInput, {FormTextArea} from '../../../Forms/FormTextInput';
+import FormTextInput, {CreatePostTextArea} from '../../../Forms/FormTextInput';
 
 import './CreatePost.css';
 
@@ -39,7 +39,7 @@ export default function PublicationPostForm({
       >
         <Form className="signin-form">
           <div className="creating-post-main-text-container">
-            <FormTextArea name="mainContent" />
+            <CreatePostTextArea name="mainContent" />
           </div>
           <div className="creating-post-tags">
             <FormTextInput
