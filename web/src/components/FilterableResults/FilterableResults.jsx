@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useContext} from 'react';
 import update from 'immutability-helper';
 import {FeatureFlags} from '../../App';
+import HomePageTabs from '../HomePageTabs';
 
 import {FilterMenu} from '../Filter/Filter';
 import ResultsList from '../Results/Results';
@@ -21,6 +22,7 @@ export default function FilterableResults({
   useTabs,
   useFilterSider,
   createPost,
+  homePageTabs,
 }) {
   const [hasMore, setHasMore] = useState(false);
   const [skip, setSkip] = useState(0);
@@ -130,6 +132,7 @@ export default function FilterableResults({
   const feedAndTabs = () => (
     <div className="feed-container">
       {createPost & featureFlags.has('create-post') ? <CreatePost /> : null}
+      {homePageTabs ? <HomePageTabs /> : null}
       {useTabs ? (
         <Tabs
           tabFilter={filterOptions[DEFAULT_TAB_IDX]}

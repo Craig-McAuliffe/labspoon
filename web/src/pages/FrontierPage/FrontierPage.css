@@ -1,0 +1,150 @@
+.frontier-sider-items-container {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  row-gap: 20px;
+}
+
+.frontier-page-highlights-container {
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
+}
+
+.frontier-page-headline-item-container {
+  height: 200px;
+}
+
+.frontier-page-headline-item-header {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  padding: 10px 10px;
+}
+
+.frontier-headline-article-author-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.frontier-headline-article-author-name {
+  text-align: center;
+}
+
+.frontier-page-headline-item-container h3 {
+  padding-left: 10px;
+}
+
+.frontier-headline-article-avatar-container {
+  display: flex;
+  justify-content: center;
+}
+
+.frontier-page-headline-item-container p {
+  margin: 0px 10px;
+}
+
+.frontier-headline-article-date,
+.frontier-author-attribute-secondary-article-date {
+  font-size: 0.8em;
+  text-align: center;
+  line-height: normal;
+  color: #99999f;
+}
+
+.frontier-secondary-article-author-attributes h4 {
+  line-height: 0.5em;
+}
+
+.frontier-headline-article-date {
+  padding-top: 5px;
+}
+.frontier-author-attribute-secondary-article-date {
+  margin-top: -10px;
+}
+
+.frontier-page-secondary-items-container {
+  border-top: 1px solid #dcdce0;
+  border-bottom: 1px solid #dcdce0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 270px;
+}
+
+.frontier-page-secondary-article h4 {
+  margin: 10px 10px;
+}
+
+.frontier-page-secondary-article p {
+  margin: 0px 10px;
+}
+
+.frontier-page-secondary-article-text {
+  height: 200px;
+}
+
+.frontier-secondary-article-author-attributes {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.frontier-page-tertiary-articles-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 90px;
+  border-left: 1px solid #dcdce0;
+}
+
+.frontier-tertiary-article {
+  height: 90px;
+}
+
+.frontier-page-tertiary-article-title {
+  padding: 5px 10px;
+}
+
+.frontier-tertiary-article-header {
+  height: 50px;
+}
+
+.frontier-tertiary-article-author-attributes {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 0px 5px;
+}
+
+.frontier-author-attribute-tertiary-article-date {
+  font-size: 0.8em;
+  line-height: normal;
+  color: #99999f;
+}
+
+.frontier-tertiary-article {
+  border-top: 1px solid #dcdce0;
+}
+
+.frontier-page-quaternary-items-container {
+  display: flex;
+  overflow: hidden;
+}
+
+.frontier-page-quaternary-item,
+.frontier-page-last-quaternary-item {
+  min-width: 25%;
+  max-width: 25%;
+  height: 300px;
+  padding: 5px 10px;
+}
+.frontier-page-quaternary-item {
+  border-right: 1px solid #dcdce0;
+}
+
+.frontier-page-quaternary-item h4 {
+  margin-bottom: 5px;
+}
+
+.frontier-page-quaternary-item-text {
+  height: 250px;
+}
+
+.frontier-page-feed {
+  margin-top: 50px;
+}

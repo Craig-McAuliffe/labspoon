@@ -142,7 +142,8 @@ export function getTestPosts(uniqueID) {
       createdAt: 'July 15, 2020 09:35:32',
       title: 'This publication just came out!',
       content: {
-        text: '',
+        text:
+          'This is an incredible publication. Wow, look at that . So good. The best. So many goods',
       },
       type: postTypes()[1],
       postType: postTypes()[1],
@@ -154,6 +155,38 @@ export function getTestPosts(uniqueID) {
       id: '3829huoewrn' + uniqueID,
       resourceType: 'post',
       title: 'Another new publication for you!',
+      author: users()[9],
+      createdAt: 'July 15, 2020 09:35:32',
+      content: {
+        text: '',
+      },
+      type: postTypes()[1],
+      postType: postTypes()[1],
+      generated: true,
+      topics: [topics()[3], topics()[4]],
+      referencedResource: publications()[3],
+    },
+    {
+      id: 'fdehfu9r37r9ehufi' + uniqueID,
+      resourceType: 'post',
+      title: 'A publication for you!',
+      author: users()[9],
+      createdAt: 'July 15, 2020 09:35:32',
+      content: {
+        text: '',
+      },
+      type: postTypes()[1],
+      postType: postTypes()[1],
+      generated: true,
+      topics: [topics()[3], topics()[4]],
+      referencedResource: publications()[3],
+    },
+
+    {
+      id: 'fjdfs9h39hfuei' + uniqueID,
+      resourceType: 'post',
+      title:
+        'Complement 1b is involved in SARS CoV2-induced immune overstimulation.',
       author: users()[9],
       createdAt: 'July 15, 2020 09:35:32',
       content: {

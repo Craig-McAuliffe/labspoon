@@ -19,6 +19,7 @@ import LoginPage from './pages/LoginPage';
 import PublicationPage from './pages/ResourcePages/PublicationPage/PublicationPage';
 import PostPage from './pages/ResourcePages/PostPage';
 import TopicPage from './pages/TopicPage';
+import FrontierPage from './pages/FrontierPage';
 
 /**
  * Top level routing structure for the app.
@@ -28,6 +29,9 @@ export default function Routes({user, setUser}) {
     <Switch>
       <Route exact path="/">
         <FollowingFeedPage />
+      </Route>
+      <Route exact path="/frontier">
+        <FrontierPage />
       </Route>
       <Route path="/login">
         <LoginPage />
