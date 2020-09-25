@@ -1,0 +1,10 @@
+Main text: #000000
+Secondary Text: #5D5D65
+Tertiary Text: #99999F
+Quaternary Text: #DCDCE0
+
+Primary Color: #00507C
+Secondary Color: #3099D3
+
+Destructive color: #DA0000
+Warning color: #FF8A00
