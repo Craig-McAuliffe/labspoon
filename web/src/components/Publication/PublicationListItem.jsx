@@ -3,7 +3,7 @@ import {Link} from 'react-router-dom';
 import {ExpandIcon, HideIcon} from '../../assets/PostActionIcons';
 import PostActions from '../Posts/Post/PostParts/PostActions';
 import detectJournal from '../Publication/DetectJournal';
-import FeedItemTopics from '../FeedItems/FeedItemTopics';
+import ListItemTopics from '../CommonListItemParts/ListItemTopics';
 import {FeatureFlags} from '../../App';
 
 import './PublicationListItem.css';
@@ -64,7 +64,7 @@ export default function PublicationListItem({
         </div>
         {mixedResults ? null : (
           <div className="publication-list-item-topics-container">
-            <FeedItemTopics taggedItem={publication} />
+            <ListItemTopics taggedItem={publication} />
           </div>
         )}
       </div>

@@ -4,8 +4,8 @@ import SeeMore from '../SeeMore';
 
 import UserAvatar from '../Avatar/UserAvatar';
 
-import './GroupFeedItem.css';
-export default function GroupFeedItem({group}) {
+import './GroupListItem.css';
+export default function GroupListItem({group}) {
   const [displayFullDescription, setDisplayFullDescription] = useState({
     display: false,
     size: 100,
@@ -18,21 +18,21 @@ export default function GroupFeedItem({group}) {
   };
 
   return (
-    <div className="group-feed-item-container">
+    <div className="group-list-item-container">
       <Link to={`/group/${group.id}`}>
-        <div className="group-feed-item-icon-and-name">
+        <div className="group-list-item-icon-and-name">
           <UserAvatar src={group.avatar} height="100" width="100" />
           <p>{group.name}</p>
         </div>
       </Link>
-      <div className="group-feed-item-text-container">
+      <div className="group-list-item-text-container">
         <Link to={`/group/${group.id}`}>
           <h3>{group.name}</h3>
         </Link>
         <div
           ref={groupDescriptionRef}
           style={descriptionSize}
-          className="group-feed-item-description"
+          className="group-list-item-description"
         >
           <p>{group.about}</p>
         </div>

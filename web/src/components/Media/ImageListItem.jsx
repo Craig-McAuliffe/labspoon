@@ -1,8 +1,8 @@
 import React, {useRef, useEffect} from 'react';
 
-import './ImageFeedItem.css';
+import './ImageListItem.css';
 
-export default function ImageFeedItem({src, alt}) {
+export default function ImageListItem({src, alt}) {
   const imageContainerRef = useRef();
   useEffect(() => {
     imageContainerRef.current.style.backgroundImage = `url(${src})`;
