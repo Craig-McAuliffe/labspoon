@@ -4,14 +4,14 @@ import {db} from '../../../firebase';
 
 import FollowButton from '../../Buttons/FollowButton';
 
-export default function FollowUserButton({pageUser}) {
+export default function FollowUserButton({targetUser}) {
   const [following, setFollowing] = useState(false);
   const featureFlags = useContext(FeatureFlags);
   const {user: authUser} = useContext(AuthContext);
 
   useEffect(() => {
     if (!featureFlags.has('disable-cloud-firestore') && authUser) {
-      db.doc(`users/${authUser.uid}/followsUsers/${pageUser.id}`)
+      db.doc(`users/${authUser.uid}/followsUsers/${targetUser.id}`)
         .get()
         .then((doc) => setFollowing(doc.exists))
         .catch((err) => console.log(err));
@@ -22,16 +22,16 @@ export default function FollowUserButton({pageUser}) {
     if (!featureFlags.has('disable-cloud-firestore')) {
       const batch = db.batch();
       const followsUsersDoc = db.doc(
-        `users/${authUser.uid}/followsUsers/${pageUser.id}`
+        `users/${authUser.uid}/followsUsers/${targetUser.id}`
       );
       const followedByUsersDoc = db.doc(
-        `users/${pageUser.id}/followedByUsers/${authUser.uid}`
+        `users/${targetUser.id}/followedByUsers/${authUser.uid}`
       );
       if (!following) {
         batch.set(followsUsersDoc, {
-          id: pageUser.id,
-          name: pageUser.name,
-          avatar: pageUser.avatar,
+          id: targetUser.id,
+          name: targetUser.name,
+          avatar: targetUser.avatar,
         });
         batch.set(followedByUsersDoc, {
           id: authUser.uid,
