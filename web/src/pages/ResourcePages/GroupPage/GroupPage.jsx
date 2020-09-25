@@ -15,7 +15,7 @@ import GroupPageSider from './GroupPageSider';
 import groupPageFeedData from './GroupPageFeedData';
 import FilterableResults from '../../../components/FilterableResults/FilterableResults';
 import UserAvatar from '../../../components/Avatar/UserAvatar';
-import FollowButton from '../../../components/Buttons/FollowButton';
+import FollowGroupButton from '../../../components/Group/FollowGroupButton';
 import MessageButton from '../../../components/Buttons/MessageButton';
 import {PinnedPost} from '../../../components/Posts/Post/Post';
 import SeeMore from '../../../components/SeeMore';
@@ -247,7 +247,7 @@ const GroupDetails = ({group, groupDescriptionRef}) => {
               <h3>{group.institution}</h3>
             </div>
             <div className="group-follow-container">
-              <FollowButton />
+              <FollowGroupButton targetGroup={group} />
             </div>
           </div>
           <div
