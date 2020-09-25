@@ -1,10 +1,11 @@
 import React, {useRef, useState} from 'react';
 import {Link} from 'react-router-dom';
 import SeeMore from '../SeeMore';
-
+import FollowGroupButton from './FollowGroupButton';
 import UserAvatar from '../Avatar/UserAvatar';
 
 import './GroupListItem.css';
+
 export default function GroupListItem({group}) {
   const [displayFullDescription, setDisplayFullDescription] = useState({
     display: false,
@@ -42,6 +43,9 @@ export default function GroupListItem({group}) {
           groupDescriptionRef={groupDescriptionRef}
           id={group.id}
         />
+      </div>
+      <div className="follow-group-button">
+        <FollowGroupButton targetGroup={group} />
       </div>
     </div>
   );

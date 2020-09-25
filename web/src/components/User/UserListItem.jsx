@@ -1,7 +1,7 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 import UserAvatar from '../Avatar/UserAvatar';
-import FollowButton from '../Buttons/FollowButton';
+import FollowUserButton from './FollowUserButton/FollowUserButton';
 import './UserListItem.css';
 
 export default function UserListItem({user}) {
@@ -25,7 +25,7 @@ export default function UserListItem({user}) {
         <h3>{user.institution}</h3>
       </div>
       <div className="Follow">
-        <FollowButton />
+        <FollowUserButton targetUser={user} />
       </div>
     </div>
   );

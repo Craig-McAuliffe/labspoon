@@ -1,7 +1,7 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 
-import FollowButton from '../Buttons/FollowButton';
+import FollowTopicButton from './FollowTopicButton';
 
 import './TopicListItem.css';
 
@@ -18,7 +18,7 @@ export default function TopicListItem({topic, dedicatedPage}) {
           <h3>{topic.name}</h3>
         </Link>
       )}
-      <FollowButton />
+      <FollowTopicButton targetTopic={topic} />
     </div>
   );
 }

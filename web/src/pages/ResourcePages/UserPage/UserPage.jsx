@@ -197,7 +197,7 @@ function UserDetails({user}) {
       </div>
       <div className="user-message-follow">
         <MessageButton />
-        {!ownProfile ? <FollowUserButton pageUser={user} /> : <></>}
+        {!ownProfile ? <FollowUserButton targetUser={user} /> : <></>}
       </div>
     </div>
   );

@@ -1,17 +1,17 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {AuthContext, FeatureFlags} from '../../../App';
-import {db} from '../../../firebase';
+import {AuthContext, FeatureFlags} from '../../App';
+import {db} from '../../firebase';
 
-import FollowButton from '../../Buttons/FollowButton';
+import FollowButton from '../Buttons/FollowButton';
 
-export default function FollowUserButton({targetUser}) {
+export default function FollowGroupButton({targetGroup}) {
   const [following, setFollowing] = useState(false);
   const featureFlags = useContext(FeatureFlags);
   const {user: authUser} = useContext(AuthContext);
 
   useEffect(() => {
     if (!featureFlags.has('disable-cloud-firestore') && authUser) {
-      db.doc(`users/${authUser.uid}/followsUsers/${targetUser.id}`)
+      db.doc(`users/${authUser.uid}/followsGroups/${targetGroup.id}`)
         .get()
         .then((doc) => setFollowing(doc.exists))
         .catch((err) => console.log(err));
@@ -21,17 +21,16 @@ export default function FollowUserButton({targetUser}) {
   function setFollowingAndUpdateDB() {
     if (!featureFlags.has('disable-cloud-firestore')) {
       const batch = db.batch();
-      const followsUsersDoc = db.doc(
-        `users/${authUser.uid}/followsUsers/${targetUser.id}`
+      const followsGroupsDoc = db.doc(
+        `users/${authUser.uid}/followsGroups/${targetGroup.id}`
       );
       const followedByUsersDoc = db.doc(
-        `users/${targetUser.id}/followedByUsers/${authUser.uid}`
+        `groups/${targetGroup.id}/followedByUsers/${authUser.uid}`
       );
       if (!following) {
-        batch.set(followsUsersDoc, {
-          id: targetUser.id,
-          name: targetUser.name,
-          avatar: targetUser.avatar,
+        batch.set(followsGroupsDoc, {
+          id: targetGroup.id,
+          name: targetGroup.name,
         });
         batch.set(followedByUsersDoc, {
           id: authUser.uid,
@@ -44,7 +43,7 @@ export default function FollowUserButton({targetUser}) {
           .then(() => setFollowing(true))
           .catch((err) => console.log(err));
       } else {
-        batch.delete(followsUsersDoc);
+        batch.delete(followsGroupsDoc);
         batch.delete(followedByUsersDoc);
         batch
           .commit()

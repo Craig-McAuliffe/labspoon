@@ -1,6 +1,6 @@
 .group-list-item-container {
   display: grid;
-  grid-template-columns: 150px 1fr;
+  grid-template-columns: 150px 1fr 150px;
   grid-template-rows: none;
   margin: 2px 2px 30px 2px;
   padding: 20px 16px 10px 0px;
@@ -33,6 +33,12 @@
   text-align: center;
   color: #99999f;
   margin-top: 4px;
+}
+
+.follow-group-button {
+  max-height: 200px;
+  align-self: center;
+  justify-self: flex-end;
 }
 
 .group-list-item-icon-and-name:hover p {
