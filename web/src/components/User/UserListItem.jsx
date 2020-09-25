@@ -1,16 +1,10 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 import UserAvatar from '../Avatar/UserAvatar';
-import FollowButton from '../Buttons/FollowButton';
 import PrimaryButton from '../Buttons/PrimaryButton';
-import NegativeButton from '../Buttons/NegativeButton';
 import './UserListItem.css';
 
-export default function UserListItem({user, removeAction}) {
-  const removeUser = () => {
-    removeAction(user.id);
-  };
-
+export default function UserListItem({user, children}) {
   return (
     <div className="user-listItem-container">
       <Link to={`/user/${user.id}`}>
@@ -30,13 +24,7 @@ export default function UserListItem({user, removeAction}) {
       <div className="user-listItem-institution">
         <h3>{user.institution}</h3>
       </div>
-      <div className="Follow">
-        {removeAction ? (
-          <NegativeButton onClick={removeUser}>Remove</NegativeButton>
-        ) : (
-          <FollowButton />
-        )}
-      </div>
+      <div className="Follow">{children}</div>
     </div>
   );
 }

@@ -20,6 +20,7 @@ import FormTextInput, {
 } from '../../../components/Forms/FormTextInput';
 import SubmitButton from '../../../components/Buttons/SubmitButton';
 import CancelButton from '../../../components/Buttons/CancelButton';
+import NegativeButton from '../../../components/Buttons/NegativeButton';
 import CreatePost from '../../../components/Posts/Post/CreatePost/CreatePost';
 import {AddMemberIcon, AddProfilePhoto} from '../../../assets/CreateGroupIcons';
 import UserListItem, {
@@ -215,11 +216,11 @@ function SelectedMembers({selectedUsers, setSelectedUsers}) {
   return (
     <>
       {selectedUsers.map((user) => (
-        <UserListItem
-          user={user}
-          key={user.id}
-          removeAction={removeSelectedUser}
-        />
+        <UserListItem user={user} key={user.id}>
+          <NegativeButton onClick={() => removeSelectedUser(user.id)}>
+            Remove
+          </NegativeButton>
+        </UserListItem>
       ))}
     </>
   );
