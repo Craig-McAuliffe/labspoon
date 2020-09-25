@@ -83,6 +83,25 @@
   margin-left: 5px;
 }
 
+.follow-button-position {
+  position: relative;
+}
+
+.sign-up-prompt {
+  position: absolute;
+  right: 50px;
+  padding: 20px 16px;
+  box-shadow: 0px 0px 4px rgba(0, 7, 12, 0.6);
+  border: 1px solid #00507c;
+  width: 200px;
+  top: 10px;
+  background: white;
+}
+
+.sign-up-prompt p {
+  line-height: 16px;
+}
+
 @media screen and (max-width: 560px) {
   .primary-button-text h2 {
     font-size: 1.2em;
