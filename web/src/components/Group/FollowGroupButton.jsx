@@ -7,7 +7,7 @@ import FollowButton from '../Buttons/FollowButton';
 export default function FollowGroupButton({targetGroup}) {
   const [following, setFollowing] = useState(false);
   const featureFlags = useContext(FeatureFlags);
-  const {user: authUser} = useContext(AuthContext);
+  const {user: authUser, userProfile} = useContext(AuthContext);
 
   useEffect(() => {
     if (!featureFlags.has('disable-cloud-firestore') && authUser) {
@@ -35,8 +35,7 @@ export default function FollowGroupButton({targetGroup}) {
         batch.set(followedByUsersDoc, {
           id: authUser.uid,
           name: authUser.displayName,
-          // TODO(#104) Update this with the user avatar when made available.
-          // avatar: authUser.avatar,
+          avatar: userProfile.avatar,
         });
         batch
           .commit()

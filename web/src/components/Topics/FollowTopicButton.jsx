@@ -7,8 +7,7 @@ import FollowButton from '../Buttons/FollowButton';
 export default function FollowTopicButton({targetTopic}) {
   const [following, setFollowing] = useState(false);
   const featureFlags = useContext(FeatureFlags);
-  const {user: authUser} = useContext(AuthContext);
-
+  const {user: authUser, userProfile} = useContext(AuthContext);
   useEffect(() => {
     if (!featureFlags.has('disable-cloud-firestore') && authUser) {
       db.doc(`users/${authUser.uid}/followsTopics/${targetTopic.id}`)
@@ -35,8 +34,7 @@ export default function FollowTopicButton({targetTopic}) {
         batch.set(followedByUsersDoc, {
           id: authUser.uid,
           name: authUser.displayName,
-          // TODO(#104) Update this with the user avatar when made available.
-          // avatar: authUser.avatar,
+          avatar: userProfile.avatar,
         });
         batch
           .commit()

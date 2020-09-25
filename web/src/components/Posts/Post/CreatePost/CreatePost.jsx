@@ -7,7 +7,7 @@ import './CreatePost.css';
 
 const DEFAULT_POST = 'Default';
 
-export default function CreatePost() {
+export default function CreatePost({pinnedPost}) {
   const {user} = useContext(AuthContext);
   const [creatingPost, setCreatingPost] = useState(false);
 
@@ -21,6 +21,14 @@ export default function CreatePost() {
       cancelPost={cancelPost}
       setCreatingPost={setCreatingPost}
     />
+  ) : pinnedPost ? (
+    <button
+      onClick={() => setCreatingPost(true)}
+      className="create-pinned-post-button"
+    >
+      <WriteIcon />
+      <h3>Create Pinned Post</h3>
+    </button>
   ) : (
     <div className="not-creating-post-container">
       <button onClick={() => setCreatingPost(true)}>
@@ -44,6 +52,13 @@ function PostTypeSpecificForm({cancelPost, setCreatingPost}) {
         />
       );
     default:
-      return <DefaultPost />;
+      return (
+        <DefaultPost
+          cancelPost={cancelPost}
+          setCreatingPost={setCreatingPost}
+          setPostType={setPostType}
+          postType={postType}
+        />
+      );
   }
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import firebase from '../../../../firebase';
 
 import PostForm from './PostForm';
-import {FormTextArea} from '../../../Forms/FormTextInput';
+import {CreatePostTextArea} from '../../../Forms/FormTextInput';
 import * as Yup from 'yup';
 
 import './CreatePost.css';
@@ -35,7 +35,7 @@ export default function DefaultPost({
       postType={postType}
       setPostType={setPostType}
     >
-      <FormTextArea name="title" />
+      <CreatePostTextArea name="title" />
     </PostForm>
   );
 }
