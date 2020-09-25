@@ -7,8 +7,8 @@ import Post from '../Posts/Post/Post';
 import BookmarkListItem from '../Bookmarks/BookmarkListItem/BookmarkListItem';
 import PublicationListItem from '../Publication/PublicationListItem';
 import UserListItem from '../User/UserListItem';
-import ImageFeedItem from '../Media/ImageFeedItem';
-import GroupFeedItem from '../Group/GroupFeedItem';
+import ImageListItem from '../Media/ImageListItem';
+import GroupListItem from '../Group/GroupListItem';
 import TopicListItem from '../Topics/TopicListItem';
 
 import './Results.css';
@@ -93,12 +93,12 @@ export function GenericListItem({result, onBookmarkPage}) {
     case 'user':
       return <UserListItem user={result} key={result.id + 'user'} />;
     case 'group':
-      return <GroupFeedItem key={result.id + 'group'} group={result} />;
+      return <GroupListItem key={result.id + 'group'} group={result} />;
     case 'topic':
       return <TopicListItem key={result.id + 'topic'} topic={result} />;
     case 'image':
       return (
-        <ImageFeedItem
+        <ImageListItem
           src={result.src}
           alt={result.alt}
           key={result.id + 'image'}
@@ -130,7 +130,7 @@ function MixedResultsPage({results}) {
           <h3 className="mixed-tab-section-header">Images</h3>
           <div className="feed-images-container">
             {imageResults.map((image) => (
-              <ImageFeedItem
+              <ImageListItem
                 key={image.id + 'image'}
                 src={image.src}
                 alt={image.alt}

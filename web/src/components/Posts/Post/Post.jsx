@@ -13,7 +13,7 @@ import {
 } from '../../../assets/PostTypeIcons';
 import PostOptionalTags from './PostParts/PostOptionalTags';
 import PostActions, {BookmarkedPostSymbol} from './PostParts/PostActions';
-import FeedItemTopics from '../../FeedItems/FeedItemTopics';
+import ListItemTopics from '../../CommonListItemParts/ListItemTopics';
 import PublicationListItem from '../../Publication/PublicationListItem';
 import UserAvatar from '../../Avatar/UserAvatar';
 import publications from '../../../mockdata/publications';
@@ -61,7 +61,7 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
       />
       <PostTextContent post={post} />
       <PostOptionalTags optionalTags={post.optionaltags} />
-      <FeedItemTopics taggedItem={post} />
+      <ListItemTopics taggedItem={post} />
       {bookmarkedVariation ? null : (
         <PostActions post={post} dedicatedPage={dedicatedPage} />
       )}

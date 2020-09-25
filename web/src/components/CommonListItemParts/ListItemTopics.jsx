@@ -2,9 +2,9 @@ import React from 'react';
 
 import {Link} from 'react-router-dom';
 import PropTypes from 'prop-types';
-import './FeedItemTopics.css';
+import './ListItemTopics.css';
 
-export default function FeedItemTopics({taggedItem}) {
+export default function ListItemTopics({taggedItem}) {
   return (
     <div className="post-topics">
       <p className="topics-sub-title">Topics: </p>
@@ -22,7 +22,7 @@ export default function FeedItemTopics({taggedItem}) {
     </div>
   );
 }
-FeedItemTopics.propTypes = {
+ListItemTopics.propTypes = {
   topics: PropTypes.arrayOf(
     PropTypes.exact({
       id: PropTypes.string.isRequired,

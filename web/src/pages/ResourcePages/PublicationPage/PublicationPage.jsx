@@ -6,7 +6,7 @@ import {db} from '../../../firebase';
 import {dbPublicationToJSPublication} from '../../../helpers/publications';
 
 import publications from '../../../mockdata/publications';
-import FeedItemTopics from '../../../components/FeedItems/FeedItemTopics';
+import ListItemTopics from '../../../components/CommonListItemParts/ListItemTopics';
 import FilterableResults from '../../../components/FilterableResults/FilterableResults';
 import publicationPageFeedData from './PublicationPageFeedData';
 import PublicationSider from './PublicationPageSider';
@@ -189,7 +189,7 @@ function PublicationBody({publicationDetails}) {
       <p className="publication-body-abstract">
         {publicationDetails.content.abstract}
       </p>
-      <FeedItemTopics taggedItem={publicationDetails} />
+      <ListItemTopics taggedItem={publicationDetails} />
     </div>
   );
 }
