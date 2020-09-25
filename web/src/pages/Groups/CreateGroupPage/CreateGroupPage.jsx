@@ -203,7 +203,6 @@ function SelectUsers({selectedUsers, addSelectedUsers, setSelectedUsers}) {
 }
 
 function SelectedMembers({selectedUsers, setSelectedUsers}) {
-  // TODO: Replace the following button with a remove button
   const removeSelectedUser = (selectedUserID) => {
     const indexToBeRemoved = selectedUsers.findIndex(
       (previouslySelectedUser) => previouslySelectedUser.id === selectedUserID
