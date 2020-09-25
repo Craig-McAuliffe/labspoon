@@ -4,7 +4,7 @@ import SubmitButton from '../../../Buttons/SubmitButton';
 import PostTypeDropDown from './PostTypeDropDown';
 import * as Yup from 'yup';
 import {Form, Formik} from 'formik';
-import FormTextInput, {FormTextArea} from '../../../Forms/FormTextInput';
+import FormTextInput, {CreatePostTextArea} from '../../../Forms/FormTextInput';
 import FormDateInput from '../../../Forms/FormDateInput';
 
 import './CreatePost.css';
@@ -41,7 +41,7 @@ export default function OpenPositionPostForm({
       >
         <Form>
           <div className="creating-post-main-text-container">
-            <FormTextArea name="mainContent" />
+            <CreatePostTextArea name="mainContent" />
           </div>
           <div className="creating-post-tags">
             <FormTextInput sideLabel={true} name="position" label="Position" />

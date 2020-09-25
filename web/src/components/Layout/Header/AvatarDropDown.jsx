@@ -6,6 +6,7 @@ import {
   GroupMenuIcon,
   SettingsMenuIcon,
   UserProfileMenuIcon,
+  CreateGroupIcon,
 } from '../../../assets/MenuIcons';
 
 import {AuthContext} from '../../../App';
@@ -39,15 +40,15 @@ const AvatarDropDown = () => {
         <Dropdown.Menu>
           <Dropdown.Item href="/bookmarks">
             <BookmarksMenuIcon />
-            <p className="LinkItem">Bookmarks</p>
+            <p className="link-item">Bookmarks</p>
           </Dropdown.Item>
           <Dropdown.Item href={`/user/${user.uid}`}>
             <UserProfileMenuIcon />
-            <p className="LinkItem">Profile</p>
+            <p className="link-item">Profile</p>
           </Dropdown.Item>
           <Dropdown.Item href="/settings">
             <SettingsMenuIcon />
-            <p className="LinkItem">Settings</p>
+            <p className="link-item">Settings</p>
           </Dropdown.Item>
           <div className="log-out-container">
             <button
@@ -65,10 +66,9 @@ const AvatarDropDown = () => {
             <div className="dropdown-group-subtitle">My Groups</div>
           </Dropdown.Header>
           <UserGroups userID={user.uid} />
-          <Dropdown.Item>
-            <Link to="/group/create">
-              <p className="LinkItem">Create Group</p>
-            </Link>
+          <Dropdown.Item href="/group/create">
+            <CreateGroupIcon />
+            <p className="link-item">Create Group</p>
           </Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>
@@ -83,7 +83,7 @@ function UserGroups({userID}) {
   if (matchedUserRelationships === undefined) return null;
   return matchedUserRelationships.memberOfGroups.map((group) => (
     <Dropdown.Item key={group.id} href={`/group/${group.id}`}>
-      <p className="LinkItem">{group.name}</p>
+      <p className="link-item">{group.name}</p>
     </Dropdown.Item>
   ));
 }

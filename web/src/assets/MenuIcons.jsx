@@ -92,3 +92,19 @@ export const GroupMenuIcon = () => (
     />
   </svg>
 );
+
+export const CreateGroupIcon = () => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 23 26"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M10.5 21V10.5M10.5 0V10.5M10.5 10.5H0M10.5 10.5H21"
+      stroke="#00507C"
+      strokeWidth="4"
+    />
+  </svg>
+);

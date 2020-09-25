@@ -1,10 +1,10 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 import UserAvatar from '../Avatar/UserAvatar';
-import FollowButton from '../Buttons/FollowButton';
+import PrimaryButton from '../Buttons/PrimaryButton';
 import './UserListItem.css';
 
-export default function UserListItem({user}) {
+export default function UserListItem({user, children}) {
   return (
     <div className="user-listItem-container">
       <Link to={`/user/${user.id}`}>
@@ -24,9 +24,7 @@ export default function UserListItem({user}) {
       <div className="user-listItem-institution">
         <h3>{user.institution}</h3>
       </div>
-      <div className="Follow">
-        <FollowButton />
-      </div>
+      <div className="Follow">{children}</div>
     </div>
   );
 }
@@ -43,18 +41,10 @@ export function UserSmallResultItem({user, selectUser}) {
         <h4>{user.institution}</h4>
       </div>
       <div className="Follow">
-        <SelectButton select={select} />
+        <PrimaryButton onClick={select} small>
+          Select
+        </PrimaryButton>
       </div>
     </div>
-  );
-}
-
-function SelectButton({select}) {
-  return (
-    <button type="button" className="primary-button" onClick={select}>
-      <div className="primary-button-text">
-        <h4>Select</h4>
-      </div>
-    </button>
   );
 }

@@ -10,13 +10,13 @@
 
 .form-text-input-container-side-label {
   display: grid;
-  grid-template-columns: 150px 1fr;
-  margin: 40px 0px 40px 8px;
+  grid-template-columns: 100px 1fr;
+  margin: 0px 0px 40px 0px;
   align-items: center;
 }
 
-.form-text-input-container label,
-.form-text-input-container-side-label label {
+.form-text-input-container-side-label label,
+.form-input-label {
   font-size: 1.1em;
 }
 
@@ -29,4 +29,31 @@
 .error-container {
   grid-column: 2/3;
   justify-self: flex-start;
+}
+
+.create-post-main-text {
+  height: 100px;
+  min-width: 100%;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  overflow-x: hidden;
+  resize: none;
+  border: none;
+  font-size: 1.1em;
+}
+
+.create-post-main-text:focus {
+  outline: none;
+}
+
+.form-text-area {
+  min-width: 100%;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  overflow-x: hidden;
+  resize: none;
+  border: none;
+  font-size: 1.1em;
+  margin: 0px 0px 40px 0px;
+  border: 1px solid #99999f;
 }

@@ -3,12 +3,14 @@
   border-bottom: 1px solid #99999f;
   padding: 10px;
   margin-bottom: 40px;
+  min-width: 100%;
 }
 
 .creating-post-container {
   padding-bottom: 20px;
   margin-bottom: 40px;
   border-bottom: 4px solid #dcdce0;
+  min-width: 100%;
 }
 
 .creating-post-main-text-container {
@@ -47,7 +49,7 @@
 .dropdown {
   display: flex;
   align-items: center;
-  margin-right: 15px;
+  padding-right: 15px;
 }
 
 .post-type-dropdown-option {
@@ -66,17 +68,16 @@
   margin-left: 5px;
 }
 
-.create-post-main-text {
-  height: 100px;
-  min-width: 100%;
-  max-width: 100%;
-  overflow-wrap: break-word;
-  overflow-x: hidden;
-  resize: none;
-  border: none;
-  font-size: 1.1em;
+.create-pinned-post-button {
+  background: 2px solid #00507c;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  color: #00507c;
 }
 
-.create-post-main-text:focus {
-  outline: none;
+.create-pinned-post-button svg {
+  display: inline-block;
+  margin-right: 10px;
+  margin-top: -4px;
 }

@@ -12,6 +12,7 @@ import GroupListItem from '../Group/GroupListItem';
 import TopicListItem from '../Topics/TopicListItem';
 
 import './Results.css';
+import FollowUserButton from '../User/FollowUserButton/FollowUserButton';
 
 /**
  * Displays an infinitely scrolling list of posts.
@@ -91,7 +92,11 @@ export function GenericListItem({result, onBookmarkPage}) {
         />
       );
     case 'user':
-      return <UserListItem user={result} key={result.id + 'user'} />;
+      return (
+        <UserListItem user={result} key={result.id + 'user'}>
+          <FollowUserButton targetUser={result} />
+        </UserListItem>
+      );
     case 'group':
       return <GroupListItem key={result.id + 'group'} group={result} />;
     case 'topic':
@@ -155,7 +160,9 @@ function MixedResultsPage({results}) {
         <div className="mixed-tab-section">
           <h3 className="mixed-tab-section-header">Researchers</h3>
           {userResults.map((user) => (
-            <UserListItem key={user.id + 'user'} user={user} />
+            <UserListItem key={user.id + 'user'} user={user}>
+              <FollowUserButton targetUser={user} />
+            </UserListItem>
           ))}
         </div>
       ) : null}
