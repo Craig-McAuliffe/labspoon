@@ -36,6 +36,11 @@ export const createPost = functions.https.onCall(async (data, context) => {
     content: {
       text: data.title,
       publicationURL: data.publicationURL,
+      position: data.position,
+      location: data.location,
+      salary: data.salary,
+      methods: data.methods,
+      startDate: data.startDate,
     },
     topics: [],
     timestamp: new Date(),
@@ -171,6 +176,7 @@ interface PostContent {
   amount?: string;
   researchers?: Array<UserRef>;
   publicationURL?: string;
+  position?: string;
 }
 
 interface PostType {

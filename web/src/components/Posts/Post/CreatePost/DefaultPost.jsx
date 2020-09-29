@@ -36,7 +36,9 @@ export default function DefaultPost({
       postType={postType}
       setPostType={setPostType}
     >
-      <CreatePostTextArea name="title" />
+      <div className="creating-post-main-text-container">
+        <CreatePostTextArea name="title" />
+      </div>
     </PostForm>
   );
 }

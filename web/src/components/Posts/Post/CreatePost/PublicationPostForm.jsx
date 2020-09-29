@@ -34,24 +34,24 @@ export default function PublicationPostForm({
   });
 
   return (
-    <div className="creating-post-container">
-      <PostForm
-        onSubmit={submitChanges}
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        cancelPost={cancelPost}
-        postType={postType}
-        setPostType={setPostType}
-      >
+    <PostForm
+      onSubmit={submitChanges}
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+      cancelPost={cancelPost}
+      postType={postType}
+      setPostType={setPostType}
+    >
+      <div className="creating-post-main-text-container">
         <CreatePostTextArea name="title" />
-        <div className="creating-post-tags">
-          <FormTextInput
-            name="publicationURL"
-            label="Publication Link"
-            sideLabel={true}
-          />
-        </div>
-      </PostForm>
-    </div>
+      </div>
+      <div className="creating-post-tags">
+        <FormTextInput
+          name="publicationURL"
+          label="Publication Link"
+          sideLabel={true}
+        />
+      </div>
+    </PostForm>
   );
 }

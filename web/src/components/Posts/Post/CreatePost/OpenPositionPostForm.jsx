@@ -1,13 +1,13 @@
 import React from 'react';
-import CancelButton from '../../../Buttons/CancelButton';
-import SubmitButton from '../../../Buttons/SubmitButton';
-import PostTypeDropDown from './PostTypeDropDown';
 import * as Yup from 'yup';
-import {Form, Formik} from 'formik';
 import FormTextInput, {CreatePostTextArea} from '../../../Forms/FormTextInput';
 import FormDateInput from '../../../Forms/FormDateInput';
+import PostForm from './PostForm';
+import firebase from '../../../../firebase';
 
 import './CreatePost.css';
+
+const createPost = firebase.functions().httpsCallable('posts-createPost');
 
 export default function OpenPositionPostForm({
   cancelPost,
@@ -15,8 +15,11 @@ export default function OpenPositionPostForm({
   setPostType,
   postType,
 }) {
-  const submitChanges = () => {
-    setCreatingPost(false);
+  const submitChanges = (res) => {
+    res.postType = {id: 'openPositionPost', name: 'Open Position Post'};
+    createPost(res)
+      .then(() => setCreatingPost(false))
+      .catch((err) => alert(err));
   };
   const initialValues = {
     title: '',
@@ -33,38 +36,24 @@ export default function OpenPositionPostForm({
     ),
   });
   return (
-    <div className="creating-post-container">
-      <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={submitChanges}
-      >
-        <Form>
-          <div className="creating-post-main-text-container">
-            <CreatePostTextArea name="title" />
-          </div>
-          <div className="creating-post-tags">
-            <FormTextInput sideLabel={true} name="position" label="Position" />
-            <FormTextInput sideLabel={true} name="location" label="Location" />
-            <FormTextInput sideLabel={true} name="salary" label="Salary" />
-            <FormTextInput sideLabel={true} name="methods" label="Methods" />
-            <FormDateInput
-              sideLabel={true}
-              name="startDate"
-              label="Start Date"
-            />
-          </div>
-          <div className="create-post-actions">
-            <div className="create-post-cancel-container">
-              <CancelButton cancelAction={cancelPost} />
-            </div>
-            <div className="create-post-actions-positive">
-              <PostTypeDropDown setPostType={setPostType} postType={postType} />
-              <SubmitButton inputText="Submit" />
-            </div>
-          </div>
-        </Form>
-      </Formik>
-    </div>
+    <PostForm
+      onSubmit={submitChanges}
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+      cancelPost={cancelPost}
+      postType={postType}
+      setPostType={setPostType}
+    >
+      <div className="creating-post-main-text-container">
+        <CreatePostTextArea name="title" />
+      </div>
+      <div className="creating-post-tags">
+        <FormTextInput sideLabel={true} name="position" label="Position" />
+        <FormTextInput sideLabel={true} name="location" label="Location" />
+        <FormTextInput sideLabel={true} name="salary" label="Salary" />
+        <FormTextInput sideLabel={true} name="methods" label="Methods" />
+        <FormDateInput sideLabel={true} name="startDate" label="Start Date" />
+      </div>
+    </PostForm>
   );
 }
