@@ -1,5 +1,3 @@
-import {db} from '../../../firebase';
-
 import getFilteredPosts from '../../../mockdata/posts';
 import publications, {findCoAuthors} from '../../../mockdata/publications';
 import relationships from '../../../mockdata/relationships';
@@ -30,25 +28,8 @@ export default function userPageFeedData(skip, limit, filterOptions, userID) {
   const userFollowing = () =>
     userRelationships.followsUsers.slice(skip, skip + limit);
 
-  const userRecommends = (skip, limit) => {
-    console.log('trigger');
-    const results = db
-      .collection(`users/${userID}/recommendations`)
-      .orderBy('recommendedResourceID');
-    return results
-      .limit(limit)
-      .get()
-      .then((qs) => {
-        const recommendations = [];
-        qs.forEach((doc) => {
-          const recommendation = doc.data();
-          recommendation.id = doc.id;
-          recommendations.push(recommendation);
-        });
-        return recommendations.slice(skip, limit);
-      })
-      .catch((err) => console.log(err));
-  };
+  const userRecommends = () =>
+    userRelationships.recommends.slice(skip, skip + limit);
 
   const userCoAuthors = () => findCoAuthors(userID).slice(skip, skip + limit);
 

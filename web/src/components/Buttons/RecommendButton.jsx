@@ -21,7 +21,7 @@ const RecommendButton = ({post}) => {
   // set the initial state of the recommendation
   useEffect(() => {
     if (user && !featureFlags.has('disable-cloud-firestore')) {
-      db.collection(`users/$user.uid}/recommendations`)
+      db.collection(`users/${user.uid}/recommendations`)
         .where('recommendedResourceType', '==', 'post')
         .where('recommendedResourceID', '==', post.id)
         .get()
