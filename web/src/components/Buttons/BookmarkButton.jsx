@@ -16,15 +16,6 @@ function BookmarkButton({post}) {
   const featureFlags = useContext(FeatureFlags);
   const {user} = useContext(AuthContext);
 
-  const bookmarkButtonDisplay = () => (
-    <div className="button-container">
-      <button className="action-button" href="/" onClick={onClick}>
-        {bookmarked ? <BookmarkIconSelected /> : <BookmarkIconUnselected />}
-        <span className="action-button-text">Bookmark</span>
-      </button>
-    </div>
-  );
-
   const onClick = () => {
     setBookmarked(!bookmarked);
   };
@@ -80,10 +71,16 @@ function BookmarkButton({post}) {
 
   if (!post) {
     setBookmarked(false);
-    return bookmarkButtonDisplay();
   }
 
-  return bookmarkButtonDisplay();
+  return (
+    <div className="button-container">
+      <button className="action-button" href="/" onClick={onClick}>
+        {bookmarked ? <BookmarkIconSelected /> : <BookmarkIconUnselected />}
+        <span className="action-button-text">Bookmark</span>
+      </button>
+    </div>
+  );
 }
 
 export default BookmarkButton;
