@@ -16,7 +16,11 @@ const PostActions = ({post, dedicatedPage}) => {
     >
       {featureFlags.has('repost-to-group') ? <RepostToGroupButton /> : <></>}
       {featureFlags.has('share-post') ? <ShareButton /> : <></>}
-      {featureFlags.has('recommendations') ? <RecommendButton /> : <></>}
+      {featureFlags.has('recommendations') ? (
+        <RecommendButton post={post} />
+      ) : (
+        <></>
+      )}
       <BookmarkButton post={post} />
     </div>
   );

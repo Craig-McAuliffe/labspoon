@@ -13,6 +13,7 @@ import {getPaginatedTopicsFromCollectionRef} from '../../../helpers/topics';
 import {getPaginatedPublicationsFromCollectionRef} from '../../../helpers/publications';
 import {getPaginatedGroupReferencesFromCollectionRef} from '../../../helpers/groups';
 import {getPaginatedUserReferencesFromCollectionRef} from '../../../helpers/users';
+import {getPaginatedRecommendationsFromCollectionRef} from '../../../helpers/recommendations';
 
 import FilterableResults from '../../../components/FilterableResults/FilterableResults';
 import MessageButton from '../../../components/Buttons/MessageButton';
@@ -240,7 +241,14 @@ function userPageFeedDataFromDB(skip, limit, filterOptions, userID, last) {
         last
       );
     case 'recommends':
-      results = [];
+      const recommendationsCollection = db.collection(
+        `users/${userID}/recommendations`
+      );
+      return getPaginatedRecommendationsFromCollectionRef(
+        recommendationsCollection,
+        limit,
+        last
+      );
       break;
     case 'coauthors':
       results = [];
