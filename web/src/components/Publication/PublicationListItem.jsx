@@ -32,7 +32,8 @@ export default function PublicationListItem({
     >
       <div className="publication-list-item-header">
         <div className="publication-list-item-journal-container">
-          {detectJournal(publication).length > 0 ? (
+          {detectJournal(publication).length &&
+          featureFlags.has('publisher-logos') > 0 ? (
             <img
               className="publication-list-item-journal-logo"
               src={detectJournal(publication)[0].logo}
