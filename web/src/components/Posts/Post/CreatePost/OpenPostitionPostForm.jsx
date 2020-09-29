@@ -19,7 +19,7 @@ export default function OpenPositionPostForm({
     setCreatingPost(false);
   };
   const initialValues = {
-    mainContent: '',
+    title: '',
     position: '',
     location: '',
     salary: '',
@@ -27,7 +27,7 @@ export default function OpenPositionPostForm({
     startDate: '',
   };
   const validationSchema = Yup.object({
-    mainContent: Yup.string().required('You need to write something!'),
+    title: Yup.string().required('You need to write something!'),
     position: Yup.string().required(
       'You need to provide a link to the publication'
     ),
@@ -41,7 +41,7 @@ export default function OpenPositionPostForm({
       >
         <Form>
           <div className="creating-post-main-text-container">
-            <CreatePostTextArea name="mainContent" />
+            <CreatePostTextArea name="title" />
           </div>
           <div className="creating-post-tags">
             <FormTextInput sideLabel={true} name="position" label="Position" />

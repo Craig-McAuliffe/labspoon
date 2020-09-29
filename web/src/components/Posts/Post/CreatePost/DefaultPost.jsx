@@ -16,6 +16,7 @@ export default function DefaultPost({
   setCreatingPost,
 }) {
   const submitChanges = (res) => {
+    res.postType = {id: 'defaultPost', name: 'Default Post'};
     createPost(res)
       .then(() => setCreatingPost(false))
       .catch((err) => alert(err));

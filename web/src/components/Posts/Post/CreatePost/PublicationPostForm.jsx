@@ -5,8 +5,11 @@ import PostTypeDropDown from './PostTypeDropDown';
 import * as Yup from 'yup';
 import {Form, Formik} from 'formik';
 import FormTextInput, {CreatePostTextArea} from '../../../Forms/FormTextInput';
+import firebase from '../../../../firebase';
 
 import './CreatePost.css';
+
+const createPost = firebase.functions().httpsCallable('posts-createPost');
 
 export default function PublicationPostForm({
   cancelPost,
@@ -14,17 +17,20 @@ export default function PublicationPostForm({
   setPostType,
   postType,
 }) {
-  const submitChanges = () => {
-    setCreatingPost(false);
+  const submitChanges = (res) => {
+    res.postType = {id: 'publicationPost', name: 'Publication Post'};
+    createPost(res)
+      .then(() => setCreatingPost(false))
+      .catch((err) => alert(err));
   };
 
   const initialValues = {
-    mainContent: '',
+    title: '',
     publicationURL: '',
   };
 
   const validationSchema = Yup.object({
-    mainContent: Yup.string().required('You need to write something!'),
+    title: Yup.string().required('You need to write something!'),
     publicationURL: Yup.string()
       .required('You need to provide a link to the publication')
       .url(`This isn't a valid url`),
@@ -39,7 +45,7 @@ export default function PublicationPostForm({
       >
         <Form className="signin-form">
           <div className="creating-post-main-text-container">
-            <CreatePostTextArea name="mainContent" />
+            <CreatePostTextArea name="title" />
           </div>
           <div className="creating-post-tags">
             <FormTextInput

@@ -133,7 +133,7 @@ export default function FilterableResults({
 
   const feedAndTabs = () => (
     <div className="feed-container">
-      {createPost & featureFlags.has('create-post') ? <CreatePost /> : null}
+      {createPost & !featureFlags.has('create-post') ? <CreatePost /> : null}
       {homePageTabs ? <HomePageTabs /> : null}
       {useTabs ? (
         <Tabs
