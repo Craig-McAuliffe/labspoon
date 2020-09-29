@@ -1,6 +1,7 @@
 import React from 'react';
 import * as Yup from 'yup';
 import FormTextInput, {CreatePostTextArea} from '../../../Forms/FormTextInput';
+import FormDateInput from '../../../Forms/FormDateInput';
 import PostForm from './PostForm';
 import firebase from '../../../../firebase';
 
@@ -8,31 +9,32 @@ import './CreatePost.css';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
-export default function PublicationPostForm({
+export default function OpenPositionPostForm({
   cancelPost,
   setCreatingPost,
   setPostType,
   postType,
 }) {
   const submitChanges = (res) => {
-    res.postType = {id: 'publicationPost', name: 'Publication Post'};
+    res.postType = {id: 'openPositionPost', name: 'Open Position Post'};
     createPost(res)
       .then(() => setCreatingPost(false))
       .catch((err) => alert(err));
   };
-
   const initialValues = {
     title: '',
-    publicationURL: '',
+    position: '',
+    location: '',
+    salary: '',
+    methods: '',
+    startDate: '',
   };
-
   const validationSchema = Yup.object({
     title: Yup.string().required('You need to write something!'),
-    publicationURL: Yup.string()
-      .required('You need to provide a link to the publication')
-      .url(`This isn't a valid url`),
+    position: Yup.string().required(
+      'You need to provide a link to the publication'
+    ),
   });
-
   return (
     <PostForm
       onSubmit={submitChanges}
@@ -46,11 +48,11 @@ export default function PublicationPostForm({
         <CreatePostTextArea name="title" />
       </div>
       <div className="creating-post-tags">
-        <FormTextInput
-          name="publicationURL"
-          label="Publication Link"
-          sideLabel={true}
-        />
+        <FormTextInput sideLabel={true} name="position" label="Position" />
+        <FormTextInput sideLabel={true} name="location" label="Location" />
+        <FormTextInput sideLabel={true} name="salary" label="Salary" />
+        <FormTextInput sideLabel={true} name="methods" label="Methods" />
+        <FormDateInput sideLabel={true} name="startDate" label="Start Date" />
       </div>
     </PostForm>
   );

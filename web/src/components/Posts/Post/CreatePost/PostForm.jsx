@@ -21,7 +21,7 @@ export default function PostForm({
         onSubmit={onSubmit}
       >
         <Form>
-          <div className="creating-post-main-text-container">{children}</div>
+          {children}
           <div className="create-post-actions">
             <div className="create-post-cancel-container">
               <CancelButton cancelAction={cancelPost} />

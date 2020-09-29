@@ -16,6 +16,7 @@ export default function DefaultPost({
   setCreatingPost,
 }) {
   const submitChanges = (res) => {
+    res.postType = {id: 'defaultPost', name: 'Default Post'};
     createPost(res)
       .then(() => setCreatingPost(false))
       .catch((err) => alert(err));
@@ -35,7 +36,9 @@ export default function DefaultPost({
       postType={postType}
       setPostType={setPostType}
     >
-      <CreatePostTextArea name="title" />
+      <div className="creating-post-main-text-container">
+        <CreatePostTextArea name="title" />
+      </div>
     </PostForm>
   );
 }

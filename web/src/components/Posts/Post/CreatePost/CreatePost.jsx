@@ -1,11 +1,15 @@
 import React, {useState, useContext} from 'react';
 import {AuthContext} from '../../../../App';
 import DefaultPost from './DefaultPost';
+import OpenPositionPostForm from './OpenPositionPostForm';
+import PublicationPostForm from './PublicationPostForm';
 import {WriteIcon} from '../../../../assets/GeneralActionIcons';
 
 import './CreatePost.css';
 
 const DEFAULT_POST = 'Default';
+const PUBLICATION_POST = 'Publication';
+const OPEN_POSITION_POST = 'Open Position';
 
 export default function CreatePost({pinnedPost}) {
   const {user} = useContext(AuthContext);
@@ -45,6 +49,24 @@ function PostTypeSpecificForm({cancelPost, setCreatingPost}) {
     case DEFAULT_POST:
       return (
         <DefaultPost
+          cancelPost={cancelPost}
+          setCreatingPost={setCreatingPost}
+          setPostType={setPostType}
+          postType={postType}
+        />
+      );
+    case PUBLICATION_POST:
+      return (
+        <PublicationPostForm
+          cancelPost={cancelPost}
+          setCreatingPost={setCreatingPost}
+          setPostType={setPostType}
+          postType={postType}
+        />
+      );
+    case OPEN_POSITION_POST:
+      return (
+        <OpenPositionPostForm
           cancelPost={cancelPost}
           setCreatingPost={setCreatingPost}
           setPostType={setPostType}

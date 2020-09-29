@@ -152,9 +152,8 @@ function PostTextContent({post}) {
   return (
     <div className="post-text-content">
       {/* <Link to={`/post/${post.id}`}> */}
-      <h3>{post.title}</h3>
-      {/* </Link> */}
       <p>{post.content.text}</p>
+      {/* </Link> */}
     </div>
   );
 }
