@@ -9,6 +9,7 @@ import {
   MethodsIcon,
   CalendarIcon,
   ResearcherIcon,
+  URLIcon,
 } from '../../../../assets/PostOptionalTagsIcons';
 
 import './PostOptionalTags.css';
@@ -59,7 +60,7 @@ const OptionalTagIcon = ({type}) => {
       return <LocationIcon />;
     case 'methods':
       return <MethodsIcon />;
-    case 'start date':
+    case 'startDate':
       return <CalendarIcon />;
     case 'salary':
       return <SalaryIcon />;
@@ -67,7 +68,13 @@ const OptionalTagIcon = ({type}) => {
       return <FunderIcon />;
     case 'amount':
       return <SalaryIcon />;
+    case 'URL':
+      return <URLIcon />;
+    case 'publicationURL':
+      return <URLIcon />;
     case 'researcher':
+      return <ResearcherIcon />;
+    case 'position':
       return <ResearcherIcon />;
     default:
       return <div></div>;
