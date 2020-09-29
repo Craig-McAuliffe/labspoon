@@ -1,10 +1,7 @@
 import React from 'react';
-import CancelButton from '../../../Buttons/CancelButton';
-import SubmitButton from '../../../Buttons/SubmitButton';
-import PostTypeDropDown from './PostTypeDropDown';
 import * as Yup from 'yup';
-import {Form, Formik} from 'formik';
 import FormTextInput, {CreatePostTextArea} from '../../../Forms/FormTextInput';
+import PostForm from './PostForm';
 import firebase from '../../../../firebase';
 
 import './CreatePost.css';
@@ -38,33 +35,23 @@ export default function PublicationPostForm({
 
   return (
     <div className="creating-post-container">
-      <Formik
+      <PostForm
+        onSubmit={submitChanges}
         initialValues={initialValues}
         validationSchema={validationSchema}
-        onSubmit={submitChanges}
+        cancelPost={cancelPost}
+        postType={postType}
+        setPostType={setPostType}
       >
-        <Form className="signin-form">
-          <div className="creating-post-main-text-container">
-            <CreatePostTextArea name="title" />
-          </div>
-          <div className="creating-post-tags">
-            <FormTextInput
-              name="publicationURL"
-              label="Publication Link"
-              sideLabel={true}
-            />
-          </div>
-          <div className="create-post-actions">
-            <div className="create-post-cancel-container">
-              <CancelButton cancelAction={cancelPost} />
-            </div>
-            <div className="create-post-actions-positive">
-              <PostTypeDropDown setPostType={setPostType} postType={postType} />
-              <SubmitButton inputText="Submit" />
-            </div>
-          </div>
-        </Form>
-      </Formik>
+        <CreatePostTextArea name="title" />
+        <div className="creating-post-tags">
+          <FormTextInput
+            name="publicationURL"
+            label="Publication Link"
+            sideLabel={true}
+          />
+        </div>
+      </PostForm>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import React, {useState, useContext} from 'react';
 import {AuthContext} from '../../../../App';
 import DefaultPost from './DefaultPost';
-import OpenPositionPostForm from './OpenPostitionPostForm';
+import OpenPositionPostForm from './OpenPositionPostForm';
 import PublicationPostForm from './PublicationPostForm';
 import {WriteIcon} from '../../../../assets/GeneralActionIcons';
 

@@ -31,10 +31,7 @@ export const createPost = functions.https.onCall(async (data, context) => {
   };
 
   const post: Post = {
-    postType: {
-      id: 'default',
-      name: 'default',
-    },
+    postType: data.postType,
     author: author,
     content: {
       text: data.title,
