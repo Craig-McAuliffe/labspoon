@@ -9,7 +9,7 @@ deploy_test_env_functions:
   only:
     - master
   script:
-    - npm run --prefix functions install
+    - npm --prefix functions install
     - npm run --prefix functions build
     - npm install firebase-tools
     - firebase use --token $FIREBASE_DEPLOY_KEY labspoon-test
@@ -23,7 +23,7 @@ deploy_test_env:
   only:
     - master
   script:
-    - npm run --prefix web install
+    - npm --prefix web install
     - npm run --prefix web build
     - npm install firebase-tools
     - firebase use --token $FIREBASE_DEPLOY_KEY labspoon-test
