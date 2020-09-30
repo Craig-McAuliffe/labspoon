@@ -88,8 +88,7 @@ export default function PublicationListItem({
       </button>
       {expandedView()}
       {mixedResults ||
-      !featureFlags.has('bookmark-publications') ||
-      bookmarkedVariation ? (
+      (featureFlags.has('bookmark-publications') && !bookmarkedVariation) ? (
         <PostActions />
       ) : null}
     </div>

@@ -1,75 +1,12 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext} from 'react';
 
-import {AuthContext, FeatureFlags} from '../../../../App';
-import {db} from '../../../../firebase';
+import {FeatureFlags} from '../../../../App';
 
 import BookmarkButton from '../../../Buttons/BookmarkButton';
 import RecommendButton from '../../../Buttons/RecommendButton';
 import RepostToGroupButton from '../../../Buttons/RepostToGroupButton';
 import ShareButton from '../../../Buttons/ShareButton';
 import './PostActions.css';
-
-function BookmarkPostButton({post}) {
-  const [bookmarked, setBookmarked] = useState(false);
-  const [bookmarkID, setBookmarkID] = useState(undefined);
-  // don't toggle when setting the current value
-  const [firstRender, setFirstRender] = useState(true);
-  const featureFlags = useContext(FeatureFlags);
-  const {user} = useContext(AuthContext);
-
-  // set the initial state of the bookmark
-  useEffect(() => {
-    if (user && !featureFlags.has('disable-cloud-firestore')) {
-      db.collection(`users/${user.uid}/bookmarks`)
-        .where('bookmarkedResourceType', '==', 'post')
-        .where('bookmarkedResourceID', '==', post.id)
-        .get()
-        .then((qs) => {
-          if (!qs.empty) {
-            qs.forEach((bookmark) => {
-              setBookmarkID(bookmark.id);
-            });
-            setBookmarked(true);
-          }
-          setFirstRender(false);
-        })
-        .catch((err) => console.log(err));
-    }
-  }, []);
-
-  // update the status of the bookmark
-  useEffect(() => {
-    if (!featureFlags.has('disable-cloud-firestore')) {
-      if (user && !firstRender) {
-        const bookmarkCollection = db.collection(`users/${user.uid}/bookmarks`);
-        if (bookmarked) {
-          bookmarkCollection
-            .add({
-              resourceType: 'bookmark',
-              bookmarkedResourceType: 'post',
-              bookmarkedResourceID: post.id,
-              bookmarkedResourceData: post,
-            })
-            .then((docRef) => {
-              setBookmarked(true);
-              setBookmarkID(docRef.id);
-            })
-            .catch((err) => console.log(err));
-        } else {
-          bookmarkCollection
-            .doc(bookmarkID)
-            .delete()
-            .then(() => setBookmarkID(undefined))
-            .catch((err) => console.log(err));
-        }
-      }
-    }
-  }, [bookmarked]);
-
-  return (
-    <BookmarkButton bookmarked={bookmarked} setBookmarked={setBookmarked} />
-  );
-}
 
 const PostActions = ({post, dedicatedPage}) => {
   const featureFlags = useContext(FeatureFlags);
@@ -79,12 +16,12 @@ const PostActions = ({post, dedicatedPage}) => {
     >
       {featureFlags.has('repost-to-group') ? <RepostToGroupButton /> : <></>}
       {featureFlags.has('share-post') ? <ShareButton /> : <></>}
-      {featureFlags.has('recommendations') ? <RecommendButton /> : <></>}
-      {post ? (
-        <BookmarkPostButton post={post} />
+      {featureFlags.has('recommendations') ? (
+        <RecommendButton post={post} />
       ) : (
-        <BookmarkButton bookmarked={false} setBookmarked={() => {}} />
+        <></>
       )}
+      <BookmarkButton post={post} />
     </div>
   );
 };
@@ -92,7 +29,7 @@ const PostActions = ({post, dedicatedPage}) => {
 export function BookmarkedPostSymbol({post}) {
   return (
     <div className="bookmark-page-post-bookmark">
-      {post ? <BookmarkPostButton post={post} /> : null}
+      {post ? <BookmarkButton post={post} /> : null}
     </div>
   );
 }
