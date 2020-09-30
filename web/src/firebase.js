@@ -27,3 +27,11 @@ if (abbrEnv == 'dev') {
 }
 export const projectURL = 'labspoon-dev-266bc.appspot.com';
 export default firebase;
+
+firebase
+  .functions()
+  .httpsCallable('publications-searchPublications')({
+    query: 'coronavirus',
+  })
+  .then((val) => console.log(val))
+  .catch((err) => console.log(err));
