@@ -1,15 +1,30 @@
 stages:
   - test
 
-test:
+deploy_test_env_functions:
+  image: node:10
   stage: test
   environment:
     name: test
   only:
     - master
   script:
-    - npm run install
-    - npm run build
+    - npm run --prefix functions install
+    - npm run --prefix functions build
     - npm install firebase-tools
     - firebase use --token $FIREBASE_DEPLOY_KEY labspoon-test
-    - firebase deploy -m "pipeline $CI_PIPELINE_ID build $CI_BUILD_ID" --non-interactive --token $FIREBASE_DEPLOY_KEY
+    - firebase deploy -m "pipeline $CI_PIPELINE_ID build $CI_BUILD_ID" --non-interactive --token $FIREBASE_DEPLOY_KEY --only functions
+
+deploy_test_env:
+  image: node:14
+  stage: test
+  environment:
+    name: test
+  only:
+    - master
+  script:
+    - npm run --prefix web install
+    - npm run --prefix web build
+    - npm install firebase-tools
+    - firebase use --token $FIREBASE_DEPLOY_KEY labspoon-test
+    - firebase deploy -m "pipeline $CI_PIPELINE_ID build $CI_BUILD_ID" --non-interactive --token $FIREBASE_DEPLOY_KEY --except functions
