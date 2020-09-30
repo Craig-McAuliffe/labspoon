@@ -13,6 +13,27 @@
   color: #000000;
 }
 
+.edit-button {
+  color: #3099d3;
+  padding-top: 10px;
+  margin-left: 5px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.edit-button h3 {
+  margin-left: -6px;
+}
+
+.edit-button:hover {
+  color: #00507c;
+}
+
+.edit-button-container {
+  display: flex;
+  align-items: center;
+}
+
 .primary-button,
 .primary-button-small {
   border: none;

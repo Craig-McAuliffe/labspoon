@@ -7,6 +7,7 @@ export default function PrimaryButton({
   onClick,
   small,
   children,
+  formID,
   ...props
 }) {
   return (
@@ -14,8 +15,8 @@ export default function PrimaryButton({
       type={submit ? 'submit' : 'button'}
       className={small ? 'primary-button-small' : 'primary-button'}
       onClick={onClick ? onClick : null}
+      form={formID ? formID : null}
     >
-      {' '}
       {small ? <h4>{children}</h4> : <h2>{children}</h2>}
     </button>
   );
