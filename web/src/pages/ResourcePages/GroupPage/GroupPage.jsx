@@ -1,7 +1,7 @@
 import React, {useRef, useEffect, useState, useContext} from 'react';
 import {Link, useParams, useHistory} from 'react-router-dom';
 
-import {FeatureFlags} from '../../../App';
+import {FeatureFlags, AuthContext} from '../../../App';
 import {db} from '../../../firebase';
 
 import {getActiveTabID} from '../../../helpers/filters';
@@ -14,21 +14,23 @@ import groups from '../../../mockdata/groups';
 import GroupPageSider from './GroupPageSider';
 import groupPageFeedData from './GroupPageFeedData';
 import FilterableResults from '../../../components/FilterableResults/FilterableResults';
+import GroupInfoForm from '../../Groups/CreateGroupPage/GroupInfoForm';
 import UserAvatar from '../../../components/Avatar/UserAvatar';
 import FollowGroupButton from '../../../components/Group/FollowGroupButton';
 import MessageButton from '../../../components/Buttons/MessageButton';
+import EditButton from '../../../components/Buttons/EditButton';
 import {PinnedPost} from '../../../components/Posts/Post/Post';
 import SeeMore from '../../../components/SeeMore';
 
 import './GroupPage.css';
 
-function fetchGroupDetailsFromDB(id) {
+function fetchGroupDataFromDB(id) {
   return db
     .doc(`groups/${id}`)
     .get()
-    .then((groupDetails) => {
-      const data = groupDetails.data();
-      data.id = groupDetails.id;
+    .then((groupData) => {
+      const data = groupData.data();
+      data.id = groupData.id;
       return data;
     })
     .catch((err) => console.log(err));
@@ -78,29 +80,31 @@ function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions) {
 export default function GroupPage() {
   const featureFlags = useContext(FeatureFlags);
   const [groupID, setGroupID] = useState(undefined);
-  const [groupDetails, setGroupDetails] = useState(undefined);
+  const [groupData, setGroupData] = useState(undefined);
+  const [userIsMember, setUserIsMember] = useState(false);
+  const [editingGroup, setEditingGroup] = useState(false);
   const history = useHistory();
+  const {user} = useContext(AuthContext);
 
   const groupIDParam = useParams().groupID;
   if (groupID !== groupIDParam) {
     setGroupID(groupIDParam);
   }
 
-  let fetchGroupDetails;
+  let fetchGroupData;
   if (!featureFlags.has('disable-cloud-firestore')) {
-    fetchGroupDetails = () => fetchGroupDetailsFromDB(groupID);
+    fetchGroupData = () => fetchGroupDataFromDB(groupID);
   } else {
-    fetchGroupDetails = () =>
-      groups().filter((group) => group.id === groupID)[0];
+    fetchGroupData = () => groups().filter((group) => group.id === groupID)[0];
   }
 
   useEffect(() => {
-    Promise.resolve(fetchGroupDetails())
-      .then((groupDetails) => {
-        if (!groupDetails) {
+    Promise.resolve(fetchGroupData())
+      .then((groupData) => {
+        if (!groupData) {
           history.push('/notfound');
         }
-        setGroupDetails(groupDetails);
+        setGroupData(groupData);
       })
       .catch((err) => console.log(err));
   }, [groupID]);
@@ -119,7 +123,7 @@ export default function GroupPage() {
       fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions);
   } else {
     fetchFeedData = (skip, limit, filterOptions, last) =>
-      groupPageFeedData(skip, limit, filterOptions, groupDetails);
+      groupPageFeedData(skip, limit, filterOptions, groupData);
   }
 
   const relationshipFilter = [
@@ -181,47 +185,77 @@ export default function GroupPage() {
     });
   }
 
+  if (user) {
+    db.collection(`groups/${groupID}/members`)
+      .where('id', '==', user.uid)
+      .get()
+      .then((qs) => {
+        if (!qs.empty) {
+          setUserIsMember(true);
+        } else setUserIsMember(false);
+      })
+      .catch((err) => console.log(err));
+  }
+
   return (
     <>
       {featureFlags.has('related-resources') ? (
-        <SuggestedGroups groupDetails={groupDetails} />
+        <SuggestedGroups groupData={groupData} />
       ) : (
         <></>
       )}
       <div className="content-layout">
         {previousPage()}
-        <div className="group-details">
-          <GroupDetails
-            group={groupDetails}
-            groupDescriptionRef={groupDescriptionRef}
-          />
-        </div>
-        <FilterableResults
-          fetchResults={fetchFeedData}
-          getDefaultFilter={getDefaultFilter}
-          limit={10}
-          useTabs={true}
-          useFilterSider={false}
-        />
+        {editingGroup ? (
+          <div className="group-details">
+            <EditingGroup
+              groupData={groupData}
+              setEditingGroup={setEditingGroup}
+            />
+          </div>
+        ) : (
+          <>
+            <div className="group-details">
+              <GroupDetails
+                group={groupData}
+                groupDescriptionRef={groupDescriptionRef}
+                userIsMember={userIsMember}
+                setEditingGroup={setEditingGroup}
+              />
+            </div>
+            <FilterableResults
+              fetchResults={fetchFeedData}
+              getDefaultFilter={getDefaultFilter}
+              limit={10}
+              useTabs={true}
+              useFilterSider={false}
+            />
+          </>
+        )}
       </div>
     </>
   );
 }
 
-function SuggestedGroups({groupDetails}) {
+function SuggestedGroups({groupData}) {
   return (
     <div className="sider-layout">
       <div className="resource-sider">
         <h3 className="resource-sider-title">Suggested Groups</h3>
         <div className="suggested-resources-container">
-          <GroupPageSider group={groupDetails} />
+          <GroupPageSider group={groupData} />
         </div>
       </div>
     </div>
   );
 }
 
-const GroupDetails = ({group, groupDescriptionRef}) => {
+const GroupDetails = ({
+  group,
+  groupDescriptionRef,
+  userIsMember,
+  setEditingGroup,
+}) => {
   const [displayFullDescription, setDisplayFullDescription] = useState({
     display: false,
     size: 100,
@@ -266,9 +300,70 @@ const GroupDetails = ({group, groupDescriptionRef}) => {
           />
         </div>
       </div>
+      {userIsMember ? (
+        <div className="group-page-edit-button-container">
+          <EditButton editAction={() => setEditingGroup(true)}>
+            Edit Group
+          </EditButton>
+        </div>
+      ) : null}
       <div className="pinned-post-container">
         <PinnedPost post={group.pinnedPost} />
       </div>
     </>
   );
 };
+
+function EditingGroup({groupData, setEditingGroup}) {
+  const groupID = groupData.id;
+  const [groupMembers, setGroupMembers] = useState([]);
+  useEffect(() => {
+    const fetchGroupMembers = db
+      .collection(`groups/${groupID}/members`)
+      .get()
+      .then((qs) => {
+        const users = [];
+        qs.forEach((doc) => {
+          const user = doc.data();
+          user.resourceType = 'user';
+          users.push(user);
+        });
+        return users;
+      });
+    fetchGroupMembers.then((fetchedMembers) => setGroupMembers(fetchedMembers));
+  }, [groupID]);
+
+  const initialValues = {
+    name: groupData.name,
+    location: groupData.location,
+    institution: groupData.institution,
+    website: groupData.website,
+    about: groupData.about,
+  };
+
+  const onEditSubmit = (values) => {
+    const writeToDB = () => {
+      const batch = db.batch();
+      const groupDocRef = db.doc(`groups/${groupID}`);
+      batch.update(groupDocRef, values);
+      batch
+        .commit()
+        .catch((err) => alert('batch failed to commit'))
+        .then(() => setEditingGroup(false));
+    };
+
+    writeToDB();
+  };
+
+  return (
+    <GroupInfoForm
+      initialValues={initialValues}
+      onSubmit={onEditSubmit}
+      selectedUsers={groupMembers}
+      setSelectedUsers={() => {}}
+      existingAvatar={groupData.avatar}
+      cancelForm={() => setEditingGroup(false)}
+      submitText="Save Changes"
+    />
+  );
+}
