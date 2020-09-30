@@ -14,6 +14,7 @@ export default function userPageFeedData(skip, limit, filterOptions, userID) {
     getFilteredPosts([])
       .filter((post) => post.author.id === userID)
       .slice(skip, skip + limit);
+
   const publicationsByUser = () =>
     publications()
       .filter(
@@ -23,6 +24,7 @@ export default function userPageFeedData(skip, limit, filterOptions, userID) {
           ).length > 0
       )
       .slice(skip, skip + limit);
+
   const userFollowing = () =>
     userRelationships.followsUsers.slice(skip, skip + limit);
 
@@ -47,6 +49,7 @@ export default function userPageFeedData(skip, limit, filterOptions, userID) {
 
   if (activeTab.length > 0) {
     const activeTabID = activeTab[0].data.id;
+    console.log(activeTabID);
     switch (activeTabID) {
       case 'overview':
         resultsList = [

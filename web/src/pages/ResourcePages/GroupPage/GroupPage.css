@@ -73,3 +73,8 @@
 .pinned-post-container {
   margin: 10px 0px;
 }
+
+.group-page-edit-button-container {
+  display: flex;
+  justify-content: flex-end;
+}
