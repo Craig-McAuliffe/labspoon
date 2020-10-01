@@ -31,10 +31,6 @@ function fetchUserFeedData(uuid, skip, limit, filter, last) {
   return filterFeedData(collection, skip, limit, filter, last);
 }
 
-function fetchPublicFeedData(skip, limit, filter, last) {
-  const collection = db.collection('feeds/newsFeed/posts').orderBy('timestamp');
-  return filterFeedData(collection, skip, limit, filter, last);
-}
 function filterFeedData(collection, skip, limit, filter, last) {
   const enabledIDs = getEnabledIDsFromFilter(filter);
   if (enabledIDs.size !== 0) {
@@ -111,15 +107,6 @@ function filterFeedData(collection, skip, limit, filter, last) {
     });
     return mappedResults;
   });
-}
-
-function fetchPublicFeedFilters() {
-  const results = db
-    .collection(`feeds/newsFeed/filterCollections`)
-    .get()
-    .then((fcqs) => getFiltersFromFilterCollection(fcqs))
-    .catch((err) => console.log(err));
-  return results;
 }
 
 function sortAndPaginateFeedData(results, last, limit) {
@@ -201,8 +188,8 @@ export default function FollowingFeedPage() {
         fetchUserFeedData(user.uid, skip, limit, filter, last);
       getDefaultFilter = () => fetchUserFeedFilters(user.uid);
     } else {
-      fetchResults = fetchPublicFeedData;
-      getDefaultFilter = fetchPublicFeedFilters;
+      fetchResults = () => [];
+      getDefaultFilter = () => [];
     }
   } else {
     fetchResults = fetchTestFeedData;
