@@ -71,9 +71,9 @@ export default function Routes({user, setUser}) {
       <Route path="/topic/:topicID">
         <TopicPage />
       </Route>
-      <Route path="/onboarding">
+      <AuthRoute user={user} path="/onboarding">
         <OnboardingPage />
-      </Route>
+      </AuthRoute>
       <Route path="/notfound">
         <NotFoundPage />
       </Route>
