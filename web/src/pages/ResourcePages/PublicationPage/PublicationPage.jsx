@@ -22,7 +22,7 @@ function fetchPublicationDetailsFromDB(publicationID) {
     .catch((err) => console.log(err));
 }
 
-export default function PublicationPage({}) {
+export default function PublicationPage() {
   const featureFlags = useContext(FeatureFlags);
   const [publicationID, setPublicationID] = useState(undefined);
   const [publicationDetails, setPublicationDetails] = useState(undefined);
@@ -49,6 +49,7 @@ export default function PublicationPage({}) {
         setPublicationDetails(newPublicationDetails);
       })
       .catch((err) => console.log(err));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [publicationID]);
 
   let fetchFeedData;
@@ -197,7 +198,7 @@ function PublicationBody({publicationDetails}) {
 function PublicationLink({publicationURL}) {
   if (!publicationURL) return <></>;
   return (
-    <a href={publicationURL} target="_blank" rel="noreferrer">
+    <a href={publicationURL} target="_blank" rel="noopener noreferrer">
       Go to full article
     </a>
   );

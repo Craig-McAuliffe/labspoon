@@ -49,6 +49,7 @@ export default function UserPage() {
         setUserDetails(userDetails);
       })
       .catch((err) => console.log(err));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userID]);
 
   let fetchFeedData;
@@ -177,7 +178,7 @@ function SuggestedUsers({userID}) {
 function UserDetails({user}) {
   const {userProfile} = useContext(AuthContext);
   if (user === undefined) return <></>;
-  const ownProfile = userProfile && userProfile.id == user.id;
+  const ownProfile = userProfile && userProfile.id === user.id;
   return (
     <div>
       <div className="user-cover-photo-container">
@@ -249,7 +250,6 @@ function userPageFeedDataFromDB(skip, limit, filterOptions, userID, last) {
         limit,
         last
       );
-      break;
     case 'coauthors':
       results = [];
       break;

@@ -18,7 +18,7 @@ firebase.initializeApp(firebaseConfig);
 export const auth = firebase.auth();
 export const db = firebase.firestore();
 export const storage = firebase.storage();
-if (abbrEnv == 'dev') {
+if (abbrEnv === 'dev') {
   db.settings({
     host: 'localhost:8080',
     ssl: false,
