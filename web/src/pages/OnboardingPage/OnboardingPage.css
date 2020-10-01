@@ -1,0 +1,9 @@
+.onboarding-search input {
+  display: inline-block;
+  flex-grow: 1;
+  height: 40px;
+  border-bottom: 1px solid #00507c;
+  border-radius: 0%;
+  background: white;
+  padding-left: 0px;
+}
