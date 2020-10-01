@@ -7,6 +7,7 @@ before_script:
 deploy_test_env_functions:
   image: node:10
   stage: test
+  resource_group: test
   environment:
     name: test
   only:
@@ -20,6 +21,7 @@ deploy_test_env_functions:
 deploy_test_env:
   image: node:current
   stage: test
+  resource_group: test
   environment:
     name: test
   only:
