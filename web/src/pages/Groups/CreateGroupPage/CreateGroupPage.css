@@ -1,8 +1,8 @@
 .create-group-submit-cancel-container {
   display: flex;
   justify-content: space-between;
-  margin-top: 50px;
-  padding-top: 50px;
+  margin-top: 90px;
+  padding-top: 10px;
   min-width: 100%;
   border-top: 1px solid #99999f;
 }

@@ -22,10 +22,6 @@
   display: inline-block;
 }
 
-.onboarding-hint-non-researchers {
-  color: #00507c;
-}
-
 .onboarding-user-container {
   margin-bottom: 80px;
 }
@@ -95,4 +91,21 @@
 .onboarding-create-group-button-container svg {
   margin-right: 5px;
   margin-top: 3px;
+}
+
+.onboarding-hint-do-it-later {
+  margin-top: 20px;
+  text-align: center;
+  color: #99999f;
+}
+
+.onboarding-create-group-container {
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
+  padding-bottom: 4px;
+}
+
+.onboarding-success-overlay-container {
+  min-width: 100%;
+  display: flex;
+  justify-content: center;
 }

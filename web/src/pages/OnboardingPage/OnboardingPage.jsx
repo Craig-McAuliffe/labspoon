@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useContext, useRef} from 'react';
-import {useHistory, Link} from 'react-router-dom';
+import {useHistory} from 'react-router-dom';
 import {AuthContext} from '../../App';
 import {db} from '../../firebase';
 import {getPaginatedUserReferencesFromCollectionRef} from '../../helpers/users';
@@ -9,6 +9,7 @@ import TopicListItem from '../../components/Topics/TopicListItem';
 import GroupListItem from '../../components/Group/GroupListItem';
 import FollowUserButton from '../../components/User/FollowUserButton/FollowUserButton';
 import {CreateGroupIcon} from '../../assets/MenuIcons';
+import CreateGroupPage from '../Groups/CreateGroupPage/CreateGroupPage';
 import UserListItem from '../../components/User/UserListItem';
 import {SearchIconGrey} from '../../assets/HeaderIcons';
 import {
@@ -26,25 +27,23 @@ export default function OnboardingPage() {
   const {user} = useContext(AuthContext);
   const history = useHistory();
   if (user === undefined) history.push('/');
-  const [onboardingStage, setOnboardingStage] = useState(0);
+  const [onboardingStage, setOnboardingStage] = useState('follow-things');
   const OnboardingStageDisplay = () => {
     switch (onboardingStage) {
-      case 0:
+      case 'follow-things':
         return (
           <OnboardingFollow
             setOnboardingStage={setOnboardingStage}
             user={user}
           />
         );
-      case 1:
+      case 'join-groups':
         return (
           <OnboardingGroup
             setOnboardingStage={setOnboardingStage}
             user={user}
           />
         );
-      case 2:
-        return null;
       default:
         return null;
     }
@@ -54,12 +53,44 @@ export default function OnboardingPage() {
       <div className="page-content-container">
         <h2 className="onboarding-main-title">Welcome to Labspoon!</h2>
         <OnboardingStageDisplay />
+        <div className="onboarding-skip-next-container">
+          <button
+            className="onboarding-skip-button"
+            onClick={() =>
+              onboardingStage === 'follow-things'
+                ? setOnboardingStage('join-groups')
+                : history.push('/')
+            }
+          >
+            Skip
+          </button>
+          <div>
+            {onboardingStage === 'join-groups' ? (
+              <button
+                className="onboarding-back-button"
+                onClick={() => setOnboardingStage('follow-things')}
+              >
+                Back
+              </button>
+            ) : null}
+            <button
+              className="onboarding-next-button"
+              onClick={() =>
+                onboardingStage === 'follow-things'
+                  ? setOnboardingStage('join-groups')
+                  : history.push('/')
+              }
+            >
+              <h3>{onboardingStage === 'join-groups' ? 'Finish' : 'Next'}</h3>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-function OnboardingFollow({setOnboardingStage, user}) {
+function OnboardingFollow({user}) {
   const [displayedUsers, setDisplayedUsers] = useState([]);
   const [displayedTopics, setDisplayedTopics] = useState([]);
   const userSearchRef = useRef();
@@ -81,8 +112,8 @@ function OnboardingFollow({setOnboardingStage, user}) {
     getTopics().then((res) => setDisplayedTopics(res));
   }, [user]);
 
+  // This checks whether the search input has any values and re-populates list if not.
   useEffect(() => {
-    console.log(userSearchRef);
     if (
       userSearchRef.current.lastChild.firstChild.firstChild.value.length < 1 &&
       displayedUsers.length === 0
@@ -106,9 +137,11 @@ function OnboardingFollow({setOnboardingStage, user}) {
           Find researchers who are active in your field of interest:
         </h4>
         <div className="onboarding-user-container">
-          <OnboardingUserSearch
-            setDisplayedUsers={setDisplayedUsers}
-            userSearchRef={userSearchRef}
+          <OnboardingSearch
+            setDisplayedItems={setDisplayedUsers}
+            inputRef={userSearchRef}
+            indexName="_USERS"
+            placeholderText="Find researchers"
           />
           <div>
             <div className="onboarding-users-to-follow-container">
@@ -126,9 +159,11 @@ function OnboardingFollow({setOnboardingStage, user}) {
           Or try looking for a specific topic:
         </h4>
         <div className="onboarding-topic-search-container">
-          <OnboardingTopicSearch
-            setDisplayedTopics={setDisplayedTopics}
-            topicSearchRef={topicSearchRef}
+          <OnboardingSearch
+            setDisplayedItems={setDisplayedTopics}
+            inputRef={topicSearchRef}
+            indexName="_TOPICS"
+            placeholderText="Find topics"
           />
           <div className="onboarding-topics-to-follow-container">
             {displayedTopics.map((displayedTopic) => (
@@ -137,51 +172,38 @@ function OnboardingFollow({setOnboardingStage, user}) {
           </div>
         </div>
       </div>
-      <div className="onboarding-skip-next-container">
-        <button
-          className="onboarding-skip-button"
-          onClick={() =>
-            setOnboardingStage((onboardingStage) => onboardingStage + 1)
-          }
-        >
-          Skip
-        </button>
-        <button
-          className="onboarding-next-button"
-          onClick={() =>
-            setOnboardingStage((onboardingStage) => onboardingStage + 1)
-          }
-        >
-          <h3> Next</h3>
-        </button>
-      </div>
     </div>
   );
 }
 
-function OnboardingUserSearch({setDisplayedUsers, userSearchRef}) {
+function OnboardingSearch({
+  setDisplayedItems,
+  inputRef,
+  indexName,
+  placeholderText,
+}) {
   const UsersResults = ({searchResults}) => {
     if (
       searchResults &&
       searchResults.nbHits !== 0 &&
       searchResults.query.length > 0
     )
-      setDisplayedUsers(searchResults.hits);
+      setDisplayedItems(searchResults.hits);
     return null;
   };
 
   const CustomStateUsers = connectStateResults(UsersResults);
   return (
-    <div className="onboarding-search-container" ref={userSearchRef}>
+    <div className="onboarding-search-container" ref={inputRef}>
       <SearchIconGrey />
       <InstantSearch
         searchClient={searchClient}
-        indexName={abbrEnv + '_USERS'}
-        onSearchStateChange={() => setDisplayedUsers([])}
+        indexName={abbrEnv + indexName}
+        onSearchStateChange={() => setDisplayedItems([])}
       >
         <SearchBox
           translations={{
-            placeholder: 'Find researchers',
+            placeholder: placeholderText,
           }}
         />
 
@@ -192,43 +214,17 @@ function OnboardingUserSearch({setDisplayedUsers, userSearchRef}) {
   );
 }
 
-function OnboardingTopicSearch({setDisplayedTopics, topicSearchRef}) {
-  const TopicsResults = ({searchResults}) => {
-    if (
-      searchResults &&
-      searchResults.nbHits !== 0 &&
-      searchResults.query.length > 0
-    )
-      setDisplayedTopics(searchResults.hits);
-
-    return null;
-  };
-
-  const CustomStateTopics = connectStateResults(TopicsResults);
-  return (
-    <div className="onboarding-search-container" ref={topicSearchRef}>
-      <SearchIconGrey />
-      <InstantSearch
-        searchClient={searchClient}
-        indexName={abbrEnv + '_TOPICS'}
-        onSearchStateChange={() => setDisplayedTopics([])}
-      >
-        <SearchBox
-          translations={{
-            placeholder: 'Find topics',
-          }}
-        />
-        <CustomStateTopics />
-        <Configure hitsPerPage={10} />
-      </InstantSearch>
-    </div>
-  );
-}
-
-function OnboardingGroup({setOnboardingStage, user}) {
+function OnboardingGroup({user}) {
   const [displayedGroups, setDisplayedGroups] = useState([]);
-  const history = useHistory();
+  const [creatingGroup, setCreatingGroup] = useState(false);
+  const [confirmGroupCreation, setConfirmGroupCreation] = useState(false);
   const groupSearchRef = useRef();
+
+  useEffect(() => {
+    if (confirmGroupCreation) {
+      setTimeout(() => setConfirmGroupCreation(false), 5000);
+    }
+  }, [confirmGroupCreation]);
 
   const getGroups = () => {
     const groupsCollection = db.collection(`groups`);
@@ -239,6 +235,7 @@ function OnboardingGroup({setOnboardingStage, user}) {
     getGroups().then((res) => setDisplayedGroups(res));
   }, [user]);
 
+  // This checks whether the search input has any values and re-populates list if not.
   useEffect(() => {
     if (
       groupSearchRef.current.lastChild.firstChild.firstChild.value.length < 1 &&
@@ -251,89 +248,52 @@ function OnboardingGroup({setOnboardingStage, user}) {
     <div className="onboarding-page-container">
       <h3>Group pages are a great place to share updates from the lab.</h3>
       <h4 className="onboarding-page-instructions">{`Are you part of a research group? Find it on Labspoon and request to join.`}</h4>
-      <span className="onboarding-hint-non-researchers">
-        {' '}
-        (You can follow groups regardless!)
-      </span>
       <div onboarding-group-search>
-        <OnboardingGroupSearch
-          setDisplayedGroups={setDisplayedGroups}
-          groupSearchRef={groupSearchRef}
+        <OnboardingSearch
+          setDisplayedItems={setDisplayedGroups}
+          inputRef={groupSearchRef}
+          indexName="_GROUPS"
+          placeholderText="Find your group"
         />
-
         <div className="onboarding-groups-to-follow-container">
           {displayedGroups.map((displayedGroup) => (
             <GroupListItem group={displayedGroup} key={displayedGroup.id} />
           ))}
         </div>
       </div>
-      <h4 className="onboarding-page-instructions">
-        Is your group not on Labspoon? Create one now.
-      </h4>
-      <div className="onboarding-create-group-button-container">
-        <Link href="/group/create">
-          <div className="onboarding-create-group-button">
-            <CreateGroupIcon />
-            <h4>Create a Group</h4>
-          </div>
-        </Link>
-      </div>
-      <div className="onboarding-skip-next-container">
-        <button
-          className="onboarding-skip-button"
-          onClick={() => history.push('/')}
-        >
-          Skip
-        </button>
-        <div>
-          <button
-            className="onboarding-back-button"
-            onClick={() =>
-              setOnboardingStage((onboardingStage) => onboardingStage - 1)
-            }
-          >
-            Back
-          </button>
-          <button
-            className="onboarding-next-button"
-            onClick={() => history.push('/')}
-          >
-            <h3> Next</h3>
-          </button>
+      {creatingGroup ? (
+        <div className="onboarding-create-group-container">
+          <CreateGroupPage
+            onboardingCancelOrSubmitAction={() => setCreatingGroup(false)}
+            confirmGroupCreation={() => setConfirmGroupCreation(true)}
+          />
         </div>
-      </div>
-    </div>
-  );
-}
+      ) : (
+        <>
+          <h4 className="onboarding-page-instructions">
+            Is your group not on Labspoon? You can create one now.
+          </h4>
+          <div className="onboarding-create-group-button-container">
+            <button onClick={() => setCreatingGroup(true)}>
+              <div className="onboarding-create-group-button">
+                <CreateGroupIcon />
+                <h4>Create a Group</h4>
+              </div>
+            </button>
+          </div>
+          <p className="onboarding-hint-do-it-later">
+            {`Don't worry, you can always make one later, just click on your profile picture in the top right!`}
+          </p>
 
-function OnboardingGroupSearch({setDisplayedGroups, groupSearchRef}) {
-  const UsersResults = ({searchResults}) => {
-    if (
-      searchResults &&
-      searchResults.nbHits !== 0 &&
-      searchResults.query.length > 0
-    )
-      setDisplayedGroups(searchResults.hits);
-    return null;
-  };
-
-  const CustomStateUsers = connectStateResults(UsersResults);
-  return (
-    <div className="onboarding-search-container" ref={groupSearchRef}>
-      <SearchIconGrey />
-      <InstantSearch
-        searchClient={searchClient}
-        indexName={abbrEnv + '_GROUPS'}
-        onSearchStateChange={() => setDisplayedGroups([])}
-      >
-        <SearchBox
-          translations={{
-            placeholder: 'Find your group',
-          }}
-        />
-        <CustomStateUsers />
-        <Configure hitsPerPage={10} />
-      </InstantSearch>
+          {confirmGroupCreation ? (
+            <div className="onboarding-success-overlay-container">
+              <div className="success-overlay">
+                <h3>Group Created! You can find it in the top right menu.</h3>
+              </div>{' '}
+            </div>
+          ) : null}
+        </>
+      )}
     </div>
   );
 }
