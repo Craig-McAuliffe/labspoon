@@ -26,7 +26,7 @@ const FollowButton = ({following, setFollowing}) => {
   });
 
   return (
-    <div className="follow-button-position">
+    <div className="button-position">
       <button
         className={following ? 'primary-button-clicked' : 'primary-button'}
         onClick={followAction}
