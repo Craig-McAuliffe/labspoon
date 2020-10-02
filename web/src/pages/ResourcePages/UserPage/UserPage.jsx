@@ -15,7 +15,10 @@ import {getPaginatedGroupReferencesFromCollectionRef} from '../../../helpers/gro
 import {getPaginatedUserReferencesFromCollectionRef} from '../../../helpers/users';
 import {getPaginatedRecommendationsFromCollectionRef} from '../../../helpers/recommendations';
 
-import FilterableResults from '../../../components/FilterableResults/FilterableResults';
+import FilterableResults, {
+  ResourceTabs,
+  NewResultsWrapper,
+} from '../../../components/FilterableResults/FilterableResults';
 import MessageButton from '../../../components/Buttons/MessageButton';
 import {UserPageAvatar} from '../../../components/Avatar/UserAvatar';
 import FollowUserButton from '../../../components/User/FollowUserButton/FollowUserButton';
@@ -136,29 +139,23 @@ export default function UserPage() {
     });
   }
 
-  const getDefaultFilter = () => relationshipFilter;
-
   return (
-    <>
-      <div className="content-layout">
-        {featureFlags.has('related-resources') ? (
-          <SuggestedUsers userID={userID} />
-        ) : (
-          <></>
-        )}
-        <div className="details-container">
-          <UserDetails user={userDetails} />
-        </div>
-
-        <FilterableResults
-          fetchResults={fetchFeedData}
-          getDefaultFilter={getDefaultFilter}
-          limit={10}
-          useTabs={true}
-          useFilterSider={false}
-        />
+    <div className="content-layout">
+      {featureFlags.has('related-resources') ? (
+        <SuggestedUsers userID={userID} />
+      ) : (
+        <></>
+      )}
+      <div className="details-container">
+        <UserDetails user={userDetails} />
       </div>
-    </>
+      <FilterableResults fetchResults={fetchFeedData} limit={10}>
+        <div className="feed-container">
+          <ResourceTabs tabs={relationshipFilter} />
+          <NewResultsWrapper />
+        </div>
+      </FilterableResults>
+    </div>
   );
 }
 
