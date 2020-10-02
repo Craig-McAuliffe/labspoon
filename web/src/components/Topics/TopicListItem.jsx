@@ -5,7 +5,7 @@ import FollowTopicButton from './FollowTopicButton';
 
 import './TopicListItem.css';
 
-export default function TopicListItem({topic, dedicatedPage}) {
+export default function TopicListItem({topic, dedicatedPage, children}) {
   if (!topic) {
     return <></>;
   }
@@ -19,6 +19,7 @@ export default function TopicListItem({topic, dedicatedPage}) {
         </Link>
       )}
       <FollowTopicButton targetTopic={topic} />
+      {children}
     </div>
   );
 }

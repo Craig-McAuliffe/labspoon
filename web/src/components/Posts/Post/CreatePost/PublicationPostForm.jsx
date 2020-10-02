@@ -24,6 +24,7 @@ export default function PublicationPostForm({
   const initialValues = {
     title: '',
     publicationURL: '',
+    topics: '',
   };
 
   const validationSchema = Yup.object({

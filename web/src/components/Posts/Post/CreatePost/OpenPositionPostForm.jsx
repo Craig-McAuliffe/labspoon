@@ -28,6 +28,7 @@ export default function OpenPositionPostForm({
     salary: '',
     methods: '',
     startDate: '',
+    topics: '',
   };
   const validationSchema = Yup.object({
     title: Yup.string().required('You need to write something!'),

@@ -6,16 +6,6 @@
   margin-top: 10px;
 }
 
-.onboarding-search-container input {
-  display: inline-block;
-  flex-grow: 1;
-  height: 40px;
-  border-bottom: 1px solid #00507c;
-  border-radius: 0%;
-  background: white;
-  padding-left: 0px;
-}
-
 .onboarding-page-instructions {
   margin-top: 40px;
   color: #5d5d65;
@@ -24,24 +14,6 @@
 
 .onboarding-user-container {
   margin-bottom: 80px;
-}
-
-.onboarding-search-container {
-  margin: 20px 0px;
-  display: flex;
-  align-items: center;
-}
-
-.onboarding-search-container path {
-  fill: #00507c;
-}
-
-.onboarding-search-container svg {
-  margin-right: 10px;
-}
-
-.ais-SearchBox {
-  flex-grow: 1;
 }
 
 .onboarding-skip-next-container {

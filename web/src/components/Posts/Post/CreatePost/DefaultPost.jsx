@@ -23,6 +23,7 @@ export default function DefaultPost({
   };
   const initialValues = {
     title: '',
+    topics: '',
   };
   const validationSchema = Yup.object({
     title: Yup.string().required('You need to write something!'),

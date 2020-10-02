@@ -11,17 +11,8 @@ import FollowUserButton from '../../components/User/FollowUserButton/FollowUserB
 import {CreateGroupIcon} from '../../assets/MenuIcons';
 import CreateGroupPage from '../Groups/CreateGroupPage/CreateGroupPage';
 import UserListItem from '../../components/User/UserListItem';
-import {SearchIconGrey} from '../../assets/HeaderIcons';
-import {
-  InstantSearch,
-  SearchBox,
-  Configure,
-  connectStateResults,
-} from 'react-instantsearch-dom';
-import {searchClient} from '../../algolia';
+import FormDatabaseSearch from '../../components/Forms/FormDatabaseSearch';
 import './OnboardingPage.css';
-
-const abbrEnv = 'dev';
 
 export default function OnboardingPage() {
   const {user} = useContext(AuthContext);
@@ -139,7 +130,7 @@ function OnboardingFollow({user}) {
           Find researchers who are active in your field of interest:
         </h4>
         <div className="onboarding-user-container">
-          <OnboardingSearch
+          <FormDatabaseSearch
             setDisplayedItems={setDisplayedUsers}
             inputRef={userSearchRef}
             indexName="_USERS"
@@ -161,7 +152,7 @@ function OnboardingFollow({user}) {
           Or try looking for a specific topic:
         </h4>
         <div className="onboarding-topic-search-container">
-          <OnboardingSearch
+          <FormDatabaseSearch
             setDisplayedItems={setDisplayedTopics}
             inputRef={topicSearchRef}
             indexName="_TOPICS"
@@ -174,44 +165,6 @@ function OnboardingFollow({user}) {
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function OnboardingSearch({
-  setDisplayedItems,
-  inputRef,
-  indexName,
-  placeholderText,
-}) {
-  const UsersResults = ({searchResults}) => {
-    if (
-      searchResults &&
-      searchResults.nbHits !== 0 &&
-      searchResults.query.length > 0
-    )
-      setDisplayedItems(searchResults.hits);
-    return null;
-  };
-
-  const CustomStateUsers = connectStateResults(UsersResults);
-  return (
-    <div className="onboarding-search-container" ref={inputRef}>
-      <SearchIconGrey />
-      <InstantSearch
-        searchClient={searchClient}
-        indexName={abbrEnv + indexName}
-        onSearchStateChange={() => setDisplayedItems([])}
-      >
-        <SearchBox
-          translations={{
-            placeholder: placeholderText,
-          }}
-        />
-
-        <CustomStateUsers />
-        <Configure hitsPerPage={10} />
-      </InstantSearch>
     </div>
   );
 }
@@ -251,7 +204,7 @@ function OnboardingGroup({user}) {
       <h3>Group pages are a great place to share updates from the lab.</h3>
       <h4 className="onboarding-page-instructions">{`Are you part of a research group? Find it on Labspoon and request to join.`}</h4>
       <div onboarding-group-search>
-        <OnboardingSearch
+        <FormDatabaseSearch
           setDisplayedItems={setDisplayedGroups}
           inputRef={groupSearchRef}
           indexName="_GROUPS"
