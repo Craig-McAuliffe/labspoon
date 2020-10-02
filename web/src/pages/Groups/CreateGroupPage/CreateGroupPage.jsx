@@ -10,7 +10,12 @@ import {AuthContext} from '../../../App';
 
 import './CreateGroupPage.css';
 
-export default function CreateGroupPage() {
+import './CreateGroupPage.css';
+
+export default function CreateGroupPage({
+  onboardingCancelOrSubmitAction,
+  confirmGroupCreation,
+}) {
   const history = useHistory();
   const {user, userProfile} = useContext(AuthContext);
   const [selectedUsers, setSelectedUsers] = useState([]);
@@ -58,7 +63,14 @@ export default function CreateGroupPage() {
       batch
         .commit()
         .catch((err) => alert('batch failed to commit'))
-        .then(() => history.push(`/group/${groupID}`));
+        .then(() => {
+          if (onboardingCancelOrSubmitAction) {
+            onboardingCancelOrSubmitAction();
+            confirmGroupCreation();
+          } else {
+            history.push(`/group/${groupID}`);
+          }
+        });
     };
     if (avatar.length > 0) {
       return avatarStorageRef.put(avatar[0], {contentType: avatar[0].type}).on(
@@ -83,7 +95,11 @@ export default function CreateGroupPage() {
       setAvatar={setAvatar}
       selectedUsers={selectedUsers}
       setSelectedUsers={setSelectedUsers}
-      cancelForm={() => history.push('/')}
+      cancelForm={
+        onboardingCancelOrSubmitAction
+          ? onboardingCancelOrSubmitAction
+          : () => history.push('/')
+      }
       submitText="Create Group"
     />
   );

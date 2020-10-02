@@ -21,6 +21,7 @@ import PostPage from './pages/ResourcePages/PostPage';
 import TopicPage from './pages/TopicPage';
 import FrontierPage from './pages/FrontierPage';
 import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
+import OnboardingPage from './pages/OnboardingPage';
 
 /**
  * Top level routing structure for the app.
@@ -70,6 +71,9 @@ export default function Routes({user, setUser}) {
       <Route path="/topic/:topicID">
         <TopicPage />
       </Route>
+      <AuthRoute user={user} path="/onboarding">
+        <OnboardingPage />
+      </AuthRoute>
       <Route path="/notfound">
         <NotFoundPage />
       </Route>

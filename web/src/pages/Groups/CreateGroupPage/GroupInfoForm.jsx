@@ -44,7 +44,6 @@ export default function GroupInfoForm({
 }) {
   const {user} = useContext(AuthContext);
   const featureFlags = useContext(FeatureFlags);
-  console.log(existingAvatar);
   const validationSchema = Yup.object({
     name: Yup.string().required('Name is required'),
     location: Yup.string(),

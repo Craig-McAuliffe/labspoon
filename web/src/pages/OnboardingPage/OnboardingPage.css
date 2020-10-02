@@ -1,0 +1,111 @@
+.onboarding-main-title {
+  color: #99999f;
+}
+
+.onboarding-page-container {
+  margin-top: 10px;
+}
+
+.onboarding-search-container input {
+  display: inline-block;
+  flex-grow: 1;
+  height: 40px;
+  border-bottom: 1px solid #00507c;
+  border-radius: 0%;
+  background: white;
+  padding-left: 0px;
+}
+
+.onboarding-page-instructions {
+  margin-top: 40px;
+  color: #5d5d65;
+  display: inline-block;
+}
+
+.onboarding-user-container {
+  margin-bottom: 80px;
+}
+
+.onboarding-search-container {
+  margin: 20px 0px;
+  display: flex;
+  align-items: center;
+}
+
+.onboarding-search-container path {
+  fill: #00507c;
+}
+
+.onboarding-search-container svg {
+  margin-right: 10px;
+}
+
+.ais-SearchBox {
+  flex-grow: 1;
+}
+
+.onboarding-skip-next-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 50px;
+  border-top: 2px solid #00507c;
+  padding-top: 10px;
+}
+
+.onboarding-back-button {
+  color: #00507c;
+  margin-right: 6px;
+}
+
+.onboarding-next-button {
+  color: #00507c;
+  padding: 8px 16px 4px 16px;
+  border: 2px solid #00507c;
+}
+
+.onboarding-skip-button {
+  color: #99999f;
+}
+
+.onboarding-create-group-button-container a:hover {
+  text-decoration: none;
+  color: #00507c;
+  border: 1px solid #00507c;
+}
+
+.onboarding-create-group-button-container {
+  display: flex;
+  margin-top: 20px;
+  min-width: 100%;
+  justify-content: center;
+}
+
+.onboarding-create-group-button {
+  border: 2px solid #00507c;
+  padding: 8px 0px 8px 25px;
+  width: 200px;
+  display: flex;
+  align-items: center;
+}
+
+.onboarding-create-group-button-container svg {
+  margin-right: 5px;
+  margin-top: 3px;
+}
+
+.onboarding-hint-do-it-later {
+  margin-top: 20px;
+  text-align: center;
+  color: #99999f;
+}
+
+.onboarding-create-group-container {
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
+  padding-bottom: 4px;
+}
+
+.onboarding-success-overlay-container {
+  min-width: 100%;
+  display: flex;
+  justify-content: center;
+}

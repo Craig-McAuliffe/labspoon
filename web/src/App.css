@@ -90,6 +90,19 @@
   margin-bottom: 20px;
 }
 
+.success-overlay {
+  display: flex;
+  justify-content: center;
+  border: 2px solid #39ae2e;
+  box-shadow: 0px 0px 4px rgba(1, 66, 15, 0.4);
+  padding: 5px;
+}
+
+.success-overlay h3 {
+  line-height: normal;
+  margin: 10px 10px;
+}
+
 @media screen and (max-width: 1017px) {
   .sider-layout {
     display: none;
