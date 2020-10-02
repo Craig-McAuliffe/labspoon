@@ -54,7 +54,9 @@ const FollowsPage = () => {
 
   return (
     <div className="content-layout">
-      <div className="details-container">Is this in the right place?</div>
+      <div className="details-container">
+        <h2>Manage that which you follow here.</h2>
+      </div>
       <FilterableResults fetchResults={fetchFeedData} limit={10}>
         <div className="feed-container">
           <ResourceTabs tabs={relationshipFilter} />
