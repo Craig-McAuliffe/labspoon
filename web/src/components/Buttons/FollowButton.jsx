@@ -1,11 +1,12 @@
 import React, {useState, useContext, useRef, useEffect} from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useLocation} from 'react-router-dom';
 import {AuthContext} from '../../App';
 import './Buttons.css';
 
 const FollowButton = ({following, setFollowing}) => {
   const [signUpPrompt, setSignUpPrompt] = useState(false);
   const {user} = useContext(AuthContext);
+  const locationPathName = useLocation().pathname;
   const signUpPromptRef = useRef();
 
   const followAction = () => {
@@ -37,7 +38,14 @@ const FollowButton = ({following, setFollowing}) => {
       </button>
       {signUpPrompt ? (
         <div className="sign-up-prompt" ref={signUpPromptRef}>
-          <Link to="/login">Sign up to follow this.</Link>
+          <Link
+            to={{
+              pathname: '/login',
+              state: {returnLocation: locationPathName},
+            }}
+          >
+            Sign up to follow this.
+          </Link>
         </div>
       ) : null}
     </div>

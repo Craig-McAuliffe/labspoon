@@ -1,6 +1,6 @@
 import React, {useState, useContext, useEffect, useRef} from 'react';
 import {FeatureFlags, AuthContext} from '../../App';
-import {Link} from 'react-router-dom';
+import {Link, useLocation} from 'react-router-dom';
 import {db} from '../../firebase';
 import {
   BookmarkIconUnselected,
@@ -14,6 +14,7 @@ function BookmarkButton({post}) {
   const [loading, setLoading] = useState(false);
   const [signUpPrompt, setSignUpPrompt] = useState(false);
   const featureFlags = useContext(FeatureFlags);
+  const locationPathName = useLocation().pathname;
   const {user} = useContext(AuthContext);
   const signUpPromptRef = useRef();
 
@@ -88,7 +89,14 @@ function BookmarkButton({post}) {
         </button>
         {signUpPrompt ? (
           <div className="sign-up-prompt-center" ref={signUpPromptRef}>
-            <Link to="/login">Sign up to bookmark this.</Link>
+            <Link
+              to={{
+                pathname: '/login',
+                state: {returnLocation: locationPathName},
+              }}
+            >
+              Sign up to bookmark this.
+            </Link>
           </div>
         ) : null}
       </div>

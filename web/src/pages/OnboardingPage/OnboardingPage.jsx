@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useContext, useRef} from 'react';
-import {useHistory} from 'react-router-dom';
+import {useHistory, useLocation} from 'react-router-dom';
 import {AuthContext} from '../../App';
 import {db} from '../../firebase';
 import {getPaginatedUserReferencesFromCollectionRef} from '../../helpers/users';
@@ -26,6 +26,8 @@ const abbrEnv = 'dev';
 export default function OnboardingPage() {
   const {user} = useContext(AuthContext);
   const history = useHistory();
+  const location = useLocation().state;
+  const returnLocation = location ? location.returnLocation : undefined;
   if (user === undefined) history.push('/');
   const [onboardingStage, setOnboardingStage] = useState('follow-things');
   const OnboardingStageDisplay = () => {
@@ -78,7 +80,7 @@ export default function OnboardingPage() {
               onClick={() =>
                 onboardingStage === 'follow-things'
                   ? setOnboardingStage('join-groups')
-                  : history.push('/')
+                  : history.push(returnLocation ? returnLocation : '/')
               }
             >
               <h3>{onboardingStage === 'join-groups' ? 'Finish' : 'Next'}</h3>
