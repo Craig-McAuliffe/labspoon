@@ -20,7 +20,12 @@ export const FilterableResultsContext = createContext({});
 // FilterableResultsContext, and uses its results values for rendering.
 //
 // limit is the number of results to return on each page
-export default function FilterableResults({children, fetchResults, limit}) {
+export default function FilterableResults({
+  children,
+  fetchResults,
+  limit,
+  usingFilter,
+}) {
   const [filter, setFilter] = useState([]);
   const [loadingFilter, setLoadingFilter] = useState(true);
   const [results, setResults] = useState([]);
@@ -47,15 +52,21 @@ export default function FilterableResults({children, fetchResults, limit}) {
 
   useEffect(() => {
     // wait until the filter is loaded to avoid an unnecessary reload of the results
-    if (loadingFilter) return;
+    if (usingFilter && loadingFilter) return;
     setLoadingResults(true);
     Promise.resolve(fetchResultsFunction(0, limit + 1, filter, undefined)).then(
       (newResults) => {
-        setHasMore(!(newResults.length <= limit));
-        setResults(newResults.slice(0, limit));
-        setLast(newResults[newResults.length - 1]);
-        setSkip(limit);
-        setLoadingResults(false);
+        if (newResults === undefined) {
+          setHasMore(false);
+          setResults([]);
+          setLoadingResults(false);
+        } else {
+          setHasMore(!(newResults.length <= limit));
+          setResults(newResults.slice(0, limit));
+          setLast(newResults[newResults.length - 1]);
+          setSkip(limit);
+          setLoadingResults(false);
+        }
       }
     );
   }, [fetchResultsFunction, filter, limit, loadingFilter]);
@@ -116,7 +127,7 @@ export function NewFilterMenuWrapper({getDefaultFilter}) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (filterableResults.loadingFilter) return <h1>Loading...</h1>;
+  if (filterableResults.loadingFilter) return <h2>Loading...</h2>;
   return (
     <FilterMenu
       options={filterableResults.filter}
@@ -170,7 +181,7 @@ export function NewResultsWrapper() {
         hasMore={filterableResults.hasMore}
         fetchMore={filterableResults.fetchMore}
       />
-      {filterableResults.loadingResults ? <h1>Loading...</h1> : null}
+      {filterableResults.loadingResults ? <h2>Loading...</h2> : null}
     </>
   );
 }

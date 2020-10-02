@@ -185,12 +185,12 @@ export default function FollowingFeedPage() {
       fetchUserFeedData(user.uid, skip, limit, filter, last);
     getDefaultFilter = () => fetchUserFeedFilters(user.uid);
   } else {
-    fetchResults = fetchPublicFeedData;
-    getDefaultFilter = fetchPublicFeedFilters;
+    fetchResults = () => [];
+    getDefaultFilter = () => [];
   }
 
   return (
-    <FilterableResults fetchResults={fetchResults} limit={10}>
+    <FilterableResults fetchResults={fetchResults} limit={10} loadingFilter>
       <div className="sider-layout">
         <NewFilterMenuWrapper getDefaultFilter={getDefaultFilter} />
       </div>

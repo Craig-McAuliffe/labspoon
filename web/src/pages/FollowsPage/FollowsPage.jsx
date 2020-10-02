@@ -1,8 +1,8 @@
 import React, {useContext} from 'react';
 import {db} from '../../firebase';
-import {FeatureFlags, AuthContext} from '../../App';
+import {AuthContext} from '../../App';
 import {getActiveTabID} from '../../helpers/filters';
-import {getPaginatedPostsFromCollectionRef} from '../../helpers/posts';
+import {getPaginatedUserReferencesFromCollectionRef} from '../../helpers/users';
 import {getPaginatedTopicsFromCollectionRef} from '../../helpers/topics';
 import {getPaginatedGroupReferencesFromCollectionRef} from '../../helpers/groups';
 
@@ -13,13 +13,10 @@ import FilterableResults, {
 
 const FollowsPage = () => {
   const {user} = useContext(AuthContext);
-  const featureFlags = useContext(FeatureFlags);
   const userID = user.uid;
-  const fetchFeedData = (skip, limit, filterOptions, last) => {
-    featureFlags.has('disable-cloud-firestore')
-      ? () => []
-      : followsPageFeedDataFromDB(skip, limit, filterOptions, last, userID);
-  };
+
+  const fetchFeedData = (skip, limit, filterOptions, last) =>
+    followsPageFeedDataFromDB(skip, limit, filterOptions, last, userID);
 
   const relationshipFilter = [
     {
@@ -69,13 +66,14 @@ const FollowsPage = () => {
 
 function followsPageFeedDataFromDB(skip, limit, filterOptions, last, userID) {
   const activeTab = getActiveTabID(filterOptions);
-  let results;
   switch (activeTab) {
     case 'people':
-      const usersCollection = db
-        .collection(`users/${userID}/followsUsers`)
-        .orderBy('name');
-      return getPaginatedPostsFromCollectionRef(usersCollection, limit, last);
+      const usersCollection = db.collection(`users/${userID}/followsUsers`);
+      return getPaginatedUserReferencesFromCollectionRef(
+        usersCollection,
+        limit,
+        last
+      );
     case 'groups':
       const groupsCollection = db
         .collection(`users/${userID}/followsGroups`)
@@ -92,9 +90,8 @@ function followsPageFeedDataFromDB(skip, limit, filterOptions, last, userID) {
       return getPaginatedTopicsFromCollectionRef(topicsCollection, limit, last);
 
     default:
-      results = [];
+      return [];
   }
-  return results;
 }
 
 export default FollowsPage;
