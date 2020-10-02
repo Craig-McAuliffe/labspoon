@@ -30,10 +30,7 @@ function LoginPage() {
           {formType === 'sign-up' ? (
             <div>
               <div className="sign-up-form">
-                <SignUpForm
-                  setFormType={setFormType}
-                  returnLocation={returnLocation}
-                />
+                <SignUpForm returnLocation={returnLocation} />
               </div>
               <p className="login-sign-in-option">
                 Already have an account?{' '}
@@ -57,7 +54,7 @@ function LoginPage() {
   }
 }
 
-const SignUpForm = ({setFormType}) => {
+const SignUpForm = ({returnLocation}) => {
   const history = useHistory();
   const submitChanges = (values) => {
     firebase
@@ -73,7 +70,10 @@ const SignUpForm = ({setFormType}) => {
             })
           )
           .then(() => {
-            history.push('/onboarding');
+            history.push({
+              pathname: '/onboarding',
+              state: {returnLocation: returnLocation},
+            });
           })
           .catch((error) => {
             console.log(error, 'Could not create display name');
@@ -91,7 +91,6 @@ const SignUpForm = ({setFormType}) => {
           alert(
             'Something went wrong. We will look into it. Please try signing up later.'
           );
-          setFormType(false);
         }
       });
   };
