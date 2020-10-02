@@ -1,6 +1,7 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
 import {SearchIconGrey} from '../../assets/HeaderIcons';
+import {FeatureFlags} from '../../App';
 import './Filter.css';
 
 /**
@@ -145,10 +146,13 @@ export function getFilterCollectionEnabledIDsSet(filterCollection) {
 }
 
 function FilterSearch() {
-  return (
-    <div className="filter-search">
-      <SearchIconGrey />
-      <input type="text" placeholder="Filter Feed By" />
-    </div>
-  );
+  const featureFlags = useContext(FeatureFlags);
+  if (featureFlags.has('filter-feed-term'))
+    return (
+      <div className="filter-search">
+        <SearchIconGrey />
+        <input type="text" placeholder="Filter Feed By" />
+      </div>
+    );
+  else return null;
 }

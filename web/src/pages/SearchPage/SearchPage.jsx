@@ -38,6 +38,7 @@ export default function SearchPage() {
     if (JSON.stringify(searchState) !== JSON.stringify(nextSearchState)) {
       setSearchState(nextSearchState);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 
   function onSearchStateChange(nextSearchState) {

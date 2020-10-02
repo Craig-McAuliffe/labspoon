@@ -83,6 +83,8 @@ function FeatureFlagsProvider({children}) {
   let fflags = new Set();
   if ('REACT_APP_ENABLED_FFLAGS' in process.env) {
     fflags = new Set(process.env.REACT_APP_ENABLED_FFLAGS.split(' '));
+  } else {
+    console.log('fflags not available');
   }
   return (
     <FeatureFlags.Provider value={fflags}>{children}</FeatureFlags.Provider>

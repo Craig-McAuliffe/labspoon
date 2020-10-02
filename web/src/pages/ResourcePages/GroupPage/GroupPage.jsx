@@ -68,9 +68,6 @@ function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions) {
     case 'topics':
       const topicsCollection = db.collection(`groups/${groupID}/topics`);
       return getPaginatedTopicsFromCollectionRef(topicsCollection, limit, last);
-    case 'overview':
-      results = [];
-      break;
     default:
       results = [];
   }
@@ -107,6 +104,7 @@ export default function GroupPage() {
         setGroupData(groupData);
       })
       .catch((err) => console.log(err));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupID]);
 
   const groupDescriptionRef = useRef();

@@ -58,6 +58,8 @@ function topicPageFeedDataFromDB(skip, limit, filterOptions, topicID, last) {
     case 'overview':
       results = [];
       break;
+    default:
+      results = [];
   }
   return results;
 }
@@ -90,6 +92,7 @@ export default function TopicPage() {
         setTopicDetails(topicDetails);
       })
       .catch((err) => console.log(err));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [topicID]);
 
   let fetchFeedData;

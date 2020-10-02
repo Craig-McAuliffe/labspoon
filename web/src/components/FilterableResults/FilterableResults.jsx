@@ -59,7 +59,8 @@ export default function FilterableResults({
         }
       }
     );
-  }, [skip, fetchResultsState, filterOptions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [skip, fetchResultsState, filterOptions, fetchResults, last, limit]);
 
   /**
    * Fetches the next page of results. Attempts to retrieve an extra result to

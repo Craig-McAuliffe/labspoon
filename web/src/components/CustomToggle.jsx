@@ -1,8 +1,7 @@
 import React from 'react';
 
 const CustomToggle = React.forwardRef(({children, onClick}, ref) => (
-  <a
-    href=""
+  <button
     ref={ref}
     onClick={(e) => {
       e.preventDefault();
@@ -10,7 +9,7 @@ const CustomToggle = React.forwardRef(({children, onClick}, ref) => (
     }}
   >
     {children}
-  </a>
+  </button>
 ));
 
 CustomToggle.displayName = CustomToggle;

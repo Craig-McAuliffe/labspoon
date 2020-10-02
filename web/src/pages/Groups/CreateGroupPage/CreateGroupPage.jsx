@@ -3,7 +3,8 @@ import GroupInfoForm from './GroupInfoForm';
 import {useHistory} from 'react-router-dom';
 import {v4 as uuid} from 'uuid';
 
-import firebase, {db, storage, projectURL} from '../../../firebase';
+import firebase, {db, storage} from '../../../firebase';
+import {projectURL} from '../../../config';
 
 import {AuthContext} from '../../../App';
 
