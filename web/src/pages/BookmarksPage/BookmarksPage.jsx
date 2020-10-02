@@ -3,12 +3,11 @@ import React, {useContext} from 'react';
 import {db} from '../../firebase';
 import {AuthContext, FeatureFlags} from '../../App';
 
-import FilterableResults from '../../components/FilterableResults/FilterableResults';
+import FilterableResults, {
+  NewResultsWrapper,
+} from '../../components/FilterableResults/FilterableResults';
 
-import {
-  getFilteredBookmarks,
-  getBookmarkFilters,
-} from '../../mockdata/bookmarks.js';
+import {getFilteredBookmarks} from '../../mockdata/bookmarks.js';
 
 function fetchMockResults(skip, limit, filter) {
   return getFilteredBookmarks(filter).slice(skip, skip + limit);
@@ -36,8 +35,6 @@ function fetchBookmarks(uuid, skip, limit, filter, last) {
     .catch((err) => console.log(err));
 }
 
-const getDefaultFilter = getBookmarkFilters;
-
 const BookmarksPage = () => {
   const featureFlags = useContext(FeatureFlags);
   const {user} = useContext(AuthContext);
@@ -50,13 +47,13 @@ const BookmarksPage = () => {
     fetchResults = fetchMockResults;
   }
   return (
-    <FilterableResults
-      fetchResults={fetchResults}
-      getDefaultFilter={getDefaultFilter}
-      useFilterSider={true}
-      limit={10}
-      useTabs={false}
-    />
+    <div className="content-layout">
+      <FilterableResults fetchResults={fetchResults} limit={10}>
+        <div className="feed-container">
+          <NewResultsWrapper />
+        </div>
+      </FilterableResults>
+    </div>
   );
 };
 

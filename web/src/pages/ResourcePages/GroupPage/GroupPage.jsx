@@ -13,7 +13,10 @@ import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
 import groups from '../../../mockdata/groups';
 import GroupPageSider from './GroupPageSider';
 import groupPageFeedData from './GroupPageFeedData';
-import FilterableResults from '../../../components/FilterableResults/FilterableResults';
+import FilterableResults, {
+  NewResultsWrapper,
+  ResourceTabs,
+} from '../../../components/FilterableResults/FilterableResults';
 import GroupInfoForm from '../../Groups/CreateGroupPage/GroupInfoForm';
 import UserAvatar from '../../../components/Avatar/UserAvatar';
 import FollowGroupButton from '../../../components/Group/FollowGroupButton';
@@ -161,7 +164,6 @@ export default function GroupPage() {
       mutable: false,
     },
   ];
-  const getDefaultFilter = () => relationshipFilter;
 
   if (featureFlags.has('group-media')) {
     relationshipFilter[0].options.push({
@@ -221,13 +223,12 @@ export default function GroupPage() {
                 setEditingGroup={setEditingGroup}
               />
             </div>
-            <FilterableResults
-              fetchResults={fetchFeedData}
-              getDefaultFilter={getDefaultFilter}
-              limit={10}
-              useTabs={true}
-              useFilterSider={false}
-            />
+            <FilterableResults fetchResults={fetchFeedData} limit={10}>
+              <div className="feed-container">
+                <ResourceTabs tabs={relationshipFilter} />
+                <NewResultsWrapper />
+              </div>
+            </FilterableResults>
           </>
         )}
       </div>

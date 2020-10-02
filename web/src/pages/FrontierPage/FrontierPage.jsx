@@ -1,7 +1,9 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 import HomePageTabs from '../../components/HomePageTabs';
-import FilterableResults from '../../components/FilterableResults/FilterableResults';
+import FilterableResults, {
+  NewResultsWrapper,
+} from '../../components/FilterableResults/FilterableResults';
 import {getTestPosts} from '../../mockdata/posts';
 import UserAvatar from '../../components/Avatar/UserAvatar';
 import {
@@ -27,9 +29,6 @@ export default function FrontierPage() {
 
   const topTenPosts = getTestPosts().slice(0, 11);
 
-  const getDefaultFilter = () => {
-    return [];
-  };
   return (
     <>
       <div className="sider-layout">
@@ -76,13 +75,9 @@ export default function FrontierPage() {
             </div>
           </div>
           <div className="frontier-page-feed">
-            <FilterableResults
-              fetchResults={fetchFeedData}
-              getDefaultFilter={getDefaultFilter}
-              limit={10}
-              useTabs={false}
-              useFilterSider={false}
-            />
+            <FilterableResults fetchResults={fetchFeedData} limit={10}>
+              <NewResultsWrapper />
+            </FilterableResults>
           </div>
         </div>
       </div>

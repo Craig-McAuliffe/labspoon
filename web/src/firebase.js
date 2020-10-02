@@ -16,11 +16,3 @@ if (abbrEnv === 'local') {
   firebase.functions().useFunctionsEmulator('http://localhost:5001');
 }
 export default firebase;
-
-firebase
-  .functions()
-  .httpsCallable('publications-searchPublications')({
-    query: 'coronavirus',
-  })
-  .then((val) => console.log(val))
-  .catch((err) => console.log(err));

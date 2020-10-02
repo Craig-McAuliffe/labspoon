@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import Spinner from 'react-bootstrap/Spinner';
 
-import {AuthContext} from './App';
+import {AuthContext, FeatureFlags} from './App';
 
 import {Switch, Route, Redirect} from 'react-router-dom';
 import SettingsPage from './pages/SettingsPage';
@@ -27,14 +27,17 @@ import OnboardingPage from './pages/OnboardingPage';
  * Top level routing structure for the app.
  */
 export default function Routes({user, setUser}) {
+  const featureFlags = useContext(FeatureFlags);
   return (
     <Switch>
       <Route exact path="/">
         <FollowingFeedPage />
       </Route>
-      <Route exact path="/frontier">
-        <FrontierPage />
-      </Route>
+      {featureFlags.has('frontiers') ? (
+        <Route exact path="/frontier">
+          <FrontierPage />
+        </Route>
+      ) : undefined}
       <Route path="/login">
         <LoginPage />
       </Route>
