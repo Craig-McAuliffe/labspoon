@@ -1,5 +1,5 @@
 import React, {useState, useContext, useEffect, useRef} from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useLocation} from 'react-router-dom';
 import {
   RecommendIconUnselected,
   RecommendIconSelected,
@@ -14,7 +14,7 @@ const RecommendButton = ({post}) => {
   const featureFlags = useContext(FeatureFlags);
   const {user} = useContext(AuthContext);
   const signUpPromptRef = useRef();
-
+  const locationPathName = useLocation().pathname;
   const onClick = () => {
     if (!user) {
       setSignUpPrompt(true);
@@ -92,7 +92,14 @@ const RecommendButton = ({post}) => {
         </button>
         {signUpPrompt ? (
           <div className="sign-up-prompt-center" ref={signUpPromptRef}>
-            <Link to="/login">Sign up to recommend this.</Link>
+            <Link
+              to={{
+                pathname: '/login',
+                state: {returnLocation: locationPathName},
+              }}
+            >
+              Sign up to recommend this.
+            </Link>
           </div>
         ) : null}
       </div>

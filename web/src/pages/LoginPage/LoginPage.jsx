@@ -1,7 +1,6 @@
 import React, {useContext, useState} from 'react';
 import firebase, {db} from '../../firebase.js';
-import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
-import {Redirect, useHistory} from 'react-router';
+import {Redirect, useHistory, useLocation} from 'react-router';
 import {AuthContext} from '../../App';
 import {Form, Formik} from 'formik';
 import CancelButton from '../../components/Buttons/CancelButton';
@@ -18,37 +17,37 @@ import './LoginPage.css';
  * @return {React.ReactElement}
  */
 function LoginPage() {
+  const location = useLocation().state;
+  const returnLocation = location ? location.returnLocation : undefined;
+
   const {user} = useContext(AuthContext);
-  const [signUpFlow, setSignUpFlow] = useState(false);
-  const UIConfig = {
-    signInFlow: 'popup',
-    signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
-    callbacks: {
-      signInSuccessWithAuthResult: () => false,
-    },
-  };
+  const [formType, setFormType] = useState('sign-up');
 
   if (!user) {
     return (
       <div className="content-layout">
         <div className="page-content-container">
-          {signUpFlow ? (
-            <div className="sign-up-form">
-              <SignUpForm setSignUpFlow={setSignUpFlow} />
+          {formType === 'sign-up' ? (
+            <div>
+              <div className="sign-up-form">
+                <SignUpForm
+                  setFormType={setFormType}
+                  returnLocation={returnLocation}
+                />
+              </div>
+              <p className="login-sign-in-option">
+                Already have an account?{' '}
+                <button onClick={() => setFormType('sign-in')}>
+                  {' '}
+                  Sign in here
+                </button>
+              </p>
             </div>
           ) : (
-            <>
-              <StyledFirebaseAuth
-                uiConfig={UIConfig}
-                firebaseAuth={firebase.auth()}
-              />
-              <div className="sign-up-container">
-                <h2 className="sign-up-container-title">Not a user yet?</h2>
-                <PrimaryButton onClick={() => setSignUpFlow(true)}>
-                  Sign up
-                </PrimaryButton>
-              </div>
-            </>
+            <SignInForm
+              setFormType={setFormType}
+              returnLocation={returnLocation}
+            />
           )}
         </div>
       </div>
@@ -58,9 +57,8 @@ function LoginPage() {
   }
 }
 
-const SignUpForm = ({setSignUpFlow}) => {
+const SignUpForm = ({setFormType}) => {
   const history = useHistory();
-
   const submitChanges = (values) => {
     firebase
       .auth()
@@ -93,7 +91,7 @@ const SignUpForm = ({setSignUpFlow}) => {
           alert(
             'Something went wrong. We will look into it. Please try signing up later.'
           );
-          setSignUpFlow(false);
+          setFormType(false);
         }
       });
   };
@@ -103,10 +101,6 @@ const SignUpForm = ({setSignUpFlow}) => {
     password: '',
     confirmPassword: '',
     userName: '',
-  };
-
-  const cancelSignUp = () => {
-    setSignUpFlow(false);
   };
 
   const validationSchema = Yup.object({
@@ -137,7 +131,7 @@ const SignUpForm = ({setSignUpFlow}) => {
       onSubmit={submitChanges}
     >
       <Form className="signin-form">
-        <h2 className="signin-form-title">{`Just a few details then you'll be spooning away...`}</h2>
+        <h2 className="signin-form-title">{`Sign up to Labspoon`}</h2>
         <FormTextInput name="email" autoComplete="email" label="Email" />
         <p className="password-tip">{`Tip: Don't forget to make your password at least 8 digits long and include a number.`}</p>
         <FormTextInput name="password" label="Password" passwordInput={true} />
@@ -151,9 +145,82 @@ const SignUpForm = ({setSignUpFlow}) => {
           label="Your Full Name (this will be displayed on your profile)"
         />
         <div className="cancel-or-submit">
-          <CancelButton cancelAction={cancelSignUp} />
+          <div></div>
           <div className="submit-button-container">
             <PrimaryButton submit={true}>Sign Up</PrimaryButton>
+          </div>
+        </div>
+      </Form>
+    </Formik>
+  );
+};
+
+const SignInForm = ({setFormType, returnLocation}) => {
+  const history = useHistory();
+  const submitChanges = (values) => {
+    firebase
+      .auth()
+      .signInWithEmailAndPassword(values.email, values.password)
+      .then(() => {
+        history.push(returnLocation ? returnLocation : '/');
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.message.includes('password is invalid')) {
+          alert(
+            'The password you entered is not connected to that email address.'
+          );
+        }
+        if (error.message.toLowerCase().includes('too many'))
+          alert(
+            'You have entered too many incorrect passwords. Please try again later.'
+          );
+        if (
+          error.message
+            .toLowerCase()
+            .includes('There is no user record corresponding')
+        )
+          alert('There is no Labspoon user registered to that email.');
+        else {
+          alert(
+            'Something went wrong. We will look into it. Please try signing in later.'
+          );
+        }
+      });
+  };
+
+  const initialValues = {
+    email: '',
+    password: '',
+  };
+
+  const validationSchema = Yup.object({
+    email: Yup.string()
+      .email('Please enter a valid email address')
+      .required('Email is required'),
+    password: Yup.string()
+      .required('Password is required')
+      .min(8, 'Password must be at least 8 characters long.')
+      .matches(
+        /^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/,
+        'Password must contain a mixture of numbers and letters.'
+      ),
+  });
+
+  return (
+    <Formik
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+      onSubmit={submitChanges}
+    >
+      <Form className="signin-form">
+        <h2 className="signin-form-title">{`Welcome Back`}</h2>
+        <FormTextInput name="email" autoComplete="email" label="Email" />
+        <FormTextInput name="password" label="Password" passwordInput={true} />
+        <div className="cancel-or-submit">
+          <CancelButton cancelAction={() => setFormType('sign-up')} />
+          <div className="submit-button-container">
+            <PrimaryButton submit={true}>Sign in</PrimaryButton>
           </div>
         </div>
       </Form>

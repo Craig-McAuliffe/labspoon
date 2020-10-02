@@ -17,3 +17,12 @@
 .signin-form-title {
   color: #00507c;
 }
+
+.login-sign-in-option {
+  margin-top: 20px;
+}
+
+.login-sign-in-option button {
+  color: #00507c;
+  font-size: 1.2em;
+}
