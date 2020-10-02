@@ -6,6 +6,7 @@ import {getPaginatedUserReferencesFromCollectionRef} from '../../helpers/users';
 import {getPaginatedTopicsFromCollectionRef} from '../../helpers/topics';
 import {getPaginatedGroupReferencesFromCollectionRef} from '../../helpers/groups';
 import TopicListItem from '../../components/Topics/TopicListItem';
+import FollowTopicButton from '../../components/Topics/FollowTopicButton';
 import GroupListItem from '../../components/Group/GroupListItem';
 import FollowUserButton from '../../components/User/FollowUserButton/FollowUserButton';
 import {CreateGroupIcon} from '../../assets/MenuIcons';
@@ -160,7 +161,9 @@ function OnboardingFollow({user}) {
           />
           <div className="onboarding-topics-to-follow-container">
             {displayedTopics.map((displayedTopic) => (
-              <TopicListItem topic={displayedTopic} key={displayedTopic.id} />
+              <TopicListItem topic={displayedTopic} key={displayedTopic.id}>
+                <FollowTopicButton targetTopic={displayedTopic} />
+              </TopicListItem>
             ))}
           </div>
         </div>

@@ -17,6 +17,11 @@
   display: flex;
 }
 
+.create-post-typed-topic-container {
+  display: flex;
+  justify-content: space-between;
+}
+
 .post-tag-topics-container {
   display: grid;
   grid-template-columns: 1fr 100px;
