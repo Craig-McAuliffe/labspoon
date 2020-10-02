@@ -19,7 +19,6 @@
   background: white;
   min-width: 80%;
   max-width: 80%;
-  margin-bottom: 200px;
   padding-left: 10px;
 }
 
@@ -30,6 +29,20 @@
   background-position-x: center;
   background-size: cover;
   display: inline-block;
+}
+
+.big-search-suggested-searches {
+  margin-right: 10px;
+}
+
+.big-search-suggested-searches-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.big-search-suggested-search {
+  margin: 0px 5px;
 }
 
 .search-input {

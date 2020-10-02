@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {useHistory} from 'react-router-dom';
+import {useHistory, Link} from 'react-router-dom';
 import SearchIcon from '../assets/searchIcon.svg';
 import {searchStateToURL} from '../helpers/search';
 
@@ -46,6 +46,21 @@ export default function SearchBar({bigSearchPrompt}) {
         {`Search for something that interests you and follow for updates!`}
       </h3>
       {searchForm()}
+      <div className="big-search-suggested-searches-container">
+        <h4 className="big-search-suggested-searches">Suggested Searches:</h4>
+        <Link to="/search?query=SARS%20CoV-2&page=1">
+          <div className="big-search-suggested-search">SARS CoV-2</div>
+        </Link>
+        <Link to="/search?query=Immunotherapy&page=1">
+          <div className="big-search-suggested-search">Immunotherapy</div>
+        </Link>
+        <Link to="/search?query=RNA%20Vaccine&page=1">
+          <div className="big-search-suggested-search">RNA Vaccine</div>
+        </Link>
+        <Link to="/search?query=Gravitational%20Waves&page=1">
+          <div className="big-search-suggested-search">Gravitational Waves</div>
+        </Link>
+      </div>
     </div>
   ) : (
     <div className="header-search">
