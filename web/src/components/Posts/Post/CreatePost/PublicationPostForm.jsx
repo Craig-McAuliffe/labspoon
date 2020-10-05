@@ -1,8 +1,10 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import * as Yup from 'yup';
+import firebase from '../../../../firebase';
+import {v4 as uuid} from 'uuid';
 import FormTextInput, {CreatePostTextArea} from '../../../Forms/FormTextInput';
 import PostForm from './PostForm';
-import firebase from '../../../../firebase';
+import {SelectedTopicsContext} from './CreatePost';
 
 import './CreatePost.css';
 
@@ -14,8 +16,13 @@ export default function PublicationPostForm({
   setPostType,
   postType,
 }) {
+  const {selectedTopics} = useContext(SelectedTopicsContext);
   const submitChanges = (res) => {
+    selectedTopics.forEach((selectedTopic) => {
+      if (selectedTopic.id === undefined) selectedTopic.id = uuid();
+    });
     res.postType = {id: 'publicationPost', name: 'Publication Post'};
+    res.topics = selectedTopics;
     createPost(res)
       .then(() => setCreatingPost(false))
       .catch((err) => alert(err));
@@ -24,7 +31,6 @@ export default function PublicationPostForm({
   const initialValues = {
     title: '',
     publicationURL: '',
-    topics: '',
   };
 
   const validationSchema = Yup.object({

@@ -42,11 +42,13 @@ export const createPost = functions.https.onCall(async (data, context) => {
       methods: data.methods,
       startDate: data.startDate,
     },
-    topics: [],
+    topics: data.topics,
     timestamp: new Date(),
     filterAuthorID: author.id,
     filterPostTypeID: 'default',
-    filterTopicIDs: [],
+    filterTopicIDs: data.topics.map(
+      (taggedTopic: {id: string; name: string}) => taggedTopic.id
+    ),
   };
   const postID = uuid();
 

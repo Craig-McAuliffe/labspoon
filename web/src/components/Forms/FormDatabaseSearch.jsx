@@ -17,15 +17,24 @@ export default function FormDatabaseSearch({
   indexName,
   placeholderText,
   hideSearchIcon,
+  displayedItems,
+  clearListOnNoResults,
 }) {
   const abbrEnv = 'dev';
+
   const UsersResults = ({searchResults}) => {
-    if (
-      searchResults &&
-      searchResults.nbHits !== 0 &&
-      searchResults.query.length > 0
-    )
-      setDisplayedItems(searchResults.hits);
+    if (searchResults) {
+      if (searchResults.nbHits !== 0 && searchResults.query.length > 0) {
+        setDisplayedItems(searchResults.hits);
+      }
+      if (
+        searchResults.query.length === 0 &&
+        displayedItems.length > 0 &&
+        clearListOnNoResults
+      ) {
+        setDisplayedItems([]);
+      }
+    }
     return null;
   };
 

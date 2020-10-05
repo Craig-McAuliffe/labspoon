@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useRef, useEffect, useContext} from 'react';
 import CancelButton from '../../../Buttons/CancelButton';
 import PrimaryButton from '../../../Buttons/PrimaryButton';
 import PostTypeDropDown from './PostTypeDropDown';
@@ -6,6 +6,7 @@ import {Form, Formik} from 'formik';
 import FormDatabaseSearch from '../../../Forms/FormDatabaseSearch';
 import TopicListItem from '../../../Topics/TopicListItem';
 import {RemoveIcon} from '../../../../assets/GeneralActionIcons';
+import {SelectedTopicsContext} from './CreatePost';
 
 import './CreatePost';
 export default function PostForm({
@@ -17,16 +18,44 @@ export default function PostForm({
   postType,
   setPostType,
 }) {
-  const [selectedTopics, setSelectedTopics] = useState([]);
   const [displayedTopics, setDisplayedTopics] = useState([]);
   const [duplicateTopic, setDuplicateTopic] = useState(false);
   const topicSearchRef = useRef();
+  const {selectedTopics, setSelectedTopics} = useContext(SelectedTopicsContext);
 
   useEffect(() => {
     if (duplicateTopic) {
       setTimeout(() => setDuplicateTopic(false), 3000);
     }
   }, [duplicateTopic]);
+
+  const typedTopic = () => {
+    if (
+      topicSearchRef.current === undefined ||
+      topicSearchRef.current.lastChild.firstChild.firstChild.value.length === 0
+    )
+      return null;
+    return topicSearchRef.current.lastChild.firstChild.firstChild.value
+      .length === 0 ? null : (
+      <div className="create-post-typed-topic-container">
+        <h4>{topicSearchRef.current.lastChild.firstChild.firstChild.value}</h4>
+        <PrimaryButton
+          onClick={() =>
+            addTopicToPost(
+              setSelectedTopics,
+              topicSearchRef.current.lastChild.firstChild.firstChild.value,
+              setDuplicateTopic,
+              undefined,
+              displayedTopics
+            )
+          }
+          small
+        >
+          Select
+        </PrimaryButton>
+      </div>
+    );
+  };
 
   return (
     <div className="creating-post-container">
@@ -69,32 +98,12 @@ export default function PostForm({
               indexName="_TOPICS"
               inputRef={topicSearchRef}
               placeholderText="this post is about..."
+              displayedItems={displayedTopics}
               hideSearchIcon
+              clearListOnNoResults
             />
             <div className="create-post-searched-topics-container">
-              {topicSearchRef.current ? (
-                <div className="create-post-typed-topic-container">
-                  <h4>
-                    {
-                      topicSearchRef.current.lastChild.firstChild.firstChild
-                        .value
-                    }
-                  </h4>
-                  <PrimaryButton
-                    onClick={() =>
-                      addTopicToPost(
-                        setSelectedTopics,
-                        topicSearchRef.current.lastChild.firstChild.firstChild
-                          .value,
-                        setDuplicateTopic
-                      )
-                    }
-                    small
-                  >
-                    Select
-                  </PrimaryButton>
-                </div>
-              ) : null}
+              {typedTopic()}
               {displayedTopics.map((displayedTopic) => (
                 <TopicListItem key={displayedTopic.id} topic={displayedTopic}>
                   <PrimaryButton
@@ -103,7 +112,8 @@ export default function PostForm({
                         setSelectedTopics,
                         displayedTopic.name,
                         setDuplicateTopic,
-                        displayedTopic.id
+                        displayedTopic.id,
+                        displayedTopics
                       )
                     }
                     small
@@ -131,12 +141,21 @@ export default function PostForm({
   );
 }
 
+// Checks if the user already added the topic
+// Checks if the user is adding a topic name that already exists
 const addTopicToPost = (
   setSelectedTopics,
   topicName,
   setDuplicateTopic,
-  topicID
+  topicID,
+  displayedTopics
 ) => {
+  let preExistingTopic = undefined;
+  displayedTopics.forEach((displayedTopic) => {
+    if (displayedTopic.name === topicName)
+      preExistingTopic = [{name: displayedTopic.name, id: displayedTopic.id}];
+  });
+
   setSelectedTopics((selectedTopics) => {
     const newTopic = [{name: topicName, id: topicID}];
     if (
@@ -148,7 +167,12 @@ const addTopicToPost = (
       setDuplicateTopic(true);
       return selectedTopics;
     }
-    const augmentedTopics = [...selectedTopics, ...newTopic];
+    let augmentedTopics;
+    if (preExistingTopic !== undefined)
+      augmentedTopics = [...selectedTopics, ...preExistingTopic];
+    else {
+      augmentedTopics = [...selectedTopics, ...newTopic];
+    }
     return augmentedTopics;
   });
 };

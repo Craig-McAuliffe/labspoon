@@ -136,6 +136,7 @@ function OnboardingFollow({user}) {
             inputRef={userSearchRef}
             indexName="_USERS"
             placeholderText="Find researchers"
+            displayedItems={displayedUsers}
           />
           <div>
             <div className="onboarding-users-to-follow-container">
@@ -158,6 +159,7 @@ function OnboardingFollow({user}) {
             inputRef={topicSearchRef}
             indexName="_TOPICS"
             placeholderText="Find topics"
+            displayedItems={displayedTopics}
           />
           <div className="onboarding-topics-to-follow-container">
             {displayedTopics.map((displayedTopic) => (
@@ -212,6 +214,7 @@ function OnboardingGroup({user}) {
           inputRef={groupSearchRef}
           indexName="_GROUPS"
           placeholderText="Find your group"
+          displayedItems={displayedGroups}
         />
         <div className="onboarding-groups-to-follow-container">
           {displayedGroups.map((displayedGroup) => (

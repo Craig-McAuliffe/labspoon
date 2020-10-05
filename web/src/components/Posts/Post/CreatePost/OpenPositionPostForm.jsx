@@ -1,9 +1,11 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import * as Yup from 'yup';
+import firebase from '../../../../firebase';
+import {v4 as uuid} from 'uuid';
 import FormTextInput, {CreatePostTextArea} from '../../../Forms/FormTextInput';
 import FormDateInput from '../../../Forms/FormDateInput';
 import PostForm from './PostForm';
-import firebase from '../../../../firebase';
+import {SelectedTopicsContext} from './CreatePost';
 
 import './CreatePost.css';
 
@@ -15,8 +17,13 @@ export default function OpenPositionPostForm({
   setPostType,
   postType,
 }) {
+  const {selectedTopics} = useContext(SelectedTopicsContext);
   const submitChanges = (res) => {
+    selectedTopics.forEach((selectedTopic) => {
+      if (selectedTopic.id === undefined) selectedTopic.id = uuid();
+    });
     res.postType = {id: 'openPositionPost', name: 'Open Position Post'};
+    res.topics = selectedTopics;
     createPost(res)
       .then(() => setCreatingPost(false))
       .catch((err) => alert(err));
@@ -28,7 +35,6 @@ export default function OpenPositionPostForm({
     salary: '',
     methods: '',
     startDate: '',
-    topics: '',
   };
   const validationSchema = Yup.object({
     title: Yup.string().required('You need to write something!'),
