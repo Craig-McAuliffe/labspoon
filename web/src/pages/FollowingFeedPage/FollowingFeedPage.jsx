@@ -185,8 +185,8 @@ export default function FollowingFeedPage() {
       fetchUserFeedData(user.uid, skip, limit, filter, last);
     getDefaultFilter = () => fetchUserFeedFilters(user.uid);
   } else {
-    fetchResults = fetchPublicFeedData;
-    getDefaultFilter = fetchPublicFeedFilters;
+    fetchResults = () => [];
+    getDefaultFilter = () => [];
   }
 
   return (
