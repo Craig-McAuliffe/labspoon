@@ -28,7 +28,6 @@ export default function PostForm({
       setTimeout(() => setDuplicateTopic(false), 3000);
     }
   }, [duplicateTopic]);
-
   const typedTopic = () => {
     if (
       topicSearchRef.current === undefined ||
@@ -171,6 +170,7 @@ const addTopicToPost = (
     if (preExistingTopic !== undefined)
       augmentedTopics = [...selectedTopics, ...preExistingTopic];
     else {
+      if (newTopic[0].id === undefined) newTopic[0].isNew = true;
       augmentedTopics = [...selectedTopics, ...newTopic];
     }
     return augmentedTopics;

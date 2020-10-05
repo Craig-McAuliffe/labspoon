@@ -54,6 +54,12 @@ export const createPost = functions.https.onCall(async (data, context) => {
 
   const batch = db.batch();
   batch.set(db.collection('posts').doc(postID), post);
+  post.topics.forEach((taggedTopic) => {
+    if (taggedTopic.isNew === true) {
+      const newTopic = {name: taggedTopic.name, id: taggedTopic.id};
+      batch.set(db.collection('topics').doc(taggedTopic.id), newTopic);
+    }
+  });
   batch.set(
     db.collection('users').doc(userID).collection('posts').doc(postID),
     post
@@ -166,6 +172,7 @@ interface Post {
 interface Topic {
   id: string;
   name: string;
+  isNew?: boolean;
 }
 
 interface PostContent {
