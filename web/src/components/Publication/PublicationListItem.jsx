@@ -1,5 +1,6 @@
 import React, {useState, useContext} from 'react';
 import {Link} from 'react-router-dom';
+import {v4 as uuid} from 'uuid';
 import {ExpandIcon, HideIcon} from '../../assets/PostActionIcons';
 import PostActions from '../Posts/Post/PostParts/PostActions';
 import detectJournal from '../Publication/DetectJournal';
@@ -15,13 +16,7 @@ export default function PublicationListItem({
   bookmarkedVariation,
 }) {
   const featureFlags = useContext(FeatureFlags);
-  const [displayAbstract, setDisplayAbstract] = useState(false);
-  const expandedView = () =>
-    displayAbstract ? (
-      <p className="publication-list-item-abstract">
-        {publication.content.abstract}
-      </p>
-    ) : null;
+
   return (
     <div
       className={
@@ -30,45 +25,90 @@ export default function PublicationListItem({
           : 'publication-list-item-container'
       }
     >
-      <div className="publication-list-item-header">
-        <div className="publication-list-item-journal-container">
-          {detectJournal(publication).length &&
-          featureFlags.has('publisher-logos') > 0 ? (
-            <img
-              className="publication-list-item-journal-logo"
-              src={detectJournal(publication)[0].logo}
-              alt={`${detectJournal(publication)[0].name} journal logo`}
-            />
-          ) : (
-            <div className="publication-list-item-journal-container"></div>
-          )}
-        </div>
-        <p className="publication-list-item-date">
-          {publication.datePublished}
-        </p>
-      </div>
+      <PublicationListItemHeader publication={publication} />
       <div className="publication-list-item-content">
-        <Link to={`/publication/${publication.id}`}>
-          <h3 className="publication-list-item-title">{publication.title}</h3>
-        </Link>
-        <div className="publication-list-item-content-authors">
-          {publication.content.authors.map((author) => (
-            <h4 key={author.id}>
-              <Link
-                to={`/user/${author.id}`}
-                className="publication-list-item-content-author"
-              >
-                {author.name}
-              </Link>
-            </h4>
-          ))}
-        </div>
+        <PublicationListItemTitle
+          ID={publication.id}
+          title={publication.title}
+        />
+        <PublicationListItemAuthors authors={publication.authors} />
         {mixedResults ? null : (
           <div className="publication-list-item-topics-container">
             <ListItemTopics taggedItem={publication} />
           </div>
         )}
       </div>
+      <PublicationListItemAbstract abstract={publication.abstract} />
+      {mixedResults ||
+      (featureFlags.has('bookmark-publications') && !bookmarkedVariation) ? (
+        <PostActions />
+      ) : null}
+    </div>
+  );
+}
+
+function PublicationListItemHeader({publication}) {
+  const fflags = useContext(FeatureFlags);
+
+  let journal;
+  if (fflags.has('publisher-logos') && detectJournal(publication).length > 0) {
+    publication = (
+      <img
+        className="publication-list-item-journal-logo"
+        src={detectJournal(publication)[0].logo}
+        alt={`${detectJournal(publication)[0].name} journal logo`}
+      />
+    );
+  } else if (publication.journal) {
+    journal = <h1>{publication.journal}</h1>;
+  }
+  return (
+    <div className="publication-list-item-header">
+      <div className="publication-list-item-journal-container">{journal}</div>
+      <p className="publication-list-item-date">{publication.datePublished}</p>
+    </div>
+  );
+}
+
+function PublicationListItemTitle({ID, title}) {
+  const titleHeader = <h3 className="publication-list-item-title">{title}</h3>;
+  if (!ID) return titleHeader;
+  return <Link to={`/publication/${ID}`}>{titleHeader}</Link>;
+}
+
+function PublicationListItemAuthors({authors}) {
+  return (
+    <div className="publication-list-item-content-authors">
+      {authors.map((author) => (
+        <PublicationListItemAuthor
+          ID={author.id}
+          name={author.name}
+          key={uuid()}
+        />
+      ))}
+    </div>
+  );
+}
+
+function PublicationListItemAuthor({ID, name}) {
+  const authorHeader = <h4 key={uuid()}>{name}</h4>;
+  if (!ID) return authorHeader;
+  return (
+    <Link className="publication-list-item-content-author" to={`users/${ID}`}>
+      {authorHeader}
+    </Link>
+  );
+}
+
+function PublicationListItemAbstract({abstract}) {
+  const [displayAbstract, setDisplayAbstract] = useState(false);
+  if (!abstract) return <></>;
+  const expandedView = () =>
+    displayAbstract ? (
+      <p className="publication-list-item-abstract">{abstract}</p>
+    ) : null;
+  return (
+    <>
       <button
         className="publication-list-item-expand-button"
         onClick={() => setDisplayAbstract((current) => !current)}
@@ -87,10 +127,6 @@ export default function PublicationListItem({
         </div>
       </button>
       {expandedView()}
-      {mixedResults ||
-      (featureFlags.has('bookmark-publications') && !bookmarkedVariation) ? (
-        <PostActions />
-      ) : null}
-    </div>
+    </>
   );
 }

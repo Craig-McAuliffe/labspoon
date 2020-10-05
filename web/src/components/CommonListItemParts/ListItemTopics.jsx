@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import './ListItemTopics.css';
 
 export default function ListItemTopics({taggedItem}) {
+  if (!taggedItem.topics) return <></>;
   return (
     <div className="post-topics">
       <p className="topics-sub-title">Topics: </p>
