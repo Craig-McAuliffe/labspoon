@@ -106,7 +106,7 @@ export const addPublicationToSearchIndex = functions.firestore
   );
 
 export const configureTopicSearchIndex = functions.https.onRequest((_, res) =>
-  configureSearchIndex(res, TOPICS_INDEX, ['name', 'id'])
+  configureSearchIndex(res, TOPICS_INDEX, ['name'])
 );
 
 export const addTopicToSearchIndex = functions.firestore

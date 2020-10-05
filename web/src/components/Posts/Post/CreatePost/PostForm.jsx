@@ -5,6 +5,7 @@ import PostTypeDropDown from './PostTypeDropDown';
 import {Form, Formik} from 'formik';
 import FormDatabaseSearch from '../../../Forms/FormDatabaseSearch';
 import TopicListItem from '../../../Topics/TopicListItem';
+import {RemoveIcon} from '../../../../assets/GeneralActionIcons';
 
 import './CreatePost';
 export default function PostForm({
@@ -36,58 +37,84 @@ export default function PostForm({
       >
         <Form id="create-post-form">{children}</Form>
       </Formik>
-      <div className="create-post-tagged-topics">
-        {selectedTopics.map((selectedTopic) => (
-          <div key={selectedTopic.id}>{selectedTopic.name}</div>
-        ))}
-      </div>
-      {duplicateTopic ? (
-        <div className="topic-tag-duplicate-topic-warning">
-          You have already added that topic
-        </div>
-      ) : null}
-      <h4>Search for topics to add to your post</h4>
-      <div className="creating-post-topic-search-container">
-        <FormDatabaseSearch
-          setDisplayedItems={setDisplayedTopics}
-          indexName="_TOPICS"
-          inputRef={topicSearchRef}
-          placeholderText="Look through existing topics"
-        />
-      </div>
-      <div className="create-post-searched-topics-container">
-        {topicSearchRef.current ? (
-          <div className="create-post-typed-topic-container">
-            <h4>
-              {topicSearchRef.current.lastChild.firstChild.firstChild.value}
-            </h4>
-            <PrimaryButton
+      <div className="create-post-topic-section-container">
+        <div className="create-post-tagged-topics-container">
+          {selectedTopics.map((selectedTopic) => (
+            <button
+              key={selectedTopic.name}
+              className="create-post-tagged-topic"
               onClick={() =>
-                addTopicToPost(
-                  setSelectedTopics,
-                  topicSearchRef.current.lastChild.firstChild.firstChild.value,
-                  setDuplicateTopic
+                removeSelectedTopic(
+                  selectedTopic.name,
+                  selectedTopics,
+                  setSelectedTopics
                 )
               }
-              small
             >
-              Select
-            </PrimaryButton>
+              {selectedTopic.name}
+              <RemoveIcon />
+            </button>
+          ))}
+        </div>
+        {duplicateTopic ? (
+          <div className="topic-tag-duplicate-topic-warning">
+            You have already added that topic
           </div>
         ) : null}
-        {displayedTopics.map((displayedTopic) => (
-          <TopicListItem key={displayedTopic.id} topic={displayedTopic}>
-            <button
-              onClick={() =>
-                setSelectedTopics((selectedTopics) =>
-                  selectedTopics.push(displayedTopic)
-                )
-              }
-            >
-              Select
-            </button>
-          </TopicListItem>
-        ))}
+        <div className="create-post-topic-search-container">
+          <h4 className="create-post-topic-tag-title">Add related topics</h4>
+          <div className="create-post-topic-search-tool-container">
+            <FormDatabaseSearch
+              setDisplayedItems={setDisplayedTopics}
+              indexName="_TOPICS"
+              inputRef={topicSearchRef}
+              placeholderText="this post is about..."
+              hideSearchIcon
+            />
+            <div className="create-post-searched-topics-container">
+              {topicSearchRef.current ? (
+                <div className="create-post-typed-topic-container">
+                  <h4>
+                    {
+                      topicSearchRef.current.lastChild.firstChild.firstChild
+                        .value
+                    }
+                  </h4>
+                  <PrimaryButton
+                    onClick={() =>
+                      addTopicToPost(
+                        setSelectedTopics,
+                        topicSearchRef.current.lastChild.firstChild.firstChild
+                          .value,
+                        setDuplicateTopic
+                      )
+                    }
+                    small
+                  >
+                    Select
+                  </PrimaryButton>
+                </div>
+              ) : null}
+              {displayedTopics.map((displayedTopic) => (
+                <TopicListItem key={displayedTopic.id} topic={displayedTopic}>
+                  <PrimaryButton
+                    onClick={() =>
+                      addTopicToPost(
+                        setSelectedTopics,
+                        displayedTopic.name,
+                        setDuplicateTopic,
+                        displayedTopic.id
+                      )
+                    }
+                    small
+                  >
+                    Select
+                  </PrimaryButton>
+                </TopicListItem>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
       <div className="create-post-actions">
         <div className="create-post-cancel-container">
@@ -104,9 +131,14 @@ export default function PostForm({
   );
 }
 
-const addTopicToPost = (setSelectedTopics, topicName, setDuplicateTopic) => {
+const addTopicToPost = (
+  setSelectedTopics,
+  topicName,
+  setDuplicateTopic,
+  topicID
+) => {
   setSelectedTopics((selectedTopics) => {
-    const newTopic = [{name: topicName, id: undefined}];
+    const newTopic = [{name: topicName, id: topicID}];
     if (
       selectedTopics.some(
         (previouslySelectedTopic) =>
@@ -118,5 +150,22 @@ const addTopicToPost = (setSelectedTopics, topicName, setDuplicateTopic) => {
     }
     const augmentedTopics = [...selectedTopics, ...newTopic];
     return augmentedTopics;
+  });
+};
+
+const removeSelectedTopic = (
+  selectedTopicName,
+  selectedTopics,
+  setSelectedTopics
+) => {
+  const indexToBeRemoved = selectedTopics.findIndex(
+    (previouslySelectedTopic) =>
+      previouslySelectedTopic.name === selectedTopicName
+  );
+  setSelectedTopics((previouslySelectedTopics) => {
+    const curatedSelectedTopics = [...previouslySelectedTopics];
+    curatedSelectedTopics.splice(indexToBeRemoved, 1);
+    if (curatedSelectedTopics.length === 0) return [];
+    return curatedSelectedTopics;
   });
 };

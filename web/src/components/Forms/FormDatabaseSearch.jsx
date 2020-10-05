@@ -16,6 +16,7 @@ export default function FormDatabaseSearch({
   inputRef,
   indexName,
   placeholderText,
+  hideSearchIcon,
 }) {
   const abbrEnv = 'dev';
   const UsersResults = ({searchResults}) => {
@@ -34,7 +35,7 @@ export default function FormDatabaseSearch({
       className="form-database-search-container"
       ref={inputRef ? inputRef : null}
     >
-      <SearchIconGrey />
+      {hideSearchIcon ? null : <SearchIconGrey />}
       <InstantSearch
         searchClient={searchClient}
         indexName={abbrEnv + indexName}
