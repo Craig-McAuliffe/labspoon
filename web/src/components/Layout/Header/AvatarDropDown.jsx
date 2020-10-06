@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 // import {Dropdown, Menu} from 'antd';
 import {Link} from 'react-router-dom';
 import {
@@ -10,12 +10,13 @@ import {
   FollowIcon,
 } from '../../../assets/MenuIcons';
 
+import {db} from '../../../firebase';
 import {AuthContext} from '../../../App';
 import DefaultUserIcon from '../../../assets/DefaultUserIcon.svg';
 import UserAvatar from '../../Avatar/UserAvatar';
 import Dropdown from 'react-bootstrap/Dropdown';
 import CustomToggle from '../../CustomToggle';
-import relationships from '../../../mockdata/relationships';
+import {getPaginatedGroupReferencesFromCollectionRef} from '../../../helpers/groups';
 import users from '../../../mockdata/users';
 import firebase from '../../../firebase';
 
@@ -90,15 +91,22 @@ const AvatarDropDown = () => {
 };
 
 function UserGroups({userID}) {
-  const matchedUserRelationships = relationships().filter(
-    (userRelationships) => userRelationships.user.id === userID
-  )[0];
-  if (matchedUserRelationships === undefined) return null;
-  return matchedUserRelationships.memberOfGroups.map((group) => (
-    <Dropdown.Item key={group.id} href={`/group/${group.id}`}>
-      <p className="link-item">{group.name}</p>
-    </Dropdown.Item>
-  ));
+  const [listOfGroups, setListOfGroups] = useState([]);
+  const memberOfGroupsCollection = db.collection(`users/${userID}/groups`);
+
+  getPaginatedGroupReferencesFromCollectionRef(
+    memberOfGroupsCollection,
+    10
+  ).then((result) => {
+    setListOfGroups(result);
+  });
+  return listOfGroups === undefined
+    ? null
+    : listOfGroups.map((group) => (
+        <Dropdown.Item key={group.id} href={`/group/${group.id}`}>
+          <p className="link-item">{group.name}</p>
+        </Dropdown.Item>
+      ));
 }
 
 const AvatarToggle = ({user, mockUser}) => (

@@ -40,7 +40,9 @@ export default function PublicationListItem({
               alt={`${detectJournal(publication)[0].name} journal logo`}
             />
           ) : (
-            <div className="publication-list-item-journal-container"></div>
+            <div className="publication-list-item-journal-container">
+              <h3>Journal Article</h3>
+            </div>
           )}
         </div>
         <p className="publication-list-item-date">

@@ -19,6 +19,10 @@
   margin: 20px 0px;
 }
 
+.publication-list-item-journal-container h3 {
+  color: #99999f;
+}
+
 .publication-list-item-journal-logo {
   min-width: 150px;
   max-height: 50px;
@@ -27,9 +31,6 @@
 
 .publication-list-item-date {
   color: #5d5d65;
-}
-
-.publication-list-item-content {
 }
 
 .publication-list-item-content a:hover {
