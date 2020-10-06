@@ -20,12 +20,7 @@ export const FilterableResultsContext = createContext({});
 // FilterableResultsContext, and uses its results values for rendering.
 //
 // limit is the number of results to return on each page
-export default function FilterableResults({
-  children,
-  fetchResults,
-  limit,
-  usingFilter,
-}) {
+export default function FilterableResults({children, fetchResults, limit}) {
   const [filter, setFilter] = useState([]);
   const [loadingFilter, setLoadingFilter] = useState(true);
   const [results, setResults] = useState([]);
@@ -52,7 +47,7 @@ export default function FilterableResults({
 
   useEffect(() => {
     // wait until the filter is loaded to avoid an unnecessary reload of the results
-    if (usingFilter && loadingFilter) return;
+    if (loadingFilter) return;
     setLoadingResults(true);
     Promise.resolve(fetchResultsFunction(0, limit + 1, filter, undefined)).then(
       (newResults) => {
@@ -153,7 +148,10 @@ export function NewFilterMenuWrapper({getDefaultFilter}) {
 export function ResourceTabs({tabs}) {
   const filterableResults = useContext(FilterableResultsContext);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => filterableResults.setFilter(tabs), []);
+  useEffect(() => {
+    filterableResults.setFilter(tabs);
+    filterableResults.setLoadingFilter(false);
+  }, []);
   return (
     <Tabs
       tabFilter={filterableResults.filter[0]}
