@@ -12,7 +12,10 @@ import {getPaginatedGroupReferencesFromCollectionRef} from '../../helpers/groups
 import TopicListItem from '../../components/Topics/TopicListItem';
 import FollowTopicButton from '../../components/Topics/FollowTopicButton';
 import topics from '../../mockdata/topics';
-import FilterableResults from '../../components/FilterableResults/FilterableResults';
+import FilterableResults, {
+  NewResultsWrapper,
+  ResourceTabs,
+} from '../../components/FilterableResults/FilterableResults';
 import topicPageFeedData from './TopicPageFeedData';
 import TopicPageSider from './TopicPageSider';
 
@@ -153,8 +156,6 @@ export default function TopicPage() {
     });
   }
 
-  const getDefaultFilter = () => relationshipFilter;
-
   return (
     <>
       {featureFlags.has('related-resources') ? (
@@ -168,13 +169,12 @@ export default function TopicPage() {
             <FollowTopicButton targetTopic={topicDetails} />
           </TopicListItem>
         </div>
-        <FilterableResults
-          fetchResults={fetchFeedData}
-          getDefaultFilter={getDefaultFilter}
-          limit={10}
-          useTabs={true}
-          useFilterSider={false}
-        />
+        <FilterableResults fetchResults={fetchFeedData} limit={10}>
+          <div className="feed-container">
+            <ResourceTabs tabs={relationshipFilter} />
+            <NewResultsWrapper />
+          </div>
+        </FilterableResults>
       </div>
     </>
   );

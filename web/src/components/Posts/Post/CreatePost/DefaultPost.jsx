@@ -22,10 +22,13 @@ export default function DefaultPost({
     selectedTopics.forEach((selectedTopic) => {
       if (selectedTopic.id === undefined) selectedTopic.id = uuid();
     });
-    res.postType = {id: 'defaultPost', name: 'Default Post'};
+    res.postType = {id: 'defaultPost', name: 'Default'};
     res.topics = selectedTopics;
     createPost(res)
-      .then(() => setCreatingPost(false))
+      .then(() => {
+        setCreatingPost(false);
+        window.location.reload();
+      })
       .catch((err) => alert(err));
   };
   const initialValues = {

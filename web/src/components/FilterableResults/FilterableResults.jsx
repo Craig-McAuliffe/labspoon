@@ -1,174 +1,188 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext, createContext} from 'react';
 import {useLocation} from 'react-router-dom';
 import SearchBar from '../SearchBar';
 import update from 'immutability-helper';
-import HomePageTabs from '../HomePageTabs';
-
 import {FilterMenu} from '../Filter/Filter';
 import ResultsList from '../Results/Results';
-import CreatePost from '../Posts/Post/CreatePost/CreatePost';
 
 import './FilterableResults.css';
 
-const DEFAULT_TAB_ID = 'default';
-export const DEFAULT_TAB_IDX = 0;
+export const FilterableResultsContext = createContext({});
 
-/**
- * Renders a filter and the provided results component.
- */
-export default function FilterableResults({
-  fetchResults,
-  getDefaultFilter,
-  limit,
-  useTabs,
-  useFilterSider,
-  createPost,
-  homePageTabs,
-}) {
-  const [hasMore, setHasMore] = useState(false);
-  const [skip, setSkip] = useState(0);
+// Handles retrieval of data subject to a filter, and renders this into a result
+// component.
+//
+// One of its children must be a filter component that is a consumer of the
+// FilterableResultsContext, and calls the context setFilter function when
+// its values are changed.
+//
+// Another of its children must be a results component that is a consumer of the
+// FilterableResultsContext, and uses its results values for rendering.
+//
+// limit is the number of results to return on each page
+export default function FilterableResults({children, fetchResults, limit}) {
+  const [filter, setFilter] = useState([]);
+  const [loadingFilter, setLoadingFilter] = useState(true);
   const [results, setResults] = useState([]);
-
-  const [fetchResultsState, setFetchResultsState] = useState(
+  // whether there are more results left to retrieve
+  const [hasMore, setHasMore] = useState(false);
+  // `last` is used by Cloud Firestore as a pagination cursor, it is the last
+  // result returned by the previous query
+  const [last, setLast] = useState();
+  // `skip` is the number of results to skip, if this is used for pagination
+  // instead of the last result
+  const [skip, setSkip] = useState(0);
+  // whether the next batch of results are loading
+  const [loadingResults, setLoadingResults] = useState(false);
+  // whether an error occurred retrieving the results
+  const [resultsError, setResultsError] = useState();
+  // used for discerning tab and page changes, ie. when the results need to be reloaded
+  const [fetchResultsFunction, setFetchResultsFunction] = useState(
     () => fetchResults
   );
-  const [last, setLast] = useState(undefined);
-  const [filterOptions, setFilterOptions] = useState([]);
-
-  if (fetchResultsState !== fetchResults) {
-    setFetchResultsState(() => fetchResults);
+  if (fetchResultsFunction !== fetchResults) {
+    setFetchResultsFunction(() => fetchResults);
     setSkip(0);
   }
 
   useEffect(() => {
-    Promise.resolve(getDefaultFilter()).then((filter) =>
-      setFilterOptions(filter)
-    );
-  }, [getDefaultFilter]);
-
-  useEffect(() => {
-    // fetchResults may return either a result set or a promise, so we convert
-    // it to always a promise here
-    Promise.resolve(fetchResults(skip, limit + 1, filterOptions, last)).then(
+    // wait until the filter is loaded to avoid an unnecessary reload of the results
+    if (loadingFilter) return;
+    setLoadingResults(true);
+    Promise.resolve(fetchResultsFunction(0, limit + 1, filter, undefined)).then(
       (newResults) => {
-        setHasMore(!(newResults.length <= limit));
-        if (skip === 0) {
-          setResults(newResults);
+        if (newResults === undefined) {
+          setHasMore(false);
+          setResults([]);
+          setLoadingResults(false);
         } else {
-          setResults(results.concat(newResults.slice(0, limit)));
+          setHasMore(!(newResults.length <= limit));
+          setResults(newResults.slice(0, limit));
+          setLast(newResults[newResults.length - 1]);
+          setSkip(limit);
+          setLoadingResults(false);
         }
       }
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [skip, fetchResultsState, filterOptions, fetchResults, last, limit]);
+  }, [fetchResultsFunction, filter, limit, loadingFilter]);
 
-  /**
-   * Fetches the next page of results. Attempts to retrieve an extra result to
-   * determine whether there are more results available.
-   */
+  // fetches results by triggering an effect
   function fetchMore() {
-    setLast(results[results.length - 1]);
-    setSkip(skip + limit);
+    setLoadingResults(true);
+    Promise.resolve(fetchResultsFunction(skip, limit + 1, filter, last))
+      .then((newResults) => {
+        setHasMore(!(newResults.length <= limit));
+        setResults((results) => results.concat(newResults.slice(0, limit)));
+        setLast(results[results.length - 1]);
+        setSkip(skip + limit);
+        setLoadingResults(false);
+      })
+      .catch((err) => {
+        setResultsError(true);
+        console.log(err);
+      });
   }
 
-  function resetFeedFromFilterUpdate(updatedFilterOptions) {
-    setFilterOptions(updatedFilterOptions);
+  // when the filters or results fetch function are updated we want to
+  // repopulate the feed
+  useEffect(() => {
     setLast(undefined);
     setSkip(0);
-  }
-  /**
-   * Used by option components to update the filter when toggled.
-   */
-  function updateFilterOptionToState(collectionIndex, optionIndex) {
-    const updatedFilterOptions = updateFilterOption(
-      filterOptions,
-      collectionIndex,
-      optionIndex
-    );
-    resetFeedFromFilterUpdate(updatedFilterOptions);
-  }
-  /**
-   * Resets all options in a collection to disabled.
-   */
-  function resetFilterCollectionToState(collectionIndex) {
-    const updatedFilterOptions = resetFilterCollection(
-      filterOptions,
-      collectionIndex
-    );
-    resetFeedFromFilterUpdate(updatedFilterOptions);
-  }
-  /**
-   * Resets the filter collection and sets a single value to enabled. This
-   * ensures that only a single value is ever enabled on a filter collection,
-   * which is useful for managing tabs.
-   */
-  function resetThenSetFilterCollectionToState(collectionIndex, optionIndex) {
-    const resetFilterOptions = resetFilterCollection(
-      filterOptions,
-      collectionIndex
-    );
-    const updatedFilterOptions = updateFilterOption(
-      resetFilterOptions,
-      collectionIndex,
-      optionIndex
-    );
-    resetFeedFromFilterUpdate(updatedFilterOptions);
-  }
+  }, [filter, fetchResultsFunction]);
 
-  const getTabIDToIdx = () =>
-    new Map(
-      filterOptions[DEFAULT_TAB_IDX].options.map((opt, i) => [opt.data.id, i])
-    );
-
-  const setTab = (tabID) => {
-    if (tabID === DEFAULT_TAB_ID) {
-      return resetFilterCollectionToState(DEFAULT_TAB_IDX);
-    }
-    return resetThenSetFilterCollectionToState(
-      DEFAULT_TAB_IDX,
-      getTabIDToIdx().get(tabID)
-    );
-  };
-
-  const feedAndTabs = () => (
-    <div className="feed-container">
-      {createPost ? <CreatePost /> : null}
-      {homePageTabs ? <HomePageTabs /> : null}
-      {useTabs ? (
-        <Tabs
-          tabFilter={filterOptions[DEFAULT_TAB_IDX]}
-          setTabFilter={setTab}
-        />
-      ) : null}
-      <Results
-        results={results}
-        hasMore={hasMore}
-        fetchMore={fetchMore}
-        activeTabID={getActiveTabIDFromTypeFilterCollection(
-          filterOptions[DEFAULT_TAB_IDX]
-        )}
-      />
-    </div>
-  );
-
-  return useFilterSider ? (
-    <>
-      <div className="sider-layout">
-        <FilterMenu
-          options={filterOptions}
-          updateFilterOption={updateFilterOptionToState}
-          resetFilterCollection={resetFilterCollectionToState}
-        />
-      </div>
-      <div className="content-layout">{feedAndTabs()}</div>
-    </>
-  ) : (
-    feedAndTabs()
+  return (
+    <FilterableResultsContext.Provider
+      value={{
+        filter,
+        setFilter,
+        loadingFilter,
+        setLoadingFilter,
+        results,
+        hasMore,
+        fetchMore,
+        loadingResults,
+        resultsError,
+      }}
+    >
+      {children}
+    </FilterableResultsContext.Provider>
   );
 }
-FilterableResults.defaultProps = {
-  limit: 10,
-};
+
+export function NewFilterMenuWrapper({getDefaultFilter}) {
+  const filterableResults = useContext(FilterableResultsContext);
+  useEffect(() => {
+    filterableResults.setLoadingFilter(true);
+    Promise.resolve(getDefaultFilter())
+      .then((defaultFilter) => {
+        filterableResults.setFilter(defaultFilter);
+        filterableResults.setLoadingFilter(false);
+      })
+      .catch((error) => console.log(error));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (filterableResults.loadingFilter) return <h2>Loading...</h2>;
+  return (
+    <FilterMenu
+      options={filterableResults.filter}
+      updateFilterOption={(collectionIndex, optionIndex) => {
+        const updatedFilterOptions = updateFilterOption(
+          filterableResults.filter,
+          collectionIndex,
+          optionIndex
+        );
+        filterableResults.setFilter(updatedFilterOptions);
+      }}
+      resetFilterCollection={(collectionIndex) => {
+        const updatedFilterOptions = resetFilterCollection(
+          filterableResults.filter,
+          collectionIndex
+        );
+        filterableResults.setFilter(updatedFilterOptions);
+      }}
+    />
+  );
+}
+
+export function ResourceTabs({tabs}) {
+  const filterableResults = useContext(FilterableResultsContext);
+  useEffect(() => {
+    filterableResults.setFilter(tabs);
+    filterableResults.setLoadingFilter(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return (
+    <Tabs
+      tabFilter={filterableResults.filter[0]}
+      setTabFilter={(id) => {
+        const reset = resetFilterCollection(filterableResults.filter, 0);
+        const updated = updateFilterOption(
+          reset,
+          0,
+          // get the index of the enabled option
+          reset[0].options.findIndex((el) => el.data.id === id)
+        );
+        filterableResults.setFilter(updated);
+      }}
+    />
+  );
+}
+
+export function NewResultsWrapper() {
+  const filterableResults = useContext(FilterableResultsContext);
+  if (filterableResults.resultsError) return <h1>Error...</h1>;
+  return (
+    <>
+      <Results
+        results={filterableResults.results}
+        hasMore={filterableResults.hasMore}
+        fetchMore={filterableResults.fetchMore}
+      />
+      {filterableResults.loadingResults ? <h2>Loading...</h2> : null}
+    </>
+  );
+}
 
 /**
  * Safely resets the enabled status of all options in a collection
@@ -206,7 +220,7 @@ function updateFilterOption(filterOptions, collectionIndex, optionIndex) {
   return updatedFilterOptions;
 }
 
-function Tabs({tabFilter, setTabFilter}) {
+export function Tabs({tabFilter, setTabFilter}) {
   if (!tabFilter) return <div></div>;
   const selectedTabID = getActiveTabIDFromTypeFilterCollection(tabFilter);
 

@@ -22,10 +22,13 @@ export default function OpenPositionPostForm({
     selectedTopics.forEach((selectedTopic) => {
       if (selectedTopic.id === undefined) selectedTopic.id = uuid();
     });
-    res.postType = {id: 'openPositionPost', name: 'Open Position Post'};
+    res.postType = {id: 'openPositionPost', name: 'Open Position'};
     res.topics = selectedTopics;
     createPost(res)
-      .then(() => setCreatingPost(false))
+      .then(() => {
+        setCreatingPost(false);
+        window.location.reload();
+      })
       .catch((err) => alert(err));
   };
   const initialValues = {

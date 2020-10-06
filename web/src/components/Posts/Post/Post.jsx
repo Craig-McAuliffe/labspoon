@@ -126,18 +126,18 @@ function PostHeader({postType, postAuthor, postCreationDate, dedicatedPage}) {
     >
       <div className="post-header-profile">
         <div className="post-header-avatar">
-          <UserAvatar src={postAuthor.avatar} width="80px" height="80px" />
+          <UserAvatar src={postAuthor.avatar} width="60px" height="60px" />
         </div>
         <div>
-          <h2>
+          <h3>
             <Link to={`/user/${postAuthor.id}`}>{postAuthor.name}</Link>
-          </h2>
+          </h3>
           <p>{postCreationDate}</p>
         </div>
       </div>
 
       <div className="post-type-container">
-        <div className="post-type-icon">{postTypeIcons(postType.name)}</div>
+        <div className="post-type-icon">{postTypeIcons(postType.id)}</div>
         {postTypeName()}
       </div>
     </div>
@@ -158,23 +158,23 @@ function PostTextContent({post}) {
   );
 }
 
-function postTypeIcons(postTypeName) {
-  switch (postTypeName) {
-    case 'default':
+function postTypeIcons(postTypeID) {
+  switch (postTypeID) {
+    case 'defaultPost':
       return null;
-    case 'publication':
+    case 'publicationPost':
       return <PublicationIcon />;
     case 'news':
       return <NewsIcon />;
-    case 'open position':
+    case 'openPositionPost':
       return <OpenPositionIcon />;
-    case 'project':
+    case 'projectPost':
       return <ProjectIcon />;
-    case 'funding':
+    case 'fundingPost':
       return <FundingIcon />;
-    case 'lecture':
+    case 'lecturePost':
       return <LectureIcon />;
-    case 'member change':
+    case 'memberChangePost':
       return <MemberChangeIcon />;
     default:
       return null;

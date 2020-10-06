@@ -3,7 +3,10 @@ import Post from '../../../components/Posts/Post/Post';
 import PostPageSider from './PostPageSider';
 import {useParams, Link} from 'react-router-dom';
 import {getTestPosts} from '../../../mockdata/posts';
-import FilterableResults from '../../../components/FilterableResults/FilterableResults';
+import FilterableResults, {
+  ResourceTabs,
+  NewResultsWrapper,
+} from '../../../components/FilterableResults/FilterableResults';
 import postPageFeedData from './PostPageFeedData';
 import publications from '../../../mockdata/publications';
 
@@ -87,7 +90,6 @@ export default function PostPage() {
       mutable: false,
     },
   ];
-  const getDefaultFilter = () => relationshipFilter;
   return (
     <>
       <div className="sider-layout">
@@ -105,14 +107,12 @@ export default function PostPage() {
           <Post post={matchedPost} dedicatedPage={true} />
           {referencedResource()}
         </div>
-
-        <FilterableResults
-          fetchResults={fetchResults}
-          getDefaultFilter={getDefaultFilter}
-          limit={10}
-          useTabs={true}
-          useFilterSider={false}
-        />
+        <FilterableResults fetchResults={fetchResults} limit={10}>
+          <div className="feed-container">
+            <ResourceTabs tabs={relationshipFilter} />
+            <NewResultsWrapper />
+          </div>
+        </FilterableResults>
       </div>
     </>
   );

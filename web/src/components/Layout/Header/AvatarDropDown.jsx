@@ -7,6 +7,7 @@ import {
   SettingsMenuIcon,
   UserProfileMenuIcon,
   CreateGroupIcon,
+  FollowIcon,
 } from '../../../assets/MenuIcons';
 
 import {AuthContext} from '../../../App';
@@ -39,16 +40,28 @@ const AvatarDropDown = () => {
         </Dropdown.Toggle>
         <Dropdown.Menu>
           <Dropdown.Item href="/bookmarks">
-            <BookmarksMenuIcon />
-            <p className="link-item">Bookmarks</p>
+            <div className="avatar-dropdown-item-container">
+              <BookmarksMenuIcon />
+              <p className="link-item">Bookmarks</p>
+            </div>
+          </Dropdown.Item>
+          <Dropdown.Item href="/follows">
+            <div className="avatar-dropdown-item-container">
+              <FollowIcon />
+              <p className="link-item">Follows</p>
+            </div>
           </Dropdown.Item>
           <Dropdown.Item href={`/user/${user.uid}`}>
-            <UserProfileMenuIcon />
-            <p className="link-item">Profile</p>
+            <div className="avatar-dropdown-item-container">
+              <UserProfileMenuIcon />
+              <p className="link-item">Profile</p>
+            </div>
           </Dropdown.Item>
           <Dropdown.Item href="/settings">
-            <SettingsMenuIcon />
-            <p className="link-item">Settings</p>
+            <div className="avatar-dropdown-item-container">
+              <SettingsMenuIcon />
+              <p className="link-item">Settings</p>
+            </div>
           </Dropdown.Item>
           <div className="log-out-container">
             <button

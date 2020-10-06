@@ -3,9 +3,12 @@ import React, {useContext} from 'react';
 import {db} from '../../firebase';
 import {AuthContext, FeatureFlags} from '../../App';
 
-import FilterableResults from '../../components/FilterableResults/FilterableResults';
-import getFilteredTestPosts from '../../mockdata/posts';
-import {getPostFilters} from '../../mockdata/filters';
+import FilterableResults, {
+  NewFilterMenuWrapper,
+  NewResultsWrapper,
+} from '../../components/FilterableResults/FilterableResults';
+import CreatePost from '../../components/Posts/Post/CreatePost/CreatePost';
+import HomePageTabs from '../../components/HomePageTabs';
 
 function getEnabledIDsFromFilter(filter) {
   const IDsMap = new Map();
@@ -129,11 +132,6 @@ function sortAndPaginateFeedData(results, last, limit) {
     .catch((err) => console.log(err));
 }
 
-function fetchTestFeedData(skip, limit, filter) {
-  const repeatedTestPosts = getFilteredTestPosts(filter);
-  return repeatedTestPosts.slice(skip, skip + limit);
-}
-
 function getFiltersFromFilterCollection(filterCollection) {
   const filterCollections = [];
   filterCollection.forEach((filterCollectionDoc) => {
@@ -182,29 +180,27 @@ export default function FollowingFeedPage() {
 
   let fetchResults;
   let getDefaultFilter;
-  if (!featureFlags.has('disable-cloud-firestore')) {
-    if (user) {
-      fetchResults = (skip, limit, filter, last) =>
-        fetchUserFeedData(user.uid, skip, limit, filter, last);
-      getDefaultFilter = () => fetchUserFeedFilters(user.uid);
-    } else {
-      fetchResults = () => [];
-      getDefaultFilter = () => [];
-    }
+  if (user) {
+    fetchResults = (skip, limit, filter, last) =>
+      fetchUserFeedData(user.uid, skip, limit, filter, last);
+    getDefaultFilter = () => fetchUserFeedFilters(user.uid);
   } else {
-    fetchResults = fetchTestFeedData;
-    getDefaultFilter = () => getPostFilters(getFilteredTestPosts([]));
+    fetchResults = () => [];
+    getDefaultFilter = () => [];
   }
 
   return (
-    <FilterableResults
-      fetchResults={fetchResults}
-      getDefaultFilter={getDefaultFilter}
-      limit={10}
-      useTabs={false}
-      useFilterSider={true}
-      createPost={true}
-      homePageTabs={true}
-    />
+    <FilterableResults fetchResults={fetchResults} limit={10} loadingFilter>
+      <div className="sider-layout">
+        <NewFilterMenuWrapper getDefaultFilter={getDefaultFilter} />
+      </div>
+      <div className="content-layout">
+        <div className="feed-container">
+          {featureFlags.has('create-post') ? <CreatePost /> : <></>}
+          {featureFlags.has('news') ? <HomePageTabs /> : <></>}
+          <NewResultsWrapper />
+        </div>
+      </div>
+    </FilterableResults>
   );
 }

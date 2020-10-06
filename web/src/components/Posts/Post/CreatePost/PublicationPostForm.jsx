@@ -21,10 +21,13 @@ export default function PublicationPostForm({
     selectedTopics.forEach((selectedTopic) => {
       if (selectedTopic.id === undefined) selectedTopic.id = uuid();
     });
-    res.postType = {id: 'publicationPost', name: 'Publication Post'};
+    res.postType = {id: 'publicationPost', name: 'Publication'};
     res.topics = selectedTopics;
     createPost(res)
-      .then(() => setCreatingPost(false))
+      .then(() => {
+        setCreatingPost(false);
+        window.location.reload();
+      })
       .catch((err) => alert(err));
   };
 

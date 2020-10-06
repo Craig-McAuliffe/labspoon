@@ -7,7 +7,10 @@ import {dbPublicationToJSPublication} from '../../../helpers/publications';
 
 import publications from '../../../mockdata/publications';
 import ListItemTopics from '../../../components/CommonListItemParts/ListItemTopics';
-import FilterableResults from '../../../components/FilterableResults/FilterableResults';
+import FilterableResults, {
+  ResourceTabs,
+  NewResultsWrapper,
+} from '../../../components/FilterableResults/FilterableResults';
 import publicationPageFeedData from './PublicationPageFeedData';
 import PublicationSider from './PublicationPageSider';
 import detectJournal from '../../../components/Publication/DetectJournal';
@@ -117,8 +120,6 @@ export default function PublicationPage() {
     },
   ];
 
-  const getDefaultFilter = () => relationshipFilter;
-
   return (
     <>
       {featureFlags.has('related-resources') ? (
@@ -130,13 +131,12 @@ export default function PublicationPage() {
         <div className="details-container">
           <PublicationDetails publicationDetails={publicationDetails} />
         </div>
-        <FilterableResults
-          fetchResults={fetchFeedData}
-          getDefaultFilter={getDefaultFilter}
-          limit={10}
-          useTabs={true}
-          useFilterSider={false}
-        />
+        <FilterableResults fetchResults={fetchFeedData} limit={10}>
+          <div className="feed-container">
+            <ResourceTabs tabs={relationshipFilter} />
+            <NewResultsWrapper />
+          </div>
+        </FilterableResults>
       </div>
     </>
   );
