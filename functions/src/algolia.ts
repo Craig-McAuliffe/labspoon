@@ -17,7 +17,11 @@ if (algoliaConfig) {
   algoliaClient = algoliasearch(algoliaID, algoliaAdminKey);
 }
 
-function configureSearchIndex(res: functions.Response<any>, indexName: string, searchableAttributes: Array<string>): void | Promise<void> {
+function configureSearchIndex(
+  res: functions.Response<any>,
+  indexName: string,
+  searchableAttributes: Array<string>
+): void | Promise<void> {
   if (!algoliaClient) {
     res.json({error: 'No algolia client available'});
     return;
@@ -29,7 +33,12 @@ function configureSearchIndex(res: functions.Response<any>, indexName: string, s
     .catch((err: Error) => res.json(err));
 }
 
-function addToIndex(id: string, change: functions.firestore.QueryDocumentSnapshot, resourceType: string, indexName: string): void | Promise<void> {
+function addToIndex(
+  id: string,
+  change: functions.firestore.QueryDocumentSnapshot,
+  resourceType: string,
+  indexName: string
+): void | Promise<void> {
   if (!algoliaClient) return;
   const data = change.data();
   data.objectID = id;
@@ -38,36 +47,75 @@ function addToIndex(id: string, change: functions.firestore.QueryDocumentSnapsho
   index.saveObject(data);
 }
 
-export const configureUserSearchIndex = functions.https
-  .onRequest((req, res): void | Promise<void> => configureSearchIndex(res, USERS_INDEX, ['name', 'institution']));
-
-export const addUserToSearchIndex = functions.firestore.document(`users/{userID}`)
-  .onCreate((change, context) => addToIndex(context.params.userID, change, ResourceTypes.USER, USERS_INDEX))
-
-export const configureGroupSearchIndex = functions.https.onRequest((_, res) =>
-  configureSearchIndex(res, GROUPS_INDEX, ['name', 'location', 'institution', 'website', 'about'])
+export const configureUserSearchIndex = functions.https.onRequest(
+  (req, res): void | Promise<void> =>
+    configureSearchIndex(res, USERS_INDEX, ['name', 'institution'])
 );
 
-export const addGroupToSearchIndex = functions.firestore.document(`groups/{groupID}`)
-  .onCreate((change, context) => addToIndex(context.params.groupID, change, ResourceTypes.GROUP, GROUPS_INDEX));
+export const addUserToSearchIndex = functions.firestore
+  .document(`users/{userID}`)
+  .onCreate((change, context) =>
+    addToIndex(context.params.userID, change, ResourceTypes.USER, USERS_INDEX)
+  );
+
+export const configureGroupSearchIndex = functions.https.onRequest((_, res) =>
+  configureSearchIndex(res, GROUPS_INDEX, [
+    'name',
+    'location',
+    'institution',
+    'website',
+    'about',
+  ])
+);
+
+export const addGroupToSearchIndex = functions.firestore
+  .document(`groups/{groupID}`)
+  .onCreate((change, context) =>
+    addToIndex(
+      context.params.groupID,
+      change,
+      ResourceTypes.GROUP,
+      GROUPS_INDEX
+    )
+  );
 
 export const configurePostSearchIndex = functions.https.onRequest((_, res) =>
   configureSearchIndex(res, POSTS_INDEX, ['title', 'content'])
 );
 
-export const addPostToSearchIndex = functions.firestore.document(`posts/{postID}`)
-  .onCreate((change, context) => addToIndex(context.params.postID, change, ResourceTypes.POST, POSTS_INDEX));
+export const addPostToSearchIndex = functions.firestore
+  .document(`posts/{postID}`)
+  .onCreate((change, context) =>
+    addToIndex(context.params.postID, change, ResourceTypes.POST, POSTS_INDEX)
+  );
 
-export const configurePublicationSearchIndex = functions.https.onRequest((_, res) =>
-  configureSearchIndex(res, PUBLICATIONS_INDEX, ['title', 'content'])
+export const configurePublicationSearchIndex = functions.https.onRequest(
+  (_, res) =>
+    configureSearchIndex(res, PUBLICATIONS_INDEX, ['title', 'content'])
 );
 
-export const addPublicationToSearchIndex = functions.firestore.document(`publications/{publicationID}`)
-  .onCreate((change, context) => addToIndex(context.params.publicationID, change, ResourceTypes.PUBLICATION, PUBLICATIONS_INDEX));
+export const addPublicationToSearchIndex = functions.firestore
+  .document(`publications/{publicationID}`)
+  .onCreate((change, context) =>
+    addToIndex(
+      context.params.publicationID,
+      change,
+      ResourceTypes.PUBLICATION,
+      PUBLICATIONS_INDEX
+    )
+  );
 
 export const configureTopicSearchIndex = functions.https.onRequest((_, res) =>
-  configureSearchIndex(res, TOPICS_INDEX, ['title', 'content'])
+  configureSearchIndex(res, TOPICS_INDEX, ['name'])
 );
 
-export const addTopicToSearchIndex = functions.firestore.document(`topics/{topicID}`)
-  .onCreate((change, context) => addToIndex(context.params.topicID, change, ResourceTypes.TOPIC, TOPICS_INDEX));
+export const addTopicToSearchIndex = functions.firestore
+  .document(`topics/{topicID}`)
+  .onCreate((change, context) =>
+    addToIndex(
+      context.params.topicID,
+      change,
+      ResourceTypes.TOPIC,
+      TOPICS_INDEX
+    )
+  );

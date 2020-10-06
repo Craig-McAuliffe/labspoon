@@ -10,6 +10,7 @@ import {getPaginatedUserReferencesFromCollectionRef} from '../../helpers/users';
 import {getPaginatedGroupReferencesFromCollectionRef} from '../../helpers/groups';
 
 import TopicListItem from '../../components/Topics/TopicListItem';
+import FollowTopicButton from '../../components/Topics/FollowTopicButton';
 import topics from '../../mockdata/topics';
 import FilterableResults, {
   NewResultsWrapper,
@@ -164,7 +165,9 @@ export default function TopicPage() {
       )}
       <div className="content-layout">
         <div className="details-container">
-          <TopicListItem topic={topicDetails} dedicatedPage={true} />
+          <TopicListItem topic={topicDetails} dedicatedPage={true}>
+            <FollowTopicButton targetTopic={topicDetails} />
+          </TopicListItem>
         </div>
         <FilterableResults fetchResults={fetchFeedData} limit={10}>
           <div className="feed-container">

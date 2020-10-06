@@ -1,0 +1,26 @@
+.form-database-search-container {
+  margin: 20px 0px;
+  display: flex;
+  align-items: center;
+}
+
+.form-database-search-container input {
+  flex-grow: 1;
+  height: 40px;
+  border-bottom: 1px solid #00507c;
+  border-radius: 0%;
+  background: white;
+  padding-left: 0px;
+}
+
+.form-database-search-container path {
+  fill: #00507c;
+}
+
+.form-database-search-container svg {
+  margin-right: 10px;
+}
+
+.ais-SearchBox {
+  flex-grow: 1;
+}

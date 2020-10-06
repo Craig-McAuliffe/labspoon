@@ -42,16 +42,24 @@ export const createPost = functions.https.onCall(async (data, context) => {
       methods: data.methods,
       startDate: data.startDate,
     },
-    topics: [],
+    topics: data.topics,
     timestamp: new Date(),
     filterAuthorID: author.id,
     filterPostTypeID: 'default',
-    filterTopicIDs: [],
+    filterTopicIDs: data.topics.map(
+      (taggedTopic: {id: string; name: string}) => taggedTopic.id
+    ),
   };
   const postID = uuid();
 
   const batch = db.batch();
   batch.set(db.collection('posts').doc(postID), post);
+  post.topics.forEach((taggedTopic) => {
+    if (taggedTopic.isNew === true) {
+      const newTopic = {name: taggedTopic.name, id: taggedTopic.id};
+      batch.set(db.collection('topics').doc(taggedTopic.id), newTopic);
+    }
+  });
   batch.set(
     db.collection('users').doc(userID).collection('posts').doc(postID),
     post
@@ -164,6 +172,7 @@ interface Post {
 interface Topic {
   id: string;
   name: string;
+  isNew?: boolean;
 }
 
 interface PostContent {

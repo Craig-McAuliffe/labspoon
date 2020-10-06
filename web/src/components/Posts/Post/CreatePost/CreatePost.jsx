@@ -1,4 +1,4 @@
-import React, {useState, useContext} from 'react';
+import React, {useState, useContext, createContext, useEffect} from 'react';
 import {AuthContext} from '../../../../App';
 import DefaultPost from './DefaultPost';
 import OpenPositionPostForm from './OpenPositionPostForm';
@@ -11,20 +11,34 @@ const DEFAULT_POST = 'Default';
 const PUBLICATION_POST = 'Publication';
 const OPEN_POSITION_POST = 'Open Position';
 
+export const SelectedTopicsContext = createContext();
+
 export default function CreatePost({pinnedPost}) {
   const {user} = useContext(AuthContext);
   const [creatingPost, setCreatingPost] = useState(false);
+  const [selectedTopics, setSelectedTopics] = useState([]);
 
   const cancelPost = () => {
     setCreatingPost(false);
   };
 
+  useEffect(() => {
+    setSelectedTopics([]);
+  }, [creatingPost]);
+
   if (!user) return null;
   return creatingPost ? (
-    <PostTypeSpecificForm
-      cancelPost={cancelPost}
-      setCreatingPost={setCreatingPost}
-    />
+    <SelectedTopicsContext.Provider
+      value={{
+        selectedTopics: selectedTopics,
+        setSelectedTopics: setSelectedTopics,
+      }}
+    >
+      <PostTypeSpecificForm
+        cancelPost={cancelPost}
+        setCreatingPost={setCreatingPost}
+      />
+    </SelectedTopicsContext.Provider>
   ) : pinnedPost ? (
     <button
       onClick={() => setCreatingPost(true)}

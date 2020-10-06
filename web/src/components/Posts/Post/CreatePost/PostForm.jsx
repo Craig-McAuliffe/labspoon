@@ -1,8 +1,8 @@
 import React from 'react';
-import CancelButton from '../../../Buttons/CancelButton';
-import PrimaryButton from '../../../Buttons/PrimaryButton';
-import PostTypeDropDown from './PostTypeDropDown';
 import {Form, Formik} from 'formik';
+import TagTopics from './TagTopics';
+import CreatePostActions from './CreatePostActions';
+import './CreatePost';
 
 export default function PostForm({
   children,
@@ -20,19 +20,14 @@ export default function PostForm({
         validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
-        <Form>
-          {children}
-          <div className="create-post-actions">
-            <div className="create-post-cancel-container">
-              <CancelButton cancelAction={cancelPost} />
-            </div>
-            <div className="create-post-actions-positive">
-              <PostTypeDropDown setPostType={setPostType} postType={postType} />
-              <PrimaryButton submit={true}>Post</PrimaryButton>
-            </div>
-          </div>
-        </Form>
+        <Form id="create-post-form">{children}</Form>
       </Formik>
+      <TagTopics />
+      <CreatePostActions
+        cancelPost={cancelPost}
+        postType={postType}
+        setPostType={setPostType}
+      />
     </div>
   );
 }
