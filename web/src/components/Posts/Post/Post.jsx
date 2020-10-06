@@ -126,12 +126,12 @@ function PostHeader({postType, postAuthor, postCreationDate, dedicatedPage}) {
     >
       <div className="post-header-profile">
         <div className="post-header-avatar">
-          <UserAvatar src={postAuthor.avatar} width="80px" height="80px" />
+          <UserAvatar src={postAuthor.avatar} width="60px" height="60px" />
         </div>
         <div>
-          <h2>
+          <h3>
             <Link to={`/user/${postAuthor.id}`}>{postAuthor.name}</Link>
-          </h2>
+          </h3>
           <p>{postCreationDate}</p>
         </div>
       </div>
