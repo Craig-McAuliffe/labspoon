@@ -151,7 +151,7 @@ export function ResourceTabs({tabs}) {
   useEffect(() => {
     filterableResults.setFilter(tabs);
     filterableResults.setLoadingFilter(false);
-  }, []);
+  });
   return (
     <Tabs
       tabFilter={filterableResults.filter[0]}
