@@ -1,6 +1,6 @@
 import React from 'react';
 import {Link, useLocation} from 'react-router-dom';
-import {FrontierIcon, FollowingFeedIcon} from '../assets/TabsIcons';
+import {NewsIcon, FollowingFeedIcon} from '../assets/TabsIcons';
 
 import './HomePageTabs.css';
 
@@ -12,7 +12,7 @@ export default function HomePageTabs() {
         <Link to="/">
           <div
             className={
-              location.pathname === '/frontier'
+              location.pathname === '/news'
                 ? 'home-page-tab-inactive'
                 : 'home-page-tab-active'
             }
@@ -22,17 +22,17 @@ export default function HomePageTabs() {
           </div>
         </Link>
       </div>
-      <div className="home-page-frontier-tab-container">
-        <Link to="/frontier">
+      <div className="home-page-news-tab-container">
+        <Link to="/news">
           <div
             className={
-              location.pathname === '/frontier'
+              location.pathname === '/news'
                 ? 'home-page-tab-active'
                 : 'home-page-tab-inactive'
             }
           >
-            <FrontierIcon />
-            <h2>Frontier</h2>
+            <NewsIcon />
+            <h2>News</h2>
           </div>
         </Link>
       </div>

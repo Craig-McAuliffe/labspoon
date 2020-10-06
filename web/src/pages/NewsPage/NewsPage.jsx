@@ -20,9 +20,9 @@ import {
   Social,
 } from '../../assets/FrontierSideMenuIcons';
 
-import './FrontierPage.css';
+import './NewsPage.css';
 
-export default function FrontierPage() {
+export default function NewsPage() {
   const fetchFeedData = () => {
     return getTestPosts();
   };
@@ -32,7 +32,7 @@ export default function FrontierPage() {
   return (
     <>
       <div className="sider-layout">
-        <div className="frontier-sider-items-container">
+        <div className="news-sider-items-container">
           <Home />
           <Link>Home</Link>
           <Agriculture />
@@ -60,21 +60,21 @@ export default function FrontierPage() {
       <div className="content-layout">
         <div className="feed-container">
           <HomePageTabs />
-          <div className="frontier-page-highlights-container">
-            <div className="frontier-page-headline-item-container">
+          <div className="news-page-highlights-container">
+            <div className="news-page-headline-item-container">
               <HeadlineArticle article={topTenPosts[0]} />
             </div>
-            <div className="frontier-page-secondary-tertiary-items-container">
+            <div className="news-page-secondary-tertiary-items-container">
               <SecondaryArticle article={topTenPosts[1]} />
-              <div className="frontier-page-tertiary-articles-container">
+              <div className="news-page-tertiary-articles-container">
                 <TertiaryArticles articles={topTenPosts.slice(2, 5)} />
               </div>
             </div>
-            <div className="frontier-page-quaternary-items-container">
+            <div className="news-page-quaternary-items-container">
               <QuaternaryArticles articles={topTenPosts.slice(5, 11)} />
             </div>
           </div>
-          <div className="frontier-page-feed">
+          <div className="news-page-feed">
             <FilterableResults fetchResults={fetchFeedData} limit={10}>
               <NewResultsWrapper />
             </FilterableResults>
@@ -87,20 +87,20 @@ export default function FrontierPage() {
 
 function HeadlineArticle({article}) {
   return (
-    <div className="frontier-page-headline-item-header">
-      <div className="frontier-headline-article-author-container">
+    <div className="news-page-headline-item-header">
+      <div className="news-headline-article-author-container">
         <Link
           to={`/user/${article.author.id}`}
-          className="frontier-article-author-link"
+          className="news-article-author-link"
         >
-          <div className="frontier-headline-article-avatar-container">
+          <div className="news-headline-article-avatar-container">
             <UserAvatar src={article.author.avatar} height="80" width="80" />
           </div>
-          <h4 className="frontier-headline-article-author-name">
+          <h4 className="news-headline-article-author-name">
             {article.author.name}
           </h4>
         </Link>
-        <p className="frontier-headline-article-date">{article.createdAt}</p>
+        <p className="news-headline-article-date">{article.createdAt}</p>
       </div>
       <div>
         <Link to={`/post/${article.id}`}>
@@ -114,25 +114,25 @@ function HeadlineArticle({article}) {
 
 function SecondaryArticle({article}) {
   return (
-    <div className="frontier-page-secondary-article">
-      <div className="frontier-page-secondary-article-text">
+    <div className="news-page-secondary-article">
+      <div className="news-page-secondary-article-text">
         <Link to={`/post/${article.id}`}>
           <h4>{article.title}</h4>
         </Link>
         <p>{article.content.text}</p>
       </div>
-      <div className="frontier-secondary-article-author-attributes">
+      <div className="news-secondary-article-author-attributes">
         <Link to={`/user/${article.author.id}`}>
           <UserAvatar src={article.author.avatar} height="50" width="50" />
         </Link>
         <div>
           <Link
             to={`/user/${article.author.id}`}
-            className="frontier-article-author-link"
+            className="news-article-author-link"
           >
             <h4>{article.author.name}</h4>
           </Link>
-          <p className="frontier-author-attribute-secondary-article-date">
+          <p className="news-author-attribute-secondary-article-date">
             {article.createdAt}
           </p>
         </div>
@@ -143,12 +143,10 @@ function SecondaryArticle({article}) {
 
 function TertiaryArticles({articles}) {
   return articles.map((article) => (
-    <div key={article.id} className="frontier-tertiary-article">
-      <div className="frontier-tertiary-article-header">
+    <div key={article.id} className="news-tertiary-article">
+      <div className="news-tertiary-article-header">
         <Link to={`/post/${article.id}`}>
-          <h4 className="frontier-page-tertiary-article-title">
-            {article.title}
-          </h4>
+          <h4 className="news-page-tertiary-article-title">{article.title}</h4>
         </Link>
       </div>
       <AuthorAttributes article={article} />
@@ -160,13 +158,11 @@ function QuaternaryArticles({articles}) {
   return articles.map((article, i) => (
     <div
       className={
-        i === 3
-          ? 'frontier-page-last-quaternary-item'
-          : 'frontier-page-quaternary-item'
+        i === 3 ? 'news-page-last-quaternary-item' : 'news-page-quaternary-item'
       }
       key={article.id}
     >
-      <div className="frontier-page-quaternary-item-text">
+      <div className="news-page-quaternary-item-text">
         <Link to={`/post/${article.id}`}>
           <h4>{article.title}</h4>
         </Link>
@@ -179,11 +175,11 @@ function QuaternaryArticles({articles}) {
 
 function AuthorAttributes({article}) {
   return (
-    <div className="frontier-tertiary-article-author-attributes">
-      <Link to={`/user/${article.id}`} className="frontier-article-author-link">
+    <div className="news-tertiary-article-author-attributes">
+      <Link to={`/user/${article.id}`} className="news-article-author-link">
         <h4>{article.author.name}</h4>
       </Link>
-      <p className="frontier-author-attribute-tertiary-article-date">
+      <p className="news-author-attribute-tertiary-article-date">
         {article.createdAt}
       </p>
     </div>
