@@ -147,11 +147,11 @@ export function NewFilterMenuWrapper({getDefaultFilter}) {
 
 export function ResourceTabs({tabs}) {
   const filterableResults = useContext(FilterableResultsContext);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     filterableResults.setFilter(tabs);
     filterableResults.setLoadingFilter(false);
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <Tabs
       tabFilter={filterableResults.filter[0]}
