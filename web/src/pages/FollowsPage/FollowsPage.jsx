@@ -64,7 +64,7 @@ const FollowsPage = () => {
   );
 };
 
-function followsPageFeedDataFromDB(skip, limit, filterOptions, last, userID) {
+function followsPageFeedDataFromDB(limit, filterOptions, last, userID) {
   const activeTab = getActiveTabID(filterOptions);
   switch (activeTab) {
     case 'people':
