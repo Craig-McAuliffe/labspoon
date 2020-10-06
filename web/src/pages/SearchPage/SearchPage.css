@@ -5,7 +5,15 @@
   padding-left: 5px;
 }
 
+.search-page-search-container .ais-SearchBox-input {
+  display: none;
+}
+
 .ais-SearchBox-submit {
+  display: none;
+}
+
+.search-page-search-container .ais-SearchBox-reset {
   display: none;
 }
 

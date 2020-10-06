@@ -19,7 +19,7 @@ import LoginPage from './pages/LoginPage';
 import PublicationPage from './pages/ResourcePages/PublicationPage/PublicationPage';
 import PostPage from './pages/ResourcePages/PostPage';
 import TopicPage from './pages/TopicPage';
-import FrontierPage from './pages/FrontierPage';
+import NewsPage from './pages/NewsPage';
 import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
 import OnboardingPage from './pages/OnboardingPage';
 
@@ -33,9 +33,9 @@ export default function Routes({user, setUser}) {
       <Route exact path="/">
         <FollowingFeedPage />
       </Route>
-      {featureFlags.has('frontiers') ? (
-        <Route exact path="/frontier">
-          <FrontierPage />
+      {featureFlags.has('news') ? (
+        <Route exact path="/news">
+          <NewsPage />
         </Route>
       ) : undefined}
       <Route path="/login">

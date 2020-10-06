@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import './ListItemTopics.css';
 
 export default function ListItemTopics({taggedItem}) {
-  if (!taggedItem.topics) return <></>;
+  if (!taggedItem.topics || taggedItem.topics.length === 0) return <></>;
   return (
     <div className="post-topics">
       <p className="topics-sub-title">Topics: </p>
@@ -16,7 +16,7 @@ export default function ListItemTopics({taggedItem}) {
             key={topic.id}
             className="topic-names"
           >
-            {topic.name}{' '}
+            {topic.name}
           </Link>
         ))}
       </div>

@@ -72,84 +72,86 @@ export default function SearchPage() {
     <>
       <div className="content-layout">
         <div className="feed-container">
-          <InstantSearch
-            searchClient={searchClient}
-            indexName={abbrEnv + '_USERS'}
-            searchState={searchState}
-            onSearchStateChange={onSearchStateChange}
-            createURL={createURL}
-          >
-            <SearchBox
-              translations={{
-                placeholder: 'Edit your query',
-              }}
-              submit={<img src="" alt="" />}
-            />
-            <div className="feed-tabs-container">
-              <div className="feed-tabs-layout">{tabs}</div>
-            </div>
-            {tab === PUBLICATIONS &&
-            fflags.has('microsoft-academic-knowledge-api-publications') ? (
-              <MicrosoftAcademicKnowledgeAPIPublicationResults
-                query={searchState.query}
+          <div className="search-page-search-container">
+            <InstantSearch
+              searchClient={searchClient}
+              indexName={abbrEnv + '_USERS'}
+              searchState={searchState}
+              onSearchStateChange={onSearchStateChange}
+              createURL={createURL}
+            >
+              <SearchBox
+                translations={{
+                  placeholder: 'Edit your query',
+                }}
+                submit={<img src="" alt="" />}
               />
-            ) : (
-              <></>
-            )}
-            {tab === PUBLICATIONS &&
-            !fflags.has('microsoft-academic-knowledge-api-publications') ? (
-              <Index indexName={abbrEnv + '_PUBLICATIONS'}>
-                <Hits
-                  hitComponent={({hit}) => (
-                    <GenericListItem
-                      result={dbPublicationToJSPublication(hit)}
-                    />
-                  )}
+              <div className="feed-tabs-container">
+                <div className="feed-tabs-layout">{tabs}</div>
+              </div>
+              {tab === PUBLICATIONS &&
+              fflags.has('microsoft-academic-knowledge-api-publications') ? (
+                <MicrosoftAcademicKnowledgeAPIPublicationResults
+                  query={searchState.query}
                 />
-              </Index>
-            ) : (
-              <></>
-            )}
-            {tab === POSTS ? (
-              <Index indexName={abbrEnv + '_POSTS'}>
-                <Hits
-                  hitComponent={({hit}) => <GenericListItem result={hit} />}
-                />
-              </Index>
-            ) : (
-              <></>
-            )}
-            {tab === USERS ? (
-              <Index indexName={abbrEnv + '_USERS'}>
-                <Hits
-                  hitComponent={({hit}) => <GenericListItem result={hit} />}
-                />
-              </Index>
-            ) : (
-              <></>
-            )}
-            {tab === GROUPS ? (
-              <Index indexName={abbrEnv + '_GROUPS'}>
-                <Hits
-                  hitComponent={({hit}) => {
-                    hit.id = hit.objectID;
-                    return <GenericListItem result={hit} />;
-                  }}
-                />
-              </Index>
-            ) : (
-              <></>
-            )}
-            {tab === TOPICS ? (
-              <Index indexName={abbrEnv + '_TOPICS'}>
-                <Hits
-                  hitComponent={({hit}) => <GenericListItem result={hit} />}
-                />
-              </Index>
-            ) : (
-              <></>
-            )}
-          </InstantSearch>
+              ) : (
+                <></>
+              )}
+              {tab === PUBLICATIONS &&
+              !fflags.has('microsoft-academic-knowledge-api-publications') ? (
+                <Index indexName={abbrEnv + '_PUBLICATIONS'}>
+                  <Hits
+                    hitComponent={({hit}) => (
+                      <GenericListItem
+                        result={dbPublicationToJSPublication(hit)}
+                      />
+                    )}
+                  />
+                </Index>
+              ) : (
+                <></>
+              )}
+              {tab === POSTS ? (
+                <Index indexName={abbrEnv + '_POSTS'}>
+                  <Hits
+                    hitComponent={({hit}) => <GenericListItem result={hit} />}
+                  />
+                </Index>
+              ) : (
+                <></>
+              )}
+              {tab === USERS ? (
+                <Index indexName={abbrEnv + '_USERS'}>
+                  <Hits
+                    hitComponent={({hit}) => <GenericListItem result={hit} />}
+                  />
+                </Index>
+              ) : (
+                <></>
+              )}
+              {tab === GROUPS ? (
+                <Index indexName={abbrEnv + '_GROUPS'}>
+                  <Hits
+                    hitComponent={({hit}) => {
+                      hit.id = hit.objectID;
+                      return <GenericListItem result={hit} />;
+                    }}
+                  />
+                </Index>
+              ) : (
+                <></>
+              )}
+              {tab === TOPICS ? (
+                <Index indexName={abbrEnv + '_TOPICS'}>
+                  <Hits
+                    hitComponent={({hit}) => <GenericListItem result={hit} />}
+                  />
+                </Index>
+              ) : (
+                <></>
+              )}
+            </InstantSearch>
+          </div>
         </div>
       </div>
     </>

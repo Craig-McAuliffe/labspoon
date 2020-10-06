@@ -6,22 +6,14 @@ import {getPaginatedUserReferencesFromCollectionRef} from '../../helpers/users';
 import {getPaginatedTopicsFromCollectionRef} from '../../helpers/topics';
 import {getPaginatedGroupReferencesFromCollectionRef} from '../../helpers/groups';
 import TopicListItem from '../../components/Topics/TopicListItem';
+import FollowTopicButton from '../../components/Topics/FollowTopicButton';
 import GroupListItem from '../../components/Group/GroupListItem';
 import FollowUserButton from '../../components/User/FollowUserButton/FollowUserButton';
 import {CreateGroupIcon} from '../../assets/MenuIcons';
 import CreateGroupPage from '../Groups/CreateGroupPage/CreateGroupPage';
 import UserListItem from '../../components/User/UserListItem';
-import {SearchIconGrey} from '../../assets/HeaderIcons';
-import {
-  InstantSearch,
-  SearchBox,
-  Configure,
-  connectStateResults,
-} from 'react-instantsearch-dom';
-import {searchClient} from '../../algolia';
+import FormDatabaseSearch from '../../components/Forms/FormDatabaseSearch';
 import './OnboardingPage.css';
-
-const abbrEnv = 'dev';
 
 export default function OnboardingPage() {
   const {user} = useContext(AuthContext);
@@ -139,11 +131,12 @@ function OnboardingFollow({user}) {
           Find researchers who are active in your field of interest:
         </h4>
         <div className="onboarding-user-container">
-          <OnboardingSearch
+          <FormDatabaseSearch
             setDisplayedItems={setDisplayedUsers}
             inputRef={userSearchRef}
             indexName="_USERS"
             placeholderText="Find researchers"
+            displayedItems={displayedUsers}
           />
           <div>
             <div className="onboarding-users-to-follow-container">
@@ -161,57 +154,22 @@ function OnboardingFollow({user}) {
           Or try looking for a specific topic:
         </h4>
         <div className="onboarding-topic-search-container">
-          <OnboardingSearch
+          <FormDatabaseSearch
             setDisplayedItems={setDisplayedTopics}
             inputRef={topicSearchRef}
             indexName="_TOPICS"
             placeholderText="Find topics"
+            displayedItems={displayedTopics}
           />
           <div className="onboarding-topics-to-follow-container">
             {displayedTopics.map((displayedTopic) => (
-              <TopicListItem topic={displayedTopic} key={displayedTopic.id} />
+              <TopicListItem topic={displayedTopic} key={displayedTopic.id}>
+                <FollowTopicButton targetTopic={displayedTopic} />
+              </TopicListItem>
             ))}
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function OnboardingSearch({
-  setDisplayedItems,
-  inputRef,
-  indexName,
-  placeholderText,
-}) {
-  const UsersResults = ({searchResults}) => {
-    if (
-      searchResults &&
-      searchResults.nbHits !== 0 &&
-      searchResults.query.length > 0
-    )
-      setDisplayedItems(searchResults.hits);
-    return null;
-  };
-
-  const CustomStateUsers = connectStateResults(UsersResults);
-  return (
-    <div className="onboarding-search-container" ref={inputRef}>
-      <SearchIconGrey />
-      <InstantSearch
-        searchClient={searchClient}
-        indexName={abbrEnv + indexName}
-        onSearchStateChange={() => setDisplayedItems([])}
-      >
-        <SearchBox
-          translations={{
-            placeholder: placeholderText,
-          }}
-        />
-
-        <CustomStateUsers />
-        <Configure hitsPerPage={10} />
-      </InstantSearch>
     </div>
   );
 }
@@ -251,11 +209,12 @@ function OnboardingGroup({user}) {
       <h3>Group pages are a great place to share updates from the lab.</h3>
       <h4 className="onboarding-page-instructions">{`Are you part of a research group? Find it on Labspoon and request to join.`}</h4>
       <div onboarding-group-search>
-        <OnboardingSearch
+        <FormDatabaseSearch
           setDisplayedItems={setDisplayedGroups}
           inputRef={groupSearchRef}
           indexName="_GROUPS"
           placeholderText="Find your group"
+          displayedItems={displayedGroups}
         />
         <div className="onboarding-groups-to-follow-container">
           {displayedGroups.map((displayedGroup) => (

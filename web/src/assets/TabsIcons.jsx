@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const FrontierIcon = () => (
+export const NewsIcon = () => (
   <svg
     width="35"
     height="35"

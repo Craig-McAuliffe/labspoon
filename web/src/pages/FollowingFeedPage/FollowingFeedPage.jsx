@@ -190,14 +190,14 @@ export default function FollowingFeedPage() {
   }
 
   return (
-    <FilterableResults fetchResults={fetchResults} limit={10}>
+    <FilterableResults fetchResults={fetchResults} limit={10} loadingFilter>
       <div className="sider-layout">
         <NewFilterMenuWrapper getDefaultFilter={getDefaultFilter} />
       </div>
       <div className="content-layout">
         <div className="feed-container">
           {featureFlags.has('create-post') ? <CreatePost /> : <></>}
-          {featureFlags.has('frontiers') ? <HomePageTabs /> : <></>}
+          {featureFlags.has('news') ? <HomePageTabs /> : <></>}
           <NewResultsWrapper />
         </div>
       </div>

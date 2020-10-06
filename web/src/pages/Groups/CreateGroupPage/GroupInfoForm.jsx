@@ -1,4 +1,4 @@
-import React, {useState, useContext} from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 import {Formik, Form} from 'formik';
 import * as Yup from 'yup';
 import {
@@ -42,7 +42,7 @@ export default function GroupInfoForm({
   cancelForm,
   submitText,
 }) {
-  const {user} = useContext(AuthContext);
+  const {user, userProfile} = useContext(AuthContext);
   const featureFlags = useContext(FeatureFlags);
   const validationSchema = Yup.object({
     name: Yup.string().required('Name is required'),
@@ -51,6 +51,15 @@ export default function GroupInfoForm({
     website: Yup.string(),
     about: Yup.string().max(1000, 'Must have fewer than 1000 characters'),
   });
+
+  useEffect(() => {
+    if (userProfile === undefined) return;
+
+    setSelectedUsers((previouslySelectedUsers) => [
+      ...previouslySelectedUsers,
+      ...[userProfile],
+    ]);
+  }, [userProfile]);
 
   const addSelectedUsers = (chosenUser) => {
     if (
@@ -64,7 +73,6 @@ export default function GroupInfoForm({
   const onAvatarSelect = (selectedAvatar) => {
     setAvatar(selectedAvatar);
   };
-
   return (
     <div className="content-layout">
       <div className="feed-container">
@@ -183,9 +191,11 @@ function SelectedMembers({selectedUsers, setSelectedUsers}) {
     <>
       {selectedUsers.map((user) => (
         <UserListItem user={user} key={user.id}>
-          <NegativeButton onClick={() => removeSelectedUser(user.id)}>
-            Remove
-          </NegativeButton>
+          {user.resourceType ? (
+            <NegativeButton onClick={() => removeSelectedUser(user.id)}>
+              Remove
+            </NegativeButton>
+          ) : null}
         </UserListItem>
       ))}
     </>
