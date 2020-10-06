@@ -6,7 +6,7 @@ import axios from 'axios';
 
 export const microsoftAcademicKnowledgePublicationSearch = functions.https.onCall(
     async (data, context) => {
-        if (!config.microsoftAcademicKnowledgeAPI || !config.microsoftAcademicKnowledgeAPI.subscriptionKey) {
+        if (!config.microsoftacademicknowledgeapi || !config.microsoftacademicknowledgeapi.subscriptionkey) {
             throw new functions.https.HttpsError('unavailable', 'Microsoft Academic Knowledge API is not configured in this environment');
         }
         const subscriptionKey = config.microsoftAcademicKnowledgeAPI.subscriptionKey;
