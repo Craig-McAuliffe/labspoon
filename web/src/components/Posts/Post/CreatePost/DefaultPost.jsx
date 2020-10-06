@@ -18,7 +18,10 @@ export default function DefaultPost({
   const submitChanges = (res) => {
     res.postType = {id: 'defaultPost', name: 'Default'};
     createPost(res)
-      .then(() => setCreatingPost(false))
+      .then(() => {
+        setCreatingPost(false);
+        window.location.reload();
+      })
       .catch((err) => alert(err));
   };
   const initialValues = {

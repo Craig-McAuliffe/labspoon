@@ -18,7 +18,10 @@ export default function OpenPositionPostForm({
   const submitChanges = (res) => {
     res.postType = {id: 'openPositionPost', name: 'Open Position'};
     createPost(res)
-      .then(() => setCreatingPost(false))
+      .then(() => {
+        setCreatingPost(false);
+        window.location.reload();
+      })
       .catch((err) => alert(err));
   };
   const initialValues = {
