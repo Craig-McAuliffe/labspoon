@@ -54,12 +54,11 @@ export default function GroupInfoForm({
 
   useEffect(() => {
     if (userProfile === undefined) return;
-
     setSelectedUsers((previouslySelectedUsers) => [
       ...previouslySelectedUsers,
       ...[userProfile],
     ]);
-  }, [userProfile]);
+  }, [userProfile, setSelectedUsers]);
 
   const addSelectedUsers = (chosenUser) => {
     if (
