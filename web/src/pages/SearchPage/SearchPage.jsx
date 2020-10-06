@@ -8,13 +8,16 @@ import {InstantSearch, SearchBox, Hits, Index} from 'react-instantsearch-dom';
 import {searchClient} from '../../algolia';
 import {searchStateToURL, createURL} from '../../helpers/search';
 
-import {dbPublicationToJSPublication} from '../../helpers/publications';
+import Results, {GenericListItem} from '../../components/Results/Results';
 
-import {GenericListItem} from '../../components/Results/Results';
+import {dbPublicationToJSPublication} from '../../helpers/publications';
 
 import 'instantsearch.css/themes/algolia.css';
 
 import './SearchPage.css';
+import {functions} from 'firebase';
+import {useContext} from 'react';
+import {FeatureFlags} from '../../App';
 
 const PUBLICATIONS = 'Publications';
 const POSTS = 'Posts';
@@ -32,6 +35,7 @@ export default function SearchPage() {
   const [tab, setTab] = useState(PUBLICATIONS);
   const [searchState, setSearchState] = useState(urlToSearchState(location));
   const setStateId = React.useRef();
+  const fflags = useContext(FeatureFlags);
 
   useEffect(() => {
     const nextSearchState = urlToSearchState(location);
@@ -85,7 +89,16 @@ export default function SearchPage() {
               <div className="feed-tabs-container">
                 <div className="feed-tabs-layout">{tabs}</div>
               </div>
-              {tab === PUBLICATIONS ? (
+              {tab === PUBLICATIONS &&
+              fflags.has('microsoft-academic-knowledge-api-publications') ? (
+                <MicrosoftAcademicKnowledgeAPIPublicationResults
+                  query={searchState.query}
+                />
+              ) : (
+                <></>
+              )}
+              {tab === PUBLICATIONS &&
+              !fflags.has('microsoft-academic-knowledge-api-publications') ? (
                 <Index indexName={abbrEnv + '_PUBLICATIONS'}>
                   <Hits
                     hitComponent={({hit}) => (
@@ -146,3 +159,30 @@ export default function SearchPage() {
 }
 
 const urlToSearchState = (location) => qs.parse(location.search.slice(1));
+
+const getMicrosoftAcademicKnowledgeAPIPublications = functions().httpsCallable(
+  'publications-microsoftAcademicKnowledgePublicationSearch'
+);
+
+function MicrosoftAcademicKnowledgeAPIPublicationResults({query}) {
+  const [results, setResults] = useState([]);
+  useEffect(() => {
+    if (!query) return;
+    const apiCallTimeout = setTimeout(
+      () =>
+        getMicrosoftAcademicKnowledgeAPIPublications({
+          query: query,
+        })
+          .then((res) => setResults(res.data.map(toLocalPublication)))
+          .catch((err) => alert(err)),
+      2000
+    );
+    return () => clearTimeout(apiCallTimeout);
+  }, [query]);
+  return <Results results={results} hasMore={false} />;
+}
+
+function toLocalPublication(remotePublication) {
+  remotePublication.resourceType = 'publication';
+  return remotePublication;
+}
