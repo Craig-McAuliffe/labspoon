@@ -108,3 +108,24 @@ export const CreateGroupIcon = () => (
     />
   </svg>
 );
+
+export const FollowIcon = () => (
+  <svg
+    width="34"
+    height="24"
+    viewBox="2 0 36 23"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M2.0003 13.0883L9.24177 11.7824L7.80973 19"
+      stroke="#99999F"
+      strokeWidth="3"
+    />
+    <path
+      d="M8.4251 7.2621L15.6666 5.95625L14.2345 13.1738"
+      stroke="#99999F"
+      strokeWidth="3"
+    />
+  </svg>
+);

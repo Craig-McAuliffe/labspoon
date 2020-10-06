@@ -190,7 +190,7 @@ export default function FollowingFeedPage() {
   }
 
   return (
-    <FilterableResults fetchResults={fetchResults} limit={10}>
+    <FilterableResults fetchResults={fetchResults} limit={10} loadingFilter>
       <div className="sider-layout">
         <NewFilterMenuWrapper getDefaultFilter={getDefaultFilter} />
       </div>

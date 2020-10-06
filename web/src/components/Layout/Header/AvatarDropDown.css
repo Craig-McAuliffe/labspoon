@@ -61,6 +61,11 @@
   color: #99999f;
 }
 
+.avatar-dropdown-item-container {
+  display: grid;
+  grid-template-columns: 15px 1fr;
+  align-items: center;
+}
 @media screen and (max-width: 1007px) {
   .dropdown-name {
     display: none;

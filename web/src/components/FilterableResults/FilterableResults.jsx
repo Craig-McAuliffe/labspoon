@@ -51,11 +51,17 @@ export default function FilterableResults({children, fetchResults, limit}) {
     setLoadingResults(true);
     Promise.resolve(fetchResultsFunction(0, limit + 1, filter, undefined)).then(
       (newResults) => {
-        setHasMore(!(newResults.length <= limit));
-        setResults(newResults.slice(0, limit));
-        setLast(newResults[newResults.length - 1]);
-        setSkip(limit);
-        setLoadingResults(false);
+        if (newResults === undefined) {
+          setHasMore(false);
+          setResults([]);
+          setLoadingResults(false);
+        } else {
+          setHasMore(!(newResults.length <= limit));
+          setResults(newResults.slice(0, limit));
+          setLast(newResults[newResults.length - 1]);
+          setSkip(limit);
+          setLoadingResults(false);
+        }
       }
     );
   }, [fetchResultsFunction, filter, limit, loadingFilter]);
@@ -116,7 +122,7 @@ export function NewFilterMenuWrapper({getDefaultFilter}) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (filterableResults.loadingFilter) return <h1>Loading...</h1>;
+  if (filterableResults.loadingFilter) return <h2>Loading...</h2>;
   return (
     <FilterMenu
       options={filterableResults.filter}
@@ -142,7 +148,10 @@ export function NewFilterMenuWrapper({getDefaultFilter}) {
 export function ResourceTabs({tabs}) {
   const filterableResults = useContext(FilterableResultsContext);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => filterableResults.setFilter(tabs), []);
+  useEffect(() => {
+    filterableResults.setFilter(tabs);
+    filterableResults.setLoadingFilter(false);
+  }, []);
   return (
     <Tabs
       tabFilter={filterableResults.filter[0]}
@@ -170,7 +179,7 @@ export function NewResultsWrapper() {
         hasMore={filterableResults.hasMore}
         fetchMore={filterableResults.fetchMore}
       />
-      {filterableResults.loadingResults ? <h1>Loading...</h1> : null}
+      {filterableResults.loadingResults ? <h2>Loading...</h2> : null}
     </>
   );
 }
