@@ -172,7 +172,9 @@ function MicrosoftAcademicKnowledgeAPIPublicationResults({query}) {
       () =>
         getMicrosoftAcademicKnowledgeAPIPublications({
           query: query,
-        }).then((res) => setResults(res.data.map(toLocalPublication))),
+        })
+          .then((res) => setResults(res.data.map(toLocalPublication)))
+          .catch((err) => alert(err)),
       2000
     );
     return () => clearTimeout(apiCallTimeout);

@@ -1,13 +1,19 @@
 import * as functions from 'firebase-functions';
+import {config} from './config';
 // @ts-ignore
 import CrossRef from 'crossref';
 import axios from 'axios';
 
 export const microsoftAcademicKnowledgePublicationSearch = functions.https.onCall(
     async (data, context) => {
+        if (!config.microsoftAcademicKnowledgeAPI || !config.microsoftAcademicKnowledgeAPI.subscriptionKey) {
+            throw new functions.https.HttpsError('unavailable', 'Microsoft Academic Knowledge API is not configured in this environment');
+        }
+        const subscriptionKey = config.microsoftAcademicKnowledgeAPI.subscriptionKey;
+        
         const baseURL = 'https://api.labs.cognitive.microsoft.com/academic/v1.0';
         const headers = {
-            'Ocp-Apim-Subscription-Key': 'cebe71521f5a44a5a1861dde6e7ff30f',
+            'Ocp-Apim-Subscription-Key': subscriptionKey,
         };
         let results;
         await axios({
