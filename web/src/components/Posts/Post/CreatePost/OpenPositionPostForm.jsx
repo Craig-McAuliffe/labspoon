@@ -16,7 +16,7 @@ export default function OpenPositionPostForm({
   postType,
 }) {
   const submitChanges = (res) => {
-    res.postType = {id: 'openPositionPost', name: 'Open Position Post'};
+    res.postType = {id: 'openPositionPost', name: 'Open Position'};
     createPost(res)
       .then(() => setCreatingPost(false))
       .catch((err) => alert(err));

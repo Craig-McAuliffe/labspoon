@@ -15,7 +15,7 @@ export default function PublicationPostForm({
   postType,
 }) {
   const submitChanges = (res) => {
-    res.postType = {id: 'publicationPost', name: 'Publication Post'};
+    res.postType = {id: 'publicationPost', name: 'Publication'};
     createPost(res)
       .then(() => setCreatingPost(false))
       .catch((err) => alert(err));
