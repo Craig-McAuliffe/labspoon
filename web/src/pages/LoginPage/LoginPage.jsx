@@ -67,6 +67,8 @@ const SignUpForm = ({returnLocation}) => {
             db.doc(`users/${result.user.uid}`).set({
               id: result.user.uid,
               name: result.user.displayName,
+              coverPhoto:
+                'https://i.ibb.co/HNJcLdj/user-cover-photo-default-1-2.jpg',
             })
           )
           .then(() => {

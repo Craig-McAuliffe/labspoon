@@ -14,6 +14,7 @@ import {getPaginatedPublicationsFromCollectionRef} from '../../../helpers/public
 import {getPaginatedGroupReferencesFromCollectionRef} from '../../../helpers/groups';
 import {getPaginatedUserReferencesFromCollectionRef} from '../../../helpers/users';
 import {getPaginatedRecommendationsFromCollectionRef} from '../../../helpers/recommendations';
+import DefaultUserIcon from '../../../assets/DefaultUserIcon.svg';
 
 import FilterableResults, {
   ResourceTabs,
@@ -180,18 +181,31 @@ function UserDetails({user}) {
     <div>
       <div className="user-cover-photo-container">
         <img
-          src={user.coverPhoto}
+          src={
+            user.coverPhoto
+              ? user.coverPhoto
+              : 'https://i.ibb.co/HNJcLdj/user-cover-photo-default-1-2.jpg'
+          }
           alt="user cover"
           className="user-cover-photo"
         />
       </div>
       <div className="user-headline">
         <div className="user-page-avatar-container">
-          <UserPageAvatar src={user.avatar} width="100px" height="100px" />
+          {user.avatar ? (
+            <UserPageAvatar src={user.avatar} width="100px" height="100px" />
+          ) : (
+            <img
+              src={DefaultUserIcon}
+              alt="user icon"
+              className="user-page-default-user-avatar"
+            />
+          )}
         </div>
         <div className="user-headline-text">
           <h2>{user.name}</h2>
-          <h3>{user.institution}</h3>
+          <h4>{user.institution ? user.institution : <button></button>}</h4>
+          <h4>{user.position ? user.position : <button></button>}</h4>
         </div>
       </div>
       <div className="user-message-follow">
