@@ -9,7 +9,7 @@ import {getPaginatedUserReferencesFromCollectionRef} from '../../../helpers/user
 import {getPaginatedTopicsFromCollectionRef} from '../../../helpers/topics';
 import {getPaginatedPublicationsFromCollectionRef} from '../../../helpers/publications';
 import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
-
+import EditGroup from './EditGroup';
 import groups from '../../../mockdata/groups';
 import GroupPageSider from './GroupPageSider';
 import groupPageFeedData from './GroupPageFeedData';
@@ -17,7 +17,6 @@ import FilterableResults, {
   NewResultsWrapper,
   ResourceTabs,
 } from '../../../components/FilterableResults/FilterableResults';
-import GroupInfoForm from '../../Groups/CreateGroupPage/GroupInfoForm';
 import UserAvatar from '../../../components/Avatar/UserAvatar';
 import FollowGroupButton from '../../../components/Group/FollowGroupButton';
 import MessageButton from '../../../components/Buttons/MessageButton';
@@ -204,34 +203,27 @@ export default function GroupPage() {
       ) : (
         <></>
       )}
-      <div className="content-layout">
-        {previousPage()}
-        {editingGroup ? (
+      {editingGroup ? (
+        <EditGroup groupData={groupData} setEditingGroup={setEditingGroup} />
+      ) : (
+        <div className="content-layout">
+          {previousPage()}
           <div className="group-details">
-            <EditingGroup
-              groupData={groupData}
+            <GroupDetails
+              group={groupData}
+              groupDescriptionRef={groupDescriptionRef}
+              userIsMember={userIsMember}
               setEditingGroup={setEditingGroup}
             />
           </div>
-        ) : (
-          <>
-            <div className="group-details">
-              <GroupDetails
-                group={groupData}
-                groupDescriptionRef={groupDescriptionRef}
-                userIsMember={userIsMember}
-                setEditingGroup={setEditingGroup}
-              />
+          <FilterableResults fetchResults={fetchFeedData} limit={10}>
+            <div className="feed-container">
+              <ResourceTabs tabs={relationshipFilter} />
+              <NewResultsWrapper />
             </div>
-            <FilterableResults fetchResults={fetchFeedData} limit={10}>
-              <div className="feed-container">
-                <ResourceTabs tabs={relationshipFilter} />
-                <NewResultsWrapper />
-              </div>
-            </FilterableResults>
-          </>
-        )}
-      </div>
+          </FilterableResults>
+        </div>
+      )}
     </>
   );
 }
@@ -312,57 +304,3 @@ const GroupDetails = ({
     </>
   );
 };
-
-function EditingGroup({groupData, setEditingGroup}) {
-  const groupID = groupData.id;
-  const [groupMembers, setGroupMembers] = useState([]);
-  useEffect(() => {
-    const fetchGroupMembers = db
-      .collection(`groups/${groupID}/members`)
-      .get()
-      .then((qs) => {
-        const users = [];
-        qs.forEach((doc) => {
-          const user = doc.data();
-          user.resourceType = 'user';
-          users.push(user);
-        });
-        return users;
-      });
-    fetchGroupMembers.then((fetchedMembers) => setGroupMembers(fetchedMembers));
-  }, [groupID]);
-
-  const initialValues = {
-    name: groupData.name,
-    location: groupData.location,
-    institution: groupData.institution,
-    website: groupData.website,
-    about: groupData.about,
-  };
-
-  const onEditSubmit = (values) => {
-    const writeToDB = () => {
-      const batch = db.batch();
-      const groupDocRef = db.doc(`groups/${groupID}`);
-      batch.update(groupDocRef, values);
-      batch
-        .commit()
-        .catch((err) => alert('batch failed to commit'))
-        .then(() => setEditingGroup(false));
-    };
-
-    writeToDB();
-  };
-
-  return (
-    <GroupInfoForm
-      initialValues={initialValues}
-      onSubmit={onEditSubmit}
-      selectedUsers={groupMembers}
-      setSelectedUsers={() => {}}
-      existingAvatar={groupData.avatar}
-      cancelForm={() => setEditingGroup(false)}
-      submitText="Save Changes"
-    />
-  );
-}

@@ -9,6 +9,7 @@ import TopicListItem from '../../components/Topics/TopicListItem';
 import FollowTopicButton from '../../components/Topics/FollowTopicButton';
 import GroupListItem from '../../components/Group/GroupListItem';
 import FollowUserButton from '../../components/User/FollowUserButton/FollowUserButton';
+import SecondaryButton from '../../components/Buttons/SecondaryButton';
 import {CreateGroupIcon} from '../../assets/MenuIcons';
 import CreateGroupPage from '../Groups/CreateGroupPage/CreateGroupPage';
 import UserListItem from '../../components/User/UserListItem';
@@ -67,16 +68,14 @@ export default function OnboardingPage() {
                 Back
               </button>
             ) : null}
-            <button
-              className="onboarding-next-button"
+            <SecondaryButton
               onClick={() =>
                 onboardingStage === 'follow-things'
                   ? setOnboardingStage('join-groups')
                   : history.push(returnLocation ? returnLocation : '/')
               }
-            >
-              <h3>{onboardingStage === 'join-groups' ? 'Finish' : 'Next'}</h3>
-            </button>
+              buttonText={onboardingStage === 'join-groups' ? 'Finish' : 'Next'}
+            />
           </div>
         </div>
       </div>

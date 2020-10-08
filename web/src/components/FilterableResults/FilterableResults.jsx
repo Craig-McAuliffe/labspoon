@@ -229,7 +229,9 @@ export function Tabs({tabFilter, setTabFilter}) {
       onClick={() => setTabFilter(option.data.id)}
       key={option.data.id}
       className={
-        option.data.id === selectedTabID ? 'feed-tab-active' : 'feed-tab'
+        option.data.id === selectedTabID
+          ? 'feed-tab-active'
+          : 'feed-tab-inactive'
       }
     >
       <h3>{option.data.name}</h3>

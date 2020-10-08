@@ -32,12 +32,14 @@ export function FilterMenu({
       />
     );
   });
+
   return (
     <div className="filter-container">
       <FilterSearch />
       {filterCollections}
     </div>
   );
+  return null;
 }
 FilterMenu.propTypes = {
   options: PropTypes.array.isRequired,
