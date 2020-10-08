@@ -2,6 +2,7 @@ import React from 'react';
 import {Link} from 'react-router-dom';
 import UserAvatar from '../Avatar/UserAvatar';
 import PrimaryButton from '../Buttons/PrimaryButton';
+import DefaultUserIcon from '../../assets/DefaultUserIcon.svg';
 import './UserListItem.css';
 
 export default function UserListItem({user, children}) {
@@ -10,10 +11,26 @@ export default function UserListItem({user, children}) {
       <Link to={`/user/${user.id}`}>
         <div className="user-listItem-link">
           <div className="Avatar">
-            <UserAvatar src={user.avatar} width="60px" height="60px" />
+            {user.avatar ? (
+              <UserAvatar src={user.avatar} width="60px" height="60px" />
+            ) : (
+              <img
+                src={DefaultUserIcon}
+                alt="default user icon"
+                className="user-list-item-default-avatar"
+              />
+            )}
           </div>
           <div className="AvatarSmall">
-            <UserAvatar src={user.avatar} width="40px" height="40px" />
+            {user.avatar ? (
+              <UserAvatar src={user.avatar} width="40px" height="40px" />
+            ) : (
+              <img
+                src={DefaultUserIcon}
+                alt="default user icon"
+                className="user-list-item-default-small"
+              />
+            )}
           </div>
           <div className="user-listItem-name">
             <h2>{user.name}</h2>
@@ -34,7 +51,15 @@ export function UserSmallResultItem({user, selectUser}) {
   return (
     <div className="user-listItem-container">
       <div className="user-listItem-link">
-        <UserAvatar src={user.avatar} width="40px" height="40px" />
+        {user.avatar ? (
+          <UserAvatar src={user.avatar} width="40px" height="40px" />
+        ) : (
+          <img
+            src={DefaultUserIcon}
+            alt="default user icon"
+            className="user-list-item-default-small"
+          />
+        )}
         <h4>{user.name}</h4>
       </div>
       <div className="user-listItem-institution">
