@@ -40,7 +40,9 @@ export default function CreateGroupPage({
           .get()
           .then((fetchedPostsByMember) => {
             fetchedPostsByMember.forEach((fetchedPostSnapShot) => {
-              collectedPostsByMembers.push(fetchedPostSnapShot.data());
+              const fetchedPostData = fetchedPostSnapShot.data();
+              fetchedPostData.onGroupPage = false;
+              collectedPostsByMembers.push(fetchedPostData);
             });
             if (i === selectedUsers.length - 1) writeGroupToDB();
           })
