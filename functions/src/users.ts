@@ -61,7 +61,7 @@ export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall
 );
 
 // for a given name, return potential matching publications so the user can select theirs
-export const getPotentialMicrosoftAcademicPublicationMatchesByAuthorName = functions.https.onCall(
+export const getSuggestedPublicationsForAuthorName = functions.https.onCall(
   async (data, context) => {
     const name = data.name;
     if (name === undefined)
