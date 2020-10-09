@@ -61,6 +61,16 @@
   color: #99999f;
 }
 
+.user-list-item-default-avatar {
+  display: inline-block;
+  width: 60px;
+  height: 60px;
+}
+
+.user-list-item-default-avatar-small {
+  display: none;
+}
+
 @media screen and (max-width: 560px) {
   .user-listItem-institution {
     color: #5d5d65;
@@ -85,6 +95,16 @@
   .AvatarSmall {
     display: block;
     margin: 5px;
+  }
+
+  .user-list-item-default-avatar-small {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+  }
+
+  .user-list-item-default-avatar {
+    display: none;
   }
 
   .tag-container {

@@ -17,13 +17,12 @@ import UserAvatar from '../../Avatar/UserAvatar';
 import Dropdown from 'react-bootstrap/Dropdown';
 import CustomToggle from '../../CustomToggle';
 import {getPaginatedGroupReferencesFromCollectionRef} from '../../../helpers/groups';
-import users from '../../../mockdata/users';
 import firebase from '../../../firebase';
 
 import './AvatarDropDown.css';
 
 const AvatarDropDown = () => {
-  const {user} = useContext(AuthContext);
+  const {user, userProfile} = useContext(AuthContext);
   if (!user) {
     return (
       <Dropdown variant="success" id="dropdown-basic">
@@ -33,11 +32,10 @@ const AvatarDropDown = () => {
       </Dropdown>
     );
   } else {
-    const mockUser = users().filter((mockUser) => mockUser.id === user.uid)[0];
     return (
       <Dropdown>
         <Dropdown.Toggle as={CustomToggle} id="dropdown-custom-components">
-          <AvatarToggle user={user} mockUser={mockUser} />
+          <AvatarToggle user={user} userProfile={userProfile} />
         </Dropdown.Toggle>
         <Dropdown.Menu>
           <Dropdown.Item href="/bookmarks">
@@ -109,15 +107,21 @@ function UserGroups({userID}) {
       ));
 }
 
-const AvatarToggle = ({user, mockUser}) => (
-  <div className="dropdown-header">
-    {mockUser ? (
-      <UserAvatar src={mockUser.avatar} width="50" height="50" />
-    ) : (
-      <img src={DefaultUserIcon} alt="user icon" />
-    )}
-    <p className="dropdown-name">{user.displayName}</p>
-  </div>
-);
+const AvatarToggle = ({user, userProfile}) => {
+  return (
+    <div className="dropdown-header">
+      {userProfile ? (
+        userProfile.avatar ? (
+          <UserAvatar src={userProfile.avatar} width="50" height="50" />
+        ) : (
+          <img src={DefaultUserIcon} alt="user icon" />
+        )
+      ) : (
+        <img src={DefaultUserIcon} alt="user icon" />
+      )}
+      <p className="dropdown-name">{user.displayName}</p>
+    </div>
+  );
+};
 
 export default AvatarDropDown;
