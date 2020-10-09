@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {useContext, useState} from 'react';
 import {Link} from 'react-router-dom';
 import PropTypes from 'prop-types';
-
+import {SelectedListItemsContext} from '../../../pages/ResourcePages/GroupPage/EditGroupPosts';
 import {
   LectureIcon,
   ProjectIcon,
@@ -27,9 +27,25 @@ import './Post.css';
  * @return {React.ReactElement}
  */
 export default function Post({post, dedicatedPage, bookmarkedVariation}) {
-  const referencedResourceWrapper = () => {
-    if (dedicatedPage || post.url === undefined) return postContent();
+  const setFeedSelectionState = useContext(SelectedListItemsContext);
+  const [isSelected, setIsSelected] = useState(false);
+  const selectPost = () => {
+    isSelected
+      ? setFeedSelectionState((feedSelectionState) => {
+          const filteredSelectionState = feedSelectionState.filter(
+            (selectedPostID) => selectedPostID !== post.id
+          );
+          return filteredSelectionState;
+        })
+      : setFeedSelectionState((feedSelectionState) => [
+          ...feedSelectionState,
+          ...[post.id],
+        ]);
+    setIsSelected(!isSelected);
+  };
 
+  const referencedResourceWrapper = () => {
+    if (dedicatedPage) return postContent();
     const referencedPublication = publications().filter(
       (publication) => publication.url === post.url
     )[0];
@@ -40,6 +56,21 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
           removeBorder={true}
         />
         {postContent()}
+      </div>
+    ) : post.hasSelector ? (
+      <div className="post-with-selector-container">
+        {postContent()}
+        <div className="post-selector-container">
+          <button
+            className={
+              isSelected
+                ? 'post-selector-button-active'
+                : 'post-selector-button-inactive'
+            }
+            onClick={() => selectPost()}
+          />
+          <p>Add</p>
+        </div>
       </div>
     ) : (
       postContent()

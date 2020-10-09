@@ -109,7 +109,7 @@ export default function FilterableResults({children, fetchResults, limit}) {
   );
 }
 
-export function NewFilterMenuWrapper({getDefaultFilter}) {
+export function NewFilterMenuWrapper({getDefaultFilter, radio}) {
   const filterableResults = useContext(FilterableResultsContext);
   useEffect(() => {
     filterableResults.setLoadingFilter(true);
@@ -130,7 +130,8 @@ export function NewFilterMenuWrapper({getDefaultFilter}) {
         const updatedFilterOptions = updateFilterOption(
           filterableResults.filter,
           collectionIndex,
-          optionIndex
+          optionIndex,
+          radio
         );
         filterableResults.setFilter(updatedFilterOptions);
       }}
@@ -141,6 +142,7 @@ export function NewFilterMenuWrapper({getDefaultFilter}) {
         );
         filterableResults.setFilter(updatedFilterOptions);
       }}
+      radio={radio}
     />
   );
 }
@@ -205,7 +207,17 @@ function resetFilterCollection(filterOptions, collectionIndex) {
   return updatedFilterOptions;
 }
 
-function updateFilterOption(filterOptions, collectionIndex, optionIndex) {
+function updateFilterOption(
+  filterOptions,
+  collectionIndex,
+  optionIndex,
+  radio
+) {
+  if (radio) {
+    filterOptions[collectionIndex].options.forEach((filterOption) => {
+      filterOption.enabled = false;
+    });
+  }
   const updatedFilterOptions = update(filterOptions, {
     [collectionIndex]: {
       options: {

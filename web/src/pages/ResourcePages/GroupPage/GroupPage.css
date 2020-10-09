@@ -126,3 +126,23 @@
   border: 2px solid #99999f;
   padding: 10px;
 }
+
+.edit-group-posts-selected-posts-container {
+  position: fixed;
+  bottom: 5vh;
+  right: 25vw;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.9);
+  background: white;
+  height: 20vh;
+  width: 25vw;
+  padding: 20px 10px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 1;
+}
+
+.edit-group-posts-selected-posts-actions {
+  display: flex;
+  justify-content: space-between;
+}
