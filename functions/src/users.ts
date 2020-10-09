@@ -140,8 +140,8 @@ export const getPotentialMicrosoftAcademicPublicationMatchesByAuthorName = funct
         });
     });
     const publicationsByInterpretation = await Promise.all(executePromises);
-    const publications = flatten(publicationsByInterpretation);
-    return publications;
+    const suggestedPublications = flatten(publicationsByInterpretation);
+    return suggestedPublications;
   }
 );
 
