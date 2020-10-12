@@ -36,7 +36,7 @@ export const microsoftAcademicKnowledgePublicationSearch = functions.https.onCal
           pubSubClient
             .topic('add-publication')
             .publish(messageBuffer)
-            .catch((err) =>
+            .catch((err: Error) =>
               console.error(
                 'Error raised publishing message to add-publication topic with payload',
                 jsonString,
