@@ -156,7 +156,7 @@ interface FilterCollection {
   rank?: number;
 }
 
-interface Post {
+export interface Post {
   postType: PostType;
   author: UserRef;
   content: PostContent;
@@ -169,13 +169,13 @@ interface Post {
   filterTopicIDs: string[];
 }
 
-interface Topic {
+export interface Topic {
   id: string;
   name: string;
   isNew?: boolean;
 }
 
-interface PostContent {
+export interface PostContent {
   text?: string;
   location?: string;
   methods?: Array<string>;
@@ -188,12 +188,12 @@ interface PostContent {
   position?: string;
 }
 
-interface PostType {
+export interface PostType {
   id: string;
   name: string;
 }
 
-interface UserRef {
+export interface UserRef {
   id: string;
   name: string;
   avatar?: string;

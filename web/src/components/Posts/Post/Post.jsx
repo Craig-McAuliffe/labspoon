@@ -52,7 +52,8 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
       <div className="post-with-selector-container">
         {postContent()}
         <div className="post-selector-container">
-          {post.hasSelector === 'active' ? (
+          {post.hasSelector === 'active-add' ||
+          post.hasSelector === 'active-remove' ? (
             <>
               <button
                 className={
@@ -69,7 +70,9 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
                   )
                 }
               />
-              <p className="post-selector-active-text">Add</p>
+              <p className="post-selector-active-text">
+                {post.hasSelector === 'active-add' ? 'Add' : 'Remove'}
+              </p>
             </>
           ) : (
             <p className="post-selector-inactive-text">Already on group</p>

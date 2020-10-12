@@ -7,36 +7,40 @@ import './GroupPage.css';
 export default function EditGroup({groupData, setEditingGroup}) {
   const tabs = ['Info', 'Posts'];
   const [editType, setEditType] = useState(tabs[0]);
-  return editType === tabs[0] ? (
-    <div className="content-layout">
-      <div className="group-details">
-        <EditGroupTabs
-          editType={editType}
-          tabs={tabs}
-          setEditType={setEditType}
-        />
-        <div className="edit-group-posts-cancel">
-          <button onClick={() => setEditingGroup(false)}>
-            <h4>Back to Group Page</h4>
-          </button>
+  if (editType === tabs[0])
+    return (
+      <div className="content-layout">
+        <div className="group-details">
+          <EditGroupTabs
+            editType={editType}
+            tabs={tabs}
+            setEditType={setEditType}
+          />
+          <div className="edit-group-posts-cancel">
+            <button onClick={() => setEditingGroup(false)}>
+              <h4>Back to Group Page</h4>
+            </button>
+          </div>
+          <EditGroupInfo
+            groupData={groupData}
+            setEditingGroup={setEditingGroup}
+          />
         </div>
-        <EditGroupInfo
+      </div>
+    );
+  if (editType === tabs[1])
+    return (
+      <>
+        <EditGroupPosts
           groupData={groupData}
           setEditingGroup={setEditingGroup}
+          tabs={tabs}
+          setEditType={setEditType}
+          editType={editType}
         />
-      </div>
-    </div>
-  ) : editType === tabs[1] ? (
-    <>
-      <EditGroupPosts
-        groupData={groupData}
-        setEditingGroup={setEditingGroup}
-        tabs={tabs}
-        setEditType={setEditType}
-        editType={editType}
-      />
-    </>
-  ) : null;
+      </>
+    );
+  else return null;
 }
 
 export function EditGroupTabs({editType, tabs, setEditType}) {

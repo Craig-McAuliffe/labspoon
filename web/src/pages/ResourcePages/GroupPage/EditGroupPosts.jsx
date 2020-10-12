@@ -21,11 +21,15 @@ export default function EditingGroupInfo({
   setEditType,
   editType,
 }) {
-  const [addOrRemove, setAddOrRemove] = useState('add');
+  const ADD = 'add';
+  const REMOVE = 'remove';
+  const [addOrRemove, setAddOrRemove] = useState(ADD);
   const [selectedPosts, setSelectedPosts] = useState([]);
   const [filteredMember, setFilteredMember] = useState('');
   const [displaySuccessMessage, setDisplaySuccessMessage] = useState(false);
   const [resetSelection, setResetSelection] = useState(false);
+  const groupID = groupData.id;
+  const membersDBCollectionRef = db.collection(`groups/${groupID}/members`);
 
   // Resets selection if user switches between member or tabs
   useEffect(() => {
@@ -52,9 +56,6 @@ export default function EditingGroupInfo({
     }
   }, [resetSelection]);
 
-  const groupID = groupData.id;
-  const membersDBCollectionRef = db.collection(`groups/${groupID}/members`);
-
   async function addPostsToGroup() {
     selectedPosts.forEach((selectedPost) => {
       delete selectedPost.hasSelector;
@@ -63,13 +64,26 @@ export default function EditingGroupInfo({
         .then(() => setDisplaySuccessMessage(true))
         .catch((err) => {
           console.log(err);
-          alert(`Sorry, we couldn't add the posts. Please try again later.`);
+          alert(`Sorry, something went wrong. Please try again later.`);
         });
     });
     setSelectedPosts([]);
   }
 
-  const memberFilter = () => {
+  async function removePostsFromGroup() {
+    selectedPosts.forEach((selectedPost) => {
+      db.doc(`groups/${groupID}/posts/${selectedPost.id}`)
+        .delete()
+        .then(() => setDisplaySuccessMessage(true))
+        .catch((err) => {
+          console.log(err);
+          alert(`Sorry, something went wrong. Please try again later.`);
+        });
+    });
+    setSelectedPosts([]);
+  }
+
+  const getMemberFilter = () => {
     const filterCollections = [];
     const memberFilterPromise = getPaginatedUserReferencesFromCollectionRef(
       membersDBCollectionRef,
@@ -88,7 +102,7 @@ export default function EditingGroupInfo({
               id: fetchedGroupMember.id,
               name: fetchedGroupMember.name,
             },
-            enabled: i === 0 ? true : false,
+            enabled: i === 0,
           });
         });
         return filterCollection;
@@ -98,35 +112,15 @@ export default function EditingGroupInfo({
     return Promise.all(filterCollections);
   };
 
-  const groupPostsMemberFilter = () => {
-    const filterCollections = [];
-    const groupPostsMemberFilterRef = db.collection(
-      `groups/${groupID}/filterCollections/usersWithPostsOnGroup`
-    );
-    const memberFilterPromise = db
-      .collection(groupPostsMemberFilterRef)
-      .get()
-      .then((fetchedMembers) => {
-        const filterCollection = {
-          collectionName: 'Group Members',
-          options: [],
-          mutable: true,
-        };
+  const getGroupPostsMemberFilter = () => {
+    console.log('hello');
+    const filterCollection = {
+      collectionName: 'Group Members',
+      options: [],
+      mutable: true,
+    };
 
-        fetchedMembers.forEach((fetchedGroupMember, i) => {
-          filterCollection.options.push({
-            data: {
-              id: fetchedGroupMember.id,
-              name: fetchedGroupMember.name,
-            },
-            enabled: i === 0 ? true : false,
-          });
-        });
-        return filterCollection;
-      })
-      .catch((err) => console.log('filter err', err));
-    filterCollections.push(memberFilterPromise);
-    return Promise.all(filterCollections);
+    return filterCollection;
   };
 
   const fetchPostsByFilteredMember = (skip, limit, filter, last) => {
@@ -148,7 +142,7 @@ export default function EditingGroupInfo({
           .doc(`groups/${groupID}/posts/${fetchedPost.id}`)
           .get()
           .then((qs) => {
-            fetchedPost.hasSelector = qs.exists ? 'active' : 'inactive';
+            fetchedPost.hasSelector = qs.exists ? 'inactive-add' : 'active-add';
             return fetchedPost;
           })
       );
@@ -157,7 +151,7 @@ export default function EditingGroupInfo({
     return postsByMembersPromise;
   };
 
-  const fetchPostsOnGroup = (skip, limit, filter, last) => {
+  const fetchPostsOnGroupByMember = (skip, limit, filter, last) => {
     const enabledMemberID = filter[0].options.filter(
       (option) => option.enabled === true
     )[0].data.id;
@@ -165,23 +159,27 @@ export default function EditingGroupInfo({
       .collection(`groups/${groupID}/posts`)
       .where('author.id', '==', enabledMemberID)
       .orderBy('timestamp', 'desc');
+
     const groupPostsPromise = getPaginatedPostsFromCollectionRef(
       enabledMemberDBRef,
       limit,
       last
     ).then((postsList) => {
       postsList.forEach((fetchedPost) => {
-        fetchedPost.hasSelector = 'active';
+        fetchedPost.hasSelector = 'active-remove';
       });
       return postsList;
     });
     return groupPostsPromise;
   };
+
   return (
     <>
       <FilterableResults
         fetchResults={
-          addOrRemove === 'add' ? fetchPostsByFilteredMember : fetchPostsOnGroup
+          addOrRemove === ADD
+            ? fetchPostsByFilteredMember
+            : fetchPostsOnGroupByMember
         }
         limit={10}
         loadingFilter
@@ -189,7 +187,7 @@ export default function EditingGroupInfo({
         <div className="sider-layout">
           <NewFilterMenuWrapper
             getDefaultFilter={
-              addOrRemove === 'add' ? memberFilter : groupPostsMemberFilter
+              addOrRemove === ADD ? getMemberFilter : getGroupPostsMemberFilter
             }
             radio={true}
           />
@@ -206,49 +204,30 @@ export default function EditingGroupInfo({
                 <h4>Back to Group Page</h4>
               </button>
             </div>
-            <div className="edit-group-posts-add-or-remove-container">
-              <div className="edit-group-posts-add-or-remove-button-container">
-                <button
-                  onClick={() => {
-                    if (addOrRemove !== 'add') setAddOrRemove('add');
-                  }}
-                  className={
-                    addOrRemove === 'add'
-                      ? 'feed-tab-active'
-                      : 'feed-tab-inactive'
-                  }
-                >
-                  <h3>Add Posts</h3>
-                </button>
-              </div>
-              <div className="edit-group-posts-add-or-remove-button-container">
-                <button
-                  onClick={() => {
-                    if (addOrRemove !== 'remove') setAddOrRemove('remove');
-                  }}
-                  className={
-                    addOrRemove === 'remove'
-                      ? 'feed-tab-active'
-                      : 'feed-tab-inactive'
-                  }
-                >
-                  <h3>Remove Posts</h3>
-                </button>
-              </div>
-              {selectedPosts.length > 0 ? (
-                <AddOrRemoveConfirmation
-                  selectedPosts={selectedPosts}
-                  groupData={groupData}
-                  addPostsToGroup={addPostsToGroup}
-                  setResetSelection={setResetSelection}
-                />
-              ) : null}
-            </div>
+            <AddOrRemoveToggle
+              addOrRemove={addOrRemove}
+              setAddOrRemove={setAddOrRemove}
+              ADD={ADD}
+              REMOVE={REMOVE}
+            />
+            {selectedPosts.length > 0 ? (
+              <AddOrRemoveConfirmation
+                selectedPosts={selectedPosts}
+                groupData={groupData}
+                addPostsToGroup={addPostsToGroup}
+                setResetSelection={setResetSelection}
+                addOrRemove={addOrRemove}
+                removePostsFromGroup={removePostsFromGroup}
+                ADD={ADD}
+              />
+            ) : null}
 
             {displaySuccessMessage ? (
               <div className="edit-group-posts-success-message-container">
                 <SuccessMessage>
-                  Posts Added to {groupData.name}!
+                  {addOrRemove === ADD
+                    ? `Posts Added to ${groupData.name}!`
+                    : `Posts Removed from ${groupData.name}!`}
                 </SuccessMessage>
               </div>
             ) : null}
@@ -273,17 +252,63 @@ const AddOrRemoveConfirmation = ({
   groupData,
   addPostsToGroup,
   setResetSelection,
+  addOrRemove,
+  removePostsFromGroup,
+  ADD,
 }) => {
   return (
     <div className="edit-group-posts-selected-posts-container">
-      <h2>
-        Add {selectedPosts.length} selected posts to {groupData.name}
-      </h2>
+      {addOrRemove === ADD ? (
+        <h2>
+          Add {selectedPosts.length} selected posts to {groupData.name}
+        </h2>
+      ) : (
+        <h2>
+          Remove {selectedPosts.length} selected posts from {groupData.name}
+        </h2>
+      )}
       <div className="edit-group-posts-selected-posts-actions">
         <button onClick={() => setResetSelection(true)}>Deselect All</button>
-        <PrimaryButton onClick={() => addPostsToGroup()}>
-          Add to Group
-        </PrimaryButton>
+        {addOrRemove === ADD ? (
+          <PrimaryButton onClick={() => addPostsToGroup()}>
+            Add to Group
+          </PrimaryButton>
+        ) : (
+          <PrimaryButton onClick={() => removePostsFromGroup()}>
+            Remove from Group
+          </PrimaryButton>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const AddOrRemoveToggle = ({addOrRemove, setAddOrRemove, ADD, REMOVE}) => {
+  return (
+    <div className="edit-group-posts-add-or-remove-container">
+      <div className="edit-group-posts-add-or-remove-button-container">
+        <button
+          onClick={() => {
+            if (addOrRemove !== ADD) setAddOrRemove(ADD);
+          }}
+          className={
+            addOrRemove === ADD ? 'feed-tab-active' : 'feed-tab-inactive'
+          }
+        >
+          <h3>Add Posts</h3>
+        </button>
+      </div>
+      <div className="edit-group-posts-add-or-remove-button-container">
+        <button
+          onClick={() => {
+            if (addOrRemove !== REMOVE) setAddOrRemove(REMOVE);
+          }}
+          className={
+            addOrRemove === REMOVE ? 'feed-tab-active' : 'feed-tab-inactive'
+          }
+        >
+          <h3>Remove Posts</h3>
+        </button>
       </div>
     </div>
   );
