@@ -5,7 +5,7 @@ import {firestore} from 'firebase-admin';
 
 import { UserRef } from "./users";
 
-const db: firestore.Firestore = admin.firestore();
+const db = admin.firestore();
 
 db.settings({
   ignoreUndefinedProperties: true,
@@ -124,7 +124,7 @@ async function updateFilterCollection(
   feedRef: firestore.DocumentReference<firestore.DocumentData>,
   filterCollection: FilterCollection,
   filterOption: FilterOption
-) {
+) { 
   const filterCollectionDocRef = feedRef
     .collection('filterCollections')
     .doc(filterCollection.resourceType);

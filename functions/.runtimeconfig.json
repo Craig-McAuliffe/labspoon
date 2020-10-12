@@ -1,4 +1,7 @@
 {
+  "microsoftacademicknowledgeapi": {
+    "subscriptionkey": "cebe71521f5a44a5a1861dde6e7ff30f"
+  },
   "env": {
     "name": "dev"
   }
