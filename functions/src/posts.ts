@@ -1,8 +1,9 @@
 import * as functions from 'firebase-functions';
 import {v4 as uuid} from 'uuid';
-
 import {admin, ResourceTypes} from './config';
 import {firestore} from 'firebase-admin';
+
+import { UserRef } from "./users";
 
 const db: firestore.Firestore = admin.firestore();
 
@@ -191,10 +192,4 @@ interface PostContent {
 interface PostType {
   id: string;
   name: string;
-}
-
-interface UserRef {
-  id: string;
-  name: string;
-  avatar?: string;
 }

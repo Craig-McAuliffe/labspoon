@@ -20,6 +20,19 @@ export const instantiateFollowingFeedForNewUser = functions.firestore
     });
   });
 
+export const setUserIsFollowedBySelfOnCreation = functions.firestore
+  .document('users/{userID}')
+  .onCreate(async (change, context) => {
+    const userID = change.id;
+    const user = change.data();
+    const userRef: UserRef = {
+      id: change.id,
+      name: user.name,
+    };
+    if (user.avatar) userRef.avatar = user.avatar;
+    await db.doc(`users/${userID}/followedByUsers/${userID}`).set(userRef);
+  });
+
 // for a set of selected publications, set the user's microsoft academic ID
 export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall(
   async (data, context) => {
@@ -176,4 +189,10 @@ interface interpretationRuleOutput {
 interface PublicationSuggestion {
   microsoftAcademicIDMatch: string;
   publicationInfo: Publication;
+}
+
+export interface UserRef {
+  id: string;
+  name: string;
+  avatar?: string;
 }
