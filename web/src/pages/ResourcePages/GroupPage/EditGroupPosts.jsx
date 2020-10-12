@@ -1,7 +1,8 @@
-import React, {useState, createContext} from 'react';
+import React, {useState, createContext, useEffect} from 'react';
 import {getPaginatedUserReferencesFromCollectionRef} from '../../../helpers/users';
 import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
 import PrimaryButton from '../../../components/Buttons/PrimaryButton';
+import SuccessMessage from '../../../components/Forms/SuccessMessage';
 import FilterableResults, {
   NewFilterMenuWrapper,
   NewResultsWrapper,
@@ -22,9 +23,51 @@ export default function EditingGroupInfo({
 }) {
   const [addOrRemove, setAddOrRemove] = useState('add');
   const [selectedPosts, setSelectedPosts] = useState([]);
+  const [filteredMember, setFilteredMember] = useState('');
+  const [displaySuccessMessage, setDisplaySuccessMessage] = useState(false);
+  const [resetSelection, setResetSelection] = useState(false);
+
+  // Resets selection if user switches between member or tabs
+  useEffect(() => {
+    setSelectedPosts([]);
+  }, [filteredMember, addOrRemove]);
+
+  // Deselect posts when successfully adding posts
+  useEffect(() => {
+    if (displaySuccessMessage) {
+      setResetSelection(true);
+      setSelectedPosts([]);
+      setTimeout(() => {
+        setResetSelection(false);
+        setFilteredMember(false);
+        setDisplaySuccessMessage(false);
+      }, 3000);
+    }
+  }, [displaySuccessMessage]);
+
+  useEffect(() => {
+    if (resetSelection) {
+      setSelectedPosts([]);
+      setTimeout(() => setResetSelection(false), 10);
+    }
+  }, [resetSelection]);
+
   const groupID = groupData.id;
   const membersDBCollectionRef = db.collection(`groups/${groupID}/members`);
-  console.log(selectedPosts);
+
+  async function addPostsToGroup() {
+    selectedPosts.forEach((selectedPost) => {
+      delete selectedPost.hasSelector;
+      db.doc(`groups/${groupID}/posts/${selectedPost.id}`)
+        .set(selectedPost)
+        .then(() => setDisplaySuccessMessage(true))
+        .catch((err) => {
+          console.log(err);
+          alert(`Sorry, we couldn't add the posts. Please try again later.`);
+        });
+    });
+    setSelectedPosts([]);
+  }
 
   const memberFilter = () => {
     const filterCollections = [];
@@ -90,16 +133,26 @@ export default function EditingGroupInfo({
     const enabledMemberID = filter[0].options.filter(
       (option) => option.enabled === true
     )[0].data.id;
-    const enabledMemberDBRef = db.collection(`users/${enabledMemberID}/posts`);
+    setFilteredMember(enabledMemberID);
+    const enabledMemberDBRef = db
+      .collection(`users/${enabledMemberID}/posts`)
+      .orderBy('timestamp', 'desc');
+
     const postsByMembersPromise = getPaginatedPostsFromCollectionRef(
       enabledMemberDBRef,
       limit,
       last
     ).then((postsList) => {
-      postsList.forEach((fetchedPost) => {
-        fetchedPost.hasSelector = true;
-      });
-      return postsList;
+      const postsWithSelector = postsList.map((fetchedPost) =>
+        db
+          .doc(`groups/${groupID}/posts/${fetchedPost.id}`)
+          .get()
+          .then((qs) => {
+            fetchedPost.hasSelector = qs.exists ? 'active' : 'inactive';
+            return fetchedPost;
+          })
+      );
+      return Promise.all(postsWithSelector);
     });
     return postsByMembersPromise;
   };
@@ -110,20 +163,20 @@ export default function EditingGroupInfo({
     )[0].data.id;
     const enabledMemberDBRef = db
       .collection(`groups/${groupID}/posts`)
-      .where('author.id', '==', enabledMemberID);
+      .where('author.id', '==', enabledMemberID)
+      .orderBy('timestamp', 'desc');
     const groupPostsPromise = getPaginatedPostsFromCollectionRef(
       enabledMemberDBRef,
       limit,
       last
     ).then((postsList) => {
       postsList.forEach((fetchedPost) => {
-        fetchedPost.hasSelector = true;
+        fetchedPost.hasSelector = 'active';
       });
       return postsList;
     });
     return groupPostsPromise;
   };
-
   return (
     <>
       <FilterableResults
@@ -148,13 +201,17 @@ export default function EditingGroupInfo({
               tabs={tabs}
               setEditType={setEditType}
             />
+            <div className="edit-group-posts-cancel">
+              <button onClick={() => setEditingGroup(false)}>
+                <h4>Back to Group Page</h4>
+              </button>
+            </div>
             <div className="edit-group-posts-add-or-remove-container">
               <div className="edit-group-posts-add-or-remove-button-container">
                 <button
                   onClick={() => {
                     if (addOrRemove !== 'add') setAddOrRemove('add');
                   }}
-                  buttonText=" Add posts"
                   className={
                     addOrRemove === 'add'
                       ? 'feed-tab-active'
@@ -169,7 +226,6 @@ export default function EditingGroupInfo({
                   onClick={() => {
                     if (addOrRemove !== 'remove') setAddOrRemove('remove');
                   }}
-                  inactive={addOrRemove === 'remove' ? false : true}
                   className={
                     addOrRemove === 'remove'
                       ? 'feed-tab-active'
@@ -180,21 +236,29 @@ export default function EditingGroupInfo({
                 </button>
               </div>
               {selectedPosts.length > 0 ? (
-                <div className="edit-group-posts-selected-posts-container">
-                  <h2>
-                    Add {selectedPosts.length} selected posts to{' '}
-                    {groupData.name}
-                  </h2>
-                  <div className="edit-group-posts-selected-posts-actions">
-                    <button>Deselect All</button>
-                    <PrimaryButton onClick={() => {}}>
-                      Add to Group
-                    </PrimaryButton>
-                  </div>
-                </div>
+                <AddOrRemoveConfirmation
+                  selectedPosts={selectedPosts}
+                  groupData={groupData}
+                  addPostsToGroup={addPostsToGroup}
+                  setResetSelection={setResetSelection}
+                />
               ) : null}
             </div>
-            <SelectedListItemsContext.Provider value={setSelectedPosts}>
+
+            {displaySuccessMessage ? (
+              <div className="edit-group-posts-success-message-container">
+                <SuccessMessage>
+                  Posts Added to {groupData.name}!
+                </SuccessMessage>
+              </div>
+            ) : null}
+
+            <SelectedListItemsContext.Provider
+              value={{
+                setSelectedPosts: setSelectedPosts,
+                resetSelection: resetSelection,
+              }}
+            >
               <NewResultsWrapper />
             </SelectedListItemsContext.Provider>
           </div>
@@ -204,29 +268,23 @@ export default function EditingGroupInfo({
   );
 }
 
-// const readGroupFromDB = () => {
-//   for (let i = 0; i < selectedUsers.length; i++) {
-//     db.collection(`users/${selectedUsers[i].id}/posts`)
-//       .get()
-//       .then((fetchedPostsByMember) => {
-//         fetchedPostsByMember.forEach((fetchedPostSnapShot) => {
-//           const fetchedPostData = fetchedPostSnapShot.data();
-//           fetchedPostData.onGroupPage = false;
-//           collectedPostsByMembers.push(fetchedPostData);
-//         });
-//         if (i === selectedUsers.length - 1) writeGroupToDB();
-//       })
-//       .catch((err) => {
-//         console.log(err, 'could not fetch posts by members');
-//         alert('Something went worng, please try agian later. (sorry)');
-//       });
-//   }
-// };
-
-// collectedPostsByMembers.forEach((collectedPost) => {
-//   batch.set(
-//     groupDocRef.collection('posts').doc(collectedPost.id),
-
-//     collectedPost
-//   );
-// });
+const AddOrRemoveConfirmation = ({
+  selectedPosts,
+  groupData,
+  addPostsToGroup,
+  setResetSelection,
+}) => {
+  return (
+    <div className="edit-group-posts-selected-posts-container">
+      <h2>
+        Add {selectedPosts.length} selected posts to {groupData.name}
+      </h2>
+      <div className="edit-group-posts-selected-posts-actions">
+        <button onClick={() => setResetSelection(true)}>Deselect All</button>
+        <PrimaryButton onClick={() => addPostsToGroup()}>
+          Add to Group
+        </PrimaryButton>
+      </div>
+    </div>
+  );
+};

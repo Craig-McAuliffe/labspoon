@@ -146,3 +146,15 @@
   display: flex;
   justify-content: space-between;
 }
+
+.edit-group-posts-success-message-container {
+  margin-bottom: 20px;
+}
+
+.edit-group-posts-cancel {
+  margin: 0px 0px 24px -5px;
+}
+
+.edit-group-posts-cancel button {
+  color: #00507c;
+}

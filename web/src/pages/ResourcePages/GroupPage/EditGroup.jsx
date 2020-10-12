@@ -15,6 +15,11 @@ export default function EditGroup({groupData, setEditingGroup}) {
           tabs={tabs}
           setEditType={setEditType}
         />
+        <div className="edit-group-posts-cancel">
+          <button onClick={() => setEditingGroup(false)}>
+            <h4>Back to Group Page</h4>
+          </button>
+        </div>
         <EditGroupInfo
           groupData={groupData}
           setEditingGroup={setEditingGroup}

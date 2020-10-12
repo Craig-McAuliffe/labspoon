@@ -46,7 +46,9 @@ function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions) {
       results = [];
       break;
     case 'posts':
-      const postsCollection = db.collection(`groups/${groupID}/posts`);
+      const postsCollection = db
+        .collection(`groups/${groupID}/posts`)
+        .orderBy('timestamp', 'desc');
       return getPaginatedPostsFromCollectionRef(postsCollection, limit, last);
     case 'media':
       results = [];

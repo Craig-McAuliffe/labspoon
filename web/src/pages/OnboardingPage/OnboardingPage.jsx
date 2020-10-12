@@ -14,6 +14,8 @@ import {CreateGroupIcon} from '../../assets/MenuIcons';
 import CreateGroupPage from '../Groups/CreateGroupPage/CreateGroupPage';
 import UserListItem from '../../components/User/UserListItem';
 import FormDatabaseSearch from '../../components/Forms/FormDatabaseSearch';
+import SuccessMessage from '../../components/Forms/SuccessMessage';
+
 import './OnboardingPage.css';
 
 export default function OnboardingPage() {
@@ -246,11 +248,9 @@ function OnboardingGroup({user}) {
           </p>
 
           {confirmGroupCreation ? (
-            <div className="onboarding-success-overlay-container">
-              <div className="success-overlay">
-                <h3>Group Created! You can find it in the top right menu.</h3>
-              </div>{' '}
-            </div>
+            <SuccessMessage>
+              Group Created! You can find it in the top right menu.
+            </SuccessMessage>
           ) : null}
         </>
       )}

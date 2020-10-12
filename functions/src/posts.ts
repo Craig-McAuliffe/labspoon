@@ -119,7 +119,7 @@ async function updateFiltersByPost(
   // TODO(#146): Add topics to the filter
 }
 
-async function updateFilterCollection(
+export async function updateFilterCollection(
   feedRef: firestore.DocumentReference<firestore.DocumentData>,
   filterCollection: FilterCollection,
   filterOption: FilterOption

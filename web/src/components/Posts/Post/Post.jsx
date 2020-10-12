@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {Link} from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {SelectedListItemsContext} from '../../../pages/ResourcePages/GroupPage/EditGroupPosts';
@@ -27,22 +27,13 @@ import './Post.css';
  * @return {React.ReactElement}
  */
 export default function Post({post, dedicatedPage, bookmarkedVariation}) {
-  const setFeedSelectionState = useContext(SelectedListItemsContext);
+  const selectionVariation = useContext(SelectedListItemsContext);
   const [isSelected, setIsSelected] = useState(false);
-  const selectPost = () => {
-    isSelected
-      ? setFeedSelectionState((feedSelectionState) => {
-          const filteredSelectionState = feedSelectionState.filter(
-            (selectedPostID) => selectedPostID !== post.id
-          );
-          return filteredSelectionState;
-        })
-      : setFeedSelectionState((feedSelectionState) => [
-          ...feedSelectionState,
-          ...[post.id],
-        ]);
-    setIsSelected(!isSelected);
-  };
+  useEffect(() => {
+    if (selectionVariation) {
+      if (selectionVariation.resetSelection === true) setIsSelected(false);
+    }
+  }, [selectionVariation]);
 
   const referencedResourceWrapper = () => {
     if (dedicatedPage) return postContent();
@@ -61,15 +52,28 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
       <div className="post-with-selector-container">
         {postContent()}
         <div className="post-selector-container">
-          <button
-            className={
-              isSelected
-                ? 'post-selector-button-active'
-                : 'post-selector-button-inactive'
-            }
-            onClick={() => selectPost()}
-          />
-          <p>Add</p>
+          {post.hasSelector === 'active' ? (
+            <>
+              <button
+                className={
+                  isSelected
+                    ? 'post-selector-button-active'
+                    : 'post-selector-button-inactive'
+                }
+                onClick={() =>
+                  selectPost(
+                    selectionVariation,
+                    isSelected,
+                    setIsSelected,
+                    post
+                  )
+                }
+              />
+              <p className="post-selector-active-text">Add</p>
+            </>
+          ) : (
+            <p className="post-selector-inactive-text">Already on group</p>
+          )}
         </div>
       </div>
     ) : (
@@ -122,7 +126,6 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
 Post.propTypes = {
   post: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
     postType: PropTypes.object.isRequired,
     author: PropTypes.shape({
       id: PropTypes.string.isRequired,
@@ -130,13 +133,6 @@ Post.propTypes = {
       avatar: PropTypes.string.isRequired,
     }).isRequired,
     content: PropTypes.object.isRequired,
-    topics: PropTypes.arrayOf(
-      PropTypes.exact({
-        id: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired,
-        resourceType: PropTypes.string.isRequired,
-      })
-    ),
     optionaltags: PropTypes.arrayOf(PropTypes.object.isRequired),
   }).isRequired,
 };
@@ -230,3 +226,21 @@ export function PinnedPost({post}) {
     </div>
   );
 }
+
+const selectPost = (selectionVariation, isSelected, setIsSelected, post) => {
+  if (selectionVariation) {
+    const setFeedSelectionState = selectionVariation.setSelectedPosts;
+    isSelected
+      ? setFeedSelectionState((feedSelectionState) => {
+          const filteredSelectionState = feedSelectionState.filter(
+            (selectedPost) => selectedPost.id !== post.id
+          );
+          return filteredSelectionState;
+        })
+      : setFeedSelectionState((feedSelectionState) => [
+          ...feedSelectionState,
+          ...[post],
+        ]);
+    setIsSelected(!isSelected);
+  }
+};

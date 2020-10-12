@@ -109,7 +109,7 @@
   border: #3099d3;
 }
 
-.post-selector-container p {
+.post-selector-active-text {
   margin-top: 5px;
   color: #00507c;
 }
@@ -161,6 +161,11 @@
 
 .pinned-post-more-info {
   margin: 20px 0px 0px;
+  color: #99999f;
+}
+
+.post-selector-inactive-text {
+  text-align: center;
   color: #99999f;
 }
 
