@@ -13,6 +13,7 @@ import {
 } from '../../../assets/PostTypeIcons';
 import PostOptionalTags from './PostParts/PostOptionalTags';
 import PostActions, {BookmarkedPostSymbol} from './PostParts/PostActions';
+import DefaultUserIcon from '../../../assets/DefaultUserIcon.svg';
 import ListItemTopics from '../../CommonListItemParts/ListItemTopics';
 import PublicationListItem from '../../Publication/PublicationListItem';
 import UserAvatar from '../../Avatar/UserAvatar';
@@ -126,7 +127,8 @@ function PostHeader({postType, postAuthor, postCreationDate, dedicatedPage}) {
     >
       <div className="post-header-profile">
         <div className="post-header-avatar">
-          <UserAvatar src={postAuthor.avatar} width="60px" height="60px" />
+          {postAuthor.avatar ? <UserAvatar src={postAuthor.avatar} width="60px" height="60px" /> : <img src={DefaultUserIcon} alt="user icon" />}
+          
         </div>
         <div>
           <h3>
