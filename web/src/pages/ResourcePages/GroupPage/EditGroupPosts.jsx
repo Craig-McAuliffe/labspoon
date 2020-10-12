@@ -113,13 +113,12 @@ export default function EditingGroupInfo({
   };
 
   const getGroupPostsMemberFilter = () => {
-    console.log('hello');
     const filterCollection = {
       collectionName: 'Group Members',
       options: [],
       mutable: true,
     };
-
+    const postUserFilterPromise = db.doc();
     return filterCollection;
   };
 

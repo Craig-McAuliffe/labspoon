@@ -1,10 +1,11 @@
 import * as functions from 'firebase-functions';
 import {v4 as uuid} from 'uuid';
-
 import {admin, ResourceTypes} from './config';
 import {firestore} from 'firebase-admin';
 
-const db: firestore.Firestore = admin.firestore();
+import {UserRef} from './users';
+
+const db = admin.firestore();
 
 db.settings({
   ignoreUndefinedProperties: true,
@@ -191,10 +192,4 @@ export interface PostContent {
 export interface PostType {
   id: string;
   name: string;
-}
-
-export interface UserRef {
-  id: string;
-  name: string;
-  avatar?: string;
 }

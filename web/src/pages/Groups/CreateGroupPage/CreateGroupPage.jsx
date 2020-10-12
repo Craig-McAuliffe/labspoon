@@ -46,18 +46,20 @@ export default function CreateGroupPage({
       };
       values.avatar = `https://storage.googleapis.com/${projectURL}/groups/${groupID}/avatar`;
       batch.set(groupDocRef, values);
-      batch.set(groupDocRef.collection('members').doc(user.uid), {
+      const userRef = {
         id: userProfile.id,
         name: userProfile.name,
-        avatar: userProfile.avatar,
-      });
+      };
+      if (userProfile.avatar) userRef.avatar = userProfile.avatar;
+      batch.set(groupDocRef.collection('members').doc(user.uid), userRef);
       batch.set(db.doc(`users/${user.uid}/groups/${groupID}`), groupRef);
       selectedUsers.forEach((member) => {
-        batch.set(groupDocRef.collection('members').doc(member.id), {
+        const memberRef = {
           id: member.id,
           name: member.name,
-          avatar: member.avatar,
-        });
+        }
+        if (member.avatar) memberRef.avatar = member.avatar;
+        batch.set(groupDocRef.collection('members').doc(member.id), memberRef);
         batch.set(db.doc(`users/${member.id}/groups/${groupID}`), groupRef);
       });
       batch
