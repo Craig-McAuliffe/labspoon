@@ -224,12 +224,21 @@ function PublicationBody({publicationDetails}) {
       <PublicationAuthors
         publicationAuthors={publicationDetails.content.authors}
       />
-      <h3 className="publication-section-title">Abstract</h3>
-      <p className="publication-body-abstract">
-        {publicationDetails.content.abstract}
-      </p>
+      <PublicationBodyAbstract abstract={publicationDetails.abstract} />
       <ListItemTopics taggedItem={publicationDetails} />
     </div>
+  );
+}
+
+function PublicationBodyAbstract({abstract}) {
+  if (!abstract) return <></>;
+  return (
+    <>
+      <h3 className="publication-section-title">Abstract</h3>
+      <p className="publication-body-abstract">
+        {abstract}
+      </p>
+    </>
   );
 }
 
@@ -243,6 +252,7 @@ function PublicationLink({publicationURL}) {
 }
 
 function PublicationAuthors({publicationAuthors}) {
+  if (!publicationAuthors) return <></>;
   return publicationAuthors.map((author) => (
     <h3 className="publication-body-authors" key={author.id}>
       <Link to={`/user/${author.id}`}>{author.name}</Link>

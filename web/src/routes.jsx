@@ -16,7 +16,9 @@ import FollowsPage from './pages/FollowsPage';
 import SearchPage from './pages/SearchPage';
 import UserPage from './pages/ResourcePages/UserPage';
 import LoginPage from './pages/LoginPage';
-import PublicationPage, {MAGPublicationRouter} from './pages/ResourcePages/PublicationPage/PublicationPage';
+import PublicationPage, {
+  MAGPublicationRouter,
+} from './pages/ResourcePages/PublicationPage/PublicationPage';
 import PostPage from './pages/ResourcePages/PostPage';
 import TopicPage from './pages/TopicPage';
 import NewsPage from './pages/NewsPage';
