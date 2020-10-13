@@ -42,7 +42,7 @@ export function MAGPublicationRouter() {
       setError(true);
       console.error(err);
     });
-  }, []);
+  }, [magPublicationID]);
 
   if (loading || publicationID === undefined) return <h1>Loading...</h1>;
   if (error) return (
