@@ -5,7 +5,6 @@ import {
   executeExpression,
   MAKPublication,
   Publication,
-  Author,
   makPublicationToPublication,
 } from './microsoft';
 
@@ -120,10 +119,10 @@ export const getSuggestedPublicationsForAuthorName = functions.https.onCall(
           const publications: PublicationSuggestion[] = resp.data.entities.map(
             (entity: MAKPublication) => {
               const publication = makPublicationToPublication(entity);
-              const authors = publication.authors as Author[];
+              const authors = publication.authors!;
               const matchingAuthor = authors.find(
                 (author) => author.normalisedName === normalisedAuthorName
-              ) as Author;
+              )!;
               const publicationSuggestion: PublicationSuggestion = {
                 microsoftAcademicIDMatch: matchingAuthor.ID,
                 publicationInfo: publication,

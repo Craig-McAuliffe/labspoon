@@ -62,11 +62,8 @@ export const addNewPublicationAsync = functions.pubsub
     if (!message.json) return;
     const microsoftPublication = message.json as MAKPublication;
     if (!microsoftPublication.Id) return;
-    const microsoftPublicationID = microsoftPublication.Id as number;
+    const microsoftPublicationID = microsoftPublication.Id;
     const microsoftPublicationRef = db.collection('MAPublications').doc(microsoftPublicationID.toString());
-    // Keep the extra Microsoft data for later
-    microsoftPublicationRef.set(microsoftPublication, {merge: true});
-
     const publication = makPublicationToPublication(microsoftPublication);
     // TODO(Patrick): Reintroduce authors
     delete publication.authors;
