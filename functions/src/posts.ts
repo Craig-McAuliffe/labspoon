@@ -103,7 +103,8 @@ async function updateFiltersByPost(
     {
       name: post.postType.name,
       resourceID: post.postType.id,
-    }
+    },
+    false
   );
   await updateFilterCollection(
     followingFeedRef,
@@ -115,7 +116,8 @@ async function updateFiltersByPost(
       name: post.author.name,
       resourceID: post.author.id,
       avatar: post.author.avatar,
-    }
+    },
+    false
   );
   // TODO(#146): Add topics to the filter
 }
@@ -123,7 +125,8 @@ async function updateFiltersByPost(
 export async function updateFilterCollection(
   feedRef: firestore.DocumentReference<firestore.DocumentData>,
   filterCollection: FilterCollection,
-  filterOption: FilterOption
+  filterOption: FilterOption,
+  removedResource: boolean
 ) {
   const filterCollectionDocRef = feedRef
     .collection('filterCollections')
@@ -137,11 +140,34 @@ export async function updateFilterCollection(
   // create the filter option if it doesn't exist
   await filterOptionDocRef.set(filterOption, {merge: true});
 
-  // increment the rank of the filter collection and option
-  await filterCollectionDocRef.update({
-    rank: firestore.FieldValue.increment(1),
-  });
-  await filterOptionDocRef.update({rank: firestore.FieldValue.increment(1)});
+  if (!removedResource) {
+    // increment the rank of the filter collection and option
+    await filterCollectionDocRef.update({
+      rank: firestore.FieldValue.increment(1),
+    });
+    await filterOptionDocRef.update({rank: firestore.FieldValue.increment(1)});
+  }
+
+  if (removedResource) {
+    await filterOptionDocRef.get().then((qs) => {
+      const filterOptionData = qs.data() as FilterOption;
+      if (filterOptionData === undefined) {
+        console.log('could not find filter option');
+        return;
+      }
+
+      const filterOptionRank = filterOptionData.rank as number;
+      if (filterOptionRank < 1) {
+        filterOptionDocRef
+          .delete()
+          .then(() => console.log('filter option removed'));
+      } else {
+        filterOptionDocRef
+          .update({rank: filterOptionRank - 1})
+          .then(() => console.log('filter updated'));
+      }
+    });
+  }
 }
 
 interface FilterOption {

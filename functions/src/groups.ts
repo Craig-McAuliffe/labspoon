@@ -56,7 +56,8 @@ export const addGroupMembersToPostFilter = functions.firestore
         name: post.author.name,
         resourceID: post.author.id,
         avatar: post.author.avatar,
-      }
+      },
+      false
     );
   });
 
@@ -69,4 +70,20 @@ export const createGroupDocuments = functions.firestore
       .set({id: 'postsFeed'});
   });
 
-// export const removeGroupMembersFromPostFilter = functions.firestore
+export const removeGroupMembersFromPostFilter = functions.firestore
+  .document(`groups/{groupID}/posts/{postID}`)
+  .onDelete(async (change, context) => {
+    const groupID = context.params.groupID;
+    const post = change.data() as Post;
+    const groupPostsFeedRef = db.doc(`groups/${groupID}/feeds/postsFeed`);
+    updateFilterCollection(
+      groupPostsFeedRef,
+      {resourceName: 'Author', resourceType: ResourceTypes.USER},
+      {
+        name: post.author.name,
+        resourceID: post.author.id,
+        avatar: post.author.avatar,
+      },
+      true
+    );
+  });

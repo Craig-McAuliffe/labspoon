@@ -33,17 +33,15 @@ export default function EditingGroupInfo({
 
   // Resets selection if user switches between member or tabs
   useEffect(() => {
-    setSelectedPosts([]);
+    setResetSelection(true);
+    setDisplaySuccessMessage(false);
   }, [filteredMember, addOrRemove]);
 
   // Deselect posts when successfully adding posts
   useEffect(() => {
     if (displaySuccessMessage) {
       setResetSelection(true);
-      setSelectedPosts([]);
       setTimeout(() => {
-        setResetSelection(false);
-        setFilteredMember(false);
         setDisplaySuccessMessage(false);
       }, 3000);
     }
@@ -52,7 +50,7 @@ export default function EditingGroupInfo({
   useEffect(() => {
     if (resetSelection) {
       setSelectedPosts([]);
-      setTimeout(() => setResetSelection(false), 10);
+      setResetSelection(false);
     }
   }, [resetSelection]);
 
@@ -61,26 +59,30 @@ export default function EditingGroupInfo({
       delete selectedPost.hasSelector;
       db.doc(`groups/${groupID}/posts/${selectedPost.id}`)
         .set(selectedPost)
-        .then(() => setDisplaySuccessMessage(true))
+        .then(() => {
+          setResetSelection(true);
+          setDisplaySuccessMessage(true);
+        })
         .catch((err) => {
           console.log(err);
           alert(`Sorry, something went wrong. Please try again later.`);
         });
     });
-    setSelectedPosts([]);
   }
 
   async function removePostsFromGroup() {
     selectedPosts.forEach((selectedPost) => {
       db.doc(`groups/${groupID}/posts/${selectedPost.id}`)
         .delete()
-        .then(() => setDisplaySuccessMessage(true))
+        .then(() => {
+          setResetSelection(true);
+          setDisplaySuccessMessage(true);
+        })
         .catch((err) => {
           console.log(err);
           alert(`Sorry, something went wrong. Please try again later.`);
         });
     });
-    setSelectedPosts([]);
   }
 
   const getMemberFilter = () => {
@@ -113,13 +115,35 @@ export default function EditingGroupInfo({
   };
 
   const getGroupPostsMemberFilter = () => {
-    const filterCollection = {
-      collectionName: 'Group Members',
-      options: [],
-      mutable: true,
-    };
-    const postUserFilterPromise = db.doc();
-    return filterCollection;
+    const filterCollections = [];
+    const postUserFilterRef = db.collection(
+      `groups/${groupID}/feeds/postsFeed/filterCollections/user/filterOptions`
+    );
+    const postUserFilterPromise = getPaginatedUserReferencesFromCollectionRef(
+      postUserFilterRef,
+      20
+    )
+      .then((fetchedMembers) => {
+        const filterCollection = {
+          collectionName: 'Group Members',
+          options: [],
+          mutable: true,
+        };
+
+        fetchedMembers.forEach((fetchedGroupMember, i) => {
+          filterCollection.options.push({
+            data: {
+              id: fetchedGroupMember.resourceID,
+              name: fetchedGroupMember.name,
+            },
+            enabled: i === 0,
+          });
+        });
+        return filterCollection;
+      })
+      .catch((err) => console.log('filter err', err));
+    filterCollections.push(postUserFilterPromise);
+    return Promise.all(filterCollections);
   };
 
   const fetchPostsByFilteredMember = (skip, limit, filter, last) => {
@@ -154,6 +178,7 @@ export default function EditingGroupInfo({
     const enabledMemberID = filter[0].options.filter(
       (option) => option.enabled === true
     )[0].data.id;
+
     const enabledMemberDBRef = db
       .collection(`groups/${groupID}/posts`)
       .where('author.id', '==', enabledMemberID)
