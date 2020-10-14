@@ -142,12 +142,12 @@ export async function updateFilterCollection(
 
   if (removedResource) {
     await filterOptionDocRef.get().then((qs) => {
-      const filterOptionData = qs.data() as FilterOption;
-      if (filterOptionData === undefined) {
+      if (!qs.exists) {
         console.log('could not find filter option');
         return;
       }
-
+      const filterOptionData = qs.data() as FilterOption;
+      if (!filterOptionData.rank) return;
       const filterOptionRank = filterOptionData.rank as number;
       if (filterOptionRank === 1) {
         filterOptionDocRef.delete();
