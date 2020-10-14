@@ -113,7 +113,9 @@ export function FilterManager({children}) {
   const filterableResults = useContext(FilterableResultsContext);
   const [displayedTabFilter, setDisplayedTabFilter] = useState();
   const [displayedSiderFilter, setDisplayedSiderFilter] = useState();
-  const [multiFilterLoadingState, setMultiFilterLoadingState] = useState({});
+  const [siderFilterLoading, setSiderFilterLoading] = useState();
+  const [tabsFilterLoading, setTabsFilterLoading] = useState();
+
   useEffect(() => {
     let pageFilter;
     if (
@@ -129,13 +131,10 @@ export function FilterManager({children}) {
 
   useEffect(() => {
     filterableResults.setLoadingFilter(true);
-    if (
-      multiFilterLoadingState.tabs === false &&
-      multiFilterLoadingState.siderFilter === false
-    ) {
+    if (tabsFilterLoading === false && siderFilterLoading === false) {
       filterableResults.setLoadingFilter(false);
     }
-  }, [multiFilterLoadingState]);
+  }, [tabsFilterLoading, siderFilterLoading]);
 
   return (
     <FilterManagerContext.Provider
@@ -144,7 +143,8 @@ export function FilterManager({children}) {
         setDisplayedTabFilter,
         displayedSiderFilter,
         setDisplayedSiderFilter,
-        setMultiFilterLoadingState,
+        setSiderFilterLoading,
+        setTabsFilterLoading,
       }}
     >
       {children}
@@ -164,26 +164,17 @@ export function NewFilterMenuWrapper({
   const tabFilter = filterManager.displayedTabFilter;
 
   useEffect(() => {
-    filterManager.setMultiFilterLoadingState((loadingState) => ({
-      ...loadingState,
-      ...{siderFilter: true},
-    }));
+    filterManager.setSiderFilterLoading(true);
 
     if (getDefaultFilter === undefined) {
-      filterManager.setMultiFilterLoadingState((loadingState) => ({
-        ...loadingState,
-        ...{siderFilter: false},
-      }));
+      filterManager.setSiderFilterLoading(false);
     }
     if (getDefaultFilter) {
       if (!dependentOnTab) {
         Promise.resolve(getDefaultFilter())
           .then((defaultFilter) => {
             setSiderFilter(defaultFilter);
-            filterManager.setMultiFilterLoadingState((loadingState) => ({
-              ...loadingState,
-              ...{siderFilter: false},
-            }));
+            filterManager.setSiderFilterLoading(false);
           })
           .catch((error) => console.log(error));
       }
@@ -194,18 +185,12 @@ export function NewFilterMenuWrapper({
   useEffect(() => {
     if (getDefaultFilter) {
       if (dependentOnTab) {
-        filterManager.setMultiFilterLoadingState((loadingState) => ({
-          ...loadingState,
-          ...{siderFilter: true},
-        }));
+        filterManager.setSiderFilterLoading(true);
         if (filterManager.displayedTabFilter) {
           Promise.resolve(getDefaultFilter(tabFilter))
             .then((defaultFilter) => {
               setSiderFilter(defaultFilter);
-              filterManager.setMultiFilterLoadingState((loadingState) => ({
-                ...loadingState,
-                ...{siderFilter: false},
-              }));
+              filterManager.setSiderFilterLoading(false);
             })
             .catch((error) => console.log(error));
         }
@@ -244,23 +229,14 @@ export function ResourceTabs({tabs, affectsFilter}) {
   const setTabFilter = filterManager.setDisplayedTabFilter;
   const tabFilter = filterManager.displayedTabFilter;
   useEffect(() => {
-    filterManager.setMultiFilterLoadingState((loadingState) => ({
-      ...loadingState,
-      ...{tabs: true},
-    }));
+    filterManager.setTabsFilterLoading(true);
 
     if (tabs === undefined) {
-      filterManager.setMultiFilterLoadingState((loadingState) => ({
-        ...loadingState,
-        ...{tabs: false},
-      }));
+      filterManager.setTabsFilterLoading(false);
     }
     if (tabs) {
       setTabFilter(tabs);
-      filterManager.setMultiFilterLoadingState((loadingState) => ({
-        ...loadingState,
-        ...{tabs: false},
-      }));
+      filterManager.setTabsFilterLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -354,10 +330,7 @@ export function Tabs({tabFilter, setTabFilter, affectsFilter}) {
         // If the filter changes on tab change, we should not fetch results
         // until the new filter is loaded
         if (affectsFilter) {
-          filterManager.setMultiFilterLoadingState((loadingState) => ({
-            ...loadingState,
-            ...{siderFilter: true},
-          }));
+          filterManager.setSiderFilterLoading(true);
         }
         setTabFilter(option.data.id);
       }}
