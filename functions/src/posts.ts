@@ -157,7 +157,7 @@ export async function updateFilterCollection(
       }
 
       const filterOptionRank = filterOptionData.rank as number;
-      if (filterOptionRank < 1) {
+      if (filterOptionRank === 1) {
         filterOptionDocRef
           .delete()
           .then(() => console.log('filter option removed'));
