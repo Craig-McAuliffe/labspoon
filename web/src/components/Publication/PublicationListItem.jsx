@@ -86,6 +86,7 @@ function PublicationListItemTitle({url, title}) {
 }
 
 function PublicationListItemAuthors({authors}) {
+  if (!authors) return <></>;
   return (
     <div className="publication-list-item-content-authors">
       {authors.map((author) => (

@@ -66,9 +66,27 @@ export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall
     const microsoftAcademicAuthorID =
       selectedPublicationSuggestions[0].microsoftAcademicIDMatch;
 
-    await db.doc(`users/${userID}`).update({
+    const batch = db.batch();
+    batch.update(db.doc(`users/${userID}`), {
       microsoftAcademicAuthorID: microsoftAcademicAuthorID,
     });
+
+    const msPublicationsForUserQS = await db
+      .collection(`MSUsers/${microsoftAcademicAuthorID}/publications`)
+      .get();
+    const publicationWritePromises: Promise<null>[] = [];
+    msPublicationsForUserQS.forEach((msPublicationDS) => publicationWritePromises.push((async(resolve) => {
+      // Find the publication
+      const publicationsQS = await db.collection('publications').where('microsoftID', '==', msPublicationDS.id).limit(1).get();
+      if (publicationsQS.empty) {
+        console.log('No publication found with Microsoft Publication ID ', msPublicationDS.id, ' this should not happen and likely indicates a logic issue.');
+      }
+      const publicationDS = publicationsQS.docs[0];
+      batch.set(db.doc(`users/${userID}/publications/${publicationDS.id}`), publicationDS.data());
+      return null;
+    })()));
+    await Promise.all(publicationWritePromises).catch((err) => console.error(err));
+    await batch.commit().catch((err) => console.error(err));
   }
 );
 
