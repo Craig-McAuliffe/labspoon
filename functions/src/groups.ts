@@ -43,6 +43,15 @@ export const generateAvatarThumbnailOnGroupCreate = functions.firestore
     fs.unlinkSync(tmp);
   });
 
+export const createGroupDocuments = functions.firestore
+  .document(`groups/{groupID}`)
+  .onCreate(async (change, context) => {
+    const groupID = context.params.groupID;
+    db.collection(`groups/${groupID}/feeds`)
+      .doc(`postsFeed`)
+      .set({id: 'postsFeed'});
+  });
+
 export const addGroupMembersToPostFilter = functions.firestore
   .document(`groups/{groupID}/posts/{postID}`)
   .onCreate(async (change, context) => {
@@ -59,15 +68,6 @@ export const addGroupMembersToPostFilter = functions.firestore
       },
       false
     );
-  });
-
-export const createGroupDocuments = functions.firestore
-  .document(`groups/{groupID}`)
-  .onCreate(async (change, context) => {
-    const groupID = context.params.groupID;
-    db.collection(`groups/${groupID}/feeds`)
-      .doc(`postsFeed`)
-      .set({id: 'postsFeed'});
   });
 
 export const removeGroupMembersFromPostFilter = functions.firestore

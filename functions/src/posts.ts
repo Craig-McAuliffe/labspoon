@@ -164,7 +164,7 @@ export async function updateFilterCollection(
       } else {
         filterOptionDocRef
           .update({rank: filterOptionRank - 1})
-          .then(() => console.log('filter updated'));
+          .then(() => console.log('filter rank decreased'));
       }
     });
   }
