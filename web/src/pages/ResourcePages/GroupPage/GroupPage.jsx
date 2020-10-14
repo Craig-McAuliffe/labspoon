@@ -16,6 +16,8 @@ import groupPageFeedData from './GroupPageFeedData';
 import FilterableResults, {
   NewResultsWrapper,
   ResourceTabs,
+  FilterManager,
+  NewFilterMenuWrapper,
 } from '../../../components/FilterableResults/FilterableResults';
 import UserAvatar from '../../../components/Avatar/UserAvatar';
 import FollowGroupButton from '../../../components/Group/FollowGroupButton';
@@ -39,7 +41,7 @@ function fetchGroupDataFromDB(id) {
 }
 
 function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions) {
-  const activeTab = getActiveTabID(filterOptions);
+  const activeTab = filterOptions ? getActiveTabID(filterOptions) : null;
   let results;
   switch (activeTab) {
     case 'overview':
@@ -220,7 +222,10 @@ export default function GroupPage() {
           </div>
           <FilterableResults fetchResults={fetchFeedData} limit={10}>
             <div className="feed-container">
-              <ResourceTabs tabs={relationshipFilter} />
+              <FilterManager>
+                <ResourceTabs tabs={relationshipFilter} />
+                <NewFilterMenuWrapper />
+              </FilterManager>
               <NewResultsWrapper />
             </div>
           </FilterableResults>

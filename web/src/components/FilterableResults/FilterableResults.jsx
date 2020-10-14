@@ -8,6 +8,7 @@ import ResultsList from '../Results/Results';
 import './FilterableResults.css';
 
 export const FilterableResultsContext = createContext({});
+export const FilterManagerContext = createContext({});
 
 // Handles retrieval of data subject to a filter, and renders this into a result
 // component.
@@ -44,7 +45,6 @@ export default function FilterableResults({children, fetchResults, limit}) {
     setFetchResultsFunction(() => fetchResults);
     setSkip(0);
   }
-
   useEffect(() => {
     // wait until the filter is loaded to avoid an unnecessary reload of the results
     if (loadingFilter) return;
@@ -109,64 +109,173 @@ export default function FilterableResults({children, fetchResults, limit}) {
   );
 }
 
-export function NewFilterMenuWrapper({getDefaultFilter, radio}) {
+export function FilterManager({children}) {
   const filterableResults = useContext(FilterableResultsContext);
+  const [displayedTabFilter, setDisplayedTabFilter] = useState();
+  const [dislayedSiderFilter, setDisplayedSiderFilter] = useState();
+  const [multiFilterLoadingState, setMultiFilterLoadingState] = useState({});
+  useEffect(() => {
+    let pageFilter;
+    if (Array.isArray(displayedTabFilter) && Array.isArray(dislayedSiderFilter))
+      pageFilter = [...displayedTabFilter, ...dislayedSiderFilter];
+    else if (Array.isArray(displayedTabFilter)) pageFilter = displayedTabFilter;
+    else if (Array.isArray(dislayedSiderFilter))
+      pageFilter = dislayedSiderFilter;
+    filterableResults.setFilter(pageFilter);
+  }, [displayedTabFilter, dislayedSiderFilter]);
+
   useEffect(() => {
     filterableResults.setLoadingFilter(true);
-    Promise.resolve(getDefaultFilter())
-      .then((defaultFilter) => {
-        filterableResults.setFilter(defaultFilter);
-        filterableResults.setLoadingFilter(false);
-      })
-      .catch((error) => console.log(error));
+    if (
+      multiFilterLoadingState.tabs === false &&
+      multiFilterLoadingState.siderFilter === false
+    ) {
+      filterableResults.setLoadingFilter(false);
+    }
+  }, [multiFilterLoadingState]);
+
+  return (
+    <FilterManagerContext.Provider
+      value={{
+        displayedTabFilter,
+        setDisplayedTabFilter,
+        dislayedSiderFilter,
+        setDisplayedSiderFilter,
+        setMultiFilterLoadingState,
+      }}
+    >
+      {children}
+    </FilterManagerContext.Provider>
+  );
+}
+
+export function NewFilterMenuWrapper({
+  getDefaultFilter,
+  radio,
+  dependentOnTab,
+}) {
+  const filterableResults = useContext(FilterableResultsContext);
+  const filterManager = useContext(FilterManagerContext);
+  const siderFilter = filterManager.dislayedSiderFilter;
+  const setSiderFilter = filterManager.setDisplayedSiderFilter;
+  const tabFilter = filterManager.displayedTabFilter;
+
+  useEffect(() => {
+    filterManager.setMultiFilterLoadingState((loadingState) => ({
+      ...loadingState,
+      ...{siderFilter: true},
+    }));
+
+    if (getDefaultFilter === undefined) {
+      filterManager.setMultiFilterLoadingState((loadingState) => ({
+        ...loadingState,
+        ...{siderFilter: false},
+      }));
+    }
+    if (getDefaultFilter) {
+      if (!dependentOnTab) {
+        Promise.resolve(getDefaultFilter())
+          .then((defaultFilter) => {
+            setSiderFilter(defaultFilter);
+            filterManager.setMultiFilterLoadingState((loadingState) => ({
+              ...loadingState,
+              ...{siderFilter: false},
+            }));
+          })
+          .catch((error) => console.log(error));
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
+  // Fetch sider filter on tab change if dependentOnTab
+  useEffect(() => {
+    if (getDefaultFilter) {
+      if (dependentOnTab) {
+        filterManager.setMultiFilterLoadingState((loadingState) => ({
+          ...loadingState,
+          ...{siderFilter: true},
+        }));
+        if (filterManager.displayedTabFilter) {
+          Promise.resolve(getDefaultFilter(tabFilter))
+            .then((defaultFilter) => {
+              setSiderFilter(defaultFilter);
+              filterManager.setMultiFilterLoadingState((loadingState) => ({
+                ...loadingState,
+                ...{siderFilter: false},
+              }));
+            })
+            .catch((error) => console.log(error));
+        }
+      }
+    }
+  }, [tabFilter]);
+  if (!siderFilter) return null;
   if (filterableResults.loadingFilter) return <h2>Loading...</h2>;
+
   return (
     <FilterMenu
-      options={filterableResults.filter}
+      options={siderFilter}
       updateFilterOption={(collectionIndex, optionIndex) => {
         const updatedFilterOptions = updateFilterOption(
-          filterableResults.filter,
+          siderFilter,
           collectionIndex,
           optionIndex,
           radio
         );
-        filterableResults.setFilter(updatedFilterOptions);
+        setSiderFilter(updatedFilterOptions);
       }}
       resetFilterCollection={(collectionIndex) => {
         const updatedFilterOptions = resetFilterCollection(
-          filterableResults.filter,
+          siderFilter,
           collectionIndex
         );
-        filterableResults.setFilter(updatedFilterOptions);
+        setSiderFilter(updatedFilterOptions);
       }}
       radio={radio}
     />
   );
 }
 
-export function ResourceTabs({tabs}) {
-  const filterableResults = useContext(FilterableResultsContext);
+export function ResourceTabs({tabs, affectsFilter}) {
+  const filterManager = useContext(FilterManagerContext);
+  const setTabFilter = filterManager.setDisplayedTabFilter;
+  const tabFilter = filterManager.displayedTabFilter;
   useEffect(() => {
-    filterableResults.setFilter(tabs);
-    filterableResults.setLoadingFilter(false);
+    filterManager.setMultiFilterLoadingState((loadingState) => ({
+      ...loadingState,
+      ...{tabs: true},
+    }));
+
+    if (tabs === undefined) {
+      filterManager.setMultiFilterLoadingState((loadingState) => ({
+        ...loadingState,
+        ...{tabs: false},
+      }));
+    }
+    if (tabs) {
+      setTabFilter(tabs);
+      filterManager.setMultiFilterLoadingState((loadingState) => ({
+        ...loadingState,
+        ...{tabs: false},
+      }));
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  if (!tabFilter) return null;
   return (
     <Tabs
-      tabFilter={filterableResults.filter[0]}
+      tabFilter={tabFilter[0]}
       setTabFilter={(id) => {
-        const reset = resetFilterCollection(filterableResults.filter, 0);
+        const reset = resetFilterCollection(tabFilter, 0);
         const updated = updateFilterOption(
           reset,
           0,
           // get the index of the enabled option
           reset[0].options.findIndex((el) => el.data.id === id)
         );
-        filterableResults.setFilter(updated);
+        setTabFilter(updated);
       }}
+      affectsFilter={affectsFilter}
     />
   );
 }
@@ -232,13 +341,23 @@ function updateFilterOption(
   return updatedFilterOptions;
 }
 
-export function Tabs({tabFilter, setTabFilter}) {
+export function Tabs({tabFilter, setTabFilter, affectsFilter}) {
+  const filterManager = useContext(FilterManagerContext);
   if (!tabFilter) return <div></div>;
   const selectedTabID = getActiveTabIDFromTypeFilterCollection(tabFilter);
-
   const tabs = tabFilter.options.map((option) => (
     <button
-      onClick={() => setTabFilter(option.data.id)}
+      onClick={() => {
+        // If the filter changes on tab change, we should not fetch results
+        // until the new filter is loaded
+        if (affectsFilter) {
+          filterManager.setMultiFilterLoadingState((loadingState) => ({
+            ...loadingState,
+            ...{siderFilter: true},
+          }));
+        }
+        setTabFilter(option.data.id);
+      }}
       key={option.data.id}
       className={
         option.data.id === selectedTabID

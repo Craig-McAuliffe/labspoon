@@ -30,6 +30,13 @@ import './Post.css';
 export default function Post({post, dedicatedPage, bookmarkedVariation}) {
   const selectionVariation = useContext(SelectedListItemsContext);
   const [isSelected, setIsSelected] = useState(false);
+
+  // Checks if the post should already be selected
+  useEffect(() => {
+    if (post.hasBeenSelected) setIsSelected(true);
+  }, [post.hasBeenSelected]);
+
+  // Checks if the parent component resets all selections
   useEffect(() => {
     if (selectionVariation) {
       if (selectionVariation.resetSelection === true) setIsSelected(false);
@@ -157,8 +164,11 @@ function PostHeader({postType, postAuthor, postCreationDate, dedicatedPage}) {
     >
       <div className="post-header-profile">
         <div className="post-header-avatar">
-          {postAuthor.avatar ? <UserAvatar src={postAuthor.avatar} width="60px" height="60px" /> : <img src={DefaultUserIcon} alt="user icon" />}
-          
+          {postAuthor.avatar ? (
+            <UserAvatar src={postAuthor.avatar} width="60px" height="60px" />
+          ) : (
+            <img src={DefaultUserIcon} alt="user icon" />
+          )}
         </div>
         <div>
           <h3>

@@ -1,13 +1,20 @@
-import React, {useState, createContext, useEffect} from 'react';
+import React, {useState, createContext, useEffect, useContext} from 'react';
 import {getPaginatedUserReferencesFromCollectionRef} from '../../../helpers/users';
 import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
+import {
+  getActiveTabID,
+  getEnabledIDsFromFilter,
+} from '../../../helpers/filters';
 import PrimaryButton from '../../../components/Buttons/PrimaryButton';
-import SuccessMessage from '../../../components/Forms/SuccessMessage';
 import FilterableResults, {
   NewFilterMenuWrapper,
   NewResultsWrapper,
+  ResourceTabs,
+  FilterManager,
+  FilterableResultsContext,
 } from '../../../components/FilterableResults/FilterableResults';
 import {EditGroupTabs} from './EditGroup';
+
 import {db} from '../../../firebase';
 
 import './GroupPage.css';
@@ -23,19 +30,10 @@ export default function EditingGroupInfo({
 }) {
   const ADD = 'add';
   const REMOVE = 'remove';
-  const [addOrRemove, setAddOrRemove] = useState(ADD);
   const [selectedPosts, setSelectedPosts] = useState([]);
-  const [filteredMember, setFilteredMember] = useState('');
   const [displaySuccessMessage, setDisplaySuccessMessage] = useState(false);
   const [resetSelection, setResetSelection] = useState(false);
   const groupID = groupData.id;
-  const membersDBCollectionRef = db.collection(`groups/${groupID}/members`);
-
-  // Resets selection if user switches between member or tabs
-  useEffect(() => {
-    setResetSelection(true);
-    setDisplaySuccessMessage(false);
-  }, [filteredMember, addOrRemove]);
 
   // Deselect posts when successfully adding posts
   useEffect(() => {
@@ -54,235 +52,158 @@ export default function EditingGroupInfo({
     }
   }, [resetSelection]);
 
-  async function addPostsToGroup() {
-    selectedPosts.forEach((selectedPost) => {
-      delete selectedPost.hasSelector;
-      db.doc(`groups/${groupID}/posts/${selectedPost.id}`)
-        .set(selectedPost)
-        .then(() => {
-          setResetSelection(true);
-          setDisplaySuccessMessage(true);
-        })
-        .catch((err) => {
-          console.log(err);
-          alert(`Sorry, something went wrong. Please try again later.`);
-        });
-    });
+  const addOrRemoveOptions = [
+    {
+      collectionName: 'Add or Remove',
+      options: [
+        {
+          enabled: false,
+          data: {
+            id: 'add',
+            name: 'Add Posts',
+          },
+        },
+        {
+          enabled: false,
+          data: {
+            id: 'remove',
+            name: 'Remove Posts',
+          },
+        },
+      ],
+
+      mutable: false,
+    },
+  ];
+
+  function fetchPostsFromDB(skip, limit, filter, last) {
+    const activeTab = filter ? getActiveTabID(filter) : null;
+    switch (activeTab) {
+      case ADD:
+        return fetchPostsByFilteredMember(
+          limit,
+          filter,
+          last,
+          groupID,
+          selectedPosts
+        );
+      case REMOVE:
+        return fetchPostsOnGroupByFilteredMember(
+          limit,
+          filter,
+          last,
+          groupID,
+          selectedPosts
+        );
+      default:
+        return [];
+    }
   }
 
-  async function removePostsFromGroup() {
-    selectedPosts.forEach((selectedPost) => {
-      db.doc(`groups/${groupID}/posts/${selectedPost.id}`)
-        .delete()
-        .then(() => {
-          setResetSelection(true);
-          setDisplaySuccessMessage(true);
-        })
-        .catch((err) => {
-          console.log(err);
-          alert(`Sorry, something went wrong. Please try again later.`);
-        });
-    });
-  }
-
-  const getMemberFilter = () => {
-    const filterCollections = [];
-    const memberFilterPromise = getPaginatedUserReferencesFromCollectionRef(
-      membersDBCollectionRef,
-      20
-    )
-      .then((fetchedMembers) => {
-        const filterCollection = {
-          collectionName: 'Group Members',
-          options: [],
-          mutable: true,
-        };
-
-        fetchedMembers.forEach((fetchedGroupMember, i) => {
-          filterCollection.options.push({
-            data: {
-              id: fetchedGroupMember.id,
-              name: fetchedGroupMember.name,
-            },
-            enabled: i === 0,
-          });
-        });
-        return filterCollection;
-      })
-      .catch((err) => console.log('filter err', err));
-    filterCollections.push(memberFilterPromise);
-    return Promise.all(filterCollections);
-  };
-
-  const getGroupPostsMemberFilter = () => {
-    const filterCollections = [];
-    const postUserFilterRef = db.collection(
-      `groups/${groupID}/feeds/postsFeed/filterCollections/user/filterOptions`
-    );
-    const postUserFilterPromise = getPaginatedUserReferencesFromCollectionRef(
-      postUserFilterRef,
-      20
-    )
-      .then((fetchedMembers) => {
-        const filterCollection = {
-          collectionName: 'Group Members',
-          options: [],
-          mutable: true,
-        };
-
-        fetchedMembers.forEach((fetchedGroupMember, i) => {
-          filterCollection.options.push({
-            data: {
-              id: fetchedGroupMember.resourceID,
-              name: fetchedGroupMember.name,
-            },
-            enabled: i === 0,
-          });
-        });
-        return filterCollection;
-      })
-      .catch((err) => console.log('filter err', err));
-    filterCollections.push(postUserFilterPromise);
-    return Promise.all(filterCollections);
-  };
-
-  const fetchPostsByFilteredMember = (skip, limit, filter, last) => {
-    const enabledMemberID = filter[0].options.filter(
-      (option) => option.enabled === true
-    )[0].data.id;
-    setFilteredMember(enabledMemberID);
-    const enabledMemberDBRef = db
-      .collection(`users/${enabledMemberID}/posts`)
-      .orderBy('timestamp', 'desc');
-
-    const postsByMembersPromise = getPaginatedPostsFromCollectionRef(
-      enabledMemberDBRef,
-      limit,
-      last
-    ).then((postsList) => {
-      const postsWithSelector = postsList.map((fetchedPost) =>
-        db
-          .doc(`groups/${groupID}/posts/${fetchedPost.id}`)
-          .get()
-          .then((qs) => {
-            fetchedPost.hasSelector = qs.exists ? 'inactive-add' : 'active-add';
-            return fetchedPost;
-          })
-      );
-      return Promise.all(postsWithSelector);
-    });
-    return postsByMembersPromise;
-  };
-
-  const fetchPostsOnGroupByMember = (skip, limit, filter, last) => {
-    const enabledMemberID = filter[0].options.filter(
-      (option) => option.enabled === true
-    )[0].data.id;
-
-    const enabledMemberDBRef = db
-      .collection(`groups/${groupID}/posts`)
-      .where('author.id', '==', enabledMemberID)
-      .orderBy('timestamp', 'desc');
-
-    const groupPostsPromise = getPaginatedPostsFromCollectionRef(
-      enabledMemberDBRef,
-      limit,
-      last
-    ).then((postsList) => {
-      postsList.forEach((fetchedPost) => {
-        fetchedPost.hasSelector = 'active-remove';
-      });
-      return postsList;
-    });
-    return groupPostsPromise;
+  const defaultFilterTypes = (filter) => {
+    const activeTab = filter ? getActiveTabID(filter) : null;
+    return activeTab === REMOVE
+      ? getGroupPostsAuthorsFilter(groupID)
+      : getMemberFilter(groupID);
   };
 
   return (
     <>
       <FilterableResults
-        fetchResults={
-          addOrRemove === ADD
-            ? fetchPostsByFilteredMember
-            : fetchPostsOnGroupByMember
-        }
+        fetchResults={fetchPostsFromDB}
         limit={10}
         loadingFilter
       >
-        <div className="sider-layout">
-          <NewFilterMenuWrapper
-            getDefaultFilter={
-              addOrRemove === ADD ? getMemberFilter : getGroupPostsMemberFilter
-            }
-            radio={true}
-          />
-        </div>
-        <div className="content-layout">
-          <div className="feed-container">
-            <EditGroupTabs
-              editType={editType}
-              tabs={tabs}
-              setEditType={setEditType}
+        <TabReset
+          setResetSelection={setResetSelection}
+          setDisplaySuccessMessage={setDisplaySuccessMessage}
+        />
+        <FilterManager>
+          <div className="sider-layout">
+            <NewFilterMenuWrapper
+              getDefaultFilter={defaultFilterTypes}
+              radio={true}
+              dependentOnTab={true}
             />
-            <div className="edit-group-posts-cancel">
-              <button onClick={() => setEditingGroup(false)}>
-                <h4>Back to Group Page</h4>
-              </button>
-            </div>
-            <AddOrRemoveToggle
-              addOrRemove={addOrRemove}
-              setAddOrRemove={setAddOrRemove}
-              ADD={ADD}
-              REMOVE={REMOVE}
-            />
-            {selectedPosts.length > 0 ? (
-              <AddOrRemoveConfirmation
-                selectedPosts={selectedPosts}
-                groupData={groupData}
-                addPostsToGroup={addPostsToGroup}
-                setResetSelection={setResetSelection}
-                addOrRemove={addOrRemove}
-                removePostsFromGroup={removePostsFromGroup}
-                ADD={ADD}
-              />
-            ) : null}
-
-            {displaySuccessMessage ? (
-              <div className="edit-group-posts-success-message-container">
-                <SuccessMessage>
-                  {addOrRemove === ADD
-                    ? `Posts Added to ${groupData.name}!`
-                    : `Posts Removed from ${groupData.name}!`}
-                </SuccessMessage>
-              </div>
-            ) : null}
-
-            <SelectedListItemsContext.Provider
-              value={{
-                setSelectedPosts: setSelectedPosts,
-                resetSelection: resetSelection,
-              }}
-            >
-              <NewResultsWrapper />
-            </SelectedListItemsContext.Provider>
           </div>
-        </div>
+          <div className="content-layout">
+            <div className="feed-container">
+              <EditGroupTabs
+                editType={editType}
+                tabs={tabs}
+                setEditType={setEditType}
+              />
+              <div className="edit-group-posts-cancel">
+                <button onClick={() => setEditingGroup(false)}>
+                  <h4>Back to Group Page</h4>
+                </button>
+              </div>
+              <ResourceTabs tabs={addOrRemoveOptions} affectsFilter={true} />
+              {selectedPosts.length > 0 ? (
+                <AddOrRemoveConfirmation
+                  selectedPosts={selectedPosts}
+                  groupData={groupData}
+                  setResetSelection={setResetSelection}
+                  ADD={ADD}
+                  setDisplaySuccessMessage={setDisplaySuccessMessage}
+                />
+              ) : null}
+              <div className="edit-group-posts-success-message-container">
+                <GroupPostSuccessMessage
+                  groupName={groupData.name}
+                  ADD={ADD}
+                  setDisplaySuccessMessage={setDisplaySuccessMessage}
+                  displaySuccessMessage={displaySuccessMessage}
+                />
+              </div>
+
+              <SelectedListItemsContext.Provider
+                value={{
+                  setSelectedPosts: setSelectedPosts,
+                  resetSelection: resetSelection,
+                }}
+              >
+                <NewResultsWrapper />
+              </SelectedListItemsContext.Provider>
+            </div>
+          </div>
+        </FilterManager>
       </FilterableResults>
     </>
   );
 }
 
+const TabReset = ({setResetSelection, setDisplaySuccessMessage}) => {
+  const filterableResults = useContext(FilterableResultsContext);
+  const filters = filterableResults.filter;
+  const tabFilter = filters ? filters[0] : undefined;
+  // Resets selection if user switches between member or tabs
+  useEffect(() => {
+    if (filters) {
+      const activeTabID = getActiveTabID(filters);
+      if (activeTabID) setResetSelection(true);
+      setDisplaySuccessMessage(false);
+    }
+  }, [tabFilter]);
+  return null;
+};
+
 const AddOrRemoveConfirmation = ({
   selectedPosts,
   groupData,
-  addPostsToGroup,
   setResetSelection,
-  addOrRemove,
-  removePostsFromGroup,
   ADD,
+  setDisplaySuccessMessage,
 }) => {
+  const filterableResults = useContext(FilterableResultsContext);
+  const filter = filterableResults.filter;
+  const activeTab = filter ? getActiveTabID(filter) : undefined;
+
+  if (activeTab === undefined) return null;
+
   return (
     <div className="edit-group-posts-selected-posts-container">
-      {addOrRemove === ADD ? (
+      {activeTab === ADD ? (
         <h2>
           Add {selectedPosts.length} selected posts to {groupData.name}
         </h2>
@@ -293,12 +214,30 @@ const AddOrRemoveConfirmation = ({
       )}
       <div className="edit-group-posts-selected-posts-actions">
         <button onClick={() => setResetSelection(true)}>Deselect All</button>
-        {addOrRemove === ADD ? (
-          <PrimaryButton onClick={() => addPostsToGroup()}>
+        {activeTab === ADD ? (
+          <PrimaryButton
+            onClick={() =>
+              addPostsToGroup(
+                selectedPosts,
+                groupData.id,
+                setResetSelection,
+                setDisplaySuccessMessage
+              )
+            }
+          >
             Add to Group
           </PrimaryButton>
         ) : (
-          <PrimaryButton onClick={() => removePostsFromGroup()}>
+          <PrimaryButton
+            onClick={() =>
+              removePostsFromGroup(
+                selectedPosts,
+                groupData.id,
+                setResetSelection,
+                setDisplaySuccessMessage
+              )
+            }
+          >
             Remove from Group
           </PrimaryButton>
         )}
@@ -307,33 +246,214 @@ const AddOrRemoveConfirmation = ({
   );
 };
 
-const AddOrRemoveToggle = ({addOrRemove, setAddOrRemove, ADD, REMOVE}) => {
+function addPostsToGroup(
+  selectedPosts,
+  groupID,
+  setResetSelection,
+  setDisplaySuccessMessage
+) {
+  selectedPosts.forEach((selectedPost) => {
+    delete selectedPost.hasSelector;
+    delete selectedPost.hasBeenSelected;
+    db.doc(`groups/${groupID}/posts/${selectedPost.id}`)
+      .set(selectedPost)
+      .then(() => {
+        setResetSelection(true);
+        setDisplaySuccessMessage(true);
+      })
+      .catch((err) => {
+        console.log(err);
+        alert(`Sorry, something went wrong. Please try again later.`);
+      });
+  });
+}
+
+function removePostsFromGroup(
+  selectedPosts,
+  groupID,
+  setResetSelection,
+  setDisplaySuccessMessage
+) {
+  selectedPosts.forEach((selectedPost) => {
+    db.doc(`groups/${groupID}/posts/${selectedPost.id}`)
+      .delete()
+      .then(() => {
+        setResetSelection(true);
+        setDisplaySuccessMessage(true);
+      })
+      .catch((err) => {
+        console.log(err);
+        alert(`Sorry, something went wrong. Please try again later.`);
+      });
+  });
+}
+
+export function GroupPostSuccessMessage({
+  groupName,
+  ADD,
+  setDisplaySuccessMessage,
+  displaySuccessMessage,
+}) {
+  const filterableResults = useContext(FilterableResultsContext);
+  const filter = filterableResults.filter;
+  const activeTab = filter ? getActiveTabID(filter) : undefined;
+
+  useEffect(() => {
+    setDisplaySuccessMessage(false);
+  }, [activeTab]);
+
+  if (!displaySuccessMessage) return null;
+
+  if (activeTab === undefined) return null;
+
   return (
-    <div className="edit-group-posts-add-or-remove-container">
-      <div className="edit-group-posts-add-or-remove-button-container">
-        <button
-          onClick={() => {
-            if (addOrRemove !== ADD) setAddOrRemove(ADD);
-          }}
-          className={
-            addOrRemove === ADD ? 'feed-tab-active' : 'feed-tab-inactive'
-          }
-        >
-          <h3>Add Posts</h3>
-        </button>
-      </div>
-      <div className="edit-group-posts-add-or-remove-button-container">
-        <button
-          onClick={() => {
-            if (addOrRemove !== REMOVE) setAddOrRemove(REMOVE);
-          }}
-          className={
-            addOrRemove === REMOVE ? 'feed-tab-active' : 'feed-tab-inactive'
-          }
-        >
-          <h3>Remove Posts</h3>
-        </button>
+    <div className="onboarding-success-overlay-container">
+      <div className="success-overlay">
+        <h3>
+          {activeTab === ADD
+            ? `Posts Added to ${groupName}!`
+            : `Posts Removed from ${groupName}!`}
+        </h3>
       </div>
     </div>
   );
+}
+
+const fetchPostsByFilteredMember = (
+  limit,
+  filter,
+  last,
+  groupID,
+  selectedPosts
+) => {
+  const enabledFilterIDs = filter ? getEnabledIDsFromFilter(filter) : undefined;
+  if (enabledFilterIDs === undefined) return [];
+  const enabledAuthorID = enabledFilterIDs.get('Group Members')[0];
+  if (enabledAuthorID === undefined) return [];
+  const enabledMemberDBRef = db
+    .collection(`users/${enabledAuthorID}/posts`)
+    .orderBy('timestamp', 'desc');
+  const postsByMembersPromise = getPaginatedPostsFromCollectionRef(
+    enabledMemberDBRef,
+    limit,
+    last
+  ).then((postsList) => {
+    const postsWithSelector = postsList.map((fetchedPost) =>
+      db
+        .doc(`groups/${groupID}/posts/${fetchedPost.id}`)
+        .get()
+        .then((qs) => {
+          fetchedPost.hasSelector = qs.exists ? 'inactive-add' : 'active-add';
+          // Allows user to switch sider filter and still keep selection
+          fetchedPost.hasBeenSelected = selectedPosts.some(
+            (selectedPost) => selectedPost.id === fetchedPost.id
+          )
+            ? true
+            : false;
+          return fetchedPost;
+        })
+    );
+    return Promise.all(postsWithSelector);
+  });
+  return postsByMembersPromise;
+};
+
+const fetchPostsOnGroupByFilteredMember = (
+  limit,
+  filter,
+  last,
+  groupID,
+  selectedPosts
+) => {
+  const enabledFilterIDs = filter ? getEnabledIDsFromFilter(filter) : undefined;
+  if (enabledFilterIDs === undefined) return [];
+  const enabledAuthorID = enabledFilterIDs.get('Group Members')[0];
+  if (enabledAuthorID === undefined) return [];
+
+  const enabledMemberDBRef = db
+    .collection(`groups/${groupID}/posts`)
+    .where('author.id', '==', enabledAuthorID)
+    .orderBy('timestamp', 'desc');
+
+  const groupPostsPromise = getPaginatedPostsFromCollectionRef(
+    enabledMemberDBRef,
+    limit,
+    last
+  )
+    .then((postsList) => {
+      postsList.forEach((fetchedPost) => {
+        fetchedPost.hasSelector = 'active-remove';
+        // Allows user to switch sider filter and still keep selection
+        fetchedPost.hasBeenSelected = selectedPosts.some(
+          (selectedPost) => selectedPost.id === fetchedPost.id
+        )
+          ? true
+          : false;
+      });
+      return postsList;
+    })
+    .catch((err) => console.log('Could not get group posts', err));
+  return groupPostsPromise;
+};
+
+const getMemberFilter = (groupID) => {
+  const membersDBCollectionRef = db.collection(`groups/${groupID}/members`);
+  const filterCollections = [];
+  const memberFilterPromise = getPaginatedUserReferencesFromCollectionRef(
+    membersDBCollectionRef,
+    20
+  )
+    .then((fetchedMembers) => {
+      const filterCollection = {
+        collectionName: 'Group Members',
+        options: [],
+        mutable: true,
+      };
+
+      fetchedMembers.forEach((fetchedGroupMember, i) => {
+        filterCollection.options.push({
+          data: {
+            id: fetchedGroupMember.id,
+            name: fetchedGroupMember.name,
+          },
+          enabled: i === 0,
+        });
+      });
+      return filterCollection;
+    })
+    .catch((err) => console.log('filter err', err));
+  filterCollections.push(memberFilterPromise);
+  return Promise.all(filterCollections);
+};
+
+const getGroupPostsAuthorsFilter = (groupID) => {
+  const filterCollections = [];
+  const postUserFilterRef = db.collection(
+    `groups/${groupID}/feeds/postsFeed/filterCollections/user/filterOptions`
+  );
+  const postUserFilterPromise = getPaginatedUserReferencesFromCollectionRef(
+    postUserFilterRef,
+    20
+  )
+    .then((fetchedMembers) => {
+      const filterCollection = {
+        collectionName: 'Group Members',
+        options: [],
+        mutable: true,
+      };
+
+      fetchedMembers.forEach((fetchedGroupMember, i) => {
+        filterCollection.options.push({
+          data: {
+            id: fetchedGroupMember.resourceID,
+            name: fetchedGroupMember.name,
+          },
+          enabled: i === 0,
+        });
+      });
+      return filterCollection;
+    })
+    .catch((err) => console.log('filter err', err));
+  filterCollections.push(postUserFilterPromise);
+  return Promise.all(filterCollections);
 };
