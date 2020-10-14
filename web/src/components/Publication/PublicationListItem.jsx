@@ -17,6 +17,13 @@ export default function PublicationListItem({
 }) {
   const featureFlags = useContext(FeatureFlags);
 
+  let publicationURL;
+  if (publication.id) {
+    publicationURL = `/publication/${publication.id}`;
+  } else if (publication.microsoftID) {
+    publicationURL = `/magPublication/${publication.microsoftID}`;
+  }
+
   return (
     <div
       className={
@@ -28,7 +35,7 @@ export default function PublicationListItem({
       <PublicationListItemHeader publication={publication} />
       <div className="publication-list-item-content">
         <PublicationListItemTitle
-          ID={publication.id}
+          url={publicationURL}
           title={publication.title}
         />
         <PublicationListItemAuthors authors={publication.authors} />
@@ -72,10 +79,10 @@ function PublicationListItemHeader({publication}) {
   );
 }
 
-function PublicationListItemTitle({ID, title}) {
+function PublicationListItemTitle({url, title}) {
   const titleHeader = <h3 className="publication-list-item-title">{title}</h3>;
-  if (!ID) return titleHeader;
-  return <Link to={`/publication/${ID}`}>{titleHeader}</Link>;
+  if (!url) return titleHeader;
+  return <Link to={url}>{titleHeader}</Link>;
 }
 
 function PublicationListItemAuthors({authors}) {

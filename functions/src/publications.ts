@@ -6,6 +6,7 @@ import {
   executeExpression,
   makPublicationToPublication,
   Publication,
+  MAKPublication,
 } from './microsoft';
 
 const pubSubClient = new PubSub();
@@ -55,9 +56,74 @@ export const microsoftAcademicKnowledgePublicationSearch = functions.https.onCal
   }
 );
 
-export const addNewPublicationAsync = functions.pubsub
+export const addNewMSPublicationAsync = functions.pubsub
   .topic('add-publication')
-  .onPublish((message) => {
-    const publication = message.json;
-    db.collection('MAPublications').doc(publication.Id.toString()).set(publication);
+  .onPublish(async (message) => {
+    if (!message.json) return;
+    const microsoftPublication = message.json as MAKPublication;
+    if (!microsoftPublication.Id) return;
+    const microsoftPublicationID = microsoftPublication.Id.toString();
+    const microsoftPublicationRef = db.collection('MSPublications').doc(microsoftPublicationID);
+    try {
+      await db.runTransaction(async (t) => {
+        const microsoftPublicationDS = await t.get(microsoftPublicationRef);
+
+        // If the Microsoft publication has been added and marked as processed then the labspoon publication must already exist 
+        if (microsoftPublicationDS.exists) {
+          const microsoftPublicationDSData = microsoftPublicationDS.data() as MAKPublication;
+          if (microsoftPublicationDSData.processed) return;
+        }
+
+        microsoftPublication.processed = true;
+
+        // store the MS publication and 
+        t.set(microsoftPublicationRef, microsoftPublication);
+        const publication = makPublicationToPublication(microsoftPublication);
+        // TODO(Patrick): Reintroduce authors
+        delete publication.authors;
+        t.set(db.collection('publications').doc(), publication);
+
+        microsoftPublication.AA?.forEach((author) =>{
+        const authorID = author.AuId.toString();
+          t.set(db.collection('MSUsers').doc(authorID), author);
+          t.set(
+            db
+              .collection('MSUsers')
+              .doc(author.AuId.toString())
+              .collection('publications')
+              .doc(microsoftPublicationID),
+            microsoftPublication
+          )
+        });
+      });
+    } catch (err) {
+      console.error(err);
+    }
+    return null;
   });
+
+  export const addNewMAKPublicationToAuthors = functions.firestore
+    .document('MSUsers/{msUserID}/publications/{msPublicationID}')
+    .onCreate(async (change, context) => {
+      const msUserID = context.params.msUserID;
+      const msPublicationID = context.params.msPublicationID;
+
+      // Check whether there is a labspoon user with this ID, otherwise do nothing.
+      const userQS = await db
+        .collection('users')
+        .where('microsoftAcademicAuthorID', '==', msUserID)
+        .limit(1)
+        .get();
+      if (userQS.empty) return null;
+      const userDS = userQS.docs[0];
+
+      // Find the publication
+      const publicationsQS = await db.collection('publications').where('microsoftID', '==', msPublicationID).limit(1).get();
+      if (publicationsQS.empty) {
+        console.log('No publication found with Microsoft Publication ID ', msPublicationID, ' this should not happen and likely indicates a logic issue.');
+      }
+      const publicationDS = publicationsQS.docs[0];
+      await db.doc(`users/${userDS.id}/publications/${publicationDS.id}`).set(publicationDS.data());
+
+      return null;
+    });

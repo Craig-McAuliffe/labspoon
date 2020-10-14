@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {FeatureFlags} from '../../../App';
-import {Link, useParams} from 'react-router-dom';
+import {Link, Redirect, useParams} from 'react-router-dom';
 import {db} from '../../../firebase';
 
 import {dbPublicationToJSPublication} from '../../../helpers/publications';
@@ -18,6 +18,44 @@ import PublicationSider from './PublicationPageSider';
 import detectJournal from '../../../components/Publication/DetectJournal';
 
 import './PublicationPage.css';
+
+// If the user clicks on a search result from Microsoft we redirect them to the corresponding Labspoon publication.
+export function MAGPublicationRouter() {
+  const magPublicationID = useParams().magPublicationID;
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [publicationID, setPublicationID] = useState();
+
+  useEffect(() => {
+    db.collection('publications')
+    .where('microsoftID', '==', magPublicationID)
+    .limit(1)
+    .get()
+    .then((qs) => {
+      setLoading(false);
+      if (qs.empty) return setError(true);
+      qs.forEach((doc) => {
+        console.log(doc.data(), doc.id);
+        setPublicationID(doc.id);
+      });
+    })
+    .catch((err) => {
+      setLoading(false);
+      setError(true);
+      console.error(err);
+    });
+  }, [magPublicationID]);
+
+  if (loading || publicationID === undefined) return <h1>Loading...</h1>;
+  if (error) return (
+    <>
+      <h1>Error: Publication not found</h1>
+      <p>We're probably just indexing this, so try again in a few minutes.</p>
+    </>
+  );
+
+  return <Redirect to={`/publication/${publicationID}`} />;
+}
 
 function fetchPublicationDetailsFromDB(publicationID) {
   return db
@@ -191,12 +229,21 @@ function PublicationBody({publicationDetails}) {
       <PublicationAuthors
         publicationAuthors={publicationDetails.content.authors}
       />
-      <h3 className="publication-section-title">Abstract</h3>
-      <p className="publication-body-abstract">
-        {publicationDetails.content.abstract}
-      </p>
+      <PublicationBodyAbstract abstract={publicationDetails.abstract} />
       <ListItemTopics taggedItem={publicationDetails} />
     </div>
+  );
+}
+
+function PublicationBodyAbstract({abstract}) {
+  if (!abstract) return <></>;
+  return (
+    <>
+      <h3 className="publication-section-title">Abstract</h3>
+      <p className="publication-body-abstract">
+        {abstract}
+      </p>
+    </>
   );
 }
 
@@ -210,6 +257,7 @@ function PublicationLink({publicationURL}) {
 }
 
 function PublicationAuthors({publicationAuthors}) {
+  if (!publicationAuthors) return <></>;
   return publicationAuthors.map((author) => (
     <h3 className="publication-body-authors" key={author.id}>
       <Link to={`/user/${author.id}`}>{author.name}</Link>

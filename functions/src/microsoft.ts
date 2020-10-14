@@ -53,6 +53,7 @@ export function executeExpression(params: executeParams): AxiosPromise {
   });
 }
 
+
 export function makPublicationToPublication(
   makPublication: MAKPublication
 ): Publication {
@@ -60,6 +61,7 @@ export function makPublicationToPublication(
   if (makPublication.D) publication.date = makPublication.D;
   if (makPublication.DN) publication.title = makPublication.DN;
   if (makPublication.AA) publication.authors = makPublication.AA.map(makAuthorToAuthor);
+  if (makPublication.Id) publication.microsoftID = makPublication.Id.toString();
   return publication;
 }
 
@@ -69,12 +71,16 @@ export interface MAKPublication {
   D?: string,
   DN?: string;
   AA?: Array<MAKAuthor>;
+  Id?: number;
+  // Tracks whether the publication has been added to the Labspoon publications. Defaults to false.
+  processed?: boolean,
 }
 
 export interface Publication {
   date?: string;
   title?: string;
   authors?: Array<Author>;
+  microsoftID?: string;
 }
 
 function makAuthorToAuthor(makAuthor: MAKAuthor): Author {

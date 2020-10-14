@@ -24,7 +24,7 @@ export const createPost = functions.https.onCall(async (data, context) => {
   if (!userDoc.exists) {
     throw new functions.https.HttpsError('not-found', 'User not found');
   }
-  const userData = userDoc.data() as firestore.DocumentData;
+  const userData = userDoc.data()!;
   const author: UserRef = {
     id: userData.id,
     name: userData.name,
