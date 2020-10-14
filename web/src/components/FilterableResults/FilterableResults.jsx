@@ -113,8 +113,8 @@ export function FilterManager({children}) {
   const filterableResults = useContext(FilterableResultsContext);
   const [displayedTabFilter, setDisplayedTabFilter] = useState([]);
   const [displayedSiderFilter, setDisplayedSiderFilter] = useState([]);
-  const [siderFilterLoading, setSiderFilterLoading] = useState();
-  const [tabsFilterLoading, setTabsFilterLoading] = useState();
+  const [siderFilterLoading, setSiderFilterLoading] = useState(true);
+  const [tabsFilterLoading, setTabsFilterLoading] = useState(true);
 
   useEffect(() => {
     const pageFilter = [...displayedTabFilter, ...displayedSiderFilter];
