@@ -103,7 +103,9 @@
 }
 
 .filter-checkbox:not(:checked),
-.filter-checkbox:checked {
+.filter-checkbox:checked,
+.filter-radio:not(:checked),
+.filter-radio:checked {
   top: 10px;
   opacity: 0;
   position: absolute;
@@ -113,36 +115,73 @@
 }
 
 .filter-checkbox:not(:checked) + .filter-checkbox-design,
-.filter-checkbox:checked + .filter-checkbox-design {
+.filter-checkbox:checked + .filter-checkbox-design,
+.filter-radio:not(:checked) + .filter-radio-design,
+.filter-radio:checked + .filter-radio-design {
   top: 10px;
   position: absolute;
   height: 20px;
   width: 20px;
-  border-radius: 10%;
   border: 1px solid #00507c;
   cursor: pointer;
   background: transparent;
 }
-.filter-checkbox + .filter-checkbox-design:hover {
+
+.filter-checkbox:not(:checked) + .filter-checkbox-design,
+.filter-checkbox:checked + .filter-checkbox-design {
+  border-radius: 10%;
+}
+
+.filter-radio:not(:checked) + .filter-radio-design,
+.filter-radio:checked + .filter-radio-design {
+  border-radius: 50%;
+}
+
+.filter-checkbox + .filter-checkbox-design:hover,
+.filter-radio + .filter-radio-design:hover {
   height: 20px;
   width: 20px;
-  border-radius: 10%;
   border: 2px solid #00507c;
   cursor: pointer;
 }
-.filter-checkbox + .filter-checkbox-design:focus {
+
+.filter-checkbox + .filter-checkbox-design:hover {
+  border-radius: 10%;
+}
+
+.filter-radio + .filter-radio-design:hover {
+  border-radius: 50%;
+}
+
+.filter-checkbox + .filter-checkbox-design:focus,
+.filter-radio + .filter-radio-design:focus {
   height: 15px;
   width: 15px;
-  border-radius: 10%;
   border: 1px solid #00507c;
   background: #00507c;
   cursor: pointer;
 }
 
-.filter-checkbox:checked + .filter-checkbox-design {
+.filter-checkbox + .filter-checkbox-design:focus {
+  border-radius: 10%;
+}
+
+.filter-radio + .filter-radio-design:focus {
+  border-radius: 50%;
+}
+
+.filter-checkbox:checked + .filter-checkbox-design,
+.filter-radio:checked + .filter-radio-design {
   height: 20px;
   width: 20px;
-  border-radius: 10%;
   background: #00507c;
   cursor: pointer;
+}
+
+.filter-checkbox:checked + .filter-checkbox-design {
+  border-radius: 10%;
+}
+
+.filter-radio:checked + .filter-radio-design {
+  border-radius: 50%;
 }

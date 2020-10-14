@@ -9,10 +9,13 @@ import TopicListItem from '../../components/Topics/TopicListItem';
 import FollowTopicButton from '../../components/Topics/FollowTopicButton';
 import GroupListItem from '../../components/Group/GroupListItem';
 import FollowUserButton from '../../components/User/FollowUserButton/FollowUserButton';
+import SecondaryButton from '../../components/Buttons/SecondaryButton';
 import {CreateGroupIcon} from '../../assets/MenuIcons';
 import CreateGroupPage from '../Groups/CreateGroupPage/CreateGroupPage';
 import UserListItem from '../../components/User/UserListItem';
 import FormDatabaseSearch from '../../components/Forms/FormDatabaseSearch';
+import SuccessMessage from '../../components/Forms/SuccessMessage';
+
 import './OnboardingPage.css';
 
 export default function OnboardingPage() {
@@ -67,16 +70,14 @@ export default function OnboardingPage() {
                 Back
               </button>
             ) : null}
-            <button
-              className="onboarding-next-button"
+            <SecondaryButton
               onClick={() =>
                 onboardingStage === 'follow-things'
                   ? setOnboardingStage('join-groups')
                   : history.push(returnLocation ? returnLocation : '/')
               }
-            >
-              <h3>{onboardingStage === 'join-groups' ? 'Finish' : 'Next'}</h3>
-            </button>
+              buttonText={onboardingStage === 'join-groups' ? 'Finish' : 'Next'}
+            />
           </div>
         </div>
       </div>
@@ -226,7 +227,7 @@ function OnboardingGroup({user}) {
         <div className="onboarding-create-group-container">
           <CreateGroupPage
             onboardingCancelOrSubmitAction={() => setCreatingGroup(false)}
-            confirmGroupCreation={() => setConfirmGroupCreation(true)}
+            onboardingConfirmGroupCreation={() => setConfirmGroupCreation(true)}
           />
         </div>
       ) : (
@@ -247,11 +248,9 @@ function OnboardingGroup({user}) {
           </p>
 
           {confirmGroupCreation ? (
-            <div className="onboarding-success-overlay-container">
-              <div className="success-overlay">
-                <h3>Group Created! You can find it in the top right menu.</h3>
-              </div>{' '}
-            </div>
+            <SuccessMessage>
+              Group Created! You can find it in the top right menu.
+            </SuccessMessage>
           ) : null}
         </>
       )}

@@ -2,26 +2,15 @@ import React, {useContext} from 'react';
 
 import {db} from '../../firebase';
 import {AuthContext, FeatureFlags} from '../../App';
-
+import {getEnabledIDsFromFilter} from '../../helpers/filters';
 import FilterableResults, {
   NewFilterMenuWrapper,
   NewResultsWrapper,
+  ResourceTabs,
+  FilterManager,
 } from '../../components/FilterableResults/FilterableResults';
 import CreatePost from '../../components/Posts/Post/CreatePost/CreatePost';
 import HomePageTabs from '../../components/HomePageTabs';
-
-function getEnabledIDsFromFilter(filter) {
-  const IDsMap = new Map();
-  filter.forEach((filterCollection) => {
-    IDsMap.set(
-      filterCollection.collectionName,
-      filterCollection.options
-        .filter((option) => option.enabled)
-        .map((option) => option.data.id)
-    );
-  });
-  return IDsMap;
-}
 
 // Due to the limitations in firestore filters described in
 // https://firebase.google.com/docs/firestore/query-data/queries it is not
@@ -192,7 +181,10 @@ export default function FollowingFeedPage() {
   return (
     <FilterableResults fetchResults={fetchResults} limit={10} loadingFilter>
       <div className="sider-layout">
-        <NewFilterMenuWrapper getDefaultFilter={getDefaultFilter} />
+        <FilterManager>
+          <NewFilterMenuWrapper getDefaultFilter={getDefaultFilter} />
+          <ResourceTabs />
+        </FilterManager>
       </div>
       <div className="content-layout">
         <div className="feed-container">

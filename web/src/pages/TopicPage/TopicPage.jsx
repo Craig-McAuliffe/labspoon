@@ -15,6 +15,8 @@ import topics from '../../mockdata/topics';
 import FilterableResults, {
   NewResultsWrapper,
   ResourceTabs,
+  FilterManager,
+  NewFilterMenuWrapper,
 } from '../../components/FilterableResults/FilterableResults';
 import topicPageFeedData from './TopicPageFeedData';
 import TopicPageSider from './TopicPageSider';
@@ -171,7 +173,10 @@ export default function TopicPage() {
         </div>
         <FilterableResults fetchResults={fetchFeedData} limit={10}>
           <div className="feed-container">
-            <ResourceTabs tabs={relationshipFilter} />
+            <FilterManager>
+              <ResourceTabs tabs={relationshipFilter} />
+              <NewFilterMenuWrapper />
+            </FilterManager>
             <NewResultsWrapper />
           </div>
         </FilterableResults>

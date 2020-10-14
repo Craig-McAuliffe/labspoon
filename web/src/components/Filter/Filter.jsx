@@ -18,6 +18,7 @@ export function FilterMenu({
   options,
   updateFilterOption,
   resetFilterCollection,
+  radio,
 }) {
   const filterCollections = options.map((optionCollection, index) => {
     if (!optionCollection.mutable) return null;
@@ -29,15 +30,18 @@ export function FilterMenu({
         options={optionCollection.options}
         updateFilterOption={updateFilterOption}
         resetFilterCollection={resetFilterCollection}
+        radio={radio}
       />
     );
   });
+
   return (
     <div className="filter-container">
       <FilterSearch />
       {filterCollections}
     </div>
   );
+  return null;
 }
 FilterMenu.propTypes = {
   options: PropTypes.array.isRequired,
@@ -58,6 +62,7 @@ function FilterCollection({
   index,
   updateFilterOption,
   resetFilterCollection,
+  radio,
 }) {
   /**
    * Callback used for updating the enabled status of an option within this
@@ -72,12 +77,14 @@ function FilterCollection({
     <div className="filter-collection">
       <div className="filter-collection-header">
         <h3 className="filter-collection-title">{name}</h3>
-        <button
-          onClick={() => resetFilterCollection(index)}
-          className="filter-collection-reset"
-        >
-          Reset
-        </button>
+        {radio === undefined ? (
+          <button
+            onClick={() => resetFilterCollection(index)}
+            className="filter-collection-reset"
+          >
+            Reset
+          </button>
+        ) : null}
       </div>
       {options.map((option, index) => (
         <FilterOption
@@ -86,6 +93,7 @@ function FilterCollection({
           data={option.data}
           enabled={option.enabled}
           setOption={updateFilterCollectionOption}
+          radio={radio}
         />
       ))}
     </div>
@@ -106,20 +114,26 @@ FilterCollection.propTypes = {
  * enabled
  * @return {React.ReactElement} - a filter option
  */
-function FilterOption({data, index, enabled, setOption}) {
+function FilterOption({data, index, enabled, setOption, radio}) {
   return (
     <div className="filter-options-container">
       <div className="filter-option-name">{data.name}</div>
       <label className="filter-checkbox-container">
         <input
-          type="checkbox"
+          type={radio === undefined ? 'checkbox' : 'radio'}
           name={data.name}
           id={`fitlerOption ${data.name}`}
           checked={enabled}
           onChange={() => setOption(index)}
-          className="filter-checkbox"
+          className={radio === undefined ? 'filter-checkbox' : 'filter-radio'}
         />
-        <span className="filter-checkbox-design"></span>
+        <span
+          className={
+            radio === undefined
+              ? 'filter-checkbox-design'
+              : 'filter-radio-design'
+          }
+        ></span>
       </label>
     </div>
   );

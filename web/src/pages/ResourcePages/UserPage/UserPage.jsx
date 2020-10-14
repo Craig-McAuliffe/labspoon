@@ -19,6 +19,8 @@ import DefaultUserIcon from '../../../assets/DefaultUserIcon.svg';
 import FilterableResults, {
   ResourceTabs,
   NewResultsWrapper,
+  NewFilterMenuWrapper,
+  FilterManager,
 } from '../../../components/FilterableResults/FilterableResults';
 import MessageButton from '../../../components/Buttons/MessageButton';
 import {UserPageAvatar} from '../../../components/Avatar/UserAvatar';
@@ -152,7 +154,10 @@ export default function UserPage() {
       </div>
       <FilterableResults fetchResults={fetchFeedData} limit={10}>
         <div className="feed-container">
-          <ResourceTabs tabs={relationshipFilter} />
+          <FilterManager>
+            <ResourceTabs tabs={relationshipFilter} />
+            <NewFilterMenuWrapper />
+          </FilterManager>
           <NewResultsWrapper />
         </div>
       </FilterableResults>

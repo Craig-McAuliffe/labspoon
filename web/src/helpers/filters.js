@@ -16,3 +16,16 @@ export function getActiveTabID(filterOptions) {
   }
   return activeTab;
 }
+
+export function getEnabledIDsFromFilter(filter) {
+  const IDsMap = new Map();
+  filter.forEach((filterCollection) => {
+    IDsMap.set(
+      filterCollection.collectionName,
+      filterCollection.options
+        .filter((option) => option.enabled)
+        .map((option) => option.data.id)
+    );
+  });
+  return IDsMap;
+}
