@@ -48,48 +48,50 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
     const referencedPublication = publications().filter(
       (publication) => publication.url === post.url
     )[0];
-    return referencedPublication ? (
-      <div className="post-referenced-resource-container">
-        <PublicationListItem
-          publication={referencedPublication}
-          removeBorder={true}
-        />
-        {postContent()}
-      </div>
-    ) : post.hasSelector ? (
-      <div className="post-with-selector-container">
-        {postContent()}
-        <div className="post-selector-container">
-          {post.hasSelector === 'active-add' ||
-          post.hasSelector === 'active-remove' ? (
-            <>
-              <button
-                className={
-                  isSelected
-                    ? 'post-selector-button-active'
-                    : 'post-selector-button-inactive'
-                }
-                onClick={() =>
-                  selectPost(
-                    selectionVariation,
-                    isSelected,
-                    setIsSelected,
-                    post
-                  )
-                }
-              />
-              <p className="post-selector-active-text">
-                {post.hasSelector === 'active-add' ? 'Add' : 'Remove'}
-              </p>
-            </>
-          ) : (
-            <p className="post-selector-inactive-text">Already on group</p>
-          )}
+    if (referencedPublication)
+      return (
+        <div className="post-referenced-resource-container">
+          <PublicationListItem
+            publication={referencedPublication}
+            removeBorder={true}
+          />
+          {postContent()}
         </div>
-      </div>
-    ) : (
-      postContent()
-    );
+      );
+    else if (post.hasSelector)
+      return (
+        <div className="post-with-selector-container">
+          {postContent()}
+          <div className="post-selector-container">
+            {post.hasSelector === 'active-add' ||
+            post.hasSelector === 'active-remove' ? (
+              <>
+                <button
+                  className={
+                    isSelected
+                      ? 'post-selector-button-active'
+                      : 'post-selector-button-inactive'
+                  }
+                  onClick={() =>
+                    selectPost(
+                      selectionVariation,
+                      isSelected,
+                      setIsSelected,
+                      post
+                    )
+                  }
+                />
+                <p className="post-selector-active-text">
+                  {post.hasSelector === 'active-add' ? 'Add' : 'Remove'}
+                </p>
+              </>
+            ) : (
+              <p className="post-selector-inactive-text">Already on group</p>
+            )}
+          </div>
+        </div>
+      );
+    else return postContent();
   };
 
   const postContent = () => (

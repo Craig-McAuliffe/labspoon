@@ -112,17 +112,20 @@ export default function FilterableResults({children, fetchResults, limit}) {
 export function FilterManager({children}) {
   const filterableResults = useContext(FilterableResultsContext);
   const [displayedTabFilter, setDisplayedTabFilter] = useState();
-  const [dislayedSiderFilter, setDisplayedSiderFilter] = useState();
+  const [displayedSiderFilter, setDisplayedSiderFilter] = useState();
   const [multiFilterLoadingState, setMultiFilterLoadingState] = useState({});
   useEffect(() => {
     let pageFilter;
-    if (Array.isArray(displayedTabFilter) && Array.isArray(dislayedSiderFilter))
-      pageFilter = [...displayedTabFilter, ...dislayedSiderFilter];
+    if (
+      Array.isArray(displayedTabFilter) &&
+      Array.isArray(displayedSiderFilter)
+    )
+      pageFilter = [...displayedTabFilter, ...displayedSiderFilter];
     else if (Array.isArray(displayedTabFilter)) pageFilter = displayedTabFilter;
-    else if (Array.isArray(dislayedSiderFilter))
-      pageFilter = dislayedSiderFilter;
+    else if (Array.isArray(displayedSiderFilter))
+      pageFilter = displayedSiderFilter;
     filterableResults.setFilter(pageFilter);
-  }, [displayedTabFilter, dislayedSiderFilter]);
+  }, [displayedTabFilter, displayedSiderFilter]);
 
   useEffect(() => {
     filterableResults.setLoadingFilter(true);
@@ -139,7 +142,7 @@ export function FilterManager({children}) {
       value={{
         displayedTabFilter,
         setDisplayedTabFilter,
-        dislayedSiderFilter,
+        displayedSiderFilter,
         setDisplayedSiderFilter,
         setMultiFilterLoadingState,
       }}
@@ -156,7 +159,7 @@ export function NewFilterMenuWrapper({
 }) {
   const filterableResults = useContext(FilterableResultsContext);
   const filterManager = useContext(FilterManagerContext);
-  const siderFilter = filterManager.dislayedSiderFilter;
+  const siderFilter = filterManager.displayedSiderFilter;
   const setSiderFilter = filterManager.setDisplayedSiderFilter;
   const tabFilter = filterManager.displayedTabFilter;
 

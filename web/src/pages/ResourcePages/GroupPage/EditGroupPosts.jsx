@@ -21,6 +21,9 @@ import './GroupPage.css';
 
 export const SelectedListItemsContext = createContext();
 
+const ADD = 'add';
+const REMOVE = 'remove';
+
 export default function EditingGroupInfo({
   groupData,
   setEditingGroup,
@@ -28,22 +31,20 @@ export default function EditingGroupInfo({
   setEditType,
   editType,
 }) {
-  const ADD = 'add';
-  const REMOVE = 'remove';
   const [selectedPosts, setSelectedPosts] = useState([]);
-  const [displaySuccessMessage, setDisplaySuccessMessage] = useState(false);
+  const [postsEditSuccess, setPostsEditSuccess] = useState(false);
   const [resetSelection, setResetSelection] = useState(false);
   const groupID = groupData.id;
 
   // Deselect posts when successfully adding posts
   useEffect(() => {
-    if (displaySuccessMessage) {
+    if (postsEditSuccess) {
       setResetSelection(true);
       setTimeout(() => {
-        setDisplaySuccessMessage(false);
+        setPostsEditSuccess(false);
       }, 3000);
     }
-  }, [displaySuccessMessage]);
+  }, [postsEditSuccess]);
 
   useEffect(() => {
     if (resetSelection) {
@@ -116,7 +117,7 @@ export default function EditingGroupInfo({
       >
         <TabReset
           setResetSelection={setResetSelection}
-          setDisplaySuccessMessage={setDisplaySuccessMessage}
+          setPostsEditSuccess={setPostsEditSuccess}
         />
         <FilterManager>
           <div className="sider-layout">
@@ -144,16 +145,14 @@ export default function EditingGroupInfo({
                   selectedPosts={selectedPosts}
                   groupData={groupData}
                   setResetSelection={setResetSelection}
-                  ADD={ADD}
-                  setDisplaySuccessMessage={setDisplaySuccessMessage}
+                  setPostsEditSuccess={setPostsEditSuccess}
                 />
               ) : null}
               <div className="edit-group-posts-success-message-container">
                 <GroupPostSuccessMessage
                   groupName={groupData.name}
-                  ADD={ADD}
-                  setDisplaySuccessMessage={setDisplaySuccessMessage}
-                  displaySuccessMessage={displaySuccessMessage}
+                  setPostsEditSuccess={setPostsEditSuccess}
+                  postsEditSuccess={postsEditSuccess}
                 />
               </div>
 
@@ -173,7 +172,7 @@ export default function EditingGroupInfo({
   );
 }
 
-const TabReset = ({setResetSelection, setDisplaySuccessMessage}) => {
+const TabReset = ({setResetSelection, setPostsEditSuccess}) => {
   const filterableResults = useContext(FilterableResultsContext);
   const filters = filterableResults.filter;
   const tabFilter = filters ? filters[0] : undefined;
@@ -182,7 +181,7 @@ const TabReset = ({setResetSelection, setDisplaySuccessMessage}) => {
     if (filters) {
       const activeTabID = getActiveTabID(filters);
       if (activeTabID) setResetSelection(true);
-      setDisplaySuccessMessage(false);
+      setPostsEditSuccess(false);
     }
   }, [tabFilter]);
   return null;
@@ -192,8 +191,7 @@ const AddOrRemoveConfirmation = ({
   selectedPosts,
   groupData,
   setResetSelection,
-  ADD,
-  setDisplaySuccessMessage,
+  setPostsEditSuccess,
 }) => {
   const filterableResults = useContext(FilterableResultsContext);
   const filter = filterableResults.filter;
@@ -221,7 +219,7 @@ const AddOrRemoveConfirmation = ({
                 selectedPosts,
                 groupData.id,
                 setResetSelection,
-                setDisplaySuccessMessage
+                setPostsEditSuccess
               )
             }
           >
@@ -234,7 +232,7 @@ const AddOrRemoveConfirmation = ({
                 selectedPosts,
                 groupData.id,
                 setResetSelection,
-                setDisplaySuccessMessage
+                setPostsEditSuccess
               )
             }
           >
@@ -250,7 +248,7 @@ function addPostsToGroup(
   selectedPosts,
   groupID,
   setResetSelection,
-  setDisplaySuccessMessage
+  setPostsEditSuccess
 ) {
   selectedPosts.forEach((selectedPost) => {
     delete selectedPost.hasSelector;
@@ -259,7 +257,7 @@ function addPostsToGroup(
       .set(selectedPost)
       .then(() => {
         setResetSelection(true);
-        setDisplaySuccessMessage(true);
+        setPostsEditSuccess(true);
       })
       .catch((err) => {
         console.log(err);
@@ -272,14 +270,14 @@ function removePostsFromGroup(
   selectedPosts,
   groupID,
   setResetSelection,
-  setDisplaySuccessMessage
+  setPostsEditSuccess
 ) {
   selectedPosts.forEach((selectedPost) => {
     db.doc(`groups/${groupID}/posts/${selectedPost.id}`)
       .delete()
       .then(() => {
         setResetSelection(true);
-        setDisplaySuccessMessage(true);
+        setPostsEditSuccess(true);
       })
       .catch((err) => {
         console.log(err);
@@ -290,19 +288,18 @@ function removePostsFromGroup(
 
 export function GroupPostSuccessMessage({
   groupName,
-  ADD,
-  setDisplaySuccessMessage,
-  displaySuccessMessage,
+  setPostsEditSuccess,
+  postsEditSuccess,
 }) {
   const filterableResults = useContext(FilterableResultsContext);
   const filter = filterableResults.filter;
   const activeTab = filter ? getActiveTabID(filter) : undefined;
 
   useEffect(() => {
-    setDisplaySuccessMessage(false);
+    setPostsEditSuccess(false);
   }, [activeTab]);
 
-  if (!displaySuccessMessage) return null;
+  if (!postsEditSuccess) return null;
 
   if (activeTab === undefined) return null;
 

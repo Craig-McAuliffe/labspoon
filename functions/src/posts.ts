@@ -140,14 +140,6 @@ export async function updateFilterCollection(
   // create the filter option if it doesn't exist
   await filterOptionDocRef.set(filterOption, {merge: true});
 
-  if (!removedResource) {
-    // increment the rank of the filter collection and option
-    await filterCollectionDocRef.update({
-      rank: firestore.FieldValue.increment(1),
-    });
-    await filterOptionDocRef.update({rank: firestore.FieldValue.increment(1)});
-  }
-
   if (removedResource) {
     await filterOptionDocRef.get().then((qs) => {
       const filterOptionData = qs.data() as FilterOption;
@@ -158,15 +150,19 @@ export async function updateFilterCollection(
 
       const filterOptionRank = filterOptionData.rank as number;
       if (filterOptionRank === 1) {
-        filterOptionDocRef
-          .delete()
-          .then(() => console.log('filter option removed'));
+        filterOptionDocRef.delete();
       } else {
-        filterOptionDocRef
-          .update({rank: filterOptionRank - 1})
-          .then(() => console.log('filter rank decreased'));
+        filterOptionDocRef.update({rank: filterOptionRank - 1});
       }
     });
+    return;
+  } else {
+    // increment the rank of the filter collection and option
+    await filterCollectionDocRef.update({
+      rank: firestore.FieldValue.increment(1),
+    });
+    await filterOptionDocRef.update({rank: firestore.FieldValue.increment(1)});
+    return;
   }
 }
 
