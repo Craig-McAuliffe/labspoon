@@ -5,6 +5,11 @@ before_script:
   - npm i -g firebase-tools
   - npm i -g n
 
+cache:
+  paths:
+    - node_modules/
+    - functions/node_modules
+
 deploy_test_env:
   image: node:current
   stage: test
