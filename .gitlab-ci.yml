@@ -10,13 +10,14 @@ cache:
     - node_modules/
     - functions/node_modules
 
-deploy_test_env:
+deploy_test_env:on-schedule:
   image: node:current
   stage: test
   environment:
     name: test
   only:
     - master
+    - schedules
   script:
     - n current
     - npm --prefix web install
