@@ -78,3 +78,83 @@
   display: flex;
   justify-content: flex-end;
 }
+
+.edit-group-tabs-container {
+  margin-left: -5px;
+}
+
+.edit-group-tabs-container button:hover {
+  color: #000000;
+}
+
+.edit-group-tab-active {
+  color: #000000;
+  text-decoration: underline;
+  margin: 0px 20px 20px 0px;
+}
+
+.edit-group-tab-inactive {
+  color: #5d5d65;
+  margin: 0px 20px 20px 0px;
+}
+
+.edit-group-posts-add-or-remove-container {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+  margin: 20px -8px 0px;
+}
+
+.edit-group-posts-add-or-remove-button-container {
+  margin: 0px 20px 20px 0px;
+}
+
+.edit-group-posts-add-or-remove-container:hover {
+  color: #00507c;
+}
+
+.edit-group-posts-title-active {
+  color: #00507c;
+  margin: 0px 20px 20px 0px;
+  border: 2px solid #00507c;
+  padding: 10px;
+}
+
+.edit-group-posts-title-inactive {
+  color: #99999f;
+  margin: 0px 20px 20px 0px;
+  border: 2px solid #99999f;
+  padding: 10px;
+}
+
+.edit-group-posts-selected-posts-container {
+  position: fixed;
+  bottom: 5vh;
+  right: 25vw;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.9);
+  background: white;
+  height: 20vh;
+  width: 25vw;
+  padding: 20px 10px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 1;
+}
+
+.edit-group-posts-selected-posts-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.edit-group-posts-success-message-container {
+  margin-bottom: 20px;
+}
+
+.edit-group-posts-cancel {
+  margin: 0px 0px 24px -5px;
+}
+
+.edit-group-posts-cancel button {
+  color: #00507c;
+}

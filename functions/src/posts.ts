@@ -3,7 +3,7 @@ import {v4 as uuid} from 'uuid';
 import {admin, ResourceTypes} from './config';
 import {firestore} from 'firebase-admin';
 
-import { UserRef } from "./users";
+import {UserRef} from './users';
 
 const db = admin.firestore();
 
@@ -103,7 +103,8 @@ async function updateFiltersByPost(
     {
       name: post.postType.name,
       resourceID: post.postType.id,
-    }
+    },
+    false
   );
   await updateFilterCollection(
     followingFeedRef,
@@ -115,16 +116,18 @@ async function updateFiltersByPost(
       name: post.author.name,
       resourceID: post.author.id,
       avatar: post.author.avatar,
-    }
+    },
+    false
   );
   // TODO(#146): Add topics to the filter
 }
 
-async function updateFilterCollection(
+export async function updateFilterCollection(
   feedRef: firestore.DocumentReference<firestore.DocumentData>,
   filterCollection: FilterCollection,
-  filterOption: FilterOption
-) { 
+  filterOption: FilterOption,
+  removedResource: boolean
+) {
   const filterCollectionDocRef = feedRef
     .collection('filterCollections')
     .doc(filterCollection.resourceType);
@@ -137,11 +140,30 @@ async function updateFilterCollection(
   // create the filter option if it doesn't exist
   await filterOptionDocRef.set(filterOption, {merge: true});
 
-  // increment the rank of the filter collection and option
-  await filterCollectionDocRef.update({
-    rank: firestore.FieldValue.increment(1),
-  });
-  await filterOptionDocRef.update({rank: firestore.FieldValue.increment(1)});
+  if (removedResource) {
+    await filterOptionDocRef.get().then((qs) => {
+      if (!qs.exists) {
+        console.log('could not find filter option');
+        return;
+      }
+      const filterOptionData = qs.data() as FilterOption;
+      if (!filterOptionData.rank) return;
+      const filterOptionRank = filterOptionData.rank as number;
+      if (filterOptionRank === 1) {
+        filterOptionDocRef.delete();
+      } else {
+        filterOptionDocRef.update({rank: filterOptionRank - 1});
+      }
+    });
+    return;
+  } else {
+    // increment the rank of the filter collection and option
+    await filterCollectionDocRef.update({
+      rank: firestore.FieldValue.increment(1),
+    });
+    await filterOptionDocRef.update({rank: firestore.FieldValue.increment(1)});
+    return;
+  }
 }
 
 interface FilterOption {
@@ -157,7 +179,7 @@ interface FilterCollection {
   rank?: number;
 }
 
-interface Post {
+export interface Post {
   postType: PostType;
   author: UserRef;
   content: PostContent;
@@ -170,13 +192,13 @@ interface Post {
   filterTopicIDs: string[];
 }
 
-interface Topic {
+export interface Topic {
   id: string;
   name: string;
   isNew?: boolean;
 }
 
-interface PostContent {
+export interface PostContent {
   text?: string;
   location?: string;
   methods?: Array<string>;
@@ -189,7 +211,7 @@ interface PostContent {
   position?: string;
 }
 
-interface PostType {
+export interface PostType {
   id: string;
   name: string;
 }

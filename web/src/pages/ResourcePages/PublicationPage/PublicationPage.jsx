@@ -10,6 +10,8 @@ import ListItemTopics from '../../../components/CommonListItemParts/ListItemTopi
 import FilterableResults, {
   ResourceTabs,
   NewResultsWrapper,
+  FilterManager,
+  NewFilterMenuWrapper,
 } from '../../../components/FilterableResults/FilterableResults';
 import publicationPageFeedData from './PublicationPageFeedData';
 import PublicationSider from './PublicationPageSider';
@@ -171,7 +173,10 @@ export default function PublicationPage() {
         </div>
         <FilterableResults fetchResults={fetchFeedData} limit={10}>
           <div className="feed-container">
-            <ResourceTabs tabs={relationshipFilter} />
+            <FilterManager>
+              <ResourceTabs tabs={relationshipFilter} />
+              <NewFilterMenuWrapper />
+            </FilterManager>
             <NewResultsWrapper />
           </div>
         </FilterableResults>

@@ -138,6 +138,18 @@
   line-height: 16px;
 }
 
+.secondary-button-active {
+  color: #00507c;
+  padding: 8px 16px 4px 16px;
+  border: 2px solid #00507c;
+}
+
+.secondary-button-inactive {
+  color: #99999f;
+  padding: 10px 16px 4px 16px;
+  border: 2px solid #99999f;
+}
+
 @media screen and (max-width: 560px) {
   .primary-button-text h2 {
     font-size: 1.2em;

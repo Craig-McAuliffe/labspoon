@@ -34,7 +34,7 @@
   min-width: 100%;
 }
 
-.feed-tab,
+.feed-tab-inactive,
 .feed-tab-active {
   border: 1px solid #99999f;
   margin: 0px 10px 10px;
@@ -51,7 +51,7 @@
   color: #000000;
 }
 
-.feed-tab:hover {
+.feed-tab-inactive:hover {
   border: 1px solid #5d5d65;
   color: #5d5d65;
 }

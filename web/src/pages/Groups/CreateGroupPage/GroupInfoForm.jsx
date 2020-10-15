@@ -106,12 +106,7 @@ export default function GroupInfoForm({
               </div>
               <div className="create-group-meta-info">
                 <h3>Basic Info</h3>
-                <FormTextInput
-                  label="Name"
-                  name="name"
-                  sideLabel
-                  customSpacing="0"
-                />
+                <FormTextInput label="Name" name="name" sideLabel />
                 <FormTextInput label="Location" name="location" sideLabel />
                 <FormTextInput
                   label="Institution"

@@ -62,7 +62,7 @@ export default function SearchPage() {
     <button
       onClick={() => setTab(tabName)}
       key={tabName}
-      className={tabName === tab ? 'feed-tab-active' : 'feed-tab'}
+      className={tabName === tab ? 'feed-tab-active' : 'feed-tab-inactive'}
     >
       <h3>{tabName}</h3>
     </button>

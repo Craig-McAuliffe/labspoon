@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {Link} from 'react-router-dom';
 import PropTypes from 'prop-types';
-
+import {SelectedListItemsContext} from '../../../pages/ResourcePages/GroupPage/EditGroupPosts';
 import {
   LectureIcon,
   ProjectIcon,
@@ -28,23 +28,70 @@ import './Post.css';
  * @return {React.ReactElement}
  */
 export default function Post({post, dedicatedPage, bookmarkedVariation}) {
-  const referencedResourceWrapper = () => {
-    if (dedicatedPage || post.url === undefined) return postContent();
+  const selectionVariation = useContext(SelectedListItemsContext);
+  const [isSelected, setIsSelected] = useState(false);
 
+  // Checks if the post should already be selected
+  useEffect(() => {
+    if (post.hasBeenSelected) setIsSelected(true);
+  }, [post.hasBeenSelected]);
+
+  // Checks if the parent component resets all selections
+  useEffect(() => {
+    if (selectionVariation) {
+      if (selectionVariation.resetSelection === true) setIsSelected(false);
+    }
+  }, [selectionVariation]);
+
+  const referencedResourceWrapper = () => {
+    if (dedicatedPage) return postContent();
     const referencedPublication = publications().filter(
       (publication) => publication.url === post.url
     )[0];
-    return referencedPublication ? (
-      <div className="post-referenced-resource-container">
-        <PublicationListItem
-          publication={referencedPublication}
-          removeBorder={true}
-        />
-        {postContent()}
-      </div>
-    ) : (
-      postContent()
-    );
+    if (referencedPublication)
+      return (
+        <div className="post-referenced-resource-container">
+          <PublicationListItem
+            publication={referencedPublication}
+            removeBorder={true}
+          />
+          {postContent()}
+        </div>
+      );
+    else if (post.hasSelector)
+      return (
+        <div className="post-with-selector-container">
+          {postContent()}
+          <div className="post-selector-container">
+            {post.hasSelector === 'active-add' ||
+            post.hasSelector === 'active-remove' ? (
+              <>
+                <button
+                  className={
+                    isSelected
+                      ? 'post-selector-button-active'
+                      : 'post-selector-button-inactive'
+                  }
+                  onClick={() =>
+                    selectPost(
+                      selectionVariation,
+                      isSelected,
+                      setIsSelected,
+                      post
+                    )
+                  }
+                />
+                <p className="post-selector-active-text">
+                  {post.hasSelector === 'active-add' ? 'Add' : 'Remove'}
+                </p>
+              </>
+            ) : (
+              <p className="post-selector-inactive-text">Already on group</p>
+            )}
+          </div>
+        </div>
+      );
+    else return postContent();
   };
 
   const postContent = () => (
@@ -92,7 +139,6 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
 Post.propTypes = {
   post: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
     postType: PropTypes.object.isRequired,
     author: PropTypes.shape({
       id: PropTypes.string.isRequired,
@@ -100,13 +146,6 @@ Post.propTypes = {
       avatar: PropTypes.string.isRequired,
     }).isRequired,
     content: PropTypes.object.isRequired,
-    topics: PropTypes.arrayOf(
-      PropTypes.exact({
-        id: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired,
-        resourceType: PropTypes.string.isRequired,
-      })
-    ),
     optionaltags: PropTypes.arrayOf(PropTypes.object.isRequired),
   }).isRequired,
 };
@@ -127,8 +166,11 @@ function PostHeader({postType, postAuthor, postCreationDate, dedicatedPage}) {
     >
       <div className="post-header-profile">
         <div className="post-header-avatar">
-          {postAuthor.avatar ? <UserAvatar src={postAuthor.avatar} width="60px" height="60px" /> : <img src={DefaultUserIcon} alt="user icon" />}
-          
+          {postAuthor.avatar ? (
+            <UserAvatar src={postAuthor.avatar} width="60px" height="60px" />
+          ) : (
+            <img src={DefaultUserIcon} alt="user icon" />
+          )}
         </div>
         <div>
           <h3>
@@ -201,3 +243,21 @@ export function PinnedPost({post}) {
     </div>
   );
 }
+
+const selectPost = (selectionVariation, isSelected, setIsSelected, post) => {
+  if (selectionVariation) {
+    const setFeedSelectionState = selectionVariation.setSelectedPosts;
+    isSelected
+      ? setFeedSelectionState((feedSelectionState) => {
+          const filteredSelectionState = feedSelectionState.filter(
+            (selectedPost) => selectedPost.id !== post.id
+          );
+          return filteredSelectionState;
+        })
+      : setFeedSelectionState((feedSelectionState) => [
+          ...feedSelectionState,
+          ...[post],
+        ]);
+    setIsSelected(!isSelected);
+  }
+};

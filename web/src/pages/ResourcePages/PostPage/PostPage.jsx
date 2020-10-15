@@ -6,6 +6,8 @@ import {getTestPosts} from '../../../mockdata/posts';
 import FilterableResults, {
   ResourceTabs,
   NewResultsWrapper,
+  FilterManager,
+  NewFilterMenuWrapper,
 } from '../../../components/FilterableResults/FilterableResults';
 import postPageFeedData from './PostPageFeedData';
 import publications from '../../../mockdata/publications';
@@ -109,7 +111,10 @@ export default function PostPage() {
         </div>
         <FilterableResults fetchResults={fetchResults} limit={10}>
           <div className="feed-container">
-            <ResourceTabs tabs={relationshipFilter} />
+            <FilterManager>
+              <NewFilterMenuWrapper />
+              <ResourceTabs tabs={relationshipFilter} />
+            </FilterManager>
             <NewResultsWrapper />
           </div>
         </FilterableResults>
