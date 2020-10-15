@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import * as Yup from 'yup';
-import firebase from '../../../../firebase';
+import firebase, {db} from '../../../../firebase';
 import {v4 as uuid} from 'uuid';
 import FormTextInput, {CreatePostTextArea} from '../../../Forms/FormTextInput';
 import PostForm from './PostForm';
@@ -18,10 +18,14 @@ export default function PublicationPostForm({
 }) {
   const {selectedTopics} = useContext(SelectedTopicsContext);
   const submitChanges = (res) => {
+    res.postType = {id: 'publicationPost', name: 'Publication'};
     selectedTopics.forEach((selectedTopic) => {
       if (selectedTopic.id === undefined) selectedTopic.id = uuid();
+      if (selectedTopic.isNew) {
+        db.doc(`topics/${selectedTopic.id}`).set(selectedTopic);
+        delete selectedTopic.isNew;
+      }
     });
-    res.postType = {id: 'publicationPost', name: 'Publication'};
     res.topics = selectedTopics;
     createPost(res)
       .then(() => {

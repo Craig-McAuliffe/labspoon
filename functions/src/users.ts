@@ -7,6 +7,7 @@ import {
   Publication,
   makPublicationToPublication,
 } from './microsoft';
+import {Topic} from './posts';
 
 const db = admin.firestore();
 
@@ -31,6 +32,41 @@ export const setUserIsFollowedBySelfOnCreation = functions.firestore
     if (user.avatar) userRef.avatar = user.avatar;
     await db.doc(`users/${userID}/followedByUsers/${userID}`).set(userRef);
   });
+
+export const addUserToRelatedTopicPage = functions.firestore
+  .document('users/{userID}/topics/{topicID}')
+  .onCreate(async (change, context) => {
+    const topic = change.data() as Topic;
+    const userID = context.params.userID;
+    setUserOnTopic(topic, userID);
+  });
+
+export const updateUserOnRelatedTopicPage = functions.firestore
+  .document('users/{userID}/topics/{topicID}')
+  .onUpdate(async (change, context) => {
+    const topic = change.after.data() as Topic;
+    const userID = context.params.userID;
+    setUserOnTopic(topic, userID);
+  });
+
+export async function setUserOnTopic(topic: Topic, userID: string) {
+  const userInTopicDocRef = db.doc(`topics/${topic.id}/users/${userID}`);
+  await db
+    .doc(`users/${userID}`)
+    .get()
+    .then((qs) => {
+      if (!qs.exists) return;
+      const user = qs.data() as UserRef;
+      const userRef = {
+        id: user.id,
+        name: user.name,
+        avatar: user.avatar,
+        rank: topic.rank,
+      };
+      userInTopicDocRef.set(userRef);
+    })
+    .catch((err) => console.log(err, 'could not search for user'));
+}
 
 // for a set of selected publications, set the user's microsoft academic ID
 export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall(
@@ -75,17 +111,34 @@ export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall
       .collection(`MSUsers/${microsoftAcademicAuthorID}/publications`)
       .get();
     const publicationWritePromises: Promise<null>[] = [];
-    msPublicationsForUserQS.forEach((msPublicationDS) => publicationWritePromises.push((async(resolve) => {
-      // Find the publication
-      const publicationsQS = await db.collection('publications').where('microsoftID', '==', msPublicationDS.id).limit(1).get();
-      if (publicationsQS.empty) {
-        console.log('No publication found with Microsoft Publication ID ', msPublicationDS.id, ' this should not happen and likely indicates a logic issue.');
-      }
-      const publicationDS = publicationsQS.docs[0];
-      batch.set(db.doc(`users/${userID}/publications/${publicationDS.id}`), publicationDS.data());
-      return null;
-    })()));
-    await Promise.all(publicationWritePromises).catch((err) => console.error(err));
+    msPublicationsForUserQS.forEach((msPublicationDS) =>
+      publicationWritePromises.push(
+        (async (resolve) => {
+          // Find the publication
+          const publicationsQS = await db
+            .collection('publications')
+            .where('microsoftID', '==', msPublicationDS.id)
+            .limit(1)
+            .get();
+          if (publicationsQS.empty) {
+            console.log(
+              'No publication found with Microsoft Publication ID ',
+              msPublicationDS.id,
+              ' this should not happen and likely indicates a logic issue.'
+            );
+          }
+          const publicationDS = publicationsQS.docs[0];
+          batch.set(
+            db.doc(`users/${userID}/publications/${publicationDS.id}`),
+            publicationDS.data()
+          );
+          return null;
+        })()
+      )
+    );
+    await Promise.all(publicationWritePromises).catch((err) =>
+      console.error(err)
+    );
     await batch.commit().catch((err) => console.error(err));
   }
 );
@@ -207,9 +260,10 @@ interface PublicationSuggestion {
   microsoftAcademicIDMatch: string;
   publicationInfo: Publication;
 }
-
+// Rank relates to how often the user posts in this topic
 export interface UserRef {
   id: string;
   name: string;
   avatar?: string;
+  rank?: number;
 }

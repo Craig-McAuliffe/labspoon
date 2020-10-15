@@ -55,12 +55,6 @@ export const createPost = functions.https.onCall(async (data, context) => {
 
   const batch = db.batch();
   batch.set(db.collection('posts').doc(postID), post);
-  post.topics.forEach((taggedTopic) => {
-    if (taggedTopic.isNew === true) {
-      const newTopic = {name: taggedTopic.name, id: taggedTopic.id};
-      batch.set(db.collection('topics').doc(taggedTopic.id), newTopic);
-    }
-  });
   batch.set(
     db.collection('users').doc(userID).collection('posts').doc(postID),
     post
@@ -165,6 +159,31 @@ export async function updateFilterCollection(
     return;
   }
 }
+// This also triggers the user to be added to the topic with the same rank
+export const linkPostTopicsToAuthor = functions.firestore
+  .document(`posts/{postID}`)
+  .onCreate(async (change, context) => {
+    const post = change.data() as Post;
+    const postTopics = post.topics;
+    const authorID = post.author.id;
+    postTopics.forEach((postTopic) => {
+      postTopic.rank = 1;
+      const userTopicDocRef = db.doc(
+        `users/${authorID}/topics/${postTopic.id}`
+      );
+      db.runTransaction((transaction) => {
+        return transaction.get(userTopicDocRef).then((qs: any) => {
+          if (!qs.exists) {
+            transaction.set(userTopicDocRef, postTopic);
+          } else {
+            transaction.update(userTopicDocRef, {
+              rank: firestore.FieldValue.increment(1),
+            });
+          }
+        });
+      });
+    });
+  });
 
 interface FilterOption {
   name: string;
@@ -191,11 +210,11 @@ export interface Post {
   filterAuthorID: string;
   filterTopicIDs: string[];
 }
-
+// Rank relates to how often the resource mentions this topic
 export interface Topic {
   id: string;
   name: string;
-  isNew?: boolean;
+  rank?: number;
 }
 
 export interface PostContent {
