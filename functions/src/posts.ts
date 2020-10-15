@@ -221,6 +221,7 @@ export interface Topic {
   id: string;
   name: string;
   isNew?: boolean;
+  rank?: number;
 }
 
 export interface PostContent {

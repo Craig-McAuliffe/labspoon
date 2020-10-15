@@ -8,6 +8,7 @@ import {
   Publication,
   makPublicationToPublication,
 } from './microsoft';
+import {Topic} from './posts';
 
 const db = admin.firestore();
 
@@ -33,65 +34,41 @@ export const setUserIsFollowedBySelfOnCreation = functions.firestore
     await db.doc(`users/${userID}/followedByUsers/${userID}`).set(userRef);
   });
 
-export const addUserToRelevantTopicPages = functions.firestore
+export const addUserToRelatedTopicPage = functions.firestore
   .document('users/{userID}/topics/{topicID}')
   .onCreate(async (change, context) => {
-    const topic = change.data();
+    const topic = change.data() as Topic;
     const userID = context.params.userID;
-    const userInTopicDocRef = db.doc(`topics/${topic.id}/users/${userID}`);
-
-    await db.runTransaction((transaction) => {
-      return transaction
-        .get(db.doc(`users/${userID}`))
-        .then((qs) => {
-          if (!qs.exists) return;
-          const user = qs.data() as UserRef;
-          const userRef = {
-            id: user.id,
-            name: user.name,
-            avatar: user.avatar,
-            rank: topic.rank,
-          };
-          transaction.set(userInTopicDocRef, userRef);
-        })
-        .catch((err) => console.log(err, 'could not search for user'));
-    });
+    setUserOnTopic(topic, userID);
   });
 
-export const setUserAndRankOnTopicPage = functions.firestore
+export const updateUserOnRelatedTopicPage = functions.firestore
   .document('users/{userID}/topics/{topicID}')
   .onUpdate(async (change, context) => {
+    const topic = change.after.data() as Topic;
     const userID = context.params.userID;
-    const topic = change.after.data();
-    const userInTopicDocRef = db.doc(`topics/${topic.id}/users/${userID}`);
-    await db.runTransaction((transaction) => {
-      return transaction
-        .get(userInTopicDocRef)
-        .then((qs: any) => {
-          if (!qs.exists) {
-            transaction
-              .get(db.doc(`users/${userID}`))
-              .then((qs: any) => {
-                const user = qs.data() as UserRef;
-                const userRef = {
-                  id: user.id,
-                  name: user.name,
-                  avatar: user.avatar,
-                  rank: topic.rank,
-                };
-                transaction.set(userInTopicDocRef, userRef);
-              })
-              .catch((err) => console.log(err, 'could not set user on topic'));
-          } else
-            userInTopicDocRef
-              .update({rank: topic.rank})
-              .catch((err) =>
-                console.log(err, 'could not update user rank on topic')
-              );
-        })
-        .catch((err) => console.log(err, 'could not search for user on topic'));
-    });
+    setUserOnTopic(topic, userID);
   });
+
+export async function setUserOnTopic(topic: Topic, userID: string) {
+  const userInTopicDocRef = db.doc(`topics/${topic.id}/users/${userID}`);
+  await db.runTransaction((transaction) => {
+    return transaction
+      .get(db.doc(`users/${userID}`))
+      .then((qs) => {
+        if (!qs.exists) return;
+        const user = qs.data() as UserRef;
+        const userRef = {
+          id: user.id,
+          name: user.name,
+          avatar: user.avatar,
+          rank: topic.rank,
+        };
+        transaction.set(userInTopicDocRef, userRef);
+      })
+      .catch((err) => console.log(err, 'could not search for user'));
+  });
+}
 
 // for a set of selected publications, set the user's microsoft academic ID
 export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall(
