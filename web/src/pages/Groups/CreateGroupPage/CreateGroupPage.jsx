@@ -57,8 +57,9 @@ export default function CreateGroupPage({
         const memberRef = {
           id: member.id,
           name: member.name,
-        }
-        if (member.avatar) memberRef.avatar = member.avatar;
+          avatar: member.avatar ? member.avatar : '',
+        };
+
         batch.set(groupDocRef.collection('members').doc(member.id), memberRef);
         batch.set(db.doc(`users/${member.id}/groups/${groupID}`), groupRef);
       });

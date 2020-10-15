@@ -7,6 +7,8 @@ import './GroupPage.css';
 export default function EditingGroupInfo({groupData, setEditingGroup}) {
   const groupID = groupData.id;
   const [groupMembers, setGroupMembers] = useState([]);
+  const [selectedUsers, setSelectedUsers] = useState([]);
+
   useEffect(() => {
     const fetchGroupMembers = db
       .collection(`groups/${groupID}/members`)
@@ -23,6 +25,10 @@ export default function EditingGroupInfo({groupData, setEditingGroup}) {
     fetchGroupMembers.then((fetchedMembers) => setGroupMembers(fetchedMembers));
   }, [groupID]);
 
+  useEffect(() => {
+    setSelectedUsers(groupMembers);
+  }, [groupMembers]);
+
   const initialValues = {
     name: groupData.name,
     location: groupData.location,
@@ -31,11 +37,36 @@ export default function EditingGroupInfo({groupData, setEditingGroup}) {
     about: groupData.about,
   };
 
-  const onEditSubmit = (values) => {
+  const onSubmitEdit = (values) => {
+    const memberIDsToBeRemoved = [];
+    groupMembers.forEach((existingGroupMember) => {
+      if (
+        !selectedUsers.some(
+          (newGroupMember) => newGroupMember.id === existingGroupMember.id
+        )
+      )
+        memberIDsToBeRemoved.push(existingGroupMember.id);
+    });
     const writeToDB = () => {
       const batch = db.batch();
       const groupDocRef = db.doc(`groups/${groupID}`);
       batch.update(groupDocRef, values);
+      selectedUsers.forEach((newMember) => {
+        const memberRef = {
+          id: newMember.id,
+          name: newMember.name,
+          avatar: newMember.avatar ? newMember.avatar : '',
+        };
+        batch.set(
+          groupDocRef.collection('members').doc(newMember.id),
+          memberRef
+        );
+      });
+      memberIDsToBeRemoved.forEach((memberIDToBeRemoved) => {
+        batch.delete(
+          groupDocRef.collection('members').doc(memberIDToBeRemoved)
+        );
+      });
       batch
         .commit()
         .catch((err) => alert('batch failed to commit'))
@@ -48,9 +79,9 @@ export default function EditingGroupInfo({groupData, setEditingGroup}) {
   return (
     <GroupInfoForm
       initialValues={initialValues}
-      onSubmit={onEditSubmit}
-      selectedUsers={groupMembers}
-      setSelectedUsers={() => {}}
+      onSubmit={onSubmitEdit}
+      selectedUsers={selectedUsers}
+      setSelectedUsers={setSelectedUsers}
       existingAvatar={groupData.avatar}
       cancelForm={() => setEditingGroup(false)}
       submitText="Save Changes"

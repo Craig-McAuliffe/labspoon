@@ -27,34 +27,37 @@ export default function CreatePost({pinnedPost}) {
   }, [creatingPost]);
 
   if (!user) return null;
-  return creatingPost ? (
-    <SelectedTopicsContext.Provider
-      value={{
-        selectedTopics: selectedTopics,
-        setSelectedTopics: setSelectedTopics,
-      }}
-    >
-      <PostTypeSpecificForm
-        cancelPost={cancelPost}
-        setCreatingPost={setCreatingPost}
-      />
-    </SelectedTopicsContext.Provider>
-  ) : pinnedPost ? (
-    <button
-      onClick={() => setCreatingPost(true)}
-      className="create-pinned-post-button"
-    >
-      <WriteIcon />
-      <h3>Create Pinned Post</h3>
-    </button>
-  ) : (
-    <div className="not-creating-post-container">
-      <button onClick={() => setCreatingPost(true)}>
+  if (creatingPost)
+    return (
+      <SelectedTopicsContext.Provider
+        value={{
+          selectedTopics: selectedTopics,
+          setSelectedTopics: setSelectedTopics,
+        }}
+      >
+        <PostTypeSpecificForm
+          cancelPost={cancelPost}
+          setCreatingPost={setCreatingPost}
+        />
+      </SelectedTopicsContext.Provider>
+    );
+  else
+    return pinnedPost ? (
+      <button
+        onClick={() => setCreatingPost(true)}
+        className="create-pinned-post-button"
+      >
         <WriteIcon />
-        <p className="not-creating-post-text">Post to your followers</p>
+        <h3>Create Pinned Post</h3>
       </button>
-    </div>
-  );
+    ) : (
+      <div className="not-creating-post-container">
+        <button onClick={() => setCreatingPost(true)}>
+          <WriteIcon />
+          <p className="not-creating-post-text">Post to your followers</p>
+        </button>
+      </div>
+    );
 }
 
 function PostTypeSpecificForm({cancelPost, setCreatingPost}) {
