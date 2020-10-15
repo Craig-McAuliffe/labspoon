@@ -173,12 +173,20 @@ export const linkPostTopicsToAuthor = functions.firestore
     const postTopics = post.topics;
     const authorID = post.author.id;
     postTopics.forEach((postTopic) => {
-      const trimmedTopic = {name: postTopic.name, id: postTopic.id};
+      const trimmedTopic = {name: postTopic.name, id: postTopic.id, rank: 1};
       const userTopicDocRef = db.doc(
         `users/${authorID}/topics/${postTopic.id}`
       );
-      userTopicDocRef.set(trimmedTopic, {merge: true}).then(() => {
-        userTopicDocRef.update({rank: firestore.FieldValue.increment(1)});
+      db.runTransaction((transaction) => {
+        return transaction.get(userTopicDocRef).then((qs: any) => {
+          if (!qs.exists) {
+            transaction.set(userTopicDocRef, trimmedTopic);
+          } else {
+            transaction.update(userTopicDocRef, {
+              rank: firestore.FieldValue.increment(1),
+            });
+          }
+        });
       });
     });
   });

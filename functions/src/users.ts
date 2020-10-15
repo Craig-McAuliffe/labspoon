@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import {admin} from './config';
-import {firestore} from 'firebase-admin';
+// import {firestore} from 'firebase-admin';
 import {
   interpretQuery,
   executeExpression,
@@ -36,38 +36,61 @@ export const setUserIsFollowedBySelfOnCreation = functions.firestore
 export const addUserToRelevantTopicPages = functions.firestore
   .document('users/{userID}/topics/{topicID}')
   .onCreate(async (change, context) => {
-    const topicID = change.id;
+    const topic = change.data();
     const userID = context.params.userID;
-    const userInTopicDocRef = db.doc(`topics/${topicID}/users/${userID}`);
-    const userRef: UserRef = {
-      id: '',
-      name: '',
-      avatar: '',
-    };
-    await db
-      .doc(`users/${userID}`)
-      .get()
-      .then((qs) => {
-        if (!qs.exists) return;
-        const user = qs.data() as UserRef;
-        userRef.id = user.id;
-        userRef.name = user.name;
-        userRef.avatar = user.avatar;
-      });
-    await userInTopicDocRef
-      .set(userRef, {merge: true})
-      .then(() =>
-        userInTopicDocRef.update({rank: firestore.FieldValue.increment(1)})
-      );
+    const userInTopicDocRef = db.doc(`topics/${topic.id}/users/${userID}`);
+
+    await db.runTransaction((transaction) => {
+      return transaction
+        .get(db.doc(`users/${userID}`))
+        .then((qs) => {
+          if (!qs.exists) return;
+          const user = qs.data() as UserRef;
+          const userRef = {
+            id: user.id,
+            name: user.name,
+            avatar: user.avatar,
+            rank: topic.rank,
+          };
+          transaction.set(userInTopicDocRef, userRef);
+        })
+        .catch((err) => console.log(err, 'could not search for user'));
+    });
   });
 
-export const updateUserRankOnTopicPage = functions.firestore
+export const setUserAndRankOnTopicPage = functions.firestore
   .document('users/{userID}/topics/{topicID}')
   .onUpdate(async (change, context) => {
     const userID = context.params.userID;
     const topic = change.after.data();
     const userInTopicDocRef = db.doc(`topics/${topic.id}/users/${userID}`);
-    await userInTopicDocRef.set(topic);
+    await db.runTransaction((transaction) => {
+      return transaction
+        .get(userInTopicDocRef)
+        .then((qs: any) => {
+          if (!qs.exists) {
+            transaction
+              .get(db.doc(`users/${userID}`))
+              .then((qs: any) => {
+                const user = qs.data() as UserRef;
+                const userRef = {
+                  id: user.id,
+                  name: user.name,
+                  avatar: user.avatar,
+                  rank: topic.rank,
+                };
+                transaction.set(userInTopicDocRef, userRef);
+              })
+              .catch((err) => console.log(err, 'could not set user on topic'));
+          } else
+            userInTopicDocRef
+              .update({rank: topic.rank})
+              .catch((err) =>
+                console.log(err, 'could not update user rank on topic')
+              );
+        })
+        .catch((err) => console.log(err, 'could not search for user on topic'));
+    });
   });
 
 // for a set of selected publications, set the user's microsoft academic ID
@@ -267,4 +290,5 @@ export interface UserRef {
   id: string;
   name: string;
   avatar?: string;
+  rank?: number;
 }
