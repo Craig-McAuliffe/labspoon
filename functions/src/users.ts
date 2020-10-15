@@ -52,22 +52,21 @@ export const updateUserOnRelatedTopicPage = functions.firestore
 
 export async function setUserOnTopic(topic: Topic, userID: string) {
   const userInTopicDocRef = db.doc(`topics/${topic.id}/users/${userID}`);
-  await db.runTransaction((transaction) => {
-    return transaction
-      .get(db.doc(`users/${userID}`))
-      .then((qs) => {
-        if (!qs.exists) return;
-        const user = qs.data() as UserRef;
-        const userRef = {
-          id: user.id,
-          name: user.name,
-          avatar: user.avatar,
-          rank: topic.rank,
-        };
-        transaction.set(userInTopicDocRef, userRef);
-      })
-      .catch((err) => console.log(err, 'could not search for user'));
-  });
+  await db
+    .doc(`users/${userID}`)
+    .get()
+    .then((qs) => {
+      if (!qs.exists) return;
+      const user = qs.data() as UserRef;
+      const userRef = {
+        id: user.id,
+        name: user.name,
+        avatar: user.avatar,
+        rank: topic.rank,
+      };
+      userInTopicDocRef.set(userRef);
+    })
+    .catch((err) => console.log(err, 'could not search for user'));
 }
 
 // for a set of selected publications, set the user's microsoft academic ID
