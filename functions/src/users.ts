@@ -1,6 +1,5 @@
 import * as functions from 'firebase-functions';
 import {admin} from './config';
-// import {firestore} from 'firebase-admin';
 import {
   interpretQuery,
   executeExpression,
@@ -261,7 +260,7 @@ interface PublicationSuggestion {
   microsoftAcademicIDMatch: string;
   publicationInfo: Publication;
 }
-
+// Rank relates to how often the user posts in this topic
 export interface UserRef {
   id: string;
   name: string;

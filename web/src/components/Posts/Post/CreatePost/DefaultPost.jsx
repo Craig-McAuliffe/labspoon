@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import firebase from '../../../../firebase';
+import firebase, {db} from '../../../../firebase';
 import * as Yup from 'yup';
 import {v4 as uuid} from 'uuid';
 import PostForm from './PostForm';
@@ -19,10 +19,14 @@ export default function DefaultPost({
   const {selectedTopics} = useContext(SelectedTopicsContext);
 
   const submitChanges = (res) => {
+    res.postType = {id: 'defaultPost', name: 'Default'};
     selectedTopics.forEach((selectedTopic) => {
       if (selectedTopic.id === undefined) selectedTopic.id = uuid();
+      if (selectedTopic.isNew) {
+        db.doc(`topics/${selectedTopic.id}`).set(selectedTopic);
+        delete selectedTopic.isNew;
+      }
     });
-    res.postType = {id: 'defaultPost', name: 'Default'};
     res.topics = selectedTopics;
     createPost(res)
       .then(() => {

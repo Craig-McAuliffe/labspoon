@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import * as Yup from 'yup';
-import firebase from '../../../../firebase';
+import firebase, {db} from '../../../../firebase';
 import {v4 as uuid} from 'uuid';
 import FormTextInput, {CreatePostTextArea} from '../../../Forms/FormTextInput';
 import FormDateInput from '../../../Forms/FormDateInput';
@@ -19,10 +19,14 @@ export default function OpenPositionPostForm({
 }) {
   const {selectedTopics} = useContext(SelectedTopicsContext);
   const submitChanges = (res) => {
+    res.postType = {id: 'openPositionPost', name: 'Open Position'};
     selectedTopics.forEach((selectedTopic) => {
       if (selectedTopic.id === undefined) selectedTopic.id = uuid();
+      if (selectedTopic.isNew) {
+        db.doc(`topics/${selectedTopic.id}`).set(selectedTopic);
+        delete selectedTopic.isNew;
+      }
     });
-    res.postType = {id: 'openPositionPost', name: 'Open Position'};
     res.topics = selectedTopics;
     createPost(res)
       .then(() => {
