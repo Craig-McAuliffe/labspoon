@@ -1,5 +1,6 @@
 import * as functions from 'firebase-functions';
 import {admin} from './config';
+import {firestore} from 'firebase-admin';
 import {
   interpretQuery,
   executeExpression,
@@ -30,6 +31,43 @@ export const setUserIsFollowedBySelfOnCreation = functions.firestore
     };
     if (user.avatar) userRef.avatar = user.avatar;
     await db.doc(`users/${userID}/followedByUsers/${userID}`).set(userRef);
+  });
+
+export const addUserToRelevantTopicPages = functions.firestore
+  .document('users/{userID}/topics/{topicID}')
+  .onCreate(async (change, context) => {
+    const topicID = change.id;
+    const userID = context.params.userID;
+    const userInTopicDocRef = db.doc(`topics/${topicID}/users/${userID}`);
+    const userRef: UserRef = {
+      id: '',
+      name: '',
+      avatar: '',
+    };
+    await db
+      .doc(`users/${userID}`)
+      .get()
+      .then((qs) => {
+        if (!qs.exists) return;
+        const user = qs.data() as UserRef;
+        userRef.id = user.id;
+        userRef.name = user.name;
+        userRef.avatar = user.avatar;
+      });
+    await userInTopicDocRef
+      .set(userRef, {merge: true})
+      .then(() =>
+        userInTopicDocRef.update({rank: firestore.FieldValue.increment(1)})
+      );
+  });
+
+export const updateUserRankOnTopicPage = functions.firestore
+  .document('users/{userID}/topics/{topicID}')
+  .onUpdate(async (change, context) => {
+    const userID = context.params.userID;
+    const topic = change.after.data();
+    const userInTopicDocRef = db.doc(`topics/${topic.id}/users/${userID}`);
+    await userInTopicDocRef.set(topic);
   });
 
 // for a set of selected publications, set the user's microsoft academic ID
@@ -75,17 +113,34 @@ export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall
       .collection(`MSUsers/${microsoftAcademicAuthorID}/publications`)
       .get();
     const publicationWritePromises: Promise<null>[] = [];
-    msPublicationsForUserQS.forEach((msPublicationDS) => publicationWritePromises.push((async(resolve) => {
-      // Find the publication
-      const publicationsQS = await db.collection('publications').where('microsoftID', '==', msPublicationDS.id).limit(1).get();
-      if (publicationsQS.empty) {
-        console.log('No publication found with Microsoft Publication ID ', msPublicationDS.id, ' this should not happen and likely indicates a logic issue.');
-      }
-      const publicationDS = publicationsQS.docs[0];
-      batch.set(db.doc(`users/${userID}/publications/${publicationDS.id}`), publicationDS.data());
-      return null;
-    })()));
-    await Promise.all(publicationWritePromises).catch((err) => console.error(err));
+    msPublicationsForUserQS.forEach((msPublicationDS) =>
+      publicationWritePromises.push(
+        (async (resolve) => {
+          // Find the publication
+          const publicationsQS = await db
+            .collection('publications')
+            .where('microsoftID', '==', msPublicationDS.id)
+            .limit(1)
+            .get();
+          if (publicationsQS.empty) {
+            console.log(
+              'No publication found with Microsoft Publication ID ',
+              msPublicationDS.id,
+              ' this should not happen and likely indicates a logic issue.'
+            );
+          }
+          const publicationDS = publicationsQS.docs[0];
+          batch.set(
+            db.doc(`users/${userID}/publications/${publicationDS.id}`),
+            publicationDS.data()
+          );
+          return null;
+        })()
+      )
+    );
+    await Promise.all(publicationWritePromises).catch((err) =>
+      console.error(err)
+    );
     await batch.commit().catch((err) => console.error(err));
   }
 );

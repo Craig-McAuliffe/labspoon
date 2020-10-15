@@ -166,6 +166,23 @@ export async function updateFilterCollection(
   }
 }
 
+export const linkPostTopicsToAuthor = functions.firestore
+  .document(`posts/{postID}`)
+  .onCreate(async (change, context) => {
+    const post = change.data() as Post;
+    const postTopics = post.topics;
+    const authorID = post.author.id;
+    postTopics.forEach((postTopic) => {
+      const trimmedTopic = {name: postTopic.name, id: postTopic.id};
+      const userTopicDocRef = db.doc(
+        `users/${authorID}/topics/${postTopic.id}`
+      );
+      userTopicDocRef.set(trimmedTopic, {merge: true}).then(() => {
+        userTopicDocRef.update({rank: firestore.FieldValue.increment(1)});
+      });
+    });
+  });
+
 interface FilterOption {
   name: string;
   avatar?: string;
