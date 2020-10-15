@@ -185,6 +185,66 @@ export const linkPostTopicsToAuthor = functions.firestore
     });
   });
 
+// This also triggers the group to be added to the topic with the same rank
+export const addPostTopicsToGroup = functions.firestore
+  .document(`groups/{groupID}/posts/{postID}`)
+  .onCreate(async (change, context) => {
+    const post = change.data() as Post;
+    const postTopics = post.topics;
+    const groupID = context.params.groupID;
+    postTopics.forEach((postTopic) => {
+      postTopic.rank = 1;
+      const groupTopicDocRef = db.doc(
+        `groups/${groupID}/topics/${postTopic.id}`
+      );
+      db.runTransaction((transaction) => {
+        return transaction.get(groupTopicDocRef).then((qs: any) => {
+          if (!qs.exists) {
+            transaction.set(groupTopicDocRef, postTopic);
+          } else {
+            transaction.update(groupTopicDocRef, {
+              rank: firestore.FieldValue.increment(1),
+            });
+          }
+        });
+      });
+    });
+  });
+
+// This also triggers the group to be added to the topic with the same rank
+export const removePostTopicsFromGroup = functions.firestore
+  .document(`groups/{groupID}/posts/{postID}`)
+  .onDelete(async (change, context) => {
+    const post = change.data() as Post;
+    const postTopics = post.topics;
+    const groupID = context.params.groupID;
+    postTopics.forEach((postTopic) => {
+      const groupTopicDocRef = db.doc(
+        `groups/${groupID}/topics/${postTopic.id}`
+      );
+      return groupTopicDocRef
+        .get()
+        .then((qs: any) => {
+          if (!qs.exists) return;
+          const topicRank = qs.data().rank;
+          if (topicRank === 1) {
+            groupTopicDocRef
+              .delete()
+              .catch((err) =>
+                console.log(err, 'could not delete topic on group')
+              );
+          } else {
+            groupTopicDocRef
+              .update({rank: topicRank - 1})
+              .catch((err) =>
+                console.log(err, 'could not decrease topic rank on group')
+              );
+          }
+        })
+        .catch((err) => console.log(err, 'could not fetch the group topic'));
+    });
+  });
+
 interface FilterOption {
   name: string;
   avatar?: string;

@@ -23,8 +23,8 @@ export default function OpenPositionPostForm({
     selectedTopics.forEach((selectedTopic) => {
       if (selectedTopic.id === undefined) selectedTopic.id = uuid();
       if (selectedTopic.isNew) {
-        db.doc(`topics/${selectedTopic.id}`).set(selectedTopic);
         delete selectedTopic.isNew;
+        db.doc(`topics/${selectedTopic.id}`).set(selectedTopic);
       }
     });
     res.topics = selectedTopics;
