@@ -114,7 +114,10 @@ export default function SearchPage() {
               {tab === POSTS ? (
                 <Index indexName={abbrEnv + '_POSTS'}>
                   <Hits
-                    hitComponent={({hit}) => <GenericListItem result={hit} />}
+                    hitComponent={({hit}) => {
+                      hit.id = hit.objectID;
+                      return <GenericListItem result={hit} />;
+                    }}
                   />
                 </Index>
               ) : (
