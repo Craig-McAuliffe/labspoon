@@ -22,7 +22,9 @@ import FilterableResults, {
   NewFilterMenuWrapper,
   FilterManager,
 } from '../../../components/FilterableResults/FilterableResults';
+import EditUserPage from './EditUserPage';
 import MessageButton from '../../../components/Buttons/MessageButton';
+import EditButton from '../../../components/Buttons/EditButton';
 import {UserPageAvatar} from '../../../components/Avatar/UserAvatar';
 import FollowUserButton from '../../../components/User/FollowUserButton/FollowUserButton';
 
@@ -32,6 +34,7 @@ export default function UserPage() {
   const featureFlags = useContext(FeatureFlags);
   const [userID, setUserID] = useState(undefined);
   const [userDetails, setUserDetails] = useState(undefined);
+  const [editingUserProfile, setEditingUserProfile] = useState(false);
   const history = useHistory();
 
   const userIDParam = useParams().userID;
@@ -141,7 +144,13 @@ export default function UserPage() {
       },
     });
   }
-
+  if (editingUserProfile)
+    return (
+      <EditUserPage
+        user={userDetails}
+        cancelEdit={() => setEditingUserProfile(false)}
+      />
+    );
   return (
     <div className="content-layout">
       {featureFlags.has('related-resources') ? (
@@ -150,7 +159,10 @@ export default function UserPage() {
         <></>
       )}
       <div className="details-container">
-        <UserDetails user={userDetails} />
+        <UserDetails
+          user={userDetails}
+          setEditingUserProfile={setEditingUserProfile}
+        />
       </div>
       <FilterableResults fetchResults={fetchFeedData} limit={10}>
         <div className="feed-container">
@@ -178,7 +190,7 @@ function SuggestedUsers({userID}) {
   );
 }
 
-function UserDetails({user}) {
+function UserDetails({user, setEditingUserProfile}) {
   const {userProfile} = useContext(AuthContext);
   if (user === undefined) return <></>;
   const ownProfile = userProfile && userProfile.id === user.id;
@@ -214,8 +226,19 @@ function UserDetails({user}) {
         </div>
       </div>
       <div className="user-message-follow">
-        <MessageButton />
-        {!ownProfile ? <FollowUserButton targetUser={user} /> : <></>}
+        {ownProfile ? (
+          <>
+            <div></div>
+            <EditButton editAction={() => setEditingUserProfile(true)}>
+              Edit Profile
+            </EditButton>
+          </>
+        ) : (
+          <>
+            <MessageButton />
+            <FollowUserButton targetUser={user} />{' '}
+          </>
+        )}
       </div>
     </div>
   );
