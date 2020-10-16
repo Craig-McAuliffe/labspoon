@@ -4,7 +4,7 @@ import firebase, {db} from '../../../../firebase';
 import {v4 as uuid} from 'uuid';
 import FormTextInput, {CreatePostTextArea} from '../../../Forms/FormTextInput';
 import PostForm from './PostForm';
-import {SelectedTopicsContext} from './CreatePost';
+import {CreatingPostContext} from './CreatePost';
 
 import './CreatePost.css';
 
@@ -16,7 +16,7 @@ export default function PublicationPostForm({
   setPostType,
   postType,
 }) {
-  const {selectedTopics} = useContext(SelectedTopicsContext);
+  const {selectedTopics, setPostSuccess} = useContext(CreatingPostContext);
   const submitChanges = (res) => {
     res.postType = {id: 'publicationPost', name: 'Publication'};
     selectedTopics.forEach((selectedTopic) => {
@@ -30,7 +30,7 @@ export default function PublicationPostForm({
     createPost(res)
       .then(() => {
         setCreatingPost(false);
-        window.location.reload();
+        setPostSuccess(true);
       })
       .catch((err) => alert(err));
   };

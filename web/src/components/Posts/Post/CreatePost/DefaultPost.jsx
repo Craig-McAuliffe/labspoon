@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 import {v4 as uuid} from 'uuid';
 import PostForm from './PostForm';
 import {CreatePostTextArea} from '../../../Forms/FormTextInput';
-import {SelectedTopicsContext} from './CreatePost';
+import {CreatingPostContext} from './CreatePost';
 
 import './CreatePost.css';
 
@@ -16,7 +16,7 @@ export default function DefaultPost({
   postType,
   setCreatingPost,
 }) {
-  const {selectedTopics} = useContext(SelectedTopicsContext);
+  const {selectedTopics, setPostSuccess} = useContext(CreatingPostContext);
 
   const submitChanges = (res) => {
     res.postType = {id: 'defaultPost', name: 'Default'};
@@ -31,7 +31,7 @@ export default function DefaultPost({
     createPost(res)
       .then(() => {
         setCreatingPost(false);
-        window.location.reload();
+        setPostSuccess(true);
       })
       .catch((err) => alert(err));
   };
