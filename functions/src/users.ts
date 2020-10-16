@@ -38,7 +38,9 @@ export const addUserToRelatedTopicPage = functions.firestore
   .onCreate(async (change, context) => {
     const topic = change.data() as Topic;
     const userID = context.params.userID;
-    setUserOnTopic(topic, userID);
+    setUserOnTopic(topic, userID).catch((err) =>
+      console.log(err, 'could not add user to topic')
+    );
   });
 
 export const updateUserOnRelatedTopicPage = functions.firestore
@@ -46,7 +48,9 @@ export const updateUserOnRelatedTopicPage = functions.firestore
   .onUpdate(async (change, context) => {
     const topic = change.after.data() as Topic;
     const userID = context.params.userID;
-    setUserOnTopic(topic, userID);
+    setUserOnTopic(topic, userID).catch((err) =>
+      console.log(err, 'could not update user rank on topic')
+    );
   });
 
 export async function setUserOnTopic(topic: Topic, userID: string) {
@@ -63,7 +67,9 @@ export async function setUserOnTopic(topic: Topic, userID: string) {
         avatar: user.avatar,
         rank: topic.rank,
       };
-      userInTopicDocRef.set(userRef);
+      userInTopicDocRef
+        .set(userRef)
+        .catch((err) => console.log(err, 'could not set user on topic'));
     })
     .catch((err) => console.log(err, 'could not search for user'));
 }

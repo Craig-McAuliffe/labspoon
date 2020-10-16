@@ -142,11 +142,17 @@ export async function updateFilterCollection(
       }
       const filterOptionData = qs.data() as FilterOption;
       if (!filterOptionData.rank) return;
-      const filterOptionRank = filterOptionData.rank as number;
+      const filterOptionRank = filterOptionData.rank;
       if (filterOptionRank === 1) {
-        filterOptionDocRef.delete();
+        filterOptionDocRef
+          .delete()
+          .catch((err) => console.log(err, 'could not delete filter option'));
       } else {
-        filterOptionDocRef.update({rank: filterOptionRank - 1});
+        filterOptionDocRef
+          .update({rank: filterOptionRank - 1})
+          .catch((err) =>
+            console.log(err, 'could not decrease filter option rank')
+          );
       }
     });
     return;
@@ -171,16 +177,25 @@ export const linkPostTopicsToAuthor = functions.firestore
       const userTopicDocRef = db.doc(
         `users/${authorID}/topics/${postTopic.id}`
       );
-      db.runTransaction((transaction) => {
-        return transaction.get(userTopicDocRef).then((qs: any) => {
-          if (!qs.exists) {
-            transaction.set(userTopicDocRef, postTopic);
-          } else {
-            transaction.update(userTopicDocRef, {
+      userTopicDocRef.get().then((qs: any) => {
+        if (!qs.exists) {
+          userTopicDocRef
+            .set(postTopic)
+            .catch((err) =>
+              console.log(err, 'could not link post topics to author')
+            );
+        } else {
+          userTopicDocRef
+            .update({
               rank: firestore.FieldValue.increment(1),
-            });
-          }
-        });
+            })
+            .catch((err) =>
+              console.log(
+                err,
+                'could not update author topics ranks from post topics'
+              )
+            );
+        }
       });
     });
   });
@@ -197,16 +212,25 @@ export const addPostTopicsToGroup = functions.firestore
       const groupTopicDocRef = db.doc(
         `groups/${groupID}/topics/${postTopic.id}`
       );
-      db.runTransaction((transaction) => {
-        return transaction.get(groupTopicDocRef).then((qs: any) => {
-          if (!qs.exists) {
-            transaction.set(groupTopicDocRef, postTopic);
-          } else {
-            transaction.update(groupTopicDocRef, {
+      return groupTopicDocRef.get().then((qs: any) => {
+        if (!qs.exists) {
+          groupTopicDocRef
+            .set(postTopic)
+            .catch((err) =>
+              console.log(err, 'could not link post topics to group')
+            );
+        } else {
+          groupTopicDocRef
+            .update({
               rank: firestore.FieldValue.increment(1),
-            });
-          }
-        });
+            })
+            .catch((err) =>
+              console.log(
+                err,
+                'could not update group topics ranks from post topics'
+              )
+            );
+        }
       });
     });
   });

@@ -5,8 +5,7 @@ const spawn = require('child-process-promise').spawn;
 import * as path from 'path';
 import * as os from 'os';
 import * as fs from 'fs';
-import {updateFilterCollection, Post} from './posts';
-import {Topic} from './posts';
+import {updateFilterCollection, Post, Topic} from './posts';
 
 const db: firestore.Firestore = admin.firestore();
 
@@ -50,7 +49,10 @@ export const createGroupDocuments = functions.firestore
     const groupID = context.params.groupID;
     db.collection(`groups/${groupID}/feeds`)
       .doc(`postsFeed`)
-      .set({id: 'postsFeed'});
+      .set({id: 'postsFeed'})
+      .catch((err) =>
+        console.log(err, 'could not create postsFeed for new group')
+      );
   });
 
 export const addGroupMembersToPostFilter = functions.firestore
@@ -68,6 +70,11 @@ export const addGroupMembersToPostFilter = functions.firestore
         avatar: post.author.avatar,
       },
       false
+    ).catch((err) =>
+      console.log(
+        err,
+        'could not update author option on group posts feed filter'
+      )
     );
   });
 
@@ -86,6 +93,11 @@ export const removeGroupMembersFromPostFilter = functions.firestore
         avatar: post.author.avatar,
       },
       true
+    ).catch((err) =>
+      console.log(
+        err,
+        'could not remove author option on group posts feed filter'
+      )
     );
   });
 
@@ -94,7 +106,9 @@ export const addGroupToRelatedTopicPage = functions.firestore
   .onCreate(async (change, context) => {
     const topic = change.data() as Topic;
     const groupID = context.params.groupID;
-    setGroupOnTopic(topic, groupID);
+    setGroupOnTopic(topic, groupID).catch((err) =>
+      console.log(err, 'could not add group to topic')
+    );
   });
 
 export const updateGroupOnRelatedTopicPage = functions.firestore
@@ -102,7 +116,9 @@ export const updateGroupOnRelatedTopicPage = functions.firestore
   .onUpdate(async (change, context) => {
     const topic = change.after.data() as Topic;
     const groupID = context.params.groupID;
-    setGroupOnTopic(topic, groupID);
+    setGroupOnTopic(topic, groupID).catch((err) =>
+      console.log(err, 'could not update group rank on topic')
+    );
   });
 
 export const removeGroupOnRelatedTopicPage = functions.firestore
