@@ -57,7 +57,7 @@ export default function CreateGroupPage({
         const memberRef = {
           id: member.id,
           name: member.name,
-          avatar: member.avatar ? member.avatar : '',
+          avatar: member.avatar,
         };
 
         batch.set(groupDocRef.collection('members').doc(member.id), memberRef);
