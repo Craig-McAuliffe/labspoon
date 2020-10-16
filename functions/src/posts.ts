@@ -177,26 +177,29 @@ export const linkPostTopicsToAuthor = functions.firestore
       const userTopicDocRef = db.doc(
         `users/${authorID}/topics/${postTopic.id}`
       );
-      userTopicDocRef.get().then((qs: any) => {
-        if (!qs.exists) {
-          userTopicDocRef
-            .set(postTopic)
-            .catch((err) =>
-              console.log(err, 'could not link post topics to author')
-            );
-        } else {
-          userTopicDocRef
-            .update({
-              rank: firestore.FieldValue.increment(1),
-            })
-            .catch((err) =>
-              console.log(
-                err,
-                'could not update author topics ranks from post topics'
-              )
-            );
-        }
-      });
+      userTopicDocRef
+        .get()
+        .then((qs: any) => {
+          if (!qs.exists) {
+            userTopicDocRef
+              .set(postTopic)
+              .catch((err) =>
+                console.log(err, 'could not link post topics to author')
+              );
+          } else {
+            userTopicDocRef
+              .update({
+                rank: firestore.FieldValue.increment(1),
+              })
+              .catch((err) =>
+                console.log(
+                  err,
+                  'could not update author topics ranks from post topics'
+                )
+              );
+          }
+        })
+        .catch((err) => console.log(err, 'could not get user topic document'));
     });
   });
 
