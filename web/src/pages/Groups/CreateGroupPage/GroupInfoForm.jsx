@@ -177,10 +177,10 @@ function SelectedMembers({selectedUsers, setSelectedUsers}) {
       (previouslySelectedUser) => previouslySelectedUser.id === selectedUserID
     );
     setSelectedUsers((previouslySelectedMembers) => {
-      const curatedSelectedTopics = [...previouslySelectedMembers];
-      curatedSelectedTopics.splice(indexToBeRemoved, 1);
-      if (curatedSelectedTopics.length === 0) return [];
-      return curatedSelectedTopics;
+      const curatedSelectedMembers = [...previouslySelectedMembers];
+      curatedSelectedMembers.splice(indexToBeRemoved, 1);
+      if (curatedSelectedMembers.length === 0) return [];
+      return curatedSelectedMembers;
     });
   };
   return (

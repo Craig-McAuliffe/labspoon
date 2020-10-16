@@ -68,6 +68,17 @@ export async function setUserOnTopic(topic: Topic, userID: string) {
     .catch((err) => console.log(err, 'could not search for user'));
 }
 
+export const removeGroupFromUser = functions.firestore
+  .document('groups/{groupID}/members/{userID}')
+  .onDelete(async (change, context) => {
+    const userID = context.params.userID;
+    const groupID = context.params.groupID;
+    await db
+      .doc(`users/${userID}/groups/${groupID}`)
+      .delete()
+      .catch((err) => console.log(err, 'could not remove group from user'));
+  });
+
 // for a set of selected publications, set the user's microsoft academic ID
 export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall(
   async (data, context) => {
