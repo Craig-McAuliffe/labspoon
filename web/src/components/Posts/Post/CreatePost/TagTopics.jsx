@@ -3,14 +3,14 @@ import PrimaryButton from '../../../Buttons/PrimaryButton';
 import FormDatabaseSearch from '../../../Forms/FormDatabaseSearch';
 import TopicListItem from '../../../Topics/TopicListItem';
 import {RemoveIcon} from '../../../../assets/GeneralActionIcons';
-import {SelectedTopicsContext} from './CreatePost';
+import {CreatingPostContext} from './CreatePost';
 import './CreatePost';
 
 export default function TagTopics() {
   const [displayedTopics, setDisplayedTopics] = useState([]);
   const [duplicateTopic, setDuplicateTopic] = useState(false);
   const topicSearchRef = useRef();
-  const {selectedTopics, setSelectedTopics} = useContext(SelectedTopicsContext);
+  const {selectedTopics, setSelectedTopics} = useContext(CreatingPostContext);
 
   // Tells user that they are trying to input a duplicate topic
   //

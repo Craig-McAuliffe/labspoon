@@ -131,3 +131,17 @@
   margin-right: 10px;
   margin-top: -4px;
 }
+
+.post-success-message {
+  color: #00507c;
+  position: fixed;
+  left: 50%;
+  margin-left: -100px;
+  background: #ffffff;
+  border: 1px solid #00507c;
+  top: 6vh;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
+  width: 200px;
+  padding: 20px 0px;
+  text-align: center;
+}

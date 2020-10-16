@@ -11,16 +11,21 @@ const DEFAULT_POST = 'Default';
 const PUBLICATION_POST = 'Publication';
 const OPEN_POSITION_POST = 'Open Position';
 
-export const SelectedTopicsContext = createContext();
+export const CreatingPostContext = createContext();
 
 export default function CreatePost({pinnedPost}) {
   const {user} = useContext(AuthContext);
   const [creatingPost, setCreatingPost] = useState(false);
   const [selectedTopics, setSelectedTopics] = useState([]);
+  const [postSuccess, setPostSuccess] = useState(false);
 
   const cancelPost = () => {
     setCreatingPost(false);
   };
+
+  useEffect(() => {
+    setTimeout(() => setPostSuccess(false), 3000);
+  }, [postSuccess]);
 
   useEffect(() => {
     setSelectedTopics([]);
@@ -29,17 +34,18 @@ export default function CreatePost({pinnedPost}) {
   if (!user) return null;
   if (creatingPost)
     return (
-      <SelectedTopicsContext.Provider
+      <CreatingPostContext.Provider
         value={{
           selectedTopics: selectedTopics,
           setSelectedTopics: setSelectedTopics,
+          setPostSuccess: setPostSuccess,
         }}
       >
         <PostTypeSpecificForm
           cancelPost={cancelPost}
           setCreatingPost={setCreatingPost}
         />
-      </SelectedTopicsContext.Provider>
+      </CreatingPostContext.Provider>
     );
   else
     return pinnedPost ? (
@@ -56,6 +62,9 @@ export default function CreatePost({pinnedPost}) {
           <WriteIcon />
           <p className="not-creating-post-text">Post to your followers</p>
         </button>
+        {postSuccess ? (
+          <h4 className="post-success-message">Post Created!</h4>
+        ) : null}
       </div>
     );
 }

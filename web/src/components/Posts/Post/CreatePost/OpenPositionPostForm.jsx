@@ -5,7 +5,7 @@ import {v4 as uuid} from 'uuid';
 import FormTextInput, {CreatePostTextArea} from '../../../Forms/FormTextInput';
 import FormDateInput from '../../../Forms/FormDateInput';
 import PostForm from './PostForm';
-import {SelectedTopicsContext} from './CreatePost';
+import {CreatingPostContext} from './CreatePost';
 
 import './CreatePost.css';
 
@@ -17,7 +17,7 @@ export default function OpenPositionPostForm({
   setPostType,
   postType,
 }) {
-  const {selectedTopics} = useContext(SelectedTopicsContext);
+  const {selectedTopics, setPostSuccess} = useContext(CreatingPostContext);
   const submitChanges = (res) => {
     res.postType = {id: 'openPositionPost', name: 'Open Position'};
     selectedTopics.forEach((selectedTopic) => {
@@ -31,7 +31,7 @@ export default function OpenPositionPostForm({
     createPost(res)
       .then(() => {
         setCreatingPost(false);
-        window.location.reload();
+        setPostSuccess(true);
       })
       .catch((err) => alert(err));
   };
