@@ -69,7 +69,7 @@ export default function EditingGroupInfo({groupData, setEditingGroup}) {
       });
       batch
         .commit()
-        .catch((err) => alert('batch failed to commit'))
+        .catch((err) => alert(err, 'batch failed to commit'))
         .then(() => setEditingGroup(false));
     };
 
