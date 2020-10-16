@@ -180,10 +180,12 @@ const TabReset = ({setResetSelection, setPostsEditSuccess}) => {
   useEffect(() => {
     if (filters) {
       const activeTabID = getActiveTabID(filters);
-      if (activeTabID) setResetSelection(true);
-      setPostsEditSuccess(false);
+      if (activeTabID) {
+        setResetSelection(true);
+        setPostsEditSuccess(false);
+      }
     }
-  }, [tabFilter]);
+  }, [tabFilter, setPostsEditSuccess, setResetSelection]);
   return null;
 };
 
@@ -297,7 +299,7 @@ export function GroupPostSuccessMessage({
 
   useEffect(() => {
     setPostsEditSuccess(false);
-  }, [activeTab]);
+  }, [activeTab, setPostsEditSuccess]);
 
   if (!postsEditSuccess) return null;
 

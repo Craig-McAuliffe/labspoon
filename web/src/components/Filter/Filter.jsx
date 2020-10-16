@@ -41,7 +41,6 @@ export function FilterMenu({
       {filterCollections}
     </div>
   );
-  return null;
 }
 FilterMenu.propTypes = {
   options: PropTypes.array.isRequired,

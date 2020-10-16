@@ -119,6 +119,7 @@ export function FilterManager({children}) {
   useEffect(() => {
     const pageFilter = [...displayedTabFilter, ...displayedSiderFilter];
     filterableResults.setFilter(pageFilter);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [displayedTabFilter, displayedSiderFilter]);
 
   useEffect(() => {
@@ -126,6 +127,7 @@ export function FilterManager({children}) {
     if (tabsFilterLoading === false && siderFilterLoading === false) {
       filterableResults.setLoadingFilter(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabsFilterLoading, siderFilterLoading]);
 
   return (
@@ -188,6 +190,7 @@ export function NewFilterMenuWrapper({
         }
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabFilter]);
   if (!siderFilter) return null;
   if (filterableResults.loadingFilter) return <h2>Loading...</h2>;
