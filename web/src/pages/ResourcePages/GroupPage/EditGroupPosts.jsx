@@ -185,6 +185,7 @@ const TabReset = ({setResetSelection, setPostsEditSuccess}) => {
         setPostsEditSuccess(false);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabFilter, setPostsEditSuccess, setResetSelection]);
   return null;
 };
