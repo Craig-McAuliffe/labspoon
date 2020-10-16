@@ -176,9 +176,11 @@ function SelectedMembers({selectedUsers, setSelectedUsers}) {
     const indexToBeRemoved = selectedUsers.findIndex(
       (previouslySelectedUser) => previouslySelectedUser.id === selectedUserID
     );
-    setSelectedUsers(() => {
-      selectedUsers.splice(indexToBeRemoved, 1);
-      return selectedUsers.length === 0 ? [] : selectedUsers;
+    setSelectedUsers((previouslySelectedMembers) => {
+      const curatedSelectedMembers = [...previouslySelectedMembers];
+      curatedSelectedMembers.splice(indexToBeRemoved, 1);
+      if (curatedSelectedMembers.length === 0) return [];
+      return curatedSelectedMembers;
     });
   };
   return (
