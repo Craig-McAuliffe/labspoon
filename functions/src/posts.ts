@@ -31,6 +31,8 @@ export const createPost = functions.https.onCall(async (data, context) => {
     avatar: userData.avatar,
   };
 
+  const postID = uuid();
+
   const post: Post = {
     postType: data.postType,
     author: author,
@@ -50,8 +52,8 @@ export const createPost = functions.https.onCall(async (data, context) => {
     filterTopicIDs: data.topics.map(
       (taggedTopic: {id: string; name: string}) => taggedTopic.id
     ),
+    id: postID,
   };
-  const postID = uuid();
 
   const batch = db.batch();
   batch.set(db.collection('posts').doc(postID), post);
@@ -81,6 +83,20 @@ export const addPostToUserFollowingFeeds = functions.firestore
       );
       await followingFeedRef.collection('posts').doc(postID).set(post);
       await updateFiltersByPost(followingFeedRef, post);
+    });
+  });
+
+export const addPostToTopic = functions.firestore
+  .document(`posts/{postID}`)
+  .onCreate(async (change, context) => {
+    const post = change.data();
+    const postID = context.params.postID;
+    const postTopics = post.topics;
+    postTopics.forEach((postTopic: Topic) => {
+      postTopic.rank = 1;
+      db.doc(`topics/${postTopic.id}/posts/${postID}`)
+        .set(post)
+        .catch((err) => console.log(err, 'could not add post to topic'));
     });
   });
 
@@ -291,6 +307,7 @@ export interface Post {
   content: PostContent;
   topics: Topic[];
   timestamp: Date;
+  id: string;
 
   // filterable fields
   filterPostTypeID: string;
