@@ -11,6 +11,28 @@ export default function FormTextInput({
   ...props
 }) {
   const [field, meta] = useField(props);
+  let error;
+  if (meta.touched && meta.error) error = <InputError error={meta.error} />;
+  return (
+    <TextInput
+      error={error}
+      field={field}
+      label={label}
+      passwordInput={passwordInput}
+      sideLabel={sideLabel}
+      {...props}
+    />
+  );
+}
+
+export function TextInput({
+  error,
+  field,
+  label,
+  passwordInput,
+  sideLabel,
+  ...props
+}) {
   return (
     <div
       className={
@@ -28,9 +50,7 @@ export default function FormTextInput({
         {...field}
         {...props}
       />
-      <div className="error-container">
-        {meta.touched && meta.error ? <InputError error={meta.error} /> : null}
-      </div>
+      <div className="error-container">{error}</div>
     </div>
   );
 }

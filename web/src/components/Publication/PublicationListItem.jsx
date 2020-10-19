@@ -16,14 +16,7 @@ export default function PublicationListItem({
   bookmarkedVariation,
 }) {
   const featureFlags = useContext(FeatureFlags);
-
-  let publicationURL;
-  if (publication.id) {
-    publicationURL = `/publication/${publication.id}`;
-  } else if (publication.microsoftID) {
-    publicationURL = `/magPublication/${publication.microsoftID}`;
-  }
-
+  const publicationURL = getPublicationURL(publication);
   return (
     <div
       className={
@@ -52,6 +45,28 @@ export default function PublicationListItem({
       ) : null}
     </div>
   );
+}
+
+export function SmallPublicationListItem({publication, children}) {
+  const publicationURL = getPublicationURL(publication);
+  return (
+    <div className={'publication-list-item-container'}>
+      <PublicationListItemTitle
+        url={publicationURL}
+        title={publication.title}
+      />
+      <PublicationListItemAuthors authors={publication.authors} />
+      {children}
+    </div>
+  );
+}
+
+function getPublicationURL(publication) {
+  if (publication.id) {
+    return `/publication/${publication.id}`;
+  } else if (publication.microsoftID) {
+    return `/magPublication/${publication.microsoftID}`;
+  }
 }
 
 function PublicationListItemHeader({publication}) {
@@ -85,23 +100,50 @@ function PublicationListItemTitle({url, title}) {
   return <Link to={url}>{titleHeader}</Link>;
 }
 
+// the max number of authors to display at a time
+const AUTHORS_DISPLAY_LIMIT = 3;
+
 function PublicationListItemAuthors({authors}) {
   if (!authors) return <></>;
+  let authorsList;
+  if (authors.length <= AUTHORS_DISPLAY_LIMIT) {
+    authorsList = authorsToAuthorList(authors);
+  } else {
+    authorsList = authorsToAuthorList(authors.slice(0, AUTHORS_DISPLAY_LIMIT));
+    const remainingCount = authors.length - AUTHORS_DISPLAY_LIMIT;
+    authorsList.push(
+      <h4>
+        and {remainingCount} other{remainingCount > 1 ? 's' : ''}
+      </h4>
+    );
+  }
   return (
-    <div className="publication-list-item-content-authors">
-      {authors.map((author) => (
-        <PublicationListItemAuthor
-          ID={author.id}
-          name={author.name}
-          key={uuid()}
-        />
-      ))}
-    </div>
+    <div className="publication-list-item-content-authors">{authorsList}</div>
   );
 }
 
-function PublicationListItemAuthor({ID, name}) {
-  const authorHeader = <h4 key={uuid()}>{name}</h4>;
+function authorsToAuthorList(authors) {
+  return authors.map((author, idx) => (
+    <PublicationListItemAuthor
+      ID={author.id}
+      name={author.name}
+      key={uuid()}
+      first={idx == 0}
+      last={idx == authors.length - 1}
+    />
+  ));
+}
+
+function PublicationListItemAuthor({ID, name, first, last}) {
+  let nameStr;
+  if (first && !last) {
+    nameStr = `${name},`;
+  } else if (first && last) {
+    nameStr = `${name}`;
+  } else {
+    nameStr = `and ${name}`;
+  }
+  const authorHeader = <h4 key={uuid()}>{nameStr}&nbsp;</h4>;
   if (!ID) return authorHeader;
   return (
     <Link className="publication-list-item-content-author" to={`users/${ID}`}>

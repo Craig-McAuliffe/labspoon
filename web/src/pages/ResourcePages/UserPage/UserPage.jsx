@@ -8,7 +8,10 @@ import UserPageSider from './UserPageSider';
 import users from '../../../mockdata/users';
 
 import {getActiveTabID} from '../../../helpers/filters';
-import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
+import {
+  getPaginatedPostsFromCollectionRef,
+  translateOptionalFields,
+} from '../../../helpers/posts';
 import {getPaginatedTopicsFromCollectionRef} from '../../../helpers/topics';
 import {getPaginatedPublicationsFromCollectionRef} from '../../../helpers/publications';
 import {getPaginatedGroupReferencesFromCollectionRef} from '../../../helpers/groups';
@@ -263,7 +266,11 @@ function userPageFeedDataFromDB(skip, limit, filterOptions, userID, last) {
       const postsCollection = db
         .collection(`users/${userID}/posts`)
         .orderBy('timestamp', 'desc');
-      return getPaginatedPostsFromCollectionRef(postsCollection, limit, last);
+      return getPaginatedPostsFromCollectionRef(
+        postsCollection,
+        limit,
+        last
+      ).then(translateOptionalFields);
     case 'publications':
       const publicationsCollection = db.collection(
         `users/${userID}/publications`
