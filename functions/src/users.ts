@@ -266,36 +266,37 @@ export const addPostsInTopicToFollowingFeeds = functions.firestore
     const topicFollowersCollectionRef = db.collection(
       `topics/${topicID}/followedByUsers`
     );
-    topicFollowersCollectionRef
-      .get()
-      .then(async (qs: any) => {
-        qs.forEach((doc: any) => {
-          const topicFollower = doc.data();
-          const userID = topicFollower.id;
-          const userPostsDocRef = db.doc(
-            `users/${userID}/feeds/followingFeed/posts/${postID}`
-          );
-          userPostsDocRef
-            .set(post)
-            .catch((err) =>
-              console.log(
-                err,
-                'failed to add posts from topic to user following feed'
-              )
-            );
-        });
-      })
-      .catch((err) => console.log(err, 'could not fetch followers of topic'));
-  });
 
-// interface User {
-//   coverPhoto?: string;
-//   avatar?: string;
-//   institution?: string;
-//   position?: string;
-//   name: string;
-//   id: string;
-// }
+    const updateFollowersOfTopic = () => {
+      return topicFollowersCollectionRef
+        .get()
+        .then((qs) => {
+          const topicFollowers = [] as UserRef[];
+          qs.forEach((doc) => {
+            topicFollowers.push(doc.data() as UserRef);
+          });
+          const topicFollowersPromisesArray = topicFollowers.map(
+            (topicFollower) => {
+              const userID = topicFollower.id;
+              const userPostsDocRef = db.doc(
+                `users/${userID}/feeds/followingFeed/posts/${postID}`
+              );
+              return userPostsDocRef
+                .set(post)
+                .catch((err) =>
+                  console.log(
+                    err,
+                    'failed to add posts from topic to user following feed'
+                  )
+                );
+            }
+          );
+          return Promise.all(topicFollowersPromisesArray);
+        })
+        .catch((err) => console.log(err, 'could not fetch followers of topic'));
+    };
+    return updateFollowersOfTopic();
+  });
 
 interface interpretationResult {
   logprob: number;

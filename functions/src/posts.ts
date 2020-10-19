@@ -92,12 +92,12 @@ export const addPostToTopic = functions.firestore
     const post = change.data();
     const postID = context.params.postID;
     const postTopics = post.topics;
-    postTopics.forEach((postTopic: Topic) => {
-      postTopic.rank = 1;
+    const topicsToTopicsPromisesArray = postTopics.map((postTopic: Topic) => {
       db.doc(`topics/${postTopic.id}/posts/${postID}`)
         .set(post)
         .catch((err) => console.log(err, 'could not add post to topic'));
     });
+    return Promise.all(topicsToTopicsPromisesArray);
   });
 
 async function updateFiltersByPost(
