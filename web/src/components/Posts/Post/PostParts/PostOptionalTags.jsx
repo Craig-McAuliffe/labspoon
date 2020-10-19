@@ -40,7 +40,7 @@ const PostOptionalTags = ({optionalTags}) => {
           </div>
         );
       }
-      if (optionalTag.type == 'publication') {
+      if (optionalTag.type === 'publication') {
         return <PublicationListItem publication={optionalTag.content} />;
       }
       return (

@@ -128,8 +128,8 @@ function authorsToAuthorList(authors) {
       ID={author.id}
       name={author.name}
       key={uuid()}
-      first={idx == 0}
-      last={idx == authors.length - 1}
+      first={idx === 0}
+      last={idx === authors.length - 1}
     />
   ));
 }
