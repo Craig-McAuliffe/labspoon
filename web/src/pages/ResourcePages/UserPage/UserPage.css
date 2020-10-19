@@ -24,10 +24,6 @@
   background: transparent;
   position: relative;
 }
-/* .user-page-avatar {
-  position: absolute;
-  
-} */
 
 .user-headline-text {
   padding-top: 10px;
@@ -45,7 +41,11 @@
   left: -100px;
 }
 
-.user-headline-text h3 {
+.user-headline-text h2 {
+  margin-bottom: 2px;
+}
+
+.user-headline-text h4 {
   color: #5d5d65;
 }
 
