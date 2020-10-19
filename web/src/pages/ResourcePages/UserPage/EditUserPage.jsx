@@ -8,6 +8,8 @@ import FormTextInput from '../../../components/Forms/FormTextInput';
 
 export default function EditUserPage({user, cancelEdit}) {
   const onSubmit = (values) => {
+    // Any edits to user that appear on UserRef must update in all the places in which
+    // user ref is stored
     const userDocRef = db.doc(`users/${user.id}`);
     userDocRef
       .update(values)
@@ -22,6 +24,7 @@ export default function EditUserPage({user, cancelEdit}) {
 
   const validationSchema = Yup.object({
     institution: Yup.string(),
+    position: Yup.string(),
   });
 
   const initialValues = {
