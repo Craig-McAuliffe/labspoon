@@ -63,7 +63,7 @@ deploy_dev_env:on-schedule:
     - master
     - schedules
   script:
-    - firebase use --token $FIREBASE_DEPLOY_KEY labspoon-dev
+    - firebase use --token $FIREBASE_DEPLOY_KEY labspoon-dev-266bc
     - firebase deploy -m "pipeline $CI_PIPELINE_ID build $CI_BUILD_ID" --non-interactive --token $FIREBASE_DEPLOY_KEY
   dependencies:
     - build
