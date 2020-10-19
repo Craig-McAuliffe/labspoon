@@ -7,29 +7,7 @@ workflow:
     - when: never
 
 stages:
-  - build
-  - deploy
-
-build:
-  image: node:current
-  stage: build
-  environment:
-    name: build
-  only:
-    - master
-    - schedules
-  script:
-    - n current
-    - npm --prefix web install
-    - npm run --prefix web build
-    - n 10
-    - npm --prefix functions install
-    - npm run --prefix functions build
-  artifacts:
-    paths:
-      - web/build
-      - functions/
-
+  - build_and_deploy
 
 before_script:
   - npm i -g firebase-tools
@@ -42,28 +20,36 @@ cache:
 
 deploy_test_env:on-schedule:
   image: node:current
-  stage: deploy
+  stage: build_and_deploy
   environment:
     name: test
   only:
     - master
     - schedules
   script:
+    - n current
+    - npm --prefix web install
+    - npm run --prefix web build
+    - n 10
+    - npm --prefix functions install
+    - npm run --prefix functions build
     - firebase use --token $FIREBASE_DEPLOY_KEY labspoon-test
     - firebase deploy -m "pipeline $CI_PIPELINE_ID build $CI_BUILD_ID" --non-interactive --token $FIREBASE_DEPLOY_KEY
-  dependencies:
-    - build
 
 deploy_dev_env:on-schedule:
   image: node:current
-  stage: deploy
+  stage: build_and_deploy
   environment:
     name: dev
   only:
     - master
     - schedules
   script:
+    - n current
+    - npm --prefix web install
+    - npm run --prefix web build
+    - n 10
+    - npm --prefix functions install
+    - npm run --prefix functions build
     - firebase use --token $FIREBASE_DEPLOY_KEY labspoon-dev-266bc
     - firebase deploy -m "pipeline $CI_PIPELINE_ID build $CI_BUILD_ID" --non-interactive --token $FIREBASE_DEPLOY_KEY
-  dependencies:
-    - build
