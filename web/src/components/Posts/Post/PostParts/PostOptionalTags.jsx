@@ -11,6 +11,7 @@ import {
   ResearcherIcon,
   URLIcon,
 } from '../../../../assets/PostOptionalTagsIcons';
+import PublicationListItem from '../../../Publication/PublicationListItem';
 
 import './PostOptionalTags.css';
 
@@ -38,6 +39,9 @@ const PostOptionalTags = ({optionalTags}) => {
             </div>
           </div>
         );
+      }
+      if (optionalTag.type == 'publication') {
+        return <PublicationListItem publication={optionalTag.content} />;
       }
       return (
         <div key={optionalTag.type} className="optional-tag">
