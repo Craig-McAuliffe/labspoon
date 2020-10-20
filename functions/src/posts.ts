@@ -31,7 +31,9 @@ export const createPost = functions.https.onCall(async (data, context) => {
     name: userData.name,
     avatar: userData.avatar,
   };
-  console.log(data);
+
+  const postID = uuid();
+
   const content: PostContent = {
     text: data.title,
     position: data.position,
@@ -53,41 +55,72 @@ export const createPost = functions.https.onCall(async (data, context) => {
     filterTopicIDs: data.topics.map(
       (taggedTopic: {id: string; name: string}) => taggedTopic.id
     ),
+    id: postID,
   };
-  const postID = uuid();
 
   const batch = db.batch();
   batch.set(db.collection('posts').doc(postID), post);
   await batch.commit();
 });
 
-export const writePostToAuthorPosts = functions.firestore.document(`posts/{postID}`).onWrite(async (change, context) => {
-  if (context.eventType == 'providers/google.firebase.database/eventTypes/ref.delete') return null;
-  const post = change.after.data() as Post;
-  const postID = change.after.id;
-  const authorID = post.author.id;
-  await db.collection('users').doc(authorID).collection('posts').doc(postID).set(post);
-  return null;
-});
-
-export const writePostToUserFollowingFeeds = functions.firestore.document(`posts/{postID}`).onWrite(async (change, context) => {
-  if (context.eventType == 'providers/google.firebase.database/eventTypes/ref.delete') return null;
-  const post = change.after.data() as Post;
-  const postID = change.after.id;
-  const followers = await db
-    .collection(`users/${post.author.id}/followedByUsers`)
-    .get();
-  if (followers.empty) return null;
-  followers.forEach(async (followerSnapshot) => {
-    const follower = followerSnapshot.data() as UserRef;
-    const followingFeedRef = db.doc(
-      `users/${follower.id}/feeds/followingFeed`
-    );
-    await followingFeedRef.collection('posts').doc(postID).set(post);
-    await updateFiltersByPost(followingFeedRef, post);
+export const writePostToAuthorPosts = functions.firestore
+  .document(`posts/{postID}`)
+  .onWrite(async (change, context) => {
+    if (
+      context.eventType ==
+      'providers/google.firebase.database/eventTypes/ref.delete'
+    )
+      return null;
+    const post = change.after.data() as Post;
+    const postID = change.after.id;
+    const authorID = post.author.id;
+    await db
+      .collection('users')
+      .doc(authorID)
+      .collection('posts')
+      .doc(postID)
+      .set(post);
+    return null;
   });
-  return null;
-});
+
+export const writePostToUserFollowingFeeds = functions.firestore
+  .document(`posts/{postID}`)
+  .onWrite(async (change, context) => {
+    if (
+      context.eventType ==
+      'providers/google.firebase.database/eventTypes/ref.delete'
+    )
+      return null;
+    const post = change.after.data() as Post;
+    const postID = change.after.id;
+    const followers = await db
+      .collection(`users/${post.author.id}/followedByUsers`)
+      .get();
+    if (followers.empty) return null;
+    followers.forEach(async (followerSnapshot) => {
+      const follower = followerSnapshot.data() as UserRef;
+      const followingFeedRef = db.doc(
+        `users/${follower.id}/feeds/followingFeed`
+      );
+      await followingFeedRef.collection('posts').doc(postID).set(post);
+      await updateFiltersByPost(followingFeedRef, post);
+    });
+    return null;
+  });
+
+export const addPostToTopic = functions.firestore
+  .document(`posts/{postID}`)
+  .onCreate(async (change, context) => {
+    const post = change.data();
+    const postID = context.params.postID;
+    const postTopics = post.topics;
+    const topicsToTopicsPromisesArray = postTopics.map((postTopic: Topic) => {
+      db.doc(`topics/${postTopic.id}/posts/${postID}`)
+        .set(post)
+        .catch((err) => console.log(err, 'could not add post to topic'));
+    });
+    return Promise.all(topicsToTopicsPromisesArray);
+  });
 
 async function updateFiltersByPost(
   followingFeedRef: firestore.DocumentReference<firestore.DocumentData>,
@@ -296,6 +329,7 @@ export interface Post {
   content: PostContent;
   topics: Topic[];
   timestamp: Date;
+  id: string;
 
   // filterable fields
   filterPostTypeID: string;
