@@ -2,6 +2,7 @@ import React, {useContext, useState} from 'react';
 import firebase, {db} from '../../firebase.js';
 import {Redirect, useHistory, useLocation} from 'react-router';
 import {AuthContext} from '../../App';
+import {projectURL} from '../../config';
 import {Form, Formik} from 'formik';
 import CancelButton from '../../components/Buttons/CancelButton';
 import PrimaryButton from '../../components/Buttons/PrimaryButton';
@@ -67,8 +68,8 @@ const SignUpForm = ({returnLocation}) => {
             db.doc(`users/${result.user.uid}`).set({
               id: result.user.uid,
               name: result.user.displayName,
-              coverPhoto:
-                'https://i.ibb.co/HNJcLdj/user-cover-photo-default-1-2.jpg',
+              coverPhoto: `https://storage.cloud.google.com/${projectURL}/avatars/default_group_cover_photo.png`,
+              avatar: `https://storage.cloud.google.com/${projectURL}/avatars/default_avatar%20(2).jpg`,
             })
           )
           .then(() => {
