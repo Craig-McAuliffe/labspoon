@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'react-bootstrap/Image';
+import {getDefaultAvatar} from '../../helpers/users.js';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './UserAvatar.css';
@@ -12,7 +13,7 @@ const UserAvatar = ({src, width, height}) => {
       roundedCircle
       width={width}
       height={height}
-      onError={(img) => (img.target.src = 'https://picsum.photos/id/1/200/200')}
+      onError={(img) => (img.target.src = getDefaultAvatar())}
     />
   );
 };

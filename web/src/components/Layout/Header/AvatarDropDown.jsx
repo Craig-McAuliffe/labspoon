@@ -1,7 +1,5 @@
 import React, {useContext, useState} from 'react';
-// import {Dropdown, Menu} from 'antd';
 import {Link} from 'react-router-dom';
-import {projectURL} from '../../../config';
 import {
   BookmarksMenuIcon,
   GroupMenuIcon,
@@ -111,21 +109,9 @@ const AvatarToggle = ({user, userProfile}) => {
   return (
     <div className="dropdown-header">
       {userProfile ? (
-        userProfile.avatar ? (
-          <UserAvatar src={userProfile.avatar} width="50" height="50" />
-        ) : (
-          <UserAvatar
-            src={`https://storage.cloud.google.com/${projectURL}/avatars/default_avatar%20(2).jpg`}
-            width="50"
-            height="50"
-          />
-        )
+        <UserAvatar src={userProfile.avatar} width="50" height="50" />
       ) : (
-        <UserAvatar
-          src={`https://storage.cloud.google.com/${projectURL}/avatars/default_avatar%20(2).jpg`}
-          width="50"
-          height="50"
-        />
+        <UserAvatar width="50" height="50" />
       )}
       <p className="dropdown-name">{user.displayName}</p>
     </div>

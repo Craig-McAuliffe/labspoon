@@ -6,6 +6,7 @@ import {auth, db} from './firebase';
 import Header from './components/Layout/Header/Header';
 
 import './App.css';
+import {getDefaultAvatar} from './helpers/users.js';
 
 /**
  * Primary entry point into the app
@@ -54,7 +55,11 @@ function AuthProvider({children}) {
     if (user === null || user === undefined) return setUserProfile(undefined);
     db.doc(`users/${user.uid}`)
       .get()
-      .then((profile) => setUserProfile(profile.data()));
+      .then((profile) => {
+        const userData = profile.data();
+        if (!userData.avatar) userData.avatar = getDefaultAvatar();
+        setUserProfile(userData);
+      });
   }, [user]);
   return (
     <AuthContext.Provider value={{user, userProfile}}>

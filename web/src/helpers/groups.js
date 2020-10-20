@@ -1,3 +1,5 @@
+import {projectURL} from '../config';
+
 // Retrieves paginated group references from passed group reference collection
 // for use in results pages. Returns a promise that returns an array of results
 // when resolved. If there are no results, or the collection does not exist, an
@@ -23,4 +25,8 @@ export function getPaginatedGroupReferencesFromCollectionRef(
       });
       return groups;
     });
+}
+
+export function getDefaultAvatar() {
+  return `https://storage.googleapis.com/${projectURL}/avatars/default_group_avatar.jpg`;
 }

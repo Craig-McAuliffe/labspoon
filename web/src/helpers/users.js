@@ -1,3 +1,5 @@
+import {projectURL} from '../config';
+
 // Retrieves paginated user references from passed user reference collection
 // for use in results pages. Returns a promise that returns an array of results
 // when resolved. If there are no results, or the collection does not exist, an
@@ -22,4 +24,12 @@ export function getPaginatedUserReferencesFromCollectionRef(
       });
       return users;
     });
+}
+
+export function getDefaultAvatar() {
+  return `https://storage.googleapis.com/${projectURL}/avatars/default_avatar.jpg`;
+}
+
+export function getDefaultCoverPhoto() {
+  return `https://storage.googleapis.com/${projectURL}/avatars/default_group_cover_photo.png`;
 }

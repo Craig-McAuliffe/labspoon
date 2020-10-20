@@ -28,31 +28,35 @@ export function MAGPublicationRouter() {
 
   useEffect(() => {
     db.collection('publications')
-    .where('microsoftID', '==', magPublicationID)
-    .limit(1)
-    .get()
-    .then((qs) => {
-      setLoading(false);
-      if (qs.empty) return setError(true);
-      qs.forEach((doc) => {
-        console.log(doc.data(), doc.id);
-        setPublicationID(doc.id);
+      .where('microsoftID', '==', magPublicationID)
+      .limit(1)
+      .get()
+      .then((qs) => {
+        setLoading(false);
+        if (qs.empty) return setError(true);
+        qs.forEach((doc) => {
+          console.log(doc.data(), doc.id);
+          setPublicationID(doc.id);
+        });
+      })
+      .catch((err) => {
+        setLoading(false);
+        setError(true);
+        console.error(err);
       });
-    })
-    .catch((err) => {
-      setLoading(false);
-      setError(true);
-      console.error(err);
-    });
   }, [magPublicationID]);
 
   if (loading || publicationID === undefined) return <h1>Loading...</h1>;
-  if (error) return (
-    <>
-      <h1>Error: Publication not found</h1>
-      <p>We're probably just indexing this, so try again in a few minutes.</p>
-    </>
-  );
+  if (error)
+    return (
+      <>
+        <h1>Error: Publication not found</h1>
+        <p>
+          We&rsquo;re probably just indexing this, so try again in a few
+          minutes.
+        </p>
+      </>
+    );
 
   return <Redirect to={`/publication/${publicationID}`} />;
 }
@@ -240,9 +244,7 @@ function PublicationBodyAbstract({abstract}) {
   return (
     <>
       <h3 className="publication-section-title">Abstract</h3>
-      <p className="publication-body-abstract">
-        {abstract}
-      </p>
+      <p className="publication-body-abstract">{abstract}</p>
     </>
   );
 }
