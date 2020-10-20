@@ -42,9 +42,9 @@ export default function CreateGroupPage({
         location: values.location,
         institution: values.institution,
         website: values.website,
-        avatar: `https://storage.googleapis.com/${projectURL}/groups/${groupID}/avatar`,
+        avatar: `https://storage.cloud.google.com/labspoon-dev-266bc.appspot.com/avatars/default_group_avatar%20(2).jpg`,
       };
-      values.avatar = `https://storage.googleapis.com/${projectURL}/groups/${groupID}/avatar`;
+      values.avatar = `https://storage.cloud.google.com/labspoon-dev-266bc.appspot.com/avatars/default_group_avatar%20(2).jpg`;
       batch.set(groupDocRef, values);
       const userRef = {
         id: userProfile.id,

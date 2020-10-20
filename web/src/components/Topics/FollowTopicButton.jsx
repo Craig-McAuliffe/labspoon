@@ -1,6 +1,7 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {AuthContext, FeatureFlags} from '../../App';
 import {db} from '../../firebase';
+import {projectURL} from '../../config';
 
 import FollowButton from '../Buttons/FollowButton';
 
@@ -34,7 +35,9 @@ export default function FollowTopicButton({targetTopic}) {
         batch.set(followedByUsersDoc, {
           id: authUser.uid,
           name: authUser.displayName,
-          avatar: userProfile.avatar,
+          avatar: userProfile
+            ? userProfile.avatar
+            : `https://storage.cloud.google.com/${projectURL}/avatars/default_avatar%20(2).jpg`,
         });
         batch
           .commit()
