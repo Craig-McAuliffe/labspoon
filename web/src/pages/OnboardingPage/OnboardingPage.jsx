@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useContext, useRef} from 'react';
-import {useHistory, useLocation} from 'react-router-dom';
+import {useHistory, useLocation, useParams} from 'react-router-dom';
 import {AuthContext} from '../../App';
 import {db} from '../../firebase';
 import {getPaginatedUserReferencesFromCollectionRef} from '../../helpers/users';
@@ -15,36 +15,74 @@ import CreateGroupPage from '../Groups/CreateGroupPage/CreateGroupPage';
 import UserListItem from '../../components/User/UserListItem';
 import FormDatabaseSearch from '../../components/Forms/FormDatabaseSearch';
 import SuccessMessage from '../../components/Forms/SuccessMessage';
+import {SearchIconGrey} from '../../assets/HeaderIcons';
+import firebase from '../../firebase';
 
 import './OnboardingPage.css';
 
+const getSuggestedPublicationsForAuthorName = firebase
+  .functions()
+  .httpsCallable('users-getSuggestedPublicationsForAuthorName');
+const setMicrosoftAcademicIDByPublicationMatches = firebase
+  .functions()
+  .httpsCallable('users-setMicrosoftAcademicIDByPublicationMatches');
+
+const FOLLOW = 'follow';
+const LINKAUTHOR = 'link-author';
+const GROUPS = 'groups';
 export default function OnboardingPage() {
   const {user} = useContext(AuthContext);
   const history = useHistory();
-  const location = useLocation().state;
-  const returnLocation = location ? location.returnLocation : undefined;
+  const location = useLocation();
+  const onboardingStage = useParams().onboardingStage;
+  const locationState = location.state;
+  const returnLocation = locationState
+    ? locationState.returnLocation
+    : undefined;
   if (user === undefined) history.push('/');
-  const [onboardingStage, setOnboardingStage] = useState('follow-things');
   const OnboardingStageDisplay = () => {
     switch (onboardingStage) {
-      case 'follow-things':
+      case FOLLOW:
+        return <OnboardingFollow user={user} />;
+      case LINKAUTHOR:
         return (
-          <OnboardingFollow
-            setOnboardingStage={setOnboardingStage}
+          <OnboardingAuthorLink
+            nextOnboardingStage={nextOnboardingStage}
             user={user}
           />
         );
-      case 'join-groups':
-        return (
-          <OnboardingGroup
-            setOnboardingStage={setOnboardingStage}
-            user={user}
-          />
-        );
+      case GROUPS:
+        return <OnboardingGroup user={user} />;
       default:
-        return null;
+        return <OnboardingFollow user={user} />;
     }
   };
+
+  const nextOnboardingStage = () => {
+    switch (onboardingStage) {
+      case FOLLOW:
+        history.push(`/onboarding/${LINKAUTHOR}`);
+        break;
+      case LINKAUTHOR:
+        history.push(`/onboarding/${GROUPS}`);
+        break;
+      case GROUPS:
+        history.push(returnLocation ? returnLocation : '/');
+        break;
+    }
+  };
+
+  const previousOnboardingStage = () => {
+    switch (onboardingStage) {
+      case LINKAUTHOR:
+        history.push('/onboarding');
+        break;
+      case GROUPS:
+        history.push(returnLocation ? returnLocation : '/');
+        break;
+    }
+  };
+
   return (
     <div className="content-layout">
       <div className="page-content-container">
@@ -53,31 +91,22 @@ export default function OnboardingPage() {
         <div className="onboarding-skip-next-container">
           <button
             className="onboarding-skip-button"
-            onClick={() =>
-              onboardingStage === 'follow-things'
-                ? setOnboardingStage('join-groups')
-                : history.push('/')
-            }
+            onClick={() => nextOnboardingStage()}
           >
             Skip
           </button>
           <div>
-            {onboardingStage === 'join-groups' ? (
+            {onboardingStage !== FOLLOW ? (
               <button
                 className="onboarding-back-button"
-                onClick={() => setOnboardingStage('follow-things')}
+                onClick={() => previousOnboardingStage()}
               >
                 Back
               </button>
             ) : null}
-            <SecondaryButton
-              onClick={() =>
-                onboardingStage === 'follow-things'
-                  ? setOnboardingStage('join-groups')
-                  : history.push(returnLocation ? returnLocation : '/')
-              }
-              buttonText={onboardingStage === 'join-groups' ? 'Finish' : 'Next'}
-            />
+            <SecondaryButton onClick={() => nextOnboardingStage()}>
+              {onboardingStage === GROUPS ? 'Finish' : 'Next'}
+            </SecondaryButton>
           </div>
         </div>
       </div>
@@ -253,6 +282,54 @@ function OnboardingGroup({user}) {
             </SuccessMessage>
           ) : null}
         </>
+      )}
+    </div>
+  );
+}
+
+function OnboardingAuthorLink({user, nextOnboardingStage}) {
+  const [linkingAuthor, setLinkingAuthor] = useState(false);
+  return (
+    <div>
+      <h3>Have you authored journal publications?</h3>
+      {!linkingAuthor ? (
+        <div className="onboarding-author-papers-choice-container">
+          <div className="onboarding-author-papers-choice-button-container">
+            <SecondaryButton
+              onClick={() => setLinkingAuthor(true)}
+              width="100px"
+              height="60px"
+            >
+              Yes
+            </SecondaryButton>
+          </div>
+          <div className="onboarding-author-papers-choice-button-container">
+            <SecondaryButton
+              onClick={() => nextOnboardingStage()}
+              width="100px"
+              height="60px"
+            >
+              No
+            </SecondaryButton>
+          </div>
+        </div>
+      ) : (
+        <form className="onboarding-author-link-form">
+          <label>
+            Your name as it appears on publications
+            <input type="text" className="onboarding-author-name-input" />
+            <button
+              type="submit"
+              value="Submit Search"
+              className="onboarding-author-link-button"
+            >
+              <SearchIconGrey />
+              <span className="onboarding-author-link-search-button-text">
+                Search
+              </span>
+            </button>
+          </label>
+        </form>
       )}
     </div>
   );

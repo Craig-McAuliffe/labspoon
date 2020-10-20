@@ -74,7 +74,7 @@ const SignUpForm = ({returnLocation}) => {
           )
           .then(() => {
             history.push({
-              pathname: '/onboarding',
+              pathname: '/onboarding/follow',
               state: {returnLocation: returnLocation},
             });
           })
