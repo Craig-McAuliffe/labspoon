@@ -19,6 +19,7 @@ import {SearchIconGrey} from '../../assets/HeaderIcons';
 import firebase from '../../firebase';
 
 import './OnboardingPage.css';
+import PrimaryButton from '../../components/Buttons/PrimaryButton';
 
 const getSuggestedPublicationsForAuthorName = firebase
   .functions()
@@ -26,13 +27,13 @@ const getSuggestedPublicationsForAuthorName = firebase
 const setMicrosoftAcademicIDByPublicationMatches = firebase
   .functions()
   .httpsCallable('users-setMicrosoftAcademicIDByPublicationMatches');
-
 const FOLLOW = 'follow';
 const LINKAUTHOR = 'link-author';
 const GROUPS = 'groups';
+
 export default function OnboardingPage() {
-  const {user} = useContext(AuthContext);
   const history = useHistory();
+  const {user} = useContext(AuthContext);
   const location = useLocation();
   const onboardingStage = useParams().onboardingStage;
   const locationState = location.state;
@@ -75,10 +76,10 @@ export default function OnboardingPage() {
   const previousOnboardingStage = () => {
     switch (onboardingStage) {
       case LINKAUTHOR:
-        history.push('/onboarding');
+        history.push(`/onboarding/${FOLLOW}`);
         break;
       case GROUPS:
-        history.push(returnLocation ? returnLocation : '/');
+        history.push(`/onboarding/${LINKAUTHOR}`);
         break;
     }
   };
@@ -291,46 +292,163 @@ function OnboardingAuthorLink({user, nextOnboardingStage}) {
   const [linkingAuthor, setLinkingAuthor] = useState(false);
   return (
     <div>
-      <h3>Have you authored journal publications?</h3>
       {!linkingAuthor ? (
-        <div className="onboarding-author-papers-choice-container">
-          <div className="onboarding-author-papers-choice-button-container">
-            <SecondaryButton
-              onClick={() => setLinkingAuthor(true)}
-              width="100px"
-              height="60px"
-            >
-              Yes
-            </SecondaryButton>
+        <>
+          <h3>Have you authored any journal publications?</h3>
+          <div className="onboarding-author-papers-choice-container">
+            <div className="onboarding-author-papers-choice-button-container">
+              <SecondaryButton
+                onClick={() => setLinkingAuthor(true)}
+                width="100px"
+                height="60px"
+              >
+                Yes
+              </SecondaryButton>
+            </div>
+            <div className="onboarding-author-papers-choice-button-container">
+              <SecondaryButton
+                onClick={() => nextOnboardingStage()}
+                width="100px"
+                height="60px"
+              >
+                No
+              </SecondaryButton>
+            </div>
           </div>
-          <div className="onboarding-author-papers-choice-button-container">
-            <SecondaryButton
-              onClick={() => nextOnboardingStage()}
-              width="100px"
-              height="60px"
-            >
-              No
-            </SecondaryButton>
-          </div>
-        </div>
+        </>
       ) : (
-        <form className="onboarding-author-link-form">
-          <label>
-            Your name as it appears on publications
-            <input type="text" className="onboarding-author-name-input" />
-            <button
-              type="submit"
-              value="Submit Search"
-              className="onboarding-author-link-button"
-            >
-              <SearchIconGrey />
-              <span className="onboarding-author-link-search-button-text">
-                Search
-              </span>
-            </button>
-          </label>
-        </form>
+        <LinkAuthorIDForm />
       )}
     </div>
+  );
+}
+
+function LinkAuthorIDForm() {
+  const [name, setName] = useState('');
+  const [suggestedPublications, setSuggestedPublications] = useState([]);
+  const [loadingState, setLoadingState] = useState();
+
+  const searchProgress = () => {
+    if (loadingState === 'loading') return <h4>Loading Publications</h4>;
+    if (loadingState === 'error')
+      return (
+        <h4>Something went wrong, sorry about that. Please try again later.</h4>
+      );
+    if (loadingState === 'loaded') return null;
+  };
+
+  return (
+    <div>
+      <h3 className="onboarding-author-link-explain">
+        Connect your Labspoon account to your publications
+      </h3>
+      <form
+        className="onboarding-author-link-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          setLoadingState('loading');
+          getSuggestedPublicationsForAuthorName({
+            name: name,
+          })
+            .then((fetchedSuggestedPublications) => {
+              setLoadingState('loaded');
+              setSuggestedPublications(fetchedSuggestedPublications.data);
+            })
+            .catch((err) => {
+              console.log(err);
+              setLoadingState('error');
+            });
+        }}
+      >
+        <label>
+          Your name as it appears on publications
+          <input
+            type="text"
+            className="onboarding-author-name-input"
+            name="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <button
+            type="submit"
+            value="Submit Search"
+            className="onboarding-author-link-button"
+          >
+            <SearchIconGrey />
+            <span className="onboarding-author-link-search-button-text">
+              Search
+            </span>
+          </button>
+        </label>
+      </form>
+      {searchProgress()}
+      {suggestedPublications.length > 0 ? (
+        <SuggestedPublications suggestedPublications={suggestedPublications} />
+      ) : null}
+    </div>
+  );
+}
+
+function SuggestedPublications({suggestedPublications}) {
+  const history = useHistory();
+  const [
+    selectedPublicationsAuthorID,
+    setSelectedPublicationsAuthorID,
+  ] = useState();
+  const suggestedPublicationItems = () =>
+    suggestedPublications.map((suggestedPublication, i) => {
+      if (!suggestedPublication) return null;
+      return (
+        <React.Fragment key={suggestedPublication.publicationInfo.title + i}>
+          <div>
+            <h4 className="onboarding-suggested-publication-title">
+              {suggestedPublication.publicationInfo.title}
+            </h4>
+          </div>
+          <div className="post-selector-container">
+            <button
+              className={
+                selectedPublicationsAuthorID ===
+                suggestedPublication.microsoftAcademicIDMatch
+                  ? 'onboarding-publication-selector-button-selected'
+                  : 'onboarding-publication-selector-button'
+              }
+              type="button"
+              onClick={() => {
+                if (
+                  suggestedPublication.microsoftAcademicIDMatch ===
+                  selectedPublicationsAuthorID
+                )
+                  setSelectedPublicationsAuthorID(undefined);
+                else
+                  setSelectedPublicationsAuthorID(
+                    suggestedPublication.microsoftAcademicIDMatch
+                  );
+              }}
+            />
+          </div>
+        </React.Fragment>
+      );
+    });
+
+  return (
+    <>
+      <div className="onboarding-suggested-publications-container">
+        {suggestedPublicationItems()}
+      </div>
+      <div className="onboarding-suggested-publications-submit-container">
+        <PrimaryButton
+          type="button"
+          onClick={() => {
+            setMicrosoftAcademicIDByPublicationMatches({
+              microsoftAcademicAuthorID: selectedPublicationsAuthorID,
+            });
+            history.push(`/onboarding/${GROUPS}`);
+          }}
+        >
+          Link Papers to Profile
+        </PrimaryButton>
+      </div>
+    </>
   );
 }
