@@ -1,6 +1,7 @@
 import React, {useContext, useState} from 'react';
 // import {Dropdown, Menu} from 'antd';
 import {Link} from 'react-router-dom';
+import {projectURL} from '../../../config';
 import {
   BookmarksMenuIcon,
   GroupMenuIcon,
@@ -12,7 +13,6 @@ import {
 
 import {db} from '../../../firebase';
 import {AuthContext} from '../../../App';
-import DefaultUserIcon from '../../../assets/DefaultUserIcon.svg';
 import UserAvatar from '../../Avatar/UserAvatar';
 import Dropdown from 'react-bootstrap/Dropdown';
 import CustomToggle from '../../CustomToggle';
@@ -114,10 +114,18 @@ const AvatarToggle = ({user, userProfile}) => {
         userProfile.avatar ? (
           <UserAvatar src={userProfile.avatar} width="50" height="50" />
         ) : (
-          <img src={DefaultUserIcon} alt="user icon" />
+          <UserAvatar
+            src={`https://storage.cloud.google.com/${projectURL}/avatars/default_avatar%20(2).jpg`}
+            width="50"
+            height="50"
+          />
         )
       ) : (
-        <img src={DefaultUserIcon} alt="user icon" />
+        <UserAvatar
+          src={`https://storage.cloud.google.com/${projectURL}/avatars/default_avatar%20(2).jpg`}
+          width="50"
+          height="50"
+        />
       )}
       <p className="dropdown-name">{user.displayName}</p>
     </div>
