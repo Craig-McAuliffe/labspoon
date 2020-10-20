@@ -15,14 +15,14 @@ import {
 import {searchClient} from '../../algolia';
 import {searchStateToURL, createURL} from '../../helpers/search';
 
-import Results, {GenericListItem} from '../../components/Results/Results';
+import {GenericListItem} from '../../components/Results/Results';
+import {MicrosoftAcademicKnowledgeAPIPublicationResults} from '../../components/Publication/MicrosoftResults';
 
 import {dbPublicationToJSPublication} from '../../helpers/publications';
 
 import 'instantsearch.css/themes/algolia.css';
 
 import './SearchPage.css';
-import {functions} from 'firebase';
 import {useContext} from 'react';
 import {FeatureFlags} from '../../App';
 
@@ -304,30 +304,3 @@ const TopicsResults = () => {
 };
 
 const urlToSearchState = (location) => qs.parse(location.search.slice(1));
-
-const getMicrosoftAcademicKnowledgeAPIPublications = functions().httpsCallable(
-  'publications-microsoftAcademicKnowledgePublicationSearch'
-);
-
-function MicrosoftAcademicKnowledgeAPIPublicationResults({query}) {
-  const [results, setResults] = useState([]);
-  useEffect(() => {
-    if (!query) return;
-    const apiCallTimeout = setTimeout(
-      () =>
-        getMicrosoftAcademicKnowledgeAPIPublications({
-          query: query,
-        })
-          .then((res) => setResults(res.data.map(toLocalPublication)))
-          .catch((err) => alert(err)),
-      2000
-    );
-    return () => clearTimeout(apiCallTimeout);
-  }, [query]);
-  return <Results results={results} hasMore={false} />;
-}
-
-function toLocalPublication(remotePublication) {
-  remotePublication.resourceType = 'publication';
-  return remotePublication;
-}

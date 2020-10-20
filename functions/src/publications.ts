@@ -8,6 +8,7 @@ import {
   Publication,
   MAKPublication,
 } from './microsoft';
+import {Post} from './posts';
 
 const pubSubClient = new PubSub();
 const db = admin.firestore();
@@ -83,8 +84,8 @@ export const addNewMSPublicationAsync = functions.pubsub
         delete publication.authors;
         t.set(db.collection('publications').doc(), publication);
 
-        microsoftPublication.AA?.forEach((author) =>{
-        const authorID = author.AuId.toString();
+        microsoftPublication.AA?.forEach((author) => {
+          const authorID = author.AuId.toString();
           t.set(db.collection('MSUsers').doc(authorID), author);
           t.set(
             db
@@ -102,28 +103,52 @@ export const addNewMSPublicationAsync = functions.pubsub
     return null;
   });
 
-  export const addNewMAKPublicationToAuthors = functions.firestore
-    .document('MSUsers/{msUserID}/publications/{msPublicationID}')
-    .onCreate(async (change, context) => {
-      const msUserID = context.params.msUserID;
-      const msPublicationID = context.params.msPublicationID;
+export const addNewMAKPublicationToAuthors = functions.firestore
+  .document('MSUsers/{msUserID}/publications/{msPublicationID}')
+  .onCreate(async (change, context) => {
+    const msUserID = context.params.msUserID;
+    const msPublicationID = context.params.msPublicationID;
 
-      // Check whether there is a labspoon user with this ID, otherwise do nothing.
-      const userQS = await db
-        .collection('users')
-        .where('microsoftAcademicAuthorID', '==', msUserID)
-        .limit(1)
-        .get();
-      if (userQS.empty) return null;
-      const userDS = userQS.docs[0];
+    // Check whether there is a labspoon user corresponding to the microsoft academic ID, otherwise do nothing.
+    const userQS = await db
+      .collection('users')
+      .where('microsoftAcademicAuthorID', '==', msUserID)
+      .limit(1)
+      .get();
+    if (userQS.empty) return null;
+    const userDS = userQS.docs[0];
 
-      // Find the publication
-      const publicationsQS = await db.collection('publications').where('microsoftID', '==', msPublicationID).limit(1).get();
-      if (publicationsQS.empty) {
-        console.log('No publication found with Microsoft Publication ID ', msPublicationID, ' this should not happen and likely indicates a logic issue.');
-      }
-      const publicationDS = publicationsQS.docs[0];
-      await db.doc(`users/${userDS.id}/publications/${publicationDS.id}`).set(publicationDS.data());
+    // Find the publication
+    const publicationDS = await getPublicationByMicrosoftPublicationID(msPublicationID);
+    await db.doc(`users/${userDS.id}/publications/${publicationDS.id}`).set(publicationDS.data());
 
-      return null;
-    });
+    return null;
+  });
+
+export const addPublicationPostToPublication = functions.firestore
+  .document(`posts/{postID}`)
+  .onCreate(async (change) => {
+    const postID = change.id;
+    const post = change.data() as Post;
+    const publication = post.content.publication;
+    if (!publication) return null;
+
+    // The publication on the post will not yet be associated with an ID as this is not provided
+    // at post creation so we need to find the publication ID based on the microsoft ID.
+    const publicationDS = await getPublicationByMicrosoftPublicationID(publication.microsoftID!);
+    const publicationID = publicationDS.id;
+
+    const batch = db.batch();
+    batch.update(change.ref, {'content.publication.id': publicationID});
+    batch.set(publicationDS.ref.collection('posts').doc(postID), post);
+    await batch.commit();
+    return null;
+  });
+
+async function getPublicationByMicrosoftPublicationID(msPublicationID: string) {
+  const publicationsQS = await db.collection('publications').where('microsoftID', '==', msPublicationID).limit(1).get();
+  if (publicationsQS.empty) {
+    throw new Error('Could not find publication with microsoft publication ID: ' + msPublicationID);
+  }
+  return publicationsQS.docs[0];
+}

@@ -11,6 +11,7 @@ import FilterableResults, {
 } from '../../components/FilterableResults/FilterableResults';
 import CreatePost from '../../components/Posts/Post/CreatePost/CreatePost';
 import HomePageTabs from '../../components/HomePageTabs';
+import {translateOptionalFields} from '../../helpers/posts';
 
 // Due to the limitations in firestore filters described in
 // https://firebase.google.com/docs/firestore/query-data/queries it is not
@@ -79,26 +80,7 @@ function filterFeedData(collection, skip, limit, filter, last) {
     last,
     limit
   );
-  return sortedAndPaginatedResults.then((results) => {
-    const mappedResults = results.map((result) => {
-      Object.entries(result.content).forEach((value) => {
-        let [type, content] = value;
-        if (type === 'text') return;
-        if (type === 'researchers') type = 'researcher';
-        if (
-          !result.hasOwnProperty('optionaltags') ||
-          result.optionaltags.length === 0
-        )
-          result.optionaltags = [];
-        result.optionaltags.push({
-          type: type,
-          content: content,
-        });
-      });
-      return result;
-    });
-    return mappedResults;
-  });
+  return sortedAndPaginatedResults.then(translateOptionalFields);
 }
 
 function sortAndPaginateFeedData(results, last, limit) {

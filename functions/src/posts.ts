@@ -4,6 +4,7 @@ import {admin, ResourceTypes} from './config';
 import {firestore} from 'firebase-admin';
 
 import {UserRef} from './users';
+import {Publication} from './microsoft';
 
 const db = admin.firestore();
 
@@ -33,18 +34,20 @@ export const createPost = functions.https.onCall(async (data, context) => {
 
   const postID = uuid();
 
+  const content: PostContent = {
+    text: data.title,
+    position: data.position,
+    location: data.location,
+    salary: data.salary,
+    methods: data.methods,
+    startDate: data.startDate,
+  };
+  if (data.publication) content.publication = data.publication;
+  if (data.publicationURL) content.publicationURL = data.publicationURL;
   const post: Post = {
     postType: data.postType,
     author: author,
-    content: {
-      text: data.title,
-      publicationURL: data.publicationURL,
-      position: data.position,
-      location: data.location,
-      salary: data.salary,
-      methods: data.methods,
-      startDate: data.startDate,
-    },
+    content: content,
     topics: data.topics,
     timestamp: new Date(),
     filterAuthorID: author.id,
@@ -57,25 +60,43 @@ export const createPost = functions.https.onCall(async (data, context) => {
 
   const batch = db.batch();
   batch.set(db.collection('posts').doc(postID), post);
-  batch.set(
-    db.collection('users').doc(userID).collection('posts').doc(postID),
-    post
-  );
   await batch.commit();
 });
 
-export const addPostToUserFollowingFeeds = functions.firestore
+export const writePostToAuthorPosts = functions.firestore
   .document(`posts/{postID}`)
-  .onCreate(async (change, context) => {
-    const postID = change.id;
-    const post = change.data() as Post;
+  .onWrite(async (change, context) => {
+    if (
+      context.eventType ==
+      'providers/google.firebase.database/eventTypes/ref.delete'
+    )
+      return null;
+    const post = change.after.data() as Post;
+    const postID = change.after.id;
     const authorID = post.author.id;
+    await db
+      .collection('users')
+      .doc(authorID)
+      .collection('posts')
+      .doc(postID)
+      .set(post);
+    return null;
+  });
+
+export const writePostToUserFollowingFeeds = functions.firestore
+  .document(`posts/{postID}`)
+  .onWrite(async (change, context) => {
+    if (
+      context.eventType ==
+      'providers/google.firebase.database/eventTypes/ref.delete'
+    )
+      return null;
+    const post = change.after.data() as Post;
+    const postID = change.after.id;
     const followers = await db
-      .collection(`users/${authorID}/followedByUsers`)
+      .collection(`users/${post.author.id}/followedByUsers`)
       .get();
-    if (followers.empty) {
-      return;
-    }
+    if (followers.empty) return null;
     followers.forEach(async (followerSnapshot) => {
       const follower = followerSnapshot.data() as UserRef;
       const followingFeedRef = db.doc(
@@ -84,6 +105,7 @@ export const addPostToUserFollowingFeeds = functions.firestore
       await followingFeedRef.collection('posts').doc(postID).set(post);
       await updateFiltersByPost(followingFeedRef, post);
     });
+    return null;
   });
 
 export const addPostToTopic = functions.firestore
@@ -332,6 +354,7 @@ export interface PostContent {
   researchers?: Array<UserRef>;
   publicationURL?: string;
   position?: string;
+  publication?: Publication;
 }
 
 export interface PostType {
