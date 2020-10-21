@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {Form, Formik} from 'formik';
 import TagTopics from './TagTopics';
 import CreatePostActions from './CreatePostActions';
@@ -13,12 +13,26 @@ export default function PostForm({
   postType,
   setPostType,
 }) {
+  const [postSubmitted, setPostSubmitted] = useState(false);
+
+  useEffect(() => {
+    if (postSubmitted) {
+      setTimeout(() => setPostSubmitted(false), 10000);
+    }
+  }, [postSubmitted]);
+
+  const createPost = (res) => {
+    setPostSubmitted(true);
+    if (postSubmitted) return;
+    onSubmit(res);
+  };
+
   return (
     <div className="creating-post-container">
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
-        onSubmit={onSubmit}
+        onSubmit={createPost}
       >
         <Form id="create-post-form">{children}</Form>
       </Formik>
