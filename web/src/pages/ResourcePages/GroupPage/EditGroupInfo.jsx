@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import GroupInfoForm from '../../Groups/CreateGroupPage/GroupInfoForm';
-import {db} from '../../../firebase';
+import firebase, {db, storage} from '../../../firebase';
 
 import './GroupPage.css';
 
@@ -8,6 +8,7 @@ export default function EditingGroupInfo({groupData, setEditingGroup}) {
   const groupID = groupData.id;
   const [groupMembers, setGroupMembers] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
+  const [avatar, setAvatar] = useState([]);
 
   useEffect(() => {
     const fetchGroupMembers = db
@@ -72,7 +73,20 @@ export default function EditingGroupInfo({groupData, setEditingGroup}) {
         .catch((err) => alert(err, 'batch failed to commit'))
         .then(() => setEditingGroup(false));
     };
-
+    const avatarStorageRef = storage.ref(`groups/${groupID}/avatar_fullSize`);
+    if (avatar.length > 0) {
+      return avatarStorageRef.put(avatar[0], {contentType: avatar[0].type}).on(
+        firebase.storage.TaskEvent.STATE_CHANGED,
+        (snapshot) => {
+          // TODO: implement loading symbol
+          console.log('snapshot', snapshot);
+        },
+        (err) => {
+          alert(`failed to write avatar ${err}`);
+        },
+        writeToDB
+      );
+    }
     writeToDB();
   };
 
@@ -82,6 +96,7 @@ export default function EditingGroupInfo({groupData, setEditingGroup}) {
       onSubmit={onSubmitEdit}
       selectedUsers={selectedUsers}
       setSelectedUsers={setSelectedUsers}
+      setAvatar={setAvatar}
       existingAvatar={groupData.avatar}
       cancelForm={() => setEditingGroup(false)}
       submitText="Save Changes"

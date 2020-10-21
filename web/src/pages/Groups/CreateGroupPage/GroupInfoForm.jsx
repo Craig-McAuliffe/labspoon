@@ -19,7 +19,7 @@ import PrimaryButton from '../../../components/Buttons/PrimaryButton';
 import CancelButton from '../../../components/Buttons/CancelButton';
 import NegativeButton from '../../../components/Buttons/NegativeButton';
 import CreatePost from '../../../components/Posts/Post/CreatePost/CreatePost';
-import UserAvatar from '../../../components/Avatar/UserAvatar';
+import GroupAvatar from '../../../components/Avatar/GroupAvatar';
 import {AddMemberIcon, AddProfilePhoto} from '../../../assets/CreateGroupIcons';
 import UserListItem, {
   UserSmallResultItem,
@@ -82,28 +82,10 @@ export default function GroupInfoForm({
         >
           <Form id="create-group-form">
             <div className="create-group-profile-info-container">
-              <div>
-                <h3>Group Picture</h3>
-                {existingAvatar ? (
-                  <UserAvatar
-                    src={existingAvatar}
-                    height="190px"
-                    width="190px"
-                  />
-                ) : (
-                  <div className="group-profile-avatar">
-                    <AddProfilePhoto />
-                    <ImageUploader
-                      onChange={onAvatarSelect}
-                      imgExtension={['.jpg', '.png']}
-                      singleImage
-                      withPreview
-                      withIcon={false}
-                      buttonStyles={{background: '#00507c'}}
-                    />
-                  </div>
-                )}
-              </div>
+              <EditAvatar
+                existingAvatar={existingAvatar}
+                onAvatarSelect={onAvatarSelect}
+              />
               <div className="create-group-meta-info">
                 <h3>Basic Info</h3>
                 <FormTextInput label="Name" name="name" sideLabel />
@@ -146,6 +128,34 @@ export default function GroupInfoForm({
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function EditAvatar({existingAvatar, onAvatarSelect}) {
+  const [editingAvatar, setEditingAvatar] = useState(false);
+  if (!existingAvatar || editingAvatar)
+    return (
+      <div className="group-profile-avatar">
+        <AddProfilePhoto />
+        <ImageUploader
+          onChange={onAvatarSelect}
+          imgExtension={['.jpg', '.png']}
+          singleImage
+          withPreview
+          withIcon={false}
+          buttonStyles={{background: '#00507c'}}
+        />
+        <CancelButton cancelAction={() => setEditingAvatar(false)} />
+      </div>
+    );
+  return (
+    <div>
+      <h3>Group Picture </h3>
+      <GroupAvatar src={existingAvatar} height="190px" width="190px" />
+      <PrimaryButton onClick={() => setEditingAvatar(true)}>
+        Upload New Photo
+      </PrimaryButton>
     </div>
   );
 }

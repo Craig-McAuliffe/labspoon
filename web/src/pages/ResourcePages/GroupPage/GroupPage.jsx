@@ -19,7 +19,7 @@ import FilterableResults, {
   FilterManager,
   NewFilterMenuWrapper,
 } from '../../../components/FilterableResults/FilterableResults';
-import UserAvatar from '../../../components/Avatar/UserAvatar';
+import GroupAvatar from '../../../components/Avatar/GroupAvatar';
 import FollowGroupButton from '../../../components/Group/FollowGroupButton';
 import MessageButton from '../../../components/Buttons/MessageButton';
 import EditButton from '../../../components/Buttons/EditButton';
@@ -269,7 +269,7 @@ const GroupDetails = ({
     <>
       <div className="group-header">
         <div className="group-icon-and-message">
-          <UserAvatar src={group.avatar} height="120px" width="120px" />
+          <GroupAvatar src={group.avatar} height="120px" width="120px" />
           <MessageButton />
         </div>
         <div className="group-header-info">
