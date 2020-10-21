@@ -10,6 +10,7 @@ import FollowTopicButton from '../../components/Topics/FollowTopicButton';
 import GroupListItem from '../../components/Group/GroupListItem';
 import FollowUserButton from '../../components/User/FollowUserButton/FollowUserButton';
 import SecondaryButton from '../../components/Buttons/SecondaryButton';
+import PrimaryButton from '../../components/Buttons/PrimaryButton';
 import {CreateGroupIcon} from '../../assets/MenuIcons';
 import CreateGroupPage from '../Groups/CreateGroupPage/CreateGroupPage';
 import UserListItem from '../../components/User/UserListItem';
@@ -19,7 +20,6 @@ import {SearchIconGrey} from '../../assets/HeaderIcons';
 import firebase from '../../firebase';
 
 import './OnboardingPage.css';
-import PrimaryButton from '../../components/Buttons/PrimaryButton';
 
 const getSuggestedPublicationsForAuthorName = firebase
   .functions()
@@ -396,88 +396,97 @@ function SuggestedPublications({suggestedPublications}) {
     setSelectedPublicationsAuthorID,
   ] = useState();
 
-  const suggestedPublicationItems = () =>
-    suggestedPublications.map((suggestedPublication, i) => {
-      if (!suggestedPublication) return null;
-      return (
-        <React.Fragment key={suggestedPublication.publicationInfo.title + i}>
-          <div className="onboarding-suggested-publication-title-container">
-            <h4 className="onboarding-suggested-publication-title">
-              {suggestedPublication.publicationInfo.title}
-            </h4>
-            {suggestedPublication.publicationInfo.authors.map((author, i) => {
-              if (i > 6) {
-                if (
-                  i ===
-                  suggestedPublication.publicationInfo.authors.length - 1
-                )
-                  return (
-                    <p
-                      key={author.id}
-                      className="onboarding-suggested-publication-authors"
-                    >
-                      ...and {i + 1} more.
-                    </p>
-                  );
-                return;
-              }
-              return (
-                <p
-                  key={author.id}
-                  className="onboarding-suggested-publication-authors"
-                >
-                  {author.name}
-                  {i === suggestedPublication.publicationInfo.authors.length - 1
-                    ? null
-                    : ','}
-                </p>
-              );
-            })}
-          </div>
-          <div className="post-selector-container">
-            <button
-              className={
-                selectedPublicationsAuthorID ===
-                suggestedPublication.microsoftAcademicIDMatch
-                  ? 'onboarding-publication-selector-button-selected'
-                  : 'onboarding-publication-selector-button'
-              }
-              type="button"
-              onClick={() => {
-                if (
-                  suggestedPublication.microsoftAcademicIDMatch ===
-                  selectedPublicationsAuthorID
-                )
-                  setSelectedPublicationsAuthorID(undefined);
-                else
-                  setSelectedPublicationsAuthorID(
-                    suggestedPublication.microsoftAcademicIDMatch
-                  );
-              }}
-            />
-          </div>
-        </React.Fragment>
-      );
-    });
-
   return (
     <>
       <div className="onboarding-suggested-publications-container">
-        {suggestedPublicationItems()}
+        <SuggestedPublicationItems
+          suggestedPublications={suggestedPublications}
+          selectedPublicationsAuthorID={selectedPublicationsAuthorID}
+          setSelectedPublicationsAuthorID={setSelectedPublicationsAuthorID}
+        />
       </div>
       <div className="onboarding-suggested-publications-submit-container">
         <PrimaryButton
           type="button"
           onClick={() => {
+            if (selectedPublicationsAuthorID === undefined) return;
             setMicrosoftAcademicIDByPublicationMatches({
               microsoftAcademicAuthorID: selectedPublicationsAuthorID,
             });
             history.push(`/onboarding/${GROUPS}`);
           }}
+          inactive={selectedPublicationsAuthorID ? false : true}
         >
           Link Papers to Profile
         </PrimaryButton>
       </div>
     </>
   );
+}
+
+function SuggestedPublicationItems({
+  suggestedPublications,
+  selectedPublicationsAuthorID,
+  setSelectedPublicationsAuthorID,
+}) {
+  return suggestedPublications.map((suggestedPublication, i) => {
+    if (!suggestedPublication) return null;
+    return (
+      <React.Fragment key={suggestedPublication.publicationInfo.title + i}>
+        <div className="onboarding-suggested-publication-title-container">
+          <h4 className="onboarding-suggested-publication-title">
+            {suggestedPublication.publicationInfo.title}
+          </h4>
+          <SuggestedPublicationAuthors
+            authors={suggestedPublication.publicationInfo.authors}
+          />
+        </div>
+        <div className="post-selector-container">
+          <button
+            className={
+              selectedPublicationsAuthorID ===
+              suggestedPublication.microsoftAcademicIDMatch
+                ? 'onboarding-publication-selector-button-selected'
+                : 'onboarding-publication-selector-button'
+            }
+            type="button"
+            onClick={() => {
+              if (
+                suggestedPublication.microsoftAcademicIDMatch ===
+                selectedPublicationsAuthorID
+              )
+                setSelectedPublicationsAuthorID(undefined);
+              else
+                setSelectedPublicationsAuthorID(
+                  suggestedPublication.microsoftAcademicIDMatch
+                );
+            }}
+          />
+        </div>
+      </React.Fragment>
+    );
+  });
+}
+
+function SuggestedPublicationAuthors({authors}) {
+  return authors.map((author, i) => {
+    if (i > 6) {
+      if (i === authors.length - 1)
+        return (
+          <p
+            key={author.id}
+            className="onboarding-suggested-publication-authors"
+          >
+            ...and {i + 1} more.
+          </p>
+        );
+      return;
+    }
+    return (
+      <p key={author.id} className="onboarding-suggested-publication-authors">
+        {author.name}
+        {i === authors.length - 1 ? null : ','}
+      </p>
+    );
+  });
 }

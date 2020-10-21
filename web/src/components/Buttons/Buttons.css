@@ -35,7 +35,8 @@
 }
 
 .primary-button,
-.primary-button-small {
+.primary-button-small,
+.primary-button-inactive {
   border: none;
   border-radius: 4%;
   text-decoration: none;
@@ -47,7 +48,8 @@
   -moz-appearance: none;
 }
 
-.primary-button {
+.primary-button,
+.primary-button-inactive {
   padding: 10px 10px 5px 10px;
 }
 
@@ -75,9 +77,15 @@
 
 .primary-button:hover,
 .primary-button:focus,
+.primary-button-inactive:hover,
+.primary-button-inactive:focus,
 .primary-button-small:hover,
 .primary-button-small:focus {
   background: #023b5a;
+}
+
+.primary-button-inactive {
+  opacity: 40%;
 }
 
 .primary-button-clicked {
@@ -157,6 +165,8 @@
 
   .primary-button,
   .primary-button:hover,
+  .primary-button-inactive:hover,
+  .primary-button-inactive,
   .FollowButton:hover h2 {
     padding: 6px 11px 1px 11px;
     border-radius: 3%;
