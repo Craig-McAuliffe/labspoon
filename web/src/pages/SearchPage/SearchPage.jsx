@@ -142,7 +142,6 @@ export default function SearchPage() {
 function SeeMoreWrapper({onClick, resourceType, children}) {
   const Wrapper = connectStateResults(
     ({searchState, searchResults, children}) => {
-      if (resourceType === 'Topics') console.log(searchResults);
       if (searchResults && searchResults.nbHits !== 0) {
         return (
           <>
