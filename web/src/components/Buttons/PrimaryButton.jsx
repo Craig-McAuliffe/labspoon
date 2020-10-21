@@ -8,12 +8,19 @@ export default function PrimaryButton({
   small,
   children,
   formID,
+  inactive,
   ...props
 }) {
   return (
     <button
       type={submit ? 'submit' : 'button'}
-      className={small ? 'primary-button-small' : 'primary-button'}
+      className={
+        small
+          ? 'primary-button-small'
+          : inactive
+          ? 'primary-button-inactive'
+          : 'primary-button'
+      }
       onClick={onClick ? onClick : null}
       form={formID ? formID : null}
     >

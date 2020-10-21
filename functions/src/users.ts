@@ -96,34 +96,29 @@ export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall
     }
     const userID = context.auth.uid;
 
-    const selectedPublicationSuggestions: PublicationSuggestion[] =
-      data.publicationSuggestions;
-    if (
-      !selectedPublicationSuggestions ||
-      selectedPublicationSuggestions.length === 0
-    )
+    const microsoftAcademicAuthorID: string = data.microsoftAcademicAuthorID;
+    if (microsoftAcademicAuthorID === undefined)
       throw new functions.https.HttpsError(
         'invalid-argument',
         'Must provide selected publication suggestions'
       );
-    const seenIDs: Set<string> = new Set();
-    selectedPublicationSuggestions.forEach(
-      (publicationSuggestion: PublicationSuggestion) =>
-        seenIDs.add(publicationSuggestion.microsoftAcademicIDMatch)
-    );
-    if (seenIDs.size !== 1)
-      throw new functions.https.HttpsError(
-        'invalid-argument',
-        'All selected publications must be from same user'
-      );
-    const microsoftAcademicAuthorID =
-      selectedPublicationSuggestions[0].microsoftAcademicIDMatch;
 
     const batch = db.batch();
-    batch.update(db.doc(`users/${userID}`), {
-      microsoftAcademicAuthorID: microsoftAcademicAuthorID,
-    });
-
+    async function linkUserToMicrosoftID() {
+      const userToBeLinkedDBRef = db.doc(`users/${userID}`);
+      await userToBeLinkedDBRef
+        .get()
+        .then((qs) => {
+          if (!qs.exists) return;
+          const userToBeLinked = qs.data() as UserDB;
+          if (userToBeLinked.microsoftAcademicAuthorID !== undefined) return;
+          batch.update(userToBeLinkedDBRef, {
+            microsoftAcademicAuthorID: microsoftAcademicAuthorID,
+          });
+        })
+        .catch((err) => console.log(err, 'could not fetch user to be linked'));
+    }
+    await linkUserToMicrosoftID();
     const msPublicationsForUserQS = await db
       .collection(`MSUsers/${microsoftAcademicAuthorID}/publications`)
       .get();
@@ -324,4 +319,8 @@ export interface UserRef {
   name: string;
   avatar?: string;
   rank?: number;
+}
+
+interface UserDB {
+  microsoftAcademicAuthorID?: string;
 }
