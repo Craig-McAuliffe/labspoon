@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react';
-import PrimaryButton from '../../../Buttons/PrimaryButton';
+import NegativeButton from '../../../Buttons/NegativeButton';
 import * as Yup from 'yup';
 import firebase, {db} from '../../../../firebase';
 import {v4 as uuid} from 'uuid';
@@ -7,9 +7,9 @@ import {CreatePostTextArea, TextInput} from '../../../Forms/FormTextInput';
 import PostForm from './PostForm';
 import {CreatingPostContext} from './CreatePost';
 import {FormPublicationResults} from '../../../Publication/MicrosoftResults';
+import {SmallPublicationListItem} from '../../../Publication/PublicationListItem';
 
 import './CreatePost.css';
-import {SmallPublicationListItem} from '../../../Publication/PublicationListItem';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
@@ -81,6 +81,7 @@ export default function PublicationPostForm({cancelPost, setCreatingPost}) {
   );
 }
 
+// CSS classes found in
 function SelectPublication({
   publication,
   setPublication,
@@ -89,38 +90,47 @@ function SelectPublication({
   const [query, setQuery] = useState();
   if (publication) {
     return (
-      <SmallPublicationListItem publication={publication}>
-        <PrimaryButton
-          onClick={() => {
-            setQuery(undefined);
-            setPublication(undefined);
-          }}
-          small
-        >
-          Deselect
-        </PrimaryButton>
-      </SmallPublicationListItem>
+      <div className="create-publication-post-list-item-container">
+        <SmallPublicationListItem publication={publication} />
+        <div className="create-publication-post-list-item-select-container">
+          <NegativeButton
+            onClick={() => {
+              setQuery(undefined);
+              setPublication(undefined);
+            }}
+            small
+          >
+            Deselect
+          </NegativeButton>
+        </div>
+      </div>
     );
   }
+  // The "search" button is just there to prevent search/url switch
+  // if the user clicks enter
   return (
     <>
       <div className="creating-post-tags">
         <TextInput
           value={query}
-          label={'Search publications:'}
+          label={'Search Publications:'}
           sideLabel={true}
           onChange={(event) => setQuery(event.target.value)}
           className="search-input"
         />
       </div>
-      <button
-        onClick={() => {
-          setUsePublicationURL(true);
-        }}
-        small
-      >
-        Can&rsquo;t find the publication you&rsquo;re looking for?
-      </button>
+      <div className="create-publication-post-search-or-link-container">
+        <button className="create-publication-search-publications-button"></button>
+        <p>Can&rsquo;t find the publication you&rsquo;re looking for?</p>
+        <button
+          onClick={() => {
+            setUsePublicationURL(true);
+          }}
+          small
+        >
+          <h4>Add Link Instead</h4>
+        </button>
+      </div>
       <FormPublicationResults query={query} setPublication={setPublication} />
     </>
   );
@@ -132,7 +142,7 @@ function PublicationURL({
   setUsePublicationURL,
 }) {
   return (
-    <>
+    <div className="creating-post-tags">
       <TextInput
         value={publicationURL}
         label={'Publication URL:'}
@@ -140,14 +150,17 @@ function PublicationURL({
         onChange={(event) => setPublicationURL(event.target.value)}
         className="search-input"
       />
-      <button
-        onClick={() => {
-          setUsePublicationURL(false);
-        }}
-        small
-      >
-        Search for a publication instead?
-      </button>
-    </>
+      <div className="create-publication-post-search-or-link-container">
+        <p>Search for a publication instead?</p>
+        <button
+          onClick={() => {
+            setUsePublicationURL(false);
+          }}
+          small
+        >
+          <h4>Find on Labspoon</h4>
+        </button>
+      </div>
+    </div>
   );
 }

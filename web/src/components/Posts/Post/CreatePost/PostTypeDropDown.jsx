@@ -20,13 +20,11 @@ export default function PostTypeDropDown({postType, setPostType}) {
         </Dropdown.Toggle>
         <Dropdown.Menu>
           {postTypeOptions.map((postTypeOption) => (
-            <Dropdown.Item key={postTypeOption}>
-              <div className="post-type-dropdown-option">
-                <button onClick={() => setPostType(postTypeOption)}>
-                  {postTypeOption}
-                </button>
-              </div>
-            </Dropdown.Item>
+            <div key={postTypeOption} className="post-type-dropdown-option">
+              <button onClick={() => setPostType(postTypeOption)}>
+                {postTypeOption}
+              </button>
+            </div>
           ))}
         </Dropdown.Menu>
       </Dropdown>

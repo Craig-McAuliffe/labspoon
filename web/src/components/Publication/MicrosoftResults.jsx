@@ -4,6 +4,7 @@ import {functions} from 'firebase';
 import Results from '../Results/Results';
 import {SmallPublicationListItem} from './PublicationListItem';
 
+import './PublicationListItem.css';
 const getMicrosoftAcademicKnowledgeAPIPublications = functions().httpsCallable(
   'publications-microsoftAcademicKnowledgePublicationSearch'
 );
@@ -24,14 +25,17 @@ export function FormPublicationResults({query, setPublication}) {
   ]);
   if (loading) return <h1>Loading...</h1>;
   return results.map((publication) => (
-    <SmallPublicationListItem
-      publication={publication}
+    <div
       key={publication.id || publication.microsoftID}
+      className="form-publication-list-item-container"
     >
-      <PrimaryButton onClick={() => setPublication(publication)} small>
-        Select
-      </PrimaryButton>
-    </SmallPublicationListItem>
+      <SmallPublicationListItem publication={publication} />
+      <div className="form-publication-list-item-select-container">
+        <PrimaryButton onClick={() => setPublication(publication)}>
+          Select
+        </PrimaryButton>
+      </div>
+    </div>
   ));
 }
 

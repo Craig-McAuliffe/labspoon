@@ -50,7 +50,7 @@ export default function PublicationListItem({
 export function SmallPublicationListItem({publication, children}) {
   const publicationURL = getPublicationURL(publication);
   return (
-    <div className={'publication-list-item-container'}>
+    <div className="publication-list-item-container">
       <PublicationListItemTitle
         url={publicationURL}
         title={publication.title}
@@ -82,9 +82,9 @@ function PublicationListItemHeader({publication}) {
       />
     );
   } else if (publication.journal) {
-    journal = <h1>{publication.journal}</h1>;
+    journal = <h4>{publication.journal}</h4>;
   } else {
-    journal = <h1>Journal Article</h1>;
+    journal = <h4>Journal Article</h4>;
   }
   return (
     <div className="publication-list-item-header">
