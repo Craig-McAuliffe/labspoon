@@ -23,6 +23,7 @@ export default function PublicationPostForm({
   const [publication, setPublication] = useState();
   const [usePublicationURL, setUsePublicationURL] = useState(false);
   const [publicationURL, setPublicationURL] = useState();
+
   const submitChanges = (res) => {
     if (!(publication || publicationURL)) {
       return alert('Must select a publication or provide a publication URL');

@@ -18,6 +18,7 @@ export default function OpenPositionPostForm({
   postType,
 }) {
   const {selectedTopics, setPostSuccess} = useContext(CreatingPostContext);
+
   const submitChanges = (res) => {
     res.postType = {id: 'openPositionPost', name: 'Open Position'};
     selectedTopics.forEach((selectedTopic) => {
