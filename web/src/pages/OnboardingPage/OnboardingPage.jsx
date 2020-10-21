@@ -395,15 +395,44 @@ function SuggestedPublications({suggestedPublications}) {
     selectedPublicationsAuthorID,
     setSelectedPublicationsAuthorID,
   ] = useState();
+
   const suggestedPublicationItems = () =>
     suggestedPublications.map((suggestedPublication, i) => {
       if (!suggestedPublication) return null;
       return (
         <React.Fragment key={suggestedPublication.publicationInfo.title + i}>
-          <div>
+          <div className="onboarding-suggested-publication-title-container">
             <h4 className="onboarding-suggested-publication-title">
               {suggestedPublication.publicationInfo.title}
             </h4>
+            {suggestedPublication.publicationInfo.authors.map((author, i) => {
+              if (i > 6) {
+                if (
+                  i ===
+                  suggestedPublication.publicationInfo.authors.length - 1
+                )
+                  return (
+                    <p
+                      key={author.id}
+                      className="onboarding-suggested-publication-authors"
+                    >
+                      ...and {i + 1} more.
+                    </p>
+                  );
+                return;
+              }
+              return (
+                <p
+                  key={author.id}
+                  className="onboarding-suggested-publication-authors"
+                >
+                  {author.name}
+                  {i === suggestedPublication.publicationInfo.authors.length - 1
+                    ? null
+                    : ','}
+                </p>
+              );
+            })}
           </div>
           <div className="post-selector-container">
             <button

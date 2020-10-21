@@ -122,6 +122,9 @@
 }
 
 .onboarding-suggested-publication-title {
+}
+
+.onboarding-suggested-publication-title-container {
   margin: 20px 0px;
 }
 
@@ -163,4 +166,16 @@
   margin: 40px 0px 0px;
   display: flex;
   justify-content: flex-end;
+}
+
+.onboarding-suggested-publication-authors-container {
+  /* display: flex; */
+}
+
+.onboarding-suggested-publication-authors {
+  display: inline-block;
+  margin-right: 10px;
+  color: #5d5d65;
+  line-height: 0px;
+  margin-bottom: 0px;
 }
