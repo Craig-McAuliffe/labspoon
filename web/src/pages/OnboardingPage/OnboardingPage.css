@@ -168,10 +168,6 @@
   justify-content: flex-end;
 }
 
-.onboarding-suggested-publication-authors-container {
-  /* display: flex; */
-}
-
 .onboarding-suggested-publication-authors {
   display: inline-block;
   margin-right: 10px;
