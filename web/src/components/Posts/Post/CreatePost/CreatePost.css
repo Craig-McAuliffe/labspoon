@@ -115,7 +115,12 @@
 .create-post-dropdown-toggle-name {
   display: inline-block;
   font-size: 1.1em;
-  margin-left: 5px;
+  margin-right: 5px;
+  color: #00507c;
+}
+
+.create-post-dropdown-toggle-name span {
+  border-bottom: 2px solid #00507c;
 }
 
 .create-pinned-post-button {
@@ -144,4 +149,12 @@
   width: 200px;
   padding: 20px 0px;
   text-align: center;
+}
+
+.create-post-post-type-dropdown-container {
+  margin-bottom: 15px;
+}
+
+.create-post-post-type-dropdown-container path {
+  stroke: #00507c;
 }

@@ -13,12 +13,7 @@ import {SmallPublicationListItem} from '../../../Publication/PublicationListItem
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
-export default function PublicationPostForm({
-  cancelPost,
-  setCreatingPost,
-  setPostType,
-  postType,
-}) {
+export default function PublicationPostForm({cancelPost, setCreatingPost}) {
   const {selectedTopics, setPostSuccess} = useContext(CreatingPostContext);
   const [publication, setPublication] = useState();
   const [usePublicationURL, setUsePublicationURL] = useState(false);
@@ -63,8 +58,6 @@ export default function PublicationPostForm({
       initialValues={initialValues}
       validationSchema={validationSchema}
       cancelPost={cancelPost}
-      postType={postType}
-      setPostType={setPostType}
     >
       <div className="creating-post-main-text-container">
         <CreatePostTextArea name="title" />

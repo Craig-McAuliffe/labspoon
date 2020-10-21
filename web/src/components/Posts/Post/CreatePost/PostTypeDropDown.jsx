@@ -8,20 +8,28 @@ import './CreatePost.css';
 export default function PostTypeDropDown({postType, setPostType}) {
   const postTypeOptions = ['Default', 'Publication', 'Open Position'];
   return (
-    <Dropdown>
-      <Dropdown.Toggle as={CustomToggle} id="dropdown-custom-components">
-        <ExpandIcon />
-        <div className="create-post-dropdown-toggle-name">Type:{postType}</div>
-      </Dropdown.Toggle>
-      <Dropdown.Menu>
-        {postTypeOptions.map((postTypeOption) => (
-          <div key={postTypeOption} className="post-type-dropdown-option">
-            <button onClick={() => setPostType(postTypeOption)}>
-              {postTypeOption}
-            </button>
+    <div className="create-post-post-type-dropdown-container">
+      <Dropdown>
+        <Dropdown.Toggle as={CustomToggle} id="dropdown-custom-components">
+          <div className="create-post-dropdown-toggle-name">
+            <h4>
+              Post Type: <span>{postType}</span>
+            </h4>
           </div>
-        ))}
-      </Dropdown.Menu>
-    </Dropdown>
+          <ExpandIcon />
+        </Dropdown.Toggle>
+        <Dropdown.Menu>
+          {postTypeOptions.map((postTypeOption) => (
+            <Dropdown.Item key={postTypeOption}>
+              <div className="post-type-dropdown-option">
+                <button onClick={() => setPostType(postTypeOption)}>
+                  {postTypeOption}
+                </button>
+              </div>
+            </Dropdown.Item>
+          ))}
+        </Dropdown.Menu>
+      </Dropdown>
+    </div>
   );
 }
