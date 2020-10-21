@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useState, useEffect} from 'react';
 import PrimaryButton from '../../../Buttons/PrimaryButton';
 import * as Yup from 'yup';
 import firebase, {db} from '../../../../firebase';
@@ -23,7 +23,17 @@ export default function PublicationPostForm({
   const [publication, setPublication] = useState();
   const [usePublicationURL, setUsePublicationURL] = useState(false);
   const [publicationURL, setPublicationURL] = useState();
+  const [postSubmitted, setPostSubmitted] = useState(false);
+
+  useEffect(() => {
+    if (postSubmitted) {
+      setTimeout(() => setPostSubmitted(false), 10000);
+    }
+  }, [postSubmitted]);
+
   const submitChanges = (res) => {
+    setPostSubmitted(true);
+    if (postSubmitted) return;
     if (!(publication || publicationURL)) {
       return alert('Must select a publication or provide a publication URL');
     } else if (publication) {

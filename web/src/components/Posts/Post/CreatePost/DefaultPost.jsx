@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useState, useEffect} from 'react';
 import firebase, {db} from '../../../../firebase';
 import * as Yup from 'yup';
 import {v4 as uuid} from 'uuid';
@@ -17,8 +17,17 @@ export default function DefaultPost({
   setCreatingPost,
 }) {
   const {selectedTopics, setPostSuccess} = useContext(CreatingPostContext);
+  const [postSubmitted, setPostSubmitted] = useState(false);
+
+  useEffect(() => {
+    if (postSubmitted) {
+      setTimeout(() => setPostSubmitted(false), 10000);
+    }
+  }, [postSubmitted]);
 
   const submitChanges = (res) => {
+    setPostSubmitted(true);
+    if (postSubmitted) return;
     res.postType = {id: 'defaultPost', name: 'Default'};
     selectedTopics.forEach((selectedTopic) => {
       if (selectedTopic.id === undefined) selectedTopic.id = uuid();

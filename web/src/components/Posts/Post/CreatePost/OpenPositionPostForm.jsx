@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useState, useEffect} from 'react';
 import * as Yup from 'yup';
 import firebase, {db} from '../../../../firebase';
 import {v4 as uuid} from 'uuid';
@@ -18,7 +18,17 @@ export default function OpenPositionPostForm({
   postType,
 }) {
   const {selectedTopics, setPostSuccess} = useContext(CreatingPostContext);
+  const [postSubmitted, setPostSubmitted] = useState(false);
+
+  useEffect(() => {
+    if (postSubmitted) {
+      setTimeout(() => setPostSubmitted(false), 10000);
+    }
+  }, [postSubmitted]);
+
   const submitChanges = (res) => {
+    setPostSubmitted(true);
+    if (postSubmitted) return;
     res.postType = {id: 'openPositionPost', name: 'Open Position'};
     selectedTopics.forEach((selectedTopic) => {
       if (selectedTopic.id === undefined) selectedTopic.id = uuid();
