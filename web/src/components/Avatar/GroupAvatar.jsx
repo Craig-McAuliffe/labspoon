@@ -1,11 +1,11 @@
 import React from 'react';
 import Image from 'react-bootstrap/Image';
-import {getDefaultAvatar} from '../../helpers/users.js';
+import {getDefaultAvatar} from '../../helpers/groups.js';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Avatar.css';
 
-const UserAvatar = ({src, width, height}) => {
+const GroupAvatar = ({src, width, height}) => {
   return (
     <Image
       className="avatar"
@@ -18,16 +18,4 @@ const UserAvatar = ({src, width, height}) => {
   );
 };
 
-export const UserPageAvatar = ({src, width, height}) => {
-  return (
-    <Image
-      className="userPage-avatar"
-      src={src}
-      roundedCircle
-      width={width}
-      height={height}
-    />
-  );
-};
-
-export default UserAvatar;
+export default GroupAvatar;

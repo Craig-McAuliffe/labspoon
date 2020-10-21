@@ -2,7 +2,7 @@ import React, {useRef, useState} from 'react';
 import {Link} from 'react-router-dom';
 import SeeMore from '../SeeMore';
 import FollowGroupButton from './FollowGroupButton';
-import UserAvatar from '../Avatar/UserAvatar';
+import GroupAvatar from '../Avatar/GroupAvatar';
 
 import './GroupListItem.css';
 
@@ -22,7 +22,7 @@ export default function GroupListItem({group}) {
     <div className="group-list-item-container">
       <Link to={`/group/${group.id}`}>
         <div className="group-list-item-icon-and-name">
-          <UserAvatar src={group.avatar} height="100" width="100" />
+          <GroupAvatar src={group.avatar} height="100" width="100" />
           <p>{group.name}</p>
         </div>
       </Link>

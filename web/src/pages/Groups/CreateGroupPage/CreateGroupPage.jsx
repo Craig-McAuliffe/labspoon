@@ -2,13 +2,10 @@ import React, {useState, useContext} from 'react';
 import GroupInfoForm from './GroupInfoForm';
 import {useHistory} from 'react-router-dom';
 import {v4 as uuid} from 'uuid';
-
 import firebase, {db, storage} from '../../../firebase';
-import {projectURL} from '../../../config';
 
 import {AuthContext} from '../../../App';
-
-import './CreateGroupPage.css';
+import {getAvatar} from '../../../helpers/groups';
 
 import './CreateGroupPage.css';
 
@@ -42,9 +39,9 @@ export default function CreateGroupPage({
         location: values.location,
         institution: values.institution,
         website: values.website,
-        avatar: `https://storage.cloud.google.com/labspoon-dev-266bc.appspot.com/avatars/default_group_avatar%20(2).jpg`,
+        avatar: getAvatar(groupID),
       };
-      values.avatar = `https://storage.cloud.google.com/labspoon-dev-266bc.appspot.com/avatars/default_group_avatar%20(2).jpg`;
+      values.avatar = getAvatar(groupID);
       batch.set(groupDocRef, values);
       const userRef = {
         id: userProfile.id,

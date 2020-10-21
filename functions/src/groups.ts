@@ -10,12 +10,18 @@ import {updateFilterCollection, Post, Topic} from './posts';
 const db: firestore.Firestore = admin.firestore();
 
 const storage = admin.storage();
-export const generateAvatarThumbnailOnGroupCreate = functions.firestore
-  .document(`groups/{groupID}`)
-  .onCreate(async (change) => {
-    console.log('avatar generation triggered');
-    const groupID = change.id;
-    const fullsizeAvatarPath = `groups/${groupID}/avatar_fullSize`;
+export const generateThumbnailAvatarOnFullSizeUpload = functions.storage.object()
+  .onFinalize(async (object) => {
+    const filepathRegex = /groups\/([a-z0-9-]+)\/avatar_fullSize/gm;
+    const fullsizeAvatarPath = object.name!;
+    const regexResults = filepathRegex.exec(fullsizeAvatarPath);
+    // Object is not a group avatar
+    if (!regexResults) return;
+    const groupID = regexResults[1];
+    if (!groupID) {
+      throw new Error('Unable to extract group ID from path:' + fullsizeAvatarPath);
+    }
+
     // download the fullsize image into memory
     const fileName = `${groupID}_avatarThumbnail`;
     const tmp = path.join(os.tmpdir(), fileName);
@@ -38,7 +44,7 @@ export const generateAvatarThumbnailOnGroupCreate = functions.firestore
         contentType: metadata.contentType,
       },
       predefinedAcl: 'publicRead',
-    });
+    }).then((resp) => resp[0].makePublic());
     // free up disk space
     fs.unlinkSync(tmp);
   });

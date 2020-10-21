@@ -30,3 +30,7 @@ export function getPaginatedGroupReferencesFromCollectionRef(
 export function getDefaultAvatar() {
   return `https://storage.googleapis.com/${projectURL}/avatars/default_group_avatar.jpg`;
 }
+
+export function getAvatar(groupID) {
+  return `https://storage.googleapis.com/${projectURL}/groups/${groupID}/avatar`;
+}
