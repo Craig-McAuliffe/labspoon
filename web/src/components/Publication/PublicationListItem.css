@@ -16,7 +16,7 @@
 }
 
 .publication-list-item-journal-container {
-  margin: 20px 0px;
+  margin-top: 20px;
 }
 
 .publication-list-item-journal-container h3 {
@@ -38,21 +38,20 @@
 }
 
 .publication-list-item-content-authors {
-  margin: 10px 5px 0px;
+  margin: 0px 5px 5px;
   display: flex;
 }
 
 .publication-list-item-content-author {
   margin-right: 15px;
-  /* color: #5d5d65; */
 }
 
 .publication-list-item-title {
   color: #000000;
-  margin-bottom: 10px;
   background: #ececec;
   padding: 10px 5px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+  margin-top: 20px;
 }
 
 .publication-list-item-expand-button {
@@ -89,4 +88,14 @@
 
 .publication-list-item-topics-container {
   margin-left: 5px;
+}
+
+.form-publication-list-item-container {
+  display: grid;
+  grid-template-columns: 1fr 100px;
+  align-items: center;
+}
+
+.form-publication-list-item-select-container {
+  padding: 0px 20px;
 }

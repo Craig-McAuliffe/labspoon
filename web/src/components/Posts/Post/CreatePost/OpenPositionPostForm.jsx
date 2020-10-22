@@ -11,12 +11,7 @@ import './CreatePost.css';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
-export default function OpenPositionPostForm({
-  cancelPost,
-  setCreatingPost,
-  setPostType,
-  postType,
-}) {
+export default function OpenPositionPostForm({cancelPost, setCreatingPost}) {
   const {selectedTopics, setPostSuccess} = useContext(CreatingPostContext);
 
   const submitChanges = (res) => {
@@ -56,8 +51,6 @@ export default function OpenPositionPostForm({
       initialValues={initialValues}
       validationSchema={validationSchema}
       cancelPost={cancelPost}
-      postType={postType}
-      setPostType={setPostType}
     >
       <div className="creating-post-main-text-container">
         <CreatePostTextArea name="title" />

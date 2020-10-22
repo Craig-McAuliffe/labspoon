@@ -10,7 +10,7 @@
 
 .form-text-input-container-side-label {
   display: grid;
-  grid-template-columns: 100px 1fr;
+  grid-template-columns: 200px 1fr;
   margin: 0px 0px 40px 0px;
   align-items: center;
 }

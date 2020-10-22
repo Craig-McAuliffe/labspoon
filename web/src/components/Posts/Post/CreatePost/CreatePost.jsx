@@ -3,6 +3,7 @@ import {AuthContext} from '../../../../App';
 import DefaultPost from './DefaultPost';
 import OpenPositionPostForm from './OpenPositionPostForm';
 import PublicationPostForm from './PublicationPostForm';
+import PostTypeDropDown from './PostTypeDropDown';
 import {WriteIcon} from '../../../../assets/GeneralActionIcons';
 
 import './CreatePost.css';
@@ -18,6 +19,7 @@ export default function CreatePost({pinnedPost}) {
   const [creatingPost, setCreatingPost] = useState(false);
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [postSuccess, setPostSuccess] = useState(false);
+  const [postType, setPostType] = useState(DEFAULT_POST);
 
   const cancelPost = () => {
     setCreatingPost(false);
@@ -41,9 +43,12 @@ export default function CreatePost({pinnedPost}) {
           setPostSuccess: setPostSuccess,
         }}
       >
+        <PostTypeDropDown setPostType={setPostType} postType={postType} />
         <PostTypeSpecificForm
           cancelPost={cancelPost}
           setCreatingPost={setCreatingPost}
+          postType={postType}
+          setPostType={setPostType}
         />
       </CreatingPostContext.Provider>
     );
@@ -69,8 +74,12 @@ export default function CreatePost({pinnedPost}) {
     );
 }
 
-function PostTypeSpecificForm({cancelPost, setCreatingPost}) {
-  const [postType, setPostType] = useState(DEFAULT_POST);
+function PostTypeSpecificForm({
+  cancelPost,
+  setCreatingPost,
+  postType,
+  setPostType,
+}) {
   switch (postType) {
     case DEFAULT_POST:
       return (

@@ -1,7 +1,7 @@
 .form-date-input-container-side-label {
   display: grid;
-  grid-template-columns: 150px 1fr;
-  margin: 40px 0px 40px 8px;
+  grid-template-columns: 200px 1fr;
+  margin: 40px 0px;
   align-items: center;
 }
 

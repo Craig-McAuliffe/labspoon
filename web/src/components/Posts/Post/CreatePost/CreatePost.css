@@ -18,8 +18,8 @@
 }
 
 .create-post-topic-section-container {
-  padding: 10px 5px 0px;
-  margin: 20px 0px 50px;
+  padding: 0px 5px;
+  margin: 10px 0px 50px;
 }
 
 .create-post-tagged-topic {
@@ -103,19 +103,31 @@
 }
 
 .post-type-dropdown-option {
-  margin: 4px 0px 4px 0px;
   color: #00507c;
+  width: 150px;
+}
+
+.post-type-dropdown-option:hover {
+  background: #78afcd48;
 }
 
 .post-type-dropdown-option button {
   color: #00507c;
   font-size: 1.1em;
+  margin-left: 6px;
+  min-width: 100%;
+  text-align: start;
 }
 
 .create-post-dropdown-toggle-name {
   display: inline-block;
   font-size: 1.1em;
-  margin-left: 5px;
+  margin-right: 5px;
+  color: #00507c;
+}
+
+.create-post-dropdown-toggle-name span {
+  border-bottom: 2px solid #00507c;
 }
 
 .create-pinned-post-button {
@@ -144,4 +156,46 @@
   width: 200px;
   padding: 20px 0px;
   text-align: center;
+}
+
+.create-post-post-type-dropdown-container {
+  margin-bottom: 15px;
+}
+
+.create-post-post-type-dropdown-container path {
+  stroke: #00507c;
+}
+
+.create-publication-post-search-or-link-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -30px;
+}
+
+.create-publication-post-search-or-link-container p {
+  color: #5d5d65;
+  display: inline-block;
+  margin-top: 20px;
+}
+
+.create-publication-post-search-or-link-container button {
+  color: #00507c;
+}
+
+.create-publication-search-publications-button {
+  display: hidden;
+  position: absolute;
+}
+
+.create-publication-post-list-item-container {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.create-publication-post-list-item-select-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
