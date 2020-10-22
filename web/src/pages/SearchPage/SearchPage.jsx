@@ -36,6 +36,7 @@ const TOPICS = 'Topics';
 const abbrEnv = 'dev';
 
 const DEBOUNCE_TIME = 700;
+let currentTab;
 
 export default function SearchPage() {
   const location = useLocation();
@@ -52,6 +53,10 @@ export default function SearchPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
+
+  useEffect(() => {
+    currentTab = tab;
+  }, [tab]);
 
   function onSearchStateChange(nextSearchState) {
     clearTimeout(setStateId.current);
@@ -138,6 +143,26 @@ export default function SearchPage() {
   );
 }
 
+const IndexResults = connectStateResults(
+  ({searchState, searchResults, children}) => {
+    if (searchResults && searchResults.nbHits !== 0) return children;
+    if (currentTab === OVERVIEW) {
+      if (searchResults) {
+        if (searchResults.index.includes('POSTS'))
+          return <div>No results were found for {searchState.query}.</div>;
+        return null;
+      }
+    } else
+      return (
+        <div>
+          No {currentTab} were found for {searchState.query}. Check the other
+          tabs or try a different query.
+        </div>
+      );
+    return null;
+  }
+);
+
 // Adds a 'see more' button to the end of a hits component. Used for switching to tabs from the federated overview search.
 function SeeMoreWrapper({onClick, resourceType, children}) {
   const Wrapper = connectStateResults(
@@ -166,12 +191,14 @@ function OverviewResultsSection({
 }) {
   return (
     <Index indexName={abbrEnv + indexSuffix}>
-      <SeeMoreWrapper
-        onClick={() => setTab(tabName)}
-        resourceType={resourceType}
-      >
-        {children}
-      </SeeMoreWrapper>
+      <IndexResults>
+        <SeeMoreWrapper
+          onClick={() => setTab(tabName)}
+          resourceType={resourceType}
+        >
+          {children}
+        </SeeMoreWrapper>
+      </IndexResults>
     </Index>
   );
 }
@@ -258,46 +285,56 @@ const OverviewResults = ({setTab}) => (
 
 const PublicationsResults = () => (
   <Index indexName={abbrEnv + '_PUBLICATIONS'}>
-    <Hits
-      hitComponent={({hit}) => (
-        <GenericListItem result={dbPublicationToJSPublication(hit)} />
-      )}
-    />
+    <IndexResults>
+      <Hits
+        hitComponent={({hit}) => (
+          <GenericListItem result={dbPublicationToJSPublication(hit)} />
+        )}
+      />
+    </IndexResults>
   </Index>
 );
 
 const UsersResults = () => (
   <Index indexName={abbrEnv + '_USERS'}>
-    <Hits hitComponent={({hit}) => <GenericListItem result={hit} />} />
+    <IndexResults>
+      <Hits hitComponent={({hit}) => <GenericListItem result={hit} />} />
+    </IndexResults>
   </Index>
 );
 
 const GroupsResults = () => (
   <Index indexName={abbrEnv + '_GROUPS'}>
-    <Hits
-      hitComponent={({hit}) => {
-        hit.id = hit.objectID;
-        return <GenericListItem result={hit} />;
-      }}
-    />
+    <IndexResults>
+      <Hits
+        hitComponent={({hit}) => {
+          hit.id = hit.objectID;
+          return <GenericListItem result={hit} />;
+        }}
+      />
+    </IndexResults>
   </Index>
 );
 
 const PostsResults = () => (
   <Index indexName={abbrEnv + '_POSTS'}>
-    <Hits
-      hitComponent={({hit}) => {
-        hit.id = hit.objectID;
-        return <GenericListItem result={hit} />;
-      }}
-    />
+    <IndexResults>
+      <Hits
+        hitComponent={({hit}) => {
+          hit.id = hit.objectID;
+          return <GenericListItem result={hit} />;
+        }}
+      />
+    </IndexResults>
   </Index>
 );
 
 const TopicsResults = () => {
   return (
     <Index indexName={abbrEnv + '_TOPICS'}>
-      <Hits hitComponent={({hit}) => <GenericListItem result={hit} />} />
+      <IndexResults>
+        <Hits hitComponent={({hit}) => <GenericListItem result={hit} />} />
+      </IndexResults>
     </Index>
   );
 };
