@@ -3,7 +3,6 @@ import firebase, {db} from '../../firebase.js';
 import {Redirect, useHistory, useLocation} from 'react-router';
 import {AuthContext} from '../../App';
 import {Form, Formik} from 'formik';
-import CancelButton from '../../components/Buttons/CancelButton';
 import PrimaryButton from '../../components/Buttons/PrimaryButton';
 import FormTextInput from '../../components/Forms/FormTextInput';
 import * as Yup from 'yup';
@@ -30,22 +29,31 @@ function LoginPage() {
         <div className="page-content-container">
           {formType === 'sign-up' ? (
             <div>
-              <div className="sign-up-form">
-                <SignUpForm returnLocation={returnLocation} />
-              </div>
+              <h2 className="signin-form-title">{`Sign up to Labspoon`}</h2>
               <p className="login-sign-in-option">
                 Already have an account?{' '}
                 <button onClick={() => setFormType('sign-in')}>
-                  {' '}
                   Sign in here
                 </button>
               </p>
+              <div className="sign-up-form">
+                <SignUpForm returnLocation={returnLocation} />
+              </div>
             </div>
           ) : (
-            <SignInForm
-              setFormType={setFormType}
-              returnLocation={returnLocation}
-            />
+            <>
+              <h2 className="signin-form-title">{`Welcome Back`}</h2>
+              <p className="login-sign-in-option">
+                {`Don't have an account yet?`}
+                <button onClick={() => setFormType('sign-up')}>
+                  Sign up here
+                </button>
+              </p>
+              <SignInForm
+                setFormType={setFormType}
+                returnLocation={returnLocation}
+              />
+            </>
           )}
         </div>
       </div>
@@ -133,7 +141,6 @@ const SignUpForm = ({returnLocation}) => {
       onSubmit={submitChanges}
     >
       <Form className="signin-form">
-        <h2 className="signin-form-title">{`Sign up to Labspoon`}</h2>
         <FormTextInput name="email" autoComplete="email" label="Email" />
         <p className="password-tip">{`Tip: Don't forget to make your password at least 8 digits long and include a number.`}</p>
         <FormTextInput name="password" label="Password" passwordInput={true} />
@@ -216,11 +223,10 @@ const SignInForm = ({setFormType, returnLocation}) => {
       onSubmit={submitChanges}
     >
       <Form className="signin-form">
-        <h2 className="signin-form-title">{`Welcome Back`}</h2>
         <FormTextInput name="email" autoComplete="email" label="Email" />
         <FormTextInput name="password" label="Password" passwordInput={true} />
         <div className="cancel-or-submit">
-          <CancelButton cancelAction={() => setFormType('sign-up')} />
+          <div></div>
           <div className="submit-button-container">
             <PrimaryButton submit={true}>Sign in</PrimaryButton>
           </div>
