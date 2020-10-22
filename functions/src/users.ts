@@ -8,8 +8,32 @@ import {
   makPublicationToPublication,
 } from './microsoft';
 import {Topic, Post} from './posts';
+import {generateThumbnail} from './helpers/images';
 
 const db = admin.firestore();
+
+const COVER_PHOTO_FILENAME = 'coverPhoto_fullSize';
+// Generates thumbnails for cover photos.
+export const generateThumbnailCoverPhotoOnFullSizeUpload = functions.storage.object()
+  .onFinalize(async (object) => {
+    if (!object.name) return;
+    if (!object.name.endsWith(COVER_PHOTO_FILENAME)) return;
+
+    const fullSizeCoverPhotoPath = object.name;
+    await generateThumbnail(fullSizeCoverPhotoPath, 'coverPhoto', ['-thumbnail', '1070x200^', '-gravity', 'center', '-extent', '1070x200']);
+  });
+
+const AVATAR_FILENAME = 'avatar_fullSize';
+// Generates thumbnails for user and group avatars.
+export const generateThumbnailAvatarOnFullSizeUpload = functions.storage.object()
+  .onFinalize(async (object) => {
+    if (!object.name) return;
+    if (!object.name.endsWith(AVATAR_FILENAME)) return;
+
+    const fullSizeAvatarPath = object.name;
+    await generateThumbnail(fullSizeAvatarPath, 'avatar', ['thumbnail', '200x200>'])
+  });
+
 
 export const instantiateFollowingFeedForNewUser = functions.firestore
   .document('users/{userID}')

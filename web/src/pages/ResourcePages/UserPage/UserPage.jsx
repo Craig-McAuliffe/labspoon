@@ -17,7 +17,6 @@ import {getPaginatedPublicationsFromCollectionRef} from '../../../helpers/public
 import {getPaginatedGroupReferencesFromCollectionRef} from '../../../helpers/groups';
 import {getPaginatedUserReferencesFromCollectionRef} from '../../../helpers/users';
 import {getPaginatedRecommendationsFromCollectionRef} from '../../../helpers/recommendations';
-import DefaultUserIcon from '../../../assets/DefaultUserIcon.svg';
 
 import FilterableResults, {
   ResourceTabs,
@@ -28,7 +27,10 @@ import FilterableResults, {
 import EditUserPage from './EditUserPage';
 import MessageButton from '../../../components/Buttons/MessageButton';
 import EditButton from '../../../components/Buttons/EditButton';
-import {UserPageAvatar} from '../../../components/Avatar/UserAvatar';
+import {
+  UserPageAvatar,
+  CoverPhoto,
+} from '../../../components/Avatar/UserAvatar';
 import FollowUserButton from '../../../components/User/FollowUserButton/FollowUserButton';
 
 import './UserPage.css';
@@ -200,27 +202,11 @@ function UserDetails({user, setEditingUserProfile}) {
   return (
     <div>
       <div className="user-cover-photo-container">
-        <img
-          src={
-            user.coverPhoto
-              ? user.coverPhoto
-              : 'https://i.ibb.co/HNJcLdj/user-cover-photo-default-1-2.jpg'
-          }
-          alt="user cover"
-          className="user-cover-photo"
-        />
+        <CoverPhoto src={user.coverPhoto} />
       </div>
       <div className="user-headline">
         <div className="user-page-avatar-container">
-          {user.avatar ? (
-            <UserPageAvatar src={user.avatar} width="100px" height="100px" />
-          ) : (
-            <img
-              src={DefaultUserIcon}
-              alt="user icon"
-              className="user-page-default-user-avatar"
-            />
-          )}
+          <UserPageAvatar src={user.avatar} width="100px" height="100px" />
         </div>
         <div className="user-headline-text">
           <h2>{user.name}</h2>

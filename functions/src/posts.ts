@@ -67,7 +67,7 @@ export const writePostToAuthorPosts = functions.firestore
   .document(`posts/{postID}`)
   .onWrite(async (change, context) => {
     if (
-      context.eventType ==
+      context.eventType ===
       'providers/google.firebase.database/eventTypes/ref.delete'
     )
       return null;
@@ -87,7 +87,7 @@ export const writePostToUserFollowingFeeds = functions.firestore
   .document(`posts/{postID}`)
   .onWrite(async (change, context) => {
     if (
-      context.eventType ==
+      context.eventType ===
       'providers/google.firebase.database/eventTypes/ref.delete'
     )
       return null;

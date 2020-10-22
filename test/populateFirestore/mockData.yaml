@@ -39,10 +39,10 @@ users:
   YdZkqyCThmUNhej0VXtqqWgD69s2:
     id: YdZkqyCThmUNhej0VXtqqWgD69s2
     name: Patrick Leask
-    avatar: https://i.picsum.photos/id/804/200/200.jpg?hmac=73qw3Bnt67aOsdWd033BvfX9Gq0gIJ6FSL3Dp3gA97E
+    avatar: https://storage.googleapis.com/labspoon-dev-266bc.appspot.com/users/YdZkqyCThmUNhej0VXtqqWgD69s2/avatar
     memberOfGroup: Neuro Genomics Group,
     coverPhoto:
-      https://i.picsum.photos/id/638/1070/200.jpg?hmac=IgJ8dCBUGLoANdgkRMzDCfWKbbrys26pcX69SKhB950
+      https://storage.googleapis.com/labspoon-dev-266bc.appspot.com/users/YdZkqyCThmUNhej0VXtqqWgD69s2/coverPhoto
     institution: University College London
     topics:
       b1a66949-0b46-428e-a47e-15b17499ba5a:
