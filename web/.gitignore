@@ -66,5 +66,4 @@ node_modules/
 # dotenv environment variables file
 .env
 
-# Algolia, microsoft api, env config
-.runtimeconfig.json
+

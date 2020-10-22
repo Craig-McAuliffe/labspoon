@@ -9,3 +9,6 @@ node_modules/
 
 *.log
 pubsub-debug.log
+
+# Algolia, microsoft api, env config
+.runtimeconfig.json
