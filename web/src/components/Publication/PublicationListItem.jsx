@@ -112,7 +112,7 @@ function PublicationListItemAuthors({authors}) {
     authorsList = authorsToAuthorList(authors.slice(0, AUTHORS_DISPLAY_LIMIT));
     const remainingCount = authors.length - AUTHORS_DISPLAY_LIMIT;
     authorsList.push(
-      <h4>
+      <h4 key="authors spill over">
         and {remainingCount} other{remainingCount > 1 ? 's' : ''}
       </h4>
     );

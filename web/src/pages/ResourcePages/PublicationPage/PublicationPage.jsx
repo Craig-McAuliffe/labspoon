@@ -7,17 +7,18 @@ import {dbPublicationToJSPublication} from '../../../helpers/publications';
 
 import publications from '../../../mockdata/publications';
 import ListItemTopics from '../../../components/CommonListItemParts/ListItemTopics';
+import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
 import FilterableResults, {
   ResourceTabs,
   NewResultsWrapper,
   FilterManager,
   NewFilterMenuWrapper,
 } from '../../../components/FilterableResults/FilterableResults';
-import publicationPageFeedData from './PublicationPageFeedData';
 import PublicationSider from './PublicationPageSider';
 import detectJournal from '../../../components/Publication/DetectJournal';
 
 import './PublicationPage.css';
+import {getActiveTabID} from '../../../helpers/filters';
 
 // If the user clicks on a search result from Microsoft we redirect them to the corresponding Labspoon publication.
 export function MAGPublicationRouter() {
@@ -99,18 +100,8 @@ export default function PublicationPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [publicationID]);
 
-  let fetchFeedData;
-  if (!featureFlags.has('disable-cloud-firestore')) {
-    fetchFeedData = () => [];
-  } else {
-    fetchFeedData = (skip, limit, filterOptions) =>
-      publicationPageFeedData(
-        skip,
-        limit,
-        filterOptions,
-        fetchPublicationDetails()
-      );
-  }
+  const fetchFeedData = (skip, limit, filterOptions, last) =>
+    fetchFeedDataFromDB(limit, filterOptions, last, publicationID);
 
   const relationshipFilter = [
     {
@@ -119,50 +110,60 @@ export default function PublicationPage() {
         {
           enabled: false,
           data: {
-            id: 'similarPublications',
-            name: 'Similar Publications',
-          },
-        },
-        {
-          enabled: false,
-          data: {
             id: 'relatedPosts',
             name: 'Related Posts',
           },
         },
-        {
-          enabled: false,
-          data: {
-            id: 'citesPublications',
-            name: 'Cites Publications',
-          },
-        },
-        {
-          enabled: false,
-          data: {
-            id: 'citedByPublications',
-            name: 'Cited By Publications',
-          },
-        },
-        {
-          enabled: false,
-          data: {
-            id: 'relatedUsers',
-            name: 'Related Users',
-          },
-        },
-        {
-          enabled: false,
-          data: {
-            id: 'relatedGroups',
-            name: 'Related Groups',
-          },
-        },
       ],
-
       mutable: false,
     },
   ];
+
+  if (featureFlags.has('publication-similar-publications')) {
+    relationshipFilter[0].options.push({
+      enabled: false,
+      data: {
+        id: 'similarPublications',
+        name: 'Similar Publications',
+      },
+    });
+  }
+  if (featureFlags.has('publication-cites')) {
+    relationshipFilter[0].options.push({
+      enabled: false,
+      data: {
+        id: 'citesPublications',
+        name: 'Cites Publications',
+      },
+    });
+  }
+  if (featureFlags.has('publication-cited-by')) {
+    relationshipFilter[0].options.push({
+      enabled: false,
+      data: {
+        id: 'citedByPublications',
+        name: 'Cited By Publications',
+      },
+    });
+  }
+  if (featureFlags.has('publication-related-users')) {
+    relationshipFilter[0].options.push({
+      enabled: false,
+      data: {
+        id: 'relatedUsers',
+        name: 'Related Users',
+      },
+    });
+  }
+  if (featureFlags.has('publication-related-groups')) {
+    relationshipFilter[0].options.push({
+      enabled: false,
+      data: {
+        id: 'relatedGroups',
+        name: 'Related Groups',
+      },
+    });
+  }
 
   return (
     <>
@@ -265,4 +266,17 @@ function PublicationAuthors({publicationAuthors}) {
       <Link to={`/user/${author.id}`}>{author.name}</Link>
     </h3>
   ));
+}
+
+function fetchFeedDataFromDB(limit, filterOptions, last, publicationID) {
+  const activeTab = getActiveTabID(filterOptions);
+  switch (activeTab) {
+    case 'relatedPosts':
+      const relatedPostsDBRef = db.collection(
+        `publications/${publicationID}/posts`
+      );
+      return getPaginatedPostsFromCollectionRef(relatedPostsDBRef, limit, last);
+    default:
+      return [];
+  }
 }
