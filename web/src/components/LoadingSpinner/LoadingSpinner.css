@@ -1,0 +1,10 @@
+.loading-spinner-container {
+  display: flex;
+  justify-content: center;
+}
+
+.spinner-border {
+  color: #00507c;
+  width: 50px;
+  height: 50px;
+}
