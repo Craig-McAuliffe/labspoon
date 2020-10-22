@@ -3,6 +3,7 @@ import PrimaryButton from '../Buttons/PrimaryButton';
 import {functions} from 'firebase';
 import Results from '../Results/Results';
 import {SmallPublicationListItem} from './PublicationListItem';
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 
 import './PublicationListItem.css';
 const getMicrosoftAcademicKnowledgeAPIPublications = functions().httpsCallable(
@@ -16,7 +17,7 @@ export function MicrosoftAcademicKnowledgeAPIPublicationResults({query}) {
   useEffect(() => microsoftPublicationSearch(query, setResults, setLoading), [
     query,
   ]);
-  if (loading) return <h1>Loading...</h1>;
+  if (loading) return <LoadingSpinner />;
   return <Results results={results} hasMore={false} />;
 }
 
@@ -27,7 +28,7 @@ export function FormPublicationResults({query, setPublication}) {
   useEffect(() => microsoftPublicationSearch(query, setResults, setLoading), [
     query,
   ]);
-  if (loading) return <h1>Loading...</h1>;
+  if (loading) return <LoadingSpinner />;
   return results.map((publication) => (
     <div
       key={publication.id || publication.microsoftID}

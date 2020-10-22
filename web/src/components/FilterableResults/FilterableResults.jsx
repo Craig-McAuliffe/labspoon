@@ -4,6 +4,7 @@ import SearchBar from '../SearchBar';
 import update from 'immutability-helper';
 import {FilterMenu} from '../Filter/Filter';
 import ResultsList from '../Results/Results';
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 
 import './FilterableResults.css';
 
@@ -45,6 +46,7 @@ export default function FilterableResults({children, fetchResults, limit}) {
     setFetchResultsFunction(() => fetchResults);
     setSkip(0);
   }
+
   useEffect(() => {
     // wait until the filter is loaded to avoid an unnecessary reload of the results
     if (loadingFilter) return;
@@ -89,7 +91,6 @@ export default function FilterableResults({children, fetchResults, limit}) {
     setLast(undefined);
     setSkip(0);
   }, [filter, fetchResultsFunction]);
-
   return (
     <FilterableResultsContext.Provider
       value={{
@@ -264,7 +265,7 @@ export function NewResultsWrapper() {
         hasMore={filterableResults.hasMore}
         fetchMore={filterableResults.fetchMore}
       />
-      {filterableResults.loadingResults ? <h2>Loading...</h2> : null}
+      {filterableResults.loadingResults ? <LoadingSpinner /> : null}
     </>
   );
 }
