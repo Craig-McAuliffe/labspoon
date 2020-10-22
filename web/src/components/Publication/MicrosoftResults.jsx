@@ -12,7 +12,11 @@ const getMicrosoftAcademicKnowledgeAPIPublications = functions().httpsCallable(
 // Fully fledged search results for use on the search page.
 export function MicrosoftAcademicKnowledgeAPIPublicationResults({query}) {
   const [results, setResults] = useState([]);
-  useEffect(() => microsoftPublicationSearch(query, setResults), [query]);
+  const [loading, setLoading] = useState(false);
+  useEffect(() => microsoftPublicationSearch(query, setResults, setLoading), [
+    query,
+  ]);
+  if (loading) return <h1>Loading...</h1>;
   return <Results results={results} hasMore={false} />;
 }
 

@@ -254,6 +254,7 @@ const GroupDetails = ({
   userIsMember,
   setEditingGroup,
 }) => {
+  const featureFlags = useContext(FeatureFlags);
   const [displayFullDescription, setDisplayFullDescription] = useState({
     display: false,
     size: 100,
@@ -270,7 +271,7 @@ const GroupDetails = ({
       <div className="group-header">
         <div className="group-icon-and-message">
           <GroupAvatar src={group.avatar} height="120px" width="120px" />
-          <MessageButton />
+          {featureFlags.has('group-message-button') ? <MessageButton /> : null}
         </div>
         <div className="group-header-info">
           <div className="group-header-info-headline">
@@ -305,9 +306,11 @@ const GroupDetails = ({
           </EditButton>
         </div>
       ) : null}
-      <div className="pinned-post-container">
-        <PinnedPost post={group.pinnedPost} />
-      </div>
+      {featureFlags.has('group-pinned-post') ? (
+        <div className="pinned-post-container">
+          <PinnedPost post={group.pinnedPost} />
+        </div>
+      ) : null}
     </>
   );
 };
