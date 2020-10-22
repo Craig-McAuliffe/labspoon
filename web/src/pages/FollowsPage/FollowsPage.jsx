@@ -9,6 +9,8 @@ import {getPaginatedGroupReferencesFromCollectionRef} from '../../helpers/groups
 import FilterableResults, {
   ResourceTabs,
   NewResultsWrapper,
+  NewFilterMenuWrapper,
+  FilterManager,
 } from '../../components/FilterableResults/FilterableResults';
 
 const FollowsPage = () => {
@@ -16,7 +18,7 @@ const FollowsPage = () => {
   const userID = user.uid;
 
   const fetchFeedData = (skip, limit, filterOptions, last) =>
-    followsPageFeedDataFromDB(skip, limit, filterOptions, last, userID);
+    followsPageFeedDataFromDB(limit, filterOptions, last, userID);
 
   const relationshipFilter = [
     {
@@ -56,7 +58,10 @@ const FollowsPage = () => {
       </div>
       <FilterableResults fetchResults={fetchFeedData} limit={10}>
         <div className="feed-container">
-          <ResourceTabs tabs={relationshipFilter} />
+          <FilterManager>
+            <ResourceTabs tabs={relationshipFilter} />
+            <NewFilterMenuWrapper />
+          </FilterManager>
           <NewResultsWrapper />
         </div>
       </FilterableResults>

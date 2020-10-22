@@ -5,6 +5,9 @@ import {AuthContext, FeatureFlags} from '../../App';
 
 import FilterableResults, {
   NewResultsWrapper,
+  NewFilterMenuWrapper,
+  ResourceTabs,
+  FilterManager,
 } from '../../components/FilterableResults/FilterableResults';
 
 import {getFilteredBookmarks} from '../../mockdata/bookmarks.js';
@@ -14,6 +17,7 @@ function fetchMockResults(skip, limit, filter) {
 }
 
 function fetchBookmarks(uuid, skip, limit, filter, last) {
+  console.log('trigger');
   let results = db
     .collection(`users/${uuid}/bookmarks`)
     .orderBy('bookmarkedResourceID');
@@ -50,6 +54,10 @@ const BookmarksPage = () => {
     <div className="content-layout">
       <FilterableResults fetchResults={fetchResults} limit={10}>
         <div className="feed-container">
+          <FilterManager>
+            <ResourceTabs />
+            <NewFilterMenuWrapper />
+          </FilterManager>
           <NewResultsWrapper />
         </div>
       </FilterableResults>
