@@ -1,0 +1,66 @@
+import * as functions from 'firebase-functions';
+import {
+  interpretationResult,
+  interpretQuery,
+  executeExpression,
+  MAKPublication,
+  makPublicationToPublication
+} from './microsoft';
+
+const fieldNameExprRegex = /^Composite\(F.FN==\'(?<fieldName>[a-zA-Z0-9 -]+)\'\)$/;
+export const topicSearch = functions.https.onCall(async (data) => {
+  const topicQuery = data.topicQuery;
+  if (topicQuery === undefined)
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      'A topic query must be provided'
+    );
+  // Get an array of up to 10 interpretations of the query and filter to ensure they match the field name pattern.
+  const expressions: expressionField[] = await interpretQuery({
+    query: topicQuery,
+    complete: 1,
+    count: 100,
+  })
+    .then((resp) =>
+      resp.data.interpretations
+        .map((result: interpretationResult) => result.rules[0].output.value)
+        .map(
+          (expr: string): expressionField | null => {
+            const match = fieldNameExprRegex.exec(expr);
+            if (!match) return null;
+            return {
+              expr: `And(${expr}, Ty=='0')`,
+              fieldName: match.groups!.fieldName,
+            };
+          }
+        )
+        .filter((res: expressionField | null) => res !== null)
+        .slice(0, 10)
+    )
+    .catch((err: Error) => {
+      console.error(err);
+      throw new functions.https.HttpsError('internal', 'An error occurred.');
+    });
+  const executePromises = expressions.map((fieldExpr) =>
+    executeExpression({
+      expr: fieldExpr.expr,
+      count: 1,
+      attributes: 'F.DFN,F.FId,F.FN',
+    }).then((resp) => {
+      const entities: MAKPublication[] = resp.data.entities;
+      if (entities.length === 0) return;
+      const publication = makPublicationToPublication(entities[0]);
+      const topicMatch =  publication.topics!.find((topic) => topic.normalisedName! === fieldExpr.fieldName);
+      return topicMatch;
+    }).catch((err: Error) => {
+      console.error(err);
+      throw new functions.https.HttpsError('internal', 'An error occurred.');
+    })
+  );
+  return await Promise.all(executePromises);
+});
+
+interface expressionField {
+  expr: string;
+  fieldName: string;
+}
