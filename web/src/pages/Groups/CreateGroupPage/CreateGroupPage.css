@@ -10,6 +10,7 @@
 .create-group-profile-info-container {
   display: grid;
   grid-template-columns: 1fr 2fr;
+  margin-bottom: 20px;
 }
 
 .create-group-profile-info-container h3 {
@@ -54,4 +55,49 @@
 
 .create-group-member-search {
   margin-bottom: 20px;
+}
+
+.edit-group-info-upload-photo-button:hover img {
+  opacity: 50%;
+}
+
+.edit-group-info-upload-photo-button {
+  position: relative;
+}
+
+.edit-group-info-upload-photo-button::after {
+  content: '';
+  background: #00507c;
+  position: absolute;
+  bottom: 52%;
+  right: 25%;
+  height: 20px;
+  width: 50%;
+  opacity: 0%;
+}
+
+.edit-group-info-upload-photo-button-plus {
+  content: '';
+  background: #00507c;
+  position: absolute;
+  right: 45%;
+  bottom: 37%;
+  width: 20px;
+  height: 40%;
+  opacity: 0%;
+}
+
+.edit-group-info-upload-photo-button:hover::after,
+.edit-group-info-upload-photo-button:hover
+  .edit-group-info-upload-photo-button-plus {
+  opacity: 100%;
+}
+
+.edit-group-info-upload-photo-button h3 {
+  color: #00507c;
+  margin-top: 10px;
+  margin-left: 7px;
+}
+
+.edit-group-info-upload-photo-button-plus {
 }
