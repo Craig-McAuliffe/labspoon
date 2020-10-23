@@ -152,10 +152,14 @@ function EditAvatar({existingAvatar, onAvatarSelect}) {
   return (
     <div>
       <h3>Group Picture </h3>
-      <GroupAvatar src={existingAvatar} height="190px" width="190px" />
-      <PrimaryButton onClick={() => setEditingAvatar(true)}>
-        Upload New Photo
-      </PrimaryButton>
+      <button
+        className="edit-group-info-upload-photo-button"
+        onClick={() => setEditingAvatar(true)}
+      >
+        <GroupAvatar src={existingAvatar} height="190px" width="190px" />
+        <h3>Upload New Photo</h3>
+        <div className="edit-group-info-upload-photo-button-plus"></div>
+      </button>
     </div>
   );
 }
