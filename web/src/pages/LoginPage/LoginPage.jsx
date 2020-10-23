@@ -5,6 +5,7 @@ import {AuthContext} from '../../App';
 import {Form, Formik} from 'formik';
 import PrimaryButton from '../../components/Buttons/PrimaryButton';
 import FormTextInput from '../../components/Forms/FormTextInput';
+import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import * as Yup from 'yup';
 
 import './LoginPage.css';
@@ -19,10 +20,10 @@ import {getDefaultAvatar, getDefaultCoverPhoto} from '../../helpers/users.js';
 function LoginPage() {
   const location = useLocation().state;
   const returnLocation = location ? location.returnLocation : undefined;
-
+  // This prevents the redirect to '/' being triggered.
+  const [goToOnboarding, setGoToOnboarding] = useState(false);
   const {user} = useContext(AuthContext);
   const [formType, setFormType] = useState('sign-up');
-
   if (!user) {
     return (
       <div className="content-layout">
@@ -37,7 +38,7 @@ function LoginPage() {
                 </button>
               </p>
               <div className="sign-up-form">
-                <SignUpForm returnLocation={returnLocation} />
+                <SignUpForm setGoToOnboarding={setGoToOnboarding} />
               </div>
             </div>
           ) : (
@@ -59,17 +60,29 @@ function LoginPage() {
       </div>
     );
   } else {
-    return <Redirect to="/" />;
+    return goToOnboarding ? (
+      <Redirect
+        to={{
+          pathname: '/onboarding/follow',
+          state: {returnLocation: returnLocation},
+        }}
+      />
+    ) : (
+      <Redirect to="/" />
+    );
   }
 }
 
-const SignUpForm = ({returnLocation}) => {
-  const history = useHistory();
+const SignUpForm = ({setGoToOnboarding}) => {
+  const [loading, setLoading] = useState(false);
   const submitChanges = (values) => {
+    setLoading(true);
     firebase
       .auth()
       .createUserWithEmailAndPassword(values.email, values.password)
       .then((result) => {
+        setGoToOnboarding(true);
+        setLoading(false);
         result.user
           .updateProfile({displayName: values.userName})
           .then(() =>
@@ -80,12 +93,6 @@ const SignUpForm = ({returnLocation}) => {
               avatar: getDefaultAvatar(),
             })
           )
-          .then(() => {
-            history.push({
-              pathname: '/onboarding/follow',
-              state: {returnLocation: returnLocation},
-            });
-          })
           .catch((error) => {
             console.log(error, 'Could not create display name');
           });
@@ -159,18 +166,22 @@ const SignUpForm = ({returnLocation}) => {
             <PrimaryButton submit={true}>Sign Up</PrimaryButton>
           </div>
         </div>
+        {loading ? <LoadingSpinner /> : null}
       </Form>
     </Formik>
   );
 };
 
 const SignInForm = ({setFormType, returnLocation}) => {
+  const [loading, setLoading] = useState(false);
   const history = useHistory();
   const submitChanges = (values) => {
+    setLoading(true);
     firebase
       .auth()
       .signInWithEmailAndPassword(values.email, values.password)
       .then(() => {
+        setLoading(false);
         history.push(returnLocation ? returnLocation : '/');
       })
       .catch((error) => {
@@ -231,6 +242,7 @@ const SignInForm = ({setFormType, returnLocation}) => {
             <PrimaryButton submit={true}>Sign in</PrimaryButton>
           </div>
         </div>
+        {loading ? <LoadingSpinner /> : null}
       </Form>
     </Formik>
   );
