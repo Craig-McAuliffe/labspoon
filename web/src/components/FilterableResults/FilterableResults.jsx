@@ -151,6 +151,7 @@ export function NewFilterMenuWrapper({
   getDefaultFilter,
   radio,
   dependentOnTab,
+  userID,
 }) {
   const filterableResults = useContext(FilterableResultsContext);
   const filterManager = useContext(FilterManagerContext);
@@ -164,22 +165,26 @@ export function NewFilterMenuWrapper({
       filterManager.setSiderFilterLoading(false);
       return;
     }
-    if (getDefaultFilter) {
-      if (!dependentOnTab) {
-        Promise.resolve(getDefaultFilter())
-          .then((defaultFilter) => {
-            if (defaultFilter === 'loading') {
-              filterManager.setSiderFilterLoading(true);
-            } else {
-              setSiderFilter(defaultFilter);
-              filterManager.setSiderFilterLoading(false);
-            }
-          })
-          .catch((error) => console.log(error));
-      }
+    // Establish whether the user is logged in
+    if (userID === null) {
+      filterManager.setSiderFilterLoading(true);
+      return;
+    }
+    // If undefined user, then no side filter
+    if (userID === undefined) {
+      filterManager.setSiderFilterLoading(false);
+      return;
+    }
+    if (!dependentOnTab) {
+      Promise.resolve(getDefaultFilter())
+        .then((defaultFilter) => {
+          setSiderFilter(defaultFilter);
+          filterManager.setSiderFilterLoading(false);
+        })
+        .catch((error) => console.log(error));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getDefaultFilter]);
+  }, [getDefaultFilter, userID]);
   // Fetch sider filter on tab change if dependentOnTab
   useEffect(() => {
     if (getDefaultFilter) {

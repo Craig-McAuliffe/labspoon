@@ -146,24 +146,18 @@ function fetchUserFeedFilters(uuid) {
 }
 
 export default function FollowingFeedPage() {
-  const [userID, setUserID] = useState(undefined);
-  const {user} = useContext(AuthContext);
+  const [userID, setUserID] = useState(null);
+  const {user, previouslySignedIn} = useContext(AuthContext);
   const featureFlags = useContext(FeatureFlags);
 
   useEffect(() => {
+    if (user === undefined) setUserID(undefined);
     if (user) setUserID(user.uid);
   }, [user]);
 
   const getDefaultFilter = () => {
-    if (!userID) {
-      setTimeout(() => {
-        if (!user) {
-          setUserID('no user');
-        }
-      }, 10);
-      return 'loading';
-    }
-    if (userID === 'no user') return [];
+    console.log(previouslySignedIn);
+    if (!userID) return [];
     return fetchUserFeedFilters(userID);
   };
 
@@ -176,7 +170,10 @@ export default function FollowingFeedPage() {
     <FilterableResults fetchResults={fetchResults} limit={10} loadingFilter>
       <div className="sider-layout">
         <FilterManager>
-          <NewFilterMenuWrapper getDefaultFilter={getDefaultFilter} />
+          <NewFilterMenuWrapper
+            getDefaultFilter={getDefaultFilter}
+            userID={userID}
+          />
           <ResourceTabs />
         </FilterManager>
       </div>

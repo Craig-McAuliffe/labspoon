@@ -42,9 +42,11 @@ export const AuthContext = createContext(null);
 function AuthProvider({children}) {
   const [user, setUser] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
+
   useEffect(
     () =>
       auth.onAuthStateChanged((user) => {
+        if (user === null) setUser(undefined);
         setUser(user);
         if (user) localStorage.setItem('labspoon.expectSignIn', '1');
         else localStorage.removeItem('labspoon.expectSignIn');
