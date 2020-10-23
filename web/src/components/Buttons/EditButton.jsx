@@ -11,7 +11,7 @@ export default function EditButton({editAction, children}) {
       <button
         className="edit-button"
         type="button"
-        onClick={() => editAction()}
+        onClick={editAction ? () => editAction() : () => {}}
       >
         <h3>{children}</h3>
       </button>

@@ -1,5 +1,5 @@
 import React, {useContext, useState, useEffect} from 'react';
-import {useParams, useHistory} from 'react-router-dom';
+import {useParams, useHistory, Link} from 'react-router-dom';
 import {FeatureFlags, AuthContext} from '../../../App';
 import {db} from '../../../firebase';
 
@@ -24,7 +24,6 @@ import FilterableResults, {
   NewFilterMenuWrapper,
   FilterManager,
 } from '../../../components/FilterableResults/FilterableResults';
-import EditUserPage from './EditUserPage';
 import MessageButton from '../../../components/Buttons/MessageButton';
 import EditButton from '../../../components/Buttons/EditButton';
 import {
@@ -32,6 +31,7 @@ import {
   CoverPhoto,
 } from '../../../components/Avatar/UserAvatar';
 import FollowUserButton from '../../../components/User/FollowUserButton/FollowUserButton';
+import EditUserPage from './EditUserPage';
 
 import './UserPage.css';
 
@@ -39,7 +39,6 @@ export default function UserPage() {
   const featureFlags = useContext(FeatureFlags);
   const [userID, setUserID] = useState(undefined);
   const [userDetails, setUserDetails] = useState(undefined);
-  const [editingUserProfile, setEditingUserProfile] = useState(false);
   const history = useHistory();
 
   const userIDParam = useParams().userID;
@@ -74,6 +73,9 @@ export default function UserPage() {
     fetchFeedData = (skip, limit, filterOptions, last) =>
       userPageFeedData(skip, limit, filterOptions, userID, last);
   }
+
+  if (history.location.pathname.includes('edit_profile'))
+    return <EditUserPage user={userDetails} />;
 
   const relationshipFilter = [
     {
@@ -149,13 +151,6 @@ export default function UserPage() {
       },
     });
   }
-  if (editingUserProfile)
-    return (
-      <EditUserPage
-        user={userDetails}
-        cancelEdit={() => setEditingUserProfile(false)}
-      />
-    );
   return (
     <div className="content-layout">
       {featureFlags.has('related-resources') ? (
@@ -164,10 +159,7 @@ export default function UserPage() {
         <></>
       )}
       <div className="details-container">
-        <UserDetails
-          user={userDetails}
-          setEditingUserProfile={setEditingUserProfile}
-        />
+        <UserInfo user={userDetails} />
       </div>
       <FilterableResults fetchResults={fetchFeedData} limit={10}>
         <div className="feed-container">
@@ -195,7 +187,7 @@ function SuggestedUsers({userID}) {
   );
 }
 
-function UserDetails({user, setEditingUserProfile}) {
+function UserInfo({user}) {
   const {userProfile} = useContext(AuthContext);
   if (user === undefined) return <></>;
   const ownProfile = userProfile && userProfile.id === user.id;
@@ -218,9 +210,9 @@ function UserDetails({user, setEditingUserProfile}) {
         {ownProfile ? (
           <>
             <div></div>
-            <EditButton editAction={() => setEditingUserProfile(true)}>
-              Edit Profile
-            </EditButton>
+            <Link to={`/user/${user.id}/edit_profile`}>
+              <EditButton>Edit Profile</EditButton>
+            </Link>
           </>
         ) : (
           <>
@@ -233,7 +225,7 @@ function UserDetails({user, setEditingUserProfile}) {
   );
 }
 
-function fetchUserDetailsFromDB(uuid) {
+export function fetchUserDetailsFromDB(uuid) {
   return db
     .doc(`users/${uuid}`)
     .get()

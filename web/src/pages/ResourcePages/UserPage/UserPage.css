@@ -55,6 +55,18 @@
   margin-bottom: 20px;
 }
 
+.user-message-follow a:hover {
+  color: #3099d3;
+}
+
+.user-message-follow h3:hover {
+  color: #3099d3;
+}
+
+.user-message-follow button:hover {
+  color: #3099d3;
+}
+
 .suggested-user {
   padding: 12px 0px;
 }
@@ -67,4 +79,43 @@
 
 .suggested-user div {
   margin-left: 10px;
+}
+
+.edit-user-profile-submit-image-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.edit-user-profile-upload-image-container {
+  width: 30vw;
+  min-width: 250px;
+  min-height: 100px;
+  height: 15vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #5d5d65;
+  overflow: hidden;
+}
+
+.edit-user-profile-change-picture-section {
+  padding: 20px 0px;
+  border-bottom: 1px solid #dcdce0;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+}
+
+.update-picture-button {
+  color: #00507c;
+  text-align: start;
+}
+
+.edit-user-profile-expanded-upload-picture-section {
+  display: grid;
+  grid-template-columns: 1fr 100px;
+  overflow-x: hidden;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 5px;
 }
