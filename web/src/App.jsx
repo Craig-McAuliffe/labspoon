@@ -56,10 +56,15 @@ function AuthProvider({children}) {
     db.doc(`users/${user.uid}`)
       .get()
       .then((profile) => {
+        if (!profile.exists) {
+          setUserProfile(undefined);
+          return;
+        }
         const userData = profile.data();
         if (!userData.avatar) userData.avatar = getDefaultAvatar();
         setUserProfile(userData);
-      });
+      })
+      .catch((err) => console.log(err, 'could not retrieve user profile'));
   }, [user]);
   return (
     <AuthContext.Provider value={{user, userProfile}}>
