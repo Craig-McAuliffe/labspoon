@@ -15,6 +15,10 @@ import CreateGroupPage from './pages/Groups/CreateGroupPage/CreateGroupPage';
 import FollowsPage from './pages/FollowsPage';
 import SearchPage from './pages/SearchPage';
 import UserPage from './pages/ResourcePages/UserPage';
+import {
+  EditUserProfilePicturePage,
+  EditUserCoverPhotoPage,
+} from './pages/ResourcePages/UserPage/EditUserPage';
 import LoginPage from './pages/LoginPage';
 import PublicationPage, {
   MAGPublicationRouter,
@@ -64,6 +68,12 @@ export default function Routes({user, setUser}) {
       <Route path="/search/:query?">
         <SearchPage />
       </Route>
+      <AuthRoute user={user} path="/user/:userID/edit/profilePicture">
+        <EditUserProfilePicturePage />
+      </AuthRoute>
+      <AuthRoute user={user} path="/user/:userID/edit/coverPhoto">
+        <EditUserCoverPhotoPage />
+      </AuthRoute>
       <Route user={user} path="/user/:userID">
         <UserPage />
       </Route>

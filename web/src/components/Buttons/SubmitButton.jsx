@@ -4,7 +4,7 @@ import './Buttons.css';
 
 export default function SubmitButton({inputText, ...props}) {
   return (
-    <button type="submit" className="primary-button">
+    <button type="submit" className="primary-button" {...props}>
       <div className="primary-button-text">
         <h2>{inputText}</h2>
       </div>

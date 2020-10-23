@@ -31,5 +31,13 @@ export function getDefaultAvatar() {
 }
 
 export function getDefaultCoverPhoto() {
-  return `https://storage.googleapis.com/${projectURL}/avatars/default_group_cover_photo.png`;
+  return `https://storage.googleapis.com/${projectURL}/avatars/default_cover_photo.png`;
+}
+
+export function getAvatar(userID) {
+  return `https://storage.googleapis.com/${projectURL}/users/${userID}/avatar`;
+}
+
+export function getCoverPhoto(userID) {
+  return `https://storage.googleapis.com/${projectURL}/users/${userID}/coverPhoto`;
 }
