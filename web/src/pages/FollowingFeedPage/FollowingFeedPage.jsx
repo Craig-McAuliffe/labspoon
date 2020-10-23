@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
 import {db} from '../../firebase';
 import {AuthContext, FeatureFlags} from '../../App';
@@ -146,19 +146,31 @@ function fetchUserFeedFilters(uuid) {
 }
 
 export default function FollowingFeedPage() {
-  const featureFlags = useContext(FeatureFlags);
+  const [userID, setUserID] = useState(undefined);
   const {user} = useContext(AuthContext);
+  const featureFlags = useContext(FeatureFlags);
 
-  let fetchResults;
-  let getDefaultFilter;
-  if (user) {
-    fetchResults = (skip, limit, filter, last) =>
-      fetchUserFeedData(user.uid, skip, limit, filter, last);
-    getDefaultFilter = () => fetchUserFeedFilters(user.uid);
-  } else {
-    fetchResults = () => [];
-    getDefaultFilter = () => [];
-  }
+  useEffect(() => {
+    if (user) setUserID(user.uid);
+  }, [user]);
+
+  const getDefaultFilter = () => {
+    if (!userID) {
+      setTimeout(() => {
+        if (!user) {
+          setUserID('no user');
+        }
+      }, 1);
+      return 'loading';
+    }
+    if (userID === 'no user') return [];
+    return fetchUserFeedFilters(userID);
+  };
+
+  const fetchResults = (skip, limit, filter, last) => {
+    if (!userID) return [];
+    return fetchUserFeedData(userID, skip, limit, filter, last);
+  };
 
   return (
     <FilterableResults fetchResults={fetchResults} limit={10} loadingFilter>

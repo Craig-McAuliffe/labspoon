@@ -160,22 +160,26 @@ export function NewFilterMenuWrapper({
 
   useEffect(() => {
     filterManager.setSiderFilterLoading(true);
-
-    if (getDefaultFilter === undefined) {
+    if (!getDefaultFilter) {
       filterManager.setSiderFilterLoading(false);
+      return;
     }
     if (getDefaultFilter) {
       if (!dependentOnTab) {
         Promise.resolve(getDefaultFilter())
           .then((defaultFilter) => {
-            setSiderFilter(defaultFilter);
-            filterManager.setSiderFilterLoading(false);
+            if (defaultFilter === 'loading') {
+              filterManager.setSiderFilterLoading(true);
+            } else {
+              setSiderFilter(defaultFilter);
+              filterManager.setSiderFilterLoading(false);
+            }
           })
           .catch((error) => console.log(error));
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [getDefaultFilter]);
   // Fetch sider filter on tab change if dependentOnTab
   useEffect(() => {
     if (getDefaultFilter) {
@@ -194,7 +198,7 @@ export function NewFilterMenuWrapper({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabFilter]);
   if (!siderFilter) return null;
-  if (filterableResults.loadingFilter) return <h2>Loading...</h2>;
+  if (filterableResults.loadingFilter) return <LoadingSpinner />;
 
   return (
     <FilterMenu
