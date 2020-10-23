@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext} from 'react';
 
 import {db} from '../../firebase';
 import {AuthContext, FeatureFlags} from '../../App';
@@ -146,24 +146,17 @@ function fetchUserFeedFilters(uuid) {
 }
 
 export default function FollowingFeedPage() {
-  const [userID, setUserID] = useState(null);
-  const {user, previouslySignedIn} = useContext(AuthContext);
+  const {user, isLoggedIn} = useContext(AuthContext);
   const featureFlags = useContext(FeatureFlags);
 
-  useEffect(() => {
-    if (user === undefined) setUserID(undefined);
-    if (user) setUserID(user.uid);
-  }, [user]);
-
   const getDefaultFilter = () => {
-    console.log(previouslySignedIn);
-    if (!userID) return [];
-    return fetchUserFeedFilters(userID);
+    if (!user) return [];
+    return fetchUserFeedFilters(user.uid);
   };
 
   const fetchResults = (skip, limit, filter, last) => {
-    if (!userID) return [];
-    return fetchUserFeedData(userID, skip, limit, filter, last);
+    if (!user) return [];
+    return fetchUserFeedData(user.uid, skip, limit, filter, last);
   };
 
   return (
@@ -172,7 +165,7 @@ export default function FollowingFeedPage() {
         <FilterManager>
           <NewFilterMenuWrapper
             getDefaultFilter={getDefaultFilter}
-            userID={userID}
+            isLoggedIn={isLoggedIn}
           />
           <ResourceTabs />
         </FilterManager>

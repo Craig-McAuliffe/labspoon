@@ -42,12 +42,14 @@ export const AuthContext = createContext(null);
 function AuthProvider({children}) {
   const [user, setUser] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(null);
 
   useEffect(
     () =>
       auth.onAuthStateChanged((user) => {
-        if (user === null) setUser(undefined);
+        if (user === null) setIsLoggedIn(false);
         setUser(user);
+        setIsLoggedIn(true);
         if (user) localStorage.setItem('labspoon.expectSignIn', '1');
         else localStorage.removeItem('labspoon.expectSignIn');
       }),
@@ -69,7 +71,7 @@ function AuthProvider({children}) {
       .catch((err) => console.log(err, 'could not retrieve user profile'));
   }, [user]);
   return (
-    <AuthContext.Provider value={{user, userProfile}}>
+    <AuthContext.Provider value={{user, userProfile, isLoggedIn}}>
       {children}
     </AuthContext.Provider>
   );
