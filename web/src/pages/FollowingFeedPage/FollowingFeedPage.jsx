@@ -160,7 +160,7 @@ export default function FollowingFeedPage() {
         if (!user) {
           setUserID('no user');
         }
-      }, 1);
+      }, 10);
       return 'loading';
     }
     if (userID === 'no user') return [];
