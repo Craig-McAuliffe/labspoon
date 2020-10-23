@@ -151,7 +151,6 @@ export function NewFilterMenuWrapper({
   getDefaultFilter,
   radio,
   dependentOnTab,
-  isLoggedIn,
 }) {
   const filterableResults = useContext(FilterableResultsContext);
   const filterManager = useContext(FilterManagerContext);
@@ -164,16 +163,6 @@ export function NewFilterMenuWrapper({
       filterManager.setSiderFilterLoading(false);
       return;
     }
-    // Establish whether the user is logged in
-    if (isLoggedIn === null) {
-      filterManager.setSiderFilterLoading(true);
-      return;
-    }
-    // If undefined user, then no side filter
-    if (isLoggedIn === undefined) {
-      filterManager.setSiderFilterLoading(false);
-      return;
-    }
     if (!dependentOnTab) {
       Promise.resolve(getDefaultFilter())
         .then((defaultFilter) => {
@@ -183,7 +172,7 @@ export function NewFilterMenuWrapper({
         .catch((error) => console.log(error));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getDefaultFilter, isLoggedIn]);
+  }, [getDefaultFilter]);
   // Fetch sider filter on tab change if dependentOnTab
   useEffect(() => {
     if (getDefaultFilter) {

@@ -12,6 +12,7 @@ import FilterableResults, {
 import CreatePost from '../../components/Posts/Post/CreatePost/CreatePost';
 import HomePageTabs from '../../components/HomePageTabs';
 import {translateOptionalFields} from '../../helpers/posts';
+import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 
 // Due to the limitations in firestore filters described in
 // https://firebase.google.com/docs/firestore/query-data/queries it is not
@@ -146,7 +147,7 @@ function fetchUserFeedFilters(uuid) {
 }
 
 export default function FollowingFeedPage() {
-  const {user, isLoggedIn} = useContext(AuthContext);
+  const {user, authLoaded} = useContext(AuthContext);
   const featureFlags = useContext(FeatureFlags);
 
   const getDefaultFilter = () => {
@@ -159,14 +160,19 @@ export default function FollowingFeedPage() {
     return fetchUserFeedData(user.uid, skip, limit, filter, last);
   };
 
+  if (authLoaded === false)
+    return (
+      <div className="content-layout">
+        <div className="feed-container">
+          <LoadingSpinner />
+        </div>
+      </div>
+    );
   return (
     <FilterableResults fetchResults={fetchResults} limit={10} loadingFilter>
       <div className="sider-layout">
         <FilterManager>
-          <NewFilterMenuWrapper
-            getDefaultFilter={getDefaultFilter}
-            isLoggedIn={isLoggedIn}
-          />
+          <NewFilterMenuWrapper getDefaultFilter={getDefaultFilter} />
           <ResourceTabs />
         </FilterManager>
       </div>
