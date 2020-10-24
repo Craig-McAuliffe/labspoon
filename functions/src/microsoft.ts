@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions';
 import {config} from './config';
 import axios, {AxiosPromise} from 'axios';
+import {Topic} from './topics';
 
 const baseURL = 'https://api.labs.cognitive.microsoft.com/academic/v1.0';
 
@@ -123,22 +124,15 @@ interface interpretationRuleOutput {
   value: string;
 }
 
-interface MAKField {
+export interface MAKField {
   DFN: string;
-  FId: string;
+  FId: number;
   FN: string;
 }
 
-interface Topic {
-  ID?: string;
-  microsoftID: string;
-  name: string;
-  normalisedName?: string;
-}
-
-export function makFieldToTopic(field: MAKField) {
+export function makFieldToTopic(field: MAKField): Topic {
   return {
-    microsoftID: field.FId,
+    microsoftID: field.FId.toString(),
     name: field.DFN,
     normalisedName: field.FN,
   };

@@ -57,7 +57,7 @@ function AuthProvider({children}) {
       .get()
       .then((profile) => {
         const userData = profile.data();
-        if (!userData.avatar) userData.avatar = getDefaultAvatar();
+        if (userData && !userData.avatar) userData.avatar = getDefaultAvatar();
         setUserProfile(userData);
       });
   }, [user]);

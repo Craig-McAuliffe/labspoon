@@ -6,6 +6,7 @@ import {
   MAKPublication,
   makPublicationToPublication
 } from './microsoft';
+import {allPublicationFields, publishAddPublicationRequests} from './publications';
 
 const fieldNameExprRegex = /^Composite\(F.FN==\'(?<fieldName>[a-zA-Z0-9 -]+)\'\)$/;
 export const topicSearch = functions.https.onCall(async (data) => {
@@ -45,11 +46,12 @@ export const topicSearch = functions.https.onCall(async (data) => {
     executeExpression({
       expr: fieldExpr.expr,
       count: 1,
-      attributes: 'F.DFN,F.FId,F.FN',
-    }).then((resp) => {
-      const entities: MAKPublication[] = resp.data.entities;
-      if (entities.length === 0) return;
-      const publication = makPublicationToPublication(entities[0]);
+      attributes: allPublicationFields,
+    }).then(async (resp) => {
+      const publications: MAKPublication[] = resp.data.entities;
+      if (publications.length === 0) return;
+      await publishAddPublicationRequests(publications);
+      const publication = makPublicationToPublication(publications[0]);
       const topicMatch =  publication.topics!.find((topic) => topic.normalisedName! === fieldExpr.fieldName);
       return topicMatch;
     }).catch((err: Error) => {
@@ -64,3 +66,11 @@ interface expressionField {
   expr: string;
   fieldName: string;
 }
+
+export interface Topic {
+  ID?: string;
+  microsoftID: string;
+  name: string;
+  normalisedName?: string;
+}
+
