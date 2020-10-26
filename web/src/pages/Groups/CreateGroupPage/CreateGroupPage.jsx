@@ -62,7 +62,10 @@ export default function CreateGroupPage({
       });
       batch
         .commit()
-        .catch((err) => alert('batch failed to commit'))
+        .catch((err) => {
+          console.log(err);
+          alert('batch failed to commit');
+        })
         .then(() => {
           if (onboardingCancelOrSubmitAction) {
             onboardingCancelOrSubmitAction();
