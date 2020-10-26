@@ -39,3 +39,4 @@ pubsub-debug.log*
 /builds
 local-gitlab-runner-dev.sh
 local-gitlab-runner-test.sh
+local-gitlab-runner-prod.sh
