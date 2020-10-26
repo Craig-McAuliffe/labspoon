@@ -64,7 +64,7 @@ function AuthProvider({children}) {
           return;
         }
         const userData = profile.data();
-        if (!userData.avatar) userData.avatar = getDefaultAvatar();
+        if (userData && !userData.avatar) userData.avatar = getDefaultAvatar();
         setUserProfile(userData);
       })
       .catch((err) => console.log(err, 'could not retrieve user profile'));

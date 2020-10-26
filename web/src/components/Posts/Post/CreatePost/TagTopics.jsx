@@ -13,7 +13,6 @@ export default function TagTopics() {
   const {selectedTopics, setSelectedTopics} = useContext(CreatingPostContext);
 
   // Tells user that they are trying to input a duplicate topic
-  //
   useEffect(() => {
     if (duplicateTopic) {
       setTimeout(() => setDuplicateTopic(false), 3000);
@@ -21,29 +20,11 @@ export default function TagTopics() {
   }, [duplicateTopic]);
   return (
     <div className="create-post-topic-section-container">
-      <div className="create-post-tagged-topics-container">
-        {selectedTopics.map((selectedTopic) => (
-          <button
-            key={selectedTopic.name}
-            className="create-post-tagged-topic"
-            onClick={() =>
-              removeSelectedTopic(
-                selectedTopic.name,
-                selectedTopics,
-                setSelectedTopics
-              )
-            }
-          >
-            {selectedTopic.name}
-            <RemoveIcon />
-          </button>
-        ))}
-      </div>
-      {duplicateTopic ? (
-        <div className="topic-tag-duplicate-topic-warning">
-          You have already added that topic
-        </div>
-      ) : null}
+      <SelectedTopics
+        selectedTopics={selectedTopics}
+        setSelectedTopics={setSelectedTopics}
+      />
+      {duplicateTopic ? <DuplicateTopicWarning /> : null}
       <div className="create-post-topic-search-container">
         <h4 className="create-post-topic-tag-title">Add related topics</h4>
         <div className="create-post-topic-search-tool-container">
@@ -63,27 +44,71 @@ export default function TagTopics() {
               setDuplicateTopic={setDuplicateTopic}
               displayedTopics={displayedTopics}
             />
-            {displayedTopics.map((displayedTopic) => (
-              <TopicListItem key={displayedTopic.id} topic={displayedTopic}>
-                <PrimaryButton
-                  onClick={() =>
-                    addTopicToPost(
-                      setSelectedTopics,
-                      displayedTopic.name,
-                      setDuplicateTopic,
-                      displayedTopic.id,
-                      displayedTopics
-                    )
-                  }
-                  small
-                >
-                  Select
-                </PrimaryButton>
-              </TopicListItem>
-            ))}
+            <TopicsList
+              topics={displayedTopics}
+              setSelectedTopics={setSelectedTopics}
+              setDuplicateTopic={setDuplicateTopic}
+              displayedTopics={displayedTopics}
+            />
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+const TopicsList = ({
+  topics,
+  setSelectedTopics,
+  setDuplicateTopic,
+  displayedTopics,
+}) =>
+  topics.map((displayedTopic) => (
+    <TopicListItem key={displayedTopic.id} topic={displayedTopic}>
+      <PrimaryButton
+        onClick={() =>
+          addTopicToPost(
+            setSelectedTopics,
+            displayedTopic.name,
+            setDuplicateTopic,
+            displayedTopic.id,
+            displayedTopics
+          )
+        }
+        small
+      >
+        Select
+      </PrimaryButton>
+    </TopicListItem>
+  ));
+
+function DuplicateTopicWarning() {
+  return (
+    <div className="topic-tag-duplicate-topic-warning">
+      You have already added that topic
+    </div>
+  );
+}
+
+function SelectedTopics({selectedTopics, setSelectedTopics}) {
+  return (
+    <div className="create-post-tagged-topics-container">
+      {selectedTopics.map((selectedTopic) => (
+        <button
+          key={selectedTopic.name}
+          className="create-post-tagged-topic"
+          onClick={() =>
+            removeSelectedTopic(
+              selectedTopic.name,
+              selectedTopics,
+              setSelectedTopics
+            )
+          }
+        >
+          {selectedTopic.name}
+          <RemoveIcon />
+        </button>
+      ))}
     </div>
   );
 }

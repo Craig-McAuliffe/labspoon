@@ -6,6 +6,7 @@ import {
   MAKPublication,
   Publication,
   makPublicationToPublication,
+  interpretationResult,
 } from './microsoft';
 import {Topic, Post} from './posts';
 import {generateThumbnail} from './helpers/images';
@@ -37,7 +38,7 @@ export const generateThumbnailAvatarOnFullSizeUpload = functions.storage.object(
 
 export const instantiateFollowingFeedForNewUser = functions.firestore
   .document('users/{userID}')
-  .onCreate(async (change, context) => {
+  .onCreate(async (change) => {
     const userID = change.id;
     await db.doc(`users/${userID}/feeds/followingFeed`).set({
       id: 'followingFeed',
@@ -46,7 +47,7 @@ export const instantiateFollowingFeedForNewUser = functions.firestore
 
 export const setUserIsFollowedBySelfOnCreation = functions.firestore
   .document('users/{userID}')
-  .onCreate(async (change, context) => {
+  .onCreate(async (change) => {
     const userID = change.id;
     const user = change.data();
     const userRef: UserRef = {
@@ -100,7 +101,7 @@ export async function setUserOnTopic(topic: Topic, userID: string) {
 
 export const removeGroupFromUser = functions.firestore
   .document('groups/{groupID}/members/{userID}')
-  .onDelete(async (change, context) => {
+  .onDelete(async (_, context) => {
     const userID = context.params.userID;
     const groupID = context.params.groupID;
     await db
@@ -149,7 +150,7 @@ export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall
     const publicationWritePromises: Promise<null>[] = [];
     msPublicationsForUserQS.forEach((msPublicationDS) =>
       publicationWritePromises.push(
-        (async (resolve) => {
+        (async () => {
           // Find the publication
           const publicationsQS = await db
             .collection('publications')
@@ -181,7 +182,7 @@ export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall
 
 // for a given name, return potential matching publications so the user can select theirs
 export const getSuggestedPublicationsForAuthorName = functions.https.onCall(
-  async (data, context) => {
+  async (data) => {
     const name = data.name;
     if (name === undefined)
       throw new functions.https.HttpsError(
@@ -201,9 +202,10 @@ export const getSuggestedPublicationsForAuthorName = functions.https.onCall(
         )
       )
       .catch((err) => {
+        console.error(err);
         throw new functions.https.HttpsError('internal', 'An error occurred.');
       });
-    const executePromises = expressions.map((expression) => {
+    const executePromises = expressions.map(async (expression) => {
       return executeExpression({
         expr: expression,
         count: 100,
@@ -286,7 +288,7 @@ export const addPostsInTopicToFollowingFeeds = functions.firestore
       `topics/${topicID}/followedByUsers`
     );
 
-    const updateFollowersOfTopic = () => {
+    const updateFollowersOfTopic = async () => {
       return topicFollowersCollectionRef
         .get()
         .then((qs) => {
@@ -295,7 +297,7 @@ export const addPostsInTopicToFollowingFeeds = functions.firestore
             topicFollowers.push(doc.data() as UserRef);
           });
           const topicFollowersPromisesArray = topicFollowers.map(
-            (topicFollower) => {
+            async (topicFollower) => {
               const userID = topicFollower.id;
               const userPostsDocRef = db.doc(
                 `users/${userID}/feeds/followingFeed/posts/${postID}`
@@ -316,22 +318,6 @@ export const addPostsInTopicToFollowingFeeds = functions.firestore
     };
     return updateFollowersOfTopic();
   });
-
-interface interpretationResult {
-  logprob: number;
-  parse: string;
-  rules: Array<interpretationRules>;
-}
-
-interface interpretationRules {
-  name: string;
-  output: interpretationRuleOutput;
-}
-
-interface interpretationRuleOutput {
-  type: string;
-  value: string;
-}
 
 interface PublicationSuggestion {
   microsoftAcademicIDMatch: string;
