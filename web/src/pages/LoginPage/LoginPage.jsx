@@ -9,7 +9,7 @@ import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import * as Yup from 'yup';
 
 import './LoginPage.css';
-import {getDefaultAvatar, getDefaultCoverPhoto} from '../../helpers/users.js';
+import {getAvatar, getCoverPhoto} from '../../helpers/users.js';
 
 /**
  * Sign in page using the Firebase authentication handler
@@ -89,8 +89,8 @@ const SignUpForm = ({setGoToOnboarding}) => {
             db.doc(`users/${result.user.uid}`).set({
               id: result.user.uid,
               name: result.user.displayName,
-              coverPhoto: getDefaultCoverPhoto(),
-              avatar: getDefaultAvatar(),
+              coverPhoto: getCoverPhoto(result.user.uid),
+              avatar: getAvatar(result.user.uid),
             })
           )
           .catch((error) => {
