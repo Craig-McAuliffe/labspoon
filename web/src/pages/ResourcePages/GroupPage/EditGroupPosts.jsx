@@ -103,6 +103,7 @@ export default function EditingGroupInfo({
 
   const defaultFilterTypes = (filter) => {
     const activeTab = filter ? getActiveTabID(filter) : null;
+    console.log(activeTab);
     return activeTab === REMOVE
       ? getGroupPostsAuthorsFilter(groupID)
       : getMemberFilter(groupID);
@@ -110,11 +111,7 @@ export default function EditingGroupInfo({
 
   return (
     <>
-      <FilterableResults
-        fetchResults={fetchPostsFromDB}
-        limit={10}
-        loadingFilter
-      >
+      <FilterableResults fetchResults={fetchPostsFromDB} limit={10}>
         <TabReset
           setResetSelection={setResetSelection}
           setPostsEditSuccess={setPostsEditSuccess}
