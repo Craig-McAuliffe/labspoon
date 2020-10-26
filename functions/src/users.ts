@@ -32,7 +32,7 @@ export const generateThumbnailAvatarOnFullSizeUpload = functions.storage.object(
     if (!object.name.endsWith(AVATAR_FILENAME)) return;
 
     const fullSizeAvatarPath = object.name;
-    await generateThumbnail(fullSizeAvatarPath, 'avatar', ['thumbnail', '200x200>'])
+    await generateThumbnail(fullSizeAvatarPath, 'avatar', ['-thumbnail', '200x200>'])
   });
 
 
