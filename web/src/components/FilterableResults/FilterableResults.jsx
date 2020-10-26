@@ -164,7 +164,7 @@ export function NewFilterMenuWrapper({
       return;
     }
     if (!dependentOnTab) {
-      Promise.resolve(getDefaultFilter())
+      Promise.resolve(getDefaultFilter(tabFilter))
         .then((defaultFilter) => {
           setSiderFilter(defaultFilter);
           filterManager.setSiderFilterLoading(false);
@@ -172,7 +172,7 @@ export function NewFilterMenuWrapper({
         .catch((error) => console.log(error));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getDefaultFilter]);
+  }, []);
   // Fetch sider filter on tab change if dependentOnTab
   useEffect(() => {
     if (getDefaultFilter) {
