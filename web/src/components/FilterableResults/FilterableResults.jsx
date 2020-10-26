@@ -164,7 +164,7 @@ export function NewFilterMenuWrapper({
       return;
     }
     if (!dependentOnTab) {
-      Promise.resolve(getDefaultFilter(tabFilter))
+      Promise.resolve(getDefaultFilter())
         .then((defaultFilter) => {
           setSiderFilter(defaultFilter);
           filterManager.setSiderFilterLoading(false);
