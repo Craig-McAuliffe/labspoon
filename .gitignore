@@ -35,6 +35,7 @@ firebase-debug.log*
 firestore-debug.log*
 ui-debug.log*
 pubsub-debug.log*
+./firebase
 
 /builds
 local-gitlab-runner-dev.sh
