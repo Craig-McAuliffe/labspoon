@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
-import firebase, {db} from '../../../../firebase';
+import firebase from '../../../../firebase';
 import * as Yup from 'yup';
-import {v4 as uuid} from 'uuid';
+import {addTaggedTopicToDB} from './TagTopics';
 import PostForm from './PostForm';
 import {CreatePostTextArea} from '../../../Forms/FormTextInput';
 import {CreatingPostContext} from './CreatePost';
@@ -16,11 +16,7 @@ export default function DefaultPost({cancelPost, setCreatingPost}) {
   const submitChanges = (res) => {
     res.postType = {id: 'defaultPost', name: 'Default'};
     selectedTopics.forEach((selectedTopic) => {
-      if (selectedTopic.id === undefined) selectedTopic.id = uuid();
-      if (selectedTopic.isNew) {
-        delete selectedTopic.isNew;
-        db.doc(`topics/${selectedTopic.id}`).set(selectedTopic);
-      }
+      addTaggedTopicToDB(selectedTopic);
     });
     res.topics = selectedTopics;
     createPost(res)

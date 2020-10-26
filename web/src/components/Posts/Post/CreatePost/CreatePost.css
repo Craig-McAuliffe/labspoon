@@ -60,6 +60,15 @@
 .create-post-typed-topic-container {
   display: flex;
   justify-content: space-between;
+  margin-top: 15px;
+}
+
+.create-post-typed-topic-container h4 {
+  color: #5d5d65;
+}
+
+.create-post-typed-topic-container button {
+  color: #00507c;
 }
 
 .creating-post-main-text-container {
@@ -198,4 +207,14 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
+}
+
+.create-post-topic-search-input {
+  border-bottom: 1px solid #00507c;
+  margin-top: 7px;
+  padding-top: 20px;
+}
+
+.create-post-loading-spinner-container {
+  margin-top: 10px;
 }

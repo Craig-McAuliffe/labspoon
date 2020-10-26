@@ -1,4 +1,5 @@
 export function dbPublicationToJSPublication(dbPublication) {
+  console.log(dbPublication);
   const JSPublication = dbPublication;
   if (JSPublication.resourceType === undefined) {
     JSPublication.resourceType = 'publication';

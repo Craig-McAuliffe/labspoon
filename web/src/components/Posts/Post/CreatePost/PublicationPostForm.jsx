@@ -1,13 +1,13 @@
 import React, {useContext, useState} from 'react';
 import NegativeButton from '../../../Buttons/NegativeButton';
 import * as Yup from 'yup';
-import firebase, {db} from '../../../../firebase';
-import {v4 as uuid} from 'uuid';
+import firebase from '../../../../firebase';
 import {CreatePostTextArea, TextInput} from '../../../Forms/FormTextInput';
 import PostForm from './PostForm';
 import {CreatingPostContext} from './CreatePost';
 import {FormPublicationResults} from '../../../Publication/MicrosoftResults';
 import {SmallPublicationListItem} from '../../../Publication/PublicationListItem';
+import {addTaggedTopicToDB} from './TagTopics';
 
 import './CreatePost.css';
 
@@ -29,11 +29,7 @@ export default function PublicationPostForm({cancelPost, setCreatingPost}) {
     }
     res.postType = {id: 'publicationPost', name: 'Publication'};
     selectedTopics.forEach((selectedTopic) => {
-      if (selectedTopic.id === undefined) selectedTopic.id = uuid();
-      if (selectedTopic.isNew) {
-        delete selectedTopic.isNew;
-        db.doc(`topics/${selectedTopic.id}`).set(selectedTopic);
-      }
+      addTaggedTopicToDB(selectedTopic);
     });
     res.topics = selectedTopics;
     createPost(res)
