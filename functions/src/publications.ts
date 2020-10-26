@@ -7,11 +7,14 @@ import {
   makPublicationToPublication,
   Publication,
   MAKPublication,
+  makFieldToTopic,
 } from './microsoft';
 import {Post} from './posts';
 
 const pubSubClient = new PubSub();
 const db = admin.firestore();
+
+export const allPublicationFields = 'AA.AfId,AA.AfN,AA.AuId,AA.AuN,AA.DAuN,AA.DAfN,AA.S,AW,BT,BV,C.CId,C.CN,CC,CitCon,D,DN,DOI,E,ECC,F.DFN,F.FId,F.FN,FamId,FP,I,IA,Id,J.JId,J.JN,LP,PB,Pt,RId,S,Ti,V,VFN,VSN,W,Y';
 
 export const microsoftAcademicKnowledgePublicationSearch = functions.https.onCall(
   async (data, context) => {
@@ -27,35 +30,39 @@ export const microsoftAcademicKnowledgePublicationSearch = functions.https.onCal
           // https://docs.microsoft.com/en-us/academic-services/project-academic-knowledge/reference-entity-attributes
           expr: `And(${resp.data.interpretations[0].rules[0].output.value}, Ty='0')`,
           count: 10,
-          attributes:
-            'AA.AfId,AA.AfN,AA.AuId,AA.AuN,AA.DAuN,AA.DAfN,AA.S,AW,BT,BV,C.CId,C.CN,CC,CitCon,D,DN,DOI,E,ECC,F.DFN,F.FId,F.FN,FamId,FP,I,IA,Id,J.JId,J.JN,LP,PB,Pt,RId,S,Ti,V,VFN,VSN,W,Y',
+          attributes: allPublicationFields,
         });
       })
-      .then((resp) => {
-        resp.data.entities.forEach((result: object) => {
-          const jsonString = JSON.stringify(result);
-          const messageBuffer = Buffer.from(jsonString);
-          pubSubClient
-            .topic('add-publication')
-            .publish(messageBuffer)
-            .catch((err: Error) =>
-              console.error(
-                'Error raised publishing message to add-publication topic with payload',
-                jsonString,
-                err
-              )
-            );
-        });
-        results = resp.data.entities.map(makPublicationToPublication);
+      .then(async (resp) => {
+        const publications = resp.data.entities;
+        await publishAddPublicationRequests(publications);
+        results = publications.map(makPublicationToPublication);
       })
       .catch((err) => {
         console.error(err);
         throw new functions.https.HttpsError('internal', 'An error occured.');
       });
-
     return results;
   }
 );
+
+export function publishAddPublicationRequests(makPublications: MAKPublication[]): Promise<any> {
+  const publishPromises = makPublications.map(async (result: object) => {
+    const jsonString = JSON.stringify(result);
+    const messageBuffer = Buffer.from(jsonString);
+    return pubSubClient
+      .topic('add-publication')
+      .publish(messageBuffer)
+      .catch((err: Error) =>
+        console.error(
+          'Error raised publishing message to add-publication topic with payload',
+          jsonString,
+          err
+        )
+      );
+  });
+  return Promise.all(publishPromises);
+}
 
 export const addNewMSPublicationAsync = functions.pubsub
   .topic('add-publication')
@@ -65,6 +72,7 @@ export const addNewMSPublicationAsync = functions.pubsub
     if (!microsoftPublication.Id) return;
     const microsoftPublicationID = microsoftPublication.Id.toString();
     const microsoftPublicationRef = db.collection('MSPublications').doc(microsoftPublicationID);
+
     try {
       await db.runTransaction(async (t) => {
         const microsoftPublicationDS = await t.get(microsoftPublicationRef);
@@ -77,11 +85,11 @@ export const addNewMSPublicationAsync = functions.pubsub
 
         microsoftPublication.processed = true;
 
-        // store the MS publication and 
+        // store the MS publication and the converted labspoon publication
         t.set(microsoftPublicationRef, microsoftPublication);
         const publication = makPublicationToPublication(microsoftPublication);
-        // TODO(Patrick): Reintroduce authors
         delete publication.authors;
+        delete publication.topics;
         t.set(db.collection('publications').doc(), publication);
 
         microsoftPublication.AA?.forEach((author) => {
@@ -96,10 +104,50 @@ export const addNewMSPublicationAsync = functions.pubsub
             microsoftPublication
           )
         });
+
+        microsoftPublication.F?.forEach((field) => {
+          const fieldID = field.FId.toString();
+          t.set(db.collection('MSFields').doc(fieldID), field);
+          t.set(db.collection('topics').doc(), makFieldToTopic(field));
+          t.set(db.collection('MSFields').doc(fieldID).collection('publications').doc(microsoftPublicationID), microsoftPublication);
+        });
       });
     } catch (err) {
       console.error(err);
     }
+  });
+
+export const addNewMAKPublicationToTopics = functions.firestore
+  .document('MSFields/{msFieldID}/publications/{msPublicationID}')
+  .onCreate(async (change, context) => {
+    const msFieldID = context.params.msFieldID;
+    const msPublicationID = context.params.msPublicationID;
+
+    // Find the topic that corresponds to the Microsoft field of study ID
+    const topicQS = await db
+      .collection('topics')
+      .where('microsoftID', '==', msFieldID)
+      .limit(1)
+      .get();
+    if (topicQS.empty) {
+      console.error('topic not found; returning');
+      return;
+    }
+    const topicDS = topicQS.docs[0];
+    const topicID = topicDS.id;
+
+    const publicationDS = await getPublicationByMicrosoftPublicationID(msPublicationID);
+    const publicationID = publicationDS.id;
+
+    try {
+      await db.runTransaction(async (t) => {
+        const publication = await t.get(db.doc(`publications/${publicationID}`));
+        t.set(db.doc(`topics/${topicID}/publications/${publicationID}`), publication.data());
+      });
+    } catch (err) {
+      console.error(err);
+    }
+
     return null;
   });
 
