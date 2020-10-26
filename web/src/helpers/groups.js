@@ -1,4 +1,4 @@
-import {projectURL} from '../config';
+import {firebaseConfig} from '../config';
 
 // Retrieves paginated group references from passed group reference collection
 // for use in results pages. Returns a promise that returns an array of results
@@ -28,9 +28,9 @@ export function getPaginatedGroupReferencesFromCollectionRef(
 }
 
 export function getDefaultAvatar() {
-  return `https://storage.googleapis.com/${projectURL}/avatars/default_group_avatar.jpg`;
+  return `https://storage.googleapis.com/${firebaseConfig.storageBucket}/avatars/default_group_avatar.jpg`;
 }
 
 export function getAvatar(groupID) {
-  return `https://storage.googleapis.com/${projectURL}/groups/${groupID}/avatar`;
+  return `https://storage.googleapis.com/${firebaseConfig.storageBucket}/groups/${groupID}/avatar`;
 }
