@@ -103,7 +103,6 @@ export default function EditingGroupInfo({
 
   const defaultFilterTypes = (filter) => {
     const activeTab = filter ? getActiveTabID(filter) : null;
-    console.log(activeTab);
     return activeTab === REMOVE
       ? getGroupPostsAuthorsFilter(groupID)
       : getMemberFilter(groupID);
