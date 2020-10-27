@@ -68,7 +68,7 @@ interface expressionField {
 }
 
 export interface Topic {
-  ID?: string;
+  id?: string;
   microsoftID: string;
   name: string;
   normalisedName?: string;

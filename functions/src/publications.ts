@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions';
 import {PubSub} from '@google-cloud/pubsub';
 import {admin} from './config';
+import * as adminNS from 'firebase-admin';
 import {
   interpretQuery,
   executeExpression,
@@ -10,6 +11,7 @@ import {
   makFieldToTopic,
 } from './microsoft';
 import {Post} from './posts';
+import {Topic} from './topics';
 
 const pubSubClient = new PubSub();
 const db = admin.firestore();
@@ -141,8 +143,14 @@ export const addNewMAKPublicationToTopics = functions.firestore
 
     try {
       await db.runTransaction(async (t) => {
-        const publication = await t.get(db.doc(`publications/${publicationID}`));
-        t.set(db.doc(`topics/${topicID}/publications/${publicationID}`), publication.data());
+        const publicationDS = await t.get(db.doc(`publications/${publicationID}`));
+        const topicDS = await t.get(db.doc(`topics/${topicID}`));
+        t.set(db.doc(`topics/${topicID}/publications/${publicationID}`), publicationDS.data());
+        const topic = topicDS.data() as Topic;
+        topic.id = topicID;
+        t.update(db.doc(`publications/${publicationID}`), {
+          topics: adminNS.firestore.FieldValue.arrayUnion(topic)
+        });
       });
     } catch (err) {
       console.error(err);
