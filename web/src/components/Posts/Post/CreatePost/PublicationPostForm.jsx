@@ -7,7 +7,6 @@ import PostForm from './PostForm';
 import {CreatingPostContext} from './CreatePost';
 import {FormPublicationResults} from '../../../Publication/MicrosoftResults';
 import {SmallPublicationListItem} from '../../../Publication/PublicationListItem';
-import {addTaggedTopicToDB} from './TagTopics';
 
 import './CreatePost.css';
 
@@ -28,10 +27,15 @@ export default function PublicationPostForm({cancelPost, setCreatingPost}) {
       res.publicationURL = publicationURL;
     }
     res.postType = {id: 'publicationPost', name: 'Publication'};
+    const customTopics = [];
+    const DBTopics = [];
     selectedTopics.forEach((selectedTopic) => {
-      addTaggedTopicToDB(selectedTopic);
+      if (selectedTopic.isNew) {
+        customTopics.push(selectedTopic.name);
+      } else DBTopics.push(selectedTopic);
     });
-    res.topics = selectedTopics;
+    res.customTopics = customTopics;
+    res.topics = DBTopics;
     createPost(res)
       .then(() => {
         setCreatingPost(false);
@@ -77,7 +81,6 @@ export default function PublicationPostForm({cancelPost, setCreatingPost}) {
   );
 }
 
-// CSS classes found in
 function SelectPublication({
   publication,
   setPublication,

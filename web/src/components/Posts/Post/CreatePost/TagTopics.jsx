@@ -4,12 +4,10 @@ import TopicListItem from '../../../Topics/TopicListItem';
 import {RemoveIcon} from '../../../../assets/GeneralActionIcons';
 import {CreatingPostContext} from './CreatePost';
 import firebase from '../../../../firebase';
-import {v4 as uuid} from 'uuid';
-import {db} from '../../../../firebase';
-import './CreatePost';
 import LoadingSpinner from '../../../LoadingSpinner/LoadingSpinner';
+import './CreatePost';
 
-const test = firebase.functions().httpsCallable('topics-topicSearch');
+const topicSearch = firebase.functions().httpsCallable('topics-topicSearch');
 
 export default function TagTopics() {
   const [displayedTopics, setDisplayedTopics] = useState([]);
@@ -25,25 +23,19 @@ export default function TagTopics() {
     }
   }, [duplicateTopic]);
 
-  const searchMicrosoftTopics = (e) => {
-    const topicInputValue = e.target.value;
-    setTypedTopic(topicInputValue);
-    setLoadingTopics(true);
-    if (topicInputValue.length === 0) {
+  useEffect(() => {
+    if (typedTopic.length === 0) {
       setDisplayedTopics([]);
+      setLoadingTopics(false);
       return;
     }
-    test({topicQuery: topicInputValue})
-      .then((microsoftTopics) => {
-        setLoadingTopics(false);
-        setDisplayedTopics(microsoftTopics.data);
-      })
-      .catch((err) => {
-        setLoadingTopics(false);
-        setDisplayedTopics([]);
-        console.log(err, 'could not search topics');
-      });
-  };
+    return searchMicrosoftTopics(
+      typedTopic,
+      setLoadingTopics,
+      setDisplayedTopics
+    );
+  }, [typedTopic]);
+
   return (
     <div className="create-post-topic-section-container">
       <SelectedTopics
@@ -56,7 +48,9 @@ export default function TagTopics() {
         <input
           type="text"
           className="create-post-topic-search-input"
-          onChange={(e) => searchMicrosoftTopics(e)}
+          onChange={(e) => {
+            setTypedTopic(e.target.value);
+          }}
           placeholder="this post is about..."
         />
         <div></div>
@@ -102,7 +96,7 @@ const TopicsList = ({
             setSelectedTopics,
             displayedTopic.name,
             setDuplicateTopic,
-            displayedTopic.id,
+            displayedTopic.microsoftID,
             displayedTopics
           )
         }
@@ -120,6 +114,26 @@ function DuplicateTopicWarning() {
     </div>
   );
 }
+
+// clearTimeout is called on unmount from useEffect hook
+const searchMicrosoftTopics = (query, setLoadingTopics, setDisplayedTopics) => {
+  setLoadingTopics(true);
+  const apiCallTimeout = setTimeout(
+    () =>
+      topicSearch({topicQuery: query})
+        .then((microsoftTopics) => {
+          setLoadingTopics(false);
+          setDisplayedTopics(microsoftTopics.data);
+        })
+        .catch((err) => {
+          setLoadingTopics(false);
+          setDisplayedTopics([]);
+          console.log(err, 'could not search topics');
+        }),
+    1400
+  );
+  return () => clearTimeout(apiCallTimeout);
+};
 
 function SelectedTopics({selectedTopics, setSelectedTopics}) {
   return (
@@ -178,21 +192,24 @@ const addTopicToPost = (
   setSelectedTopics,
   topicName,
   setDuplicateTopic,
-  topicID,
+  microsoftID,
   displayedTopics
 ) => {
   let preExistingTopic = undefined;
-  displayedTopics.forEach((displayedTopic) => {
-    if (displayedTopic.name === topicName)
-      preExistingTopic = [{name: displayedTopic.name, id: displayedTopic.id}];
-  });
-
+  if (microsoftID === undefined) {
+    displayedTopics.forEach((displayedTopic) => {
+      if (displayedTopic.name === topicName)
+        preExistingTopic = [
+          {name: displayedTopic.name, microsoftID: displayedTopic.microsoftID},
+        ];
+    });
+  }
   setSelectedTopics((selectedTopics) => {
-    const newTopic = [{name: topicName, id: topicID}];
+    const newTopic = {name: topicName, microsoftID: microsoftID};
     if (
       selectedTopics.some(
         (previouslySelectedTopic) =>
-          previouslySelectedTopic.name === newTopic[0].name
+          previouslySelectedTopic.name === newTopic.name
       )
     ) {
       setDuplicateTopic(true);
@@ -202,8 +219,8 @@ const addTopicToPost = (
     if (preExistingTopic !== undefined)
       augmentedTopics = [...selectedTopics, ...preExistingTopic];
     else {
-      if (newTopic[0].id === undefined) newTopic[0].isNew = true;
-      augmentedTopics = [...selectedTopics, ...newTopic];
+      if (newTopic.microsoftID === undefined) newTopic.isNew = true;
+      augmentedTopics = [...selectedTopics, newTopic];
     }
     return augmentedTopics;
   });
@@ -225,11 +242,3 @@ const removeSelectedTopic = (
     return curatedSelectedTopics;
   });
 };
-
-export function addTaggedTopicToDB(selectedTopic) {
-  if (selectedTopic.id === undefined) selectedTopic.id = uuid();
-  if (selectedTopic.isNew) {
-    delete selectedTopic.isNew;
-    db.doc(`topics/${selectedTopic.id}`).set(selectedTopic);
-  }
-}

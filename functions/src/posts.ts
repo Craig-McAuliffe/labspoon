@@ -4,7 +4,7 @@ import {admin, ResourceTypes} from './config';
 import {firestore} from 'firebase-admin';
 
 import {UserRef} from './users';
-import {Publication} from './microsoft';
+import {Publication, MAKField} from './microsoft';
 
 const db = admin.firestore();
 
@@ -42,25 +42,56 @@ export const createPost = functions.https.onCall(async (data, context) => {
     methods: data.methods,
     startDate: data.startDate,
   };
+
   if (data.publication) content.publication = data.publication;
   if (data.publicationURL) content.publicationURL = data.publicationURL;
-  const post: Post = {
-    postType: data.postType,
-    author: author,
-    content: content,
-    topics: data.topics,
-    timestamp: new Date(),
-    filterAuthorID: author.id,
-    filterPostTypeID: 'default',
-    filterTopicIDs: data.topics.map(
-      (taggedTopic: {id: string; name: string}) => taggedTopic.id
-    ),
-    id: postID,
-  };
 
-  const batch = db.batch();
-  batch.set(db.collection('posts').doc(postID), post);
-  await batch.commit();
+  return db
+    .runTransaction((transaction) => {
+      const postTopics: Topic[] = [];
+      const matchedTopicsPromises = data.topics.map((taggedTopic: Topic) => {
+        return transaction
+          .get(db.doc(`MSFields/${taggedTopic.microsoftID}`))
+          .then((qs) => {
+            if (!qs.exists) {
+              console.log('error, cannot find microsoft topic');
+              return;
+            }
+            const MSField = qs.data() as MAKField;
+            const correspondingLabspoonTopicID = MSField.processed;
+            if (!MSField.processed) {
+              console.log(
+                'error, corresponding Labspoon topic has not been created'
+              );
+              return;
+            }
+            postTopics.push({
+              name: taggedTopic.name,
+              microsoftID: taggedTopic.microsoftID,
+              id: correspondingLabspoonTopicID,
+            });
+          });
+      });
+
+      const post: Post = {
+        postType: data.postType,
+        author: author,
+        content: content,
+        topics: postTopics,
+        customTopics: data.customTopics,
+        timestamp: new Date(),
+        filterAuthorID: author.id,
+        filterPostTypeID: 'default',
+        filterTopicIDs: data.topics.map(
+          (taggedTopic: {id: string; name: string}) => taggedTopic.id
+        ),
+        id: postID,
+      };
+      return Promise.all(matchedTopicsPromises).then(() => {
+        transaction.set(db.collection('posts').doc(postID), post);
+      });
+    })
+    .catch((err) => console.log(err, 'could not create post.'));
 });
 
 export const writePostToAuthorPosts = functions.firestore
@@ -328,6 +359,7 @@ export interface Post {
   author: UserRef;
   content: PostContent;
   topics: Topic[];
+  customTopics?: string[];
   timestamp: Date;
   id: string;
 
@@ -338,7 +370,8 @@ export interface Post {
 }
 // Rank relates to how often the resource mentions this topic
 export interface Topic {
-  id: string;
+  id?: string;
+  microsoftID?: string;
   name: string;
   rank?: number;
 }
