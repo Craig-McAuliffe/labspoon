@@ -143,10 +143,10 @@ export const addNewMAKPublicationToTopics = functions.firestore
 
     try {
       await db.runTransaction(async (t) => {
-        const publicationDS = await t.get(db.doc(`publications/${publicationID}`));
-        const topicDS = await t.get(db.doc(`topics/${topicID}`));
-        t.set(db.doc(`topics/${topicID}/publications/${publicationID}`), publicationDS.data());
-        const topic = topicDS.data() as Topic;
+        const publicationTDS = await t.get(db.doc(`publications/${publicationID}`));
+        const topicTDS = await t.get(db.doc(`topics/${topicID}`));
+        t.set(db.doc(`topics/${topicID}/publications/${publicationID}`), publicationTDS.data());
+        const topic = topicTDS.data() as Topic;
         topic.id = topicID;
         t.update(db.doc(`publications/${publicationID}`), {
           topics: adminNS.firestore.FieldValue.arrayUnion(topic)
