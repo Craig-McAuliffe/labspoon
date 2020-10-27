@@ -24,7 +24,7 @@ import PublicationPage, {
   MAGPublicationRouter,
 } from './pages/ResourcePages/PublicationPage/PublicationPage';
 import PostPage from './pages/ResourcePages/PostPage';
-import TopicPage from './pages/TopicPage';
+import TopicPage, {MAGFieldRouter} from './pages/TopicPage';
 import NewsPage from './pages/NewsPage';
 import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
 import OnboardingPage from './pages/OnboardingPage';
@@ -88,6 +88,9 @@ export default function Routes({user, setUser}) {
       </Route>
       <Route path="/topic/:topicID">
         <TopicPage />
+      </Route>
+      <Route path="/magField/:magFieldID">
+        <MAGFieldRouter />
       </Route>
       <AuthRoute user={user} path="/onboarding/:onboardingStage">
         <OnboardingPage />

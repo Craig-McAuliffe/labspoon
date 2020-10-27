@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {FeatureFlags} from '../../../App';
-import {Link, Redirect, useParams} from 'react-router-dom';
+import {Link, useParams} from 'react-router-dom';
 import {db} from '../../../firebase';
 
 import {dbPublicationToJSPublication} from '../../../helpers/publications';
@@ -19,47 +19,20 @@ import detectJournal from '../../../components/Publication/DetectJournal';
 
 import './PublicationPage.css';
 import {getActiveTabID} from '../../../helpers/filters';
+import MAGRouterDisplay from '../../../components/MAGRouter';
 
 // If the user clicks on a search result from Microsoft we redirect them to the corresponding Labspoon publication.
 export function MAGPublicationRouter() {
   const magPublicationID = useParams().magPublicationID;
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [publicationID, setPublicationID] = useState();
-
-  useEffect(() => {
-    db.collection('publications')
-      .where('microsoftID', '==', magPublicationID)
-      .limit(1)
-      .get()
-      .then((qs) => {
-        setLoading(false);
-        if (qs.empty) return setError(true);
-        qs.forEach((doc) => {
-          console.log(doc.data(), doc.id);
-          setPublicationID(doc.id);
-        });
-      })
-      .catch((err) => {
-        setLoading(false);
-        setError(true);
-        console.error(err);
-      });
-  }, [magPublicationID]);
-
-  if (loading || publicationID === undefined) return <h1>Loading...</h1>;
-  if (error)
-    return (
-      <>
-        <h1>Error: Publication not found</h1>
-        <p>
-          We&rsquo;re probably just indexing this, so try again in a few
-          minutes.
-        </p>
-      </>
-    );
-
-  return <Redirect to={`/publication/${publicationID}`} />;
+  return (
+    <MAGRouterDisplay
+      query={db
+        .collection('publications')
+        .where('microsoftID', '==', magPublicationID)
+        .limit(1)}
+      formatRedirectPath={(id) => `/publication/${id}`}
+    />
+  );
 }
 
 function fetchPublicationDetailsFromDB(publicationID) {

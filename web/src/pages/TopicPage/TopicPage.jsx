@@ -22,6 +22,7 @@ import topicPageFeedData from './TopicPageFeedData';
 import TopicPageSider from './TopicPageSider';
 
 import './TopicPage.css';
+import MAGRouterDisplay from '../../components/MAGRouter';
 
 function fetchTopicDetailsFromDB(topicID) {
   return db
@@ -195,5 +196,18 @@ function SuggestedTopics({topicDetails}) {
         </div>
       </div>
     </div>
+  );
+}
+
+export function MAGFieldRouter() {
+  const magFieldID = useParams().magFieldID;
+  return (
+    <MAGRouterDisplay
+      query={db
+        .collection('topics')
+        .where('microsoftID', '==', magFieldID)
+        .limit(1)}
+      formatRedirectPath={(id) => `/topic/${id}`}
+    />
   );
 }

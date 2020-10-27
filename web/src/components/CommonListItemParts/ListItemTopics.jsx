@@ -5,21 +5,24 @@ import PropTypes from 'prop-types';
 import './ListItemTopics.css';
 
 export default function ListItemTopics({taggedItem}) {
+  const topicLinks = taggedItem.topics.map((topic) => {
+    let link;
+    if (topic.id) {
+      link = `/topic/${topic.id}`;
+    } else {
+      link = `/magField/${topic.microsoftID}`;
+    }
+    return (
+      <Link to={link} key={topic.id} className="topic-names">
+        {topic.name}
+      </Link>
+    );
+  });
   if (!taggedItem.topics || taggedItem.topics.length === 0) return <></>;
   return (
     <div className="post-topics">
       <p className="topics-sub-title">Topics: </p>
-      <div className="topic-names-container">
-        {taggedItem.topics.map((topic) => (
-          <Link
-            to={`/topic/${topic.id}`}
-            key={topic.id}
-            className="topic-names"
-          >
-            {topic.name}
-          </Link>
-        ))}
-      </div>
+      <div className="topic-names-container">{topicLinks}</div>
     </div>
   );
 }
