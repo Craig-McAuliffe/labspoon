@@ -108,6 +108,66 @@ export const writePostToUserFollowingFeeds = functions.firestore
     return null;
   });
 
+export const addRecentPostsToFeedOnNewUserFollow = functions.firestore.document(`users/{followerID}/followsUsers/{followingID}`).onCreate(async (_, context): Promise<void[]> => {
+  const followerID = context.params.followerID;
+  const followingID = context.params.followingID;
+
+  try {
+    return addRecentPostsToFollowingFeed(followerID, db.collection(`users/${followingID}/posts`));
+  } catch (err) {
+    console.error(`Error while adding recent posts to the following feed of user ${followerID} who has just started following user ${followingID}`, err);
+  }
+  return new Promise(() => []);
+});
+
+export const addRecentPostsToFeedOnNewGroupFollow = functions.firestore.document(`users/{followerID}/followsGroups/{followingID}`).onCreate(async (_, context): Promise<void[]> => {
+  const followerID = context.params.followerID;
+  const followingID = context.params.followingID;
+  try {
+    return addRecentPostsToFollowingFeed(followerID, db.collection(`groups/${followingID}/posts`));
+  } catch (err) {
+    console.error(`Error while adding recent posts to the following feed of user ${followerID} who has just started following group ${followingID}`, err);
+  }
+  return new Promise(() => []);
+});
+
+export const addRecentPostsToFeedOnNewTopicFollow = functions.firestore.document(`users/{followerID}/followsTopics/{followingID}`).onCreate(async (_, context): Promise<void[]> => {
+  const followerID = context.params.followerID;
+  const followingID = context.params.followingID;
+  try {
+    return addRecentPostsToFollowingFeed(followerID, db.collection(`topics/${followingID}/posts`));
+  } catch (err) {
+    console.error(`Error while adding recent posts to the following feed of user ${followerID} who has just started following topic ${followingID}`, err);
+  }
+  return new Promise(() => []);
+});
+
+// When a user starts following a new resource, they will not intially see any
+// of that resource's posts in their following feed as the resource will
+// probably not have posted since the user started following it. This is not
+// engaging for new users as it means their following feed will be entirely
+// empty. To make the new user experience more engaging we add the most recents
+// posts from that resource into the following feed.
+const POSTS_TO_ADD_ON_NEW_FOLLOW = 2;
+async function addRecentPostsToFollowingFeed(followerID: string, originCollection: firestore.CollectionReference): Promise<void[]> {
+  const posts = await originCollection.orderBy('timestamp', 'desc').limit(POSTS_TO_ADD_ON_NEW_FOLLOW).get().catch((err) => {
+    throw new Error(`Unable to retrieves posts from collection ${originCollection}: ${err}`);
+  });
+  if (posts.empty) new Promise(() => []);
+  const postAddedPromises: Promise<void>[] = [];
+  posts.forEach((postDS) => {
+    const post = postDS.data() as Post;
+    const followingFeedRef = db.doc(`users/${followerID}/feeds/followingFeed/posts/${post.id}`);
+    // Not important if we fail to add past posts to the feed.
+    const postAddedPromise = followingFeedRef.set(post).then(() => updateFiltersByPost(followingFeedRef, post)).catch((err) => {
+      console.error(`Unable to add post ${post.id} to the following feed of user ${followerID}:`, err);
+    });
+    postAddedPromises.push(postAddedPromise);
+  });
+  return Promise.all(postAddedPromises);
+}
+
+
 export const addPostToTopic = functions.firestore
   .document(`posts/{postID}`)
   .onCreate(async (change, context) => {
