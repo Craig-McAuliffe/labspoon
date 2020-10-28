@@ -4,9 +4,12 @@ import {
   interpretQuery,
   executeExpression,
   MAKPublication,
-  makPublicationToPublication
+  makPublicationToPublication,
 } from './microsoft';
-import {allPublicationFields, publishAddPublicationRequests} from './publications';
+import {
+  allPublicationFields,
+  publishAddPublicationRequests,
+} from './publications';
 
 const fieldNameExprRegex = /^Composite\(F.FN==\'(?<fieldName>[a-zA-Z0-9 -]+)\'\)$/;
 export const topicSearch = functions.https.onCall(async (data) => {
@@ -25,16 +28,14 @@ export const topicSearch = functions.https.onCall(async (data) => {
     .then((resp) =>
       resp.data.interpretations
         .map((result: interpretationResult) => result.rules[0].output.value)
-        .map(
-          (expr: string): expressionField | null => {
-            const match = fieldNameExprRegex.exec(expr);
-            if (!match) return null;
-            return {
-              expr: `And(${expr}, Ty=='0')`,
-              fieldName: match.groups!.fieldName,
-            };
-          }
-        )
+        .map((expr: string): expressionField | null => {
+          const match = fieldNameExprRegex.exec(expr);
+          if (!match) return null;
+          return {
+            expr: `And(${expr}, Ty=='0')`,
+            fieldName: match.groups!.fieldName,
+          };
+        })
         .filter((res: expressionField | null) => res !== null)
         .slice(0, 10)
     )
@@ -47,17 +48,21 @@ export const topicSearch = functions.https.onCall(async (data) => {
       expr: fieldExpr.expr,
       count: 1,
       attributes: allPublicationFields,
-    }).then(async (resp) => {
-      const publications: MAKPublication[] = resp.data.entities;
-      if (publications.length === 0) return;
-      await publishAddPublicationRequests(publications);
-      const publication = makPublicationToPublication(publications[0]);
-      const topicMatch =  publication.topics!.find((topic) => topic.normalisedName! === fieldExpr.fieldName);
-      return topicMatch;
-    }).catch((err: Error) => {
-      console.error(err);
-      throw new functions.https.HttpsError('internal', 'An error occurred.');
     })
+      .then(async (resp) => {
+        const publications: MAKPublication[] = resp.data.entities;
+        if (publications.length === 0) return;
+        await publishAddPublicationRequests(publications);
+        const publication = makPublicationToPublication(publications[0]);
+        const topicMatch = publication.topics!.find(
+          (topic) => topic.normalisedName! === fieldExpr.fieldName
+        );
+        return topicMatch;
+      })
+      .catch((err: Error) => {
+        console.error(err);
+        throw new functions.https.HttpsError('internal', 'An error occurred.');
+      })
   );
   return await Promise.all(executePromises);
 });
@@ -73,4 +78,3 @@ export interface Topic {
   name: string;
   normalisedName?: string;
 }
-

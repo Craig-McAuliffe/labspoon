@@ -8,6 +8,7 @@ import {
   Publication,
   MAKPublication,
   makFieldToTopic,
+  MAKField,
 } from './microsoft';
 import {Post} from './posts';
 
@@ -110,32 +111,48 @@ export const addNewMSPublicationAsync = functions.pubsub
           );
         });
 
-        microsoftPublication.F?.forEach((field) => {
-          const fieldID = field.FId.toString();
-          t.set(db.collection('MSFields').doc(fieldID), field);
-          t.set(db.collection('topics').doc(), makFieldToTopic(field));
-          t.set(
-            db
-              .collection('MSFields')
-              .doc(fieldID)
-              .collection('publications')
-              .doc(microsoftPublicationID),
-            microsoftPublication
-          );
-        });
+        microsoftPublication.F?.forEach((field) => {});
       });
     } catch (err) {
       console.error(err);
     }
   });
 
-export const processMAKFields = functions.firestore
-  .document('topics/{topicID}')
+export const createTopicsFromNewMAKPublication = functions.firestore
+  .document('MSPublications/{msPublicationID}')
   .onCreate(async (change, context) => {
-    const labspoonTopidID = context.params.topicID;
-    const labspoonTopic = change.data();
-    const microsoftFieldID = labspoonTopic.microsoftID;
-    db.doc(`MSFields/${microsoftFieldID}`).update({processed: labspoonTopidID});
+    const microsoftPublication = change.data();
+    const microsoftPublicationID = context.params.msPublicationID;
+    const publicationTopicPromiseArray = microsoftPublication.F?.map(
+      async (field: MAKField) => {
+        return db.runTransaction((transaction) => {
+          const fieldID = field.FId.toString();
+          return transaction.get(db.doc(`MSFields/${fieldID}`)).then((qs) => {
+            if (qs.exists) {
+              return console.log('topic already created');
+            }
+            const microsoftField = field;
+            const labspoonTopicDS = db.collection('topics').doc();
+            const labspoonTopicID = labspoonTopicDS.id;
+            microsoftField.processed = labspoonTopicID;
+            transaction.set(labspoonTopicDS, makFieldToTopic(field));
+            transaction.set(
+              db.collection('MSFields').doc(fieldID),
+              microsoftField
+            );
+            transaction.set(
+              db
+                .collection('MSFields')
+                .doc(fieldID)
+                .collection('publications')
+                .doc(microsoftPublicationID),
+              microsoftPublication
+            );
+          });
+        });
+      }
+    );
+    return Promise.all(publicationTopicPromiseArray);
   });
 
 export const addNewMAKPublicationToTopics = functions.firestore
