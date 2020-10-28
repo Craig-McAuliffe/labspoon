@@ -19,7 +19,7 @@ export default function ListItemTopics({taggedItem}) {
         </Link>
       ) : (
         <p className="tagged-topic-names" key={topic.name}>
-          {topic}
+          {topic.name}
         </p>
       )
     );

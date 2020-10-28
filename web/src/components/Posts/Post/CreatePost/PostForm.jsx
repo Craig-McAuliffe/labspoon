@@ -51,7 +51,7 @@ export function handlePostTopics(selectedTopics) {
   const DBTopics = [];
   selectedTopics.forEach((selectedTopic) => {
     if (selectedTopic.isNew) {
-      customTopics.push(selectedTopic.name);
+      customTopics.push({name: selectedTopic.name});
     } else DBTopics.push(selectedTopic);
   });
   return {customTopics: customTopics, DBTopics: DBTopics};
