@@ -4,6 +4,7 @@ import firebase from '../../../../firebase';
 import FormTextInput, {CreatePostTextArea} from '../../../Forms/FormTextInput';
 import FormDateInput from '../../../Forms/FormDateInput';
 import PostForm from './PostForm';
+import {handlePostTopics} from './PostForm';
 import {CreatingPostContext} from './CreatePost';
 
 import './CreatePost.css';
@@ -15,15 +16,9 @@ export default function OpenPositionPostForm({cancelPost, setCreatingPost}) {
 
   const submitChanges = (res) => {
     res.postType = {id: 'openPositionPost', name: 'Open Position'};
-    const customTopics = [];
-    const DBTopics = [];
-    selectedTopics.forEach((selectedTopic) => {
-      if (selectedTopic.isNew) {
-        customTopics.push(selectedTopic.name);
-      } else DBTopics.push(selectedTopic);
-    });
-    res.customTopics = customTopics;
-    res.topics = DBTopics;
+    const taggedTopics = handlePostTopics(selectedTopics);
+    res.customTopics = taggedTopics.customTopics;
+    res.topics = taggedTopics.DBTopics;
     createPost(res)
       .then(() => {
         setCreatingPost(false);

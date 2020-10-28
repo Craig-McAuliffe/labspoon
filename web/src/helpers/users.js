@@ -1,4 +1,4 @@
-import {projectURL} from '../config';
+import {firebaseConfig} from '../config';
 
 // Retrieves paginated user references from passed user reference collection
 // for use in results pages. Returns a promise that returns an array of results
@@ -27,17 +27,17 @@ export function getPaginatedUserReferencesFromCollectionRef(
 }
 
 export function getDefaultAvatar() {
-  return `https://storage.googleapis.com/${projectURL}/avatars/default_avatar.jpg`;
+  return `https://storage.googleapis.com/${firebaseConfig.storageBucket}/avatars/default_avatar.jpg`;
 }
 
 export function getDefaultCoverPhoto() {
-  return `https://storage.googleapis.com/${projectURL}/avatars/default_cover_photo.png`;
+  return `https://storage.googleapis.com/${firebaseConfig.storageBucket}/avatars/default_cover_photo.png`;
 }
 
 export function getAvatar(userID) {
-  return `https://storage.googleapis.com/${projectURL}/users/${userID}/avatar`;
+  return `https://storage.googleapis.com/${firebaseConfig.storageBucket}/users/${userID}/avatar`;
 }
 
 export function getCoverPhoto(userID) {
-  return `https://storage.googleapis.com/${projectURL}/users/${userID}/coverPhoto`;
+  return `https://storage.googleapis.com/${firebaseConfig.storageBucket}/users/${userID}/coverPhoto`;
 }

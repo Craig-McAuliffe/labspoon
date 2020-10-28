@@ -70,6 +70,8 @@ export default function OnboardingPage() {
       case GROUPS:
         history.push(returnLocation ? returnLocation : '/');
         break;
+      default:
+        throw new Error('invalid stage');
     }
   };
 
@@ -81,6 +83,8 @@ export default function OnboardingPage() {
       case GROUPS:
         history.push(`/onboarding/${LINKAUTHOR}`);
         break;
+      default:
+        throw new Error('invalid stage');
     }
   };
 
@@ -480,7 +484,7 @@ function SuggestedPublicationAuthors({authors}) {
             ...and {i + 1} more.
           </p>
         );
-      return;
+      return <></>;
     }
     return (
       <p key={author.id} className="onboarding-suggested-publication-authors">

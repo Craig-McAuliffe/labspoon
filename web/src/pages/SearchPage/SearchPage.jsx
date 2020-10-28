@@ -11,6 +11,7 @@ import {
   Configure,
   connectStateResults,
 } from 'react-instantsearch-dom';
+import {abbrEnv} from '../../config';
 
 import {searchClient} from '../../algolia';
 import {searchStateToURL, createURL} from '../../helpers/search';
@@ -32,8 +33,6 @@ const POSTS = 'Posts';
 const USERS = 'Users';
 const GROUPS = 'Groups';
 const TOPICS = 'Topics';
-
-const abbrEnv = 'dev';
 
 const DEBOUNCE_TIME = 700;
 let currentTab;

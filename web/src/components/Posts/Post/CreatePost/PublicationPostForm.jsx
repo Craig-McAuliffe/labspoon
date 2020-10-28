@@ -6,6 +6,7 @@ import {CreatePostTextArea, TextInput} from '../../../Forms/FormTextInput';
 import PostForm from './PostForm';
 import {CreatingPostContext} from './CreatePost';
 import {FormPublicationResults} from '../../../Publication/MicrosoftResults';
+import {handlePostTopics} from './PostForm';
 import {SmallPublicationListItem} from '../../../Publication/PublicationListItem';
 
 import './CreatePost.css';
@@ -27,15 +28,9 @@ export default function PublicationPostForm({cancelPost, setCreatingPost}) {
       res.publicationURL = publicationURL;
     }
     res.postType = {id: 'publicationPost', name: 'Publication'};
-    const customTopics = [];
-    const DBTopics = [];
-    selectedTopics.forEach((selectedTopic) => {
-      if (selectedTopic.isNew) {
-        customTopics.push(selectedTopic.name);
-      } else DBTopics.push(selectedTopic);
-    });
-    res.customTopics = customTopics;
-    res.topics = DBTopics;
+    const taggedTopics = handlePostTopics(selectedTopics);
+    res.customTopics = taggedTopics.customTopics;
+    res.topics = taggedTopics.DBTopics;
     createPost(res)
       .then(() => {
         setCreatingPost(false);

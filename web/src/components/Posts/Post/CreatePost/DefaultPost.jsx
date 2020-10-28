@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 import PostForm from './PostForm';
 import {CreatePostTextArea} from '../../../Forms/FormTextInput';
 import {CreatingPostContext} from './CreatePost';
-
+import {handlePostTopics} from './PostForm';
 import './CreatePost.css';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
@@ -14,15 +14,9 @@ export default function DefaultPost({cancelPost, setCreatingPost}) {
 
   const submitChanges = (res) => {
     res.postType = {id: 'defaultPost', name: 'Default'};
-    const customTopics = [];
-    const DBTopics = [];
-    selectedTopics.forEach((selectedTopic) => {
-      if (selectedTopic.isNew) {
-        customTopics.push(selectedTopic.name);
-      } else DBTopics.push(selectedTopic);
-    });
-    res.customTopics = customTopics;
-    res.topics = DBTopics;
+    const taggedTopics = handlePostTopics(selectedTopics);
+    res.customTopics = taggedTopics.customTopics;
+    res.topics = taggedTopics.DBTopics;
     createPost(res)
       .then(() => {
         setCreatingPost(false);

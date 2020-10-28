@@ -174,7 +174,7 @@ function UploadImage({storageRef}) {
         <SubmitButton inputText="Upload" onClick={submit} />
       </div>
       {uploading ? <LoadingSpinner /> : <></>}
-      {uploaded ? <LoadingSpinner /> : <></>}
+      {uploaded ? <h1>Success</h1> : <></>}
     </>
   );
 }

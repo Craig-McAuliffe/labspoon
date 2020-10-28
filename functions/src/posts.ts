@@ -52,16 +52,21 @@ export const createPost = functions.https.onCall(async (data, context) => {
       const matchedTopicsPromises = data.topics.map((taggedTopic: Topic) => {
         return transaction
           .get(db.doc(`MSFields/${taggedTopic.microsoftID}`))
-          .then((qs) => {
-            if (!qs.exists) {
-              console.log('error, cannot find microsoft topic');
+          .then((ds) => {
+            if (!ds.exists) {
+              console.error(
+                'no microsoft field exists with id' + taggedTopic.microsoftID
+              );
               return;
             }
-            const MSField = qs.data() as MAKField;
+            const MSField = ds.data() as MAKField;
             const correspondingLabspoonTopicID = MSField.processed;
+            // This should not be possible. All MSFields should be processed
+            // upon creation.
             if (!MSField.processed) {
-              console.log(
-                'error, corresponding Labspoon topic has not been created'
+              console.error(
+                'no Labspoon topic corresponding to MSField' +
+                  taggedTopic.microsoftID
               );
               return;
             }
@@ -91,7 +96,13 @@ export const createPost = functions.https.onCall(async (data, context) => {
         transaction.set(db.collection('posts').doc(postID), post);
       });
     })
-    .catch((err) => console.log(err, 'could not create post.'));
+    .catch((err) => {
+      console.error(err, 'could not create post.');
+      throw new functions.https.HttpsError(
+        'internal',
+        'An error occured while creating the post.'
+      );
+    });
 });
 
 export const writePostToAuthorPosts = functions.firestore

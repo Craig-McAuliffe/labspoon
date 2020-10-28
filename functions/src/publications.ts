@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions';
 import {PubSub} from '@google-cloud/pubsub';
 import {admin} from './config';
+import * as adminNS from 'firebase-admin';
 import {
   interpretQuery,
   executeExpression,
@@ -11,6 +12,7 @@ import {
   MAKField,
 } from './microsoft';
 import {Post} from './posts';
+import {Topic} from './topics';
 
 const pubSubClient = new PubSub();
 const db = admin.firestore();
@@ -110,8 +112,6 @@ export const addNewMSPublicationAsync = functions.pubsub
             microsoftPublication
           );
         });
-
-        microsoftPublication.F?.forEach((field) => {});
       });
     } catch (err) {
       console.error(err);
@@ -125,31 +125,44 @@ export const createTopicsFromNewMAKPublication = functions.firestore
     const microsoftPublicationID = context.params.msPublicationID;
     const publicationTopicPromiseArray = microsoftPublication.F?.map(
       async (field: MAKField) => {
-        return db.runTransaction((transaction) => {
-          const fieldID = field.FId.toString();
-          return transaction.get(db.doc(`MSFields/${fieldID}`)).then((qs) => {
-            if (qs.exists) {
-              return console.log('topic already created');
-            }
-            const microsoftField = field;
-            const labspoonTopicDS = db.collection('topics').doc();
-            const labspoonTopicID = labspoonTopicDS.id;
-            microsoftField.processed = labspoonTopicID;
-            transaction.set(labspoonTopicDS, makFieldToTopic(field));
-            transaction.set(
-              db.collection('MSFields').doc(fieldID),
-              microsoftField
+        return db
+          .runTransaction((transaction) => {
+            const fieldID = field.FId.toString();
+            return transaction.get(db.doc(`MSFields/${fieldID}`)).then((qs) => {
+              if (qs.exists) {
+                return console.log(
+                  'MSField with id' + fieldID + ' has already been created'
+                );
+              }
+              const microsoftField = field;
+              const labspoonTopicDS = db.collection('topics').doc();
+              const labspoonTopicID = labspoonTopicDS.id;
+              microsoftField.processed = labspoonTopicID;
+              transaction.set(labspoonTopicDS, makFieldToTopic(field));
+              transaction.set(
+                db.collection('MSFields').doc(fieldID),
+                microsoftField
+              );
+              transaction.set(
+                db
+                  .collection('MSFields')
+                  .doc(fieldID)
+                  .collection('publications')
+                  .doc(microsoftPublicationID),
+                microsoftPublication
+              );
+            });
+          })
+          .catch((err) => {
+            console.error(
+              err,
+              'could not create topic and field' + field + 'from MSPublication'
             );
-            transaction.set(
-              db
-                .collection('MSFields')
-                .doc(fieldID)
-                .collection('publications')
-                .doc(microsoftPublicationID),
-              microsoftPublication
+            throw new functions.https.HttpsError(
+              'internal',
+              'An error occured while processing the field.' + field
             );
           });
-        });
       }
     );
     return Promise.all(publicationTopicPromiseArray);
@@ -181,13 +194,19 @@ export const addNewMAKPublicationToTopics = functions.firestore
 
     try {
       await db.runTransaction(async (t) => {
-        const publication = await t.get(
+        const publicationTDS = await t.get(
           db.doc(`publications/${publicationID}`)
         );
+        const topicTDS = await t.get(db.doc(`topics/${topicID}`));
         t.set(
           db.doc(`topics/${topicID}/publications/${publicationID}`),
-          publication.data()
+          publicationTDS.data()
         );
+        const topic = topicTDS.data() as Topic;
+        topic.id = topicID;
+        t.update(db.doc(`publications/${publicationID}`), {
+          topics: adminNS.firestore.FieldValue.arrayUnion(topic),
+        });
       });
     } catch (err) {
       console.error(err);
