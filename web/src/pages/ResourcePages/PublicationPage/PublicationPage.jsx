@@ -235,8 +235,12 @@ function PublicationLink({publicationURL}) {
 function PublicationAuthors({publicationAuthors}) {
   if (!publicationAuthors) return <></>;
   return publicationAuthors.map((author) => (
-    <h3 className="publication-body-authors" key={author.id}>
-      <Link to={`/user/${author.id}`}>{author.name}</Link>
+    <h3 className="publication-body-authors" key={author.name}>
+      {author.id ? (
+        <Link to={`/user/${author.id}`}>{author.name}</Link>
+      ) : (
+        author.name
+      )}
     </h3>
   ));
 }
