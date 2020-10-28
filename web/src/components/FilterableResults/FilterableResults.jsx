@@ -315,8 +315,15 @@ function updateFilterOption(
 
 export function Tabs({tabFilter, setTabFilter, affectsFilter}) {
   const filterManager = useContext(FilterManagerContext);
-  if (!tabFilter) return <div></div>;
   const selectedTabID = getActiveTabIDFromTypeFilterCollection(tabFilter);
+
+  useEffect(() => {
+    if (!tabFilter) return;
+    if (selectedTabID === 'default') setTabFilter(tabFilter.options[0].data.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tabFilter]);
+
+  if (!tabFilter) return <div></div>;
   const tabs = tabFilter.options.map((option) => (
     <button
       onClick={() => {
@@ -337,7 +344,7 @@ export function Tabs({tabFilter, setTabFilter, affectsFilter}) {
       <h3>{option.data.name}</h3>
     </button>
   ));
-  if (selectedTabID === 'default') setTabFilter(tabFilter.options[0].data.id);
+
   return (
     <div className="feed-tabs-container">
       <div className="feed-tabs-layout">{tabs}</div>
