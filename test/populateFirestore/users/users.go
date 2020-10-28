@@ -27,6 +27,7 @@ type User struct {
 	Name       string `firestore:"name,omitempty"`
 	Avatar     string `firestore:"avatar,omitempty"`
 	CoverPhoto string `firestore:"coverPhoto,omitempty" yaml:"coverPhoto"`
+	MicrosoftAcademicAuthorID string `firestore:"microsoftAcademicAuthorID,omitempty" yaml:"microsoftAcademicAuthorID"`
 	// TODO: Should embed a group ref
 	MemberOfGroup string `firestore:"memberOfGroup,omitempty"`
 	// TODO: Should embed a institution ref

@@ -82,30 +82,31 @@ export interface MAKPublication {
 export interface Publication {
   date?: string;
   title?: string;
-  authors?: Array<Author>;
+  authors?: Array<User>;
   microsoftID?: string;
   topics?: Topic[];
 }
 
-function makAuthorToAuthor(makAuthor: MAKAuthor): Author {
-  const author: Author = {
-    ID: makAuthor.AuId,
+export function makAuthorToAuthor(makAuthor: MAKAuthor): User {
+  const author: User = {
+    microsoftID: makAuthor.AuId,
     name: makAuthor.DAuN,
   };
   if (makAuthor.DAuN) author.normalisedName = makAuthor.AuN;
   return author;
 }
 
-interface MAKAuthor {
+export interface MAKAuthor {
   AuId: string;
   AuN?: string;
   DAuN: string;
 }
 
-export interface Author {
-  ID: string;
+export interface User {
+  id?: string;
   name: string;
   normalisedName?: string;
+  microsoftID?: string;
 }
 
 export interface interpretationResult {

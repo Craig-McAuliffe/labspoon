@@ -9,6 +9,9 @@ import {
   Publication,
   MAKPublication,
   makFieldToTopic,
+  MAKAuthor,
+  User,
+  makAuthorToAuthor,
 } from './microsoft';
 import {Post} from './posts';
 import {Topic} from './topics';
@@ -165,19 +168,57 @@ export const addNewMAKPublicationToAuthors = functions.firestore
     const msUserID = context.params.msUserID;
     const msPublicationID = context.params.msPublicationID;
 
+    // Find the publication
+    const publicationDS = await getPublicationByMicrosoftPublicationID(msPublicationID);
+    const publicationID = publicationDS.id;
     // Check whether there is a labspoon user corresponding to the microsoft academic ID, otherwise do nothing.
     const userQS = await db
       .collection('users')
       .where('microsoftAcademicAuthorID', '==', msUserID)
       .limit(1)
       .get();
-    if (userQS.empty) return null;
+    // If no labspoon user associated we just want to add the name to the authors
+    if (userQS.empty) {
+      try {
+        await db.runTransaction(async (t) => {
+          const microsoftUserDS = await t.get(db.doc(`MSUsers/${msUserID}`));
+          const microsoftUser = makAuthorToAuthor(microsoftUserDS.data() as MAKAuthor);
+          microsoftUser.microsoftID = msUserID;
+          t.update(db.doc(`publications/${publicationID}`), {
+            authors: adminNS.firestore.FieldValue.arrayUnion(microsoftUser)
+          });
+        });
+      } catch (err) {
+        console.error(err);
+      }
+      return null;
+    }
     const userDS = userQS.docs[0];
+    const userID = userDS.id;
 
-    // Find the publication
-    const publicationDS = await getPublicationByMicrosoftPublicationID(msPublicationID);
-    await db.doc(`users/${userDS.id}/publications/${publicationDS.id}`).set(publicationDS.data());
-
+    try {
+      await db.runTransaction(async (t) => {
+        const publicationTDS = await t.get(db.doc(`publications/${publicationID}`));
+        const userTDS = await t.get(db.doc(`users/${userID}`));
+        t.set(db.doc(`users/${userID}/publications/${publicationID}`), publicationTDS.data());
+        const user = userTDS.data() as User;
+        const publicationData = publicationTDS.data() as Publication;
+        if (publicationData.authors) {
+          const existingAuthorEntry = publicationData.authors!.find((author) => author.microsoftID == user.microsoftID);
+          // if we already added the id to the user, we don't want to remove the user here
+          delete existingAuthorEntry!.id;
+          t.update(db.doc(`publications/${publicationID}`), {
+            authors: adminNS.firestore.FieldValue.arrayRemove(existingAuthorEntry)
+          });
+        }
+        user.id = userID;
+        t.update(db.doc(`publications/${publicationID}`), {
+          authors: adminNS.firestore.FieldValue.arrayUnion(user)
+        });
+      });
+    } catch (err) {
+      console.error(err);
+    }
     return null;
   });
 

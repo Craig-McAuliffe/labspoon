@@ -233,7 +233,7 @@ export const getSuggestedPublicationsForAuthorName = functions.https.onCall(
                 (author) => author.normalisedName === normalisedAuthorName
               )!;
               const publicationSuggestion: PublicationSuggestion = {
-                microsoftAcademicIDMatch: matchingAuthor.ID,
+                microsoftAcademicIDMatch: matchingAuthor.id as string,
                 publicationInfo: publication,
               };
               return publicationSuggestion;
