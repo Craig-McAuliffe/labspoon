@@ -72,9 +72,9 @@ export function publishAddPublicationRequests(makPublications: MAKPublication[])
 export const addNewMSPublicationAsync = functions.pubsub
   .topic('add-publication')
   .onPublish(async (message) => {
-    if (!message.json) return;
+    if (!message.json) return true;
     const microsoftPublication = message.json as MAKPublication;
-    if (!microsoftPublication.Id) return;
+    if (!microsoftPublication.Id) return true;
     const microsoftPublicationID = microsoftPublication.Id.toString();
     const microsoftPublicationRef = db.collection('MSPublications').doc(microsoftPublicationID);
 
@@ -85,7 +85,7 @@ export const addNewMSPublicationAsync = functions.pubsub
         // If the Microsoft publication has been added and marked as processed then the labspoon publication must already exist 
         if (microsoftPublicationDS.exists) {
           const microsoftPublicationDSData = microsoftPublicationDS.data() as MAKPublication;
-          if (microsoftPublicationDSData.processed) return;
+          if (microsoftPublicationDSData.processed) return true;
         }
 
         microsoftPublication.processed = true;
@@ -124,7 +124,7 @@ export const addNewMSPublicationAsync = functions.pubsub
 
 export const addNewMAKPublicationToTopics = functions.firestore
   .document('MSFields/{msFieldID}/publications/{msPublicationID}')
-  .onCreate(async (change, context) => {
+  .onCreate(async (change, context): boolean => {
     const msFieldID = context.params.msFieldID;
     const msPublicationID = context.params.msPublicationID;
 
@@ -136,7 +136,7 @@ export const addNewMAKPublicationToTopics = functions.firestore
       .get();
     if (topicQS.empty) {
       console.error('topic not found; returning');
-      return;
+      return true;
     }
     const topicDS = topicQS.docs[0];
     const topicID = topicDS.id;
@@ -159,7 +159,7 @@ export const addNewMAKPublicationToTopics = functions.firestore
       console.error(err);
     }
 
-    return null;
+    return true;
   });
 
 export const addNewMAKPublicationToAuthors = functions.firestore
