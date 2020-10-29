@@ -25,7 +25,7 @@ export const allPublicationFields =
   'AA.AfId,AA.AfN,AA.AuId,AA.AuN,AA.DAuN,AA.DAfN,AA.S,AW,BT,BV,C.CId,C.CN,CC,CitCon,D,DN,DOI,E,ECC,F.DFN,F.FId,F.FN,FamId,FP,I,IA,Id,J.JId,J.JN,LP,PB,Pt,RId,S,Ti,V,VFN,VSN,W,Y';
 
 export const microsoftAcademicKnowledgePublicationSearch = functions.https.onCall(
-  async (data, context) => {
+  async (data) => {
     let results: Publication[] = [];
     await interpretQuery({
       query: data.query,
@@ -77,9 +77,9 @@ export function publishAddPublicationRequests(
 export const addNewMSPublicationAsync = functions.pubsub
   .topic('add-publication')
   .onPublish(async (message) => {
-    if (!message.json) return;
+    if (!message.json) return true;
     const microsoftPublication = message.json as MAKPublication;
-    if (!microsoftPublication.Id) return;
+    if (!microsoftPublication.Id) return true;
     const microsoftPublicationID = microsoftPublication.Id.toString();
     const microsoftPublicationRef = db
       .collection('MSPublications')
@@ -92,7 +92,7 @@ export const addNewMSPublicationAsync = functions.pubsub
         // If the Microsoft publication has been added and marked as processed then the labspoon publication must already exist
         if (microsoftPublicationDS.exists) {
           const microsoftPublicationDSData = microsoftPublicationDS.data() as MAKPublication;
-          if (microsoftPublicationDSData.processed) return;
+          if (microsoftPublicationDSData.processed) return true;
         }
 
         microsoftPublication.processed = true;
@@ -116,10 +116,12 @@ export const addNewMSPublicationAsync = functions.pubsub
             microsoftPublication
           );
         });
+        return;
       });
     } catch (err) {
       console.error(err);
     }
+    return;
   });
 
 export const createTopicsFromNewMAKPublication = functions.firestore
@@ -186,7 +188,7 @@ export async function createFieldsAndTopics(
 
 export const addNewMAKPublicationToTopics = functions.firestore
   .document('MSFields/{msFieldID}/publications/{msPublicationID}')
-  .onCreate(async (change, context) => {
+  .onCreate(async (_, context) => {
     const msFieldID = context.params.msFieldID;
     const msPublicationID = context.params.msPublicationID;
 
@@ -198,7 +200,7 @@ export const addNewMAKPublicationToTopics = functions.firestore
       .get();
     if (topicQS.empty) {
       console.error('topic not found; returning');
-      return;
+      return true;
     }
     const topicDS = topicQS.docs[0];
     const topicID = topicDS.id;
@@ -228,7 +230,7 @@ export const addNewMAKPublicationToTopics = functions.firestore
       console.error(err);
     }
 
-    return null;
+    return true;
   });
 
 export const addNewMAKPublicationToAuthors = functions.firestore
@@ -282,8 +284,8 @@ export const addNewMAKPublicationToAuthors = functions.firestore
         const user = userTDS.data() as User;
         const publicationData = publicationTDS.data() as Publication;
         if (publicationData.authors) {
-          const existingAuthorEntry = publicationData.authors!.find(
-            (author) => author.microsoftID == user.microsoftID
+          const existingAuthorEntry = publicationData.authors.find(
+            (author) => author.microsoftID === user.microsoftID
           );
           // if we already added the id to the user, we don't want to remove the user here
           delete existingAuthorEntry!.id;

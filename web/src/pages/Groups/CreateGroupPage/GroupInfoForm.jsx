@@ -10,6 +10,7 @@ import {
 import ImageUploader from 'react-images-upload';
 
 import {searchClient} from '../../../algolia';
+import {abbrEnv} from '../../../config';
 
 import {AuthContext, FeatureFlags} from '../../../App';
 import FormTextInput, {
@@ -26,8 +27,6 @@ import UserListItem, {
 } from '../../../components/User/UserListItem';
 
 import './CreateGroupPage.css';
-
-const abbrEnv = 'dev';
 
 // To do: check if the group exists OR pass argument that declares if editing or creating
 // Change onSubmit function depending on editing or creating

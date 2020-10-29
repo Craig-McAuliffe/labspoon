@@ -1,4 +1,5 @@
 import React from 'react';
+import {abbrEnv} from '../../config';
 
 import {SearchIconGrey} from '../../assets/HeaderIcons';
 import {
@@ -20,8 +21,6 @@ export default function FormDatabaseSearch({
   displayedItems,
   clearListOnNoResults,
 }) {
-  const abbrEnv = 'dev';
-
   const UsersResults = ({searchResults}) => {
     if (searchResults) {
       if (searchResults.nbHits !== 0 && searchResults.query.length > 0) {

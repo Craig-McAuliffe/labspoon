@@ -75,6 +75,7 @@ function LoginPage() {
 
 const SignUpForm = ({setGoToOnboarding}) => {
   const [loading, setLoading] = useState(false);
+  const {updateUserDetails} = useContext(AuthContext);
   const submitChanges = (values) => {
     setLoading(true);
     firebase
@@ -93,11 +94,14 @@ const SignUpForm = ({setGoToOnboarding}) => {
               avatar: getAvatar(result.user.uid),
             })
           )
+          .then(() => updateUserDetails(result.user))
           .catch((error) => {
+            setLoading(false);
             console.log(error, 'Could not create display name');
           });
       })
       .catch((error) => {
+        setLoading(false);
         console.log(error);
         if (
           error.message.includes(
@@ -185,7 +189,7 @@ const SignInForm = ({setFormType, returnLocation}) => {
         history.push(returnLocation ? returnLocation : '/');
       })
       .catch((error) => {
-        console.log(error);
+        setLoading(false);
         if (error.message.includes('password is invalid')) {
           alert(
             'The password you entered is not connected to that email address.'
