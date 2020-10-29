@@ -189,6 +189,7 @@ function SuggestedUsers({userID}) {
 
 function UserInfo({user}) {
   const {userProfile} = useContext(AuthContext);
+  const featureFlags = useContext(FeatureFlags);
   if (user === undefined) return <></>;
   const ownProfile = userProfile && userProfile.id === user.id;
   return (
@@ -216,8 +217,8 @@ function UserInfo({user}) {
           </>
         ) : (
           <>
-            <MessageButton />
-            <FollowUserButton targetUser={user} />{' '}
+            {featureFlags.has('message-user') ? <MessageButton /> : <div></div>}
+            <FollowUserButton targetUser={user} />
           </>
         )}
       </div>
