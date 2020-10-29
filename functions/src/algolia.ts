@@ -38,13 +38,14 @@ function addToIndex(
   change: functions.firestore.QueryDocumentSnapshot,
   resourceType: string,
   indexName: string
-): void | Promise<void> {
-  if (!algoliaClient) return;
+): null {
+  if (!algoliaClient) return null;
   const data = change.data();
   data.objectID = id;
   data.resourceType = resourceType;
   const index = algoliaClient.initIndex(indexName);
   index.saveObject(data);
+  return null;
 }
 
 export const configureUserSearchIndex = functions.https.onRequest(
@@ -54,7 +55,7 @@ export const configureUserSearchIndex = functions.https.onRequest(
 
 export const addUserToSearchIndex = functions.firestore
   .document(`users/{userID}`)
-  .onCreate((change, context) =>
+  .onCreate((change, context): null =>
     addToIndex(context.params.userID, change, ResourceTypes.USER, USERS_INDEX)
   );
 
@@ -70,7 +71,7 @@ export const configureGroupSearchIndex = functions.https.onRequest((_, res) =>
 
 export const addGroupToSearchIndex = functions.firestore
   .document(`groups/{groupID}`)
-  .onCreate((change, context) =>
+  .onCreate((change, context): null =>
     addToIndex(
       context.params.groupID,
       change,
@@ -85,7 +86,7 @@ export const configurePostSearchIndex = functions.https.onRequest((_, res) =>
 
 export const addPostToSearchIndex = functions.firestore
   .document(`posts/{postID}`)
-  .onCreate((change, context) =>
+  .onCreate((change, context): null =>
     addToIndex(context.params.postID, change, ResourceTypes.POST, POSTS_INDEX)
   );
 
@@ -96,7 +97,7 @@ export const configurePublicationSearchIndex = functions.https.onRequest(
 
 export const addPublicationToSearchIndex = functions.firestore
   .document(`publications/{publicationID}`)
-  .onCreate((change, context) =>
+  .onCreate((change, context): null =>
     addToIndex(
       context.params.publicationID,
       change,
@@ -111,7 +112,7 @@ export const configureTopicSearchIndex = functions.https.onRequest((_, res) =>
 
 export const addTopicToSearchIndex = functions.firestore
   .document(`topics/{topicID}`)
-  .onCreate((change, context) =>
+  .onCreate((change, context): null =>
     addToIndex(
       context.params.topicID,
       change,
