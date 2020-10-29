@@ -22,7 +22,7 @@ const db = admin.firestore();
 export const allPublicationFields = 'AA.AfId,AA.AfN,AA.AuId,AA.AuN,AA.DAuN,AA.DAfN,AA.S,AW,BT,BV,C.CId,C.CN,CC,CitCon,D,DN,DOI,E,ECC,F.DFN,F.FId,F.FN,FamId,FP,I,IA,Id,J.JId,J.JN,LP,PB,Pt,RId,S,Ti,V,VFN,VSN,W,Y';
 
 export const microsoftAcademicKnowledgePublicationSearch = functions.https.onCall(
-  async (data, context) => {
+  async (data) => {
     let results: Publication[] = [];
     await interpretQuery({
       query: data.query,
@@ -206,7 +206,7 @@ export const addNewMAKPublicationToAuthors = functions.firestore
         const user = userTDS.data() as User;
         const publicationData = publicationTDS.data() as Publication;
         if (publicationData.authors) {
-          const existingAuthorEntry = publicationData.authors!.find((author) => author.microsoftID == user.microsoftID);
+          const existingAuthorEntry = publicationData.authors.find((author) => author.microsoftID === user.microsoftID);
           // if we already added the id to the user, we don't want to remove the user here
           delete existingAuthorEntry!.id;
           t.update(db.doc(`publications/${publicationID}`), {
