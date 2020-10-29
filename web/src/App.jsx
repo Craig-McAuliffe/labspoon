@@ -54,7 +54,10 @@ function AuthProvider({children}) {
       }),
     []
   );
-  useEffect(() => {
+
+  // Refetch the user details. This is usually triggered by a change in the
+  // firebase auth, but this does not work during sign up.
+  function updateUserDetails(user) {
     if (user === null || user === undefined) return setUserProfile(undefined);
     db.doc(`users/${user.uid}`)
       .get()
@@ -68,9 +71,15 @@ function AuthProvider({children}) {
         setUserProfile(userData);
       })
       .catch((err) => console.log(err, 'could not retrieve user profile'));
+  }
+
+  useEffect(() => {
+    updateUserDetails(user);
   }, [user]);
   return (
-    <AuthContext.Provider value={{user, userProfile, authLoaded}}>
+    <AuthContext.Provider
+      value={{user, userProfile, authLoaded, updateUserDetails}}
+    >
       {children}
     </AuthContext.Provider>
   );
