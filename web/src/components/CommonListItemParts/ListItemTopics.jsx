@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import './ListItemTopics.css';
 
 export default function ListItemTopics({taggedItem}) {
+  if (!taggedItem.topics) return <></>;
   const topicLinks = taggedItem.topics.map((topic) => {
     let link;
     if (topic.id) {
