@@ -38,14 +38,14 @@ function addToIndex(
   change: functions.firestore.QueryDocumentSnapshot,
   resourceType: string,
   indexName: string
-): null {
-  if (!algoliaClient) return null;
+): boolean {
+  if (!algoliaClient) return true;
   const data = change.data();
   data.objectID = id;
   data.resourceType = resourceType;
   const index = algoliaClient.initIndex(indexName);
   index.saveObject(data);
-  return null;
+  return true;
 }
 
 export const configureUserSearchIndex = functions.https.onRequest(
@@ -55,7 +55,7 @@ export const configureUserSearchIndex = functions.https.onRequest(
 
 export const addUserToSearchIndex = functions.firestore
   .document(`users/{userID}`)
-  .onCreate((change, context): null =>
+  .onCreate((change, context): boolean =>
     addToIndex(context.params.userID, change, ResourceTypes.USER, USERS_INDEX)
   );
 
@@ -71,7 +71,7 @@ export const configureGroupSearchIndex = functions.https.onRequest((_, res) =>
 
 export const addGroupToSearchIndex = functions.firestore
   .document(`groups/{groupID}`)
-  .onCreate((change, context): null =>
+  .onCreate((change, context): boolean =>
     addToIndex(
       context.params.groupID,
       change,
@@ -86,7 +86,7 @@ export const configurePostSearchIndex = functions.https.onRequest((_, res) =>
 
 export const addPostToSearchIndex = functions.firestore
   .document(`posts/{postID}`)
-  .onCreate((change, context): null =>
+  .onCreate((change, context): boolean =>
     addToIndex(context.params.postID, change, ResourceTypes.POST, POSTS_INDEX)
   );
 
@@ -97,7 +97,7 @@ export const configurePublicationSearchIndex = functions.https.onRequest(
 
 export const addPublicationToSearchIndex = functions.firestore
   .document(`publications/{publicationID}`)
-  .onCreate((change, context): null =>
+  .onCreate((change, context): boolean =>
     addToIndex(
       context.params.publicationID,
       change,
@@ -112,7 +112,7 @@ export const configureTopicSearchIndex = functions.https.onRequest((_, res) =>
 
 export const addTopicToSearchIndex = functions.firestore
   .document(`topics/{topicID}`)
-  .onCreate((change, context): null =>
+  .onCreate((change, context): boolean =>
     addToIndex(
       context.params.topicID,
       change,
