@@ -116,15 +116,17 @@ export const addNewMSPublicationAsync = functions.pubsub
           t.set(db.collection('topics').doc(), makFieldToTopic(field));
           t.set(db.collection('MSFields').doc(fieldID).collection('publications').doc(microsoftPublicationID), microsoftPublication);
         });
+        return;
       });
     } catch (err) {
       console.error(err);
     }
+    return;
   });
 
 export const addNewMAKPublicationToTopics = functions.firestore
   .document('MSFields/{msFieldID}/publications/{msPublicationID}')
-  .onCreate(async (change, context): boolean => {
+  .onCreate(async (_, context) => {
     const msFieldID = context.params.msFieldID;
     const msPublicationID = context.params.msPublicationID;
 
