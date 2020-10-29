@@ -13,12 +13,13 @@ import './CreatePost.css';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
-export default function PublicationPostForm({cancelPost, setCreatingPost}) {
-  const {selectedTopics, setPostSuccess} = useContext(CreatingPostContext);
+export default function PublicationPostForm({setCreatingPost}) {
+  const {selectedTopics, setSubmittingPost, setPostSuccess} = useContext(
+    CreatingPostContext
+  );
   const [publication, setPublication] = useState();
   const [usePublicationURL, setUsePublicationURL] = useState(false);
   const [publicationURL, setPublicationURL] = useState();
-
   const submitChanges = (res) => {
     if (!(publication || publicationURL)) {
       return alert('Must select a publication or provide a publication URL');
@@ -35,8 +36,15 @@ export default function PublicationPostForm({cancelPost, setCreatingPost}) {
       .then(() => {
         setCreatingPost(false);
         setPostSuccess(true);
+        setSubmittingPost(false);
       })
-      .catch((err) => alert(err));
+      .catch((err) => {
+        console.log(err);
+        alert(
+          'Oh dear, something went wrong trying to create your post. Please try again later.'
+        );
+        setSubmittingPost(false);
+      });
   };
 
   const initialValues = {
@@ -52,7 +60,6 @@ export default function PublicationPostForm({cancelPost, setCreatingPost}) {
       onSubmit={submitChanges}
       initialValues={initialValues}
       validationSchema={validationSchema}
-      cancelPost={cancelPost}
     >
       <div className="creating-post-main-text-container">
         <CreatePostTextArea name="title" />

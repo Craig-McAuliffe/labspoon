@@ -8,14 +8,17 @@ import LoadingSpinner from '../../../LoadingSpinner/LoadingSpinner';
 import './CreatePost';
 
 const topicSearch = firebase.functions().httpsCallable('topics-topicSearch');
-
-export default function TagTopics() {
+// Using microsoft field names here as that is what we are returning from
+// search and sending to db.
+// microsoftFieldName = 'DFN'
+// microsoftStandardisedFieldName = 'FN'
+// microsoftFieldID = 'FId'
+export default function TagTopics({submittingPost}) {
   const [displayedTopics, setDisplayedTopics] = useState([]);
   const [duplicateTopic, setDuplicateTopic] = useState(false);
   const [loadingTopics, setLoadingTopics] = useState(false);
   const [typedTopic, setTypedTopic] = useState('');
   const {selectedTopics, setSelectedTopics} = useContext(CreatingPostContext);
-
   // Tells user that they are trying to input a duplicate topic
   useEffect(() => {
     if (duplicateTopic) {
@@ -24,7 +27,7 @@ export default function TagTopics() {
   }, [duplicateTopic]);
 
   useEffect(() => {
-    if (typedTopic.length === 0) {
+    if (typedTopic.length === 0 || submittingPost) {
       setDisplayedTopics([]);
       setLoadingTopics(false);
       return;
@@ -34,7 +37,7 @@ export default function TagTopics() {
       setLoadingTopics,
       setDisplayedTopics
     );
-  }, [typedTopic]);
+  }, [typedTopic, submittingPost]);
 
   return (
     <div className="create-post-topic-section-container">
@@ -85,18 +88,15 @@ const TopicsList = ({
   displayedTopics,
 }) =>
   topics.map((displayedTopic) => (
-    <TopicListItem
-      key={displayedTopic.microsoftID}
-      topic={displayedTopic}
-      microsoftTopic
-    >
+    <TopicListItem key={displayedTopic.FId} topic={displayedTopic} noLink>
       <PrimaryButton
         onClick={() =>
           addTopicToPost(
             setSelectedTopics,
-            displayedTopic.name,
+            displayedTopic.DFN,
             setDuplicateTopic,
-            displayedTopic.microsoftID,
+            displayedTopic.FId,
+            displayedTopic.FN,
             displayedTopics
           )
         }
@@ -140,17 +140,17 @@ function SelectedTopics({selectedTopics, setSelectedTopics}) {
     <div className="create-post-tagged-topics-container">
       {selectedTopics.map((selectedTopic) => (
         <button
-          key={selectedTopic.name}
+          key={selectedTopic.DFN}
           className="create-post-tagged-topic"
           onClick={() =>
             removeSelectedTopic(
-              selectedTopic.name,
+              selectedTopic.DFN,
               selectedTopics,
               setSelectedTopics
             )
           }
         >
-          {selectedTopic.name}
+          {selectedTopic.DFN}
           <RemoveIcon />
         </button>
       ))}
@@ -175,6 +175,7 @@ const TypedTopic = ({
             typedTopic,
             setDuplicateTopic,
             undefined,
+            undefined,
             displayedTopics
           )
         }
@@ -193,23 +194,32 @@ const addTopicToPost = (
   topicName,
   setDuplicateTopic,
   microsoftID,
+  normalisedTopicName,
   displayedTopics
 ) => {
   let preExistingTopic = undefined;
   if (microsoftID === undefined) {
     displayedTopics.forEach((displayedTopic) => {
-      if (displayedTopic.name === topicName)
+      if (displayedTopic.DFN === topicName)
         preExistingTopic = [
-          {name: displayedTopic.name, microsoftID: displayedTopic.microsoftID},
+          {
+            DFN: displayedTopic.DFN,
+            FId: displayedTopic.FId,
+            FN: displayedTopic.FN,
+          },
         ];
     });
   }
   setSelectedTopics((selectedTopics) => {
-    const newTopic = {name: topicName, microsoftID: microsoftID};
+    const newSelectedTopic = {
+      DFN: topicName,
+      FId: microsoftID,
+      FN: normalisedTopicName,
+    };
     if (
       selectedTopics.some(
         (previouslySelectedTopic) =>
-          previouslySelectedTopic.name === newTopic.name
+          previouslySelectedTopic.DFN === newSelectedTopic.DFN
       )
     ) {
       setDuplicateTopic(true);
@@ -219,8 +229,8 @@ const addTopicToPost = (
     if (preExistingTopic !== undefined)
       augmentedTopics = [...selectedTopics, ...preExistingTopic];
     else {
-      if (newTopic.microsoftID === undefined) newTopic.isNew = true;
-      augmentedTopics = [...selectedTopics, newTopic];
+      if (microsoftID === undefined) newSelectedTopic.isCustom = true;
+      augmentedTopics = [...selectedTopics, newSelectedTopic];
     }
     return augmentedTopics;
   });
@@ -233,7 +243,7 @@ const removeSelectedTopic = (
 ) => {
   const indexToBeRemoved = selectedTopics.findIndex(
     (previouslySelectedTopic) =>
-      previouslySelectedTopic.name === selectedTopicName
+      previouslySelectedTopic.DFN === selectedTopicName
   );
   setSelectedTopics((previouslySelectedTopics) => {
     const curatedSelectedTopics = [...previouslySelectedTopics];

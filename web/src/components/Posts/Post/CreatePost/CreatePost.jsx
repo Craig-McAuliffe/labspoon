@@ -20,8 +20,10 @@ export default function CreatePost({pinnedPost}) {
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [postSuccess, setPostSuccess] = useState(false);
   const [postType, setPostType] = useState(DEFAULT_POST);
+  const [submittingPost, setSubmittingPost] = useState(false);
 
   const cancelPost = () => {
+    if (submittingPost) return;
     setCreatingPost(false);
   };
 
@@ -41,11 +43,13 @@ export default function CreatePost({pinnedPost}) {
           selectedTopics: selectedTopics,
           setSelectedTopics: setSelectedTopics,
           setPostSuccess: setPostSuccess,
+          submittingPost: submittingPost,
+          setSubmittingPost: setSubmittingPost,
+          cancelPost: cancelPost,
         }}
       >
         <PostTypeDropDown setPostType={setPostType} postType={postType} />
         <PostTypeSpecificForm
-          cancelPost={cancelPost}
           setCreatingPost={setCreatingPost}
           postType={postType}
           setPostType={setPostType}
@@ -74,17 +78,11 @@ export default function CreatePost({pinnedPost}) {
     );
 }
 
-function PostTypeSpecificForm({
-  cancelPost,
-  setCreatingPost,
-  postType,
-  setPostType,
-}) {
+function PostTypeSpecificForm({setCreatingPost, postType, setPostType}) {
   switch (postType) {
     case DEFAULT_POST:
       return (
         <DefaultPost
-          cancelPost={cancelPost}
           setCreatingPost={setCreatingPost}
           setPostType={setPostType}
           postType={postType}
@@ -93,7 +91,6 @@ function PostTypeSpecificForm({
     case PUBLICATION_POST:
       return (
         <PublicationPostForm
-          cancelPost={cancelPost}
           setCreatingPost={setCreatingPost}
           setPostType={setPostType}
           postType={postType}
@@ -102,7 +99,6 @@ function PostTypeSpecificForm({
     case OPEN_POSITION_POST:
       return (
         <OpenPositionPostForm
-          cancelPost={cancelPost}
           setCreatingPost={setCreatingPost}
           setPostType={setPostType}
           postType={postType}
@@ -111,7 +107,6 @@ function PostTypeSpecificForm({
     default:
       return (
         <DefaultPost
-          cancelPost={cancelPost}
           setCreatingPost={setCreatingPost}
           setPostType={setPostType}
           postType={postType}

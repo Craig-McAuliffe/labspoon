@@ -133,6 +133,16 @@ export interface MAKField {
   processed?: string;
 }
 
+export interface MAKPublicationInDB {
+  D?: string;
+  DN?: string;
+  AA?: Array<MAKAuthor>;
+  Id?: number;
+  F?: MAKField[];
+  // Tracks whether the publication has been added to the Labspoon publications. Defaults to false.
+  processed?: boolean;
+}
+
 export function makFieldToTopic(field: MAKField): Topic {
   return {
     microsoftID: field.FId.toString(),

@@ -208,7 +208,7 @@ function PublicationBody({publicationDetails}) {
         publicationAuthors={publicationDetails.content.authors}
       />
       <PublicationBodyAbstract abstract={publicationDetails.abstract} />
-      <ListItemTopics taggedItem={publicationDetails} />
+      <ListItemTopics dbTopics={publicationDetails.topics} />
     </div>
   );
 }

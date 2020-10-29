@@ -34,7 +34,7 @@ export default function PublicationListItem({
         <PublicationListItemAuthors authors={publication.authors} />
         {mixedResults ? null : (
           <div className="publication-list-item-topics-container">
-            <ListItemTopics taggedItem={publication} />
+            <ListItemTopics dbTopics={publication.topics} />
           </div>
         )}
       </div>

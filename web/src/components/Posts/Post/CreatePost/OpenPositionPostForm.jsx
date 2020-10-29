@@ -11,8 +11,10 @@ import './CreatePost.css';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
-export default function OpenPositionPostForm({cancelPost, setCreatingPost}) {
-  const {selectedTopics, setPostSuccess} = useContext(CreatingPostContext);
+export default function OpenPositionPostForm({setCreatingPost}) {
+  const {selectedTopics, setPostSuccess, setSubmittingPost} = useContext(
+    CreatingPostContext
+  );
 
   const submitChanges = (res) => {
     res.postType = {id: 'openPositionPost', name: 'Open Position'};
@@ -23,8 +25,15 @@ export default function OpenPositionPostForm({cancelPost, setCreatingPost}) {
       .then(() => {
         setCreatingPost(false);
         setPostSuccess(true);
+        setSubmittingPost(false);
       })
-      .catch((err) => alert(err));
+      .catch((err) => {
+        console.log(err);
+        alert(
+          'Oh dear, something went wrong trying to create your post. Please try again later.'
+        );
+        setSubmittingPost(false);
+      });
   };
   const initialValues = {
     title: '',
@@ -45,7 +54,6 @@ export default function OpenPositionPostForm({cancelPost, setCreatingPost}) {
       onSubmit={submitChanges}
       initialValues={initialValues}
       validationSchema={validationSchema}
-      cancelPost={cancelPost}
     >
       <div className="creating-post-main-text-container">
         <CreatePostTextArea name="title" />

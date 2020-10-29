@@ -13,6 +13,7 @@ import {
   MAKAuthor,
   User,
   makAuthorToAuthor,
+  MAKPublicationInDB,
 } from './microsoft';
 import {Post} from './posts';
 import {Topic} from './topics';
@@ -127,49 +128,61 @@ export const createTopicsFromNewMAKPublication = functions.firestore
     const microsoftPublication = change.data();
     const microsoftPublicationID = context.params.msPublicationID;
     const publicationTopicPromiseArray = microsoftPublication.F?.map(
-      async (field: MAKField) => {
-        return db
-          .runTransaction((transaction) => {
-            const fieldID = field.FId.toString();
-            return transaction.get(db.doc(`MSFields/${fieldID}`)).then((qs) => {
-              if (qs.exists) {
-                return console.log(
-                  'MSField with id' + fieldID + ' has already been created'
-                );
-              }
-              const microsoftField = field;
-              const labspoonTopicDS = db.collection('topics').doc();
-              const labspoonTopicID = labspoonTopicDS.id;
-              microsoftField.processed = labspoonTopicID;
-              transaction.set(labspoonTopicDS, makFieldToTopic(field));
-              transaction.set(
-                db.collection('MSFields').doc(fieldID),
-                microsoftField
-              );
-              transaction.set(
-                db
-                  .collection('MSFields')
-                  .doc(fieldID)
-                  .collection('publications')
-                  .doc(microsoftPublicationID),
-                microsoftPublication
-              );
-            });
-          })
-          .catch((err) => {
-            console.error(
-              err,
-              'could not create topic and field' + field + 'from MSPublication'
-            );
-            throw new functions.https.HttpsError(
-              'internal',
-              'An error occured while processing the field.' + field
-            );
-          });
+      (field: MAKField) => {
+        createFieldsAndTopics(
+          field,
+          microsoftPublicationID,
+          microsoftPublication
+        );
       }
     );
     return Promise.all(publicationTopicPromiseArray);
   });
+
+export async function createFieldsAndTopics(
+  field: MAKField,
+  microsoftPublicationID?: string,
+  microsoftPublication?: MAKPublicationInDB
+) {
+  return db
+    .runTransaction((transaction) => {
+      const fieldID = field.FId.toString();
+      return transaction.get(db.doc(`MSFields/${fieldID}`)).then((qs) => {
+        if (qs.exists) {
+          return console.log(
+            'MSField with id' + fieldID + ' has already been created'
+          );
+        }
+        const microsoftField = field;
+        const labspoonTopicDS = db.collection('topics').doc();
+        const labspoonTopicID = labspoonTopicDS.id;
+        microsoftField.processed = labspoonTopicID;
+        transaction.set(labspoonTopicDS, makFieldToTopic(field));
+        transaction.set(db.collection('MSFields').doc(fieldID), microsoftField);
+        if (microsoftPublicationID && microsoftPublication) {
+          transaction.set(
+            db
+              .collection('MSFields')
+              .doc(fieldID)
+              .collection('publications')
+              .doc(microsoftPublicationID),
+            microsoftPublication
+          );
+        }
+        return labspoonTopicID;
+      });
+    })
+    .catch((err) => {
+      console.error(
+        err,
+        'could not create topic and field' + field + 'from MSPublication'
+      );
+      throw new functions.https.HttpsError(
+        'internal',
+        'An error occured while processing the field.' + field
+      );
+    });
+}
 
 export const addNewMAKPublicationToTopics = functions.firestore
   .document('MSFields/{msFieldID}/publications/{msPublicationID}')

@@ -109,7 +109,7 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
       />
       <PostTextContent post={post} />
       <PostOptionalTags optionalTags={post.optionaltags} />
-      <ListItemTopics taggedItem={post} />
+      <ListItemTopics dbTopics={post.topics} customTopics={post.customTopics} />
       {bookmarkedVariation ? null : (
         <PostActions post={post} dedicatedPage={dedicatedPage} />
       )}

@@ -4,7 +4,6 @@ import {
   interpretQuery,
   executeExpression,
   MAKPublication,
-  makPublicationToPublication,
 } from './microsoft';
 import {
   allPublicationFields,
@@ -12,6 +11,7 @@ import {
 } from './publications';
 
 const fieldNameExprRegex = /^Composite\(F.FN==\'(?<fieldName>[a-zA-Z0-9 -]+)\'\)$/;
+
 export const topicSearch = functions.https.onCall(async (data) => {
   const topicQuery = data.topicQuery;
   if (topicQuery === undefined)
@@ -53,9 +53,9 @@ export const topicSearch = functions.https.onCall(async (data) => {
         const publications: MAKPublication[] = resp.data.entities;
         if (publications.length === 0) return;
         await publishAddPublicationRequests(publications);
-        const publication = makPublicationToPublication(publications[0]);
-        const topicMatch = publication.topics!.find(
-          (topic) => topic.normalisedName! === fieldExpr.fieldName
+        if (!publications[0].F) return;
+        const topicMatch = publications[0].F!.find(
+          (topic) => topic.FN! === fieldExpr.fieldName
         );
         return topicMatch;
       })

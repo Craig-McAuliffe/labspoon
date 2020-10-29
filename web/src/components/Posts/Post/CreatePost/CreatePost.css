@@ -218,3 +218,19 @@
 .create-post-loading-spinner-container {
   margin-top: 10px;
 }
+
+.create-post-loading-greyed-out {
+  min-width: 100%;
+  min-height: 100%;
+}
+
+.create-post-loading-greyed-out {
+  opacity: 50%;
+}
+
+.create-post-loading-spinner {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 200px;
+}

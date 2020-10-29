@@ -5,6 +5,7 @@ import {firestore} from 'firebase-admin';
 
 import {UserRef} from './users';
 import {Publication, MAKField} from './microsoft';
+import {createFieldsAndTopics} from './publications';
 
 const db = admin.firestore();
 
@@ -49,30 +50,32 @@ export const createPost = functions.https.onCall(async (data, context) => {
   return db
     .runTransaction((transaction) => {
       const postTopics: Topic[] = [];
-      const matchedTopicsPromises = data.topics.map((taggedTopic: Topic) => {
+      const matchedTopicsPromises = data.topics.map((taggedTopic: MAKField) => {
         return transaction
-          .get(db.doc(`MSFields/${taggedTopic.microsoftID}`))
-          .then((ds) => {
+          .get(db.doc(`MSFields/${taggedTopic.FId}`))
+          .then(async (ds) => {
+            let correspondingLabspoonTopicID;
             if (!ds.exists) {
-              console.error(
-                'no microsoft field exists with id' + taggedTopic.microsoftID
+              await createFieldsAndTopics(taggedTopic).then(
+                (labspoonTopicID) => {
+                  correspondingLabspoonTopicID = labspoonTopicID;
+                }
               );
-              return;
-            }
-            const MSField = ds.data() as MAKField;
-            const correspondingLabspoonTopicID = MSField.processed;
-            // This should not be possible. All MSFields should be processed
-            // upon creation.
-            if (!MSField.processed) {
-              console.error(
-                'no Labspoon topic corresponding to MSField' +
-                  taggedTopic.microsoftID
-              );
-              return;
+            } else {
+              const dbMSField = ds.data() as MAKField;
+              correspondingLabspoonTopicID = dbMSField.processed;
+              if (!dbMSField.processed) {
+                // This should not be possible. All dbMSFields should be processed
+                // upon creation.
+                console.error(
+                  'no Labspoon topic corresponding to MSField' + taggedTopic.FId
+                );
+              }
             }
             postTopics.push({
-              name: taggedTopic.name,
-              microsoftID: taggedTopic.microsoftID,
+              name: taggedTopic.DFN,
+              microsoftID: taggedTopic.FId,
+              normalisedName: taggedTopic.FN,
               id: correspondingLabspoonTopicID,
             });
           });
@@ -92,6 +95,7 @@ export const createPost = functions.https.onCall(async (data, context) => {
         ),
         id: postID,
       };
+      console.log('matchedTopicsPromises', matchedTopicsPromises);
       return Promise.all(matchedTopicsPromises).then(() => {
         transaction.set(db.collection('posts').doc(postID), post);
       });
@@ -382,7 +386,8 @@ export interface Post {
 // Rank relates to how often the resource mentions this topic
 export interface Topic {
   id?: string;
-  microsoftID?: string;
+  microsoftID?: number;
+  normalisedName?: string;
   name: string;
   rank?: number;
 }

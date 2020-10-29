@@ -1,9 +1,11 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import CancelButton from '../../../Buttons/CancelButton';
 import PrimaryButton from '../../../Buttons/PrimaryButton';
+import {CreatingPostContext} from './CreatePost';
 import './CreatePost';
 
-export default function CreatePostActions({cancelPost}) {
+export default function CreatePostActions() {
+  const {cancelPost} = useContext(CreatingPostContext);
   return (
     <div className="create-post-actions">
       <div className="create-post-cancel-container">

@@ -6,21 +6,25 @@ import './TopicListItem.css';
 export default function TopicListItem({
   topic,
   dedicatedPage,
-  microsoftTopic,
   children,
+  noLink,
 }) {
   if (!topic) {
     return <></>;
   }
+  const displayType = () => {
+    if (dedicatedPage) return <h2>{topic.name}</h2>;
+    if (noLink) return <h3>{topic.name ? topic.name : topic.DFN}</h3>;
+    else
+      return (
+        <Link to={`/topic/${topic.id}`}>
+          <h3>{topic.name ? topic.name : topic.DFN}</h3>
+        </Link>
+      );
+  };
   return (
     <div className="topic-list-item-container">
-      {dedicatedPage || microsoftTopic ? (
-        <h2>{topic.name}</h2>
-      ) : (
-        <Link to={`/topic/${topic.id}`}>
-          <h3>{topic.name}</h3>
-        </Link>
-      )}
+      {displayType()}
       {children}
     </div>
   );
