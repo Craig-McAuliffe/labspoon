@@ -14,11 +14,11 @@ export default function TopicListItem({
   }
   const displayType = () => {
     if (dedicatedPage) return <h2>{topic.name}</h2>;
-    if (noLink) return <h3>{topic.name ? topic.name : topic.DFN}</h3>;
+    if (noLink) return <h3>{topic.name}</h3>;
     else
       return (
         <Link to={`/topic/${topic.id}`}>
-          <h3>{topic.name ? topic.name : topic.DFN}</h3>
+          <h3>{topic.name}</h3>
         </Link>
       );
   };

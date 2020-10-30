@@ -6,29 +6,24 @@ import './ListItemTopics.css';
 export default function ListItemTopics({dbTopics, customTopics}) {
   if (!dbTopics && !customTopics) return null;
 
-  const prioritisedTopicID = (topic) => {
-    if (topic.id) return topic.id;
-    if (topic.FId) return topic.FId;
-    if (topic.microsoftID) return topic.microsoftID;
-  };
   const topicLinks = (topics) => {
     if (!topics) return null;
     return topics.map((topic) => {
-      if (!topic.id && !topic.FId && !topic.microsoftID)
+      if (!topic.id && !topic.microsoftID)
         return (
           <p className="tagged-topic-names" key={topic.name}>
             {topic.name}
           </p>
         );
 
-      const topicID = prioritisedTopicID(topic);
+      const topicID = topic.id ? topic.id : topic.microsoftID;
       return (
         <Link
           to={topic.id ? `/topic/${topicID}` : `/magField/${topicID}`}
           key={topicID}
           className="tagged-topic-names"
         >
-          {topic.name ? topic.name : topic.DFN}
+          {topic.name}
         </Link>
       );
     });

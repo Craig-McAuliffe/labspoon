@@ -4,8 +4,8 @@ import {admin, ResourceTypes} from './config';
 import {firestore} from 'firebase-admin';
 
 import {UserRef} from './users';
-import {Publication, MAKField} from './microsoft';
-import {createFieldsAndTopics} from './publications';
+import {Publication, MAKField, makFieldToTopic} from './microsoft';
+import {Topic, TaggedTopic, createFieldsAndTopics} from './topics';
 
 const db = admin.firestore();
 
@@ -47,40 +47,73 @@ export const createPost = functions.https.onCall(async (data, context) => {
   if (data.publication) content.publication = data.publication;
   if (data.publicationURL) content.publicationURL = data.publicationURL;
 
+  const postTopics: TaggedTopic[] = [];
+  const matchedTopicsPromises = data.topics.map((taggedTopic: Topic) => {
+    return db
+      .doc(`MSFields/${taggedTopic.microsoftID}`)
+      .get()
+      .then(async (ds) => {
+        const addTopicToPost = (correspondingLabspoonTopicID: string) => {
+          postTopics.push({
+            name: taggedTopic.name,
+            microsoftID: taggedTopic.microsoftID,
+            normalisedName: taggedTopic.normalisedName,
+            id: correspondingLabspoonTopicID,
+          });
+        };
+
+        if (!ds.exists) {
+          await createFieldsAndTopics(taggedTopic)
+            .then(async (labspoonTopicID) => {
+              if (labspoonTopicID !== undefined) {
+                addTopicToPost(labspoonTopicID);
+              } else {
+                await db
+                  .doc(`MSFields/${taggedTopic.microsoftID}`)
+                  .get()
+                  .then((ds) => {
+                    if (!ds.exists) {
+                      console.error(
+                        `could not connect Tagged topic with microsoftID ${taggedTopic.microsoftID} on post ${postID} to newly created topic`
+                      );
+                      return undefined;
+                    } else {
+                      const dbMSField = ds.data() as MAKField;
+                      addTopicToPost(dbMSField.processed);
+                      return true;
+                    }
+                  })
+                  .catch((err) => {
+                    console.error(
+                      `could not connect Tagged topic with microsoftID ${taggedTopic.microsoftID} on post ${postID} to newly created topic. ${err}`
+                    );
+                  });
+              }
+            })
+            .catch((err) =>
+              console.error(
+                `field ${taggedTopic.microsoftID} is not in database and could not be created ${err}`
+              )
+            );
+        } else {
+          const dbMSField = ds.data() as MAKField;
+          addTopicToPost(dbMSField.processed);
+          if (!dbMSField.processed) {
+            // This should not be possible. All dbMSFields should be processed
+            // upon creation.
+            console.error(
+              'no Labspoon topic corresponding to MSField' +
+                taggedTopic.microsoftID
+            );
+            await db.collection('topics').doc().set(makFieldToTopic(dbMSField));
+          }
+        }
+      });
+  });
+
+  await Promise.all(matchedTopicsPromises);
   return db
     .runTransaction((transaction) => {
-      const postTopics: Topic[] = [];
-      const matchedTopicsPromises = data.topics.map((taggedTopic: MAKField) => {
-        return transaction
-          .get(db.doc(`MSFields/${taggedTopic.FId}`))
-          .then(async (ds) => {
-            let correspondingLabspoonTopicID;
-            if (!ds.exists) {
-              await createFieldsAndTopics(taggedTopic).then(
-                (labspoonTopicID) => {
-                  correspondingLabspoonTopicID = labspoonTopicID;
-                }
-              );
-            } else {
-              const dbMSField = ds.data() as MAKField;
-              correspondingLabspoonTopicID = dbMSField.processed;
-              if (!dbMSField.processed) {
-                // This should not be possible. All dbMSFields should be processed
-                // upon creation.
-                console.error(
-                  'no Labspoon topic corresponding to MSField' + taggedTopic.FId
-                );
-              }
-            }
-            postTopics.push({
-              name: taggedTopic.DFN,
-              microsoftID: taggedTopic.FId,
-              normalisedName: taggedTopic.FN,
-              id: correspondingLabspoonTopicID,
-            });
-          });
-      });
-
       const post: Post = {
         postType: data.postType,
         author: author,
@@ -95,13 +128,12 @@ export const createPost = functions.https.onCall(async (data, context) => {
         ),
         id: postID,
       };
-      console.log('matchedTopicsPromises', matchedTopicsPromises);
       return Promise.all(matchedTopicsPromises).then(() => {
         transaction.set(db.collection('posts').doc(postID), post);
       });
     })
     .catch((err) => {
-      console.error(err, 'could not create post.');
+      console.error(`could not create post ${postID}` + err);
       throw new functions.https.HttpsError(
         'internal',
         'An error occured while creating the post.'
@@ -154,39 +186,69 @@ export const writePostToUserFollowingFeeds = functions.firestore
     return null;
   });
 
-export const addRecentPostsToFeedOnNewUserFollow = functions.firestore.document(`users/{followerID}/followsUsers/{followingID}`).onCreate(async (_, context): Promise<void[]> => {
-  const followerID = context.params.followerID;
-  const followingID = context.params.followingID;
+export const addRecentPostsToFeedOnNewUserFollow = functions.firestore
+  .document(`users/{followerID}/followsUsers/{followingID}`)
+  .onCreate(
+    async (_, context): Promise<void[]> => {
+      const followerID = context.params.followerID;
+      const followingID = context.params.followingID;
 
-  try {
-    return addRecentPostsToFollowingFeed(followerID, db.collection(`users/${followingID}/posts`));
-  } catch (err) {
-    console.error(`Error while adding recent posts to the following feed of user ${followerID} who has just started following user ${followingID}`, err);
-  }
-  return new Promise(() => []);
-});
+      try {
+        return addRecentPostsToFollowingFeed(
+          followerID,
+          db.collection(`users/${followingID}/posts`)
+        );
+      } catch (err) {
+        console.error(
+          `Error while adding recent posts to the following feed of user ${followerID} who has just started following user ${followingID}`,
+          err
+        );
+      }
+      return new Promise(() => []);
+    }
+  );
 
-export const addRecentPostsToFeedOnNewGroupFollow = functions.firestore.document(`users/{followerID}/followsGroups/{followingID}`).onCreate(async (_, context): Promise<void[]> => {
-  const followerID = context.params.followerID;
-  const followingID = context.params.followingID;
-  try {
-    return addRecentPostsToFollowingFeed(followerID, db.collection(`groups/${followingID}/posts`));
-  } catch (err) {
-    console.error(`Error while adding recent posts to the following feed of user ${followerID} who has just started following group ${followingID}`, err);
-  }
-  return new Promise(() => []);
-});
+export const addRecentPostsToFeedOnNewGroupFollow = functions.firestore
+  .document(`users/{followerID}/followsGroups/{followingID}`)
+  .onCreate(
+    async (_, context): Promise<void[]> => {
+      const followerID = context.params.followerID;
+      const followingID = context.params.followingID;
+      try {
+        return addRecentPostsToFollowingFeed(
+          followerID,
+          db.collection(`groups/${followingID}/posts`)
+        );
+      } catch (err) {
+        console.error(
+          `Error while adding recent posts to the following feed of user ${followerID} who has just started following group ${followingID}`,
+          err
+        );
+      }
+      return new Promise(() => []);
+    }
+  );
 
-export const addRecentPostsToFeedOnNewTopicFollow = functions.firestore.document(`users/{followerID}/followsTopics/{followingID}`).onCreate(async (_, context): Promise<void[]> => {
-  const followerID = context.params.followerID;
-  const followingID = context.params.followingID;
-  try {
-    return addRecentPostsToFollowingFeed(followerID, db.collection(`topics/${followingID}/posts`));
-  } catch (err) {
-    console.error(`Error while adding recent posts to the following feed of user ${followerID} who has just started following topic ${followingID}`, err);
-  }
-  return new Promise(() => []);
-});
+export const addRecentPostsToFeedOnNewTopicFollow = functions.firestore
+  .document(`users/{followerID}/followsTopics/{followingID}`)
+  .onCreate(
+    async (_, context): Promise<void[]> => {
+      const followerID = context.params.followerID;
+      const followingID = context.params.followingID;
+      try {
+        return addRecentPostsToFollowingFeed(
+          followerID,
+          db.collection(`topics/${followingID}/posts`)
+        );
+      } catch (err) {
+        console.error(
+          `Error while adding recent posts to the following feed of user ${followerID} who has just started following topic ${followingID}`,
+          err
+        );
+      }
+      return new Promise(() => []);
+    }
+  );
 
 // When a user starts following a new resource, they will not intially see any
 // of that resource's posts in their following feed as the resource will
@@ -195,24 +257,40 @@ export const addRecentPostsToFeedOnNewTopicFollow = functions.firestore.document
 // empty. To make the new user experience more engaging we add the most recents
 // posts from that resource into the following feed.
 const POSTS_TO_ADD_ON_NEW_FOLLOW = 2;
-async function addRecentPostsToFollowingFeed(followerID: string, originCollection: firestore.CollectionReference): Promise<void[]> {
-  const posts = await originCollection.orderBy('timestamp', 'desc').limit(POSTS_TO_ADD_ON_NEW_FOLLOW).get().catch((err) => {
-    throw new Error(`Unable to retrieves posts from collection ${originCollection}: ${err}`);
-  });
+async function addRecentPostsToFollowingFeed(
+  followerID: string,
+  originCollection: firestore.CollectionReference
+): Promise<void[]> {
+  const posts = await originCollection
+    .orderBy('timestamp', 'desc')
+    .limit(POSTS_TO_ADD_ON_NEW_FOLLOW)
+    .get()
+    .catch((err) => {
+      throw new Error(
+        `Unable to retrieves posts from collection ${originCollection}: ${err}`
+      );
+    });
   if (posts.empty) new Promise(() => []);
   const postAddedPromises: Promise<void>[] = [];
   posts.forEach((postDS) => {
     const post = postDS.data() as Post;
-    const followingFeedRef = db.doc(`users/${followerID}/feeds/followingFeed/posts/${post.id}`);
+    const followingFeedRef = db.doc(
+      `users/${followerID}/feeds/followingFeed/posts/${post.id}`
+    );
     // Not important if we fail to add past posts to the feed.
-    const postAddedPromise = followingFeedRef.set(post).then(() => updateFiltersByPost(followingFeedRef, post)).catch((err) => {
-      console.error(`Unable to add post ${post.id} to the following feed of user ${followerID}:`, err);
-    });
+    const postAddedPromise = followingFeedRef
+      .set(post)
+      .then(() => updateFiltersByPost(followingFeedRef, post))
+      .catch((err) => {
+        console.error(
+          `Unable to add post ${post.id} to the following feed of user ${followerID}:`,
+          err
+        );
+      });
     postAddedPromises.push(postAddedPromise);
   });
   return Promise.all(postAddedPromises);
 }
-
 
 export const addPostToTopic = functions.firestore
   .document(`posts/{postID}`)
@@ -220,11 +298,13 @@ export const addPostToTopic = functions.firestore
     const post = change.data();
     const postID = context.params.postID;
     const postTopics = post.topics;
-    const topicsToTopicsPromisesArray = postTopics.map((postTopic: Topic) => {
-      db.doc(`topics/${postTopic.id}/posts/${postID}`)
-        .set(post)
-        .catch((err) => console.log(err, 'could not add post to topic'));
-    });
+    const topicsToTopicsPromisesArray = postTopics.map(
+      (postTopic: TaggedTopic) => {
+        db.doc(`topics/${postTopic.id}/posts/${postID}`)
+          .set(post)
+          .catch((err) => console.log(err, 'could not add post to topic'));
+      }
+    );
     return Promise.all(topicsToTopicsPromisesArray);
   });
 
@@ -317,7 +397,12 @@ export const linkPostTopicsToAuthor = functions.firestore
     const postTopics = post.topics;
     const authorID = post.author.id;
     postTopics.forEach((postTopic) => {
-      postTopic.rank = 1;
+      const userTopic = {
+        name: postTopic.name,
+        normalisedName: postTopic.normalisedName,
+        rank: 1,
+        microsoftID: postTopic.microsoftID,
+      };
       const userTopicDocRef = db.doc(
         `users/${authorID}/topics/${postTopic.id}`
       );
@@ -326,7 +411,7 @@ export const linkPostTopicsToAuthor = functions.firestore
         .then((qs: any) => {
           if (!qs.exists) {
             userTopicDocRef
-              .set(postTopic)
+              .set(userTopic)
               .catch((err) =>
                 console.log(err, 'could not link post topics to author')
               );
@@ -355,14 +440,19 @@ export const addPostTopicsToGroup = functions.firestore
     const postTopics = post.topics;
     const groupID = context.params.groupID;
     postTopics.forEach((postTopic) => {
-      postTopic.rank = 1;
+      const groupTopic = {
+        name: postTopic.name,
+        normalisedName: postTopic.normalisedName,
+        rank: 1,
+        microsoftID: postTopic.microsoftID,
+      };
       const groupTopicDocRef = db.doc(
         `groups/${groupID}/topics/${postTopic.id}`
       );
       return groupTopicDocRef.get().then((qs: any) => {
         if (!qs.exists) {
           groupTopicDocRef
-            .set(postTopic)
+            .set(groupTopic)
             .catch((err) =>
               console.log(err, 'could not link post topics to group')
             );
@@ -433,7 +523,7 @@ export interface Post {
   postType: PostType;
   author: UserRef;
   content: PostContent;
-  topics: Topic[];
+  topics: TaggedTopic[];
   customTopics?: string[];
   timestamp: Date;
   id: string;
@@ -442,14 +532,6 @@ export interface Post {
   filterPostTypeID: string;
   filterAuthorID: string;
   filterTopicIDs: string[];
-}
-// Rank relates to how often the resource mentions this topic
-export interface Topic {
-  id?: string;
-  microsoftID?: number;
-  normalisedName?: string;
-  name: string;
-  rank?: number;
 }
 
 export interface PostContent {

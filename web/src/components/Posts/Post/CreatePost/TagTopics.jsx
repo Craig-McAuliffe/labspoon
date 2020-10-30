@@ -8,11 +8,7 @@ import LoadingSpinner from '../../../LoadingSpinner/LoadingSpinner';
 import './CreatePost';
 
 const topicSearch = firebase.functions().httpsCallable('topics-topicSearch');
-// Using microsoft field names here as that is what we are returning from
-// search and sending to db.
-// microsoftFieldName = 'DFN'
-// microsoftStandardisedFieldName = 'FN'
-// microsoftFieldID = 'FId'
+
 export default function TagTopics({submittingPost}) {
   const [displayedTopics, setDisplayedTopics] = useState([]);
   const [duplicateTopic, setDuplicateTopic] = useState(false);
@@ -88,15 +84,19 @@ const TopicsList = ({
   displayedTopics,
 }) =>
   topics.map((displayedTopic) => (
-    <TopicListItem key={displayedTopic.FId} topic={displayedTopic} noLink>
+    <TopicListItem
+      key={displayedTopic.microsoftID}
+      topic={displayedTopic}
+      noLink
+    >
       <PrimaryButton
         onClick={() =>
           addTopicToPost(
             setSelectedTopics,
-            displayedTopic.DFN,
+            displayedTopic.name,
             setDuplicateTopic,
-            displayedTopic.FId,
-            displayedTopic.FN,
+            displayedTopic.microsoftID,
+            displayedTopic.normalisedName,
             displayedTopics
           )
         }
@@ -140,17 +140,17 @@ function SelectedTopics({selectedTopics, setSelectedTopics}) {
     <div className="create-post-tagged-topics-container">
       {selectedTopics.map((selectedTopic) => (
         <button
-          key={selectedTopic.DFN}
+          key={selectedTopic.name}
           className="create-post-tagged-topic"
           onClick={() =>
             removeSelectedTopic(
-              selectedTopic.DFN,
+              selectedTopic.name,
               selectedTopics,
               setSelectedTopics
             )
           }
         >
-          {selectedTopic.DFN}
+          {selectedTopic.name}
           <RemoveIcon />
         </button>
       ))}
@@ -200,26 +200,26 @@ const addTopicToPost = (
   let preExistingTopic = undefined;
   if (microsoftID === undefined) {
     displayedTopics.forEach((displayedTopic) => {
-      if (displayedTopic.DFN === topicName)
+      if (displayedTopic.name === topicName)
         preExistingTopic = [
           {
-            DFN: displayedTopic.DFN,
-            FId: displayedTopic.FId,
-            FN: displayedTopic.FN,
+            name: displayedTopic.name,
+            microsoftID: displayedTopic.microsoftID,
+            normalisedName: displayedTopic.normalisedName,
           },
         ];
     });
   }
   setSelectedTopics((selectedTopics) => {
     const newSelectedTopic = {
-      DFN: topicName,
-      FId: microsoftID,
-      FN: normalisedTopicName,
+      name: topicName,
+      microsoftID: microsoftID,
+      normalisedName: normalisedTopicName,
     };
     if (
       selectedTopics.some(
         (previouslySelectedTopic) =>
-          previouslySelectedTopic.DFN === newSelectedTopic.DFN
+          previouslySelectedTopic.name === newSelectedTopic.name
       )
     ) {
       setDuplicateTopic(true);
@@ -243,7 +243,7 @@ const removeSelectedTopic = (
 ) => {
   const indexToBeRemoved = selectedTopics.findIndex(
     (previouslySelectedTopic) =>
-      previouslySelectedTopic.DFN === selectedTopicName
+      previouslySelectedTopic.name === selectedTopicName
   );
   setSelectedTopics((previouslySelectedTopics) => {
     const curatedSelectedTopics = [...previouslySelectedTopics];

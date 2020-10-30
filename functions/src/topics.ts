@@ -4,11 +4,16 @@ import {
   interpretQuery,
   executeExpression,
   MAKPublication,
+  makPublicationToPublication,
+  MAKField,
 } from './microsoft';
 import {
   allPublicationFields,
   publishAddPublicationRequests,
 } from './publications';
+import {admin} from './config';
+
+const db = admin.firestore();
 
 const fieldNameExprRegex = /^Composite\(F.FN==\'(?<fieldName>[a-zA-Z0-9 -]+)\'\)$/;
 
@@ -51,11 +56,13 @@ export const topicSearch = functions.https.onCall(async (data) => {
     })
       .then(async (resp) => {
         const publications: MAKPublication[] = resp.data.entities;
-        if (publications.length === 0) return;
+        if (publications.length === 0) return undefined;
         await publishAddPublicationRequests(publications);
-        if (!publications[0].F) return;
-        const topicMatch = publications[0].F!.find(
-          (topic) => topic.FN! === fieldExpr.fieldName
+
+        const publication = makPublicationToPublication(publications[0]);
+        if (!publication.topics) return undefined;
+        const topicMatch = publication.topics!.find(
+          (topic) => topic.normalisedName! === fieldExpr.fieldName
         );
         return topicMatch;
       })
@@ -67,14 +74,70 @@ export const topicSearch = functions.https.onCall(async (data) => {
   return await Promise.all(executePromises);
 });
 
+export async function createFieldsAndTopics(topic: Topic) {
+  const MSFieldID = topic.microsoftID;
+  return db
+    .runTransaction((transaction) => {
+      const labspoonTopicDS = db.collection('topics').doc();
+      const labspoonTopicID = labspoonTopicDS.id;
+
+      return transaction.get(db.doc(`MSFields/${MSFieldID}`)).then((ds) => {
+        if (ds.exists) {
+          if (ds.data()!.processed === undefined) {
+            console.error(
+              `this MSField has no corresponding labspoon topic ${MSFieldID}`
+            );
+            transaction.set(labspoonTopicDS, topic);
+            transaction.update(db.doc(`MSFields/MSFieldID`), {
+              processed: labspoonTopicID,
+            });
+            return labspoonTopicID;
+          }
+          return ds.data()!.processed;
+        }
+        const processedMicrosoftField: MAKField = {
+          DFN: topic.name,
+          FId: Number(MSFieldID),
+          FN: topic.normalisedName,
+          processed: labspoonTopicID,
+        };
+
+        transaction.set(labspoonTopicDS, topic);
+        transaction.set(
+          db.collection('MSFields').doc(MSFieldID),
+          processedMicrosoftField
+        );
+        return labspoonTopicID;
+      });
+    })
+    .catch((err) => {
+      console.error(
+        err,
+        'could not create topic and field' + topic + 'from MSPublication'
+      );
+      throw new functions.https.HttpsError(
+        'internal',
+        `An error occurred while processing the field, ${topic}`
+      );
+    });
+}
+
 interface expressionField {
   expr: string;
   fieldName: string;
 }
 
+// Rank relates to how often the resource mentions this topic
 export interface Topic {
-  id?: string;
   microsoftID: string;
   name: string;
-  normalisedName?: string;
+  normalisedName: string;
+  rank?: number;
+}
+
+export interface TaggedTopic {
+  id: string;
+  microsoftID: string;
+  name: string;
+  normalisedName: string;
 }

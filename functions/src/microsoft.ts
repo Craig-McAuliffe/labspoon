@@ -130,7 +130,13 @@ export interface MAKField {
   DFN: string;
   FId: number;
   FN: string;
-  processed?: string;
+  processed: string;
+}
+
+export interface MAKFieldUnProcessed {
+  DFN: string;
+  FId: number;
+  FN: string;
 }
 
 export interface MAKPublicationInDB {
@@ -148,5 +154,13 @@ export function makFieldToTopic(field: MAKField): Topic {
     microsoftID: field.FId.toString(),
     name: field.DFN,
     normalisedName: field.FN,
+  };
+}
+
+export function TopicToMAKField(topic: Topic): MAKFieldUnProcessed {
+  return {
+    FId: Number(topic.microsoftID),
+    DFN: topic.name,
+    FN: topic.normalisedName,
   };
 }

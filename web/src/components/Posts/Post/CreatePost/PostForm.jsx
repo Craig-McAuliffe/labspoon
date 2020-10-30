@@ -49,7 +49,7 @@ export function handlePostTopics(selectedTopics) {
   const DBTopics = [];
   selectedTopics.forEach((selectedTopic) => {
     if (selectedTopic.isCustom) {
-      customTopics.push({name: selectedTopic.DFN});
+      customTopics.push({name: selectedTopic.name});
     } else DBTopics.push(selectedTopic);
   });
   return {customTopics: customTopics, DBTopics: DBTopics};
