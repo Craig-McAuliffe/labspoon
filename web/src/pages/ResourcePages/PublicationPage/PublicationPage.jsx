@@ -5,7 +5,6 @@ import {db} from '../../../firebase';
 
 import {dbPublicationToJSPublication} from '../../../helpers/publications';
 
-import publications from '../../../mockdata/publications';
 import ListItemTopics from '../../../components/CommonListItemParts/ListItemTopics';
 import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
 import FilterableResults, {
@@ -39,7 +38,9 @@ function fetchPublicationDetailsFromDB(publicationID) {
   return db
     .doc(`publications/${publicationID}`)
     .get()
-    .then((doc) => dbPublicationToJSPublication(doc.data()))
+    .then((doc) => {
+      return dbPublicationToJSPublication(doc.data());
+    })
     .catch((err) => console.log(err));
 }
 
@@ -53,19 +54,8 @@ export default function PublicationPage() {
     setPublicationID(publicationIDParam);
   }
 
-  let fetchPublicationDetails;
-  if (!featureFlags.has('disable-cloud-firestore')) {
-    fetchPublicationDetails = () =>
-      fetchPublicationDetailsFromDB(publicationID);
-  } else {
-    fetchPublicationDetails = () =>
-      publications().filter((publication) =>
-        publication.id.includes(publicationID)
-      )[0];
-  }
-
   useEffect(() => {
-    Promise.resolve(fetchPublicationDetails())
+    Promise.resolve(fetchPublicationDetailsFromDB(publicationID))
       .then((newPublicationDetails) => {
         setPublicationDetails(newPublicationDetails);
       })
@@ -204,9 +194,13 @@ function PublicationBody({publicationDetails}) {
   return (
     <div className="publication-body">
       <h2>{publicationDetails.title}</h2>
-      <PublicationAuthors
-        publicationAuthors={publicationDetails.content.authors}
-      />
+      {publicationDetails.content.authors ? (
+        <PublicationAuthors
+          publicationAuthors={publicationDetails.content.authors}
+        />
+      ) : (
+        <></>
+      )}
       <PublicationBodyAbstract abstract={publicationDetails.abstract} />
       <ListItemTopics dbTopics={publicationDetails.topics} />
     </div>
