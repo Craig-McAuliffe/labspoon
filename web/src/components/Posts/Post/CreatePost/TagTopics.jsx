@@ -1,23 +1,40 @@
-import React, {useState, useRef, useEffect, useContext} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import PrimaryButton from '../../../Buttons/PrimaryButton';
-import FormDatabaseSearch from '../../../Forms/FormDatabaseSearch';
 import TopicListItem from '../../../Topics/TopicListItem';
 import {RemoveIcon} from '../../../../assets/GeneralActionIcons';
 import {CreatingPostContext} from './CreatePost';
+import firebase from '../../../../firebase';
+import LoadingSpinner from '../../../LoadingSpinner/LoadingSpinner';
 import './CreatePost';
 
-export default function TagTopics() {
+const topicSearch = firebase.functions().httpsCallable('topics-topicSearch');
+
+export default function TagTopics({submittingPost}) {
   const [displayedTopics, setDisplayedTopics] = useState([]);
   const [duplicateTopic, setDuplicateTopic] = useState(false);
-  const topicSearchRef = useRef();
+  const [loadingTopics, setLoadingTopics] = useState(false);
+  const [typedTopic, setTypedTopic] = useState('');
   const {selectedTopics, setSelectedTopics} = useContext(CreatingPostContext);
-
   // Tells user that they are trying to input a duplicate topic
   useEffect(() => {
     if (duplicateTopic) {
       setTimeout(() => setDuplicateTopic(false), 3000);
     }
   }, [duplicateTopic]);
+
+  useEffect(() => {
+    if (typedTopic.length === 0 || submittingPost) {
+      setDisplayedTopics([]);
+      setLoadingTopics(false);
+      return;
+    }
+    return searchMicrosoftTopics(
+      typedTopic,
+      setLoadingTopics,
+      setDisplayedTopics
+    );
+  }, [typedTopic, submittingPost]);
+
   return (
     <div className="create-post-topic-section-container">
       <SelectedTopics
@@ -27,30 +44,33 @@ export default function TagTopics() {
       {duplicateTopic ? <DuplicateTopicWarning /> : null}
       <div className="create-post-topic-search-container">
         <h4 className="create-post-topic-tag-title">Add related topics</h4>
-        <div className="create-post-topic-search-tool-container">
-          <FormDatabaseSearch
-            setDisplayedItems={setDisplayedTopics}
-            indexName="_TOPICS"
-            inputRef={topicSearchRef}
-            placeholderText="this post is about..."
-            displayedItems={displayedTopics}
-            hideSearchIcon
-            clearListOnNoResults
+        <input
+          type="text"
+          className="create-post-topic-search-input"
+          onChange={(e) => {
+            setTypedTopic(e.target.value);
+          }}
+          placeholder="this post is about..."
+        />
+        <div></div>
+        <div className="create-post-searched-topics-container">
+          {loadingTopics === true ? (
+            <div className="create-post-loading-spinner-container">
+              <LoadingSpinner />
+            </div>
+          ) : null}
+          <TopicsList
+            topics={displayedTopics}
+            setSelectedTopics={setSelectedTopics}
+            setDuplicateTopic={setDuplicateTopic}
+            displayedTopics={displayedTopics}
           />
-          <div className="create-post-searched-topics-container">
-            <TypedTopic
-              topicSearchRef={topicSearchRef}
-              setSelectedTopics={setSelectedTopics}
-              setDuplicateTopic={setDuplicateTopic}
-              displayedTopics={displayedTopics}
-            />
-            <TopicsList
-              topics={displayedTopics}
-              setSelectedTopics={setSelectedTopics}
-              setDuplicateTopic={setDuplicateTopic}
-              displayedTopics={displayedTopics}
-            />
-          </div>
+          <TypedTopic
+            typedTopic={typedTopic}
+            setSelectedTopics={setSelectedTopics}
+            setDuplicateTopic={setDuplicateTopic}
+            displayedTopics={displayedTopics}
+          />
         </div>
       </div>
     </div>
@@ -64,14 +84,19 @@ const TopicsList = ({
   displayedTopics,
 }) =>
   topics.map((displayedTopic) => (
-    <TopicListItem key={displayedTopic.id} topic={displayedTopic}>
+    <TopicListItem
+      key={displayedTopic.microsoftID}
+      topic={displayedTopic}
+      noLink
+    >
       <PrimaryButton
         onClick={() =>
           addTopicToPost(
             setSelectedTopics,
             displayedTopic.name,
             setDuplicateTopic,
-            displayedTopic.id,
+            displayedTopic.microsoftID,
+            displayedTopic.normalisedName,
             displayedTopics
           )
         }
@@ -89,6 +114,26 @@ function DuplicateTopicWarning() {
     </div>
   );
 }
+
+// clearTimeout is called on unmount from useEffect hook
+const searchMicrosoftTopics = (query, setLoadingTopics, setDisplayedTopics) => {
+  setLoadingTopics(true);
+  const apiCallTimeout = setTimeout(
+    () =>
+      topicSearch({topicQuery: query})
+        .then((microsoftTopics) => {
+          setLoadingTopics(false);
+          setDisplayedTopics(microsoftTopics.data);
+        })
+        .catch((err) => {
+          setLoadingTopics(false);
+          setDisplayedTopics([]);
+          console.log(err, 'could not search topics');
+        }),
+    1400
+  );
+  return () => clearTimeout(apiCallTimeout);
+};
 
 function SelectedTopics({selectedTopics, setSelectedTopics}) {
   return (
@@ -115,27 +160,21 @@ function SelectedTopics({selectedTopics, setSelectedTopics}) {
 
 // Displays the topic that has been typed
 const TypedTopic = ({
-  topicSearchRef,
+  typedTopic,
   setSelectedTopics,
   setDuplicateTopic,
   displayedTopics,
 }) => {
-  if (
-    topicSearchRef.current === undefined ||
-    topicSearchRef.current.lastChild.firstChild.firstChild.value.length === 0
-  )
-    return null;
-  const topicInputValue =
-    topicSearchRef.current.lastChild.firstChild.firstChild.value;
-  return topicInputValue.length === 0 ? null : (
+  return typedTopic.length === 0 ? null : (
     <div className="create-post-typed-topic-container">
-      <h4>{topicInputValue}</h4>
-      <PrimaryButton
+      <h4>{typedTopic}</h4>
+      <button
         onClick={() =>
           addTopicToPost(
             setSelectedTopics,
-            topicInputValue,
+            typedTopic,
             setDuplicateTopic,
+            undefined,
             undefined,
             displayedTopics
           )
@@ -143,7 +182,7 @@ const TypedTopic = ({
         small
       >
         Select
-      </PrimaryButton>
+      </button>
     </div>
   );
 };
@@ -154,21 +193,33 @@ const addTopicToPost = (
   setSelectedTopics,
   topicName,
   setDuplicateTopic,
-  topicID,
+  microsoftID,
+  normalisedTopicName,
   displayedTopics
 ) => {
   let preExistingTopic = undefined;
-  displayedTopics.forEach((displayedTopic) => {
-    if (displayedTopic.name === topicName)
-      preExistingTopic = [{name: displayedTopic.name, id: displayedTopic.id}];
-  });
-
+  if (microsoftID === undefined) {
+    displayedTopics.forEach((displayedTopic) => {
+      if (displayedTopic.name === topicName)
+        preExistingTopic = [
+          {
+            name: displayedTopic.name,
+            microsoftID: displayedTopic.microsoftID,
+            normalisedName: displayedTopic.normalisedName,
+          },
+        ];
+    });
+  }
   setSelectedTopics((selectedTopics) => {
-    const newTopic = [{name: topicName, id: topicID}];
+    const newSelectedTopic = {
+      name: topicName,
+      microsoftID: microsoftID,
+      normalisedName: normalisedTopicName,
+    };
     if (
       selectedTopics.some(
         (previouslySelectedTopic) =>
-          previouslySelectedTopic.name === newTopic[0].name
+          previouslySelectedTopic.name === newSelectedTopic.name
       )
     ) {
       setDuplicateTopic(true);
@@ -178,8 +229,8 @@ const addTopicToPost = (
     if (preExistingTopic !== undefined)
       augmentedTopics = [...selectedTopics, ...preExistingTopic];
     else {
-      if (newTopic[0].id === undefined) newTopic[0].isNew = true;
-      augmentedTopics = [...selectedTopics, ...newTopic];
+      if (microsoftID === undefined) newSelectedTopic.isCustom = true;
+      augmentedTopics = [...selectedTopics, newSelectedTopic];
     }
     return augmentedTopics;
   });

@@ -54,29 +54,30 @@ export function executeExpression(params: executeParams): AxiosPromise {
   });
 }
 
-
 export function makPublicationToPublication(
   makPublication: MAKPublication
 ): Publication {
   const publication = {} as Publication;
   if (makPublication.D) publication.date = makPublication.D;
   if (makPublication.DN) publication.title = makPublication.DN;
-  if (makPublication.AA) publication.authors = makPublication.AA.map(makAuthorToAuthor);
+  if (makPublication.AA)
+    publication.authors = makPublication.AA.map(makAuthorToAuthor);
   if (makPublication.Id) publication.microsoftID = makPublication.Id.toString();
-  if (makPublication.F) publication.topics = makPublication.F.map(makFieldToTopic);
+  if (makPublication.F)
+    publication.topics = makPublication.F.map(makFieldToTopic);
   return publication;
 }
 
 export interface MAKPublication {
   logprob: number;
   prob: string;
-  D?: string,
+  D?: string;
   DN?: string;
   AA?: Array<MAKAuthor>;
   Id?: number;
   F?: MAKField[];
   // Tracks whether the publication has been added to the Labspoon publications. Defaults to false.
-  processed?: boolean,
+  processed?: boolean;
 }
 
 export interface Publication {
@@ -129,6 +130,23 @@ export interface MAKField {
   DFN: string;
   FId: number;
   FN: string;
+  processed: string;
+}
+
+export interface MAKFieldUnProcessed {
+  DFN: string;
+  FId: number;
+  FN: string;
+}
+
+export interface MAKPublicationInDB {
+  D?: string;
+  DN?: string;
+  AA?: Array<MAKAuthor>;
+  Id?: number;
+  F?: MAKField[];
+  // Tracks whether the publication has been added to the Labspoon publications. Defaults to false.
+  processed?: boolean;
 }
 
 export function makFieldToTopic(field: MAKField): Topic {
@@ -136,5 +154,13 @@ export function makFieldToTopic(field: MAKField): Topic {
     microsoftID: field.FId.toString(),
     name: field.DFN,
     normalisedName: field.FN,
+  };
+}
+
+export function TopicToMAKField(topic: Topic): MAKFieldUnProcessed {
+  return {
+    FId: Number(topic.microsoftID),
+    DFN: topic.name,
+    FN: topic.normalisedName,
   };
 }

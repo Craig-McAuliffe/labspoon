@@ -12,9 +12,10 @@
 .topic-names-container {
   grid-column: 2/3;
   display: flex;
+  flex-wrap: wrap;
 }
 
-.topic-names {
+.tagged-topic-names {
   display: inline-block;
-  margin: 0px 30px;
+  margin: 0px 30px 5px;
 }

@@ -202,11 +202,7 @@ function PublicationBody({publicationDetails}) {
         <></>
       )}
       <PublicationBodyAbstract abstract={publicationDetails.abstract} />
-      {publicationDetails.topics ? (
-        <ListItemTopics taggedItem={publicationDetails} />
-      ) : (
-        <></>
-      )}
+      <ListItemTopics dbTopics={publicationDetails.topics} />
     </div>
   );
 }

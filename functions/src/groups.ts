@@ -1,7 +1,8 @@
 import * as functions from 'firebase-functions';
 import {admin, ResourceTypes} from './config';
 import {firestore} from 'firebase-admin';
-import {updateFilterCollection, Post, Topic} from './posts';
+import {updateFilterCollection, Post} from './posts';
+import {Topic} from './topics';
 
 const db: firestore.Firestore = admin.firestore();
 
@@ -67,8 +68,9 @@ export const addGroupToRelatedTopicPage = functions.firestore
   .document('groups/{groupID}/topics/{topicID}')
   .onCreate(async (change, context) => {
     const topic = change.data() as Topic;
+    const topicID = context.params.topicID;
     const groupID = context.params.groupID;
-    setGroupOnTopic(topic, groupID).catch((err) =>
+    setGroupOnTopic(topic, groupID, topicID).catch((err) =>
       console.log(err, 'could not add group to topic')
     );
   });
@@ -77,8 +79,9 @@ export const updateGroupOnRelatedTopicPage = functions.firestore
   .document('groups/{groupID}/topics/{topicID}')
   .onUpdate(async (change, context) => {
     const topic = change.after.data() as Topic;
+    const topicID = context.params.topicID;
     const groupID = context.params.groupID;
-    setGroupOnTopic(topic, groupID).catch((err) =>
+    setGroupOnTopic(topic, groupID, topicID).catch((err) =>
       console.log(err, 'could not update group rank on topic')
     );
   });
@@ -86,16 +89,20 @@ export const updateGroupOnRelatedTopicPage = functions.firestore
 export const removeGroupOnRelatedTopicPage = functions.firestore
   .document('groups/{groupID}/topics/{topicID}')
   .onDelete(async (change, context) => {
-    const topic = change.data() as Topic;
+    const topicID = context.params.topicID;
     const groupID = context.params.groupID;
     await db
-      .doc(`topics/${topic.id}/groups/${groupID}`)
+      .doc(`topics/${topicID}/groups/${groupID}`)
       .delete()
       .catch((err) => console.log(err, 'unable to remove group from topic'));
   });
 
-export async function setGroupOnTopic(topic: Topic, groupID: string) {
-  const groupInTopicDocRef = db.doc(`topics/${topic.id}/groups/${groupID}`);
+export async function setGroupOnTopic(
+  topic: Topic,
+  groupID: string,
+  topicID: string
+) {
+  const groupInTopicDocRef = db.doc(`topics/${topicID}/groups/${groupID}`);
   await db
     .doc(`groups/${groupID}`)
     .get()

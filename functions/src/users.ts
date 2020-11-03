@@ -8,33 +8,45 @@ import {
   makPublicationToPublication,
   interpretationResult,
 } from './microsoft';
-import {Topic, Post} from './posts';
+import {Post} from './posts';
+import {Topic} from './topics';
 import {generateThumbnail} from './helpers/images';
 
 const db = admin.firestore();
 
 const COVER_PHOTO_FILENAME = 'coverPhoto_fullSize';
 // Generates thumbnails for cover photos.
-export const generateThumbnailCoverPhotoOnFullSizeUpload = functions.storage.object()
+export const generateThumbnailCoverPhotoOnFullSizeUpload = functions.storage
+  .object()
   .onFinalize(async (object) => {
     if (!object.name) return;
     if (!object.name.endsWith(COVER_PHOTO_FILENAME)) return;
 
     const fullSizeCoverPhotoPath = object.name;
-    await generateThumbnail(fullSizeCoverPhotoPath, 'coverPhoto', ['-thumbnail', '1070x200^', '-gravity', 'center', '-extent', '1070x200']);
+    await generateThumbnail(fullSizeCoverPhotoPath, 'coverPhoto', [
+      '-thumbnail',
+      '1070x200^',
+      '-gravity',
+      'center',
+      '-extent',
+      '1070x200',
+    ]);
   });
 
 const AVATAR_FILENAME = 'avatar_fullSize';
 // Generates thumbnails for user and group avatars.
-export const generateThumbnailAvatarOnFullSizeUpload = functions.storage.object()
+export const generateThumbnailAvatarOnFullSizeUpload = functions.storage
+  .object()
   .onFinalize(async (object) => {
     if (!object.name) return;
     if (!object.name.endsWith(AVATAR_FILENAME)) return;
 
     const fullSizeAvatarPath = object.name;
-    await generateThumbnail(fullSizeAvatarPath, 'avatar', ['-thumbnail', '200x200>'])
+    await generateThumbnail(fullSizeAvatarPath, 'avatar', [
+      '-thumbnail',
+      '200x200>',
+    ]);
   });
-
 
 export const instantiateFollowingFeedForNewUser = functions.firestore
   .document('users/{userID}')
@@ -63,7 +75,8 @@ export const addUserToRelatedTopicPage = functions.firestore
   .onCreate(async (change, context) => {
     const topic = change.data() as Topic;
     const userID = context.params.userID;
-    setUserOnTopic(topic, userID).catch((err) =>
+    const topicID = context.params.topicID;
+    setUserOnTopic(topic, topicID, userID).catch((err) =>
       console.log(err, 'could not add user to topic')
     );
   });
@@ -72,14 +85,19 @@ export const updateUserOnRelatedTopicPage = functions.firestore
   .document('users/{userID}/topics/{topicID}')
   .onUpdate(async (change, context) => {
     const topic = change.after.data() as Topic;
+    const topicID = context.params.topicID;
     const userID = context.params.userID;
-    setUserOnTopic(topic, userID).catch((err) =>
+    setUserOnTopic(topic, topicID, userID).catch((err) =>
       console.log(err, 'could not update user rank on topic')
     );
   });
 
-export async function setUserOnTopic(topic: Topic, userID: string) {
-  const userInTopicDocRef = db.doc(`topics/${topic.id}/users/${userID}`);
+export async function setUserOnTopic(
+  topic: Topic,
+  topicID: string,
+  userID: string
+) {
+  const userInTopicDocRef = db.doc(`topics/${topicID}/users/${userID}`);
   await db
     .doc(`users/${userID}`)
     .get()

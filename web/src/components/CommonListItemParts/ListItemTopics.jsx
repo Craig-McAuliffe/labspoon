@@ -1,37 +1,41 @@
 import React from 'react';
 
 import {Link} from 'react-router-dom';
-import PropTypes from 'prop-types';
 import './ListItemTopics.css';
 
-export default function ListItemTopics({taggedItem}) {
-  if (!taggedItem.topics) return <></>;
-  const topicLinks = taggedItem.topics.map((topic) => {
-    let link;
-    if (topic.id) {
-      link = `/topic/${topic.id}`;
-    } else {
-      link = `/magField/${topic.microsoftID}`;
-    }
-    return (
-      <Link to={link} key={topic.id} className="topic-names">
-        {topic.name}
-      </Link>
-    );
-  });
-  if (!taggedItem.topics || taggedItem.topics.length === 0) return <></>;
+export default function ListItemTopics({dbTopics, customTopics}) {
+  if (!dbTopics && !customTopics) return null;
+
+  const topicLinks = (topics) => {
+    if (!topics) return null;
+    return topics.map((topic) => {
+      if (!topic.id && !topic.microsoftID)
+        return (
+          <p className="tagged-topic-names" key={topic.name}>
+            {topic.name}
+          </p>
+        );
+
+      const topicID = topic.id ? topic.id : topic.microsoftID;
+      return (
+        <Link
+          to={topic.id ? `/topic/${topicID}` : `/magField/${topicID}`}
+          key={topicID}
+          className="tagged-topic-names"
+        >
+          {topic.name}
+        </Link>
+      );
+    });
+  };
+
   return (
     <div className="post-topics">
       <p className="topics-sub-title">Topics: </p>
-      <div className="topic-names-container">{topicLinks}</div>
+      <div className="topic-names-container">
+        {topicLinks(dbTopics)}
+        {topicLinks(customTopics)}
+      </div>
     </div>
   );
 }
-ListItemTopics.propTypes = {
-  topics: PropTypes.arrayOf(
-    PropTypes.exact({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-    })
-  ),
-};

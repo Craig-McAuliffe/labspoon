@@ -8,18 +8,23 @@ import {
   makPublicationToPublication,
   Publication,
   MAKPublication,
-  makFieldToTopic,
   MAKAuthor,
   User,
   makAuthorToAuthor,
 } from './microsoft';
 import {Post} from './posts';
-import {Topic} from './topics';
+import {
+  Topic,
+  createFieldAndTopic,
+  TaggedTopic,
+  convertTopicToTaggedTopic,
+} from './topics';
 
 const pubSubClient = new PubSub();
 const db = admin.firestore();
 
-export const allPublicationFields = 'AA.AfId,AA.AfN,AA.AuId,AA.AuN,AA.DAuN,AA.DAfN,AA.S,AW,BT,BV,C.CId,C.CN,CC,CitCon,D,DN,DOI,E,ECC,F.DFN,F.FId,F.FN,FamId,FP,I,IA,Id,J.JId,J.JN,LP,PB,Pt,RId,S,Ti,V,VFN,VSN,W,Y';
+export const allPublicationFields =
+  'AA.AfId,AA.AfN,AA.AuId,AA.AuN,AA.DAuN,AA.DAfN,AA.S,AW,BT,BV,C.CId,C.CN,CC,CitCon,D,DN,DOI,E,ECC,F.DFN,F.FId,F.FN,FamId,FP,I,IA,Id,J.JId,J.JN,LP,PB,Pt,RId,S,Ti,V,VFN,VSN,W,Y';
 
 export const microsoftAcademicKnowledgePublicationSearch = functions.https.onCall(
   async (data) => {
@@ -51,7 +56,9 @@ export const microsoftAcademicKnowledgePublicationSearch = functions.https.onCal
   }
 );
 
-export function publishAddPublicationRequests(makPublications: MAKPublication[]): Promise<any> {
+export function publishAddPublicationRequests(
+  makPublications: MAKPublication[]
+): Promise<any> {
   const publishPromises = makPublications.map(async (result: object) => {
     const jsonString = JSON.stringify(result);
     const messageBuffer = Buffer.from(jsonString);
@@ -76,13 +83,15 @@ export const addNewMSPublicationAsync = functions.pubsub
     const microsoftPublication = message.json as MAKPublication;
     if (!microsoftPublication.Id) return true;
     const microsoftPublicationID = microsoftPublication.Id.toString();
-    const microsoftPublicationRef = db.collection('MSPublications').doc(microsoftPublicationID);
+    const microsoftPublicationRef = db
+      .collection('MSPublications')
+      .doc(microsoftPublicationID);
 
     try {
       await db.runTransaction(async (t) => {
         const microsoftPublicationDS = await t.get(microsoftPublicationRef);
 
-        // If the Microsoft publication has been added and marked as processed then the labspoon publication must already exist 
+        // If the Microsoft publication has been added and marked as processed then the labspoon publication must already exist
         if (microsoftPublicationDS.exists) {
           const microsoftPublicationDSData = microsoftPublicationDS.data() as MAKPublication;
           if (microsoftPublicationDSData.processed) return true;
@@ -94,7 +103,6 @@ export const addNewMSPublicationAsync = functions.pubsub
         t.set(microsoftPublicationRef, microsoftPublication);
         const publication = makPublicationToPublication(microsoftPublication);
         delete publication.authors;
-        delete publication.topics;
         t.set(db.collection('publications').doc(), publication);
 
         microsoftPublication.AA?.forEach((author) => {
@@ -107,14 +115,7 @@ export const addNewMSPublicationAsync = functions.pubsub
               .collection('publications')
               .doc(microsoftPublicationID),
             microsoftPublication
-          )
-        });
-
-        microsoftPublication.F?.forEach((field) => {
-          const fieldID = field.FId.toString();
-          t.set(db.collection('MSFields').doc(fieldID), field);
-          t.set(db.collection('topics').doc(), makFieldToTopic(field));
-          t.set(db.collection('MSFields').doc(fieldID).collection('publications').doc(microsoftPublicationID), microsoftPublication);
+          );
         });
         return;
       });
@@ -124,45 +125,71 @@ export const addNewMSPublicationAsync = functions.pubsub
     return;
   });
 
-export const addNewMAKPublicationToTopics = functions.firestore
-  .document('MSFields/{msFieldID}/publications/{msPublicationID}')
-  .onCreate(async (_, context) => {
-    const msFieldID = context.params.msFieldID;
-    const msPublicationID = context.params.msPublicationID;
-
-    // Find the topic that corresponds to the Microsoft field of study ID
-    const topicQS = await db
-      .collection('topics')
-      .where('microsoftID', '==', msFieldID)
-      .limit(1)
-      .get();
-    if (topicQS.empty) {
-      console.error('topic not found; returning');
-      return true;
-    }
-    const topicDS = topicQS.docs[0];
-    const topicID = topicDS.id;
-
-    const publicationDS = await getPublicationByMicrosoftPublicationID(msPublicationID);
-    const publicationID = publicationDS.id;
-
-    try {
-      await db.runTransaction(async (t) => {
-        const publicationTDS = await t.get(db.doc(`publications/${publicationID}`));
-        const topicTDS = await t.get(db.doc(`topics/${topicID}`));
-        t.set(db.doc(`topics/${topicID}/publications/${publicationID}`), publicationTDS.data());
-        const topic = topicTDS.data() as Topic;
-        topic.id = topicID;
-        t.update(db.doc(`publications/${publicationID}`), {
-          topics: adminNS.firestore.FieldValue.arrayUnion(topic)
-        });
-      });
-    } catch (err) {
-      console.error(err);
-    }
-
-    return true;
+export const createTopicsFromNewPublicationAndAddPublicationToTopic = functions.firestore
+  .document('publications/{publicationID}')
+  .onCreate(async (change, context) => {
+    const publication = change.data();
+    const publicationID = context.params.publicationID;
+    let publicationTopicPromiseArray;
+    if (!publication.topics) publicationTopicPromiseArray = [];
+    else
+      publicationTopicPromiseArray = publication.topics?.map(
+        async (taggedTopic: TaggedTopic) => {
+          return createFieldAndTopic(taggedTopic).then((test) => {
+            addPublicationToTopic(
+              publicationID,
+              publication,
+              taggedTopic.microsoftID
+            );
+          });
+        }
+      );
+    return Promise.all(publicationTopicPromiseArray);
   });
+
+export async function addPublicationToTopic(
+  publicationID: string,
+  publication: Publication,
+  topicMicrosoftID?: string
+) {
+  await db
+    .doc(`MSFields/${topicMicrosoftID}`)
+    .get()
+    .then((ds) => {
+      if (!ds.exists) {
+        console.error(
+          `labspoon topic with id ${topicMicrosoftID} not found; returning`
+        );
+        return undefined;
+      }
+      const labspoonTopicID = ds.data()!.processed;
+      // the topic returned from the db is not the same format
+      // as a tagged topic (tagged topics have an id field and no rank)
+      const topicData = ds.data()! as Topic;
+      const taggedLabspoonTopic = convertTopicToTaggedTopic(
+        topicData,
+        labspoonTopicID
+      );
+      return db
+        .runTransaction(async (t) => {
+          t.set(
+            db.doc(`topics/${labspoonTopicID}/publications/${publicationID}`),
+            publication
+          );
+          t.update(db.doc(`publications/${publicationID}`), {
+            topics: adminNS.firestore.FieldValue.arrayUnion(
+              taggedLabspoonTopic
+            ),
+          });
+        })
+        .catch((err) => {
+          console.error(
+            `could not add publication with id ${publicationID} to topic with id ${labspoonTopicID} and nor update the publication with the same topic, ${err}`
+          );
+        });
+    });
+  return true;
+}
 
 export const addNewMAKPublicationToAuthors = functions.firestore
   .document('MSUsers/{msUserID}/publications/{msPublicationID}')
@@ -171,7 +198,9 @@ export const addNewMAKPublicationToAuthors = functions.firestore
     const msPublicationID = context.params.msPublicationID;
 
     // Find the publication
-    const publicationDS = await getPublicationByMicrosoftPublicationID(msPublicationID);
+    const publicationDS = await getPublicationByMicrosoftPublicationID(
+      msPublicationID
+    );
     const publicationID = publicationDS.id;
     // Check whether there is a labspoon user corresponding to the microsoft academic ID, otherwise do nothing.
     const userQS = await db
@@ -184,10 +213,12 @@ export const addNewMAKPublicationToAuthors = functions.firestore
       try {
         await db.runTransaction(async (t) => {
           const microsoftUserDS = await t.get(db.doc(`MSUsers/${msUserID}`));
-          const microsoftUser = makAuthorToAuthor(microsoftUserDS.data() as MAKAuthor);
+          const microsoftUser = makAuthorToAuthor(
+            microsoftUserDS.data() as MAKAuthor
+          );
           microsoftUser.microsoftID = msUserID;
           t.update(db.doc(`publications/${publicationID}`), {
-            authors: adminNS.firestore.FieldValue.arrayUnion(microsoftUser)
+            authors: adminNS.firestore.FieldValue.arrayUnion(microsoftUser),
           });
         });
       } catch (err) {
@@ -200,22 +231,31 @@ export const addNewMAKPublicationToAuthors = functions.firestore
 
     try {
       await db.runTransaction(async (t) => {
-        const publicationTDS = await t.get(db.doc(`publications/${publicationID}`));
+        const publicationTDS = await t.get(
+          db.doc(`publications/${publicationID}`)
+        );
         const userTDS = await t.get(db.doc(`users/${userID}`));
-        t.set(db.doc(`users/${userID}/publications/${publicationID}`), publicationTDS.data());
+        t.set(
+          db.doc(`users/${userID}/publications/${publicationID}`),
+          publicationTDS.data()
+        );
         const user = userTDS.data() as User;
         const publicationData = publicationTDS.data() as Publication;
         if (publicationData.authors) {
-          const existingAuthorEntry = publicationData.authors.find((author) => author.microsoftID === user.microsoftID);
+          const existingAuthorEntry = publicationData.authors.find(
+            (author) => author.microsoftID === user.microsoftID
+          );
           // if we already added the id to the user, we don't want to remove the user here
           delete existingAuthorEntry!.id;
           t.update(db.doc(`publications/${publicationID}`), {
-            authors: adminNS.firestore.FieldValue.arrayRemove(existingAuthorEntry)
+            authors: adminNS.firestore.FieldValue.arrayRemove(
+              existingAuthorEntry
+            ),
           });
         }
         user.id = userID;
         t.update(db.doc(`publications/${publicationID}`), {
-          authors: adminNS.firestore.FieldValue.arrayUnion(user)
+          authors: adminNS.firestore.FieldValue.arrayUnion(user),
         });
       });
     } catch (err) {
@@ -234,7 +274,9 @@ export const addPublicationPostToPublication = functions.firestore
 
     // The publication on the post will not yet be associated with an ID as this is not provided
     // at post creation so we need to find the publication ID based on the microsoft ID.
-    const publicationDS = await getPublicationByMicrosoftPublicationID(publication.microsoftID!);
+    const publicationDS = await getPublicationByMicrosoftPublicationID(
+      publication.microsoftID!
+    );
     const publicationID = publicationDS.id;
 
     const batch = db.batch();
@@ -245,9 +287,16 @@ export const addPublicationPostToPublication = functions.firestore
   });
 
 async function getPublicationByMicrosoftPublicationID(msPublicationID: string) {
-  const publicationsQS = await db.collection('publications').where('microsoftID', '==', msPublicationID).limit(1).get();
+  const publicationsQS = await db
+    .collection('publications')
+    .where('microsoftID', '==', msPublicationID)
+    .limit(1)
+    .get();
   if (publicationsQS.empty) {
-    throw new Error('Could not find publication with microsoft publication ID: ' + msPublicationID);
+    throw new Error(
+      'Could not find publication with microsoft publication ID: ' +
+        msPublicationID
+    );
   }
   return publicationsQS.docs[0];
 }

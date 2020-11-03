@@ -1,35 +1,39 @@
 import React, {useContext} from 'react';
 import * as Yup from 'yup';
-import firebase, {db} from '../../../../firebase';
-import {v4 as uuid} from 'uuid';
+import firebase from '../../../../firebase';
 import FormTextInput, {CreatePostTextArea} from '../../../Forms/FormTextInput';
 import FormDateInput from '../../../Forms/FormDateInput';
 import PostForm from './PostForm';
+import {handlePostTopics} from './PostForm';
 import {CreatingPostContext} from './CreatePost';
 
 import './CreatePost.css';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
-export default function OpenPositionPostForm({cancelPost, setCreatingPost}) {
-  const {selectedTopics, setPostSuccess} = useContext(CreatingPostContext);
+export default function OpenPositionPostForm({setCreatingPost}) {
+  const {selectedTopics, setPostSuccess, setSubmittingPost} = useContext(
+    CreatingPostContext
+  );
 
   const submitChanges = (res) => {
     res.postType = {id: 'openPositionPost', name: 'Open Position'};
-    selectedTopics.forEach((selectedTopic) => {
-      if (selectedTopic.id === undefined) selectedTopic.id = uuid();
-      if (selectedTopic.isNew) {
-        delete selectedTopic.isNew;
-        db.doc(`topics/${selectedTopic.id}`).set(selectedTopic);
-      }
-    });
-    res.topics = selectedTopics;
+    const taggedTopics = handlePostTopics(selectedTopics);
+    res.customTopics = taggedTopics.customTopics;
+    res.topics = taggedTopics.DBTopics;
     createPost(res)
       .then(() => {
         setCreatingPost(false);
         setPostSuccess(true);
+        setSubmittingPost(false);
       })
-      .catch((err) => alert(err));
+      .catch((err) => {
+        console.log(err);
+        alert(
+          'Oh dear, something went wrong trying to create your post. Please try again later.'
+        );
+        setSubmittingPost(false);
+      });
   };
   const initialValues = {
     title: '',
@@ -50,7 +54,6 @@ export default function OpenPositionPostForm({cancelPost, setCreatingPost}) {
       onSubmit={submitChanges}
       initialValues={initialValues}
       validationSchema={validationSchema}
-      cancelPost={cancelPost}
     >
       <div className="creating-post-main-text-container">
         <CreatePostTextArea name="title" />

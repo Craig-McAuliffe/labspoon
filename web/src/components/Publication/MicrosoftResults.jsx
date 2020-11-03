@@ -28,6 +28,19 @@ export function FormPublicationResults({query, setPublication}) {
   useEffect(() => microsoftPublicationSearch(query, setResults, setLoading), [
     query,
   ]);
+
+  if (query === undefined) {
+    if (loading) setLoading(false);
+    if (results.length > 0) setResults([]);
+    return null;
+  }
+
+  if (query.length === 0) {
+    if (loading) setLoading(false);
+    if (results.length > 0) setResults([]);
+    return null;
+  }
+
   if (loading) return <LoadingSpinner />;
   return results.map((publication) => (
     <div
@@ -47,6 +60,7 @@ export function FormPublicationResults({query, setPublication}) {
 // Retrieves publication results for a query with a time to prevent too many searches occuring during typing.
 function microsoftPublicationSearch(query, setResults, setLoading) {
   if (!query) return;
+  if (query.length === 0) return;
   setLoading(true);
   const apiCallTimeout = setTimeout(
     () =>
@@ -57,8 +71,11 @@ function microsoftPublicationSearch(query, setResults, setLoading) {
           setResults(res.data.map(toLocalPublication));
           setLoading(false);
         })
-        .catch((err) => alert(err)),
-    2000
+        .catch((err) => {
+          setLoading(false);
+          alert(err);
+        }),
+    1400
   );
   return () => clearTimeout(apiCallTimeout);
 }

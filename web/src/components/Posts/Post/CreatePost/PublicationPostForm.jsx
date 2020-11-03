@@ -1,24 +1,25 @@
 import React, {useContext, useState} from 'react';
 import NegativeButton from '../../../Buttons/NegativeButton';
 import * as Yup from 'yup';
-import firebase, {db} from '../../../../firebase';
-import {v4 as uuid} from 'uuid';
+import firebase from '../../../../firebase';
 import {CreatePostTextArea, TextInput} from '../../../Forms/FormTextInput';
 import PostForm from './PostForm';
 import {CreatingPostContext} from './CreatePost';
 import {FormPublicationResults} from '../../../Publication/MicrosoftResults';
+import {handlePostTopics} from './PostForm';
 import {SmallPublicationListItem} from '../../../Publication/PublicationListItem';
 
 import './CreatePost.css';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
-export default function PublicationPostForm({cancelPost, setCreatingPost}) {
-  const {selectedTopics, setPostSuccess} = useContext(CreatingPostContext);
+export default function PublicationPostForm({setCreatingPost}) {
+  const {selectedTopics, setSubmittingPost, setPostSuccess} = useContext(
+    CreatingPostContext
+  );
   const [publication, setPublication] = useState();
   const [usePublicationURL, setUsePublicationURL] = useState(false);
   const [publicationURL, setPublicationURL] = useState();
-
   const submitChanges = (res) => {
     if (!(publication || publicationURL)) {
       return alert('Must select a publication or provide a publication URL');
@@ -28,20 +29,22 @@ export default function PublicationPostForm({cancelPost, setCreatingPost}) {
       res.publicationURL = publicationURL;
     }
     res.postType = {id: 'publicationPost', name: 'Publication'};
-    selectedTopics.forEach((selectedTopic) => {
-      if (selectedTopic.id === undefined) selectedTopic.id = uuid();
-      if (selectedTopic.isNew) {
-        delete selectedTopic.isNew;
-        db.doc(`topics/${selectedTopic.id}`).set(selectedTopic);
-      }
-    });
-    res.topics = selectedTopics;
+    const taggedTopics = handlePostTopics(selectedTopics);
+    res.customTopics = taggedTopics.customTopics;
+    res.topics = taggedTopics.DBTopics;
     createPost(res)
       .then(() => {
         setCreatingPost(false);
         setPostSuccess(true);
+        setSubmittingPost(false);
       })
-      .catch((err) => alert(err));
+      .catch((err) => {
+        console.log(err);
+        alert(
+          'Oh dear, something went wrong trying to create your post. Please try again later.'
+        );
+        setSubmittingPost(false);
+      });
   };
 
   const initialValues = {
@@ -57,7 +60,6 @@ export default function PublicationPostForm({cancelPost, setCreatingPost}) {
       onSubmit={submitChanges}
       initialValues={initialValues}
       validationSchema={validationSchema}
-      cancelPost={cancelPost}
     >
       <div className="creating-post-main-text-container">
         <CreatePostTextArea name="title" />
@@ -81,7 +83,6 @@ export default function PublicationPostForm({cancelPost, setCreatingPost}) {
   );
 }
 
-// CSS classes found in
 function SelectPublication({
   publication,
   setPublication,
