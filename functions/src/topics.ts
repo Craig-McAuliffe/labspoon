@@ -122,6 +122,26 @@ export async function createFieldAndTopic(topic: Topic) {
     });
 }
 
+export function convertTaggedTopicToTopic(taggedTopic: TaggedTopic) {
+  const topic = {
+    name: taggedTopic.name,
+    normalisedName: taggedTopic.normalisedName,
+    rank: 1,
+    microsoftID: taggedTopic.microsoftID,
+  };
+  return topic;
+}
+
+export function convertTopicToTaggedTopic(topic: Topic, topicID: string) {
+  const taggedTopic = {
+    name: topic.name,
+    normalisedName: topic.normalisedName,
+    id: topicID,
+    microsoftID: topic.microsoftID,
+  };
+  return taggedTopic;
+}
+
 interface expressionField {
   expr: string;
   fieldName: string;

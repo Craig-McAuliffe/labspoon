@@ -13,7 +13,12 @@ import {
   makAuthorToAuthor,
 } from './microsoft';
 import {Post} from './posts';
-import {Topic, createFieldAndTopic, TaggedTopic} from './topics';
+import {
+  Topic,
+  createFieldAndTopic,
+  TaggedTopic,
+  convertTopicToTaggedTopic,
+} from './topics';
 
 const pubSubClient = new PubSub();
 const db = admin.firestore();
@@ -160,13 +165,11 @@ export async function addPublicationToTopic(
       const labspoonTopicID = ds.data()!.processed;
       // the topic returned from the db is not the same format
       // as a tagged topic (tagged topics have an id field and no rank)
-      const topicDS = ds.data()! as Topic;
-      const taggedLabspoonTopic: TaggedTopic = {
-        name: topicDS.name,
-        normalisedName: topicDS.normalisedName,
-        id: labspoonTopicID,
-        microsoftID: topicDS.microsoftID,
-      };
+      const topicData = ds.data()! as Topic;
+      const taggedLabspoonTopic = convertTopicToTaggedTopic(
+        topicData,
+        labspoonTopicID
+      );
       return db
         .runTransaction(async (t) => {
           t.set(

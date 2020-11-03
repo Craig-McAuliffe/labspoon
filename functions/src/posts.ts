@@ -5,7 +5,13 @@ import {firestore} from 'firebase-admin';
 
 import {UserRef} from './users';
 import {Publication, MAKField, makFieldToTopic} from './microsoft';
-import {Topic, TaggedTopic, createFieldAndTopic} from './topics';
+import {
+  Topic,
+  TaggedTopic,
+  createFieldAndTopic,
+  convertTaggedTopicToTopic,
+  convertTopicToTaggedTopic,
+} from './topics';
 
 const db = admin.firestore();
 
@@ -48,68 +54,55 @@ export const createPost = functions.https.onCall(async (data, context) => {
   if (data.publicationURL) content.publicationURL = data.publicationURL;
 
   const postTopics: TaggedTopic[] = [];
-  const matchedTopicsPromises = data.topics.map((taggedTopic: Topic) => {
-    return db
-      .doc(`MSFields/${taggedTopic.microsoftID}`)
-      .get()
-      .then(async (ds) => {
-        const addTopicToPost = (correspondingLabspoonTopicID: string) => {
-          postTopics.push({
-            name: taggedTopic.name,
-            microsoftID: taggedTopic.microsoftID,
-            normalisedName: taggedTopic.normalisedName,
-            id: correspondingLabspoonTopicID,
-          });
-        };
-
-        if (!ds.exists) {
-          await createFieldAndTopic(taggedTopic)
-            .then(async (labspoonTopicID) => {
-              if (labspoonTopicID !== undefined) {
-                addTopicToPost(labspoonTopicID);
-              } else {
-                await db
-                  .doc(`MSFields/${taggedTopic.microsoftID}`)
-                  .get()
-                  .then((ds) => {
-                    if (!ds.exists) {
-                      console.error(
-                        `could not connect Tagged topic with microsoftID ${taggedTopic.microsoftID} on post ${postID} to newly created topic`
-                      );
-                      return undefined;
-                    } else {
-                      const dbMSField = ds.data() as MAKField;
-                      addTopicToPost(dbMSField.processed);
-                      return true;
-                    }
-                  })
-                  .catch((err) => {
-                    console.error(
-                      `could not connect Tagged topic with microsoftID ${taggedTopic.microsoftID} on post ${postID} to newly created topic. ${err}`
-                    );
-                  });
-              }
-            })
-            .catch((err) =>
-              console.error(
-                `field ${taggedTopic.microsoftID} is not in database and could not be created ${err}`
+  const matchedTopicsPromises = data.topics.map(
+    (taggedTopicPrecursor: Topic) => {
+      return db
+        .doc(`MSFields/${taggedTopicPrecursor.microsoftID}`)
+        .get()
+        .then((ds) => {
+          function addTopicToPost(correspondingLabspoonTopicID: string) {
+            postTopics.push(
+              convertTopicToTaggedTopic(
+                taggedTopicPrecursor,
+                correspondingLabspoonTopicID
               )
             );
-        } else {
-          const dbMSField = ds.data() as MAKField;
-          addTopicToPost(dbMSField.processed);
-          if (!dbMSField.processed) {
-            // This should not be possible. All dbMSFields should be processed
-            // upon creation.
-            console.error(
-              'no Labspoon topic corresponding to MSField ' +
-                taggedTopic.microsoftID
-            );
-            await db.collection('topics').doc().set(makFieldToTopic(dbMSField));
           }
-        }
-      });
-  });
+          if (ds.exists) {
+            const MSFieldData = ds.data() as MAKField;
+            if (MSFieldData.processed) {
+              addTopicToPost(MSFieldData.processed);
+            } else {
+              // This should not be possible. All dbMSFields should be processed
+              // upon creation.
+              console.error(
+                'no Labspoon topic corresponding to MSField ' +
+                  taggedTopicPrecursor.microsoftID
+              );
+              db.collection('topics').doc().set(makFieldToTopic(MSFieldData));
+            }
+          } else {
+            createFieldAndTopic(taggedTopicPrecursor)
+              .then((labspoonTopicID) => {
+                if (labspoonTopicID === undefined) {
+                  console.error(
+                    `topic with microsoftID ${taggedTopicPrecursor.microsoftID} was created but did not return the corresponding labspoon ID`
+                  );
+                  return false;
+                } else {
+                  addTopicToPost(labspoonTopicID);
+                  return true;
+                }
+              })
+              .catch((err) =>
+                console.error(
+                  `field ${taggedTopicPrecursor.microsoftID} is not in database and could not be created ${err}`
+                )
+              );
+          }
+        });
+    }
+  );
 
   await Promise.all(matchedTopicsPromises);
   return db
@@ -124,7 +117,8 @@ export const createPost = functions.https.onCall(async (data, context) => {
         filterAuthorID: author.id,
         filterPostTypeID: 'default',
         filterTopicIDs: data.topics.map(
-          (taggedTopic: {id: string; name: string}) => taggedTopic.id
+          (taggedTopicPrecursor: {id: string; name: string}) =>
+            taggedTopicPrecursor.id
         ),
         id: postID,
       };
@@ -397,12 +391,8 @@ export const linkPostTopicsToAuthor = functions.firestore
     const postTopics = post.topics;
     const authorID = post.author.id;
     postTopics.forEach((postTopic) => {
-      const userTopic = {
-        name: postTopic.name,
-        normalisedName: postTopic.normalisedName,
-        rank: 1,
-        microsoftID: postTopic.microsoftID,
-      };
+      const userTopic = convertTaggedTopicToTopic(postTopic);
+
       const userTopicDocRef = db.doc(
         `users/${authorID}/topics/${postTopic.id}`
       );
