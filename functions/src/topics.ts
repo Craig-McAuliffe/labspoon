@@ -74,7 +74,7 @@ export const topicSearch = functions.https.onCall(async (data) => {
   return await Promise.all(executePromises);
 });
 
-export async function createFieldsAndTopics(topic: Topic) {
+export async function createFieldAndTopic(topic: Topic) {
   const MSFieldID = topic.microsoftID;
   return db
     .runTransaction((transaction) => {

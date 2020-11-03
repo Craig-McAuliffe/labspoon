@@ -13,7 +13,7 @@ import {
   makAuthorToAuthor,
 } from './microsoft';
 import {Post} from './posts';
-import {Topic, createFieldsAndTopics, TaggedTopic} from './topics';
+import {Topic, createFieldAndTopic, TaggedTopic} from './topics';
 
 const pubSubClient = new PubSub();
 const db = admin.firestore();
@@ -130,7 +130,7 @@ export const createTopicsFromNewPublicationAndAddPublicationToTopic = functions.
     else
       publicationTopicPromiseArray = publication.topics?.map(
         async (taggedTopic: TaggedTopic) => {
-          return createFieldsAndTopics(taggedTopic).then((test) => {
+          return createFieldAndTopic(taggedTopic).then((test) => {
             addPublicationToTopic(
               publicationID,
               publication,

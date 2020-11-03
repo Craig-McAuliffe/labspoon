@@ -5,7 +5,7 @@ import {firestore} from 'firebase-admin';
 
 import {UserRef} from './users';
 import {Publication, MAKField, makFieldToTopic} from './microsoft';
-import {Topic, TaggedTopic, createFieldsAndTopics} from './topics';
+import {Topic, TaggedTopic, createFieldAndTopic} from './topics';
 
 const db = admin.firestore();
 
@@ -63,7 +63,7 @@ export const createPost = functions.https.onCall(async (data, context) => {
         };
 
         if (!ds.exists) {
-          await createFieldsAndTopics(taggedTopic)
+          await createFieldAndTopic(taggedTopic)
             .then(async (labspoonTopicID) => {
               if (labspoonTopicID !== undefined) {
                 addTopicToPost(labspoonTopicID);
@@ -102,7 +102,7 @@ export const createPost = functions.https.onCall(async (data, context) => {
             // This should not be possible. All dbMSFields should be processed
             // upon creation.
             console.error(
-              'no Labspoon topic corresponding to MSField' +
+              'no Labspoon topic corresponding to MSField ' +
                 taggedTopic.microsoftID
             );
             await db.collection('topics').doc().set(makFieldToTopic(dbMSField));
