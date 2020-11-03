@@ -1,11 +1,14 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {Link} from 'react-router-dom';
 import UserAvatar from '../Avatar/UserAvatar';
 import PrimaryButton from '../Buttons/PrimaryButton';
 import DefaultUserIcon from '../../assets/DefaultUserIcon.svg';
+import {AuthContext} from '../../App';
 import './UserListItem.css';
 
 export default function UserListItem({user, children}) {
+  const {userProfile} = useContext(AuthContext);
+  const userID = userProfile.id;
   return (
     <div className="user-listItem-container">
       <Link to={`/user/${user.id}`}>
@@ -41,7 +44,7 @@ export default function UserListItem({user, children}) {
       <div className="user-listItem-institution">
         <h3>{user.institution}</h3>
       </div>
-      <div className="Follow">{children}</div>
+      {userID === user.id ? null : <div className="Follow">{children}</div>}
     </div>
   );
 }
