@@ -63,7 +63,16 @@ const AvatarDropDown = () => {
           <div className="log-out-container">
             <button
               onClick={() => {
-                firebase.auth().signOut();
+                firebase
+                  .auth()
+                  .signOut()
+                  .then(() => window.location.reload())
+                  .catch((err) => {
+                    alert(
+                      'Something went wrong trying to sign you out. We are working on it. Please try again later'
+                    );
+                    console.error('unable to sign user out ', err);
+                  });
               }}
               className="log-out-button"
             >

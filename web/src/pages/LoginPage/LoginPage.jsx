@@ -187,6 +187,7 @@ const SignInForm = ({setFormType, returnLocation}) => {
       .then(() => {
         setLoading(false);
         history.push(returnLocation ? returnLocation : '/');
+        window.location.reload();
       })
       .catch((error) => {
         setLoading(false);
