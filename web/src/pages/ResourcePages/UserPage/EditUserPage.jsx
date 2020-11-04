@@ -167,6 +167,7 @@ function UploadImage({storageRef}) {
           withPreview
           withIcon={false}
           buttonStyles={{background: '#00507c'}}
+          buttonText="Choose Image"
         />
       </div>
       {image.length === 0 ? null : (
