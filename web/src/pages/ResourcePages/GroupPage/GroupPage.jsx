@@ -1,5 +1,6 @@
 import React, {useRef, useEffect, useState, useContext} from 'react';
 import {Link, useParams, useHistory} from 'react-router-dom';
+import Linkify from 'linkifyjs/react';
 
 import {FeatureFlags, AuthContext} from '../../../App';
 import {db} from '../../../firebase';
@@ -288,7 +289,7 @@ const GroupDetails = ({
             style={descriptionSize}
             ref={groupDescriptionRef}
           >
-            <p>{group.about}</p>
+            <Linkify tagName="p">{group.about}</Linkify>
           </div>
 
           <SeeMore
