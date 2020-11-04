@@ -1,5 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {Link} from 'react-router-dom';
+import Linkify from 'linkifyjs/react';
 import PropTypes from 'prop-types';
 import {SelectedListItemsContext} from '../../../pages/ResourcePages/GroupPage/EditGroupPosts';
 import {
@@ -196,7 +197,7 @@ function PostTextContent({post}) {
   return (
     <div className="post-text-content">
       {/* <Link to={`/post/${post.id}`}> */}
-      <p>{post.content.text}</p>
+      <Linkify tagName="p">{post.content.text}</Linkify>
       {/* </Link> */}
     </div>
   );
