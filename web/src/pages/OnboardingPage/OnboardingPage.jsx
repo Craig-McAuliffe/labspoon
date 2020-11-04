@@ -242,13 +242,13 @@ function OnboardingGroup({user}) {
   return (
     <div className="onboarding-page-container">
       <h3>Group pages are a great place to share updates from the lab.</h3>
-      <h4 className="onboarding-page-instructions">{`Are you part of a research group? Find it on Labspoon and request to join.`}</h4>
+      <h4 className="onboarding-page-instructions">{`Follow groups on Labspoon.`}</h4>
       <div onboarding-group-search>
         <FormDatabaseSearch
           setDisplayedItems={setDisplayedGroups}
           inputRef={groupSearchRef}
           indexName="_GROUPS"
-          placeholderText="Find your group"
+          placeholderText="Find groups"
           displayedItems={displayedGroups}
         />
         <div className="onboarding-groups-to-follow-container">
@@ -261,31 +261,32 @@ function OnboardingGroup({user}) {
         <div className="onboarding-create-group-container">
           <CreateGroupPage
             onboardingCancelOrSubmitAction={() => setCreatingGroup(false)}
-            onboardingConfirmGroupCreation={() => setConfirmGroupCreation(true)}
+            confirmGroupCreation={() => setConfirmGroupCreation(true)}
           />
         </div>
       ) : (
         <>
           <h4 className="onboarding-page-instructions">
-            Is your group not on Labspoon? You can create one now.
+            {`Want your group to appear on Labspoon? Create it now.`}
           </h4>
           <div className="onboarding-create-group-button-container">
-            <button onClick={() => setCreatingGroup(true)}>
-              <div className="onboarding-create-group-button">
-                <CreateGroupIcon />
-                <h4>Create a Group</h4>
-              </div>
-            </button>
+            {confirmGroupCreation ? (
+              <SuccessMessage>
+                Group Created! Find it by clicking on your profile picture in
+                the top right.
+              </SuccessMessage>
+            ) : (
+              <button onClick={() => setCreatingGroup(true)}>
+                <div className="onboarding-create-group-button">
+                  <CreateGroupIcon />
+                  <h4>Create a Group</h4>
+                </div>
+              </button>
+            )}
           </div>
           <p className="onboarding-hint-do-it-later">
             {`Don't worry, you can always make one later, just click on your profile picture in the top right!`}
           </p>
-
-          {confirmGroupCreation ? (
-            <SuccessMessage>
-              Group Created! You can find it in the top right menu.
-            </SuccessMessage>
-          ) : null}
         </>
       )}
     </div>

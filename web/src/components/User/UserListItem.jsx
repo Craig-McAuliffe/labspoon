@@ -8,7 +8,7 @@ import './UserListItem.css';
 
 export default function UserListItem({user, children}) {
   const {userProfile} = useContext(AuthContext);
-  const userID = userProfile.id;
+  const userID = userProfile ? userProfile.id : undefined;
   return (
     <div className="user-listItem-container">
       <Link to={`/user/${user.id}`}>

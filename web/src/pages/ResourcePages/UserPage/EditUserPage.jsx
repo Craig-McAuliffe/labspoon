@@ -157,7 +157,6 @@ function UploadImage({storageRef}) {
       }
     );
   }
-
   return (
     <>
       <div className="edit-user-profile-upload-image-container">
@@ -168,11 +167,14 @@ function UploadImage({storageRef}) {
           withPreview
           withIcon={false}
           buttonStyles={{background: '#00507c'}}
+          buttonText="Choose Image"
         />
       </div>
-      <div className="edit-user-profile-submit-image-container">
-        <SubmitButton inputText="Upload" onClick={submit} />
-      </div>
+      {image.length === 0 ? null : (
+        <div className="edit-user-profile-submit-image-container">
+          <SubmitButton inputText="Upload" onClick={submit} />
+        </div>
+      )}
       {uploading ? <LoadingSpinner /> : <></>}
       {uploaded ? <h1>Success</h1> : <></>}
     </>
