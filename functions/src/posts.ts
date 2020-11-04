@@ -352,7 +352,7 @@ async function updateFiltersByPost(
       );
     }
   );
-  Promise.all(topicFilterUpdatePromisesArray).catch((err) =>
+  await Promise.all(topicFilterUpdatePromisesArray).catch((err) =>
     console.error(
       `could not add topics from post with id ${post.id} to following feed filter for ${followingFeedRef}, ${err}`
     )
