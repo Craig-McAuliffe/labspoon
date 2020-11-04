@@ -90,20 +90,24 @@ export const addNewMSPublicationAsync = functions.pubsub
     try {
       await db.runTransaction(async (t) => {
         const microsoftPublicationDS = await t.get(microsoftPublicationRef);
+        const labspoonPublicationRef = db.collection('publications').doc();
+        const labspoonPublicationID = labspoonPublicationRef.id;
+        const publication = makPublicationToPublication(microsoftPublication);
 
         // If the Microsoft publication has been added and marked as processed then the labspoon publication must already exist
         if (microsoftPublicationDS.exists) {
           const microsoftPublicationDSData = microsoftPublicationDS.data() as MAKPublication;
           if (microsoftPublicationDSData.processed) return true;
+          // Publications should always be processed. This should not happen.
+          t.set(labspoonPublicationRef, publication);
+          t.update(microsoftPublicationRef, {processed: labspoonPublicationID});
+          return true;
         }
-
-        microsoftPublication.processed = true;
-
+        microsoftPublication.processed = labspoonPublicationID;
         // store the MS publication and the converted labspoon publication
         t.set(microsoftPublicationRef, microsoftPublication);
-        const publication = makPublicationToPublication(microsoftPublication);
         delete publication.authors;
-        t.set(db.collection('publications').doc(), publication);
+        t.set(labspoonPublicationRef, publication);
 
         microsoftPublication.AA?.forEach((author) => {
           const authorID = author.AuId.toString();
