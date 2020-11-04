@@ -78,8 +78,8 @@ export async function createFieldAndTopic(topic: Topic) {
   const MSFieldID = topic.microsoftID;
   return db
     .runTransaction((transaction) => {
-      const labspoonTopicDS = db.collection('topics').doc();
-      const labspoonTopicID = labspoonTopicDS.id;
+      const labspoonTopicRef = db.collection('topics').doc();
+      const labspoonTopicID = labspoonTopicRef.id;
 
       return transaction.get(db.doc(`MSFields/${MSFieldID}`)).then((ds) => {
         if (ds.exists) {
@@ -87,7 +87,7 @@ export async function createFieldAndTopic(topic: Topic) {
             console.error(
               `this MSField has no corresponding labspoon topic ${MSFieldID}`
             );
-            transaction.set(labspoonTopicDS, topic);
+            transaction.set(labspoonTopicRef, topic);
             transaction.update(db.doc(`MSFields/MSFieldID`), {
               processed: labspoonTopicID,
             });
@@ -102,7 +102,7 @@ export async function createFieldAndTopic(topic: Topic) {
           processed: labspoonTopicID,
         };
 
-        transaction.set(labspoonTopicDS, topic);
+        transaction.set(labspoonTopicRef, topic);
         transaction.set(
           db.collection('MSFields').doc(MSFieldID),
           processedMicrosoftField
