@@ -44,7 +44,11 @@ export const generateThumbnailAvatarOnFullSizeUpload = functions.storage
     const fullSizeAvatarPath = object.name;
     await generateThumbnail(fullSizeAvatarPath, 'avatar', [
       '-thumbnail',
-      '200x200>',
+      '200x200^',
+      '-gravity',
+      'center',
+      '-extent',
+      '200x200',
     ]);
   });
 

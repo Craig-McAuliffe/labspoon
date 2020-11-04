@@ -121,11 +121,8 @@ export const createPost = functions.https.onCall(async (data, context) => {
         topics: postTopics,
         customTopics: data.customTopics,
         timestamp: new Date(),
-        filterAuthorID: author.id,
-        filterPostTypeID: 'default',
-        filterTopicIDs: data.topics.map(
-          (taggedTopicPrecursor: {id: string; name: string}) =>
-            taggedTopicPrecursor.id
+        filterTopicIDs: postTopics.map(
+          (taggedTopic: TaggedTopic) => taggedTopic.id
         ),
         id: postID,
       };
@@ -546,9 +543,7 @@ export interface Post {
   timestamp: Date;
   id: string;
 
-  // filterable fields
-  filterPostTypeID: string;
-  filterAuthorID: string;
+  // filterable arrays must be array of strings
   filterTopicIDs: string[];
 }
 
