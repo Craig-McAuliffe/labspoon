@@ -140,12 +140,11 @@ export function EditUserProfilePicturePage() {
   return (
     <div>
       <Alert variant="warning">
-        Profile pictures will be stretched to a 200x200 pixel square, we
-        recommend using a square source image to avoid loss of proportion.
-        Profile pictures may not update immediately subject to your browser
-        cache, we are looking into a fix for this. In the meantime to speed up
-        the reload, you can clear your browser cache or view your profile in an
-        incognito window.
+        Profile pictures will be cropped to a 200x200 pixel square, for precise
+        positioning please match this size before uploading. Profile pictures
+        may not update immediately subject to your browser cache, we are looking
+        into a fix for this. In the meantime to speed up the reload, you can
+        clear your browser cache or view your profile in an incognito window.
       </Alert>
       <UploadImage
         storageRef={storage.ref(`users/${userID}/avatar_fullSize`)}
