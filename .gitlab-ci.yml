@@ -70,4 +70,4 @@ deploy_prod_env:on-schedule:
     - npm --prefix functions install
     - npm run --prefix functions build
     - firebase use --token $FIREBASE_DEPLOY_KEY labspoon-prod-284615
-    - firebase deploy -m "pipeline $CI_PIPELINE_ID build $CI_BUILD_ID" --non-interactive --token $FIREBASE_DEPLOY_KEY
+    - firebase deploy -m "pipeline $CI_PIPELINE_ID build $CI_BUILD_ID" --non-interactive --token $FIREBASE_DEPLOY_KEY --debug
