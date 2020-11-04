@@ -129,7 +129,7 @@ export const addNewMSPublicationAsync = functions.pubsub
     return;
   });
 
-export const createTopicsFromNewPublicationAndAddPublicationToTopic = functions.firestore
+export const createTopicsFromNewPubAndAddPubToTopic = functions.firestore
   .document('publications/{publicationID}')
   .onCreate(async (change, context) => {
     const publication = change.data();
