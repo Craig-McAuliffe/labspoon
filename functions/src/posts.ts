@@ -79,7 +79,14 @@ export const createPost = functions.https.onCall(async (data, context) => {
                 'no Labspoon topic corresponding to MSField ' +
                   taggedTopicPrecursor.microsoftID
               );
-              db.collection('topics').doc().set(makFieldToTopic(MSFieldData));
+              db.collection('topics')
+                .doc()
+                .set(makFieldToTopic(MSFieldData))
+                .catch((err) =>
+                  console.error(
+                    `could not create labspoon topic from existing MSField, ${err}`
+                  )
+                );
             }
           } else {
             createFieldAndTopic(taggedTopicPrecursor)

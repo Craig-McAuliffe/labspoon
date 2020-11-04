@@ -139,13 +139,23 @@ export const createTopicsFromNewPublicationAndAddPublicationToTopic = functions.
     else
       publicationTopicPromiseArray = publication.topics?.map(
         async (taggedTopic: TaggedTopic) => {
-          return createFieldAndTopic(taggedTopic).then((test) => {
-            addPublicationToTopic(
-              publicationID,
-              publication,
-              taggedTopic.microsoftID
+          return createFieldAndTopic(taggedTopic)
+            .then(() => {
+              addPublicationToTopic(
+                publicationID,
+                publication,
+                taggedTopic.microsoftID
+              ).catch((err) =>
+                console.error(
+                  `could not add the publication to the Labspoon Topic, ${err}`
+                )
+              );
+            })
+            .catch((err) =>
+              console.error(
+                `could not create Field and Topic for topic with microsoft ID ${taggedTopic.microsoftID}, ${err}`
+              )
             );
-          });
         }
       );
     return Promise.all(publicationTopicPromiseArray);
