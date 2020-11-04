@@ -61,6 +61,7 @@ export const topicSearch = functions.https.onCall(async (data) => {
 
         const publication = makPublicationToPublication(publications[0]);
         if (!publication.topics) return undefined;
+
         const topicMatch = publication.topics!.find(
           (topic) => topic.normalisedName! === fieldExpr.fieldName
         );
