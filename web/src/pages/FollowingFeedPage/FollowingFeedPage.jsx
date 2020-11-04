@@ -32,29 +32,17 @@ function filterFeedData(collection, skip, limit, filter, last) {
     const enabledPostTypeIDs = enabledIDs.get('Post Type');
 
     if (enabledPostTypeIDs.length === 1) {
-      collection = collection.where(
-        'filter_postType_id',
-        '==',
-        enabledPostTypeIDs[0]
-      );
+      collection = collection.where('postType.id', '==', enabledPostTypeIDs[0]);
     }
     if (enabledPostTypeIDs.length > 1) {
-      collection = collection.where(
-        'filter_PostType_id',
-        'in',
-        enabledAuthorIDs
-      );
+      collection = collection.where('postType.id', 'in', enabledPostTypeIDs);
     }
 
     if (enabledAuthorIDs.length === 1) {
-      collection = collection.where(
-        'filter_author_id',
-        '==',
-        enabledAuthorIDs[0]
-      );
+      collection = collection.where('author.id', '==', enabledAuthorIDs[0]);
     }
     if (enabledAuthorIDs.length > 1) {
-      collection = collection.where('filter_author_id', 'in', enabledAuthorIDs);
+      collection = collection.where('author.id', 'in', enabledAuthorIDs);
     }
 
     const enabledTopicIDs = enabledIDs.get('Topics');
