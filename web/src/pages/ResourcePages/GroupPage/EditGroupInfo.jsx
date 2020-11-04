@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import GroupInfoForm from '../../Groups/CreateGroupPage/GroupInfoForm';
 import firebase, {db, storage} from '../../../firebase';
+import {Alert} from 'react-bootstrap';
 
 import './GroupPage.css';
 
@@ -91,15 +92,25 @@ export default function EditingGroupInfo({groupData, setEditingGroup}) {
   };
 
   return (
-    <GroupInfoForm
-      initialValues={initialValues}
-      onSubmit={onSubmitEdit}
-      selectedUsers={selectedUsers}
-      setSelectedUsers={setSelectedUsers}
-      setAvatar={setAvatar}
-      existingAvatar={groupData.avatar}
-      cancelForm={() => setEditingGroup(false)}
-      submitText="Save Changes"
-    />
+    <div>
+      <Alert variant="warning">
+        Profile pictures will be stretched to a 200x200 pixel square, we
+        recommend using a square source image to avoid loss of proportion.
+        Profile pictures may not update immediately subject to your browser
+        cache, we are looking into a fix for this. In the meantime to speed up
+        the reload, you can clear your browser cache or view your profile in an
+        incognito window.
+      </Alert>
+      <GroupInfoForm
+        initialValues={initialValues}
+        onSubmit={onSubmitEdit}
+        selectedUsers={selectedUsers}
+        setSelectedUsers={setSelectedUsers}
+        setAvatar={setAvatar}
+        existingAvatar={groupData.avatar}
+        cancelForm={() => setEditingGroup(false)}
+        submitText="Save Changes"
+      />
+    </div>
   );
 }
