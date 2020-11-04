@@ -41,6 +41,10 @@
     }
   },
   "lint-staged": {
-    "*.{ts}": ["prettier --write", "tsc", "tslint --project tsconfig.json"]
+    "*.ts": [
+      "prettier --write",
+      "tsc",
+      "tslint --project tsconfig.json"
+    ]
   }
 }
