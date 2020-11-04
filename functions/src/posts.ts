@@ -335,7 +335,28 @@ async function updateFiltersByPost(
     },
     false
   );
-  // TODO(#146): Add topics to the filter
+
+  const topicFilterUpdatePromisesArray = post.topics.map(
+    (taggedTopic: TaggedTopic) => {
+      return updateFilterCollection(
+        followingFeedRef,
+        {
+          resourceName: 'Topics',
+          resourceType: ResourceTypes.TOPIC,
+        },
+        {
+          name: taggedTopic.name,
+          resourceID: taggedTopic.id,
+        },
+        false
+      );
+    }
+  );
+  await Promise.all(topicFilterUpdatePromisesArray).catch((err) =>
+    console.error(
+      `could not add topics from post with id ${post.id} to following feed filter for ${followingFeedRef}, ${err}`
+    )
+  );
 }
 
 export async function updateFilterCollection(
