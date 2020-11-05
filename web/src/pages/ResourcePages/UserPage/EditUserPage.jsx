@@ -69,11 +69,7 @@ export default function EditUserPage({user}) {
           >
             <h3>Update Profile Picture</h3>
           </button>
-          {editingProfilePicture ? (
-            <div className="edit-user-profile-expanded-upload-picture-section">
-              <EditUserProfilePicturePage />{' '}
-            </div>
-          ) : null}
+          {editingProfilePicture ? <EditUserProfilePicturePage /> : null}
         </div>
         <div className="edit-user-profile-change-picture-section">
           <button
@@ -84,11 +80,7 @@ export default function EditUserPage({user}) {
           >
             <h3>Update Cover Photo</h3>
           </button>
-          {editingCoverPicture ? (
-            <div className="edit-user-profile-expanded-upload-picture-section">
-              <EditUserCoverPhotoPage />
-            </div>
-          ) : null}
+          {editingCoverPicture ? <EditUserCoverPhotoPage /> : null}
         </div>
         <Formik
           initialValues={initialValues}
@@ -177,7 +169,7 @@ function UploadImage({storageRef}) {
     );
   }
   return (
-    <>
+    <div className="edit-user-profile-expanded-upload-picture-section">
       <div className="edit-user-profile-upload-image-container">
         <ImageUploader
           onChange={(selectedImage) => setImage(selectedImage)}
@@ -190,12 +182,12 @@ function UploadImage({storageRef}) {
         />
       </div>
       {image.length === 0 ? null : (
-        <div className="edit-user-profile-submit-image-container">
+        <div className="edit-user-profile-submit-image-button-container">
           <SubmitButton inputText="Upload" onClick={submit} />
         </div>
       )}
       {uploading ? <LoadingSpinner /> : <></>}
       {uploaded ? <h1>Success</h1> : <></>}
-    </>
+    </div>
   );
 }
