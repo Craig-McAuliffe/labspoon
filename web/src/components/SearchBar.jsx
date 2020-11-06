@@ -5,7 +5,11 @@ import {searchStateToURL} from '../helpers/search';
 
 import './SearchBar.css';
 
-export default function SearchBar({bigSearchPrompt}) {
+export default function SearchBar({
+  bigSearchPrompt,
+  aboutPageSearch,
+  placeholderText,
+}) {
   const history = useHistory();
   const [query, setQuery] = useState(undefined);
 
@@ -19,11 +23,17 @@ export default function SearchBar({bigSearchPrompt}) {
   const searchForm = () => (
     <form
       onSubmit={onSubmit}
-      className={bigSearchPrompt ? 'big-search-container' : 'search-form'}
+      className={
+        bigSearchPrompt || aboutPageSearch ? 'big-search-form' : 'search-form'
+      }
     >
       <input
-        className={bigSearchPrompt ? 'big-search-input' : 'search-input'}
-        placeholder="Search for research"
+        className={
+          bigSearchPrompt || aboutPageSearch
+            ? 'big-search-input'
+            : 'search-input'
+        }
+        placeholder={placeholderText ? placeholderText : 'Search for research'}
         value={query}
         onChange={(event) => setQuery(event.target.value)}
       />
@@ -31,7 +41,7 @@ export default function SearchBar({bigSearchPrompt}) {
         type="submit"
         value="Submit"
         className={
-          bigSearchPrompt
+          bigSearchPrompt || aboutPageSearch
             ? 'big-search-icon-container'
             : 'search-icon-container'
         }
@@ -40,29 +50,55 @@ export default function SearchBar({bigSearchPrompt}) {
     </form>
   );
 
-  return bigSearchPrompt ? (
-    <div>
-      <h3 className="big-search-prompt-text">
-        {`Search for something that interests you and follow for updates!`}
-      </h3>
-      {searchForm()}
-      <div className="big-search-suggested-searches-container">
-        <h4 className="big-search-suggested-searches">Suggested Searches:</h4>
-        <Link to="/search?query=SARS%20CoV-2&page=1">
-          <div className="big-search-suggested-search">SARS CoV-2</div>
-        </Link>
-        <Link to="/search?query=Immunotherapy&page=1">
-          <div className="big-search-suggested-search">Immunotherapy</div>
-        </Link>
-        <Link to="/search?query=RNA%20Vaccine&page=1">
-          <div className="big-search-suggested-search">RNA Vaccine</div>
-        </Link>
-        <Link to="/search?query=Gravitational%20Waves&page=1">
-          <div className="big-search-suggested-search">Gravitational Waves</div>
-        </Link>
+  if (bigSearchPrompt || aboutPageSearch)
+    return (
+      <div>
+        {aboutPageSearch ? null : (
+          <h3 className="big-search-prompt-text">
+            {`Search for something that interests you and follow for updates!`}
+          </h3>
+        )}
+        <div className="big-search-container">
+          <div></div>
+          {searchForm()}
+          <div></div>
+          <div></div>
+          <div className="big-search-suggested-searches-container">
+            <h4 className="big-search-suggested-searches-title">
+              Suggested Searches:
+            </h4>
+
+            <Link
+              to="/search?query=Covid-19&page=1"
+              className="big-search-suggested-search"
+            >
+              Covid-19
+            </Link>
+            <Link
+              className="big-search-suggested-search"
+              to="/search?search?query=Fusion%20Reactors&page=1"
+            >
+              Fusion Reactors
+            </Link>
+            <Link
+              to="/search?query=Early%20Cancer%20Detection&page=1"
+              className="big-search-suggested-search"
+            >
+              Early Cancer Detection
+            </Link>
+            <Link
+              className="big-search-suggested-search"
+              to="/search?query=Biodegradable%20Plastic&page=1"
+            >
+              Biodegradable Plastic
+            </Link>
+          </div>
+          <div></div>
+        </div>
       </div>
-    </div>
-  ) : (
+    );
+
+  return (
     <div className="header-search">
       <div className="search-bar">{searchForm()}</div>
     </div>

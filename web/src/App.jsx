@@ -1,5 +1,5 @@
 import React, {createContext, useState, useEffect} from 'react';
-import {BrowserRouter as Router} from 'react-router-dom';
+import {BrowserRouter as Router, useLocation} from 'react-router-dom';
 import Routes from './routes.jsx';
 import {auth, db} from './firebase';
 
@@ -27,6 +27,8 @@ export default function App() {
 }
 
 const AppLayout = ({children}) => {
+  const locationPathName = useLocation().pathname;
+  if (locationPathName === '/about') return children;
   return (
     <div className="layout">
       <div className="header-layout">
