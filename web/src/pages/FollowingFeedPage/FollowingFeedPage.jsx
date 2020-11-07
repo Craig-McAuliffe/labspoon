@@ -14,6 +14,9 @@ import HomePageTabs from '../../components/HomePageTabs';
 import {translateOptionalFields} from '../../helpers/posts';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 
+const arrayContainsAnyErrorMessage =
+  'Cannot select multiple of more than one resource type. Try deselecting the last option.';
+
 // Due to the limitations in firestore filters described in
 // https://firebase.google.com/docs/firestore/query-data/queries it is not
 // possible to use multiple many-to-many filters (ie. `array-contains-any` and
@@ -28,6 +31,8 @@ function fetchUserFeedData(uuid, skip, limit, filter, last) {
 function filterFeedData(collection, skip, limit, filter, last) {
   const enabledIDs = getEnabledIDsFromFilter(filter);
   if (enabledIDs.size !== 0) {
+    // No more than one array-contains-any condition may be used in a single compound query.
+    let arrayContainsAnyCount = 0;
     const enabledAuthorIDs = enabledIDs.get('Author');
     const enabledPostTypeIDs = enabledIDs.get('Post Type');
 
@@ -35,6 +40,7 @@ function filterFeedData(collection, skip, limit, filter, last) {
       collection = collection.where('postType.id', '==', enabledPostTypeIDs[0]);
     }
     if (enabledPostTypeIDs.length > 1) {
+      arrayContainsAnyCount++;
       collection = collection.where('postType.id', 'in', enabledPostTypeIDs);
     }
 
@@ -42,6 +48,9 @@ function filterFeedData(collection, skip, limit, filter, last) {
       collection = collection.where('author.id', '==', enabledAuthorIDs[0]);
     }
     if (enabledAuthorIDs.length > 1) {
+      arrayContainsAnyCount++;
+      if (arrayContainsAnyCount > 1)
+        return [undefined, arrayContainsAnyErrorMessage];
       collection = collection.where('author.id', 'in', enabledAuthorIDs);
     }
 
@@ -55,6 +64,9 @@ function filterFeedData(collection, skip, limit, filter, last) {
         );
       }
       if (enabledTopicIDs.length > 1) {
+        arrayContainsAnyCount++;
+        if (arrayContainsAnyCount > 1)
+          return [undefined, arrayContainsAnyErrorMessage];
         collection = collection.where(
           'filter_topic_ids',
           'array-contains-any',
@@ -69,7 +81,7 @@ function filterFeedData(collection, skip, limit, filter, last) {
     last,
     limit
   );
-  return sortedAndPaginatedResults.then(translateOptionalFields);
+  return [sortedAndPaginatedResults.then(translateOptionalFields), undefined];
 }
 
 function sortAndPaginateFeedData(results, last, limit) {

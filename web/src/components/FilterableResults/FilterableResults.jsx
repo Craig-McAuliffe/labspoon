@@ -37,7 +37,7 @@ export default function FilterableResults({children, fetchResults, limit}) {
   // whether the next batch of results are loading
   const [loadingResults, setLoadingResults] = useState(false);
   // whether an error occurred retrieving the results
-  const [resultsError, setResultsError] = useState();
+  const [resultsError, setResultsError] = useState('');
   // used for discerning tab and page changes, ie. when the results need to be reloaded
   const [fetchResultsFunction, setFetchResultsFunction] = useState(
     () => fetchResults
@@ -51,21 +51,30 @@ export default function FilterableResults({children, fetchResults, limit}) {
     // wait until the filter is loaded to avoid an unnecessary reload of the results
     if (loadingFilter) return;
     setLoadingResults(true);
-    Promise.resolve(fetchResultsFunction(0, limit + 1, filter, undefined)).then(
-      (newResults) => {
-        if (newResults === undefined) {
-          setHasMore(false);
-          setResults([]);
-          setLoadingResults(false);
-        } else {
-          setHasMore(!(newResults.length <= limit));
-          setResults(newResults.slice(0, limit));
-          setLast(newResults[newResults.length - 1]);
-          setSkip(limit);
-          setLoadingResults(false);
-        }
-      }
+    const [resultsPromise, errorMessage] = fetchResultsFunction(
+      0,
+      limit + 1,
+      filter,
+      undefined
     );
+    if (errorMessage) {
+      setResultsError(errorMessage);
+    } else {
+      setResultsError('');
+    }
+    Promise.resolve(resultsPromise).then((newResults) => {
+      if (newResults === undefined) {
+        setHasMore(false);
+        setResults([]);
+        setLoadingResults(false);
+      } else {
+        setHasMore(!(newResults.length <= limit));
+        setResults(newResults.slice(0, limit));
+        setLast(newResults[newResults.length - 1]);
+        setSkip(limit);
+        setLoadingResults(false);
+      }
+    });
   }, [fetchResultsFunction, filter, limit, loadingFilter]);
 
   // fetches results by triggering an effect
@@ -80,7 +89,7 @@ export default function FilterableResults({children, fetchResults, limit}) {
         setLoadingResults(false);
       })
       .catch((err) => {
-        setResultsError(true);
+        setResultsError('Error getting results.');
         console.log(err);
       });
   }
@@ -254,7 +263,8 @@ export function ResourceTabs({tabs, affectsFilter}) {
 
 export function NewResultsWrapper() {
   const filterableResults = useContext(FilterableResultsContext);
-  if (filterableResults.resultsError) return <h1>Error...</h1>;
+  if (filterableResults.resultsError)
+    return <h1>{filterableResults.resultsError}</h1>;
   return (
     <>
       <Results
