@@ -49,14 +49,14 @@ function filterFeedData(collection, skip, limit, filter, last) {
     if (enabledTopicIDs !== undefined) {
       if (enabledTopicIDs.length === 1) {
         collection = collection.where(
-          'filterTopicIDs',
+          'filter_topic_ids',
           'array-contains',
           enabledTopicIDs[0]
         );
       }
       if (enabledTopicIDs.length > 1) {
         collection = collection.where(
-          'filterTopicIDs',
+          'filter_topic_ids',
           'array-contains-any',
           enabledTopicIDs
         );
