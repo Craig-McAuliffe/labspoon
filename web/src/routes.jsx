@@ -15,6 +15,7 @@ import CreateGroupPage from './pages/Groups/CreateGroupPage/CreateGroupPage';
 import FollowsPage from './pages/FollowsPage';
 import SearchPage from './pages/SearchPage';
 import UserPage from './pages/ResourcePages/UserPage';
+import AboutPage from './pages/AboutPage';
 import {
   EditUserProfilePicturePage,
   EditUserCoverPhotoPage,
@@ -36,9 +37,9 @@ export default function Routes({user, setUser}) {
   const featureFlags = useContext(FeatureFlags);
   return (
     <Switch>
-      <Route exact path="/">
+      <AuthRoute exact path="/" redirect="/about">
         <FollowingFeedPage />
-      </Route>
+      </AuthRoute>
       {featureFlags.has('news') ? (
         <Route exact path="/news">
           <NewsPage />
@@ -95,6 +96,9 @@ export default function Routes({user, setUser}) {
       <AuthRoute user={user} path="/onboarding/:onboardingStage">
         <OnboardingPage />
       </AuthRoute>
+      <Route exact path="/about">
+        <AboutPage />
+      </Route>
       <Route path="/notfound">
         <NotFoundPage />
       </Route>
@@ -110,7 +114,7 @@ export default function Routes({user, setUser}) {
  * authenticated
  * @return {Route}
  */
-function AuthRoute({children, ...rest}) {
+function AuthRoute({children, redirect, ...rest}) {
   const {user} = useContext(AuthContext);
 
   function render({location}) {
@@ -119,7 +123,14 @@ function AuthRoute({children, ...rest}) {
     } else if (localStorage.getItem('labspoon.expectSignIn')) {
       return <Spinner animation="border" role="status" />;
     } else {
-      return <Redirect to={{pathname: '/login', state: {from: location}}} />;
+      return (
+        <Redirect
+          to={{
+            pathname: redirect ? redirect : '/login',
+            state: {from: location},
+          }}
+        />
+      );
     }
   }
 

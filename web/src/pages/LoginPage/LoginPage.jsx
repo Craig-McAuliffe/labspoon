@@ -82,8 +82,8 @@ const SignUpForm = ({setGoToOnboarding}) => {
       .auth()
       .createUserWithEmailAndPassword(values.email, values.password)
       .then((result) => {
-        setGoToOnboarding(true);
         setLoading(false);
+        setGoToOnboarding(true);
         result.user
           .updateProfile({displayName: values.userName})
           .then(() =>
@@ -186,8 +186,7 @@ const SignInForm = ({setFormType, returnLocation}) => {
       .signInWithEmailAndPassword(values.email, values.password)
       .then(() => {
         setLoading(false);
-        history.push(returnLocation ? returnLocation : '/');
-        window.location.reload();
+        if (returnLocation) history.push(returnLocation);
       })
       .catch((error) => {
         setLoading(false);
