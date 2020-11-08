@@ -272,13 +272,14 @@ async function addRecentPostsToFollowingFeed(
   const postAddedPromises: Promise<void>[] = [];
   posts.forEach((postDS) => {
     const post = postDS.data() as Post;
-    const followingFeedRef = db.doc(
-      `users/${followerID}/feeds/followingFeed/posts/${post.id}`
-    );
     // Not important if we fail to add past posts to the feed.
-    const postAddedPromise = followingFeedRef
+    const postAddedPromise = db.doc(
+      `users/${followerID}/feeds/followingFeed/posts/${post.id}`
+    )
       .set(post)
-      .then(() => updateFiltersByPost(followingFeedRef, post))
+      .then(() => updateFiltersByPost(db.doc(
+        `users/${followerID}/feeds/followingFeed`
+      ), post))
       .catch((err) => {
         console.error(
           `Unable to add post ${post.id} to the following feed of user ${followerID}:`,
