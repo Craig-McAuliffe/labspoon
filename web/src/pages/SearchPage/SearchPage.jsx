@@ -133,7 +133,7 @@ export default function SearchPage() {
               <div className="feed-tabs-container">
                 <div className="feed-tabs-layout">{tabs}</div>
               </div>
-              {results}
+              {searchState.query ? results : <></>}
             </InstantSearch>
           </div>
         </div>

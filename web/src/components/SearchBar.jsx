@@ -15,6 +15,7 @@ export default function SearchBar({
 
   function onSubmit(event) {
     event.preventDefault();
+    if (!query) return;
     history.push(
       searchStateToURL({pathname: '/search'}, {query: query, page: 1})
     );
