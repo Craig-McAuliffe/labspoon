@@ -158,7 +158,7 @@ function FeaturesCarousel() {
           <div className="about-page-carousel-item">
             <img
               className="d-block w-100"
-              src="https://storage.cloud.google.com/labspoon-dev-266bc.appspot.com/marketing/user_profile_craig.png"
+              src="https://storage.googleapis.com/labspoon-dev-266bc.appspot.com/marketing/user_profile_craig.png"
               alt="user profile on Labspoon"
             />
           </div>
@@ -167,7 +167,7 @@ function FeaturesCarousel() {
           <div className="about-page-carousel-item">
             <img
               className="d-block w-100"
-              src="https://storage.cloud.google.com/labspoon-dev-266bc.appspot.com/marketing/group_page_labspoon.png"
+              src="https://storage.googleapis.com/labspoon-dev-266bc.appspot.com/marketing/group_page_labspoon.png"
               alt="Group page on Labspoon"
             />
           </div>
@@ -176,7 +176,7 @@ function FeaturesCarousel() {
           <div className="about-page-carousel-item">
             <img
               className="d-block w-100"
-              src="https://storage.cloud.google.com/labspoon-dev-266bc.appspot.com/marketing/topic_page_plastic_waste.png"
+              src="https://storage.googleapis.com/labspoon-dev-266bc.appspot.com/marketing/topic_page_plastic_waste.png"
               alt="Topic page on Labspoon"
             />
           </div>
