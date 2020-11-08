@@ -36,7 +36,9 @@ function topicPageFeedDataFromDB(skip, limit, filterOptions, topicID, last) {
   let results = [];
   switch (activeTab) {
     case 'posts':
-      const postsCollection = db.collection(`topics/${topicID}/posts`);
+      const postsCollection = db
+        .collection(`topics/${topicID}/posts`)
+        .orderBy('timestamp', 'desc');
       return [
         getPaginatedPostsFromCollectionRef(postsCollection, limit, last),
         null,
