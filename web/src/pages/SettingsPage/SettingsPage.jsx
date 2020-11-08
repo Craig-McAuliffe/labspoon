@@ -4,18 +4,19 @@ import {AuthContext} from '../../App';
 import {Form, Formik} from 'formik';
 import * as Yup from 'yup';
 import UserAvatar from '../../components/Avatar/UserAvatar';
-import users from '../../mockdata/users';
 import PrimaryButton from '../../components/Buttons/PrimaryButton';
 import CancelButton from '../../components/Buttons/CancelButton';
 import FormTextInput from '../../components/Forms/FormTextInput';
 import GeneralError from '../../components/GeneralError';
 
 import './SettingsPage.css';
+import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 
 const SettingsPage = () => {
-  const {user} = useContext(AuthContext);
-  const mockUser = users().filter((mockUser) => mockUser.id === user.uid)[0];
+  const {user, userProfile} = useContext(AuthContext);
   const [editState, setEditState] = useState(false);
+
+  if (!userProfile) return <LoadingSpinner />;
 
   const cancelChanges = () => {
     setEditState(false);
@@ -60,7 +61,7 @@ const SettingsPage = () => {
       <div className="content-layout">
         <div className="settings-page-content">
           <div className="settings-page-header">
-            <UserAvatar src={mockUser.avatar} width="100" height="100" />
+            <UserAvatar src={userProfile.avatar} width="100" height="100" />
             <h2>{user.displayName}</h2>
           </div>
           {editState === false ? (
