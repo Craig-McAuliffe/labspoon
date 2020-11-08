@@ -34,7 +34,10 @@ export const sendUpdateEmail = functions.pubsub
   .topic('update-email')
   .onPublish(async () => {
     const usersSnapshot = await db.collection('users').get();
-    if (usersSnapshot.empty) return console.log('No users found');
+    if (usersSnapshot.empty) {
+      console.log('No users found');
+      return;
+    }
 
     // remember to make this idempotent
     const promises: Promise<undefined>[] = [];
@@ -112,8 +115,8 @@ function getTemplateDataFromPostsSnapshot(postsQS: any) {
     activeUsersMap.set(post!.author.id, post!.author);
     post!.topics.forEach((topic: TaggedTopic) => activeTopicsMap.set(topic.id, topic));
   });
-  let activeUsers = Array.from(activeUsersMap.values()).slice(0, 10);
-  let activeTopics = Array.from(activeTopicsMap.values()).slice(0, 10);
+  const activeUsers = Array.from(activeUsersMap.values()).slice(0, 10);
+  const activeTopics = Array.from(activeTopicsMap.values()).slice(0, 10);
 
   activeUsers.forEach((user, idx) => activeUsers[idx].url = getUserURLFromID(user.id));
   activeTopics.forEach((topic, idx) => activeTopics[idx].url = getTopicURLFromID(topic.id));
