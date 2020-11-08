@@ -5,7 +5,7 @@ export const admin = adminNS.initializeApp();
 
 export const config = functions.config();
 export const environment = config.env.name;
-export const projectURL = 'labspoon-dev-266bc.appspot.com';
+export const url = config.env.url;
 
 export enum ResourceTypes {
     USER = 'user',

@@ -1,0 +1,57 @@
+<body style="font-family: 'Roboto','Helvetica Neue',sans-serif">
+    <img width="300" src="https://storage.googleapis.com/labspoon-prod-284615.appspot.com/logos/Horizontal%20Titled%20Logo.png" alt="Labspoon Logo" />
+    <div style="text-align:center">
+        <h1>You have new updates waiting on Labspoon!</h1>
+    </div>
+    <div style="overflow: hidden">
+        <h2>These users have posted recently:</h2>
+        <div style="float: left; width: 50%">
+            {{#each users_left}}
+            <div class="user" style="display: grid; grid-template-columns: 1fr 5fr; align-items: center; padding: 10px;">
+                <img
+                    src="{{this.avatar}}"
+                    height="60"
+                    width="60"
+                    style="border-radius: 50%"
+                />
+                <h3 class="link"><a href="{{this.url}}">{{this.name}}</a></h3>
+            </div>
+            {{/each}}
+        </div>
+        <div style="float: left; width: 50%">
+            {{#each users_right}}
+            <div class="user" style="display: grid; grid-template-columns: 1fr 5fr; align-items: center; padding: 10px;">
+                <img
+                    class="avatar"
+                    src="{{this.avatar}}"
+                    height="60"
+                    width="60"
+                    style="border-radius: 50%"
+                />
+                <h3 class="link"><a href="{{this.url}}">{{this.name}}</a></h3>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+    <div style="overflow: hidden">
+        <h2>These topics have been active recently:</h2>
+        <div style="float: left; width: 50%">
+            {{#each topics_left}}
+            <div class="topic">
+                <h3 class="link"><a href="{{this.url}}">{{this.name}}</a></h3>
+            </div>
+            {{/each}}
+        </div>
+        <div style="float: left; width: 50%">
+            {{#each topics_right}}
+            <div class="topic">
+                <h3 class="link"><a href="{{this.url}}">{{this.name}}</a></h3>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+    <div>
+        <p>To receive these emails less frequently, change your email options in your account settings.</p>
+    </div>
+</body>
+
