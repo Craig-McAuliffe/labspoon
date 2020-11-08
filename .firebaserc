@@ -1,6 +1,7 @@
 {
   "projects": {
     "default": "labspoon-dev-266bc",
-    "test": "labspoon-test"
+    "test": "labspoon-test",
+    "prod": "labspoon-prod-284615"
   }
 }
