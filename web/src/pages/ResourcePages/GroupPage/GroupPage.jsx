@@ -51,7 +51,10 @@ function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions) {
       const postsCollection = db
         .collection(`groups/${groupID}/posts`)
         .orderBy('timestamp', 'desc');
-      return getPaginatedPostsFromCollectionRef(postsCollection, limit, last);
+      return [
+        getPaginatedPostsFromCollectionRef(postsCollection, limit, last),
+        null,
+      ];
     case 'media':
       results = [];
       break;
@@ -59,21 +62,30 @@ function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions) {
       const publicationsCollection = db.collection(
         `groups/${groupID}/publications`
       );
-      return getPaginatedPublicationsFromCollectionRef(
-        publicationsCollection,
-        limit,
-        last
-      );
+      return [
+        getPaginatedPublicationsFromCollectionRef(
+          publicationsCollection,
+          limit,
+          last
+        ),
+        null,
+      ];
     case 'members':
       const usersCollection = db.collection(`groups/${groupID}/members`);
-      return getPaginatedUserReferencesFromCollectionRef(
-        usersCollection,
-        limit,
-        last
-      );
+      return [
+        getPaginatedUserReferencesFromCollectionRef(
+          usersCollection,
+          limit,
+          last
+        ),
+        null,
+      ];
     case 'topics':
       const topicsCollection = db.collection(`groups/${groupID}/topics`);
-      return getPaginatedTopicsFromCollectionRef(topicsCollection, limit, last);
+      return [
+        getPaginatedTopicsFromCollectionRef(topicsCollection, limit, last),
+        null,
+      ];
     default:
       results = [];
   }
