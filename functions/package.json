@@ -23,6 +23,7 @@
     "crossref": "^1.2.1",
     "firebase-admin": "^8.10.0",
     "firebase-functions": "^3.6.1",
+    "mailgun-js": "^0.22.0",
     "uuid": "^8.3.0"
   },
   "devDependencies": {
