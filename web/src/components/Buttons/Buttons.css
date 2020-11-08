@@ -168,9 +168,13 @@
   border: 2px solid #99999f;
 }
 
-@media screen and (max-width: 560px) {
-  .primary-button-text h2 {
+@media screen and (max-width: 800px) {
+  .primary-button-text {
     font-size: 1.2em;
+  }
+
+  .primary-button-text-small {
+    font-size: 1em;
   }
 
   .primary-button,
@@ -178,14 +182,66 @@
   .primary-button-inactive:hover,
   .primary-button-inactive,
   .FollowButton:hover h2 {
-    padding: 6px 11px 1px 11px;
+    padding: 7px 13px 2px 13px;
     border-radius: 3%;
   }
 
   .primary-button-clicked,
   .primary-button-clicked:hover,
   .primary-button-clicked:focus h2 {
-    padding: 6px 11px 1px 11px;
+    padding: 7px 13px 2px 13px;
     border-radius: 3%;
+  }
+}
+
+@media only screen and (max-width: 500px) {
+  .primary-button-text {
+    font-size: 1em;
+  }
+
+  .primary-button-text-small {
+    font-size: 0.8em;
+  }
+
+  .primary-button,
+  .primary-button:hover,
+  .primary-button-inactive:hover,
+  .primary-button-inactive,
+  .FollowButton:hover h2 {
+    padding: 5px 11px 0px 11px;
+    border-radius: 2%;
+  }
+
+  .primary-button-clicked,
+  .primary-button-clicked:hover,
+  .primary-button-clicked:focus h2 {
+    padding: 5px 11px 0px 11px;
+    border-radius: 2%;
+  }
+}
+
+@media only screen and (max-width: 378px) {
+  .primary-button-text {
+    font-size: 0.8em;
+  }
+
+  .primary-button-text-small {
+    font-size: 0.6em;
+  }
+
+  .primary-button,
+  .primary-button:hover,
+  .primary-button-inactive:hover,
+  .primary-button-inactive,
+  .FollowButton:hover h2 {
+    padding: 7px 9px 0px 9px;
+    border-radius: 2%;
+  }
+
+  .primary-button-clicked,
+  .primary-button-clicked:hover,
+  .primary-button-clicked:focus h2 {
+    padding: 7px 9px 0px 9px;
+    border-radius: 2%;
   }
 }

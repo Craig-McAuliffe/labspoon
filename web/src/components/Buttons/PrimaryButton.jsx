@@ -24,7 +24,11 @@ export default function PrimaryButton({
       onClick={onClick ? onClick : null}
       form={formID ? formID : null}
     >
-      {small ? <h4>{children}</h4> : <h2>{children}</h2>}
+      {small ? (
+        <h4 className="primary-button-text-small">{children}</h4>
+      ) : (
+        <h2 className="primary-button-text">{children}</h2>
+      )}
     </button>
   );
 }

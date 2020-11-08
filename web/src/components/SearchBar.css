@@ -33,14 +33,9 @@
 .big-search-suggested-searches-container {
   display: flex;
   flex-wrap: wrap;
-  margin-top: 20px;
+  justify-content: space-between;
+  margin-top: 10px;
   flex-shrink: 0;
-}
-
-.big-search-suggested-searches-title {
-  margin-right: 25px;
-  color: #5d5d65;
-  line-height: 1.2em;
 }
 
 .big-search-container {
@@ -51,10 +46,7 @@
 .big-search-suggested-search {
   margin-right: 30px;
   font-size: 1.2em;
-  line-height: 1.2em;
-}
-
-.big-search-suggested-search a {
+  line-height: 1.5em;
   flex-shrink: 0;
 }
 
@@ -102,9 +94,29 @@
   background-size: cover;
 }
 
+@media only screen and (max-width: 800px) {
+  .big-search-suggested-search {
+    font-size: 1em;
+  }
+  .big-search-input {
+    height: 50px;
+    padding-left: 8px;
+  }
+  .big-search-icon-container {
+    width: 50px;
+    height: 50px;
+  }
+  .big-search-input {
+    font-size: 0.8em;
+  }
+}
+
 @media screen and (max-width: 664px) {
   .search-icon-container {
     width: 30px;
+  }
+  .big-search-suggested-search {
+    font-size: 0.9em;
   }
 }
 
@@ -137,5 +149,25 @@
 
   .search-icon-container {
     width: 30px;
+  }
+}
+
+@media only screen and (max-width: 378px) {
+  .big-search-icon-container {
+    width: 30px;
+  }
+  .big-search-suggested-search {
+    font-size: 0.7em;
+  }
+  .big-search-input {
+    height: 30px;
+    padding-left: 6px;
+  }
+  .big-search-icon-container {
+    width: 30px;
+    height: 30px;
+  }
+  .big-search-input {
+    font-size: 0.6em;
   }
 }

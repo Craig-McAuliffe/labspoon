@@ -27,7 +27,7 @@ export default function AboutPage() {
         </div>
         <div className="about-page-header-actions">
           <Link to="/search?query=COVID%2019&page=1">
-            <h3>Research News</h3>
+            <h3 className="about-page-action-news">Research News</h3>
           </Link>
           <Link to="/login">
             <PrimaryButton>Get Started</PrimaryButton>
@@ -50,49 +50,58 @@ export default function AboutPage() {
             </div>
           </div>
           <div className="about-page-search-section">
-            <p>I am interested in...</p>
+            <p className="about-page-search-bar-label">I am interested in...</p>
             <SearchBar
               aboutPageSearch={true}
               placeholderText="Something you find fascinating"
             />
           </div>
           <div className="about-page-features-section">
-            <div className="about-page-feature-left-container">
-              <SearchAndNetworkDiagram />
-            </div>
-            <div className="about-page-feature-right-container">
-              <h2>
-                Discover the major researchers in a topic space with our natural
-                language search engine and network of experts.
-              </h2>
-            </div>
-            <div className="about-page-feature-left-container">
-              <h2>
-                Follow a topic space, a particular research group, or an
-                individual for updates directly from the lab.
-              </h2>
-            </div>
-            <div className="about-page-feature-right-container">
-              <div className="about-page-carousel-container">
-                <FeaturesCarousel />
+            <h4 className="about-page-features-section-title">Features</h4>
+            <div className="about-page-feature-text-diagram-container">
+              <div className="about-page-feature-left-container">
+                <SearchAndNetworkDiagram />
+              </div>
+              <div className="about-page-feature-right-container">
+                <h2>
+                  Discover the major researchers in a topic space with our
+                  natural language search engine and network of experts.
+                </h2>
               </div>
             </div>
-            <div className="about-page-feature-left-container">
-              <CustomUpdateFrequencyDiagram />
+            <div className="about-page-feature-text-diagram-container">
+              <div className="about-page-feature-left-container">
+                <h2>
+                  Follow a topic space, a particular research group, or an
+                  individual for updates directly from the lab.
+                </h2>
+              </div>
+              <div className="about-page-feature-right-container">
+                <div className="about-page-carousel-container">
+                  <FeaturesCarousel />
+                </div>
+              </div>
             </div>
-            <div className="about-page-feature-right-container">
-              <h2>
-                Choose the types of updates you want and when you want them.
-              </h2>
+            <div className="about-page-feature-text-diagram-container">
+              <div className="about-page-feature-left-container">
+                <CustomUpdateFrequencyDiagram />
+              </div>
+              <div className="about-page-feature-right-container">
+                <h2>
+                  Choose the types of updates you want and when you want them.
+                </h2>
+              </div>
             </div>
-            <div className="about-page-feature-left-container">
-              <h2>
-                Build your custom feeds with whatever mixture of topics you
-                choose.
-              </h2>
-            </div>
-            <div className="about-page-feature-right-container">
-              <CustomFeedDiagram />
+            <div className="about-page-feature-text-diagram-container">
+              <div className="about-page-feature-left-container">
+                <h2>
+                  Build your custom feeds with whatever mixture of topics you
+                  choose.
+                </h2>
+              </div>
+              <div className="about-page-feature-right-container">
+                <CustomFeedDiagram />
+              </div>
             </div>
           </div>
           <div className="about-page-final-actions-container">
