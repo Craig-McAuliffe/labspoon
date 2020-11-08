@@ -18,7 +18,6 @@ import FilterableResults, {
   FilterManager,
   NewFilterMenuWrapper,
 } from '../../components/FilterableResults/FilterableResults';
-import topicPageFeedData from './TopicPageFeedData';
 import TopicPageSider from './TopicPageSider';
 
 import './TopicPage.css';
@@ -38,37 +37,49 @@ function topicPageFeedDataFromDB(skip, limit, filterOptions, topicID, last) {
   switch (activeTab) {
     case 'posts':
       const postsCollection = db.collection(`topics/${topicID}/posts`);
-      return getPaginatedPostsFromCollectionRef(postsCollection, limit, last);
+      return [
+        getPaginatedPostsFromCollectionRef(postsCollection, limit, last),
+        null,
+      ];
     case 'publications':
       const publicationsCollection = db.collection(
         `topics/${topicID}/publications`
       );
-      return getPaginatedPublicationsFromCollectionRef(
-        publicationsCollection,
-        limit,
-        last
-      );
+      return [
+        getPaginatedPublicationsFromCollectionRef(
+          publicationsCollection,
+          limit,
+          last
+        ),
+        null,
+      ];
     case 'researchers':
       const usersCollection = db.collection(`topics/${topicID}/users`);
-      return getPaginatedUserReferencesFromCollectionRef(
-        usersCollection,
-        limit,
-        last
-      );
+      return [
+        getPaginatedUserReferencesFromCollectionRef(
+          usersCollection,
+          limit,
+          last
+        ),
+        null,
+      ];
     case 'groups':
       const groupsCollection = db.collection(`topics/${topicID}/groups`);
-      return getPaginatedGroupReferencesFromCollectionRef(
-        groupsCollection,
-        limit,
-        last
-      );
+      return [
+        getPaginatedGroupReferencesFromCollectionRef(
+          groupsCollection,
+          limit,
+          last
+        ),
+        null,
+      ];
     case 'overview':
       results = [];
       break;
     default:
       results = [];
   }
-  return results;
+  return [results, null];
 }
 
 export default function TopicPage() {
@@ -102,14 +113,8 @@ export default function TopicPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [topicID]);
 
-  let fetchFeedData;
-  if (!featureFlags.has('disable-cloud-firestore')) {
-    fetchFeedData = (skip, limit, filterOptions, last) =>
-      topicPageFeedDataFromDB(skip, limit, filterOptions, topicID, last);
-  } else {
-    fetchFeedData = (skip, limit, filterOptions, last) =>
-      topicPageFeedData(skip, limit, filterOptions, topicDetails, last);
-  }
+  const fetchFeedData = (skip, limit, filterOptions, last) =>
+    topicPageFeedDataFromDB(skip, limit, filterOptions, topicID, last);
 
   const relationshipFilter = [
     {

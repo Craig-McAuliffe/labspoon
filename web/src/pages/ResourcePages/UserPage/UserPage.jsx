@@ -3,7 +3,6 @@ import {useParams, useHistory, Link} from 'react-router-dom';
 import {FeatureFlags, AuthContext} from '../../../App';
 import {db} from '../../../firebase';
 
-import userPageFeedData from './UserPageFeedData';
 import UserPageSider from './UserPageSider';
 import users from '../../../mockdata/users';
 
@@ -65,14 +64,8 @@ export default function UserPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userID]);
 
-  let fetchFeedData;
-  if (!featureFlags.has('disable-cloud-firestore')) {
-    fetchFeedData = (skip, limit, filterOptions, last) =>
-      userPageFeedDataFromDB(skip, limit, filterOptions, userID, last);
-  } else {
-    fetchFeedData = (skip, limit, filterOptions, last) =>
-      userPageFeedData(skip, limit, filterOptions, userID, last);
-  }
+  const fetchFeedData = (skip, limit, filterOptions, last) =>
+    userPageFeedDataFromDB(skip, limit, filterOptions, userID, last);
 
   if (history.location.pathname.includes('edit_profile'))
     return <EditUserPage user={userDetails} />;
@@ -245,49 +238,61 @@ function userPageFeedDataFromDB(skip, limit, filterOptions, userID, last) {
       const postsCollection = db
         .collection(`users/${userID}/posts`)
         .orderBy('timestamp', 'desc');
-      return getPaginatedPostsFromCollectionRef(
-        postsCollection,
-        limit,
-        last
-      ).then(translateOptionalFields);
+      return [
+        getPaginatedPostsFromCollectionRef(postsCollection, limit, last).then(
+          translateOptionalFields
+        ),
+        null,
+      ];
     case 'publications':
       const publicationsCollection = db.collection(
         `users/${userID}/publications`
       );
-      return getPaginatedPublicationsFromCollectionRef(
-        publicationsCollection,
-        limit,
-        last
-      );
+      return [
+        getPaginatedPublicationsFromCollectionRef(
+          publicationsCollection,
+          limit,
+          last
+        ),
+        null,
+      ];
     case 'follows':
       const followsQuery = db.collection(`/users/${userID}/followsUsers`);
-      return getPaginatedUserReferencesFromCollectionRef(
-        followsQuery,
-        limit,
-        last
-      );
+      return [
+        getPaginatedUserReferencesFromCollectionRef(followsQuery, limit, last),
+        null,
+      ];
     case 'recommends':
       const recommendationsCollection = db.collection(
         `users/${userID}/recommendations`
       );
-      return getPaginatedRecommendationsFromCollectionRef(
-        recommendationsCollection,
-        limit,
-        last
-      );
+      return [
+        getPaginatedRecommendationsFromCollectionRef(
+          recommendationsCollection,
+          limit,
+          last
+        ),
+        null,
+      ];
     case 'coauthors':
       results = [];
       break;
     case 'groups':
       const groupsCollection = db.collection(`users/${userID}/groups`);
-      return getPaginatedGroupReferencesFromCollectionRef(
-        groupsCollection,
-        limit,
-        last
-      );
+      return [
+        getPaginatedGroupReferencesFromCollectionRef(
+          groupsCollection,
+          limit,
+          last
+        ),
+        null,
+      ];
     case 'topics':
       const topicsCollection = db.collection(`users/${userID}/topics`);
-      return getPaginatedTopicsFromCollectionRef(topicsCollection, limit, last);
+      return [
+        getPaginatedTopicsFromCollectionRef(topicsCollection, limit, last),
+        null,
+      ];
     default:
       results = [];
   }

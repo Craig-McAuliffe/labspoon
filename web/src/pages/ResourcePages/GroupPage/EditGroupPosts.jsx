@@ -81,23 +81,29 @@ export default function EditingGroupInfo({
     const activeTab = filter ? getActiveTabID(filter) : null;
     switch (activeTab) {
       case ADD:
-        return fetchPostsByFilteredMember(
-          limit,
-          filter,
-          last,
-          groupID,
-          selectedPosts
-        );
+        return [
+          fetchPostsByFilteredMember(
+            limit,
+            filter,
+            last,
+            groupID,
+            selectedPosts
+          ),
+          null,
+        ];
       case REMOVE:
-        return fetchPostsOnGroupByFilteredMember(
-          limit,
-          filter,
-          last,
-          groupID,
-          selectedPosts
-        );
+        return [
+          fetchPostsOnGroupByFilteredMember(
+            limit,
+            filter,
+            last,
+            groupID,
+            selectedPosts
+          ),
+          null,
+        ];
       default:
-        return [];
+        return [[], null];
     }
   }
 

@@ -13,7 +13,6 @@ import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
 import EditGroup from './EditGroup';
 import groups from '../../../mockdata/groups';
 import GroupPageSider from './GroupPageSider';
-import groupPageFeedData from './GroupPageFeedData';
 import FilterableResults, {
   NewResultsWrapper,
   ResourceTabs,
@@ -78,7 +77,7 @@ function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions) {
     default:
       results = [];
   }
-  return results;
+  return [results, null];
 }
 
 export default function GroupPage() {
@@ -122,14 +121,8 @@ export default function GroupPage() {
     </Link>
   );
 
-  let fetchFeedData;
-  if (!featureFlags.has('disable-cloud-firestore')) {
-    fetchFeedData = (skip, limit, filterOptions, last) =>
-      fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions);
-  } else {
-    fetchFeedData = (skip, limit, filterOptions, last) =>
-      groupPageFeedData(skip, limit, filterOptions, groupData);
-  }
+  const fetchFeedData = (skip, limit, filterOptions, last) =>
+    fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions);
 
   const relationshipFilter = [
     {

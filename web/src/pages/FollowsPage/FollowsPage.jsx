@@ -74,28 +74,36 @@ function followsPageFeedDataFromDB(limit, filterOptions, last, userID) {
   switch (activeTab) {
     case 'people':
       const usersCollection = db.collection(`users/${userID}/followsUsers`);
-      return getPaginatedUserReferencesFromCollectionRef(
-        usersCollection,
-        limit,
-        last
-      );
+      return [
+        getPaginatedUserReferencesFromCollectionRef(
+          usersCollection,
+          limit,
+          last
+        ),
+        null,
+      ];
     case 'groups':
       const groupsCollection = db
         .collection(`users/${userID}/followsGroups`)
         .orderBy('name');
-      return getPaginatedGroupReferencesFromCollectionRef(
-        groupsCollection,
-        limit,
-        last
-      );
+      return [
+        getPaginatedGroupReferencesFromCollectionRef(
+          groupsCollection,
+          limit,
+          last
+        ),
+        null,
+      ];
     case 'topics':
       const topicsCollection = db
         .collection(`users/${userID}/followsTopics`)
         .orderBy('name');
-      return getPaginatedTopicsFromCollectionRef(topicsCollection, limit, last);
-
+      return [
+        getPaginatedTopicsFromCollectionRef(topicsCollection, limit, last),
+        null,
+      ];
     default:
-      return [];
+      return [[], null];
   }
 }
 
