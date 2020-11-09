@@ -63,7 +63,7 @@ export default function PublicationPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [publicationID]);
 
-  const fetchFeedData = (skip, limit, filterOptions, last) =>
+  const fetchFeedData = (_, limit, filterOptions, last) =>
     fetchFeedDataFromDB(limit, filterOptions, last, publicationID);
 
   const relationshipFilter = [
@@ -246,8 +246,11 @@ function fetchFeedDataFromDB(limit, filterOptions, last, publicationID) {
       const relatedPostsDBRef = db.collection(
         `publications/${publicationID}/posts`
       );
-      return getPaginatedPostsFromCollectionRef(relatedPostsDBRef, limit, last);
+      return [
+        getPaginatedPostsFromCollectionRef(relatedPostsDBRef, limit, last),
+        null,
+      ];
     default:
-      return [];
+      return [[], null];
   }
 }
