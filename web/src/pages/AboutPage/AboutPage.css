@@ -101,6 +101,10 @@
   max-width: 100%;
 }
 
+.about-page-features-section-title {
+  display: none;
+}
+
 .about-page-feature-text-diagram-container {
   min-width: 100%;
   max-width: 100%;
@@ -421,9 +425,7 @@
     font-size: 1em;
     line-height: 1.2em;
   }
-  .about-page-features-section-title {
-    display: none;
-  }
+
   .about-page-action-news {
     display: block;
   }
