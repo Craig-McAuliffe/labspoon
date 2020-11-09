@@ -80,7 +80,18 @@ export default function FilterableResults({children, fetchResults, limit}) {
   // fetches results by triggering an effect
   function fetchMore() {
     setLoadingResults(true);
-    Promise.resolve(fetchResultsFunction(skip, limit + 1, filter, last))
+    const [resultsPromise, errorMessage] = fetchResultsFunction(
+      skip,
+      limit + 1,
+      filter,
+      last
+    );
+    if (errorMessage) {
+      setResultsError(errorMessage);
+    } else {
+      setResultsError('');
+    }
+    return Promise.resolve(resultsPromise)
       .then((newResults) => {
         setHasMore(!(newResults.length <= limit));
         setResults((results) => results.concat(newResults.slice(0, limit)));
