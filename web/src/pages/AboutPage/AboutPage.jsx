@@ -40,10 +40,18 @@ export default function AboutPage() {
           <div className="about-page-headline-section">
             <div className="about-page-headline-text-container">
               <p>For all curious people</p>
-              <h1>Find and follow experts in any topic</h1>
-              <h2>Hear straight from innovators</h2>
-              <h2>Be the first to know about breakthroughs</h2>
-              <h2>Share your expert opinion</h2>
+              <h1 className="about-page-super-title">
+                Find and follow experts in any topic
+              </h1>
+              <h2 className="about-page-super-points">
+                Hear straight from innovators
+              </h2>
+              <h2 className="about-page-super-points">
+                Be the first to know about breakthroughs
+              </h2>
+              <h2 className="about-page-super-points">
+                Share your expert opinion
+              </h2>
             </div>
             <div className="about-page-headline-diagram-container">
               <FromLabSpoonedToYouDiagram />
@@ -53,7 +61,7 @@ export default function AboutPage() {
             <p className="about-page-search-bar-label">I am interested in...</p>
             <SearchBar
               aboutPageSearch={true}
-              placeholderText="Something you find fascinating"
+              placeholderText="Search for something"
             />
           </div>
           <div className="about-page-features-section">
@@ -134,13 +142,7 @@ function FeaturesCarousel() {
           });
         }}
       >
-        <svg
-          width="71"
-          height="71"
-          viewBox="8 0 71 71"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
+        <svg viewBox="8 0 71 71" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             d="M32.5 3L64.999 35.499L32.499 67.999"
             stroke="#00507C"
