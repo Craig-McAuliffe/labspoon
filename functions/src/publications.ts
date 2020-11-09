@@ -35,6 +35,8 @@ export const microsoftAcademicKnowledgePublicationSearch = functions.https.onCal
       count: 1,
     })
       .then((resp) => {
+        if (resp.data.timed_out) throw new functions.https.HttpsError('deadline-exceeded', 'Query timed out');
+        if (resp.data.interpretations.length === 0) return new Promise(() => null);
         return executeExpression({
           // `Ty='0'` retrieves only publication type results
           // https://docs.microsoft.com/en-us/academic-services/project-academic-knowledge/reference-entity-attributes
@@ -43,13 +45,15 @@ export const microsoftAcademicKnowledgePublicationSearch = functions.https.onCal
           attributes: allPublicationFields,
         });
       })
-      .then(async (resp) => {
+      .then(async (resp: any) => {
+        if (!resp) return;
         const publications = resp.data.entities;
         await publishAddPublicationRequests(publications);
         results = publications.map(makPublicationToPublication);
       })
       .catch((err) => {
-        console.error(err);
+        // If the error is well defined re-throw it.
+        if (err.code) throw err;
         throw new functions.https.HttpsError('internal', 'An error occured.');
       });
     return results;
