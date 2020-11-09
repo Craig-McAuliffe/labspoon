@@ -17,6 +17,7 @@ export function getPaginatedTopicsFromCollectionRef(
       const topics = [];
       qs.forEach((doc) => {
         const topic = doc.data();
+        topic.id = doc.id;
         topic.resourceType = 'topic';
         topics.push(topic);
       });

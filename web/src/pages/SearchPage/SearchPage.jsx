@@ -332,7 +332,12 @@ const TopicsResults = () => {
   return (
     <Index indexName={abbrEnv + '_TOPICS'}>
       <IndexResults>
-        <Hits hitComponent={({hit}) => <GenericListItem result={hit} />} />
+        <Hits
+          hitComponent={({hit}) => {
+            hit.id = hit.objectID;
+            return <GenericListItem result={hit} />;
+          }}
+        />
       </IndexResults>
     </Index>
   );

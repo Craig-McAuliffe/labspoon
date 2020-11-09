@@ -18,36 +18,34 @@ export default function FollowTopicButton({targetTopic}) {
   });
 
   function setFollowingAndUpdateDB() {
-    if (!featureFlags.has('disable-cloud-firestore')) {
-      const batch = db.batch();
-      const followsTopicsDoc = db.doc(
-        `users/${authUser.uid}/followsTopics/${targetTopic.id}`
-      );
-      const followedByUsersDoc = db.doc(
-        `topics/${targetTopic.id}/followedByUsers/${authUser.uid}`
-      );
-      if (!following) {
-        batch.set(followsTopicsDoc, {
-          id: targetTopic.id,
-          name: targetTopic.name,
-        });
-        batch.set(followedByUsersDoc, {
-          id: authUser.uid,
-          name: authUser.displayName,
-          avatar: userProfile.avatar,
-        });
-        batch
-          .commit()
-          .then(() => setFollowing(true))
-          .catch((err) => console.log(err));
-      } else {
-        batch.delete(followsTopicsDoc);
-        batch.delete(followedByUsersDoc);
-        batch
-          .commit()
-          .then(() => setFollowing(false))
-          .catch((err) => console.log(err));
-      }
+    const batch = db.batch();
+    const followsTopicsDoc = db.doc(
+      `users/${authUser.uid}/followsTopics/${targetTopic.id}`
+    );
+    const followedByUsersDoc = db.doc(
+      `topics/${targetTopic.id}/followedByUsers/${authUser.uid}`
+    );
+    if (!following) {
+      batch.set(followsTopicsDoc, {
+        id: targetTopic.id,
+        name: targetTopic.name,
+      });
+      batch.set(followedByUsersDoc, {
+        id: authUser.uid,
+        name: authUser.displayName,
+        avatar: userProfile.avatar,
+      });
+      batch
+        .commit()
+        .then(() => setFollowing(true))
+        .catch((err) => console.log(err));
+    } else {
+      batch.delete(followsTopicsDoc);
+      batch.delete(followedByUsersDoc);
+      batch
+        .commit()
+        .then(() => setFollowing(false))
+        .catch((err) => console.log(err));
     }
   }
 
