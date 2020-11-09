@@ -24,7 +24,7 @@ type Post struct {
 	// Fields used for filtering results
 	FilterPostTypeID string   `firestore:"filter_postType_id"`
 	FilterAuthorID   string   `firestore:"filter_author_id"`
-	FilterTopicIDs   []string `firestore:"filter_topic_ids"`
+	FilterTopicIDs   []string `firestore:"filterTopicIDs"`
 }
 
 type PostType struct {

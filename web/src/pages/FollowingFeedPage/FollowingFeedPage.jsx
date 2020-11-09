@@ -58,7 +58,7 @@ function filterFeedData(collection, skip, limit, filter, last) {
     if (enabledTopicIDs !== undefined) {
       if (enabledTopicIDs.length === 1) {
         collection = collection.where(
-          'filter_topic_ids',
+          'filterTopicIDs',
           'array-contains',
           enabledTopicIDs[0]
         );
@@ -68,7 +68,7 @@ function filterFeedData(collection, skip, limit, filter, last) {
         if (arrayContainsAnyCount > 1)
           return [undefined, arrayContainsAnyErrorMessage];
         collection = collection.where(
-          'filter_topic_ids',
+          'filterTopicIDs',
           'array-contains-any',
           enabledTopicIDs
         );
