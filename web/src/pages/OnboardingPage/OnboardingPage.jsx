@@ -133,7 +133,11 @@ function OnboardingFollow({user}) {
 
   const getTopics = () => {
     const topicsCollection = db.collection(`topics`);
-    return getPaginatedTopicsFromCollectionRef(topicsCollection, 10);
+    return getPaginatedTopicsFromCollectionRef(topicsCollection, 10).then(
+      (res) => {
+        return res;
+      }
+    );
   };
 
   useEffect(() => {
@@ -197,11 +201,15 @@ function OnboardingFollow({user}) {
             displayedItems={displayedTopics}
           />
           <div className="onboarding-topics-to-follow-container">
-            {displayedTopics.map((displayedTopic) => (
-              <TopicListItem topic={displayedTopic} key={displayedTopic.id}>
-                <FollowTopicButton targetTopic={displayedTopic} />
-              </TopicListItem>
-            ))}
+            {displayedTopics.map((displayedTopic) => {
+              if (displayedTopic.objectID)
+                displayedTopic.id = displayedTopic.objectID;
+              return (
+                <TopicListItem topic={displayedTopic} key={displayedTopic.id}>
+                  <FollowTopicButton targetTopic={displayedTopic} />
+                </TopicListItem>
+              );
+            })}
           </div>
         </div>
       </div>

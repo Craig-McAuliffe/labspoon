@@ -14,7 +14,6 @@ import {getPaginatedGroupReferencesFromCollectionRef} from '../../helpers/groups
 
 import TopicListItem from '../../components/Topics/TopicListItem';
 import FollowTopicButton from '../../components/Topics/FollowTopicButton';
-import topics from '../../mockdata/topics';
 import FilterableResults, {
   NewResultsWrapper,
   ResourceTabs,
@@ -26,11 +25,15 @@ import TopicPageSider from './TopicPageSider';
 import './TopicPage.css';
 import MAGRouterDisplay from '../../components/MAGRouter';
 
-function fetchTopicDetailsFromDB(topicID) {
+async function fetchTopicDetailsFromDB(topicID) {
   return db
     .doc(`topics/${topicID}`)
     .get()
-    .then((topicDetails) => topicDetails.data())
+    .then((topicDetails) => {
+      const data = topicDetails.data();
+      data.id = topicID;
+      return data;
+    })
     .catch((err) => console.log(err));
 }
 
@@ -100,13 +103,7 @@ export default function TopicPage() {
     setTopicID(topicIDParam);
   }
 
-  let fetchTopicDetails;
-  if (!featureFlags.has('disable-cloud-firestore')) {
-    fetchTopicDetails = () => fetchTopicDetailsFromDB(topicID);
-  } else {
-    fetchTopicDetails = () =>
-      topics().filter((topic) => topic.id === topicID)[0];
-  }
+  const fetchTopicDetails = () => fetchTopicDetailsFromDB(topicID);
 
   useEffect(() => {
     Promise.resolve(fetchTopicDetails())
