@@ -24,6 +24,10 @@
   justify-self: flex-start;
 }
 
+.about-page-header-logo svg {
+  height: 40px;
+}
+
 .about-page-header-actions {
   justify-self: flex-end;
   display: flex;
@@ -40,11 +44,15 @@
   min-width: 100%;
   max-width: 100%;
   display: grid;
-  grid-template-columns: 1fr 1200px 1fr;
+  grid-template-columns: minmax(15px, 1fr) minmax(200px, 1200px) minmax(
+      15px,
+      1fr
+    );
   margin: 50px 0px;
 }
 
 .about-page-headline-section {
+  max-width: 1200px;
   padding: 40px 0px 20px;
   display: grid;
   grid-template-columns: 2fr minmax(400px, 1fr);
@@ -55,12 +63,12 @@
   color: #99999f;
 }
 
-.about-page-headline-text-container h1 {
+.about-page-super-title {
   font-size: 2.5em;
   color: #00507c;
 }
 
-.about-page-headline-text-container h2 {
+.about-page-super-points {
   font-size: 1.2em;
   line-height: 1.6em;
   color: #00507c;
@@ -71,6 +79,10 @@
   justify-content: center;
   align-items: flex-end;
   margin-top: -20px;
+}
+
+.about-page-headline-diagram-container svg {
+  width: 100%;
 }
 
 .about-page-search-section {
@@ -96,6 +108,10 @@
   grid-template-columns: 50% 50%;
   grid-row: auto;
   align-items: center;
+}
+
+.about-page-feature-text-diagram-container svg {
+  width: 100%;
 }
 
 .about-page-feature-left-container {
@@ -173,12 +189,16 @@
   top: 250px;
   left: 430px;
   z-index: 2;
-  opacity: 20%;
+  opacity: 0.2;
 }
 .about-page-carousel-next-icon-button:hover {
-  opacity: 100%;
+  opacity: 1;
   background: white;
   border: 1px solid #00507c;
+}
+
+.about-page-carousel-next-icon-button svg {
+  width: 100%;
 }
 
 .about-page-final-actions-container {
@@ -221,22 +241,12 @@
     height: 560px;
   }
 
-  .about-page-main-content {
-    min-width: 100%;
-    max-width: 100%;
-    display: grid;
-    grid-template-columns: 1fr 900px 1fr;
-    margin: 50px 0px;
-  }
-
   .about-page-carousel-next-icon-button {
     width: 100px;
     height: 100px;
-    position: absolute;
     top: 200px;
     left: 330px;
-    z-index: 2;
-    opacity: 20%;
+    opacity: 0.2;
   }
 }
 
@@ -262,11 +272,7 @@
     left: 270px;
     width: 80px;
     height: 80px;
-  }
-
-  .about-page-carousel-next-icon-button svg {
-    width: 80px;
-    height: 80px;
+    opacity: 0.2;
   }
 
   .about-page-carousel-container {
@@ -295,21 +301,17 @@
     grid-template-columns: minmax(300px, 2fr) minmax(300px, 1fr);
   }
 
-  .about-page-headline-text-container h1 {
+  .about-page-super-title {
     font-size: 2.2em;
   }
 
-  .about-page-headline-text-container h2 {
+  .about-page-super-points {
     font-size: 1.2em;
     line-height: 1.4em;
   }
 }
 
 @media only screen and (max-width: 909px) {
-  .about-page-main-content {
-    grid-template-columns: 1fr 800px 1fr;
-  }
-
   .about-page-features-section {
     margin-top: 50px;
   }
@@ -326,10 +328,6 @@
 }
 
 @media only screen and (max-width: 852px) {
-  .about-page-main-content {
-    grid-template-columns: 1fr 700px 1fr;
-  }
-
   .about-page-background-sweep-container svg {
     width: 900px;
     height: 200px;
@@ -342,21 +340,17 @@
     grid-template-columns: minmax(200px, 2fr) minmax(200px, 1fr);
   }
 
-  .about-page-headline-text-container h1 {
+  .about-page-super-title {
     font-size: 1.9em;
   }
 
-  .about-page-headline-text-container h2 {
+  .about-page-super-points {
     font-size: 1em;
     line-height: 1.3em;
   }
 
-  .about-page-header-logo {
-    margin-left: -30px;
-  }
-
   .about-page-header-logo svg {
-    height: 35px;
+    height: 30px;
   }
 
   .about-page-header-actions h3 {
@@ -372,19 +366,11 @@
     left: 265px;
     width: 60px;
     height: 60px;
-  }
-
-  .about-page-carousel-next-icon-button svg {
-    width: 60px;
-    height: 60px;
+    opacity: 0.2;
   }
 }
 
 @media only screen and (max-width: 730px) {
-  .about-page-main-content {
-    grid-template-columns: 1fr 550px 1fr;
-  }
-
   .about-page-search-bar-label {
     display: none;
   }
@@ -400,11 +386,13 @@
 
   .about-page-carousel-container {
     height: 350px;
+    margin-bottom: 30px;
   }
 
   .about-page-carousel-next-icon-button {
     top: 140px;
     left: 200px;
+    opacity: 0.2;
   }
 
   .carousel {
@@ -425,11 +413,11 @@
     grid-template-columns: minmax(200px, 2fr) minmax(200px, 1fr);
   }
 
-  .about-page-headline-text-container h1 {
+  .about-page-super-title {
     font-size: 1.5em;
   }
 
-  .about-page-headline-text-container h2 {
+  .about-page-super-points {
     font-size: 1em;
     line-height: 1.2em;
   }
@@ -442,10 +430,6 @@
 }
 
 @media only screen and (max-width: 605px) {
-  .about-page-main-content {
-    grid-template-columns: 1fr 550px 1fr;
-  }
-
   .about-page-action-news {
     display: none;
   }
@@ -485,11 +469,6 @@
 }
 
 @media only screen and (max-width: 586px) {
-  .about-page-main-content {
-    max-width: 100%;
-    grid-template-columns: 1fr 85vw 1fr;
-  }
-
   .about-page-features-section {
     margin-top: 25px;
     display: flex;
@@ -511,20 +490,32 @@
     display: grid;
   }
 
-  .about-page-headline-text-container h1 {
+  .about-page-super-title {
     font-size: 1.3em;
   }
 
-  .about-page-headline-text-container h2 {
+  .about-page-super-points {
     font-size: 0.9em;
     line-height: 1.1em;
   }
 }
 
 @media only screen and (max-width: 500px) {
+  .about-page-main-content {
+    grid-template-columns: minmax(10px, 1fr) minmax(200px, 1200px) minmax(
+        10px,
+        1fr
+      );
+  }
+
   .about-page-headline-section {
     display: block;
   }
+
+  .about-page-features-section {
+    margin-top: 0px;
+  }
+
   .about-page-features-section-title {
     font-size: 0.9em;
   }
@@ -536,17 +527,13 @@
 }
 
 @media only screen and (max-width: 378px) {
-  .about-page-headline-text-container h1 {
-    font-size: 1.1em;
+  .about-page-super-title {
+    font-size: 1.2em;
   }
 
-  .about-page-features-section h2 {
+  .about-page-super-points {
     font-size: 0.8em;
-  }
-
-  .about-page-headline-text-container h2 {
-    font-size: 0.7em;
-    line-height: 0.9em;
+    line-height: 1.1em;
   }
 
   .about-page-headline-text-container p {
@@ -554,12 +541,9 @@
     line-height: 0px;
     margin-bottom: 10px;
   }
+
   .about-page-header-logo svg {
     height: 25px;
-  }
-  .about-page-header-logo {
-    margin-left: -50px;
-    margin-top: 2px;
   }
 
   .about-page-carousel-item {
@@ -576,11 +560,7 @@
     left: 120px;
     width: 40px;
     height: 40px;
-  }
-
-  .about-page-carousel-next-icon-button svg {
-    width: 40px;
-    height: 40px;
+    opacity: 0.2;
   }
 
   .carousel {
