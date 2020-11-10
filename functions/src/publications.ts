@@ -13,12 +13,7 @@ import {
   makAuthorToAuthor,
 } from './microsoft';
 import {Post} from './posts';
-import {
-  Topic,
-  createFieldAndTopic,
-  TaggedTopic,
-  convertTopicToTaggedTopic,
-} from './topics';
+import {Topic, createFieldAndTopic, convertTopicToTaggedTopic} from './topics';
 
 const pubSubClient = new PubSub();
 const db = admin.firestore();
@@ -106,7 +101,14 @@ export const addNewMSPublicationAsync = functions.pubsub
         microsoftPublication.processed = labspoonPublicationID;
         // store the MS publication and the converted labspoon publication
         t.set(microsoftPublicationRef, microsoftPublication);
+        const taggedTopicsPrecursors = publication.topics;
+        createTopicsFromNewPubAndAddPubToTopic(
+          publication,
+          labspoonPublicationRef.id,
+          taggedTopicsPrecursors
+        );
         delete publication.authors;
+        publication.topics = [];
         t.set(labspoonPublicationRef, publication);
 
         microsoftPublication.AA?.forEach((author) => {
@@ -129,57 +131,51 @@ export const addNewMSPublicationAsync = functions.pubsub
     return;
   });
 
-export const createTopicsFromNewPubAndAddPubToTopic = functions.firestore
-  .document('publications/{publicationID}')
-  .onCreate(async (change, context) => {
-    const publication = change.data();
-    const publicationID = context.params.publicationID;
-    let publicationTopicPromiseArray;
-    if (!publication.topics) publicationTopicPromiseArray = [];
-    else
-      publicationTopicPromiseArray = publication.topics?.map(
-        async (taggedTopic: TaggedTopic) => {
-          return createFieldAndTopic(taggedTopic)
-            .then(() => {
-              addPublicationToTopic(
-                publicationID,
-                publication,
-                taggedTopic.microsoftID
-              ).catch((err) =>
-                console.error(
-                  `could not add the publication to the Labspoon Topic, ${err}`
-                )
-              );
-            })
-            .catch((err) =>
-              console.error(
-                `could not create Field and Topic for topic with microsoft ID ${taggedTopic.microsoftID}, ${err}`
-              )
-            );
-        }
-      );
-    return Promise.all(publicationTopicPromiseArray);
-  });
+export async function createTopicsFromNewPubAndAddPubToTopic(
+  publication: Publication,
+  publicationID: string,
+  taggedTopicsPrecursors?: Topic[]
+) {
+  if (!taggedTopicsPrecursors) return undefined;
+  const publicationTopicPromiseArray = taggedTopicsPrecursors.map(
+    async (precursorTaggedTopic: Topic) => {
+      return createFieldAndTopic(precursorTaggedTopic)
+        .then((labspoonTopicID) => {
+          connectPublicationWithTopic(
+            publicationID,
+            publication,
+            labspoonTopicID
+          ).catch((err) =>
+            console.error(
+              `could not add the publication to the Labspoon Topic, ${err}`
+            )
+          );
+        })
+        .catch((err) =>
+          console.error(
+            `could not create Field and Topic for topic with microsoft ID ${precursorTaggedTopic.microsoftID}, ${err}`
+          )
+        );
+    }
+  );
+  return Promise.all(publicationTopicPromiseArray);
+}
 
-export async function addPublicationToTopic(
+export async function connectPublicationWithTopic(
   publicationID: string,
   publication: Publication,
-  topicMicrosoftID?: string
+  labspoonTopicID: string
 ) {
   await db
-    .doc(`MSFields/${topicMicrosoftID}`)
+    .doc(`topics/${labspoonTopicID}`)
     .get()
     .then((ds) => {
       if (!ds.exists) {
-        console.error(
-          `labspoon topic with id ${topicMicrosoftID} not found; returning`
-        );
+        console.error(`topic with id ${labspoonTopicID} not found; returning`);
         return undefined;
       }
-      const labspoonTopicID = ds.data()!.processed;
-      // the topic returned from the db is not the same format
-      // as a tagged topic (tagged topics have an id field and no rank)
       const topicData = ds.data()! as Topic;
+      // Tagged topics have an id field
       const taggedLabspoonTopic = convertTopicToTaggedTopic(
         topicData,
         labspoonTopicID
@@ -198,7 +194,7 @@ export async function addPublicationToTopic(
         })
         .catch((err) => {
           console.error(
-            `could not add publication with id ${publicationID} to topic with id ${labspoonTopicID} and nor update the publication with the same topic, ${err}`
+            `could not connect publication with id ${publicationID} to topic with id ${labspoonTopicID}, ${err}`
           );
         });
     });

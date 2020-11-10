@@ -273,13 +273,15 @@ async function addRecentPostsToFollowingFeed(
   posts.forEach((postDS) => {
     const post = postDS.data() as Post;
     // Not important if we fail to add past posts to the feed.
-    const postAddedPromise = db.doc(
-      `users/${followerID}/feeds/followingFeed/posts/${post.id}`
-    )
+    const postAddedPromise = db
+      .doc(`users/${followerID}/feeds/followingFeed/posts/${post.id}`)
       .set(post)
-      .then(() => updateFiltersByPost(db.doc(
-        `users/${followerID}/feeds/followingFeed`
-      ), post))
+      .then(() =>
+        updateFiltersByPost(
+          db.doc(`users/${followerID}/feeds/followingFeed`),
+          post
+        )
+      )
       .catch((err) => {
         console.error(
           `Unable to add post ${post.id} to the following feed of user ${followerID}:`,
@@ -417,8 +419,7 @@ export const linkPostTopicsToAuthor = functions.firestore
     const postTopics = post.topics;
     const authorID = post.author.id;
     postTopics.forEach((postTopic) => {
-      const userTopic = convertTaggedTopicToTopic(postTopic);
-
+      const userTopic = convertTaggedTopicToTopic(postTopic, true);
       const userTopicDocRef = db.doc(
         `users/${authorID}/topics/${postTopic.id}`
       );
