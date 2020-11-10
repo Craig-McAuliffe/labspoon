@@ -81,65 +81,73 @@ export const addNewMSPublicationAsync = functions.pubsub
     const microsoftPublicationRef = db
       .collection('MSPublications')
       .doc(microsoftPublicationID);
-
     try {
-      await db.runTransaction(async (t) => {
-        const microsoftPublicationDS = await t.get(microsoftPublicationRef);
-        const labspoonPublicationRef = db.collection('publications').doc();
-        const labspoonPublicationID = labspoonPublicationRef.id;
-        const publication = makPublicationToPublication(microsoftPublication);
-
-        // If the Microsoft publication has been added and marked as processed then the labspoon publication must already exist
-        if (microsoftPublicationDS.exists) {
-          const microsoftPublicationDSData = microsoftPublicationDS.data() as MAKPublication;
-          if (microsoftPublicationDSData.processed) return true;
-          // Publications should always be processed. This should not happen.
+      const createPublicationsTransaction = await db.runTransaction(
+        async (t) => {
+          const microsoftPublicationDS = await t.get(microsoftPublicationRef);
+          const labspoonPublicationRef = db.collection('publications').doc();
+          const labspoonPublicationID = labspoonPublicationRef.id;
+          const publication = makPublicationToPublication(microsoftPublication);
+          const dataToLinkTopicsAndPub = {
+            publication: publication,
+            labspoonPublicationID: labspoonPublicationID,
+            taggedTopicsNoID: publication.topics,
+          };
+          // If the Microsoft publication has been added and marked as processed then the labspoon publication must already exist
+          if (microsoftPublicationDS.exists) {
+            const microsoftPublicationDSData = microsoftPublicationDS.data() as MAKPublication;
+            if (microsoftPublicationDSData.processed)
+              return dataToLinkTopicsAndPub;
+            // Publications should always be processed. This should not happen.
+            t.set(labspoonPublicationRef, publication);
+            t.update(microsoftPublicationRef, {
+              processed: labspoonPublicationID,
+            });
+            return dataToLinkTopicsAndPub;
+          }
+          microsoftPublication.processed = labspoonPublicationID;
+          // store the MS publication and the converted labspoon publication
+          t.set(microsoftPublicationRef, microsoftPublication);
+          delete publication.authors;
+          publication.topics = [];
           t.set(labspoonPublicationRef, publication);
-          t.update(microsoftPublicationRef, {processed: labspoonPublicationID});
-          return true;
-        }
-        microsoftPublication.processed = labspoonPublicationID;
-        // store the MS publication and the converted labspoon publication
-        t.set(microsoftPublicationRef, microsoftPublication);
-        const taggedTopicsPrecursors = publication.topics;
-        createTopicsFromNewPubAndAddPubToTopic(
-          publication,
-          labspoonPublicationRef.id,
-          taggedTopicsPrecursors
-        );
-        delete publication.authors;
-        publication.topics = [];
-        t.set(labspoonPublicationRef, publication);
 
-        microsoftPublication.AA?.forEach((author) => {
-          const authorID = author.AuId.toString();
-          t.set(db.collection('MSUsers').doc(authorID), author);
-          t.set(
-            db
-              .collection('MSUsers')
-              .doc(author.AuId.toString())
-              .collection('publications')
-              .doc(microsoftPublicationID),
-            microsoftPublication
-          );
-        });
-        return;
-      });
+          microsoftPublication.AA?.forEach((author) => {
+            const authorID = author.AuId.toString();
+            t.set(db.collection('MSUsers').doc(authorID), author);
+            t.set(
+              db
+                .collection('MSUsers')
+                .doc(author.AuId.toString())
+                .collection('publications')
+                .doc(microsoftPublicationID),
+              microsoftPublication
+            );
+          });
+          return dataToLinkTopicsAndPub;
+        }
+      );
+      createTopicsFromNewPubAndAddPubToTopic(
+        createPublicationsTransaction.publication,
+        createPublicationsTransaction.labspoonPublicationID,
+        createPublicationsTransaction.taggedTopicsNoID
+      );
+      return true;
     } catch (err) {
       console.error(err);
     }
-    return;
+    return true;
   });
 
 export async function createTopicsFromNewPubAndAddPubToTopic(
   publication: Publication,
   publicationID: string,
-  taggedTopicsPrecursors?: Topic[]
+  taggedTopicsNoID?: Topic[]
 ) {
-  if (!taggedTopicsPrecursors) return undefined;
-  const publicationTopicPromiseArray = taggedTopicsPrecursors.map(
-    async (precursorTaggedTopic: Topic) => {
-      return createFieldAndTopic(precursorTaggedTopic)
+  if (!taggedTopicsNoID) return undefined;
+  const publicationTopicPromiseArray = taggedTopicsNoID.map(
+    async (taggedTopicNoID: Topic) => {
+      return createFieldAndTopic(taggedTopicNoID)
         .then((labspoonTopicID) => {
           connectPublicationWithTopic(
             publicationID,
@@ -153,7 +161,7 @@ export async function createTopicsFromNewPubAndAddPubToTopic(
         })
         .catch((err) =>
           console.error(
-            `could not create Field and Topic for topic with microsoft ID ${precursorTaggedTopic.microsoftID}, ${err}`
+            `could not create Field and Topic for topic with microsoft ID ${taggedTopicNoID.microsoftID}, ${err}`
           )
         );
     }
