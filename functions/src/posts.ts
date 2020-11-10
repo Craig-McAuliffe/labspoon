@@ -54,62 +54,60 @@ export const createPost = functions.https.onCall(async (data, context) => {
   if (data.publicationURL) content.publicationURL = data.publicationURL;
 
   const postTopics: TaggedTopic[] = [];
-  const matchedTopicsPromises = data.topics.map(
-    (taggedTopicPrecursor: Topic) => {
-      return db
-        .doc(`MSFields/${taggedTopicPrecursor.microsoftID}`)
-        .get()
-        .then((ds) => {
-          function addTopicToPost(correspondingLabspoonTopicID: string) {
-            postTopics.push(
-              convertTopicToTaggedTopic(
-                taggedTopicPrecursor,
-                correspondingLabspoonTopicID
-              )
-            );
-          }
-          if (ds.exists) {
-            const MSFieldData = ds.data() as MAKField;
-            if (MSFieldData.processed) {
-              addTopicToPost(MSFieldData.processed);
-            } else {
-              // This should not be possible. All dbMSFields should be processed
-              // upon creation.
-              console.error(
-                'no Labspoon topic corresponding to MSField ' +
-                  taggedTopicPrecursor.microsoftID
-              );
-              db.collection('topics')
-                .doc()
-                .set(makFieldToTopic(MSFieldData))
-                .catch((err) =>
-                  console.error(
-                    `could not create labspoon topic from existing MSField, ${err}`
-                  )
-                );
-            }
+  const matchedTopicsPromises = data.topics.map((taggedTopicNoID: Topic) => {
+    return db
+      .doc(`MSFields/${taggedTopicNoID.microsoftID}`)
+      .get()
+      .then((ds) => {
+        function addTopicToPost(correspondingLabspoonTopicID: string) {
+          postTopics.push(
+            convertTopicToTaggedTopic(
+              taggedTopicNoID,
+              correspondingLabspoonTopicID
+            )
+          );
+        }
+        if (ds.exists) {
+          const MSFieldData = ds.data() as MAKField;
+          if (MSFieldData.processed) {
+            addTopicToPost(MSFieldData.processed);
           } else {
-            createFieldAndTopic(taggedTopicPrecursor)
-              .then((labspoonTopicID) => {
-                if (labspoonTopicID === undefined) {
-                  console.error(
-                    `topic with microsoftID ${taggedTopicPrecursor.microsoftID} was created but did not return the corresponding labspoon ID`
-                  );
-                  return false;
-                } else {
-                  addTopicToPost(labspoonTopicID);
-                  return true;
-                }
-              })
+            // This should not be possible. All dbMSFields should be processed
+            // upon creation.
+            console.error(
+              'no Labspoon topic corresponding to MSField ' +
+                taggedTopicNoID.microsoftID
+            );
+            db.collection('topics')
+              .doc()
+              .set(makFieldToTopic(MSFieldData))
               .catch((err) =>
                 console.error(
-                  `field ${taggedTopicPrecursor.microsoftID} is not in database and could not be created ${err}`
+                  `could not create labspoon topic from existing MSField, ${err}`
                 )
               );
           }
-        });
-    }
-  );
+        } else {
+          createFieldAndTopic(taggedTopicNoID)
+            .then((labspoonTopicID) => {
+              if (labspoonTopicID === undefined) {
+                console.error(
+                  `topic with microsoftID ${taggedTopicNoID.microsoftID} was created but did not return the corresponding labspoon ID`
+                );
+                return false;
+              } else {
+                addTopicToPost(labspoonTopicID);
+                return true;
+              }
+            })
+            .catch((err) =>
+              console.error(
+                `field ${taggedTopicNoID.microsoftID} is not in database and could not be created ${err}`
+              )
+            );
+        }
+      });
+  });
 
   await Promise.all(matchedTopicsPromises);
   return db
@@ -273,13 +271,15 @@ async function addRecentPostsToFollowingFeed(
   posts.forEach((postDS) => {
     const post = postDS.data() as Post;
     // Not important if we fail to add past posts to the feed.
-    const postAddedPromise = db.doc(
-      `users/${followerID}/feeds/followingFeed/posts/${post.id}`
-    )
+    const postAddedPromise = db
+      .doc(`users/${followerID}/feeds/followingFeed/posts/${post.id}`)
       .set(post)
-      .then(() => updateFiltersByPost(db.doc(
-        `users/${followerID}/feeds/followingFeed`
-      ), post))
+      .then(() =>
+        updateFiltersByPost(
+          db.doc(`users/${followerID}/feeds/followingFeed`),
+          post
+        )
+      )
       .catch((err) => {
         console.error(
           `Unable to add post ${post.id} to the following feed of user ${followerID}:`,
@@ -417,8 +417,7 @@ export const linkPostTopicsToAuthor = functions.firestore
     const postTopics = post.topics;
     const authorID = post.author.id;
     postTopics.forEach((postTopic) => {
-      const userTopic = convertTaggedTopicToTopic(postTopic);
-
+      const userTopic = convertTaggedTopicToTopic(postTopic, true);
       const userTopicDocRef = db.doc(
         `users/${authorID}/topics/${postTopic.id}`
       );

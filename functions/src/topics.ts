@@ -122,18 +122,21 @@ export async function createFieldAndTopic(topic: Topic) {
     });
 }
 
-export function convertTaggedTopicToTopic(taggedTopic: TaggedTopic) {
-  const topic = {
+export function convertTaggedTopicToTopic(
+  taggedTopic: TaggedTopic,
+  rank?: boolean
+) {
+  const topic: Topic = {
     name: taggedTopic.name,
     normalisedName: taggedTopic.normalisedName,
-    rank: 1,
     microsoftID: taggedTopic.microsoftID,
   };
+  if (rank) topic.rank = 1;
   return topic;
 }
 
 export function convertTopicToTaggedTopic(topic: Topic, topicID: string) {
-  const taggedTopic = {
+  const taggedTopic: TaggedTopic = {
     name: topic.name,
     normalisedName: topic.normalisedName,
     id: topicID,
