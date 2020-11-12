@@ -176,7 +176,7 @@ export const addNewMSPublicationAsync = functions.pubsub
         createPublicationsTransaction.publication,
         createPublicationsTransaction.labspoonPublicationID,
         createPublicationsTransaction.taggedTopicsNoID
-      );
+      ).catch((err) => console.log('Error raised whilst creating a new topic from publication:', err));
       return true;
     } catch (err) {
       console.error(err);
