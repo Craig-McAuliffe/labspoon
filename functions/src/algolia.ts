@@ -106,6 +106,17 @@ export const addPublicationToSearchIndex = functions.firestore
     )
   );
 
+export const updatePublicationToSearchIndex = functions.firestore
+  .document(`publications/{publicationID}`)
+  .onUpdate((change, context): boolean =>
+    addToIndex(
+      context.params.publicationID,
+      change.after,
+      ResourceTypes.PUBLICATION,
+      PUBLICATIONS_INDEX
+    )
+  );
+
 export const configureTopicSearchIndex = functions.https.onRequest((_, res) =>
   configureSearchIndex(res, TOPICS_INDEX, ['name'])
 );
