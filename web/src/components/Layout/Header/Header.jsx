@@ -9,10 +9,11 @@ import './Header.css';
 const Header = () => {
   return (
     <div className="header-container">
-      <Link to="/">
+      <Link to="/" className="header-home-link">
         <div className="header-logo">
           <HeaderLogo />
         </div>
+        <span className="header-home-text">Home</span>
       </Link>
       <SearchBar />
       <div className="header-drop-down">
