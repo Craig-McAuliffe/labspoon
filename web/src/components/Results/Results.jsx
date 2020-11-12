@@ -88,7 +88,7 @@ export function GenericListItem({result, onBookmarkPage}) {
       return (
         <PublicationListItem
           publication={result}
-          key={result.id + 'publication'}
+          key={result.id || result.microsoftID + 'publication'}
           bookmarkedVariation={onBookmarkPage}
         />
       );
