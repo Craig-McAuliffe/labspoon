@@ -21,37 +21,78 @@ const db = admin.firestore();
 export const allPublicationFields =
   'AA.AfId,AA.AfN,AA.AuId,AA.AuN,AA.DAuN,AA.DAfN,AA.S,AW,BT,BV,C.CId,C.CN,CC,CitCon,D,DN,DOI,E,ECC,F.DFN,F.FId,F.FN,FamId,FP,I,IA,Id,J.JId,J.JN,LP,PB,Pt,RId,S,Ti,V,VFN,VSN,W,Y';
 
+interface PublicationSearchResponse {
+  results: Publication[];
+  expression: string;
+}
+
+// Used for interpreting and evaluating a search query.
+interface PublicationSearchQuery {
+  query: string;
+  limit: number;
+}
+
+// Used for only evaluating a search query.
+interface PublicationSearchExpression {
+  // An expression using the microsoft academic query expression syntax https://docs.microsoft.com/en-us/academic-services/project-academic-knowledge/reference-query-expression-syntax
+  expression: string;
+  limit: number;
+  offset: number;
+}
+
+type PublicationSearchRequest =
+  | PublicationSearchQuery
+  | PublicationSearchExpression;
+
 export const microsoftAcademicKnowledgePublicationSearch = functions.https.onCall(
-  async (data) => {
-    let results: Publication[] = [];
-    await interpretQuery({
-      query: data.query,
-      complete: 1,
-      count: 1,
-    })
-      .then((resp) => {
-        if (resp.data.timed_out) throw new functions.https.HttpsError('deadline-exceeded', 'Query timed out');
-        if (resp.data.interpretations.length === 0) return new Promise(() => null);
-        return executeExpression({
-          // `Ty='0'` retrieves only publication type results
-          // https://docs.microsoft.com/en-us/academic-services/project-academic-knowledge/reference-entity-attributes
-          expr: `And(${resp.data.interpretations[0].rules[0].output.value}, Ty='0')`,
-          count: 10,
-          attributes: allPublicationFields,
-        });
-      })
-      .then(async (resp: any) => {
-        if (!resp) return;
-        const publications = resp.data.entities;
-        await publishAddPublicationRequests(publications);
-        results = publications.map(makPublicationToPublication);
-      })
-      .catch((err) => {
+  async (
+    data: PublicationSearchRequest
+  ): Promise<PublicationSearchResponse> => {
+    const response: PublicationSearchResponse = {results: [], expression: ''};
+
+    const count = data.limit;
+    let expression: string;
+    let offset: number;
+    const publicationSearchExpression = data as PublicationSearchExpression;
+    if (publicationSearchExpression.expression !== undefined) {
+      expression = publicationSearchExpression.expression;
+      offset = publicationSearchExpression.offset;
+    } else {
+      const publicationSearchQuery = data as PublicationSearchQuery;
+      const interpretationResponse = await interpretQuery({
+        query: publicationSearchQuery.query,
+        complete: 1,
+        count: 1,
+      }).catch((err) => {
         // If the error is well defined re-throw it.
         if (err.code) throw err;
+        console.error('Error raised interpreting a query in the publication search:', err);
         throw new functions.https.HttpsError('internal', 'An error occured.');
       });
-    return results;
+      if (!interpretationResponse) return response;
+      expression =
+        interpretationResponse.data.interpretations[0].rules[0].output.value;
+      offset = 0;
+    }
+
+    const executeResponse = await executeExpression({
+      // `Ty='0'` retrieves only publication type results
+      // https://docs.microsoft.com/en-us/academic-services/project-academic-knowledge/reference-entity-attributes
+      expr: `And(${expression}, Ty='0')`,
+      count: count,
+      offset: offset,
+      attributes: allPublicationFields,
+    }).catch((err) => {
+      // If the error is well defined re-throw it.
+      if (err.code) throw err;
+      throw new functions.https.HttpsError('internal', 'An error occured.');
+    });
+    if (!executeResponse) return response;
+    const publications = executeResponse.data.entities;
+    await publishAddPublicationRequests(publications);
+    response.results = publications.map(makPublicationToPublication);
+    response.expression = expression;
+    return response;
   }
 );
 
