@@ -23,7 +23,20 @@
   max-width: 100%;
 }
 
+.header-home-text {
+  display: inline-block;
+  margin-left: 5px;
+}
+
+.header-home-link:hover span {
+  color: #3099d3;
+}
+
 @media screen and (max-width: 1017px) {
+  .header-home-text {
+    display: none;
+  }
+
   .header-container {
     display: grid;
     grid-template-columns: 100px 1fr 100px;

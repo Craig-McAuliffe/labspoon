@@ -71,7 +71,7 @@ export default function AboutPage() {
                 <SearchAndNetworkDiagram />
               </div>
               <div className="about-page-feature-right-container">
-                <h2>
+                <h2 className="about-page-feature-description">
                   Discover the major researchers in a topic space with our
                   natural language search engine and network of experts.
                 </h2>
@@ -79,7 +79,7 @@ export default function AboutPage() {
             </div>
             <div className="about-page-feature-text-diagram-container">
               <div className="about-page-feature-left-container">
-                <h2>
+                <h2 className="about-page-feature-description">
                   Follow a topic space, a particular research group, or an
                   individual for updates directly from the lab.
                 </h2>
@@ -95,14 +95,14 @@ export default function AboutPage() {
                 <CustomUpdateFrequencyDiagram />
               </div>
               <div className="about-page-feature-right-container">
-                <h2>
+                <h2 className="about-page-feature-description">
                   Choose the types of updates you want and when you want them.
                 </h2>
               </div>
             </div>
             <div className="about-page-feature-text-diagram-container">
               <div className="about-page-feature-left-container">
-                <h2>
+                <h2 className="about-page-feature-description">
                   Build your custom feeds with whatever mixture of topics you
                   choose.
                 </h2>

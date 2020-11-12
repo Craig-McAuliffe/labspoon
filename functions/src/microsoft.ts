@@ -33,12 +33,17 @@ export function interpretQuery(params: interpretParams): AxiosPromise {
       'Ocp-Apim-Subscription-Key': getSubscriptionKey(),
     },
     params,
+  }).then((resp) => {
+    if (resp.data.timed_out) throw new functions.https.HttpsError('deadline-exceeded', 'Query timed out');
+    if (resp.data.interpretations.length === 0) return new Promise(() => null);
+    return resp;
   });
 }
 
 interface executeParams {
   expr: string;
   count: number;
+  offset?: number;
   attributes: string;
 }
 
