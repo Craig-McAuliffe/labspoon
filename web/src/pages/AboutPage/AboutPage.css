@@ -59,7 +59,8 @@
 }
 
 .about-page-headline-text-container p {
-  line-height: 0px;
+  line-height: 5px;
+  font-size: 1.1em;
   color: #99999f;
 }
 
@@ -69,9 +70,10 @@
 }
 
 .about-page-super-points {
-  font-size: 1.2em;
-  line-height: 1.6em;
-  color: #00507c;
+  font-size: 1.4em;
+  line-height: 1.9em;
+  margin-bottom: 10px;
+  color: #000000;
 }
 
 .about-page-headline-diagram-container {
@@ -178,7 +180,7 @@
   display: none;
 }
 
-.about-page-features-section h2 {
+.about-page-feature-description {
   color: #00507c;
 }
 
@@ -267,7 +269,7 @@
     height: 420px;
   }
 
-  .about-page-features-section h2 {
+  .about-page-feature-description {
     font-size: 1.2em;
   }
 
@@ -310,8 +312,8 @@
   }
 
   .about-page-super-points {
-    font-size: 1.2em;
-    line-height: 1.4em;
+    font-size: 1.3em;
+    line-height: 1.8em;
   }
 }
 
@@ -349,8 +351,8 @@
   }
 
   .about-page-super-points {
-    font-size: 1em;
-    line-height: 1.3em;
+    font-size: 1.4em;
+    line-height: 1.7em;
   }
 
   .about-page-header-logo svg {
@@ -384,7 +386,7 @@
     height: 350px;
   }
 
-  .about-page-features-section h2 {
+  .about-page-feature-description {
     font-size: 1.1em;
   }
 
@@ -408,7 +410,7 @@
   }
 
   .about-page-headline-text-container p {
-    font-size: 0.8em;
+    font-size: 1em;
   }
 
   .about-page-headline-section {
@@ -418,12 +420,7 @@
   }
 
   .about-page-super-title {
-    font-size: 1.5em;
-  }
-
-  .about-page-super-points {
-    font-size: 1em;
-    line-height: 1.2em;
+    font-size: 1.9em;
   }
 
   .about-page-action-news {
@@ -493,12 +490,12 @@
   }
 
   .about-page-super-title {
-    font-size: 1.3em;
+    font-size: 1.8em;
   }
 
   .about-page-super-points {
-    font-size: 0.9em;
-    line-height: 1.1em;
+    font-size: 1.3em;
+    line-height: 1.5em;
   }
 }
 
@@ -530,17 +527,16 @@
 
 @media only screen and (max-width: 378px) {
   .about-page-super-title {
-    font-size: 1.2em;
+    font-size: 1.7em;
   }
 
   .about-page-super-points {
-    font-size: 0.8em;
-    line-height: 1.1em;
+    font-size: 1.1em;
+    line-height: 1.3em;
   }
 
   .about-page-headline-text-container p {
-    font-size: 0.7em;
-    line-height: 0px;
+    font-size: 0.9em;
     margin-bottom: 10px;
   }
 

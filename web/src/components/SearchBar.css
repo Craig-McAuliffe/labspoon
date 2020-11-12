@@ -21,6 +21,10 @@
   padding-left: 10px;
 }
 
+.search-bar-suggested-searches-prompt {
+  color: #99999f;
+}
+
 .big-search-icon-container {
   width: 55px;
   height: 60px;
@@ -95,7 +99,8 @@
 }
 
 @media only screen and (max-width: 800px) {
-  .big-search-suggested-search {
+  .big-search-suggested-search,
+  .search-bar-suggested-searches-prompt {
     font-size: 1em;
   }
   .big-search-input {
@@ -115,7 +120,8 @@
   .search-icon-container {
     width: 30px;
   }
-  .big-search-suggested-search {
+  .big-search-suggested-search,
+  .search-bar-suggested-searches-prompt {
     font-size: 0.9em;
   }
 }
@@ -156,7 +162,8 @@
   .big-search-icon-container {
     width: 30px;
   }
-  .big-search-suggested-search {
+  .big-search-suggested-search,
+  .search-bar-suggested-searches-prompt {
     font-size: 0.7em;
   }
   .big-search-input {

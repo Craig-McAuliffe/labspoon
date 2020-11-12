@@ -65,6 +65,9 @@ export default function SearchBar({
           <div></div>
           <div></div>
           <div className="big-search-suggested-searches-container">
+            <span className="search-bar-suggested-searches-prompt">
+              Suggested Searches:
+            </span>
             <Link
               to="/search?query=Covid-19&page=1"
               className="big-search-suggested-search"
