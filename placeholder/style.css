@@ -320,6 +320,18 @@ input:focus {
     margin-top: 50px;
   }
 
+  .coming-soon-container {
+    margin: 30px 10vw;
+  }
+
+  .coming-soon-container h1 {
+    font-size: 1.2em;
+  }
+
+  .coming-soon-container h3 {
+    font-size: 1em;
+  }
+
   .about-page-feature-left-container {
     padding-right: 40px;
     margin-bottom: 80px;
@@ -463,6 +475,18 @@ input:focus {
     margin-top: 0px;
     width: 60%;
   }
+
+  .coming-soon-container {
+    margin: 20px 5vw;
+  }
+
+  .coming-soon-container h1 {
+    font-size: 1.1em;
+  }
+
+  .coming-soon-container h3 {
+    font-size: 1em;
+  }
 }
 
 @media only screen and (max-width: 586px) {
@@ -543,6 +567,10 @@ input:focus {
 }
 
 @media only screen and (max-width: 378px) {
+  .coming-soon-container {
+    margin: 0px 5vw;
+  }
+
   .about-page-super-title {
     font-size: 1.7em;
   }
