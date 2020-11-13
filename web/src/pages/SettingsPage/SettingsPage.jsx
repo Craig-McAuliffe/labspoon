@@ -1,5 +1,5 @@
-import React, {useContext, useState} from 'react';
-import firebase from 'firebase';
+import React, {useContext, useState, useEffect} from 'react';
+import firebase, {db} from '../../firebase';
 import {AuthContext} from '../../App';
 import {Form, Formik} from 'formik';
 import * as Yup from 'yup';
@@ -7,10 +7,13 @@ import UserAvatar from '../../components/Avatar/UserAvatar';
 import PrimaryButton from '../../components/Buttons/PrimaryButton';
 import CancelButton from '../../components/Buttons/CancelButton';
 import FormTextInput from '../../components/Forms/FormTextInput';
-import GeneralError from '../../components/GeneralError';
 
 import './SettingsPage.css';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
+
+const EMAIL = 'email';
+const PASSWORD = 'password';
+const UPDATE_EMAILS = 'updateEmails';
 
 const SettingsPage = () => {
   const {user, userProfile} = useContext(AuthContext);
@@ -19,7 +22,7 @@ const SettingsPage = () => {
   if (!userProfile) return <LoadingSpinner />;
 
   const cancelChanges = () => {
-    setEditState(false);
+    setEditState(undefined);
   };
 
   const reauthenticate = (currentPassword) => {
@@ -30,30 +33,52 @@ const SettingsPage = () => {
     return user.reauthenticateWithCredential(userCred);
   };
 
-  const editDetailsDisplay = () => (
-    <>
-      {editState === 'email' ? (
+  let settings;
+  switch (editState) {
+    case EMAIL:
+      settings = (
         <ChangeEmailForm
           user={user}
           cancelChanges={cancelChanges}
           reauthenticate={reauthenticate}
           setEditState={setEditState}
         />
-      ) : editState === 'password' ? (
+      );
+      break;
+    case PASSWORD:
+      settings = (
         <ChangePasswordForm
           user={user}
           cancelChanges={cancelChanges}
           reauthenticate={reauthenticate}
           setEditState={setEditState}
         />
-      ) : (
-        <>
-          <GeneralError />
-          <CancelButton cancelAction={cancelChanges} />
-        </>
-      )}
-    </>
-  );
+      );
+      break;
+    case UPDATE_EMAILS:
+      settings = (
+        <ChangeUpdateEmailSettingsForm
+          cancelChanges={cancelChanges}
+          setEditState={setEditState}
+        />
+      );
+      break;
+    default:
+      settings = (
+        <div className="setting-page-user-details">
+          <button onClick={() => setEditState(EMAIL)}>Change Email</button>
+          <span>{user.email}</span>
+          <button onClick={() => setEditState(PASSWORD)}>
+            Change Password
+          </button>
+          <span></span>
+          <button onClick={() => setEditState(UPDATE_EMAILS)}>
+            Update Email Settings
+          </button>
+          <span></span>
+        </div>
+      );
+  }
 
   return (
     <>
@@ -64,20 +89,7 @@ const SettingsPage = () => {
             <UserAvatar src={userProfile.avatar} width="100" height="100" />
             <h2>{user.displayName}</h2>
           </div>
-          {editState === false ? (
-            <div className="setting-page-user-details">
-              <button onClick={() => setEditState('email')}>
-                Change Email
-              </button>
-              <span>{user.email}</span>
-              <button onClick={() => setEditState('password')}>
-                Change Password
-              </button>
-              <span></span>
-            </div>
-          ) : (
-            editDetailsDisplay()
-          )}
+          {settings}
         </div>
       </div>
     </>
@@ -85,6 +97,68 @@ const SettingsPage = () => {
 };
 
 export default SettingsPage;
+
+function ChangeUpdateEmailSettingsForm({cancelChanges, setEditState}) {
+  const {user, userProfile, updateUserDetails} = useContext(AuthContext);
+  const [wednesday, setWednesday] = useState(false);
+  const [sunday, setSunday] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (userProfile.updateEmailSettings) {
+      setWednesday(userProfile.updateEmailSettings.wednesday);
+      setSunday(userProfile.updateEmailSettings.sunday);
+    }
+    setLoading(false);
+  }, [userProfile, setSunday, setWednesday]);
+
+  function handleSubmit() {
+    setLoading(true);
+    db.doc(`users/${userProfile.id}`)
+      .update({
+        updateEmailSettings: {
+          wednesday: wednesday,
+          sunday: sunday,
+        },
+      })
+      .then(() => {
+        updateUserDetails(user);
+        setEditState(undefined);
+      })
+      .catch((err) => alert(err));
+  }
+
+  if (loading) return <LoadingSpinner />;
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <br />
+      <label>
+        <input
+          type="checkbox"
+          checked={wednesday}
+          onChange={() => setWednesday((previous) => !previous)}
+        />
+        Wednesday
+      </label>
+      <br />
+      <label>
+        <input
+          type="checkbox"
+          checked={sunday}
+          onChange={() => setSunday((previous) => !previous)}
+        />
+        Sunday
+      </label>
+      <div className="cancel-or-submit">
+        <CancelButton cancelAction={cancelChanges} />
+        <div className="submit-button-container">
+          <PrimaryButton submit={true}>Save</PrimaryButton>
+        </div>
+      </div>
+    </form>
+  );
+}
 
 function ChangeEmailForm({user, cancelChanges, reauthenticate, setEditState}) {
   const initialValues = {

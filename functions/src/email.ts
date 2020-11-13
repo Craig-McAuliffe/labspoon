@@ -23,7 +23,8 @@ const dayInMS = hourInMS * 24;
 
 // Triggers an update email.
 export const triggerEmail = functions.https.onCall(async () => {
-  const messageBuffer = Buffer.from(' ');
+  const messageString = JSON.stringify({'day': 'sunday'});
+  const messageBuffer = Buffer.from(messageString);
   return pubSubClient
     .topic('update-email')
     .publish(messageBuffer)
@@ -32,7 +33,8 @@ export const triggerEmail = functions.https.onCall(async () => {
 
 export const sendUpdateEmail = functions.pubsub
   .topic('update-email')
-  .onPublish(async () => {
+  .onPublish(async (message) => {
+    const day = message.json.day;
     const usersSnapshot = await db.collection('users').get();
     if (usersSnapshot.empty) {
       console.log('No users found');
@@ -41,14 +43,38 @@ export const sendUpdateEmail = functions.pubsub
 
     // remember to make this idempotent
     const promises: Promise<undefined>[] = [];
-    usersSnapshot.forEach((ds) => promises.push(mailUser(ds)));
+    usersSnapshot.forEach((ds) => promises.push(mailUser(ds, day)));
     return Promise.all(promises);
   });
 
-async function mailUser(ds: DocumentSnapshot): Promise<undefined> {
+const DEFAULT_UPDATE_EMAIL_SETTINGS = {
+  wednesday: false,
+  sunday: true,
+}
+
+async function mailUser(ds: DocumentSnapshot, day: string): Promise<undefined> {
   const userID = ds.id;
   const user = ds.data();
-  let previousUpdateEmailTimestamp = user!.previousUpdateEmailTimestamp;
+
+  if (!user) {
+    console.error('User does not exist in user snapshot:', ds);
+    return;
+  }
+
+  // If the user doesn't have any update email settings yet, set them to the
+  // default of getting an email once a week on a sunday
+  if (!user.updateEmailSettings) {
+    await db.doc(`users/${userID}`)
+      .update({
+        updateEmailSettings: DEFAULT_UPDATE_EMAIL_SETTINGS,
+      })
+      .catch((err) => alert(err));
+    user.updateEmailSettings = DEFAULT_UPDATE_EMAIL_SETTINGS;
+  }
+
+  if (user.updateEmailSettings && !user.updateEmailSettings[day]) return;
+
+  let previousUpdateEmailTimestamp = user.previousUpdateEmailTimestamp;
   const currentTime = new Date();
 
   // If we have sent an email in the past hour don't send another one so
@@ -125,7 +151,7 @@ function getTemplateDataFromPostsSnapshot(postsQS: any) {
   const activeTopicsHalfwayIndex = Math.ceil(activeTopics.length / 2);
   return {
     users_left: activeUsers.slice(0, activeUsersHalfwayIndex),
-    users_right: activeUsers.slice( activeUsersHalfwayIndex),
+    users_right: activeUsers.slice(activeUsersHalfwayIndex),
     topics_left: activeTopics.slice(0, activeTopicsHalfwayIndex),
     topics_right: activeTopics.slice(activeTopicsHalfwayIndex)
   };
