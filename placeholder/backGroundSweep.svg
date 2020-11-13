@@ -1,0 +1,21 @@
+<svg
+      viewBox="0 0 1000 187"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      preserveAspectRatio="xMinYMin meet"
+    >
+      <path d="M0 267V0H999.589H1428L0 267Z" fill="url(#paint0_linear)" />
+      <defs>
+        <linearGradient
+          id="paint0_linear"
+          x1="580.171"
+          y1="-67.704"
+          x2="508.648"
+          y2="290.259"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stop-color="#00507C" stop-opacity="0.18" />
+          <stop offset="1" stop-color="#3099D3" stop-opacity="0" />
+        </linearGradient>
+      </defs>
+    </svg>
