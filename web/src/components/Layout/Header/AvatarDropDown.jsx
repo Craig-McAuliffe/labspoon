@@ -45,7 +45,7 @@ const AvatarDropDown = () => {
           <Dropdown.Item href="/follows">
             <div className="avatar-dropdown-item-container">
               <FollowIcon />
-              <p className="link-item">Follows</p>
+              <p className="link-item">Things you follow</p>
             </div>
           </Dropdown.Item>
           <Dropdown.Item href={`/user/${user.uid}`}>
