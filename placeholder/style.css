@@ -377,7 +377,8 @@ input:focus {
     width: 130px;
   }
 
-  .header-primary-cta-container {
+  .header-primary-cta-container,
+  .primary-cta {
     width: 130px;
   }
 
@@ -546,6 +547,9 @@ input:focus {
   .header-primary-cta-container {
     width: 100px;
     margin-right: 5px;
+  }
+  .primary-cta {
+    width: 100px;
   }
 
   .about-page-logo {
