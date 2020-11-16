@@ -233,17 +233,13 @@ input:focus {
 }
 
 .about-page-final-actions-container {
-  background: #00507c;
   width: 150px;
   cursor: pointer;
-  border-radius: 3%;
 }
 
 .header-primary-cta-container {
   justify-self: flex-end;
-  background: #00507c;
   width: 150px;
-  border-radius: 3%;
   margin-right: 10px;
   cursor: pointer;
   z-index: 1;
@@ -254,11 +250,13 @@ input:focus {
   border-radius: 4%;
   text-decoration: none;
   color: #ffffff;
-
   text-align: center;
   -webkit-appearance: none;
   -moz-appearance: none;
   width: 150px;
+  display: inline-block;
+  background-color: #00507c;
+  border-radius: 3%;
 }
 
 .primary-cta h3 {
