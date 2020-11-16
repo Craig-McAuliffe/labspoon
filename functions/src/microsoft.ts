@@ -70,6 +70,7 @@ export function makPublicationToPublication(
   if (makPublication.Id) publication.microsoftID = makPublication.Id.toString();
   if (makPublication.F)
     publication.topics = makPublication.F.map(makFieldToTopic);
+  if (makPublication.S) publication.sources = makPublication.S.map(makSourceToSource);
   return publication;
 }
 
@@ -81,6 +82,7 @@ export interface MAKPublication {
   AA?: Array<MAKAuthor>;
   Id?: number;
   F?: MAKField[];
+  S?: MAKSource[];
   // Tracks corresponding Labspoon publication.
   processed?: string;
 }
@@ -91,6 +93,60 @@ export interface Publication {
   authors?: Array<User>;
   microsoftID?: string;
   topics?: Topic[];
+  sources: Source[],
+}
+
+export function makSourceToSource(makSource: MAKSource) {
+  let sourceType;
+  switch (makSource.Ty) {
+    case 0:
+      sourceType = SourceType.HTML;
+      break;
+    case 1:
+      sourceType = SourceType.TEXT;
+      break;
+    case 2:
+      sourceType = SourceType.PDF;
+      break;
+    case 3:
+      sourceType = SourceType.DOC;
+      break;
+    case 4:
+      sourceType = SourceType.PPT;
+      break;
+    case 5:
+      sourceType = SourceType.XLS;
+      break;
+    case 6:
+      sourceType = SourceType.PS;
+      break;
+    default:
+      sourceType = SourceType.HTML;
+  }
+  return {
+    type: sourceType,
+    url: makSource.U,
+  };
+}
+
+interface MAKSource {
+  Ty: number,
+  U: string,
+}
+
+enum SourceType {
+  HTML = 'html',
+  TEXT = 'text',
+  PDF = 'pdf',
+  DOC = 'doc',
+  PPT = 'ppt',
+  XLS = 'xls',
+  PS = 'ps',
+}
+
+export interface Source {
+  type: SourceType,
+  url: string,
 }
 
 export function makAuthorToAuthor(makAuthor: MAKAuthor): User {
@@ -150,6 +206,7 @@ export interface MAKPublicationInDB {
   AA?: Array<MAKAuthor>;
   Id?: number;
   F?: MAKField[];
+  S?: MAKSource[];
   // Tracks whether the publication has been added to the Labspoon publications. Defaults to false.
   processed?: string;
 }

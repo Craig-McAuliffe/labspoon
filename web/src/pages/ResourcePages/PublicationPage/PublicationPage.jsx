@@ -14,7 +14,6 @@ import FilterableResults, {
   NewFilterMenuWrapper,
 } from '../../../components/FilterableResults/FilterableResults';
 import PublicationSider from './PublicationPageSider';
-import detectJournal from '../../../components/Publication/DetectJournal';
 
 import './PublicationPage.css';
 import {getActiveTabID} from '../../../helpers/filters';
@@ -171,29 +170,9 @@ function SuggestedPublications({publicationDetails}) {
 const PublicationDetails = ({publicationDetails}) => {
   if (publicationDetails === undefined) return <></>;
   return (
-    <>
-      <div className="publication-meta">
-        {detectJournal(publicationDetails).length === 0 ? (
-          <div></div>
-        ) : (
-          <img
-            className="publication-journal-logo"
-            src={detectJournal(publicationDetails)[0].logo}
-            alt={`${detectJournal(publicationDetails)[0].name} journal logo`}
-          />
-        )}
-        <PublicationLink publicationUrl={publicationDetails.url} />
-      </div>
-      <PublicationBody publicationDetails={publicationDetails} />
-    </>
-  );
-};
-
-function PublicationBody({publicationDetails}) {
-  if (publicationDetails === undefined) return <></>;
-  return (
     <div className="publication-body">
       <h2>{publicationDetails.title}</h2>
+      <PublicationSources sources={publicationDetails.sources} />
       {publicationDetails.content.authors ? (
         <PublicationAuthors
           publicationAuthors={publicationDetails.content.authors}
@@ -205,7 +184,7 @@ function PublicationBody({publicationDetails}) {
       <ListItemTopics dbTopics={publicationDetails.topics} />
     </div>
   );
-}
+};
 
 function PublicationBodyAbstract({abstract}) {
   if (!abstract) return <></>;
@@ -217,13 +196,29 @@ function PublicationBodyAbstract({abstract}) {
   );
 }
 
-function PublicationLink({publicationURL}) {
-  if (!publicationURL) return <></>;
-  return (
-    <a href={publicationURL} target="_blank" rel="noopener noreferrer">
-      Go to full article
-    </a>
-  );
+function PublicationSources({sources}) {
+  const [showMore, setShowMore] = useState(false);
+  if (!sources || sources.length === 0) return <></>;
+  const links = sources.map((source, idx) => (
+    <p key={source.url}>
+      {source.type.toUpperCase()}&nbsp;
+      <a href={source.url} target="_blank" rel="noopener noreferrer">
+        {source.url}
+      </a>
+      {idx === 0 ? (
+        <button
+          type="button"
+          onClick={() => setShowMore((showMore) => !showMore)}
+        >
+          See {showMore ? 'fewer' : 'more'} links
+        </button>
+      ) : (
+        <></>
+      )}
+    </p>
+  ));
+  if (!showMore) return links[0];
+  return links;
 }
 
 function PublicationAuthors({publicationAuthors}) {
