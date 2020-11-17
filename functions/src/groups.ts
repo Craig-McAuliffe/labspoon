@@ -97,6 +97,35 @@ export const removeGroupOnRelatedTopicPage = functions.firestore
       .catch((err) => console.log(err, 'unable to remove group from topic'));
   });
 
+// When a new member (Mark) is added to a group by an existing member (Jenna),
+// Mark is added to the group's members collection by Jenna. Jenna does not
+// have permission to modify Mark's groups collection, so this function
+// performs this reciprocal update.
+export const addGroupToUserGroups = functions.firestore.document('groups/{groupID}/members/{userID}').onCreate(async (_, context) => {
+  const groupID = context.params.groupID;
+  const userID = context.params.userID;
+  const groupDS = await db.doc(`groups/${groupID}`).get().catch((err) => {
+    console.log(`Unable to retrieve group with ID ${groupID}:`, err);
+    throw new functions.https.HttpsError('not-found', `Unable to retrieve group with ID ${groupID}.`);
+  });
+  const group = groupDS.data() as GroupRef;
+  await db.doc(`users/${userID}/groups/${groupID}`).set(group).catch((err) => {
+    console.log(`Unable to set group with ID ${groupID} on user ${userID} groups collection:`, err);
+    throw new functions.https.HttpsError('internal', `Unable to set group with ID ${groupID} on user ${userID} groups collection.`);
+  });
+  return true;
+});
+
+// Converse of addGroupToUserGroups.
+export const removeGroupFromUserGroups = functions.firestore.document('groups/{groupID}/members/{userID}').onCreate(async (_, context) => {
+  const groupID = context.params.groupID;
+  const userID = context.params.userID;
+  await db.doc(`users/${userID}/groups/${groupID}`).delete().catch((err) => {
+    console.log(`Unable to remove group with ID ${groupID} from user ${userID} groups collection:`, err);
+    throw new functions.https.HttpsError('internal', `Unable to remove group with ID ${groupID} from user ${userID} groups collection.`);
+  });
+});
+
 export async function setGroupOnTopic(
   topic: Topic,
   groupID: string,
