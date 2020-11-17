@@ -75,6 +75,20 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
+          "fieldPath": "filterTopicIDs",
+          "arrayConfig": "CONTAINS"
+        },
+        {
+          "fieldPath": "timestamp",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "posts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
           "fieldPath": "postType.id",
           "order": "ASCENDING"
         },
