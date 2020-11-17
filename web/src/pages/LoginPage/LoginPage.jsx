@@ -130,11 +130,7 @@ const SignUpForm = ({setGoToOnboarding}) => {
       .required('Email is required'),
     password: Yup.string()
       .required('Password is required')
-      .min(8, 'Password must be at least 8 characters long.')
-      .matches(
-        /^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/,
-        'Password must contain a mixture of numbers and letters.'
-      ),
+      .min(8, 'Password must be at least 8 characters long.'),
     confirmPassword: Yup.string()
       .required('Password confirmation is required')
       .label('Confirm password')
@@ -224,11 +220,7 @@ const SignInForm = ({setFormType, returnLocation}) => {
       .required('Email is required'),
     password: Yup.string()
       .required('Password is required')
-      .min(8, 'Password must be at least 8 characters long.')
-      .matches(
-        /^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/,
-        'Password must contain a mixture of numbers and letters.'
-      ),
+      .min(8, 'Password must be at least 8 characters long.'),
   });
 
   return (
