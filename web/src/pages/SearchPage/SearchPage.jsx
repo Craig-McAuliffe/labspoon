@@ -1,7 +1,7 @@
 // custom search logic removed after 9ebf31106b04400309e7266010aca27f9ae96342
 // in favour of algolia
 import React, {useState, useEffect} from 'react';
-import {useLocation, useHistory} from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 import qs from 'qs';
 import {
   InstantSearch,
@@ -14,7 +14,8 @@ import {
 import {abbrEnv} from '../../config';
 
 import {searchClient} from '../../algolia';
-import {searchStateToURL, createURL} from '../../helpers/search';
+// import {searchStateToURL, createURL} from '../../helpers/search';
+import {createURL} from '../../helpers/search';
 
 import {GenericListItem} from '../../components/Results/Results';
 import {MicrosoftAcademicKnowledgeAPIPublicationResults} from '../../components/Publication/MicrosoftResults';
@@ -22,10 +23,12 @@ import {MicrosoftAcademicKnowledgeAPIPublicationResults} from '../../components/
 import {dbPublicationToJSPublication} from '../../helpers/publications';
 
 import 'instantsearch.css/themes/algolia.css';
-
-import './SearchPage.css';
 import {useContext} from 'react';
 import {FeatureFlags} from '../../App';
+import SecondaryButton from '../../components/Buttons/SecondaryButton';
+import SearchBar from '../../components/SearchBar';
+
+import './SearchPage.css';
 
 const OVERVIEW = 'Overview';
 const PUBLICATIONS = 'Publications';
@@ -34,15 +37,16 @@ const USERS = 'Users';
 const GROUPS = 'Groups';
 const TOPICS = 'Topics';
 
-const DEBOUNCE_TIME = 700;
-let currentTab;
+// const DEBOUNCE_TIME = 700;
+
+const SearchPageActiveTabContext = React.createContext();
 
 export default function SearchPage() {
   const location = useLocation();
-  const history = useHistory();
+  // const history = useHistory();
   const [tab, setTab] = useState(OVERVIEW);
   const [searchState, setSearchState] = useState(urlToSearchState(location));
-  const setStateId = React.useRef();
+  // const setStateId = React.useRef();
   const fflags = useContext(FeatureFlags);
 
   useEffect(() => {
@@ -52,23 +56,18 @@ export default function SearchPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
+  // function onSearchStateChange(nextSearchState) {
+  //   clearTimeout(setStateId.current);
 
-  useEffect(() => {
-    currentTab = tab;
-  }, [tab]);
+  //   setStateId.current = setTimeout(() => {
+  //     history.push(
+  //       searchStateToURL(location, nextSearchState),
+  //       nextSearchState
+  //     );
+  //   }, DEBOUNCE_TIME);
 
-  function onSearchStateChange(nextSearchState) {
-    clearTimeout(setStateId.current);
-
-    setStateId.current = setTimeout(() => {
-      history.push(
-        searchStateToURL(location, nextSearchState),
-        nextSearchState
-      );
-    }, DEBOUNCE_TIME);
-
-    setSearchState(nextSearchState);
-  }
+  //   setSearchState(nextSearchState);
+  // }
 
   const tabs = [OVERVIEW, PUBLICATIONS, POSTS, USERS, GROUPS, TOPICS].map(
     (tabName) => (
@@ -113,16 +112,22 @@ export default function SearchPage() {
   }
 
   return (
-    <>
+    <SearchPageActiveTabContext.Provider
+      value={{
+        activeTab: tab,
+        setActiveTab: setTab,
+      }}
+    >
       <div className="content-layout">
         <div className="feed-container">
           <div className="search-page-search-container">
             <InstantSearch
               searchClient={searchClient}
-              indexName={abbrEnv + '_USERS'}
+              indexName={tabToIndex(tab)}
               searchState={searchState}
-              onSearchStateChange={onSearchStateChange}
+              // onSearchStateChange={onSearchStateChange}
               createURL={createURL}
+              refresh
             >
               <SearchBox
                 translations={{
@@ -138,29 +143,73 @@ export default function SearchPage() {
           </div>
         </div>
       </div>
-    </>
+    </SearchPageActiveTabContext.Provider>
   );
 }
 
 const IndexResults = connectStateResults(
   ({searchState, searchResults, children}) => {
-    if (searchResults && searchResults.nbHits !== 0) return children;
-    if (currentTab === OVERVIEW) {
-      if (searchResults) {
-        if (searchResults.index.includes('POSTS'))
-          return <div>No results were found for {searchState.query}.</div>;
-        return null;
-      }
-    } else
-      return (
-        <div>
-          No {currentTab} were found for {searchState.query}. Check the other
-          tabs or try a different query.
+    const {activeTab} = useContext(SearchPageActiveTabContext);
+    console.log('searchResults', searchResults);
+    if (searchResults) console.log(searchResults.index);
+    if (searchResults && searchResults.nbHits !== 0) {
+      return children;
+    }
+    return (
+      <>
+        <div className="search-page-no-results-message">
+          {`Hmm, we couldn't find any ${activeTab} for ${searchState.query}. You can check the other tabs though!`}
         </div>
-      );
-    return null;
+        <TryAnotherSearch />
+      </>
+    );
   }
 );
+
+const AllResults = connectStateResults(({allSearchResults, children}) => {
+  const {setActiveTab} = useContext(SearchPageActiveTabContext);
+  if (!allSearchResults) return null;
+  if (
+    Object.values(allSearchResults).some(
+      (individualIndexResults) => individualIndexResults.nbHits > 0
+    )
+  ) {
+    return children;
+  }
+  // These indexes trigger the AllResults to re-render and check other indexes
+  return (
+    <>
+      <Index indexName={`${abbrEnv}_PUBLICATIONS`} />
+      <Index indexName={`${abbrEnv}_POSTS`} />
+      <Index indexName={`${abbrEnv}_USERS`} />
+      <Index indexName={`${abbrEnv}_GROUPS`} />
+      <Index indexName={`${abbrEnv}_TOPICS`} />
+      <div className="search-page-no-results-message">
+        {`Hmm, looks like there's nothing on Labspoon that matches your search.`}
+      </div>
+      <div className="search-page-overview-deep-search-container">
+        <div>
+          <h2 className="search-page-overview-deep-search-title">
+            We can run a deep search for{' '}
+            <button onClick={() => setActiveTab(PUBLICATIONS)}>
+              publications outside of Labspoon.
+            </button>
+          </h2>
+        </div>
+        <div className="search-page-publication-tab-button-container">
+          <h3 className="search-page-publication-search-suggestion">
+            Just go to the publications tab
+          </h3>
+          <SecondaryButton onClick={() => setActiveTab(PUBLICATIONS)}>
+            {' '}
+            Publications
+          </SecondaryButton>
+        </div>
+      </div>
+      <TryAnotherSearch />
+    </>
+  );
+});
 
 // Adds a 'see more' button to the end of a hits component. Used for switching to tabs from the federated overview search.
 function SeeMoreWrapper({onClick, resourceType, children}) {
@@ -170,7 +219,11 @@ function SeeMoreWrapper({onClick, resourceType, children}) {
         return (
           <>
             {children}
-            <button onClick={onClick}>See more {resourceType}</button>
+            <div className="seach-page-see-more-container">
+              <button onClick={onClick} className="search-page-see-more-button">
+                ...see more {resourceType.toLowerCase()}
+              </button>
+            </div>
           </>
         );
       } else {
@@ -190,14 +243,13 @@ function OverviewResultsSection({
 }) {
   return (
     <Index indexName={abbrEnv + indexSuffix}>
-      <IndexResults>
-        <SeeMoreWrapper
-          onClick={() => setTab(tabName)}
-          resourceType={resourceType}
-        >
-          {children}
-        </SeeMoreWrapper>
-      </IndexResults>
+      <SeeMoreWrapper
+        onClick={() => setTab(tabName)}
+        resourceType={resourceType}
+      >
+        <Configure hitsPerPage={3} />
+        {children}
+      </SeeMoreWrapper>
     </Index>
   );
 }
@@ -238,109 +290,118 @@ const TopicHitsComponent = () => (
 
 const OverviewResults = ({setTab}) => (
   <>
-    <Configure hitsPerPage={3} />
-    <OverviewResultsSection
-      setTab={setTab}
-      indexSuffix={'_PUBLICATIONS'}
-      tabName={PUBLICATIONS}
-      resourceType={'Publications'}
-    >
-      <PublicationHitsComponent />
-    </OverviewResultsSection>
-    <OverviewResultsSection
-      setTab={setTab}
-      indexSuffix={'_POSTS'}
-      tabName={POSTS}
-      resourceType={'Posts'}
-    >
-      <PostHitsComponent />
-    </OverviewResultsSection>
-    <OverviewResultsSection
-      setTab={setTab}
-      indexSuffix={'_USERS'}
-      tabName={USERS}
-      resourceType={'Users'}
-    >
-      <UserHitsComponent />
-    </OverviewResultsSection>
-    <OverviewResultsSection
-      setTab={setTab}
-      indexSuffix={'_GROUPS'}
-      tabName={GROUPS}
-      resourceType={'Groups'}
-    >
-      <GroupHitsComponent />
-    </OverviewResultsSection>
-    <OverviewResultsSection
-      setTab={setTab}
-      indexSuffix={'_TOPICS'}
-      tabName={TOPICS}
-      resourceType={'Topics'}
-    >
-      <TopicHitsComponent />
-    </OverviewResultsSection>
+    <AllResults>
+      <OverviewResultsSection
+        setTab={setTab}
+        indexSuffix={'_PUBLICATIONS'}
+        tabName={PUBLICATIONS}
+        resourceType={'Publications'}
+      >
+        <PublicationHitsComponent />
+      </OverviewResultsSection>
+      <OverviewResultsSection
+        setTab={setTab}
+        indexSuffix={'_POSTS'}
+        tabName={POSTS}
+        resourceType={'Posts'}
+      >
+        <PostHitsComponent />
+      </OverviewResultsSection>
+      <OverviewResultsSection
+        setTab={setTab}
+        indexSuffix={'_USERS'}
+        tabName={USERS}
+        resourceType={'Users'}
+      >
+        <UserHitsComponent />
+      </OverviewResultsSection>
+      <OverviewResultsSection
+        setTab={setTab}
+        indexSuffix={'_GROUPS'}
+        tabName={GROUPS}
+        resourceType={'Groups'}
+      >
+        <GroupHitsComponent />
+      </OverviewResultsSection>
+      <OverviewResultsSection
+        setTab={setTab}
+        indexSuffix={'_TOPICS'}
+        tabName={TOPICS}
+        resourceType={'Topics'}
+      >
+        <TopicHitsComponent />
+      </OverviewResultsSection>
+    </AllResults>
   </>
 );
 
 const PublicationsResults = () => (
-  <Index indexName={abbrEnv + '_PUBLICATIONS'}>
-    <IndexResults>
-      <Hits
-        hitComponent={({hit}) => (
-          <GenericListItem result={dbPublicationToJSPublication(hit)} />
-        )}
-      />
-    </IndexResults>
-  </Index>
+  <IndexResults>
+    <Hits
+      hitComponent={({hit}) => (
+        <GenericListItem result={dbPublicationToJSPublication(hit)} />
+      )}
+    />
+  </IndexResults>
 );
 
 const UsersResults = () => (
-  <Index indexName={abbrEnv + '_USERS'}>
-    <IndexResults>
-      <Hits hitComponent={({hit}) => <GenericListItem result={hit} />} />
-    </IndexResults>
-  </Index>
+  <IndexResults>
+    <Hits hitComponent={({hit}) => <GenericListItem result={hit} />} />
+  </IndexResults>
 );
 
 const GroupsResults = () => (
-  <Index indexName={abbrEnv + '_GROUPS'}>
-    <IndexResults>
-      <Hits
-        hitComponent={({hit}) => {
-          hit.id = hit.objectID;
-          return <GenericListItem result={hit} />;
-        }}
-      />
-    </IndexResults>
-  </Index>
+  <IndexResults>
+    <Hits
+      hitComponent={({hit}) => {
+        hit.id = hit.objectID;
+        return <GenericListItem result={hit} />;
+      }}
+    />
+  </IndexResults>
 );
 
 const PostsResults = () => (
-  <Index indexName={abbrEnv + '_POSTS'}>
-    <IndexResults>
-      <Hits
-        hitComponent={({hit}) => {
-          hit.id = hit.objectID;
-          return <GenericListItem result={hit} />;
-        }}
-      />
-    </IndexResults>
-  </Index>
+  <IndexResults>
+    <Hits
+      hitComponent={({hit}) => {
+        hit.id = hit.objectID;
+        return <GenericListItem result={hit} />;
+      }}
+    />
+  </IndexResults>
 );
 
 const TopicsResults = () => {
   return (
-    <Index indexName={abbrEnv + '_TOPICS'}>
-      <IndexResults>
-        <Hits
-          hitComponent={({hit}) => {
-            hit.id = hit.objectID;
-            return <GenericListItem result={hit} />;
-          }}
-        />
-      </IndexResults>
-    </Index>
+    <IndexResults>
+      <Hits
+        hitComponent={({hit}) => {
+          hit.id = hit.objectID;
+          return <GenericListItem result={hit} />;
+        }}
+      />
+    </IndexResults>
   );
 };
 
 const urlToSearchState = (location) => qs.parse(location.search.slice(1));
+
+const tabToIndex = (tab) => {
+  if (tab === OVERVIEW) return `${abbrEnv}_PUBLICATIONS`;
+
+  return `${abbrEnv}_${tab.toUpperCase()}`;
+};
+
+const TryAnotherSearch = () => {
+  return (
+    <div className="search-page-try-another-search">
+      <SearchBar bigSearchPrompt>
+        <p className="search-page-search-prompt-label">
+          Or you can try another search
+        </p>
+      </SearchBar>
+    </div>
+  );
+};

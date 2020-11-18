@@ -33,3 +33,52 @@
   border: none;
   box-shadow: none;
 }
+
+.seach-page-see-more-container {
+  display: flex;
+  justify-content: flex-end;
+  margin: 10px 0px 60px;
+}
+
+.search-page-see-more-button {
+  color: #00507c;
+}
+
+.search-page-see-more-button:hover {
+  color: #3099d3;
+}
+
+.search-page-no-results-message {
+  margin-top: 20px;
+  color: #5d5d65;
+}
+
+.search-page-overview-deep-search-container {
+  margin-top: 8vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.search-page-overview-deep-search-title {
+  margin-bottom: 5vh;
+}
+
+.search-page-overview-deep-search-title button {
+  color: #00507c;
+}
+
+.search-page-overview-deep-search-title button:hover {
+  color: #3099d3;
+}
+
+.search-page-publication-search-suggestion {
+  color: #5d5d65;
+  display: inline-block;
+  margin-right: 20px;
+}
+
+.search-page-search-prompt-label {
+  margin-top: 10vh;
+  color: #5d5d65;
+}

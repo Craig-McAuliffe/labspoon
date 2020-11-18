@@ -160,12 +160,20 @@
   color: #00507c;
   padding: 8px 16px 4px 16px;
   border: 2px solid #00507c;
+  cursor: pointer;
+  box-sizing: border-box;
+  margin: 1px;
 }
 
 .secondary-button-inactive {
   color: #99999f;
   padding: 10px 16px 4px 16px;
   border: 2px solid #99999f;
+}
+
+.secondary-button-active:hover {
+  border-width: 3px;
+  margin: 0px;
 }
 
 @media screen and (max-width: 800px) {

@@ -9,6 +9,7 @@ export default function SearchBar({
   bigSearchPrompt,
   aboutPageSearch,
   placeholderText,
+  children,
 }) {
   const history = useHistory();
   const [query, setQuery] = useState(undefined);
@@ -54,7 +55,9 @@ export default function SearchBar({
   if (bigSearchPrompt || aboutPageSearch)
     return (
       <div>
-        {aboutPageSearch ? null : (
+        {aboutPageSearch ? null : children ? (
+          children
+        ) : (
           <h3 className="big-search-prompt-text">
             {`Search for something that interests you and follow for updates!`}
           </h3>
