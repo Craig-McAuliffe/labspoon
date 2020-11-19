@@ -1,4 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
+import firebase from '../../../firebase';
 import {FeatureFlags} from '../../../App';
 import {db} from '../../../firebase';
 import {useParams} from 'react-router-dom';
@@ -6,6 +7,7 @@ import {useParams} from 'react-router-dom';
 import {
   dbPublicationToJSPublication,
   getLinkForAuthor,
+  getPaginatedPublicationsFromCollectionRef,
 } from '../../../helpers/publications';
 
 import ListItemTopics from '../../../components/CommonListItemParts/ListItemTopics';
@@ -15,12 +17,18 @@ import FilterableResults, {
   NewResultsWrapper,
   FilterManager,
   NewFilterMenuWrapper,
+  FilterableResultsContext,
 } from '../../../components/FilterableResults/FilterableResults';
 import PublicationSider from './PublicationPageSider';
+import SuggestedContentSider from '../../../components/SuggestedContentSider/SuggestedContentSider';
 
 import './PublicationPage.css';
 import {getActiveTabID} from '../../../helpers/filters';
 import MAGRouterDisplay from '../../../components/MAGRouter';
+import {Alert} from 'react-bootstrap';
+import PrimaryButton from '../../../components/Buttons/PrimaryButton';
+
+const REFERENCES_TAB = 'references';
 
 // If the user clicks on a search result from Microsoft we redirect them to the corresponding Labspoon publication.
 export function MAGPublicationRouter() {
@@ -93,12 +101,12 @@ export default function PublicationPage() {
       },
     });
   }
-  if (featureFlags.has('publication-cites')) {
+  if (featureFlags.has('publication-references')) {
     relationshipFilter[0].options.push({
       enabled: false,
       data: {
-        id: 'citesPublications',
-        name: 'Cites Publications',
+        id: REFERENCES_TAB,
+        name: 'References',
       },
     });
   }
@@ -133,9 +141,9 @@ export default function PublicationPage() {
   return (
     <>
       {featureFlags.has('related-resources') ? (
-        <SuggestedPublications publicationDetails={publicationDetails} />
+        <PublicationsFromSearch publicationDetails={publicationDetails} />
       ) : (
-        <></>
+        <div></div>
       )}
       <div className="content-layout">
         <div className="details-container">
@@ -147,20 +155,78 @@ export default function PublicationPage() {
               <ResourceTabs tabs={relationshipFilter} />
               <NewFilterMenuWrapper />
             </FilterManager>
+            <RetrieveMoreReferences
+              publicationID={publicationID}
+              publication={publicationDetails}
+            />
             <NewResultsWrapper />
           </div>
         </FilterableResults>
       </div>
+      <SuggestedContentSider
+        resourceType={
+          publicationDetails ? `${publicationDetails.resourceType}` : undefined
+        }
+        resourceID={publicationDetails ? `${publicationDetails.id}` : undefined}
+      />
     </>
   );
 }
 
-function SuggestedPublications({publicationDetails}) {
+const retrieveReferences = firebase
+  .functions()
+  .httpsCallable('publications-retrieveReferencesFromMicrosoft');
+
+function RetrieveMoreReferences({publicationID, publication}) {
+  const filterableResults = useContext(FilterableResultsContext);
+  const [clicked, setClicked] = useState(false);
+  if (!filterableResults.filter || filterableResults.filter.length === 0)
+    return <></>;
+  const enabledTabID = getActiveTabID(filterableResults.filter);
+  if (enabledTabID !== REFERENCES_TAB) return <></>;
+
+  if (
+    !publication.referencedPublicationMicrosoftIDs ||
+    publication.referencedPublicationMicrosoftIDs.length === 0
+  )
+    return <></>;
+
+  function retrieveReferencesForPublication() {
+    setClicked(true);
+    retrieveReferences({publicationID: publicationID});
+  }
+
+  return (
+    <Alert variant="secondary">
+      <p>
+        {publication.referencedPublicationMicrosoftIDs.length} publication(s)
+        are not on Labspoon yet. Click below to retrieve them now!
+      </p>
+      <PrimaryButton
+        inactive={clicked}
+        submit={false}
+        onClick={retrieveReferencesForPublication}
+      >
+        Retrieve
+      </PrimaryButton>
+      {clicked ? (
+        <p>
+          We are fetching those references for you, it just takes a little
+          while. Try reloading the page in about 10 seconds
+        </p>
+      ) : (
+        <></>
+      )}
+    </Alert>
+  );
+}
+
+function PublicationsFromSearch({publicationDetails}) {
   return (
     <div className="sider-layout">
       <div className="resource-sider">
         <h3 className="resource-sider-title">
-          Similar Publications to this one
+          Other publications from previous page
         </h3>
         <div className="suggested-resources-container">
           <PublicationSider currentPublication={publicationDetails} />
@@ -249,6 +315,18 @@ function fetchFeedDataFromDB(limit, filterOptions, last, publicationID) {
       );
       return [
         getPaginatedPostsFromCollectionRef(relatedPostsDBRef, limit, last),
+        null,
+      ];
+    case REFERENCES_TAB:
+      const referencesCollection = db.collection(
+        `publications/${publicationID}/references`
+      );
+      return [
+        getPaginatedPublicationsFromCollectionRef(
+          referencesCollection,
+          limit,
+          last
+        ),
         null,
       ];
     default:

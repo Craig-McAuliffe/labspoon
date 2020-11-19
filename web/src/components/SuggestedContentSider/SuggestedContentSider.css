@@ -1,0 +1,54 @@
+.suggested-content-sider-container {
+  margin-left: 2%;
+  border-left: 1px solid #dcdce0;
+  padding: 0px 2%;
+  height: 100%;
+}
+
+.suggested-content-sider-container p {
+  line-height: 1.8rem;
+}
+
+.suggested-content-sider-title {
+  margin: 10% 0px 4% 2%;
+  color: #5d5d65;
+}
+
+.suggested-publication-link-container:hover .suggested-publication-title {
+  color: #00507c;
+}
+
+.suggested-publication-link-container:hover
+  .suggested-publications-author-name {
+  color: #5d5d65;
+}
+
+.suggested-publication-link-container:hover {
+  text-decoration: none;
+}
+
+.suggested-publication-link-container:hover .suggested-publication-container {
+  background: #f0f0f4;
+}
+
+.suggested-publication-container {
+  border-top: 1px solid #dcdce0;
+  padding: 4% 0px 4% 2%;
+}
+
+.suggested-publication-title {
+  color: #000000;
+  word-break: break-word;
+}
+
+.suggested-publication-authors-container {
+  display: flex;
+  flex-wrap: wrap;
+  text-overflow: ellipsis;
+  overflow-y: hidden;
+}
+
+.suggested-publications-author-name {
+  color: #99999f;
+  margin: 0px 10px 0px 0px;
+}
