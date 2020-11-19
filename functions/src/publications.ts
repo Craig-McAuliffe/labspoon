@@ -750,13 +750,12 @@ export const suggestedPublications = functions.https.onCall(
     const topics = publication.topics;
     if (!topics || topics.length === 0) return;
     const suggestedPublicationPromises = topics
-      .slice(0, 10)
       .map(async (topic) => {
         const topicID = topic.id;
         const suggestedPublicationsForTopicQS = await db
           .collection(`topics/${topicID}/publications`)
           .orderBy('date')
-          .limit(10)
+          .limit(11)
           .get();
         if (suggestedPublicationsForTopicQS.empty) return [];
         const suggestedPublicationsFromTopic = suggestedPublicationsForTopicQS.docs.map(
@@ -776,6 +775,7 @@ export const suggestedPublications = functions.https.onCall(
 
     // deduplicate the publications in the array
     const seenIDs = new Set();
+    seenIDs.add(publicationID);
     const suggestedPublicationsDeduplicated: PublicationRef[] = [];
     suggestedPublicationsNotUnique.forEach((publication) => {
       if (seenIDs.has(publication.id)) return;
@@ -792,7 +792,8 @@ export const suggestedPublications = functions.https.onCall(
       suggestedPublications.push(removed[0]);
     }
 
-    return suggestedPublications;
+    const filteredForNulls = suggestedPublications.filter((pub) => pub != null);
+    return filteredForNulls;
   }
 );
 
