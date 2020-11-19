@@ -71,6 +71,7 @@ export function makPublicationToPublication(
   if (makPublication.F)
     publication.topics = makPublication.F.map(makFieldToTopic);
   if (makPublication.S) publication.sources = makPublication.S.map(makSourceToSource);
+  if (makPublication.RId) publication.referencedPublicationMicrosoftIDs = makPublication.RId.map((strid) => strid.toString());
   return publication;
 }
 
@@ -83,6 +84,7 @@ export interface MAKPublication {
   Id?: number;
   F?: MAKField[];
   S?: MAKSource[];
+  RId?: string[];
   // Tracks corresponding Labspoon publication.
   processed?: string;
 }
@@ -94,6 +96,7 @@ export interface Publication {
   microsoftID?: string;
   topics?: Topic[];
   sources: Source[],
+  referencedPublicationMicrosoftIDs: string[];
 }
 
 export function makSourceToSource(makSource: MAKSource) {
@@ -207,6 +210,7 @@ export interface MAKPublicationInDB {
   Id?: number;
   F?: MAKField[];
   S?: MAKSource[];
+  RId?: string[];
   // Tracks whether the publication has been added to the Labspoon publications. Defaults to false.
   processed?: string;
 }

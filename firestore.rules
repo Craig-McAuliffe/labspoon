@@ -114,6 +114,10 @@ service cloud.firestore {
       match /posts/{postID} {
         allow read;
       }
+
+      match /references/{referenceID} {
+        allow read;
+      }
     }
   }
 }
