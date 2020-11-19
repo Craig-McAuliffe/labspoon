@@ -1,9 +1,11 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {FeatureFlags} from '../../../App';
-import {Link, useParams} from 'react-router-dom';
 import {db} from '../../../firebase';
 
-import {dbPublicationToJSPublication} from '../../../helpers/publications';
+import {
+  dbPublicationToJSPublication,
+  getLinkForAuthor,
+} from '../../../helpers/publications';
 
 import ListItemTopics from '../../../components/CommonListItemParts/ListItemTopics';
 import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
@@ -224,21 +226,11 @@ function PublicationSources({sources}) {
 function PublicationAuthors({publicationAuthors}) {
   if (!publicationAuthors) return <></>;
   return publicationAuthors.map((author) => {
-    let authorLink;
-    if (author.id) {
-      authorLink = <Link to={`/user/${author.id}`}>{author.name}</Link>;
-    } else if (author.microsoftID) {
-      authorLink = (
-        <Link
-          className="secondary-link"
-          to={`/externaluser/${author.microsoftID}`}
-        >
-          {author.name}
-        </Link>
-      );
-    } else {
-      authorLink = author.name;
-    }
+    const authorLink = getLinkForAuthor(
+      author.id,
+      author.microsoftID,
+      author.name
+    );
     return (
       <h3 className="publication-body-authors" key={author.name}>
         {authorLink}

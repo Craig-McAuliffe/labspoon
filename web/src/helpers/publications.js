@@ -1,3 +1,6 @@
+import React from 'react';
+import {Link} from 'react-router-dom';
+
 export function dbPublicationToJSPublication(dbPublication) {
   const JSPublication = dbPublication;
   if (JSPublication.resourceType === undefined) {
@@ -35,4 +38,18 @@ export function getPaginatedPublicationsFromCollectionRef(
       return publications;
     })
     .catch((err) => console.log(err));
+}
+
+export function getLinkForAuthor(ID, microsoftID, nameStr) {
+  if (ID) {
+    return <Link to={`/user/${ID}`}>{nameStr}</Link>;
+  } else if (microsoftID) {
+    return (
+      <Link className="secondary-link" to={`/externaluser/${microsoftID}`}>
+        {nameStr}
+      </Link>
+    );
+  } else {
+    return nameStr;
+  }
 }
