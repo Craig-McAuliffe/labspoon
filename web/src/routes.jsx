@@ -14,7 +14,7 @@ import GroupPage from './pages/ResourcePages/GroupPage';
 import CreateGroupPage from './pages/Groups/CreateGroupPage/CreateGroupPage';
 import FollowsPage from './pages/FollowsPage';
 import SearchPage from './pages/SearchPage';
-import UserPage from './pages/ResourcePages/UserPage';
+import UserPage, {SkeletonUserPage} from './pages/ResourcePages/UserPage';
 import AboutPage from './pages/AboutPage';
 import {
   EditUserProfilePicturePage,
@@ -77,6 +77,9 @@ export default function Routes({user, setUser}) {
       </AuthRoute>
       <Route user={user} path="/user/:userID">
         <UserPage />
+      </Route>
+      <Route user={user} path="/externaluser/:userID">
+        <SkeletonUserPage />
       </Route>
       <Route path="/publication/:publicationID">
         <PublicationPage />

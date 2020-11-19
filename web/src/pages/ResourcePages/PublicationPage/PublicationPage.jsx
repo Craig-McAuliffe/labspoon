@@ -223,15 +223,28 @@ function PublicationSources({sources}) {
 
 function PublicationAuthors({publicationAuthors}) {
   if (!publicationAuthors) return <></>;
-  return publicationAuthors.map((author) => (
-    <h3 className="publication-body-authors" key={author.name}>
-      {author.id ? (
-        <Link to={`/user/${author.id}`}>{author.name}</Link>
-      ) : (
-        author.name
-      )}
-    </h3>
-  ));
+  return publicationAuthors.map((author) => {
+    let authorLink;
+    if (author.id) {
+      authorLink = <Link to={`/user/${author.id}`}>{author.name}</Link>;
+    } else if (author.microsoftID) {
+      authorLink = (
+        <Link
+          className="secondary-link"
+          to={`/externaluser/${author.microsoftID}`}
+        >
+          {author.name}
+        </Link>
+      );
+    } else {
+      authorLink = author.name;
+    }
+    return (
+      <h3 className="publication-body-authors" key={author.name}>
+        {authorLink}
+      </h3>
+    );
+  });
 }
 
 function fetchFeedDataFromDB(limit, filterOptions, last, publicationID) {
