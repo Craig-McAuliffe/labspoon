@@ -191,7 +191,10 @@ export const addNewMSPublicationAsync = functions.pubsub
         )
       );
       await fulfillOutgoingReferencesOnLabspoon(publicationID);
-      await fulfillIncomingReferencesOnLabspoon(publicationID, microsoftPublicationID);
+      await fulfillIncomingReferencesOnLabspoon(
+        publicationID,
+        microsoftPublicationID
+      );
       return true;
     } catch (err) {
       console.error(err);
@@ -374,7 +377,7 @@ async function getPublicationByMicrosoftPublicationID(msPublicationID: string) {
   if (publicationsQS.empty) {
     throw new Error(
       'Could not find publication with microsoft publication ID: ' +
-      msPublicationID
+        msPublicationID
     );
   }
   return publicationsQS.docs[0];
@@ -444,7 +447,9 @@ export const addReferencedMicrosoftIDsToExistingPublications = functions.https.o
       if (!publicationID) return;
 
       if (!msPublication.RId) return;
-      const referenceIDs: string[] = msPublication.RId.map((strid) => strid.toString());
+      const referenceIDs: string[] = msPublication.RId.map((strid) =>
+        strid.toString()
+      );
 
       const promise = db
         .runTransaction(async (t) => {
@@ -486,7 +491,9 @@ export const triggerFulfillReferencesOnLabspoon = functions.https.onRequest(
       promises.push(fulfillOutgoingReferencesOnLabspoon(ds.id, ds))
     );
     await Promise.all(promises).catch((err) =>
-      res.status(500).send('An error occurred whilst fulfilling references: ' + err)
+      res
+        .status(500)
+        .send('An error occurred whilst fulfilling references: ' + err)
     );
     res.status(200).send();
     return;
@@ -496,7 +503,12 @@ export const triggerFulfillReferencesOnLabspoon = functions.https.onRequest(
 // For a publication with ID `publicationID`, if the publication references any
 // publications that are currently on Labspoon add those references to the
 // publication's reference collection.
-async function fulfillOutgoingReferencesOnLabspoon(publicationID: string, publicationDS: FirebaseFirestore.DocumentSnapshot<FirebaseFirestore.DocumentData> | undefined = undefined) {
+async function fulfillOutgoingReferencesOnLabspoon(
+  publicationID: string,
+  publicationDS:
+    | FirebaseFirestore.DocumentSnapshot<FirebaseFirestore.DocumentData>
+    | undefined = undefined
+) {
   const referencingPublicationRef = db
     .collection('publications')
     .doc(publicationID);
@@ -544,9 +556,7 @@ async function fulfillOutgoingReferencesOnLabspoon(publicationID: string, public
     const lsPublication = lsPublicationDS.data() as Publication;
     const batch = db.batch();
     batch.set(
-      referencingPublicationRef
-        .collection('references')
-        .doc(lsPublicationID!),
+      referencingPublicationRef.collection('references').doc(lsPublicationID!),
       toPublicationRef(lsPublicationID!, lsPublication)
     );
     batch.update(referencingPublicationRef, {
@@ -563,17 +573,30 @@ async function fulfillOutgoingReferencesOnLabspoon(publicationID: string, public
 
 // For a publication on Labspoon with ID `publicationID` add the publication to
 // the references of all publications that reference it.
-async function fulfillIncomingReferencesOnLabspoon(publicationID: string, msPublicationID: string) {
-  const referencingPublicationsQS = await db.collection('publications').where('referencedPublicationMicrosoftIDs', 'array-contains', msPublicationID).get();
+async function fulfillIncomingReferencesOnLabspoon(
+  publicationID: string,
+  msPublicationID: string
+) {
+  const referencingPublicationsQS = await db
+    .collection('publications')
+    .where(
+      'referencedPublicationMicrosoftIDs',
+      'array-contains',
+      msPublicationID
+    )
+    .get();
   if (referencingPublicationsQS.empty) return;
 
-  const publicationDS = await db.doc(`publications/${publicationID}`).get().catch((err) => {
-    throw Error(
-      `Unable to get publication with id ${publicationID}: ` + err
-    );
-  });
+  const publicationDS = await db
+    .doc(`publications/${publicationID}`)
+    .get()
+    .catch((err) => {
+      throw Error(`Unable to get publication with id ${publicationID}: ` + err);
+    });
   if (!publicationDS.exists) {
-    console.error(`No publication found with ID ${publicationID}. This should not happen.`);
+    console.error(
+      `No publication found with ID ${publicationID}. This should not happen.`
+    );
     return;
   }
   const publication = publicationDS.data() as Publication;
@@ -582,7 +605,10 @@ async function fulfillIncomingReferencesOnLabspoon(publicationID: string, msPubl
   referencingPublicationsQS.forEach(async (referencingPublicationDS) => {
     const referencingPublicationRef = referencingPublicationDS.ref;
     const batch = db.batch();
-    batch.set(referencingPublicationRef.collection('references').doc(publicationID), toPublicationRef(publicationID, publication));
+    batch.set(
+      referencingPublicationRef.collection('references').doc(publicationID),
+      toPublicationRef(publicationID, publication)
+    );
     batch.update(referencingPublicationRef, {
       referencedPublicationMicrosoftIDs: adminNS.firestore.FieldValue.arrayRemove(
         msPublicationID
@@ -627,55 +653,154 @@ export const updateReferencesToPublication = functions.firestore
   .onUpdate(async (change, _) => {
     const publicationID = change.after.id;
     const publication = change.after.data() as Publication;
-    const publicationRefQS = await db.collectionGroup('references').where('id', '==', publicationID).get();
+    const publicationRefQS = await db
+      .collectionGroup('references')
+      .where('id', '==', publicationID)
+      .get();
     if (publicationRefQS.empty) return;
     const writePromises: Promise<any>[] = [];
     publicationRefQS.forEach((publicationDS) => {
-      const writePromise = publicationDS.ref.set(toPublicationRef(publicationID, publication));
+      const writePromise = publicationDS.ref.set(
+        toPublicationRef(publicationID, publication)
+      );
       writePromises.push(writePromise);
     });
     return Promise.all(writePromises);
   });
 
-export const retrieveReferencesFromMicrosoft = functions.https.onCall(async (data) => {
-  const publicationID = data.publicationID;
-  const publicationDS = await db.doc(`publications/${publicationID}`).get().catch((err) => {
-    console.error(`An error occurred whilst retrieving the publication with ID ${publicationID}:`, err);
-    throw new functions.https.HttpsError('internal', 'Something went wrong.');
-  });
-  if (!publicationDS.exists) throw new functions.https.HttpsError('not-found', 'Publication not found.');
-  const publication = publicationDS.data() as Publication;
-  const referencedIDs = publication.referencedPublicationMicrosoftIDs;
+export const retrieveReferencesFromMicrosoft = functions.https.onCall(
+  async (data) => {
+    const publicationID = data.publicationID;
+    const publicationDS = await db
+      .doc(`publications/${publicationID}`)
+      .get()
+      .catch((err) => {
+        console.error(
+          `An error occurred whilst retrieving the publication with ID ${publicationID}:`,
+          err
+        );
+        throw new functions.https.HttpsError(
+          'internal',
+          'Something went wrong.'
+        );
+      });
+    if (!publicationDS.exists)
+      throw new functions.https.HttpsError(
+        'not-found',
+        'Publication not found.'
+      );
+    const publication = publicationDS.data() as Publication;
+    const referencedIDs = publication.referencedPublicationMicrosoftIDs;
 
-  // Microsoft Academic only allows retrieving up to 10 results by ID at a time.
-  const batchedIDs = [];
-  while (referencedIDs.length !== 0) {
-    batchedIDs.push(referencedIDs.splice(0, 10));
+    // Microsoft Academic only allows retrieving up to 10 results by ID at a time.
+    const batchedIDs = [];
+    while (referencedIDs.length !== 0) {
+      batchedIDs.push(referencedIDs.splice(0, 10));
+    }
+
+    const publicationPromises: Promise<void>[] = batchedIDs.map(
+      async (batch) => {
+        const idConditions = batch.map((id) => `Id=${id}`);
+        const expr = `OR(${idConditions.toString()})`;
+        const executeResponse = await executeExpression({
+          expr: expr,
+          count: 10,
+          offset: 0,
+          attributes: allPublicationFields,
+        }).catch((err) => {
+          console.error(
+            `An error occurred executing an expression on Microsoft Academic, the expression was ${expr}:`,
+            err
+          );
+          // If the error is well defined re-throw it.
+          if (err.code) throw err;
+          throw new functions.https.HttpsError('internal', 'An error occured.');
+        });
+        const publications = executeResponse.data.entities;
+        await publishAddPublicationRequests(publications);
+        return;
+      }
+    );
+    await Promise.all(publicationPromises);
+    return true;
   }
+);
 
-  const publicationPromises: Promise<void>[] = batchedIDs.map(async (batch) => {
-    const idConditions = batch.map((id) => `Id=${id}`);
-    const expr = `OR(${idConditions.toString()})`;
-    const executeResponse = await executeExpression({
-      expr: expr,
-      count: 10,
-      offset: 0,
-      attributes: allPublicationFields,
-    }).catch((err) => {
-      console.error(`An error occurred executing an expression on Microsoft Academic, the expression was ${expr}:`, err);
-      // If the error is well defined re-throw it.
-      if (err.code) throw err;
-      throw new functions.https.HttpsError('internal', 'An error occured.');
+// Returns suggested publications for display on the publications page.
+export const suggestedPublications = functions.https.onCall(
+  async (publicationID) => {
+    const publicationDS = await db
+      .collection('publications')
+      .doc(publicationID)
+      .get()
+      .catch((err) => {
+        console.error(
+          `Unable to retrieve publication with ID ${publicationID}:`,
+          err
+        );
+        throw new functions.https.HttpsError('internal', 'An error occured.');
+      });
+    if (!publicationDS.exists)
+      throw new functions.https.HttpsError(
+        'not-found',
+        'No matching publication found'
+      );
+
+    const publication = publicationDS.data() as Publication;
+    const topics = publication.topics;
+    if (!topics || topics.length === 0) return;
+    const suggestedPublicationPromises = topics
+      .map(async (topic) => {
+        const topicID = topic.id;
+        const suggestedPublicationsForTopicQS = await db
+          .collection(`topics/${topicID}/publications`)
+          .orderBy('date')
+          .limit(11)
+          .get();
+        if (suggestedPublicationsForTopicQS.empty) return [];
+        const suggestedPublicationsFromTopic = suggestedPublicationsForTopicQS.docs.map(
+          (suggestedPublicationsForTopicDS) => {
+            return toPublicationRef(suggestedPublicationsForTopicDS.id, suggestedPublicationsForTopicDS.data() as Publication);
+          });
+        return suggestedPublicationsFromTopic;
+      });
+    const suggestedPublicationsArrayOfArrays = await Promise.all(
+      suggestedPublicationPromises
+    );
+    // flatten the array of arrays
+    const suggestedPublicationsNotUnique: PublicationRef[] = ([] as PublicationRef[]).concat.apply(
+      [],
+      suggestedPublicationsArrayOfArrays
+    );
+
+    // deduplicate the publications in the array
+    const seenIDs = new Set();
+    seenIDs.add(publicationID);
+    const suggestedPublicationsDeduplicated: PublicationRef[] = [];
+    suggestedPublicationsNotUnique.forEach((publication) => {
+      if (seenIDs.has(publication.id)) return;
+      suggestedPublicationsDeduplicated.push(publication);
+      seenIDs.add(publication.id);
     });
-    const publications = executeResponse.data.entities;
-    await publishAddPublicationRequests(publications);
-    return;
-  });
-  await Promise.all(publicationPromises);
-  return true;
-});
 
-function toPublicationRef(publicationID: string, input: Publication): PublicationRef {
+    // randomly select 10 items from the array
+    const suggestedPublications: PublicationRef[] = [];
+    for (let i = 0; i < 10; i++) {
+      const index = Math.floor(Math.random() * suggestedPublicationsDeduplicated.length);
+      const removed = suggestedPublicationsDeduplicated.splice(index, 1);
+      // Since we are only removing one element
+      suggestedPublications.push(removed[0]);
+    }
+
+    const filteredForNulls = suggestedPublications.filter((pub) => pub != null);
+    return filteredForNulls;
+  }
+);
+
+function toPublicationRef(
+  publicationID: string,
+  input: Publication
+): PublicationRef {
   return {
     id: publicationID,
     date: input.date!,

@@ -152,6 +152,7 @@ interface expressionField {
 
 // Rank relates to how often the resource mentions this topic
 export interface Topic {
+  id?: string;
   microsoftID: string;
   name: string;
   normalisedName: string;
