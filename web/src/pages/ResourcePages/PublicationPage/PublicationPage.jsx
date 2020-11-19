@@ -1,6 +1,7 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {FeatureFlags} from '../../../App';
 import {db} from '../../../firebase';
+import {useParams} from 'react-router-dom';
 
 import {
   dbPublicationToJSPublication,
