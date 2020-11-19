@@ -14,7 +14,6 @@ import {
 import {abbrEnv} from '../../config';
 
 import {searchClient} from '../../algolia';
-// import {searchStateToURL, createURL} from '../../helpers/search';
 import {createURL} from '../../helpers/search';
 
 import {GenericListItem} from '../../components/Results/Results';
@@ -43,10 +42,8 @@ const SearchPageActiveTabContext = React.createContext();
 
 export default function SearchPage() {
   const location = useLocation();
-  // const history = useHistory();
   const [tab, setTab] = useState(OVERVIEW);
   const [searchState, setSearchState] = useState(urlToSearchState(location));
-  // const setStateId = React.useRef();
   const fflags = useContext(FeatureFlags);
 
   useEffect(() => {
@@ -56,18 +53,6 @@ export default function SearchPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
-  // function onSearchStateChange(nextSearchState) {
-  //   clearTimeout(setStateId.current);
-
-  //   setStateId.current = setTimeout(() => {
-  //     history.push(
-  //       searchStateToURL(location, nextSearchState),
-  //       nextSearchState
-  //     );
-  //   }, DEBOUNCE_TIME);
-
-  //   setSearchState(nextSearchState);
-  // }
 
   const tabs = [OVERVIEW, PUBLICATIONS, POSTS, USERS, GROUPS, TOPICS].map(
     (tabName) => (
@@ -125,7 +110,6 @@ export default function SearchPage() {
               searchClient={searchClient}
               indexName={tabToIndex(tab)}
               searchState={searchState}
-              // onSearchStateChange={onSearchStateChange}
               createURL={createURL}
               refresh
             >
@@ -150,8 +134,6 @@ export default function SearchPage() {
 const IndexResults = connectStateResults(
   ({searchState, searchResults, children}) => {
     const {activeTab} = useContext(SearchPageActiveTabContext);
-    console.log('searchResults', searchResults);
-    if (searchResults) console.log(searchResults.index);
     if (searchResults && searchResults.nbHits !== 0) {
       return children;
     }
