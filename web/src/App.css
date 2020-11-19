@@ -23,6 +23,7 @@
   justify-items: flex-start;
   align-self: flex-start;
   max-width: 100%;
+  min-height: 100%;
 }
 
 .sider-layout,
