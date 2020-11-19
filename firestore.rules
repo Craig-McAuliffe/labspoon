@@ -115,5 +115,13 @@ service cloud.firestore {
         allow read;
       }
     }
+
+    match /MSUsers/{userID} {
+      allow read;
+
+      match /publications/{publicationID} {
+        allow read;
+      }
+    }
   }
 }
