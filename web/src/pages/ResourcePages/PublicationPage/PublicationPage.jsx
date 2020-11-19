@@ -91,15 +91,6 @@ export default function PublicationPage() {
     },
   ];
 
-  if (featureFlags.has('publication-similar-publications')) {
-    relationshipFilter[0].options.push({
-      enabled: false,
-      data: {
-        id: 'similarPublications',
-        name: 'Similar Publications',
-      },
-    });
-  }
   if (featureFlags.has('publication-references')) {
     relationshipFilter[0].options.push({
       enabled: false,
@@ -163,10 +154,8 @@ export default function PublicationPage() {
         </FilterableResults>
       </div>
       <SuggestedContentSider
-        resourceType={
-          publicationDetails ? `${publicationDetails.resourceType}` : undefined
-        }
-        resourceID={publicationDetails ? `${publicationDetails.id}` : undefined}
+        resourceType={'publication'}
+        resourceID={publicationID}
       />
     </>
   );
