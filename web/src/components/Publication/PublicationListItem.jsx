@@ -8,6 +8,7 @@ import ListItemTopics from '../CommonListItemParts/ListItemTopics';
 import {FeatureFlags} from '../../App';
 
 import './PublicationListItem.css';
+import {getLinkForAuthor} from '../../helpers/publications';
 
 export default function PublicationListItem({
   publication,
@@ -126,6 +127,7 @@ function authorsToAuthorList(authors) {
   return authors.map((author, idx) => (
     <PublicationListItemAuthor
       ID={author.id}
+      microsoftID={author.microsoftID}
       name={author.name}
       key={uuid()}
       first={idx === 0}
@@ -134,7 +136,7 @@ function authorsToAuthorList(authors) {
   ));
 }
 
-function PublicationListItemAuthor({ID, name, first, last}) {
+function PublicationListItemAuthor({ID, microsoftID, name, first, last}) {
   let nameStr;
   if (first && !last) {
     nameStr = `${name},`;
@@ -143,12 +145,11 @@ function PublicationListItemAuthor({ID, name, first, last}) {
   } else {
     nameStr = `and ${name}`;
   }
-  const authorHeader = <h4 key={uuid()}>{nameStr}&nbsp;</h4>;
-  if (!ID) return authorHeader;
+  const authorLink = getLinkForAuthor(ID, microsoftID, nameStr);
   return (
-    <Link className="publication-list-item-content-author" to={`users/${ID}`}>
-      {authorHeader}
-    </Link>
+    <h4 className="publication-list-item-content-author" key={uuid()}>
+      {authorLink}&nbsp;
+    </h4>
   );
 }
 

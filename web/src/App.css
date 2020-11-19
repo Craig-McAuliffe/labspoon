@@ -135,3 +135,11 @@
     max-width: 100%;
   }
 }
+
+.secondary-link {
+  color: #5D5D65;
+}
+
+.secondary-link:hover {
+  color: #3f3f45;
+}

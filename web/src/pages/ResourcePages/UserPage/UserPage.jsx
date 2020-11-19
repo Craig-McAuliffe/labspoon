@@ -4,8 +4,6 @@ import {FeatureFlags, AuthContext} from '../../../App';
 import {db} from '../../../firebase';
 
 import UserPageSider from './UserPageSider';
-import users from '../../../mockdata/users';
-
 import {getActiveTabID} from '../../../helpers/filters';
 import {
   getPaginatedPostsFromCollectionRef,
@@ -45,12 +43,7 @@ export default function UserPage() {
     setUserID(userIDParam);
   }
 
-  let fetchUserDetails;
-  if (!featureFlags.has('disable-cloud-firestore')) {
-    fetchUserDetails = () => fetchUserDetailsFromDB(userID);
-  } else {
-    fetchUserDetails = () => users().filter((user) => user.id === userID)[0];
-  }
+  const fetchUserDetails = () => fetchUserDetailsFromDB(userID);
 
   useEffect(() => {
     Promise.resolve(fetchUserDetails())

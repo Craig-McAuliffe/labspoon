@@ -1,11 +1,12 @@
 import React, {useContext, useEffect, useState} from 'react';
 import firebase from '../../../firebase';
 import {FeatureFlags} from '../../../App';
-import {Link, useParams} from 'react-router-dom';
 import {db} from '../../../firebase';
+import {useParams} from 'react-router-dom';
 
 import {
   dbPublicationToJSPublication,
+  getLinkForAuthor,
   getPaginatedPublicationsFromCollectionRef,
 } from '../../../helpers/publications';
 
@@ -291,15 +292,18 @@ function PublicationSources({sources}) {
 
 function PublicationAuthors({publicationAuthors}) {
   if (!publicationAuthors) return <></>;
-  return publicationAuthors.map((author) => (
-    <h3 className="publication-body-authors" key={author.name}>
-      {author.id ? (
-        <Link to={`/user/${author.id}`}>{author.name}</Link>
-      ) : (
-        author.name
-      )}
-    </h3>
-  ));
+  return publicationAuthors.map((author) => {
+    const authorLink = getLinkForAuthor(
+      author.id,
+      author.microsoftID,
+      author.name
+    );
+    return (
+      <h3 className="publication-body-authors" key={author.name}>
+        {authorLink}
+      </h3>
+    );
+  });
 }
 
 function fetchFeedDataFromDB(limit, filterOptions, last, publicationID) {
