@@ -8,3 +8,5 @@ Secondary Color: #3099D3
 
 Destructive color: #DA0000
 Warning color: #FF8A00
+
+Background Grey: #f0f0f4

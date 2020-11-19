@@ -19,6 +19,7 @@ import FilterableResults, {
   FilterableResultsContext,
 } from '../../../components/FilterableResults/FilterableResults';
 import PublicationSider from './PublicationPageSider';
+import SuggestedContentSider from '../../../components/SuggestedContentSider/SuggestedContentSider';
 
 import './PublicationPage.css';
 import {getActiveTabID} from '../../../helpers/filters';
@@ -139,9 +140,9 @@ export default function PublicationPage() {
   return (
     <>
       {featureFlags.has('related-resources') ? (
-        <SuggestedPublications publicationDetails={publicationDetails} />
+        <PublicationsFromSearch publicationDetails={publicationDetails} />
       ) : (
-        <></>
+        <div></div>
       )}
       <div className="content-layout">
         <div className="details-container">
@@ -161,6 +162,12 @@ export default function PublicationPage() {
           </div>
         </FilterableResults>
       </div>
+      <SuggestedContentSider
+        resourceType={
+          publicationDetails ? `${publicationDetails.resourceType}` : undefined
+        }
+        resourceID={publicationDetails ? `${publicationDetails.id}` : undefined}
+      />
     </>
   );
 }
@@ -213,12 +220,12 @@ function RetrieveMoreReferences({publicationID, publication}) {
   );
 }
 
-function SuggestedPublications({publicationDetails}) {
+function PublicationsFromSearch({publicationDetails}) {
   return (
     <div className="sider-layout">
       <div className="resource-sider">
         <h3 className="resource-sider-title">
-          Similar Publications to this one
+          Other publications from previous page
         </h3>
         <div className="suggested-resources-container">
           <PublicationSider currentPublication={publicationDetails} />
