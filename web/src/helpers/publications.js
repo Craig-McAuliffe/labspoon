@@ -19,8 +19,9 @@ export function getPaginatedPublicationsFromCollectionRef(
   limit,
   last
 ) {
+  publicationCollection = publicationCollection.orderBy('date');
   if (typeof last !== 'undefined') {
-    publicationCollection = publicationCollection.startAt(last.timestamp);
+    publicationCollection = publicationCollection.startAt(last.date);
   }
   return publicationCollection
     .limit(limit)
