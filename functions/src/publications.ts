@@ -726,9 +726,7 @@ export const retrieveReferencesFromMicrosoft = functions.https.onCall(
   }
 );
 
-// Returns suggested publications for display on the publications page. These
-// suggestions are the first publication retrieved for the first ten topics on
-// the publication.
+// Returns suggested publications for display on the publications page.
 export const suggestedPublications = functions.https.onCall(
   async (publicationID) => {
     const publicationDS = await db
