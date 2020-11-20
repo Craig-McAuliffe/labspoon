@@ -138,11 +138,11 @@ export const addNewMSPublicationAsync = functions.pubsub
           const microsoftPublicationDS = await t.get(microsoftPublicationRef);
           const labspoonPublicationRef = db.collection('publications').doc();
           const labspoonPublicationID = labspoonPublicationRef.id;
-          const publication = makPublicationToPublication(microsoftPublication);
+          const labspoonPublication = makPublicationToPublication(microsoftPublication);
           const dataToLinkTopicsAndPub = {
-            publication: publication,
+            publication: labspoonPublication,
             labspoonPublicationID: labspoonPublicationID,
-            taggedTopicsNoID: publication.topics,
+            taggedTopicsNoID: labspoonPublication.topics,
           };
           // If the Microsoft publication has been added and marked as processed then the labspoon publication must already exist
           if (microsoftPublicationDS.exists) {
@@ -150,7 +150,7 @@ export const addNewMSPublicationAsync = functions.pubsub
             if (microsoftPublicationDSData.processed)
               return dataToLinkTopicsAndPub;
             // Publications should always be processed. This should not happen.
-            t.set(labspoonPublicationRef, publication);
+            t.set(labspoonPublicationRef, labspoonPublication);
             t.update(microsoftPublicationRef, {
               processed: labspoonPublicationID,
             });
@@ -159,9 +159,9 @@ export const addNewMSPublicationAsync = functions.pubsub
           microsoftPublication.processed = labspoonPublicationID;
           // store the MS publication and the converted labspoon publication
           t.set(microsoftPublicationRef, microsoftPublication);
-          delete publication.authors;
-          publication.topics = [];
-          t.set(labspoonPublicationRef, publication);
+          delete labspoonPublication.authors;
+          labspoonPublication.topics = [];
+          t.set(labspoonPublicationRef, labspoonPublication);
 
           microsoftPublication.AA?.forEach((author) => {
             const authorID = author.AuId.toString();
@@ -505,13 +505,14 @@ export const triggerFulfillReferencesOnLabspoon = functions.https.onRequest(
 // publication's reference collection.
 async function fulfillOutgoingReferencesOnLabspoon(
   publicationID: string,
-  publicationDS:
+  publicationDSArg:
     | FirebaseFirestore.DocumentSnapshot<FirebaseFirestore.DocumentData>
     | undefined = undefined
 ) {
   const referencingPublicationRef = db
     .collection('publications')
     .doc(publicationID);
+  let publicationDS = publicationDSArg;
   if (!publicationDS) {
     publicationDS = await referencingPublicationRef.get().catch((err) => {
       throw new Error(
@@ -777,22 +778,22 @@ export const suggestedPublications = functions.https.onCall(
     const seenIDs = new Set();
     seenIDs.add(publicationID);
     const suggestedPublicationsDeduplicated: PublicationRef[] = [];
-    suggestedPublicationsNotUnique.forEach((publication) => {
-      if (seenIDs.has(publication.id)) return;
-      suggestedPublicationsDeduplicated.push(publication);
-      seenIDs.add(publication.id);
+    suggestedPublicationsNotUnique.forEach((publicationNotUnique) => {
+      if (seenIDs.has(publicationNotUnique.id)) return;
+      suggestedPublicationsDeduplicated.push(publicationNotUnique);
+      seenIDs.add(publicationNotUnique.id);
     });
 
     // randomly select 10 items from the array
-    const suggestedPublications: PublicationRef[] = [];
+    const suggestions: PublicationRef[] = [];
     for (let i = 0; i < 10; i++) {
       const index = Math.floor(Math.random() * suggestedPublicationsDeduplicated.length);
       const removed = suggestedPublicationsDeduplicated.splice(index, 1);
       // Since we are only removing one element
-      suggestedPublications.push(removed[0]);
+      suggestions.push(removed[0]);
     }
 
-    const filteredForNulls = suggestedPublications.filter((pub) => pub != null);
+    const filteredForNulls = suggestions.filter((pub) => pub !== null);
     return filteredForNulls;
   }
 );
