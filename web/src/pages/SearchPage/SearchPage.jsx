@@ -267,7 +267,12 @@ const UserHitsComponent = () => (
 );
 
 const TopicHitsComponent = () => (
-  <Hits hitComponent={({hit}) => <GenericListItem result={hit} />} />
+  <Hits
+    hitComponent={({hit}) => {
+      hit.id = hit.objectID;
+      return <GenericListItem result={hit} />;
+    }}
+  />
 );
 
 const OverviewResults = ({setTab}) => (
@@ -358,12 +363,7 @@ const PostsResults = () => (
 const TopicsResults = () => {
   return (
     <IndexResults>
-      <Hits
-        hitComponent={({hit}) => {
-          hit.id = hit.objectID;
-          return <GenericListItem result={hit} />;
-        }}
-      />
+      <TopicHitsComponent />
     </IndexResults>
   );
 };
