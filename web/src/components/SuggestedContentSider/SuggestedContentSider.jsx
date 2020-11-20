@@ -17,9 +17,11 @@ export default function SuggestedContentSider({resourceType, resourceID}) {
     if (!resourceID) return;
     switch (resourceType) {
       case PUBLICATION_TYPE:
-        getSuggestedPublications(resourceID).then((resp) =>
+        return getSuggestedPublications(resourceID).then((resp) =>
           setSuggestedContent(resp.data)
         );
+      default:
+        return [];
     }
   }, [resourceType, resourceID]);
 
