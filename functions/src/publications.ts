@@ -793,7 +793,7 @@ export const suggestedPublications = functions.https.onCall(
       suggestions.push(removed[0]);
     }
 
-    const filteredForNulls = suggestions.filter((pub) => pub !== null);
+    const filteredForNulls = suggestions.filter(Boolean);
     return filteredForNulls;
   }
 );
