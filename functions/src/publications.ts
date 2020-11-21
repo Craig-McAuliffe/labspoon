@@ -158,10 +158,10 @@ export const addNewMSPublicationAsync = functions.pubsub
     const wrotePublicationToDB = await db.runTransaction(async (t) => {
       // check whether the microsoft publication has been processed whilst we
       // were resolving the authors and topics
-      const microsoftPublicationDS = await t.get(microsoftPublicationRef);
+      const microsoftPublicationDSTransaction = await t.get(microsoftPublicationRef);
       if (
-        microsoftPublicationDS.exists &&
-        (microsoftPublicationDS.data() as MAKPublication).processed
+        microsoftPublicationDSTransaction.exists &&
+        (microsoftPublicationDSTransaction.data() as MAKPublication).processed
       )
         return false;
 
