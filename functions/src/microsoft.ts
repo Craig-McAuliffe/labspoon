@@ -92,7 +92,7 @@ export interface MAKPublication {
 export interface Publication {
   date?: string;
   title?: string;
-  authors?: Array<User>;
+  authors?: User[];
   microsoftID?: string;
   topics?: Topic[];
   sources: Source[],
