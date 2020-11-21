@@ -9,14 +9,17 @@ import {
   Publication,
   MAKPublication,
   MAKPublicationInDB,
-  MAKAuthor,
   User,
-  makAuthorToAuthor,
   makSourceToSource,
   Source,
 } from './microsoft';
 import {Post} from './posts';
-import {Topic, createFieldAndTopic, convertTopicToTaggedTopic} from './topics';
+import {
+  Topic,
+  createFieldAndTopic,
+  convertTopicToTaggedTopic,
+  TaggedTopic,
+} from './topics';
 
 const pubSubClient = new PubSub();
 const db = admin.firestore();
@@ -127,224 +130,161 @@ export const addNewMSPublicationAsync = functions.pubsub
   .onPublish(async (message) => {
     if (!message.json) return true;
     const microsoftPublication = message.json as MAKPublication;
-    if (!microsoftPublication.Id) return true;
+
+    if (!microsoftPublication.Id)
+      throw new functions.https.HttpsError(
+        'internal',
+        'Publication does not have a Microsoft publication ID.'
+      );
     const microsoftPublicationID = microsoftPublication.Id.toString();
     const microsoftPublicationRef = db
       .collection('MSPublications')
       .doc(microsoftPublicationID);
-    try {
-      const createPublicationsTransaction = await db.runTransaction(
-        async (t) => {
-          const microsoftPublicationDS = await t.get(microsoftPublicationRef);
-          const labspoonPublicationRef = db.collection('publications').doc();
-          const labspoonPublicationID = labspoonPublicationRef.id;
-          const labspoonPublication = makPublicationToPublication(microsoftPublication);
-          const dataToLinkTopicsAndPub = {
-            publication: labspoonPublication,
-            labspoonPublicationID: labspoonPublicationID,
-            taggedTopicsNoID: labspoonPublication.topics,
-          };
-          // If the Microsoft publication has been added and marked as processed then the labspoon publication must already exist
-          if (microsoftPublicationDS.exists) {
-            const microsoftPublicationDSData = microsoftPublicationDS.data() as MAKPublication;
-            if (microsoftPublicationDSData.processed)
-              return dataToLinkTopicsAndPub;
-            // Publications should always be processed. This should not happen.
-            t.set(labspoonPublicationRef, labspoonPublication);
-            t.update(microsoftPublicationRef, {
-              processed: labspoonPublicationID,
-            });
-            return dataToLinkTopicsAndPub;
-          }
-          microsoftPublication.processed = labspoonPublicationID;
-          // store the MS publication and the converted labspoon publication
-          t.set(microsoftPublicationRef, microsoftPublication);
-          delete labspoonPublication.authors;
-          labspoonPublication.topics = [];
-          t.set(labspoonPublicationRef, labspoonPublication);
 
-          microsoftPublication.AA?.forEach((author) => {
-            const authorID = author.AuId.toString();
-            t.set(db.collection('MSUsers').doc(authorID), author);
-            t.set(
-              db
-                .collection('MSUsers')
-                .doc(author.AuId.toString())
-                .collection('publications')
-                .doc(microsoftPublicationID),
-              microsoftPublication
-            );
-          });
-          return dataToLinkTopicsAndPub;
-        }
-      );
-      const publicationID = createPublicationsTransaction.labspoonPublicationID;
-      const publication = createPublicationsTransaction.publication;
-      createTopicsFromNewPubAndAddPubToTopic(
-        publication,
-        publicationID,
-        createPublicationsTransaction.taggedTopicsNoID
-      ).catch((err) =>
-        console.error(
-          'Error raised whilst creating a new topic from publication:',
-          err
-        )
-      );
-      await fulfillOutgoingReferencesOnLabspoon(publicationID);
-      await fulfillIncomingReferencesOnLabspoon(
-        publicationID,
-        microsoftPublicationID
-      );
+    // check whether the publication has already been processed
+    const microsoftPublicationDS = await microsoftPublicationRef.get();
+    if (microsoftPublicationDS.exists) return;
+
+    const publicationRef = db.collection('publications').doc();
+    const publicationID = publicationRef.id;
+    const publication = makPublicationToPublication(microsoftPublication);
+    microsoftPublication.processed = publicationID;
+
+    if (publication.topics)
+      publication.topics = await resolveTopicIDs(publication.topics);
+    if (publication.authors)
+      publication.authors = await resolveUserIDs(publication.authors);
+
+    const wrotePublicationToDB = await db.runTransaction(async (t) => {
+      // check whether the microsoft publication has been processed whilst we
+      // were resolving the authors and topics
+      const microsoftPublicationDS = await t.get(microsoftPublicationRef);
+      if (
+        microsoftPublicationDS.exists &&
+        (microsoftPublicationDS.data() as MAKPublication).processed
+      )
+        return false;
+
+      t.set(microsoftPublicationRef, microsoftPublication);
+      t.set(publicationRef, publication);
       return true;
-    } catch (err) {
-      console.error(err);
-    }
+    });
+    if (!wrotePublicationToDB) return;
+
+    if (publication.topics)
+      await addPublicationToTopics(
+        publicationID,
+        publication,
+        publication.topics
+      );
+    if (publication.authors)
+      await addPublicationToAuthors(
+        publicationID,
+        publication,
+        publication.authors
+      );
+    await fulfillOutgoingReferencesOnLabspoon(publicationID);
+    await fulfillIncomingReferencesOnLabspoon(
+      publicationID,
+      microsoftPublicationID
+    );
+
+    await addMSPublicationToMSAuthors(
+      microsoftPublicationID,
+      microsoftPublication
+    );
 
     return true;
   });
 
-export async function createTopicsFromNewPubAndAddPubToTopic(
-  publication: Publication,
+async function addMSPublicationToMSAuthors(
   publicationID: string,
-  taggedTopicsNoID?: Topic[]
+  publication: MAKPublication
 ) {
-  if (!taggedTopicsNoID) return undefined;
-  const publicationTopicPromiseArray = taggedTopicsNoID.map(
-    async (taggedTopicNoID: Topic) => {
-      return createFieldAndTopic(taggedTopicNoID)
-        .then((labspoonTopicID) => {
-          connectPublicationWithTopic(
-            publicationID,
-            publication,
-            labspoonTopicID
-          ).catch((err) =>
-            console.error(
-              `could not add the publication to the Labspoon Topic, ${err}`
-            )
-          );
-        })
-        .catch((err) =>
-          console.error(
-            `could not create Field and Topic for topic with microsoft ID ${taggedTopicNoID.microsoftID}, ${err}`
-          )
-        );
-    }
-  );
-  return Promise.all(publicationTopicPromiseArray);
-}
-
-export async function connectPublicationWithTopic(
-  publicationID: string,
-  publication: Publication,
-  labspoonTopicID: string
-) {
-  await db
-    .doc(`topics/${labspoonTopicID}`)
-    .get()
-    .then((ds) => {
-      if (!ds.exists) {
-        console.error(`topic with id ${labspoonTopicID} not found; returning`);
-        return undefined;
-      }
-      const topicData = ds.data()! as Topic;
-      // Tagged topics have an id field
-      const taggedLabspoonTopic = convertTopicToTaggedTopic(
-        topicData,
-        labspoonTopicID
-      );
-      return db
-        .runTransaction(async (t) => {
-          t.set(
-            db.doc(`topics/${labspoonTopicID}/publications/${publicationID}`),
-            publication
-          );
-          t.update(db.doc(`publications/${publicationID}`), {
-            topics: adminNS.firestore.FieldValue.arrayUnion(
-              taggedLabspoonTopic
-            ),
-          });
-        })
-        .catch((err) => {
-          console.error(
-            `could not connect publication with id ${publicationID} to topic with id ${labspoonTopicID}, ${err}`
-          );
-        });
-    });
-  return true;
-}
-
-export const addNewMAKPublicationToAuthors = functions.firestore
-  .document('MSUsers/{msUserID}/publications/{msPublicationID}')
-  .onCreate(async (_, context) => {
-    const msUserID = context.params.msUserID;
-    const msPublicationID = context.params.msPublicationID;
-
-    // Find the publication
-    const publicationDS = await getPublicationByMicrosoftPublicationID(
-      msPublicationID
+  const promises: Promise<any>[] = [];
+  publication.AA?.forEach((author) => {
+    const authorID = author.AuId.toString();
+    const batch = db.batch();
+    batch.set(db.collection('MSUsers').doc(authorID), author);
+    batch.set(
+      db
+        .collection('MSUsers')
+        .doc(author.AuId.toString())
+        .collection('publications')
+        .doc(publicationID),
+      publication
     );
-    const publicationID = publicationDS.id;
-    // Check whether there is a labspoon user corresponding to the microsoft academic ID, otherwise do nothing.
+    promises.push(batch.commit());
+  });
+  return Promise.all(promises);
+}
+
+async function resolveUserIDs(users: User[]): Promise<User[]> {
+  const setUserPromises = users.map(async (user) => {
+    if (!user.microsoftID) {
+      console.error('Cannot resolve user without microsoft ID:', user);
+    }
+    // check whether there is a labspoon user associated with the microsoft ID
     const userQS = await db
       .collection('users')
-      .where('microsoftAcademicAuthorID', '==', msUserID)
+      .where('microsoftAcademicAuthorID', '==', user.microsoftID)
       .limit(1)
       .get();
-    // If no labspoon user associated we just want to add the name to the authors
+    // if there is not a labspoon user, just return the unresolved user
     if (userQS.empty) {
-      try {
-        await db.runTransaction(async (t) => {
-          const microsoftUserDS = await t.get(db.doc(`MSUsers/${msUserID}`));
-          const microsoftUser = makAuthorToAuthor(
-            microsoftUserDS.data() as MAKAuthor
-          );
-          microsoftUser.microsoftID = msUserID;
-          t.update(db.doc(`publications/${publicationID}`), {
-            authors: adminNS.firestore.FieldValue.arrayUnion(microsoftUser),
-          });
-        });
-      } catch (err) {
-        console.error(err);
-      }
-      return null;
+      return user;
     }
-    const userDS = userQS.docs[0];
-    const userID = userDS.id;
-
-    try {
-      await db.runTransaction(async (t) => {
-        const publicationTDS = await t.get(
-          db.doc(`publications/${publicationID}`)
-        );
-        const userTDS = await t.get(db.doc(`users/${userID}`));
-        t.set(
-          db.doc(`users/${userID}/publications/${publicationID}`),
-          publicationTDS.data()
-        );
-        const user = userTDS.data() as User;
-        const publicationData = publicationTDS.data() as Publication;
-        if (publicationData.authors) {
-          const existingAuthorEntry = publicationData.authors.find(
-            (author) => author.microsoftID === user.microsoftID
-          );
-          // if we already added the id to the user, we don't want to remove the user here
-          delete existingAuthorEntry!.id;
-          t.update(db.doc(`publications/${publicationID}`), {
-            authors: adminNS.firestore.FieldValue.arrayRemove(
-              existingAuthorEntry
-            ),
-          });
-        }
-        user.id = userID;
-        t.update(db.doc(`publications/${publicationID}`), {
-          authors: adminNS.firestore.FieldValue.arrayUnion(user),
-        });
-      });
-    } catch (err) {
-      console.error(err);
-    }
-    return null;
+    // if there is labspoon user, add the id to the user object
+    user.id = userQS.docs[0].id;
+    return user;
   });
+  return await Promise.all(setUserPromises);
+}
+
+async function addPublicationToAuthors(
+  publicationID: string,
+  publication: Publication,
+  authors: User[]
+) {
+  const writePublicationPromises = authors
+    .filter((author) => author.id)
+    .map(async (author) => {
+      return db
+        .doc(`users/${author.id}/publications/${publicationID}`)
+        .set(publication);
+    });
+  return await Promise.all(writePublicationPromises);
+}
+
+async function resolveTopicIDs(topicsNoIDs: Topic[]): Promise<TaggedTopic[]> {
+  const topicPromises: Promise<TaggedTopic>[] = topicsNoIDs.map(
+    async (taggedTopicNoID): Promise<TaggedTopic> => {
+      const topicID = await createFieldAndTopic(taggedTopicNoID).catch(
+        (err) => {
+          console.error(
+            `Could not create field and topic for field with microsoft ID ${taggedTopicNoID.microsoftID}:`,
+            err
+          );
+        }
+      );
+      return convertTopicToTaggedTopic(taggedTopicNoID, topicID);
+    }
+  );
+  return await Promise.all(topicPromises);
+}
+
+async function addPublicationToTopics(
+  publicationID: string,
+  publication: Publication,
+  topics: Topic[]
+) {
+  const writePublicationPromises = topics.map(async (topic) => {
+    return db
+      .doc(`topics/${topic.id}/publications/${publicationID}`)
+      .set(publication);
+  });
+  return await Promise.all(writePublicationPromises);
+}
 
 export const addPublicationPostToPublication = functions.firestore
   .document(`posts/{postID}`)
@@ -750,21 +690,24 @@ export const suggestedPublications = functions.https.onCall(
     const publication = publicationDS.data() as Publication;
     const topics = publication.topics;
     if (!topics || topics.length === 0) return;
-    const suggestedPublicationPromises = topics
-      .map(async (topic) => {
-        const topicID = topic.id;
-        const suggestedPublicationsForTopicQS = await db
-          .collection(`topics/${topicID}/publications`)
-          .orderBy('date')
-          .limit(11)
-          .get();
-        if (suggestedPublicationsForTopicQS.empty) return [];
-        const suggestedPublicationsFromTopic = suggestedPublicationsForTopicQS.docs.map(
-          (suggestedPublicationsForTopicDS) => {
-            return toPublicationRef(suggestedPublicationsForTopicDS.id, suggestedPublicationsForTopicDS.data() as Publication);
-          });
-        return suggestedPublicationsFromTopic;
-      });
+    const suggestedPublicationPromises = topics.map(async (topic) => {
+      const topicID = topic.id;
+      const suggestedPublicationsForTopicQS = await db
+        .collection(`topics/${topicID}/publications`)
+        .orderBy('date')
+        .limit(11)
+        .get();
+      if (suggestedPublicationsForTopicQS.empty) return [];
+      const suggestedPublicationsFromTopic = suggestedPublicationsForTopicQS.docs.map(
+        (suggestedPublicationsForTopicDS) => {
+          return toPublicationRef(
+            suggestedPublicationsForTopicDS.id,
+            suggestedPublicationsForTopicDS.data() as Publication
+          );
+        }
+      );
+      return suggestedPublicationsFromTopic;
+    });
     const suggestedPublicationsArrayOfArrays = await Promise.all(
       suggestedPublicationPromises
     );
@@ -787,7 +730,9 @@ export const suggestedPublications = functions.https.onCall(
     // randomly select 10 items from the array
     const suggestions: PublicationRef[] = [];
     for (let i = 0; i < 10; i++) {
-      const index = Math.floor(Math.random() * suggestedPublicationsDeduplicated.length);
+      const index = Math.floor(
+        Math.random() * suggestedPublicationsDeduplicated.length
+      );
       const removed = suggestedPublicationsDeduplicated.splice(index, 1);
       // Since we are only removing one element
       suggestions.push(removed[0]);
