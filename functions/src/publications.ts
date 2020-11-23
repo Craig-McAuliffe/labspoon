@@ -125,8 +125,9 @@ export function publishAddPublicationRequests(
   return Promise.all(publishPromises);
 }
 
-export const addNewMSPublicationAsync = functions.pubsub
-  .topic('add-publication')
+export const addNewMSPublicationAsync = functions
+  .runWith({timeoutSeconds: 120})
+  .pubsub.topic('add-publication')
   .onPublish(async (message) => {
     if (!message.json) return true;
     const microsoftPublication = message.json as MAKPublication;
@@ -158,7 +159,9 @@ export const addNewMSPublicationAsync = functions.pubsub
     const wrotePublicationToDB = await db.runTransaction(async (t) => {
       // check whether the microsoft publication has been processed whilst we
       // were resolving the authors and topics
-      const microsoftPublicationDSTransaction = await t.get(microsoftPublicationRef);
+      const microsoftPublicationDSTransaction = await t.get(
+        microsoftPublicationRef
+      );
       if (
         microsoftPublicationDSTransaction.exists &&
         (microsoftPublicationDSTransaction.data() as MAKPublication).processed
