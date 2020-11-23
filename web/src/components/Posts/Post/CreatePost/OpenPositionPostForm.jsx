@@ -4,6 +4,7 @@ import firebase from '../../../../firebase';
 import FormTextInput, {CreatePostTextArea} from '../../../Forms/FormTextInput';
 import FormDateInput from '../../../Forms/FormDateInput';
 import PostForm from './PostForm';
+import TypeOfTaggedResourceDropDown from './TypeOfTaggedResourceDropDown';
 import {handlePostTopics} from './PostForm';
 import {CreatingPostContext} from './CreatePost';
 
@@ -11,7 +12,11 @@ import './CreatePost.css';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
-export default function OpenPositionPostForm({setCreatingPost}) {
+export default function OpenPositionPostForm({
+  setCreatingPost,
+  postType,
+  setPostType,
+}) {
   const {selectedTopics, setPostSuccess, setSubmittingPost} = useContext(
     CreatingPostContext
   );
@@ -58,6 +63,10 @@ export default function OpenPositionPostForm({setCreatingPost}) {
       <div className="creating-post-main-text-container">
         <CreatePostTextArea name="title" />
       </div>
+      <TypeOfTaggedResourceDropDown
+        setTaggedResourceType={setPostType}
+        taggedResourceType={postType}
+      />
       <div className="creating-post-tags">
         <FormTextInput sideLabel={true} name="position" label="Position" />
         <FormTextInput sideLabel={true} name="location" label="Location" />

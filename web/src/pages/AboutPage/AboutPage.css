@@ -426,6 +426,11 @@
   .about-page-action-news {
     display: block;
   }
+
+  .about-page-headline-diagram-container {
+    margin-top: 0px;
+    margin-bottom: 40px;
+  }
 }
 
 @media only screen and (max-width: 605px) {
@@ -522,6 +527,11 @@
   .about-page-headline-diagram-container svg {
     height: 100px;
     margin-top: 30px;
+  }
+
+  .about-page-headline-diagram-container {
+    margin-top: 0px;
+    margin-bottom: 0px;
   }
 }
 

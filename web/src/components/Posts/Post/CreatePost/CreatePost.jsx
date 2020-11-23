@@ -3,14 +3,13 @@ import {AuthContext} from '../../../../App';
 import DefaultPost from './DefaultPost';
 import OpenPositionPostForm from './OpenPositionPostForm';
 import PublicationPostForm from './PublicationPostForm';
-import PostTypeDropDown from './PostTypeDropDown';
 import {WriteIcon} from '../../../../assets/GeneralActionIcons';
 
 import './CreatePost.css';
 
-const DEFAULT_POST = 'Default';
-const PUBLICATION_POST = 'Publication';
-const OPEN_POSITION_POST = 'Open Position';
+export const DEFAULT_POST = 'Default';
+export const PUBLICATION_POST = 'Publication';
+export const OPEN_POSITION_POST = 'Open Position';
 
 export const CreatingPostContext = createContext();
 
@@ -19,7 +18,7 @@ export default function CreatePost({pinnedPost}) {
   const [creatingPost, setCreatingPost] = useState(false);
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [postSuccess, setPostSuccess] = useState(false);
-  const [postType, setPostType] = useState(DEFAULT_POST);
+  const [taggedResourceType, setTaggedResourceType] = useState(DEFAULT_POST);
   const [submittingPost, setSubmittingPost] = useState(false);
 
   const cancelPost = () => {
@@ -48,11 +47,10 @@ export default function CreatePost({pinnedPost}) {
           cancelPost: cancelPost,
         }}
       >
-        <PostTypeDropDown setPostType={setPostType} postType={postType} />
         <PostTypeSpecificForm
           setCreatingPost={setCreatingPost}
-          postType={postType}
-          setPostType={setPostType}
+          postType={taggedResourceType}
+          setPostType={setTaggedResourceType}
         />
       </CreatingPostContext.Provider>
     );

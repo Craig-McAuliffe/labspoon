@@ -5,11 +5,12 @@ import PostForm from './PostForm';
 import {CreatePostTextArea} from '../../../Forms/FormTextInput';
 import {CreatingPostContext} from './CreatePost';
 import {handlePostTopics} from './PostForm';
+import TypeOfTaggedResourceDropDown from './TypeOfTaggedResourceDropDown';
 import './CreatePost.css';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
-export default function DefaultPost({setCreatingPost}) {
+export default function DefaultPost({setCreatingPost, postType, setPostType}) {
   const {selectedTopics, setPostSuccess, setSubmittingPost} = useContext(
     CreatingPostContext
   );
@@ -48,6 +49,10 @@ export default function DefaultPost({setCreatingPost}) {
       <div className="creating-post-main-text-container">
         <CreatePostTextArea name="title" />
       </div>
+      <TypeOfTaggedResourceDropDown
+        setTaggedResourceType={setPostType}
+        taggedResourceType={postType}
+      />
     </PostForm>
   );
 }

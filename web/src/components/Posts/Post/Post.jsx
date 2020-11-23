@@ -3,15 +3,6 @@ import {Link} from 'react-router-dom';
 import Linkify from 'linkifyjs/react';
 import PropTypes from 'prop-types';
 import {SelectedListItemsContext} from '../../../pages/ResourcePages/GroupPage/EditGroupPosts';
-import {
-  LectureIcon,
-  ProjectIcon,
-  FundingIcon,
-  OpenPositionIcon,
-  NewsIcon,
-  MemberChangeIcon,
-  PublicationIcon,
-} from '../../../assets/PostTypeIcons';
 import PostOptionalTags from './PostParts/PostOptionalTags';
 import PostActions, {BookmarkedPostSymbol} from './PostParts/PostActions';
 import DefaultUserIcon from '../../../assets/DefaultUserIcon.svg';
@@ -103,7 +94,6 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
     >
       {bookmarkedVariation ? <BookmarkedPostSymbol post={post} /> : null}
       <PostHeader
-        postType={post.postType}
         postAuthor={post.author}
         postCreationDate={post.createdAt}
         dedicatedPage={dedicatedPage}
@@ -126,7 +116,6 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
         />
         <div className="post-container">
           <PostHeader
-            postType={post.postType}
             postAuthor={post.author}
             postCreationDate={post.createdAt}
           />
@@ -140,7 +129,6 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
 Post.propTypes = {
   post: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    postType: PropTypes.object.isRequired,
     author: PropTypes.shape({
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
@@ -155,12 +143,7 @@ Post.propTypes = {
  * Display the header on a post
  * @return {React.ReactElement}
  */
-function PostHeader({postType, postAuthor, postCreationDate, dedicatedPage}) {
-  const postTypeName = () => {
-    if (postType.name === 'default') return null;
-    return <h2 className="post-type-name">{postType.name}</h2>;
-  };
-
+function PostHeader({postAuthor, postCreationDate, dedicatedPage}) {
   return (
     <div
       className={dedicatedPage ? 'post-header-dedicated-page' : 'post-header'}
@@ -180,11 +163,7 @@ function PostHeader({postType, postAuthor, postCreationDate, dedicatedPage}) {
           <p>{postCreationDate}</p>
         </div>
       </div>
-
-      <div className="post-type-container">
-        <div className="post-type-icon">{postTypeIcons(postType.id)}</div>
-        {postTypeName()}
-      </div>
+      <div className="post-type-container"></div>
     </div>
   );
 }
@@ -201,29 +180,6 @@ function PostTextContent({post}) {
       {/* </Link> */}
     </div>
   );
-}
-
-function postTypeIcons(postTypeID) {
-  switch (postTypeID) {
-    case 'defaultPost':
-      return null;
-    case 'publicationPost':
-      return <PublicationIcon />;
-    case 'news':
-      return <NewsIcon />;
-    case 'openPositionPost':
-      return <OpenPositionIcon />;
-    case 'projectPost':
-      return <ProjectIcon />;
-    case 'fundingPost':
-      return <FundingIcon />;
-    case 'lecturePost':
-      return <LectureIcon />;
-    case 'memberChangePost':
-      return <MemberChangeIcon />;
-    default:
-      return null;
-  }
 }
 
 export function PinnedPost({post}) {
