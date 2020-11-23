@@ -423,22 +423,34 @@ export const addReferencedMicrosoftIDsToExistingPublications = functions.https.o
 );
 
 export const triggerFulfillReferencesOnLabspoon = functions.https.onRequest(
-  async (_, res) => {
-    const publicationsQS = await db.collection('publications').get();
+  async (req, res) => {
+    const previousLastDate = req.query.previousLastDate;
+    const limit = parseInt(req.query.limit as string);
+    const orderedPublications = db.collection('publications').orderBy('date');
+
+    let paginatedPublications = orderedPublications;
+    if (previousLastDate) {
+      paginatedPublications = orderedPublications.startAfter(previousLastDate);
+    }
+
+    const publicationsQS = await paginatedPublications.limit(limit).get();
     if (publicationsQS.empty) {
       res.status(200).send();
       return;
     }
     const promises: Promise<any>[] = [];
-    publicationsQS.forEach((ds) =>
+    let lastDate;
+    publicationsQS.forEach((ds) => {
+      lastDate = ds.data().date;
       promises.push(fulfillOutgoingReferencesOnLabspoon(ds.id, ds))
-    );
-    await Promise.all(promises).catch((err) =>
-      res
-        .status(500)
-        .send('An error occurred whilst fulfilling references: ' + err)
-    );
-    res.status(200).send();
+    });
+    await Promise.all(promises)
+      .catch((err) =>
+        res
+          .status(500)
+          .send('An error occurred whilst fulfilling references: ' + err)
+      );
+    res.status(200).send(lastDate);
     return;
   }
 );
