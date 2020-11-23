@@ -300,7 +300,7 @@ function PublicationSources({sources}) {
             : 'publication-page-source-container'
         }
       >
-        {genericLink(sources[0])}
+        {showMore ? <div></div> : genericLink(sources[0])}
         {sources.length > 1 ? (
           <button
             type="button"
@@ -314,8 +314,7 @@ function PublicationSources({sources}) {
       </div>
       {showMore ? (
         <div className="publication-page-source-extra-options-container">
-          <p className="publication-page-first-option-url">{sources[0].url}</p>
-          {sources.slice(1).map((source) => (
+          {sources.map((source) => (
             <p
               className="publication-page-source-extra-option"
               key={source.url}
