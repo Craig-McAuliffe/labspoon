@@ -270,6 +270,8 @@ function PublicationSources({sources}) {
         return 'Download';
       case 'html':
         return 'Go to';
+      case 'text':
+        return 'View';
       default:
         return 'View';
     }
