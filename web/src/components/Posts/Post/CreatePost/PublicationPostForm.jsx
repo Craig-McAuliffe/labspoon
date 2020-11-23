@@ -7,13 +7,18 @@ import PostForm from './PostForm';
 import {CreatingPostContext} from './CreatePost';
 import {FormPublicationResults} from '../../../Publication/MicrosoftResults';
 import {handlePostTopics} from './PostForm';
+import TypeOfTaggedResourceDropDown from './TypeOfTaggedResourceDropDown';
 import {SmallPublicationListItem} from '../../../Publication/PublicationListItem';
 
 import './CreatePost.css';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
-export default function PublicationPostForm({setCreatingPost}) {
+export default function PublicationPostForm({
+  setCreatingPost,
+  postType,
+  setPostType,
+}) {
   const {selectedTopics, setSubmittingPost, setPostSuccess} = useContext(
     CreatingPostContext
   );
@@ -64,6 +69,10 @@ export default function PublicationPostForm({setCreatingPost}) {
       <div className="creating-post-main-text-container">
         <CreatePostTextArea name="title" />
       </div>
+      <TypeOfTaggedResourceDropDown
+        setTaggedResourceType={setPostType}
+        taggedResourceType={postType}
+      />
       {usePublicationURL ? (
         <PublicationURL
           usePublicationURL={usePublicationURL}

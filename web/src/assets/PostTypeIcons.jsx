@@ -1,5 +1,19 @@
 import React from 'react';
 
+export const TagResourceIcon = () => (
+  <svg
+    width="20"
+    height="22"
+    viewBox="0 0 20 22"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <circle cx="6" cy="16" r="6" fill="#00507C" />
+    <path d="M6 17L15.5 4" stroke="#00507C" strokeWidth="2" />
+    <circle cx="15.5" cy="4.5" r="4" fill="white" stroke="#00507C" />
+  </svg>
+);
+
 export const LectureIcon = () => (
   <svg
     width="30"
@@ -58,13 +72,7 @@ export const FundingIcon = () => (
   </svg>
 );
 export const OpenPositionIcon = () => (
-  <svg
-    width="29"
-    height="29"
-    viewBox="0 1 29 29"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
+  <svg viewBox="0 1 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="14.5784" cy="6.84402" r="5.3948" fill="#00507C" />
     <ellipse cx="6.845" cy="14.5764" rx="5.3948" ry="5.3948" fill="#00507C" />
     <ellipse
@@ -121,13 +129,7 @@ export const NewsIcon = () => (
   </svg>
 );
 export const MemberChangeIcon = () => (
-  <svg
-    width="32"
-    height="27"
-    viewBox="0 0 32 27"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
+  <svg viewBox="0 0 32 27" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
       d="M14.8614 11.571L11.1312 11.7983L11.7489 15.4839"
       stroke="#00507C"
@@ -162,13 +164,7 @@ export const MemberChangeIcon = () => (
   </svg>
 );
 export const PublicationIcon = () => (
-  <svg
-    width="26"
-    height="34"
-    viewBox="0 2 26 31"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
+  <svg viewBox="0 0 26 32" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
       d="M15.7074 31.3083L3.23426 21.8635L12.228 16.0738L24.7012 25.5186L15.7074 31.3083Z"
       fill="white"
@@ -185,5 +181,13 @@ export const PublicationIcon = () => (
       stroke="#00507C"
     />
     <circle cx="13.0451" cy="16.5207" r="1.8" fill="white" stroke="#00507C" />
+  </svg>
+);
+
+export const LinkPostToAResourceIcon = () => (
+  <svg viewBox="0 0 20 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="6" cy="16" r="6" fill="#00507C" />
+    <path d="M6 17L15.5 4" stroke="#00507C" strokeWidth="2" />
+    <circle cx="15.5" cy="4.5" r="4" fill="white" stroke="#00507C" />
   </svg>
 );
