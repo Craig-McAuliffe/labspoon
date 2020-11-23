@@ -264,7 +264,7 @@ function PublicationBodyAbstract({abstract}) {
 }
 
 function PublicationSources({sources}) {
-  const linkTypeLanguage = (sourceType) => {
+  const linkTypeCustomText = (sourceType) => {
     switch (sourceType) {
       case 'doc' || 'pdf' || 'ppt' || 'xls' || 'ps':
         return 'Download';
@@ -278,19 +278,28 @@ function PublicationSources({sources}) {
   };
   const [showMore, setShowMore] = useState(false);
   if (!sources || sources.length === 0) return <></>;
-  const genericLink = (source) => (
+  const genericLink = (source, includeURL) => (
     <a
       href={source.url}
       target="_blank"
       rel="noopener noreferrer"
       className="publication-page-source-link"
     >
-      {linkTypeLanguage(source.type)} {source.type}&nbsp;
+      {linkTypeCustomText(source.type)} {source.type}&nbsp;
+      {includeURL ? (
+        <span className="publication-page-extra-option-url">{source.url}</span>
+      ) : null}
     </a>
   );
   return (
     <>
-      <div className="publication-page-source-container">
+      <div
+        className={
+          showMore
+            ? 'publication-page-source-container-shorter'
+            : 'publication-page-source-container'
+        }
+      >
         {genericLink(sources[0])}
         {sources.length > 1 ? (
           <button
@@ -305,13 +314,14 @@ function PublicationSources({sources}) {
       </div>
       {showMore ? (
         <div className="publication-page-source-extra-options-container">
+          <p className="publication-page-first-option-url">{sources[0].url}</p>
           {sources.slice(1).map((source) => (
-            <span
+            <p
               className="publication-page-source-extra-option"
               key={source.url}
             >
-              {genericLink(source)}
-            </span>
+              {genericLink(source, true)}
+            </p>
           ))}
         </div>
       ) : null}

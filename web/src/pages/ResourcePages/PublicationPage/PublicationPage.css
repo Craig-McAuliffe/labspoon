@@ -34,14 +34,28 @@
   margin: 20px 0px 10px;
 }
 
-.publication-page-source-container {
+.publication-page-source-container,
+.publication-page-source-container-shorter {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.publication-page-source-container {
   margin-bottom: 10px;
 }
 
-.publication-page-source-link {
+.publication-page-source-container-shorter {
+  margin-bottom: 0px;
+}
+
+.publication-page-source-link:hover .publication-page-extra-option-url {
+  color: #00507c;
+}
+
+.publication-page-first-option-url {
+  margin-top: 0px;
+  color: #5d5d65;
 }
 
 .publication-page-source-options-button {
@@ -49,14 +63,13 @@
 }
 
 .publication-page-source-extra-options-container {
-  display: flex;
-  flex-wrap: wrap;
 }
 
 .publication-page-source-extra-option {
-  display: inline-block;
-  margin-right: 10px;
-  flex-shrink: 0;
+}
+
+.publication-page-extra-option-url {
+  color: #5d5d65;
 }
 
 .publication-references-info-container {
