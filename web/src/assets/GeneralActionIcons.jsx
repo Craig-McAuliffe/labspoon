@@ -83,3 +83,34 @@ export function RemoveIcon() {
     </svg>
   );
 }
+
+export function DropDownTriangle() {
+  return (
+    <svg
+      width="22"
+      height="13"
+      viewBox="0 0 22 13"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M21.8636 9.53674e-07L10.9318 13L0 9.53674e-07H21.8636Z"
+        fill="#DCDCE0"
+      />
+    </svg>
+  );
+}
+
+export function InvertedDropDownTriangle() {
+  return (
+    <svg
+      width="22"
+      height="13"
+      viewBox="0 0 22 13"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M21.8636 13L10.9318 0L0 13H21.8636Z" fill="#DCDCE0" />
+    </svg>
+  );
+}

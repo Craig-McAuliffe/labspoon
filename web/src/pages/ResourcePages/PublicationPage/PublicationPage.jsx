@@ -2,6 +2,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import firebase from '../../../firebase';
 import {FeatureFlags} from '../../../App';
 import {db} from '../../../firebase';
+import {Alert} from 'react-bootstrap';
 import {useParams} from 'react-router-dom';
 
 import {
@@ -21,12 +22,15 @@ import FilterableResults, {
 } from '../../../components/FilterableResults/FilterableResults';
 import PublicationSider from './PublicationPageSider';
 import SuggestedContentSider from '../../../components/SuggestedContentSider/SuggestedContentSider';
-
-import './PublicationPage.css';
 import {getActiveTabID} from '../../../helpers/filters';
 import MAGRouterDisplay from '../../../components/MAGRouter';
-import {Alert} from 'react-bootstrap';
 import PrimaryButton from '../../../components/Buttons/PrimaryButton';
+import {
+  DropDownTriangle,
+  InvertedDropDownTriangle,
+} from '../../../assets/GeneralActionIcons';
+
+import './PublicationPage.css';
 
 const REFERENCES_TAB = 'references';
 
@@ -229,7 +233,7 @@ const PublicationDetails = ({publicationDetails}) => {
   if (publicationDetails === undefined) return <></>;
   return (
     <div className="publication-body">
-      <h2>{publicationDetails.title}</h2>
+      <h2 className="publication-page-title">{publicationDetails.title}</h2>
       <PublicationSources sources={publicationDetails.sources} />
       {publicationDetails.content.authors ? (
         <PublicationAuthors
@@ -255,28 +259,55 @@ function PublicationBodyAbstract({abstract}) {
 }
 
 function PublicationSources({sources}) {
+  const linkTypeLanguage = (sourceType) => {
+    switch (sourceType) {
+      case 'doc' || 'pdf' || 'ppt' || 'xls' || 'ps':
+        return 'Download';
+      case 'html':
+        return 'Go to';
+      default:
+        return 'View';
+    }
+  };
   const [showMore, setShowMore] = useState(false);
   if (!sources || sources.length === 0) return <></>;
-  const links = sources.map((source, idx) => (
-    <p key={source.url}>
-      {source.type.toUpperCase()}&nbsp;
-      <a href={source.url} target="_blank" rel="noopener noreferrer">
-        {source.url}
-      </a>
-      {idx === 0 ? (
+  const genericLink = (source) => (
+    <a
+      href={source.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="publication-page-source-link"
+    >
+      {linkTypeLanguage(source.type)} {source.type}&nbsp;
+    </a>
+  );
+  return (
+    <>
+      <div className="publication-page-source-container">
+        {genericLink(sources[0])}
         <button
           type="button"
           onClick={() => setShowMore((showMore) => !showMore)}
+          className="publication-page-source-options-button"
         >
-          See {showMore ? 'fewer' : 'more'} links
+          Other viewing options{' '}
+          {showMore ? <InvertedDropDownTriangle /> : <DropDownTriangle />}
         </button>
-      ) : (
-        <></>
-      )}
-    </p>
-  ));
-  if (!showMore) return links[0];
-  return links;
+      </div>
+      {showMore ? (
+        <div className="publication-page-source-extra-options-container">
+          {sources.slice(1).map((source) => (
+            <span
+              className="publication-page-source-extra-option"
+              key={source.url}
+            >
+              {genericLink(source)}
+            </span>
+          ))}
+        </div>
+      ) : null}
+    </>
+  );
 }
 
 function PublicationAuthors({publicationAuthors}) {

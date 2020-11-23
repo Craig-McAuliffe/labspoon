@@ -20,16 +20,41 @@
   grid-column: 2/3;
 }
 
-.publication-body h2 {
-  margin: 20px 0px;
-}
-
 .publication-body-authors {
   display: inline-block;
   margin-right: 10px;
 }
 
+.publication-page-title {
+  margin: 20px 0px 10px;
+}
+
 .publication-section-title {
   color: #5d5d65;
   margin: 20px 0px 10px;
+}
+
+.publication-page-source-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.publication-page-source-link {
+}
+
+.publication-page-source-options-button {
+  color: #5d5d65;
+}
+
+.publication-page-source-extra-options-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.publication-page-source-extra-option {
+  display: inline-block;
+  margin-right: 10px;
+  flex-shrink: 0;
 }
