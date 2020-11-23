@@ -104,6 +104,10 @@
   margin: 10px 10px;
 }
 
+.not-found-title {
+  color: #5d5d65;
+}
+
 @media screen and (max-width: 1247px) {
   .main-layout {
     grid-template-columns: 350px 1fr 350px;
@@ -137,7 +141,7 @@
 }
 
 .secondary-link {
-  color: #5D5D65;
+  color: #5d5d65;
 }
 
 .secondary-link:hover {
