@@ -14,6 +14,7 @@ import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 const EMAIL = 'email';
 const PASSWORD = 'password';
 const UPDATE_EMAILS = 'updateEmails';
+const DEACTIVATE_ACCOUNT = 'deactivateAccount';
 
 const SettingsPage = () => {
   const {user, userProfile} = useContext(AuthContext);
@@ -63,6 +64,9 @@ const SettingsPage = () => {
         />
       );
       break;
+    case DEACTIVATE_ACCOUNT:
+      settings = <DeactivateAccountMessage cancelChanges={cancelChanges} />;
+      break;
     default:
       settings = (
         <div className="setting-page-user-details">
@@ -74,6 +78,10 @@ const SettingsPage = () => {
           <span></span>
           <button onClick={() => setEditState(UPDATE_EMAILS)}>
             Update Email Settings
+          </button>
+          <span></span>
+          <button onClick={() => setEditState(DEACTIVATE_ACCOUNT)}>
+            Deactivate or Delete Account
           </button>
           <span></span>
         </div>
@@ -317,5 +325,34 @@ function ChangePasswordForm({
         </div>
       </Form>
     </Formik>
+  );
+}
+
+function DeactivateAccountMessage({cancelChanges}) {
+  const {userProfile} = useContext(AuthContext);
+  const userID = userProfile.id;
+  const name = userProfile.name;
+  return (
+    <>
+      <br />
+      <p>
+        To deactivate or delete your account, please email us at{' '}
+        <a href="mailto:help@labspoon.com">help@labspoon.com</a> quoting{' '}
+        <q>
+          {name}
+          {userID}
+        </q>
+        . Please use the email you use to sign into your Labspoon account so we
+        can verify it is really you.
+      </p>
+
+      <p>
+        {' '}
+        We are constantly looking to improve Labspoon for our users, so if there
+        is anything you want to tell us about your experience, just add that to
+        the email and one of us will get back to you as soon as possible.
+      </p>
+      <CancelButton cancelAction={cancelChanges} />
+    </>
   );
 }
