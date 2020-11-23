@@ -4,8 +4,9 @@ import {
   OpenPositionIcon,
   LinkPostToAResourceIcon,
 } from '../../../../assets/PostTypeIcons';
+import {RemoveIcon} from '../../../../assets/GeneralActionIcons';
 import {DropDownTriangle} from '../../../../assets/GeneralActionIcons';
-import {PUBLICATION_POST, OPEN_POSITION_POST} from './CreatePost';
+import {PUBLICATION_POST, OPEN_POSITION_POST, DEFAULT_POST} from './CreatePost';
 
 import './CreatePost.css';
 
@@ -43,19 +44,41 @@ export default function TypeOfTaggedResourceDropDown({
         onClick={() => setTaggedResourceType(resourceType)}
         key={resourceType}
       >
-        {resourceType}
+        <h4>{resourceType}</h4>
       </button>
     ));
 
   const resourceTypeOptions = [PUBLICATION_POST, OPEN_POSITION_POST];
   return (
-    <div className="create-post-post-resource-type-dropdown-section">
-      <div className="create-post-post-resource-type-dropdown-tag">
-        <LinkPostToAResourceIcon /> <span>Tag a...</span>
-      </div>
-      <div className="create-post-post-resource-suggested-tags-container">
-        {suggestedResourceTags()}
-      </div>
+    <div
+      className={
+        taggedResourceType === DEFAULT_POST
+          ? 'create-post-post-resource-type-dropdown-section'
+          : 'create-post-post-resource-type-dropdown-section-active'
+      }
+    >
+      {taggedResourceType === DEFAULT_POST ? (
+        <>
+          {' '}
+          <div className="create-post-post-resource-type-dropdown-tag">
+            <LinkPostToAResourceIcon /> <span>Tag a...</span>
+          </div>
+          <div className="create-post-post-resource-suggested-tags-container">
+            {suggestedResourceTags()}
+          </div>
+        </>
+      ) : (
+        <button
+          className="create-post-post-tagged-resource-type-button"
+          onClick={() => setTaggedResourceType(DEFAULT_POST)}
+        >
+          {matchResourceTypeToIcon(taggedResourceType)}
+          <h4>{taggedResourceType}</h4>
+          <div className="create-post-remove-tagged-resource-icon-container">
+            <RemoveIcon />
+          </div>
+        </button>
+      )}
       <div className="create-post-resource-type-dropdown-container">
         <div className="create-post-post-resource-dropdown-toggle-container">
           <button

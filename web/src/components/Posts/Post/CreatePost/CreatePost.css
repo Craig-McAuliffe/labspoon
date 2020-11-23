@@ -167,14 +167,6 @@
   text-align: center;
 }
 
-.create-post-post-type-dropdown-container {
-  margin-bottom: 15px;
-}
-
-.create-post-post-type-dropdown-container path {
-  stroke: #00507c;
-}
-
 .create-publication-post-search-or-link-container {
   display: flex;
   justify-content: flex-end;
@@ -237,8 +229,9 @@
 
 .create-post-post-resource-type-dropdown-section {
   display: grid;
-  grid-template-columns: minmax(50px, 1fr) 4fr minmax(170px, 2fr);
+  grid-template-columns: minmax(90px, 1fr) 5fr minmax(170px, 2fr);
   align-items: center;
+  margin-top: 20px;
 }
 
 .create-post-post-resource-type-dropdown-section svg {
@@ -264,6 +257,11 @@
 
 .create-post-post-resource-type-suggestion {
   color: #00507c;
+}
+
+.create-post-post-resource-type-suggestion:hover,
+.create-post-post-resource-type-suggestion:focus {
+  color: #3099d3;
 }
 
 .create-post-resource-type-dropdown-container {
@@ -304,20 +302,23 @@
   justify-items: flex-start;
 }
 
-.create-post-resource-type-dropdown-option-button:hover {
+.create-post-resource-type-dropdown-option-button:hover,
+.create-post-resource-type-dropdown-option-button:focus {
   background-color: #00507c;
 }
 
-.create-post-resource-type-dropdown-option-button:hover h4 {
+.create-post-resource-type-dropdown-option-button:hover h4,
+.create-post-resource-type-dropdown-option-button:focus h4 {
   color: #ffffff;
 }
 
-.create-post-resource-type-dropdown-option-button:hover path {
+.create-post-resource-type-dropdown-option-button:hover path,
+.create-post-resource-type-dropdown-option-button:focus path {
   fill: #ffffff;
-  /* stroke: #ffffff; */
 }
 
-.create-post-resource-type-dropdown-option-button:hover svg {
+.create-post-resource-type-dropdown-option-button:hover svg,
+.create-post-resource-type-dropdown-option-button:focus svg {
   stroke: #ffffff;
 }
 
@@ -329,4 +330,49 @@
   display: inline-block;
   padding-left: 12px;
   color: #00507c;
+}
+
+.create-post-post-resource-type-dropdown-section-active {
+  display: grid;
+  grid-template-columns: minmax(50px, 1fr) 1fr;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.create-post-post-tagged-resource-type-button {
+  display: flex;
+  align-items: center;
+}
+
+.create-post-post-tagged-resource-type-button h4 {
+  color: #5d5d65;
+  border-bottom: 1px solid #5d5d65;
+  margin: 0px 5px 1px 10px;
+}
+
+.create-post-post-tagged-resource-type-button svg {
+  height: 40px;
+}
+
+.create-post-post-tagged-resource-type-button path,
+.create-post-post-tagged-resource-type-button circle,
+.create-post-post-tagged-resource-type-button ellipse {
+  stroke: #99999f;
+  fill: #ffffff;
+}
+
+.create-post-post-tagged-resource-type-button:hover h4,
+.create-post-post-tagged-resource-type-button:focus h4 {
+  border-bottom: 2px solid #00507c;
+  margin: 0px 5px 0px 10px;
+  color: #00507c;
+}
+
+.create-post-post-tagged-resource-type-button:hover
+  .create-post-remove-tagged-resource-icon-container
+  path,
+.create-post-post-tagged-resource-type-button:focus
+  .create-post-remove-tagged-resource-icon-container
+  path {
+  stroke: #00507c;
 }
