@@ -240,13 +240,13 @@ const PublicationDetails = ({publicationDetails}) => {
     <div className="publication-body">
       <h2 className="publication-page-title">{publicationDetails.title}</h2>
       <PublicationSources sources={publicationDetails.sources} />
-      {publicationDetails.content.authors ? (
-        <PublicationAuthors
-          publicationAuthors={publicationDetails.content.authors}
-        />
-      ) : (
-        <></>
-      )}
+      <div>
+        {publicationDetails.content.authors ? (
+          <PublicationAuthors
+            publicationAuthors={publicationDetails.content.authors}
+          />
+        ) : null}
+      </div>
       <PublicationBodyAbstract abstract={publicationDetails.abstract} />
       <ListItemTopics dbTopics={publicationDetails.topics} />
     </div>
@@ -290,14 +290,16 @@ function PublicationSources({sources}) {
     <>
       <div className="publication-page-source-container">
         {genericLink(sources[0])}
-        <button
-          type="button"
-          onClick={() => setShowMore((showMore) => !showMore)}
-          className="publication-page-source-options-button"
-        >
-          Other viewing options{' '}
-          {showMore ? <InvertedDropDownTriangle /> : <DropDownTriangle />}
-        </button>
+        {sources.length > 1 ? (
+          <button
+            type="button"
+            onClick={() => setShowMore((showMore) => !showMore)}
+            className="publication-page-source-options-button"
+          >
+            Other viewing options{' '}
+            {showMore ? <InvertedDropDownTriangle /> : <DropDownTriangle />}
+          </button>
+        ) : null}
       </div>
       {showMore ? (
         <div className="publication-page-source-extra-options-container">
