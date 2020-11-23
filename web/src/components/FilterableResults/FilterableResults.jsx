@@ -7,6 +7,7 @@ import ResultsList from '../Results/Results';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 
 import './FilterableResults.css';
+import LatestPosts from '../Posts/LatestPosts/LatestPosts';
 
 export const FilterableResultsContext = createContext({});
 export const FilterManagerContext = createContext({});
@@ -386,7 +387,10 @@ function Results({results, hasMore, fetchMore, activeTabID}) {
     );
   } else {
     return currentLocation === '/' ? (
-      <SearchBar bigSearchPrompt={true} />
+      <>
+        <SearchBar bigSearchPrompt={true} />
+        <LatestPosts />
+      </>
     ) : (
       <h3>{`Looks like there's nothing here!`}</h3>
     );

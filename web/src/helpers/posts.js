@@ -13,16 +13,7 @@ export function getPaginatedPostsFromCollectionRef(
   return postCollection
     .limit(limit)
     .get()
-    .then((qs) => {
-      const posts = [];
-      qs.forEach((doc) => {
-        const post = doc.data();
-        post.id = doc.id;
-        post.resourceType = 'post';
-        posts.push(post);
-      });
-      return posts;
-    })
+    .then((qs) => postsQSToJSPosts(qs))
     .catch((err) => console.log(err));
 }
 
@@ -46,4 +37,19 @@ export function translateOptionalFields(posts) {
     });
     return result;
   });
+}
+
+export function postsQSToJSPosts(qs) {
+  const posts = [];
+  qs.forEach((doc) => {
+    posts.push(postDSToJSPost(doc));
+  });
+  return posts;
+}
+
+function postDSToJSPost(ds) {
+  const post = ds.data();
+  post.resourceType = 'post';
+  post.id = ds.id;
+  return post;
 }

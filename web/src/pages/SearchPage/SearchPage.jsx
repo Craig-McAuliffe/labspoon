@@ -28,6 +28,7 @@ import SecondaryButton from '../../components/Buttons/SecondaryButton';
 import SearchBar from '../../components/SearchBar';
 
 import './SearchPage.css';
+import LatestPosts from '../../components/Posts/LatestPosts/LatestPosts';
 
 const OVERVIEW = 'Overview';
 const PUBLICATIONS = 'Publications';
@@ -189,6 +190,7 @@ const AllResults = connectStateResults(({allSearchResults, children}) => {
         </div>
       </div>
       <TryAnotherSearch />
+      <LatestPosts />
     </>
   );
 });
