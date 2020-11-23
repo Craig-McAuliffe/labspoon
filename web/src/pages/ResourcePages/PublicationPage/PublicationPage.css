@@ -58,3 +58,30 @@
   margin-right: 10px;
   flex-shrink: 0;
 }
+
+.publication-references-info-container {
+}
+
+.publication-references-info {
+  color: #5d5d65;
+}
+
+.publication-references-info button {
+  color: #00507c;
+}
+
+.publication-references-info button:hover {
+  color: #3099d3;
+}
+
+.publication-references-retrieval-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 30px 0px 200px;
+}
+
+.publication-references-fetching-message {
+  color: #5d5d65;
+  margin-top: 20px;
+}

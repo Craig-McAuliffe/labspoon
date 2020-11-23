@@ -2,7 +2,6 @@ import React, {useContext, useEffect, useState} from 'react';
 import firebase from '../../../firebase';
 import {FeatureFlags} from '../../../App';
 import {db} from '../../../firebase';
-import {Alert} from 'react-bootstrap';
 import {useParams} from 'react-router-dom';
 
 import {
@@ -190,27 +189,33 @@ function RetrieveMoreReferences({publicationID, publication}) {
   }
 
   return (
-    <Alert variant="secondary">
-      <p>
-        {publication.referencedPublicationMicrosoftIDs.length} publication(s)
-        are not on Labspoon yet. Click below to retrieve them now!
-      </p>
-      <PrimaryButton
-        inactive={clicked}
-        submit={false}
-        onClick={retrieveReferencesForPublication}
-      >
-        Retrieve
-      </PrimaryButton>
-      {clicked ? (
-        <p>
-          We are fetching those references for you, it just takes a little
-          while. Try reloading the page in about 10 seconds
-        </p>
-      ) : (
-        <></>
-      )}
-    </Alert>
+    <div className="publication-references-info-container">
+      <h3 className="publication-references-info">
+        There are...{' '}
+        <button onClick={() => retrieveReferencesForPublication()}>
+          {publication.referencedPublicationMicrosoftIDs.length} additional
+          referenced publications.
+        </button>
+      </h3>
+      <div className="publication-references-retrieval-container">
+        <p>Add them to Labspoon:</p>
+        <PrimaryButton
+          inactive={clicked}
+          submit={false}
+          onClick={retrieveReferencesForPublication}
+        >
+          Retrieve
+        </PrimaryButton>
+        {clicked ? (
+          <p className="publication-references-fetching-message">
+            We are fetching those references for you, it just takes a little
+            while. Try reloading the page in about 10 seconds.
+          </p>
+        ) : (
+          <></>
+        )}
+      </div>
+    </div>
   );
 }
 
