@@ -252,7 +252,7 @@
 
 .create-post-post-resource-suggested-tags-container {
   display: flex;
-  justify-content: space-evenly;
+  justify-content: flex-start;
 }
 
 .create-post-post-resource-type-suggestion {

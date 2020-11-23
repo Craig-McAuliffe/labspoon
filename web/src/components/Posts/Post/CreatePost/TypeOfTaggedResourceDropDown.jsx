@@ -1,12 +1,11 @@
 import React, {useRef, useEffect, useState} from 'react';
 import {
   PublicationIcon,
-  OpenPositionIcon,
   LinkPostToAResourceIcon,
 } from '../../../../assets/PostTypeIcons';
 import {RemoveIcon} from '../../../../assets/GeneralActionIcons';
 import {DropDownTriangle} from '../../../../assets/GeneralActionIcons';
-import {PUBLICATION_POST, OPEN_POSITION_POST, DEFAULT_POST} from './CreatePost';
+import {PUBLICATION_POST, DEFAULT_POST} from './CreatePost';
 
 import './CreatePost.css';
 
@@ -30,8 +29,6 @@ export default function TypeOfTaggedResourceDropDown({
     switch (resourceType) {
       case PUBLICATION_POST:
         return <PublicationIcon />;
-      case OPEN_POSITION_POST:
-        return <OpenPositionIcon />;
       default:
         return null;
     }
@@ -48,7 +45,7 @@ export default function TypeOfTaggedResourceDropDown({
       </button>
     ));
 
-  const resourceTypeOptions = [PUBLICATION_POST, OPEN_POSITION_POST];
+  const resourceTypeOptions = [PUBLICATION_POST];
   return (
     <div
       className={
