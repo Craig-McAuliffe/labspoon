@@ -1,4 +1,4 @@
-import React, {createContext, useState, useEffect} from 'react';
+import React, {createContext, useState, useEffect, useReducer} from 'react';
 import {BrowserRouter as Router, useLocation} from 'react-router-dom';
 import Routes from './routes.jsx';
 import {auth, db} from './firebase';
@@ -18,7 +18,9 @@ export default function App() {
       <AuthProvider>
         <Router>
           <AppLayout>
-            <Routes />
+            <MicrosoftPublicationSearchCacheProvider>
+              <Routes />
+            </MicrosoftPublicationSearchCacheProvider>
           </AppLayout>
         </Router>
       </AuthProvider>
@@ -112,5 +114,24 @@ function FeatureFlagsProvider({children}) {
   }
   return (
     <FeatureFlags.Provider value={fflags}>{children}</FeatureFlags.Provider>
+  );
+}
+
+export const MicrosoftPublicationSearchCache = createContext({});
+
+function MicrosoftPublicationSearchCacheProvider({children}) {
+  function reducer(state, action) {
+    state.set(action.args, action.results);
+    return state;
+  }
+
+  const [interpretCache, interpretDispatch] = useReducer(reducer, new Map());
+
+  return (
+    <MicrosoftPublicationSearchCache.Provider
+      value={{interpretCache, interpretDispatch}}
+    >
+      {children}
+    </MicrosoftPublicationSearchCache.Provider>
   );
 }

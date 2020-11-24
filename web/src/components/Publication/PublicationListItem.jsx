@@ -129,7 +129,7 @@ function authorsToAuthorList(authors) {
       ID={author.id}
       microsoftID={author.microsoftID}
       name={author.name}
-      key={uuid()}
+      key={author.id || author.microsoftID}
       first={idx === 0}
       last={idx === authors.length - 1}
     />
