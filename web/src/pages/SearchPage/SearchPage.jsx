@@ -1,7 +1,7 @@
 // custom search logic removed after 9ebf31106b04400309e7266010aca27f9ae96342
 // in favour of algolia
 import React, {useState, useEffect} from 'react';
-import {useLocation} from 'react-router-dom';
+import {useLocation, useHistory} from 'react-router-dom';
 import qs from 'qs';
 import {
   InstantSearch,
@@ -37,7 +37,23 @@ const USERS = 'Users';
 const GROUPS = 'Groups';
 const TOPICS = 'Topics';
 
-// const DEBOUNCE_TIME = 700;
+const urlToTabsMap = new Map([
+  ['overview', OVERVIEW],
+  ['publications', PUBLICATIONS],
+  ['posts', POSTS],
+  ['users', USERS],
+  ['groups', GROUPS],
+  ['topics', TOPICS],
+]);
+
+const tabsToURLMap = new Map([
+  [OVERVIEW, 'overview'],
+  [PUBLICATIONS, 'publications'],
+  [POSTS, 'posts'],
+  [USERS, 'users'],
+  [GROUPS, 'groups'],
+  [TOPICS, 'topics'],
+]);
 
 const SearchPageActiveTabContext = React.createContext();
 
@@ -46,6 +62,22 @@ export default function SearchPage() {
   const [tab, setTab] = useState(OVERVIEW);
   const [searchState, setSearchState] = useState(urlToSearchState(location));
   const fflags = useContext(FeatureFlags);
+  const history = useHistory();
+
+  useEffect(() => {
+    const tabPath = location.pathname.slice(1).split('/')[1];
+    if (!urlToTabsMap.has(tabPath)) {
+      setTab(OVERVIEW);
+      return;
+    }
+    setTab(urlToTabsMap.get(tabPath));
+  }, [location]);
+
+  function updateTab(tab) {
+    const tabPath = tabsToURLMap.get(tab);
+    const searchURLParams = createURL(searchState);
+    history.push(`/search/${tabPath}/${searchURLParams}`);
+  }
 
   useEffect(() => {
     const nextSearchState = urlToSearchState(location);
@@ -58,7 +90,7 @@ export default function SearchPage() {
   const tabs = [OVERVIEW, PUBLICATIONS, POSTS, USERS, GROUPS, TOPICS].map(
     (tabName) => (
       <button
-        onClick={() => setTab(tabName)}
+        onClick={() => updateTab(tabName)}
         key={tabName}
         className={tabName === tab ? 'feed-tab-active' : 'feed-tab-inactive'}
       >
@@ -70,7 +102,7 @@ export default function SearchPage() {
   let results;
   switch (tab) {
     case OVERVIEW:
-      results = <OverviewResults setTab={setTab} />;
+      results = <OverviewResults setTab={updateTab} />;
       break;
     case PUBLICATIONS:
       results = fflags.has('microsoft-academic-knowledge-api-publications') ? (
@@ -101,7 +133,7 @@ export default function SearchPage() {
     <SearchPageActiveTabContext.Provider
       value={{
         activeTab: tab,
-        setActiveTab: setTab,
+        setActiveTab: updateTab,
       }}
     >
       <div className="content-layout">
