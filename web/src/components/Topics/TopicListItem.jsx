@@ -8,6 +8,7 @@ export default function TopicListItem({
   dedicatedPage,
   children,
   noLink,
+  LinkOverride = undefined,
 }) {
   if (!topic) {
     return <></>;
@@ -15,6 +16,12 @@ export default function TopicListItem({
   const displayType = () => {
     if (dedicatedPage) return <h2>{topic.name}</h2>;
     if (noLink) return <h3>{topic.name}</h3>;
+    if (LinkOverride)
+      return (
+        <LinkOverride>
+          <h3>{topic.name}</h3>
+        </LinkOverride>
+      );
     else
       return (
         <Link to={`/topic/${topic.id}`}>
