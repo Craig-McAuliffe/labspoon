@@ -24,8 +24,12 @@ import FollowUserButton from '../User/FollowUserButton/FollowUserButton';
  */
 export default function Results({results, hasMore, fetchMore, activeTabID}) {
   const currentLocation = useLocation().pathname;
-  const items = results.map((result, i) => (
-    <GenericListItem key={result.id + i} result={result} bookmarkedVariation />
+  const items = results.map((result) => (
+    <GenericListItem
+      key={result.id || result.microsoftID}
+      result={result}
+      bookmarkedVariation
+    />
   ));
 
   const resultTypes = [];
