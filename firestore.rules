@@ -53,6 +53,10 @@ service cloud.firestore {
       match /feeds/followingFeed/{doc=**} {
         allow read: if request.auth != null && request.auth.uid == userID;
       }
+
+      match /topics/{userID} {
+        allow read;
+      }
     }
 
     match /groups/{groupID} {
