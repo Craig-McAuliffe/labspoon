@@ -66,7 +66,7 @@ export default function Routes({user, setUser}) {
       <AuthRoute user={user} path="/follows">
         <FollowsPage />
       </AuthRoute>
-      <Route path="/search/:query?">
+      <Route path="/search/:tab?/:query?">
         <SearchPage />
       </Route>
       <AuthRoute user={user} path="/user/:userID/edit/profilePicture">
