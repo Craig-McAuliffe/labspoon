@@ -24,6 +24,7 @@ import CreatePost from '../../../components/Posts/Post/CreatePost/CreatePost';
 import GroupAvatar from '../../../components/Avatar/GroupAvatar';
 import {AddMemberIcon, AddProfilePhoto} from '../../../assets/CreateGroupIcons';
 import UserListItem, {
+  UserListItemEmailOnly,
   UserSmallResultItem,
 } from '../../../components/User/UserListItem';
 
@@ -189,10 +190,17 @@ function SelectUsers({selectedUsers, addSelectedUsers, setSelectedUsers}) {
 }
 
 function SelectedMembers({selectedUsers, setSelectedUsers}) {
-  const removeSelectedUser = (selectedUserID) => {
-    const indexToBeRemoved = selectedUsers.findIndex(
-      (previouslySelectedUser) => previouslySelectedUser.id === selectedUserID
-    );
+  const removeSelectedUser = (user) => {
+    let indexToBeRemoved;
+    if (user.id) {
+      indexToBeRemoved = selectedUsers.findIndex(
+        (previouslySelectedUser) => previouslySelectedUser.id === user.id
+      );
+    } else if (user.email) {
+      indexToBeRemoved = selectedUsers.findIndex(
+        (previouslySelectedUser) => previouslySelectedUser.email === user.email
+      );
+    }
     setSelectedUsers((previouslySelectedMembers) => {
       const curatedSelectedMembers = [...previouslySelectedMembers];
       curatedSelectedMembers.splice(indexToBeRemoved, 1);
@@ -200,19 +208,25 @@ function SelectedMembers({selectedUsers, setSelectedUsers}) {
       return curatedSelectedMembers;
     });
   };
-  return (
-    <>
-      {selectedUsers.map((user) => (
+  const userListItems = selectedUsers.map((user) => {
+    if (user.id) {
+      return (
         <UserListItem user={user} key={user.id}>
-          {user.resourceType ? (
-            <NegativeButton onClick={() => removeSelectedUser(user.id)}>
-              Remove
-            </NegativeButton>
-          ) : null}
+          <NegativeButton onClick={() => removeSelectedUser(user)}>
+            Remove
+          </NegativeButton>
         </UserListItem>
-      ))}
-    </>
-  );
+      );
+    }
+    return (
+      <UserListItemEmailOnly user={user} key={user.email}>
+        <NegativeButton onClick={() => removeSelectedUser(user)}>
+          Remove
+        </NegativeButton>
+      </UserListItemEmailOnly>
+    );
+  });
+  return <>{userListItems}</>;
 }
 
 function AddMemberButton({setSelecting}) {
@@ -238,7 +252,12 @@ function AddMemberContainer({addSelectedUsers, setSelecting}) {
     {
       name: 'Invite By Email',
       icon: <FontAwesomeIcon icon={faEnvelope} />,
-      contents: <p>Inviting by email</p>,
+      contents: (
+        <AddMemberByEmail
+          addSelectedUsers={addSelectedUsers}
+          setSelecting={setSelecting}
+        />
+      ),
     },
   ];
 
@@ -249,6 +268,43 @@ const NoQueryNoResults = connectStateResults(({searchState, children}) => {
   if (!searchState.query) return <></>;
   return children;
 });
+
+function AddMemberByEmail({addSelectedUsers, setSelecting}) {
+  const validationSchema = Yup.object({
+    email: Yup.string().email().required('Email required'),
+  });
+  function onSubmit(res) {
+    addSelectedUsers({
+      email: res.email,
+    });
+    setSelecting(false);
+  }
+  return (
+    <>
+      <Formik
+        validationSchema={validationSchema}
+        onSubmit={onSubmit}
+        initialValues={{
+          email: '',
+        }}
+      >
+        <Form id="email-form">
+          <FormTextInput label="Email" name="email" sideLabel />
+        </Form>
+      </Formik>
+      <div className="create-group-submit-cancel-container">
+        <div className="create-group-cancel">
+          <CancelButton cancelAction={() => setSelecting(false)} />
+        </div>
+        <div className="create-group-submit">
+          <PrimaryButton submit formID="email-form">
+            Send
+          </PrimaryButton>
+        </div>
+      </div>
+    </>
+  );
+}
 
 function AddMemberSearch({addSelectedUsers, setSelecting}) {
   const selectUserAndStopSelecting = (user) => {
