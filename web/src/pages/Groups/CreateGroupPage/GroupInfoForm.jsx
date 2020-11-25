@@ -6,6 +6,7 @@ import {
   SearchBox,
   Hits,
   Configure,
+  connectStateResults,
 } from 'react-instantsearch-dom';
 import ImageUploader from 'react-images-upload';
 
@@ -27,6 +28,9 @@ import UserListItem, {
 } from '../../../components/User/UserListItem';
 
 import './CreateGroupPage.css';
+import TabbedContainer from '../../../components/TabbedContainer/TabbedContainer';
+import {faSearch, faEnvelope} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 
 // To do: check if the group exists OR pass argument that declares if editing or creating
 // Change onSubmit function depending on editing or creating
@@ -173,7 +177,7 @@ function SelectUsers({selectedUsers, addSelectedUsers, setSelectedUsers}) {
         setSelectedUsers={setSelectedUsers}
       />
       {selectingUser ? (
-        <AddMemberSearch
+        <AddMemberContainer
           addSelectedUsers={addSelectedUsers}
           setSelecting={setSelectingUser}
         />
@@ -219,6 +223,33 @@ function AddMemberButton({setSelecting}) {
   );
 }
 
+function AddMemberContainer({addSelectedUsers, setSelecting}) {
+  const tabDetails = [
+    {
+      name: 'Search on Labspoon',
+      icon: <FontAwesomeIcon icon={faSearch} />,
+      contents: (
+        <AddMemberSearch
+          addSelectedUsers={addSelectedUsers}
+          setSelecting={setSelecting}
+        />
+      ),
+    },
+    {
+      name: 'Invite By Email',
+      icon: <FontAwesomeIcon icon={faEnvelope} />,
+      contents: <p>Inviting by email</p>,
+    },
+  ];
+
+  return <TabbedContainer tabDetails={tabDetails} />;
+}
+
+const NoQueryNoResults = connectStateResults(({searchState, children}) => {
+  if (!searchState.query) return <></>;
+  return children;
+});
+
 function AddMemberSearch({addSelectedUsers, setSelecting}) {
   const selectUserAndStopSelecting = (user) => {
     addSelectedUsers(user);
@@ -233,17 +264,19 @@ function AddMemberSearch({addSelectedUsers, setSelecting}) {
           indexName={abbrEnv + '_USERS'}
         >
           <SearchBox />
-          <Hits
-            hitComponent={({hit}) => {
-              return (
-                <UserSmallResultItem
-                  user={hit}
-                  selectUser={selectUserAndStopSelecting}
-                  key={hit.id + 'user'}
-                />
-              );
-            }}
-          />
+          <NoQueryNoResults>
+            <Hits
+              hitComponent={({hit}) => {
+                return (
+                  <UserSmallResultItem
+                    user={hit}
+                    selectUser={selectUserAndStopSelecting}
+                    key={hit.id + 'user'}
+                  />
+                );
+              }}
+            />
+          </NoQueryNoResults>
           <Configure hitsPerPage={10} />
         </InstantSearch>
       </div>
