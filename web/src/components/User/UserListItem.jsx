@@ -13,7 +13,28 @@ export default function UserListItem({user, children}) {
     <div className="user-listItem-container">
       <Link to={`/user/${user.id}`}>
         <div className="user-listItem-link">
-          <AvatarSection avatar={user.avatar} />
+          <div className="Avatar">
+            {user.avatar ? (
+              <UserAvatar src={user.avatar} width="60px" height="60px" />
+            ) : (
+              <img
+                src={DefaultUserIcon}
+                alt="default user icon"
+                className="user-list-item-default-avatar"
+              />
+            )}
+          </div>
+          <div className="AvatarSmall">
+            {user.avatar ? (
+              <UserAvatar src={user.avatar} width="40px" height="40px" />
+            ) : (
+              <img
+                src={DefaultUserIcon}
+                alt="default user icon"
+                className="user-list-item-default-small"
+              />
+            )}
+          </div>
           <div className="user-listItem-name">
             <h2>{user.name}</h2>
             <h4>{user.name}</h4>
@@ -25,49 +46,6 @@ export default function UserListItem({user, children}) {
       </div>
       {userID === user.id ? null : <div className="Follow">{children}</div>}
     </div>
-  );
-}
-
-export function UserListItemEmailOnly({user, children}) {
-  return (
-    <div className="user-listItem-container">
-      <div className="user-listItem-link">
-        <AvatarSection />
-        <div className="user-listItem-email">
-          <h2>{user.email}</h2>
-        </div>
-      </div>
-      <div className="Follow">{children}</div>
-    </div>
-  );
-}
-
-function AvatarSection({avatar}) {
-  return (
-    <>
-      <div className="Avatar">
-        {avatar ? (
-          <UserAvatar src={avatar} width="60px" height="60px" />
-        ) : (
-          <img
-            src={DefaultUserIcon}
-            alt="default user icon"
-            className="user-list-item-default-avatar"
-          />
-        )}
-      </div>
-      <div className="AvatarSmall">
-        {avatar ? (
-          <UserAvatar src={avatar} width="40px" height="40px" />
-        ) : (
-          <img
-            src={DefaultUserIcon}
-            alt="default user icon"
-            className="user-list-item-default-small"
-          />
-        )}
-      </div>
-    </>
   );
 }
 
