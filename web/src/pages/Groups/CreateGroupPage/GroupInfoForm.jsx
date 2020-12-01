@@ -41,6 +41,7 @@ export default function GroupInfoForm({
   cancelForm,
   submitText,
 }) {
+  const [submitted, setSubmitted] = useState(false);
   const {user, userProfile} = useContext(AuthContext);
   const featureFlags = useContext(FeatureFlags);
   const validationSchema = Yup.object({
@@ -50,6 +51,12 @@ export default function GroupInfoForm({
     website: Yup.string(),
     about: Yup.string().max(1000, 'Must have fewer than 1000 characters'),
   });
+
+  function onSubmitAndPreventDuplicate(values) {
+    if (submitted) return;
+    setSubmitted(true);
+    onSubmit(values);
+  }
 
   useEffect(() => {
     if (userProfile === undefined) return;
@@ -77,7 +84,7 @@ export default function GroupInfoForm({
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
-          onSubmit={onSubmit}
+          onSubmit={onSubmitAndPreventDuplicate}
         >
           <Form id="create-group-form">
             <div className="create-group-profile-info-container">
@@ -121,7 +128,11 @@ export default function GroupInfoForm({
             <CancelButton cancelAction={cancelForm} />
           </div>
           <div className="create-group-submit">
-            <PrimaryButton submit formID="create-group-form">
+            <PrimaryButton
+              submit
+              formID="create-group-form"
+              disabled={submitted}
+            >
               {submitText}
             </PrimaryButton>
           </div>

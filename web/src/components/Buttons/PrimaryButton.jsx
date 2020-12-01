@@ -8,7 +8,7 @@ export default function PrimaryButton({
   small,
   children,
   formID,
-  inactive,
+  disabled,
   ...props
 }) {
   return (
@@ -17,12 +17,13 @@ export default function PrimaryButton({
       className={
         small
           ? 'primary-button-small'
-          : inactive
+          : disabled
           ? 'primary-button-inactive'
           : 'primary-button'
       }
       onClick={onClick ? onClick : null}
       form={formID ? formID : null}
+      disabled={disabled}
     >
       {small ? (
         <h4 className="primary-button-text-small">{children}</h4>
