@@ -9,7 +9,7 @@ export default function CreatePostActions() {
   return (
     <div className="create-post-actions">
       <div className="create-post-cancel-container">
-        <CancelButton cancelAction={cancelPost} />
+        {cancelPost ? <CancelButton cancelAction={cancelPost} /> : <></>}
       </div>
       <div className="create-post-actions-positive">
         <PrimaryButton submit={true} formID="create-post-form">

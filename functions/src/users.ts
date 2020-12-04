@@ -353,6 +353,16 @@ export interface UserRef {
   rank?: number;
 }
 
+export function toUserRef(userID: string, user: any) {
+  const userRef: UserRef = {
+    id: userID,
+    name: user.name,
+  };
+  if (user.avatar) userRef.avatar = user.avatar;
+  if (user.rank) userRef.rank = user.rank;
+  return userRef;
+}
+
 interface UserDB {
   microsoftAcademicAuthorID?: string;
 }

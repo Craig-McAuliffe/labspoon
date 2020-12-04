@@ -30,6 +30,7 @@ import TopicPage, {MAGFieldRouter} from './pages/TopicPage';
 import NewsPage from './pages/NewsPage';
 import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
 import OnboardingPage from './pages/OnboardingPage';
+import CreatePage from './pages/ResourcePages/CreatePage';
 
 /**
  * Top level routing structure for the app.
@@ -54,6 +55,9 @@ export default function Routes({user, setUser}) {
       </Route>
       <AuthRoute user={user} path="/settings">
         <SettingsPage />
+      </AuthRoute>
+      <AuthRoute user={user} path="/create">
+        <CreatePage />
       </AuthRoute>
       <AuthRoute user={user} path="/bookmarks">
         <BookmarksPage />

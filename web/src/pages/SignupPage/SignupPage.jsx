@@ -1,4 +1,5 @@
 import React, {useContext, useState} from 'react';
+import qs from 'qs';
 import firebase, {db} from '../../firebase.js';
 import {Redirect, useHistory, useLocation} from 'react-router';
 import {AuthContext} from '../../App';
@@ -22,11 +23,15 @@ function SignupPage() {
   const [goToOnboarding, setGoToOnboarding] = useState(false);
   const {user} = useContext(AuthContext);
   const history = useHistory();
+
+  const searchParams = qs.parse(search.slice(1));
+  const referrer = searchParams.referrer;
   if (!user) {
     return (
       <div className="content-layout">
         <div className="page-content-container">
           <div>
+            <ReferrerAlert referrer={referrer} />
             <h2 className="signup-form-title">{`Sign up to Labspoon`}</h2>
             <p className="signup-option">
               Already have an account?{' '}
@@ -155,3 +160,19 @@ const SignUpForm = ({setGoToOnboarding}) => {
 };
 
 export default SignupPage;
+
+function ReferrerAlert({referrer}) {
+  switch (referrer) {
+    case 'groupInvite':
+      return (
+        <div className="referrer-alert">
+          <h3>
+            You need to sign up to join the group. Don&rsquo;t worry it
+            doesn&rsquo;t take long!
+          </h3>
+        </div>
+      );
+    default:
+      return <></>;
+  }
+}

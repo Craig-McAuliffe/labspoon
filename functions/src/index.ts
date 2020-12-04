@@ -5,3 +5,4 @@ exports.users = require('./users');
 exports.publications = require('./publications');
 exports.topics = require('./topics');
 exports.email = require('./email');
+exports.invitations = require('./invitations');

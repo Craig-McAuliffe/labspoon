@@ -1,18 +1,21 @@
 import * as functions from 'firebase-functions';
+import {admin, config, url} from './config';
 import {PubSub} from '@google-cloud/pubsub';
-import {admin, url} from './config';
 import {DocumentSnapshot} from 'firebase-functions/lib/providers/firestore';
 import {UserRecord} from 'firebase-functions/lib/providers/auth';
 import {TaggedTopic} from './topics';
+import {toUserRef} from './users';
+import {GroupRef, toGroupRef} from './groups';
+import {Invitation} from './invitations';
 
-const apiKey = '222484df509ccd85ea7eff14361958f7-ea44b6dc-f3390b70';
-const domain = 'www.labspoon.com';
-const host = 'api.eu.mailgun.net';
-const mailgun = require('mailgun-js')({
-  apiKey: apiKey,
-  domain: domain,
-  host: host,
-});
+export let mailgun: any;
+if (config.mailgun) {
+  mailgun = require('mailgun-js')({
+    apiKey: config.mailgun.apikey,
+    domain: config.mailgun.domain,
+    host: config.mailgun.host,
+  });
+}
 
 const db = admin.firestore();
 const auth = admin.auth();
@@ -43,7 +46,7 @@ export const sendUpdateEmail = functions.pubsub
 
     // remember to make this idempotent
     const promises: Promise<undefined>[] = [];
-    usersSnapshot.forEach((ds) => promises.push(mailUser(ds, day)));
+    usersSnapshot.forEach((ds) => promises.push(sendUserNotificationEmail(ds, day)));
     return Promise.all(promises);
   });
 
@@ -52,7 +55,8 @@ const DEFAULT_UPDATE_EMAIL_SETTINGS = {
   sunday: true,
 }
 
-async function mailUser(ds: DocumentSnapshot, day: string): Promise<undefined> {
+async function sendUserNotificationEmail(ds: DocumentSnapshot, day: string): Promise<undefined> {
+  if (!mailgun) return;
   const userID = ds.id;
   const user = ds.data();
 
@@ -164,3 +168,61 @@ function getUserURLFromID(id: string) {
 function getTopicURLFromID(id: string) {
   return `${url}topic/${id}`;
 }
+
+export async function sendGroupInvitationEmail(invitationID: string, invitation: Invitation) {
+  if (!mailgun) return;
+
+  const emailAddress = invitation.email;
+
+  const groupID = invitation.resourceID;
+  const groupRef = db.doc(`groups/${groupID}`);
+
+  const invitingUserID = invitation.invitingUserID;
+  const invitingUserDS = await db.doc(`users/${invitingUserID}`).get();
+  const invitingUser = invitingUserDS.data();
+  const invitingUserRef = toUserRef(invitingUserID, invitingUser);
+
+  let authUser;
+  try {
+    authUser = await admin.auth().getUserByEmail(emailAddress);
+  } catch (err) {
+    // We handle not finding the user by inviting them, but for any other error we rethrow.
+    if (!(err.code === 'auth/user-not-found')) throw err;
+  }
+  if (authUser) {
+    const authUserID = authUser.uid;
+    const authUserDS = await db.doc(`users/${authUserID}`).get();
+    if (!authUserDS.exists) throw new Error(`No user found in DB for auth User ID ${authUserID}`);
+    const batch = db.batch();
+    batch.set(groupRef.collection('members').doc(authUserID), toUserRef(authUserID, authUserDS.data()));
+    batch.delete(groupRef.collection('invitations').doc(invitationID));
+    await batch.commit();
+    return;
+  }
+
+  const groupDS = await groupRef.get();
+  if (!groupDS.exists) throw new Error(`No group found with ID ${groupID}`);
+  const group = groupDS.data() as GroupRef;
+
+  const templateData = {
+    invitingUser: invitingUserRef,
+    group: toGroupRef(groupID, group),
+    url: encodeURI(`${url}login?referrer=groupInvite`),
+  };
+
+  const subject = `${invitingUser!.name} is inviting you to join ${group.name} on Labspoon!`;
+
+  mailgun.messages().send(
+    {
+      from: 'Labspoon <updates@labspoon.com>',
+      to: emailAddress,
+      subject: subject,
+      template: 'group-invitation-email',
+      'h:X-Mailgun-Variables': JSON.stringify(templateData),
+    },
+    (err: Error) => {
+      if (err) console.error('Error raised whilst sending email:', err);
+    }
+  );
+  return;
+};

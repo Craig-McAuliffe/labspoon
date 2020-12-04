@@ -175,3 +175,13 @@
   line-height: 0px;
   margin-bottom: 0px;
 }
+
+.warn-on-click {
+  color: #00507c;
+  cursor: pointer;
+}
+
+.warn-on-click:hover {
+  text-decoration: underline;
+}
+
