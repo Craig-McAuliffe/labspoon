@@ -253,7 +253,7 @@ function Popover({children, open, setClosed, content}) {
     const handleDocumentClick = (e) => {
       if (popoverRef.current) {
         if (!popoverRef.current.contains(e.target) && open === true)
-          setClosed(false);
+          setClosed();
       }
     };
     document.addEventListener('mousedown', handleDocumentClick);
