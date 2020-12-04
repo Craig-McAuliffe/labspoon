@@ -2,6 +2,7 @@ import React, {useState, useContext, useRef, useEffect} from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import {AuthContext} from '../../App';
 import './Buttons.css';
+import './FollowButton.css';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 
 const FollowButton = ({following, setFollowing}) => {
@@ -30,7 +31,13 @@ const FollowButton = ({following, setFollowing}) => {
   return (
     <div className="button-position">
       <button
-        className={following ? 'primary-button-clicked' : 'primary-button'}
+        className={
+          following == null
+            ? 'primary-button-spinner'
+            : following
+            ? 'primary-button-clicked'
+            : 'primary-button'
+        }
         onClick={followAction}
       >
         <div className="primary-button-text">

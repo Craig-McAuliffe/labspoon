@@ -36,7 +36,8 @@
 
 .primary-button,
 .primary-button-small,
-.primary-button-inactive {
+.primary-button-inactive,
+.primary-button-spinner {
   border: none;
   border-radius: 4%;
   text-decoration: none;
@@ -46,6 +47,10 @@
   text-align: center;
   -webkit-appearance: none;
   -moz-appearance: none;
+}
+
+.primary-button-spinner {
+  padding: 10px 10px 10px 10px;
 }
 
 .primary-button,
