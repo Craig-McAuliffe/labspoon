@@ -72,6 +72,43 @@ users:
         id: MA1qq6qfbFfMER5HdlTa4X36Ly42
         name: Craig McAuliffe
         avatar: https://i.picsum.photos/id/620/200/200.jpg?hmac=i-QlnBFXHK0SDe5o7B85DMYehiO7H-fZxsKLRrfFCcU
+  9ZqLJ9PaCZRleXcR7NWUb5OX4RB2:
+    id: 9ZqLJ9PaCZRleXcR7NWUb5OX4RB2
+    name: Gaj Sinjeri
+    avatar: https://i.picsum.photos/id/620/200/200.jpg?hmac=i-QlnBFXHK0SDe5o7B85DMYehiO7H-fZxsKLRrfFCcU
+    memberOfGroup: Gilestro Lab
+    coverPhoto:
+      https://i.picsum.photos/id/508/1070/200.jpg?hmac=zuoVvRij5oaspEYUA-r6XWUDuHQXigbUHUfhCaCIuqc
+    institution: University College London,
+    topics:
+      b1a66949-0b46-428e-a47e-15b17499ba5a:
+        id: b1a66949-0b46-428e-a47e-15b17499ba5a
+        name: Biology
+      dbd6811f-8e7a-416b-a5cb-0bf564f89a39:
+        id: dbd6811f-8e7a-416b-a5cb-0bf564f89a39
+        name: Physics
+    followsUsers:
+      YdZkqyCThmUNhej0VXtqqWgD69s2:
+        id: YdZkqyCThmUNhej0VXtqqWgD69s2
+        name: Patrick Leask
+        avatar: https://i.picsum.photos/id/804/200/200.jpg?hmac=73qw3Bnt67aOsdWd033BvfX9Gq0gIJ6FSL3Dp3gA97E
+    followsTopics:
+      b1a66949-0b46-428e-a47e-15b17499ba5a:
+        id: b1a66949-0b46-428e-a47e-15b17499ba5a
+        name: Biology
+      dbd6811f-8e7a-416b-a5cb-0bf564f89a39:
+        id: dbd6811f-8e7a-416b-a5cb-0bf564f89a39
+        name: Physics
+    # users follow themselves to see their own posts in their feed
+    followedByUsers:
+      MA1qq6qfbFfMER5HdlTa4X36Ly42:
+        id: MA1qq6qfbFfMER5HdlTa4X36Ly42
+        name: Craig McAuliffe
+        avatar: https://i.picsum.photos/id/620/200/200.jpg?hmac=i-QlnBFXHK0SDe5o7B85DMYehiO7H-fZxsKLRrfFCcU
+      YdZkqyCThmUNhej0VXtqqWgD69s2:
+        id: YdZkqyCThmUNhej0VXtqqWgD69s2
+        name: Patrick Leask
+        avatar: https://i.picsum.photos/id/804/200/200.jpg?hmac=73qw3Bnt67aOsdWd033BvfX9Gq0gIJ6FSL3Dp3gA97E
 posts:
   topic-only:
     id: topic-only

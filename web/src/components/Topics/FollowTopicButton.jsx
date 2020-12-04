@@ -5,7 +5,7 @@ import {db} from '../../firebase';
 import FollowButton from '../Buttons/FollowButton';
 
 export default function FollowTopicButton({targetTopic}) {
-  const [following, setFollowing] = useState(false);
+  const [following, setFollowing] = useState();
   const featureFlags = useContext(FeatureFlags);
   const {user: authUser, userProfile} = useContext(AuthContext);
   useEffect(() => {
@@ -18,6 +18,8 @@ export default function FollowTopicButton({targetTopic}) {
   });
 
   function setFollowingAndUpdateDB() {
+    if (following == null) return;
+
     const batch = db.batch();
     const followsTopicsDoc = db.doc(
       `users/${authUser.uid}/followsTopics/${targetTopic.id}`
