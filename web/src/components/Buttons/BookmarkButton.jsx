@@ -91,7 +91,7 @@ function BookmarkButton({post}) {
           <div className="sign-up-prompt-center" ref={signUpPromptRef}>
             <Link
               to={{
-                pathname: '/login',
+                pathname: '/signup',
                 state: {returnLocation: locationPathName},
               }}
             >

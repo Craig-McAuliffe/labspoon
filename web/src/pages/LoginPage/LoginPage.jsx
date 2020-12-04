@@ -23,7 +23,9 @@ function LoginPage() {
   // This prevents the redirect to '/' being triggered.
   const [goToOnboarding, setGoToOnboarding] = useState(false);
   const {user} = useContext(AuthContext);
-  const [formType, setFormType] = useState('sign-up');
+  const [formType, setFormType] = useState(
+    useLocation().pathname == '/login' ? 'sign-in' : 'sign-up'
+  );
   if (!user) {
     return (
       <div className="content-layout">

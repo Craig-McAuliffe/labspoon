@@ -40,7 +40,7 @@ const FollowButton = ({following, setFollowing}) => {
         <div className="sign-up-prompt" ref={signUpPromptRef}>
           <Link
             to={{
-              pathname: '/login',
+              pathname: '/signup',
               state: {returnLocation: locationPathName},
             }}
           >

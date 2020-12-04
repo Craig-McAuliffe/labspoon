@@ -48,6 +48,9 @@ export default function Routes({user, setUser}) {
       <Route path="/login">
         <LoginPage />
       </Route>
+      <Route path="/signup">
+        <LoginPage />
+      </Route>
       <AuthRoute user={user} path="/settings">
         <SettingsPage />
       </AuthRoute>
