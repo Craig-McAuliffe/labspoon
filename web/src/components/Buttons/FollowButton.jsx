@@ -29,18 +29,18 @@ const FollowButton = ({following, setFollowing}) => {
 
   return (
     <div className="button-position">
-      {following != null ? (
-        <button
-          className={following ? 'primary-button-clicked' : 'primary-button'}
-          onClick={followAction}
-        >
-          <div className="primary-button-text">
+      <button
+        className={following ? 'primary-button-clicked' : 'primary-button'}
+        onClick={followAction}
+      >
+        <div className="primary-button-text">
+          {following != null ? (
             <h2>{following ? 'Unfollow' : 'Follow'}</h2>
-          </div>
-        </button>
-      ) : (
-        <LoadingSpinner />
-      )}
+          ) : (
+            <LoadingSpinner />
+          )}
+        </div>
+      </button>
       {signUpPrompt ? (
         <div className="sign-up-prompt" ref={signUpPromptRef}>
           <Link
