@@ -1,0 +1,15 @@
+.light-tab-active {
+  color: #000000;
+  text-decoration: underline;
+  margin: 0px 20px 20px 0px;
+}
+
+.light-tab-inactive {
+  color: #5d5d65;
+  margin: 0px 20px 20px 0px;
+}
+
+.light-tab-group {
+  margin-left: -5px;
+  display: flex;
+}

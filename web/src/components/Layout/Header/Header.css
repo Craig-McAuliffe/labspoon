@@ -15,10 +15,18 @@
   grid-column: 1 / 2;
 }
 
-.header-drop-down {
+.header-add-button {
   display: inline-block;
   justify-self: flex-end;
   grid-column: 3 / 4;
+  max-height: 100%;
+  max-width: 100%;
+}
+
+.header-drop-down {
+  display: inline-block;
+  justify-self: flex-end;
+  grid-column: 4 / 5;
   max-height: 100%;
   max-width: 100%;
 }

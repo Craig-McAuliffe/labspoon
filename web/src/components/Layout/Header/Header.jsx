@@ -3,6 +3,7 @@ import {Link} from 'react-router-dom';
 import SearchBar from '../../SearchBar';
 import AvatarDropDown from './AvatarDropDown';
 import HeaderLogo from '../../../assets/HeaderLogo';
+import {CreateButton} from '../../../assets/HeaderIcons';
 
 import './Header.css';
 
@@ -16,6 +17,11 @@ const Header = () => {
         <span className="header-home-text">Home</span>
       </Link>
       <SearchBar />
+      <div className="header-add-button">
+        <Link to="/create">
+          <CreateButton />
+        </Link>
+      </div>
       <div className="header-drop-down">
         <AvatarDropDown />
       </div>

@@ -13,17 +13,25 @@ export const OPEN_POSITION_POST = 'Open Position';
 
 export const CreatingPostContext = createContext();
 
-export default function CreatePost({pinnedPost}) {
+export default function CreatePost({
+  pinnedPost,
+  keepExpanded = false,
+  redirect = undefined,
+}) {
   const {user} = useContext(AuthContext);
-  const [creatingPost, setCreatingPost] = useState(false);
+  const [creatingPost, setCreatingPost] = useState(keepExpanded);
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [postSuccess, setPostSuccess] = useState(false);
   const [taggedResourceType, setTaggedResourceType] = useState(DEFAULT_POST);
   const [submittingPost, setSubmittingPost] = useState(false);
 
+  const setCreatingPostIfNotExpanded = (newValue) => {
+    if (!keepExpanded) setCreatingPost(newValue);
+  };
+
   const cancelPost = () => {
     if (submittingPost) return;
-    setCreatingPost(false);
+    if (!keepExpanded) setCreatingPostIfNotExpanded(false);
   };
 
   useEffect(() => {
@@ -33,6 +41,10 @@ export default function CreatePost({pinnedPost}) {
   useEffect(() => {
     setSelectedTopics([]);
   }, [creatingPost]);
+
+  if (postSuccess && redirect) {
+    return redirect;
+  }
 
   if (!user) return null;
   if (creatingPost)
@@ -44,11 +56,11 @@ export default function CreatePost({pinnedPost}) {
           setPostSuccess: setPostSuccess,
           submittingPost: submittingPost,
           setSubmittingPost: setSubmittingPost,
-          cancelPost: cancelPost,
+          cancelPost: keepExpanded ? undefined : cancelPost,
         }}
       >
         <PostTypeSpecificForm
-          setCreatingPost={setCreatingPost}
+          setCreatingPost={setCreatingPostIfNotExpanded}
           postType={taggedResourceType}
           setPostType={setTaggedResourceType}
         />
