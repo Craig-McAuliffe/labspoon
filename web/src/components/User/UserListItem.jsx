@@ -6,41 +6,55 @@ import DefaultUserIcon from '../../assets/DefaultUserIcon.svg';
 import {AuthContext} from '../../App';
 import './UserListItem.css';
 
-export default function UserListItem({user, children}) {
+export default function UserListItem({
+  user,
+  children,
+  LinkOverride = undefined,
+}) {
   const {userProfile} = useContext(AuthContext);
   const userID = userProfile ? userProfile.id : undefined;
+
+  function WrapWithLinkOrOverride({children}) {
+    if (LinkOverride) return <LinkOverride>{children}</LinkOverride>;
+    return <Link to={`/user/${user.id}`}>{children}</Link>;
+  }
+
+  const details = (
+    <WrapWithLinkOrOverride>
+      <div className="user-listItem-link">
+        <div className="Avatar">
+          {user.avatar ? (
+            <UserAvatar src={user.avatar} width="60px" height="60px" />
+          ) : (
+            <img
+              src={DefaultUserIcon}
+              alt="default user icon"
+              className="user-list-item-default-avatar"
+            />
+          )}
+        </div>
+        <div className="AvatarSmall">
+          {user.avatar ? (
+            <UserAvatar src={user.avatar} width="40px" height="40px" />
+          ) : (
+            <img
+              src={DefaultUserIcon}
+              alt="default user icon"
+              className="user-list-item-default-small"
+            />
+          )}
+        </div>
+        <div className="user-listItem-name">
+          <h2>{user.name}</h2>
+          <h4>{user.name}</h4>
+        </div>
+      </div>
+    </WrapWithLinkOrOverride>
+  );
+
   return (
     <div className="user-listItem-container">
-      <Link to={`/user/${user.id}`}>
-        <div className="user-listItem-link">
-          <div className="Avatar">
-            {user.avatar ? (
-              <UserAvatar src={user.avatar} width="60px" height="60px" />
-            ) : (
-              <img
-                src={DefaultUserIcon}
-                alt="default user icon"
-                className="user-list-item-default-avatar"
-              />
-            )}
-          </div>
-          <div className="AvatarSmall">
-            {user.avatar ? (
-              <UserAvatar src={user.avatar} width="40px" height="40px" />
-            ) : (
-              <img
-                src={DefaultUserIcon}
-                alt="default user icon"
-                className="user-list-item-default-small"
-              />
-            )}
-          </div>
-          <div className="user-listItem-name">
-            <h2>{user.name}</h2>
-            <h4>{user.name}</h4>
-          </div>
-        </div>
-      </Link>
+      {details}
       <div className="user-listItem-institution">
         <h3>{user.institution}</h3>
       </div>

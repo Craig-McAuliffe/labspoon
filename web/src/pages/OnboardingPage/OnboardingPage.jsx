@@ -181,7 +181,11 @@ function OnboardingFollow({user}) {
             <div className="onboarding-users-to-follow-container">
               {displayedUsers.map((displayedUser) =>
                 displayedUser.id === user.uid ? null : (
-                  <UserListItem user={displayedUser} key={displayedUser.id}>
+                  <UserListItem
+                    user={displayedUser}
+                    key={displayedUser.id}
+                    LinkOverride={WarnOnClick}
+                  >
                     <FollowUserButton targetUser={displayedUser} />
                   </UserListItem>
                 )
@@ -205,7 +209,11 @@ function OnboardingFollow({user}) {
               if (displayedTopic.objectID)
                 displayedTopic.id = displayedTopic.objectID;
               return (
-                <TopicListItem topic={displayedTopic} key={displayedTopic.id}>
+                <TopicListItem
+                  topic={displayedTopic}
+                  key={displayedTopic.id}
+                  LinkOverride={WarnOnClick}
+                >
                   <FollowTopicButton targetTopic={displayedTopic} />
                 </TopicListItem>
               );
@@ -213,6 +221,56 @@ function OnboardingFollow({user}) {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function WarnOnClick({children}) {
+  const [warn, setWarn] = useState(false);
+  const popoverContent = (
+    <p>
+      Other users find it useful to finish onboarding before exploring. Keep
+      going!
+    </p>
+  );
+  return (
+    <Popover
+      open={warn}
+      setClosed={() => setWarn(false)}
+      content={popoverContent}
+    >
+      <span className="warn-on-click" onClick={() => setWarn(true)}>
+        {children}
+      </span>
+    </Popover>
+  );
+}
+
+function Popover({children, open, setClosed, content}) {
+  const popoverRef = useRef();
+
+  useEffect(() => {
+    const handleDocumentClick = (e) => {
+      if (popoverRef.current) {
+        if (!popoverRef.current.contains(e.target) && open === true)
+          setClosed();
+      }
+    };
+    document.addEventListener('mousedown', handleDocumentClick);
+  });
+
+  let popover;
+  if (open)
+    popover = (
+      <div ref={popoverRef} className="sign-up-prompt">
+        {content}
+      </div>
+    );
+
+  return (
+    <div style={{position: 'relative'}}>
+      {children}
+      {popover}
     </div>
   );
 }
@@ -261,7 +319,11 @@ function OnboardingGroup({user}) {
         />
         <div className="onboarding-groups-to-follow-container">
           {displayedGroups.map((displayedGroup) => (
-            <GroupListItem group={displayedGroup} key={displayedGroup.id} />
+            <GroupListItem
+              group={displayedGroup}
+              key={displayedGroup.id}
+              LinkOverride={WarnOnClick}
+            />
           ))}
         </div>
       </div>
