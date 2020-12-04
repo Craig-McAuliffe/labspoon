@@ -160,5 +160,17 @@ export interface GroupRef {
   name: string;
   avatar?: string;
   about?: string;
+  institution?: string;
   rank?: number;
+}
+
+export function toGroupRef(groupID: string, group: any) {
+  const groupRef: GroupRef = {
+    id: groupID,
+    name: group.name,
+  }
+  if (group.avatar) groupRef.avatar = group.avatar;
+  if (group.about) groupRef.about = group.about;
+  if (group.institution) groupRef.institution = group.institution;
+  return groupRef;
 }
