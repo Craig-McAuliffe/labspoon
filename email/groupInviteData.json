@@ -1,0 +1,16 @@
+{
+  "invitingUser": {
+    "id": "YdZkqyCThmUNhej0VXtqqWgD69s2",
+    "name": "Patrick Leask",
+    "institution": "University College London",
+    "avatar": "https://storage.googleapis.com/labspoon-dev-266bc.appspot.com/users/YdZkqyCThmUNhej0VXtqqWgD69s2/avatar"
+  },
+  "group": {
+    "id": "fy780tuhfohff",
+    "name": "Neurogenomics Group",
+    "institution": "Imperial College London",
+    "about": "Thus he said unto him, that the brightness shall come forth from the fruit that bears the sinner, and only he shall be able to set right the woes of the undying",
+    "avatar": "https://i.picsum.photos/id/941/1000/1000.jpg?hmac=L--8SZt-e5UBl9D214iij56CLomx8sVGhhwMKBveVOg"
+  },
+  "url": "http://localhost:3000/login"
+}

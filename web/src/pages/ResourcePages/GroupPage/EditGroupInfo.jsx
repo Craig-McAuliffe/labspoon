@@ -1,30 +1,46 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import GroupInfoForm from '../../Groups/CreateGroupPage/GroupInfoForm';
 import firebase, {db, storage} from '../../../firebase';
 import {Alert} from 'react-bootstrap';
+import {v4 as uuid} from 'uuid';
 
 import './GroupPage.css';
+import {AuthContext} from '../../../App';
 
 export default function EditingGroupInfo({groupData, setEditingGroup}) {
   const groupID = groupData.id;
   const [groupMembers, setGroupMembers] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [avatar, setAvatar] = useState([]);
+  const {user} = useContext(AuthContext);
+  const userID = user.uid;
 
   useEffect(() => {
-    const fetchGroupMembers = db
-      .collection(`groups/${groupID}/members`)
-      .get()
-      .then((qs) => {
-        const users = [];
-        qs.forEach((doc) => {
-          const user = doc.data();
-          user.resourceType = 'user';
-          users.push(user);
-        });
-        return users;
+    async function fetchGroupMembers() {
+      const members = [];
+      const existingMembersQS = await db
+        .collection(`groups/${groupID}/members`)
+        .get();
+      existingMembersQS.forEach((doc) => {
+        const member = doc.data();
+        member.resourceType = 'user';
+        members.push(member);
       });
-    fetchGroupMembers.then((fetchedMembers) => setGroupMembers(fetchedMembers));
+      const invitationsQS = await db
+        .collection(`groups/${groupID}/invitations`)
+        .get();
+      invitationsQS.forEach((doc) => {
+        const invitation = doc.data();
+        const emailInvitation = {
+          // cannot be id as this confuses rendering with an existing member
+          invitationID: doc.id,
+          email: invitation.email,
+        };
+        members.push(emailInvitation);
+      });
+      setGroupMembers(members);
+    }
+    fetchGroupMembers();
   }, [groupID]);
 
   useEffect(() => {
@@ -41,7 +57,18 @@ export default function EditingGroupInfo({groupData, setEditingGroup}) {
 
   const onSubmitEdit = (values) => {
     const memberIDsToBeRemoved = [];
+    const invitationsToBeRemoved = [];
     groupMembers.forEach((existingGroupMember) => {
+      if (!existingGroupMember.id) {
+        if (
+          !selectedUsers.some((newGroupMember) => {
+            return newGroupMember.email === existingGroupMember.email;
+          })
+        ) {
+          invitationsToBeRemoved.push(existingGroupMember);
+          return;
+        }
+      }
       if (
         !selectedUsers.some(
           (newGroupMember) => newGroupMember.id === existingGroupMember.id
@@ -54,6 +81,19 @@ export default function EditingGroupInfo({groupData, setEditingGroup}) {
       const groupDocRef = db.doc(`groups/${groupID}`);
       batch.update(groupDocRef, values);
       selectedUsers.forEach((newMember) => {
+        if (!newMember.id) {
+          const invitation = {
+            email: newMember.email,
+            type: 'group',
+            resourceID: groupID,
+            invitingUserID: userID,
+          };
+          batch.set(
+            groupDocRef.collection('invitations').doc(uuid()),
+            invitation
+          );
+          return;
+        }
         const memberRef = {
           id: newMember.id,
           name: newMember.name,
@@ -69,10 +109,19 @@ export default function EditingGroupInfo({groupData, setEditingGroup}) {
           groupDocRef.collection('members').doc(memberIDToBeRemoved)
         );
       });
+      invitationsToBeRemoved.forEach((invitationToRemove) => {
+        batch.delete(
+          groupDocRef
+            .collection('invitations')
+            .doc(invitationToRemove.invitationID)
+        );
+      });
       batch
         .commit()
         .catch((err) => alert(err, 'batch failed to commit'))
-        .then(() => setEditingGroup(false));
+        .then(() => {
+          setEditingGroup(false);
+        });
     };
     const avatarStorageRef = storage.ref(`groups/${groupID}/avatar_fullSize`);
     if (avatar.length > 0) {

@@ -17,6 +17,7 @@ export default function CreateGroupPage({
   const {user, userProfile} = useContext(AuthContext);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [avatar, setAvatar] = useState([]);
+  const userID = user.uid;
 
   const initialValues = {
     name: '',
@@ -33,14 +34,6 @@ export default function CreateGroupPage({
     const writeToDB = () => {
       const batch = db.batch();
       const groupDocRef = db.doc(`groups/${groupID}`);
-      const groupRef = {
-        name: values.name,
-        about: values.about,
-        location: values.location,
-        institution: values.institution,
-        website: values.website,
-        avatar: getAvatar(groupID),
-      };
       values.avatar = getAvatar(groupID);
       batch.set(groupDocRef, values);
       const userRef = {
@@ -48,17 +41,27 @@ export default function CreateGroupPage({
         name: userProfile.name,
       };
       if (userProfile.avatar) userRef.avatar = userProfile.avatar;
-      batch.set(groupDocRef.collection('members').doc(user.uid), userRef);
-      batch.set(db.doc(`users/${user.uid}/groups/${groupID}`), groupRef);
+      batch.set(groupDocRef.collection('members').doc(userID), userRef);
       selectedUsers.forEach((member) => {
+        if (!member.id) {
+          const invitation = {
+            email: member.email,
+            type: 'group',
+            resourceID: groupID,
+            invitingUserID: userID,
+          };
+          batch.set(
+            groupDocRef.collection('invitations').doc(uuid()),
+            invitation
+          );
+          return;
+        }
         const memberRef = {
           id: member.id,
           name: member.name,
           avatar: member.avatar,
         };
-
         batch.set(groupDocRef.collection('members').doc(member.id), memberRef);
-        batch.set(db.doc(`users/${member.id}/groups/${groupID}`), groupRef);
       });
       batch
         .commit()
