@@ -28,7 +28,7 @@ function SignupPage() {
         <div className="page-content-container">
           <div>
             <h2 className="signup-form-title">{`Sign up to Labspoon`}</h2>
-            <p className="login-option">
+            <p className="signup-option">
               Already have an account?{' '}
               <button onClick={() => history.push('/login')}>
                 Sign in here
