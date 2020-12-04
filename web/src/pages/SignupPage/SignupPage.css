@@ -1,5 +1,7 @@
-.signin-container {
+.sign-up-container {
   display: flex;
+  justify-content: center;
+  margin-top: 50px;
   align-items: center;
 }
 
@@ -7,15 +9,15 @@
   margin-right: 10px;
 }
 
-.signin-form-title {
+.signup-form-title {
   color: #00507c;
 }
 
-.sign-in-option {
+.login-option {
   margin-top: 20px;
 }
 
-.sign-in-option button {
+.login-option button {
   color: #00507c;
   font-size: 1.2em;
 }

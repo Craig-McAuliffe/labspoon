@@ -21,6 +21,7 @@ import {
   EditUserCoverPhotoPage,
 } from './pages/ResourcePages/UserPage/EditUserPage';
 import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
 import PublicationPage, {
   MAGPublicationRouter,
 } from './pages/ResourcePages/PublicationPage/PublicationPage';
@@ -49,7 +50,7 @@ export default function Routes({user, setUser}) {
         <LoginPage />
       </Route>
       <Route path="/signup">
-        <LoginPage />
+        <SignupPage />
       </Route>
       <AuthRoute user={user} path="/settings">
         <SettingsPage />
