@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import {useLocation} from 'react-router-dom';
@@ -14,6 +14,8 @@ import FollowTopicButton from '../Topics/FollowTopicButton';
 
 import './Results.css';
 import FollowUserButton from '../User/FollowUserButton/FollowUserButton';
+import {FilterableResultsContext} from '../FilterableResults/FilterableResults';
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 
 /**
  * Displays an infinitely scrolling list of posts.
@@ -183,6 +185,89 @@ function MixedResultsPage({results}) {
           ))}
         </div>
       ) : null}
+    </div>
+  );
+}
+
+export function SelectableResults({selectedItems, setSelectedItems}) {
+  // This should not really depend on the FilterableResultsContext directly.
+  // When we want to use it in other places too, we should wrap it with
+  // a component that retrives the FilterableResultsContext, similarly to what
+  // we do with NewResultsWrapper.
+  const filterableResults = useContext(FilterableResultsContext);
+  const results = filterableResults.results;
+  const hasMore = filterableResults.hasMore;
+  const fetchMore = filterableResults.fetchMore;
+  const loading = filterableResults.loadingResults;
+
+  if (filterableResults.resultsError)
+    return <h1>{filterableResults.resultsError}</h1>;
+
+  const selectedIDs = new Set(selectedItems.map((item) => item.id));
+
+  const items = results.map((result) => {
+    const selected = selectedIDs.has(result.id);
+    return (
+      <SelectableGenericListItem
+        key={result.id}
+        result={result}
+        selected={selected}
+        setSelected={() =>
+          setItemSelectedState(result, !selected, setSelectedItems)
+        }
+      />
+    );
+  });
+
+  return (
+    <>
+      <InfiniteScroll
+        dataLength={items.length}
+        hasMore={hasMore}
+        next={fetchMore}
+        style={{minWidth: '100%'}}
+      >
+        {items}
+      </InfiniteScroll>
+      {loading ? <LoadingSpinner /> : <></>}
+    </>
+  );
+}
+
+function setItemSelectedState(result, willAdd, setSelectedItems) {
+  if (willAdd) {
+    setSelectedItems((items) => [...items, result]);
+    return;
+  }
+  setSelectedItems((items) => items.filter((item) => item.id !== result.id));
+}
+
+function SelectableGenericListItem({result, selected, setSelected}) {
+  return (
+    <div className="post-with-selector-container">
+      <GenericListItem result={result} />
+      <Select
+        selected={selected}
+        toggle={() => setSelected(result)}
+        alreadyPresent={result._alreadyPresent}
+      />
+    </div>
+  );
+}
+
+function Select({toggle, selected, alreadyPresent}) {
+  if (alreadyPresent)
+    return (
+      <div className="post-selector-container">
+        <p className="post-selector-inactive-text">Already added</p>
+      </div>
+    );
+  const buttonClassName =
+    'post-selector-button-' + (selected ? 'active' : 'inactive');
+  return (
+    <div className="post-selector-container">
+      <button className={buttonClassName} onClick={toggle} />
+      <p className="post-selector-active-text">Select</p>
     </div>
   );
 }

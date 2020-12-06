@@ -12,6 +12,14 @@ export function dbPublicationToJSPublication(dbPublication) {
   return JSPublication;
 }
 
+export function jsPublicationToDBPublication(jsPublication) {
+  const dbPublication = {...jsPublication};
+  delete dbPublication.resourceType;
+  delete dbPublication.content;
+  delete dbPublication.id;
+  return dbPublication;
+}
+
 // Retrieves paginated publications from the passed publications collection
 // using the last publications of the previous page as a cursor. Returns
 // a promise that returns an array of results when resolved. If there are no
@@ -22,9 +30,9 @@ export function getPaginatedPublicationsFromCollectionRef(
   limit,
   last
 ) {
-  publicationCollection = publicationCollection.orderBy('date');
+  publicationCollection = publicationCollection.orderBy('date', 'desc');
   if (typeof last !== 'undefined') {
-    publicationCollection = publicationCollection.startAt(last.date);
+    publicationCollection = publicationCollection.startAfter(last.date);
   }
   return publicationCollection
     .limit(limit)

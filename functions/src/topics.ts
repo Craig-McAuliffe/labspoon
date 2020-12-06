@@ -112,8 +112,8 @@ export async function createFieldAndTopic(topic: Topic) {
     })
     .catch((err) => {
       console.error(
+        `Could not create topic and field ${topic} from MSPublication:`,
         err,
-        'could not create topic and field' + topic + 'from MSPublication'
       );
       throw new functions.https.HttpsError(
         'internal',

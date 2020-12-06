@@ -1,8 +1,7 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React from 'react';
 import {Link} from 'react-router-dom';
 import Linkify from 'linkifyjs/react';
 import PropTypes from 'prop-types';
-import {SelectedListItemsContext} from '../../../pages/ResourcePages/GroupPage/EditGroupPosts';
 import PostOptionalTags from './PostParts/PostOptionalTags';
 import PostActions, {BookmarkedPostSymbol} from './PostParts/PostActions';
 import DefaultUserIcon from '../../../assets/DefaultUserIcon.svg';
@@ -20,21 +19,6 @@ import './Post.css';
  * @return {React.ReactElement}
  */
 export default function Post({post, dedicatedPage, bookmarkedVariation}) {
-  const selectionVariation = useContext(SelectedListItemsContext);
-  const [isSelected, setIsSelected] = useState(false);
-
-  // Checks if the post should already be selected
-  useEffect(() => {
-    if (post.hasBeenSelected) setIsSelected(true);
-  }, [post.hasBeenSelected]);
-
-  // Checks if the parent component resets all selections
-  useEffect(() => {
-    if (selectionVariation) {
-      if (selectionVariation.resetSelection === true) setIsSelected(false);
-    }
-  }, [selectionVariation]);
-
   const referencedResourceWrapper = () => {
     if (dedicatedPage) return postContent();
     const referencedPublication = publications().filter(
@@ -48,39 +32,6 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
             removeBorder={true}
           />
           {postContent()}
-        </div>
-      );
-    else if (post.hasSelector)
-      return (
-        <div className="post-with-selector-container">
-          {postContent()}
-          <div className="post-selector-container">
-            {post.hasSelector === 'active-add' ||
-            post.hasSelector === 'active-remove' ? (
-              <>
-                <button
-                  className={
-                    isSelected
-                      ? 'post-selector-button-active'
-                      : 'post-selector-button-inactive'
-                  }
-                  onClick={() =>
-                    selectPost(
-                      selectionVariation,
-                      isSelected,
-                      setIsSelected,
-                      post
-                    )
-                  }
-                />
-                <p className="post-selector-active-text">
-                  {post.hasSelector === 'active-add' ? 'Add' : 'Remove'}
-                </p>
-              </>
-            ) : (
-              <p className="post-selector-inactive-text">Already on group</p>
-            )}
-          </div>
         </div>
       );
     else return postContent();
@@ -200,21 +151,3 @@ export function PinnedPost({post}) {
     </div>
   );
 }
-
-const selectPost = (selectionVariation, isSelected, setIsSelected, post) => {
-  if (selectionVariation) {
-    const setFeedSelectionState = selectionVariation.setSelectedPosts;
-    isSelected
-      ? setFeedSelectionState((feedSelectionState) => {
-          const filteredSelectionState = feedSelectionState.filter(
-            (selectedPost) => selectedPost.id !== post.id
-          );
-          return filteredSelectionState;
-        })
-      : setFeedSelectionState((feedSelectionState) => [
-          ...feedSelectionState,
-          ...[post],
-        ]);
-    setIsSelected(!isSelected);
-  }
-};
