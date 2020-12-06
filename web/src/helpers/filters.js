@@ -29,3 +29,16 @@ export function getEnabledIDsFromFilter(filter) {
   });
   return IDsMap;
 }
+
+export function usersToFilterOptions(users, filter = false) {
+  return users.map((user, i) => {
+    const id = !filter ? user.id : user.resourceID;
+    return {
+      data: {
+        id: id,
+        name: user.name,
+      },
+      enabled: i === 0,
+    };
+  });
+}

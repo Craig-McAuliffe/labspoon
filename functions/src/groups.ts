@@ -3,6 +3,7 @@ import {admin, ResourceTypes} from './config';
 import {firestore} from 'firebase-admin';
 import {updateFilterCollection, Post} from './posts';
 import {Topic} from './topics';
+import {Publication} from './microsoft';
 
 const db: firestore.Firestore = admin.firestore();
 
@@ -10,11 +11,17 @@ export const createGroupDocuments = functions.firestore
   .document(`groups/{groupID}`)
   .onCreate(async (change, context) => {
     const groupID = context.params.groupID;
-    db.collection(`groups/${groupID}/feeds`)
+    await db.collection(`groups/${groupID}/feeds`)
       .doc(`postsFeed`)
       .set({id: 'postsFeed'})
       .catch((err) =>
         console.log(err, 'could not create postsFeed for new group')
+      );
+    await db.collection(`groups/${groupID}/feeds`)
+      .doc(`publicationsFeed`)
+      .set({id: 'publicationsFeed'})
+      .catch((err) =>
+        console.log(err, 'could not create publicationsFeed for new group')
       );
   });
 
@@ -62,6 +69,60 @@ export const removeGroupMembersFromPostFilter = functions.firestore
         'could not remove author option on group posts feed filter'
       )
     );
+  });
+
+export const addGroupMembersToPublicationFilter = functions.firestore
+  .document(`groups/{groupID}/publications/{publicationID}`)
+  .onCreate(async (change, context) => {
+    const groupID = context.params.groupID;
+    const publication = change.data() as Publication;
+    const groupPublicationsFeedRef = db.doc(`groups/${groupID}/feeds/publicationsFeed`);
+    const updateFilterPromises = publication.authors!.map((author) => {
+      if (!author.id) return;
+      updateFilterCollection(
+        groupPublicationsFeedRef,
+        {resourceName: 'Author', resourceType: ResourceTypes.USER},
+        {
+          name: author.name,
+          resourceID: author.id,
+          avatar: author.avatar,
+        },
+        false
+      ).catch((err) =>
+        console.log(
+          err,
+          'could not update author option on group publications feed filter'
+        )
+      );
+    });
+    await Promise.all(updateFilterPromises);
+  });
+
+export const removeGroupMembersFromPublicationFilter = functions.firestore
+  .document(`groups/{groupID}/publications/{publicationID}`)
+  .onDelete(async (change, context) => {
+    const groupID = context.params.groupID;
+    const publication = change.data() as Publication;
+    const groupPublicationsFeedRef = db.doc(`groups/${groupID}/feeds/publicationsFeed`);
+    const updateFilterPromises = publication.authors!.map((author) => {
+      if (!author.id) return;
+      updateFilterCollection(
+        groupPublicationsFeedRef,
+        {resourceName: 'Author', resourceType: ResourceTypes.USER},
+        {
+          name: author.name,
+          resourceID: author.id,
+          avatar: author.avatar,
+        },
+        true
+      ).catch((err) =>
+        console.log(
+          err,
+          'could not update author option on group publications feed filter'
+        )
+      );
+    });
+    await Promise.all(updateFilterPromises);
   });
 
 export const addGroupToRelatedTopicPage = functions.firestore

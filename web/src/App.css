@@ -94,8 +94,8 @@
 .success-overlay {
   display: flex;
   justify-content: center;
-  border: 2px solid #39ae2e;
-  box-shadow: 0px 0px 4px rgba(1, 66, 15, 0.4);
+  border: 2px solid #287fad;
+  box-shadow: 0px 0px 4px #287fad;
   padding: 5px;
 }
 

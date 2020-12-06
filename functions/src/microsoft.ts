@@ -154,7 +154,7 @@ export interface Source {
 
 export function makAuthorToAuthor(makAuthor: MAKAuthor): User {
   const author: User = {
-    microsoftID: makAuthor.AuId,
+    microsoftID: makAuthor.AuId.toString(),
     name: makAuthor.DAuN,
   };
   if (makAuthor.DAuN) author.normalisedName = makAuthor.AuN;
@@ -172,6 +172,7 @@ export interface User {
   name: string;
   normalisedName?: string;
   microsoftID?: string;
+  avatar?: string;
 }
 
 export interface interpretationResult {

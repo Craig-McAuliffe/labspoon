@@ -11,6 +11,7 @@ import {
 import {Post} from './posts';
 import {Topic} from './topics';
 import {generateThumbnail} from './helpers/images';
+import {publishAddPublicationRequests, allPublicationFields} from './publications';
 
 const db = admin.firestore();
 
@@ -231,8 +232,13 @@ export const getSuggestedPublicationsForAuthorName = functions.https.onCall(
       return executeExpression({
         expr: expression,
         count: 100,
-        attributes: 'AA.AuId,AA.AuN,AA.DAuN,D,DN',
+        attributes: allPublicationFields,
       })
+        .then(async (resp) => {
+          const makPublications: MAKPublication[] = resp.data.entities;
+          await publishAddPublicationRequests(makPublications);
+          return resp;
+        })
         .then((resp) => {
           const evaluateExpression = resp.data.expr;
           const normalisedAuthorNameRegex = /AA\.AuN=='(?<name>[a-z ]*)'/;
@@ -246,8 +252,10 @@ export const getSuggestedPublicationsForAuthorName = functions.https.onCall(
             );
             return undefined;
           }
+          // get the first capturing group in the regex match
           const normalisedAuthorName = authorMatches[1];
-          const publications: PublicationSuggestion[] = resp.data.entities.map(
+          const makPublications: MAKPublication[] = resp.data.entities;
+          const publications: PublicationSuggestion[] = makPublications.map(
             (entity: MAKPublication) => {
               const publication = makPublicationToPublication(entity);
               const authors = publication.authors!;
@@ -255,7 +263,7 @@ export const getSuggestedPublicationsForAuthorName = functions.https.onCall(
                 (author) => author.normalisedName === normalisedAuthorName
               )!;
               const publicationSuggestion: PublicationSuggestion = {
-                microsoftAcademicIDMatch: matchingAuthor.id as string,
+                microsoftAcademicIDMatch: matchingAuthor.microsoftID as string,
                 publicationInfo: publication,
               };
               return publicationSuggestion;
@@ -284,7 +292,8 @@ export const getSuggestedPublicationsForAuthorName = functions.https.onCall(
     });
     const publicationsByInterpretation = await Promise.all(executePromises);
     const suggestedPublications = flatten(publicationsByInterpretation);
-    return suggestedPublications;
+    // filter out null values
+    return suggestedPublications.filter(Boolean);
   }
 );
 
@@ -340,6 +349,7 @@ export const addPostsInTopicToFollowingFeeds = functions.firestore
     };
     return updateFollowersOfTopic();
   });
+
 
 interface PublicationSuggestion {
   microsoftAcademicIDMatch: string;

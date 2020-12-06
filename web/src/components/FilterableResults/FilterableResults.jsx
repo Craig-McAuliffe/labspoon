@@ -95,8 +95,9 @@ export default function FilterableResults({children, fetchResults, limit}) {
     return Promise.resolve(resultsPromise)
       .then((newResults) => {
         setHasMore(!(newResults.length <= limit));
-        setResults((results) => results.concat(newResults.slice(0, limit)));
-        setLast(results[results.length - 1]);
+        const updatedResults = [...results, ...newResults.slice(0, limit)];
+        setResults(updatedResults);
+        setLast(updatedResults[updatedResults.length - 1]);
         setSkip(skip + limit);
         setLoadingResults(false);
       })
