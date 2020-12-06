@@ -1,5 +1,5 @@
 import React, {useRef, useEffect, useState, useContext} from 'react';
-import {Link, useParams, useHistory} from 'react-router-dom';
+import {useRouteMatch, Link, useParams, useHistory} from 'react-router-dom';
 import Linkify from 'linkifyjs/react';
 
 import {FeatureFlags, AuthContext} from '../../../App';
@@ -100,6 +100,7 @@ export default function GroupPage() {
   const [editingGroup, setEditingGroup] = useState(false);
   const history = useHistory();
   const {user} = useContext(AuthContext);
+  const route = useRouteMatch();
 
   const groupIDParam = useParams().groupID;
   if (groupID !== groupIDParam) {
@@ -123,7 +124,7 @@ export default function GroupPage() {
       })
       .catch((err) => console.log(err));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupID]);
+  }, [groupID, route]);
 
   const groupDescriptionRef = useRef();
 

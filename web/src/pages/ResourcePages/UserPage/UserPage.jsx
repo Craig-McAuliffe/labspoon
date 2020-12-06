@@ -1,5 +1,12 @@
 import React, {useContext, useState, useEffect} from 'react';
-import {useParams, useHistory, Link} from 'react-router-dom';
+import {
+  useParams,
+  useHistory,
+  Link,
+  Switch,
+  Route,
+  useRouteMatch,
+} from 'react-router-dom';
 import {FeatureFlags, AuthContext} from '../../../App';
 import {db} from '../../../firebase';
 
@@ -37,6 +44,7 @@ export default function UserPage() {
   const [userID, setUserID] = useState(undefined);
   const [userDetails, setUserDetails] = useState(undefined);
   const history = useHistory();
+  const route = useRouteMatch();
 
   const userIDParam = useParams().userID;
   if (userID !== userIDParam) {
@@ -55,13 +63,10 @@ export default function UserPage() {
       })
       .catch((err) => console.log(err));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userID]);
+  }, [userID, route]);
 
   const fetchFeedData = (skip, limit, filterOptions, last) =>
     userPageFeedDataFromDB(skip, limit, filterOptions, userID, last);
-
-  if (history.location.pathname.includes('edit_profile'))
-    return <EditUserPage user={userDetails} />;
 
   const relationshipFilter = [
     {
@@ -138,25 +143,32 @@ export default function UserPage() {
     });
   }
   return (
-    <div className="content-layout">
-      {featureFlags.has('related-resources') ? (
-        <SuggestedUsers userID={userID} />
-      ) : (
-        <></>
-      )}
-      <div className="details-container">
-        <UserInfo user={userDetails} />
-      </div>
-      <FilterableResults fetchResults={fetchFeedData} limit={10}>
-        <div className="feed-container">
-          <FilterManager>
-            <ResourceTabs tabs={relationshipFilter} />
-            <NewFilterMenuWrapper />
-          </FilterManager>
-          <NewResultsWrapper />
+    <Switch>
+      <Route path={`${route.path}/edit`}>
+        <EditUserPage user={userDetails} />;
+      </Route>
+      <Route path={route.path}>
+        <div className="content-layout">
+          {featureFlags.has('related-resources') ? (
+            <SuggestedUsers userID={userID} />
+          ) : (
+            <></>
+          )}
+          <div className="details-container">
+            <UserInfo user={userDetails} />
+          </div>
+          <FilterableResults fetchResults={fetchFeedData} limit={10}>
+            <div className="feed-container">
+              <FilterManager>
+                <ResourceTabs tabs={relationshipFilter} />
+                <NewFilterMenuWrapper />
+              </FilterManager>
+              <NewResultsWrapper />
+            </div>
+          </FilterableResults>
         </div>
-      </FilterableResults>
-    </div>
+      </Route>
+    </Switch>
   );
 }
 
@@ -197,7 +209,7 @@ function UserInfo({user}) {
         {ownProfile ? (
           <>
             <div></div>
-            <Link to={`/user/${user.id}/edit_profile`}>
+            <Link to={`/user/${user.id}/edit`}>
               <EditButton>Edit Profile</EditButton>
             </Link>
           </>
