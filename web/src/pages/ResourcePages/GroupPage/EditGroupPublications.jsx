@@ -159,7 +159,8 @@ async function addPublicationsToGroup(
       .filter(Boolean);
     publication.authorIDs = authorIDs;
     delete publication._alreadyPresent;
-    db.doc(`groups/${groupID}/publications/${publication.id}`)
+    return db
+      .doc(`groups/${groupID}/publications/${publication.id}`)
       .set(jsPublicationToDBPublication(publication))
       .catch((err) => {
         console.error('Could not add publication to group:', err);

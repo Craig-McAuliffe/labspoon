@@ -88,6 +88,7 @@ export function MicrosoftAcademicKnowledgeAPIPublicationResults({query}) {
       return;
     }
     setMissedCache(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, expression, limit, offset]);
 
   useEffect(() => {
@@ -105,6 +106,7 @@ export function MicrosoftAcademicKnowledgeAPIPublicationResults({query}) {
       interpretCache,
       interpretDispatch
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, missedCache]);
   function fetchMore() {
     if (!missedCache) return;
@@ -154,6 +156,7 @@ export function FormPublicationResults({query, setPublication}) {
         interpretCache,
         interpretDispatch
       ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [query]
   );
   const fetchPageByOffset = (offset) => {
