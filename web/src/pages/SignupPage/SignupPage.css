@@ -1,0 +1,23 @@
+.sign-up-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 50px;
+  align-items: center;
+}
+
+.sign-up-container-title {
+  margin-right: 10px;
+}
+
+.signup-form-title {
+  color: #00507c;
+}
+
+.signup-option {
+  margin-top: 20px;
+}
+
+.signup-option button {
+  color: #00507c;
+  font-size: 1.2em;
+}

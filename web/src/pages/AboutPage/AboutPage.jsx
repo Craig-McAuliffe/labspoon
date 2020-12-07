@@ -29,7 +29,7 @@ export default function AboutPage() {
           <Link to="/search?query=COVID%2019&page=1">
             <h3 className="about-page-action-news">Research News</h3>
           </Link>
-          <Link to="/login">
+          <Link to="/signup">
             <PrimaryButton>Get Started</PrimaryButton>
           </Link>
         </div>
@@ -113,7 +113,7 @@ export default function AboutPage() {
             </div>
           </div>
           <div className="about-page-final-actions-container">
-            <Link to="/login">
+            <Link to="/signup">
               <PrimaryButton>Get Started</PrimaryButton>
             </Link>
           </div>
