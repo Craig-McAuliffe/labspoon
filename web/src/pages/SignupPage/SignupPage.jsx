@@ -18,6 +18,7 @@ import {getAvatar, getCoverPhoto} from '../../helpers/users.js';
  */
 function SignupPage() {
   const location = useLocation().state;
+  const search = useLocation().search;
   const returnLocation = location ? location.returnLocation : undefined;
   // This prevents the redirect to '/' being triggered.
   const [goToOnboarding, setGoToOnboarding] = useState(false);
