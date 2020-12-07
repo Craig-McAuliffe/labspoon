@@ -2,6 +2,8 @@ import React, {useState, useContext, useRef, useEffect} from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import {AuthContext} from '../../App';
 import './Buttons.css';
+import './FollowButton.css';
+import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 
 const FollowButton = ({following, setFollowing}) => {
   const [signUpPrompt, setSignUpPrompt] = useState(false);
@@ -10,7 +12,7 @@ const FollowButton = ({following, setFollowing}) => {
   const signUpPromptRef = useRef();
 
   const followAction = () => {
-    user ? setFollowing(!following) : setSignUpPrompt(true);
+    user ? setFollowing() : setSignUpPrompt(true);
   };
 
   useEffect(() => {
@@ -29,11 +31,21 @@ const FollowButton = ({following, setFollowing}) => {
   return (
     <div className="button-position">
       <button
-        className={following ? 'primary-button-clicked' : 'primary-button'}
+        className={
+          following == null
+            ? 'primary-button-spinner'
+            : following
+            ? 'primary-button-clicked'
+            : 'primary-button'
+        }
         onClick={followAction}
       >
         <div className="primary-button-text">
-          <h2>{following ? 'Unfollow' : 'Follow'}</h2>
+          {following != null ? (
+            <h2>{following ? 'Unfollow' : 'Follow'}</h2>
+          ) : (
+            <LoadingSpinner />
+          )}
         </div>
       </button>
       {signUpPrompt ? (

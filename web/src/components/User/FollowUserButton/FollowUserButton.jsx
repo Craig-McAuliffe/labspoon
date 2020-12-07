@@ -5,7 +5,7 @@ import {db} from '../../../firebase';
 import FollowButton from '../../Buttons/FollowButton';
 
 export default function FollowUserButton({targetUser}) {
-  const [following, setFollowing] = useState(false);
+  const [following, setFollowing] = useState();
   const featureFlags = useContext(FeatureFlags);
   const {user: authUser, userProfile} = useContext(AuthContext);
 
@@ -20,6 +20,7 @@ export default function FollowUserButton({targetUser}) {
   });
 
   function setFollowingAndUpdateDB() {
+    if (following === null) return;
     if (!featureFlags.has('disable-cloud-firestore')) {
       const batch = db.batch();
       const followsUsersDoc = db.doc(

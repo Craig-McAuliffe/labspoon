@@ -5,7 +5,7 @@ import {db} from '../../firebase';
 import FollowButton from '../Buttons/FollowButton';
 
 export default function FollowGroupButton({targetGroup}) {
-  const [following, setFollowing] = useState(false);
+  const [following, setFollowing] = useState();
   const featureFlags = useContext(FeatureFlags);
   const {user: authUser, userProfile} = useContext(AuthContext);
 
@@ -19,6 +19,8 @@ export default function FollowGroupButton({targetGroup}) {
   });
 
   function setFollowingAndUpdateDB() {
+    if (following == null) return;
+
     if (!featureFlags.has('disable-cloud-firestore')) {
       const batch = db.batch();
       const followsGroupsDoc = db.doc(
