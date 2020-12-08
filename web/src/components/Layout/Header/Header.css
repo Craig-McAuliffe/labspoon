@@ -17,10 +17,14 @@
 
 .header-add-button {
   display: inline-block;
-  justify-self: flex-end;
-  grid-column: 3 / 4;
   max-height: 100%;
   max-width: 100%;
+}
+
+.header-right-section {
+  justify-self: flex-end;
+  display: flex;
+  align-items: center;
 }
 
 .header-drop-down {
@@ -40,69 +44,35 @@
   color: #3099d3;
 }
 
-@media screen and (max-width: 1017px) {
+@media screen and (max-width: 1247px) {
+  .header-container {
+    grid-template-columns: 350px 1fr 350px;
+  }
+}
+
+@media screen and (max-width: 1197px) {
+  .header-container {
+    grid-template-columns: 60px 1fr 350px;
+  }
+
   .header-home-text {
     display: none;
   }
+}
 
+@media screen and (max-width: 800px) {
   .header-container {
-    display: grid;
-    grid-template-columns: 100px 1fr 100px;
-    grid-template-rows: none;
-    align-items: center;
-    background: #eaf1f5;
-    padding: 0 0;
-    width: 100%;
-    height: 100%;
-  }
-
-  .header-drop-down {
-    display: inline-block;
-    justify-self: flex-end;
-    padding-right: 15px;
-    grid-column: 3 / 4;
-    max-height: 100%;
+    grid-template-columns: 60px 1fr 190px;
   }
 }
 
 @media screen and (max-width: 664px) {
   .header-container {
-    display: grid;
-    grid-template-columns: 80px 1fr 80px;
-    grid-template-rows: none;
-    align-items: center;
-    background: #eaf1f5;
-    padding: 0 0;
-    width: 100%;
-    height: 100%;
-  }
-}
-
-@media screen and (max-width: 780px) {
-  .header-container {
-    display: grid;
-    grid-template-columns: 75px 1fr 80px;
-    grid-template-rows: none;
-    align-items: center;
-    background: #eaf1f5;
-    padding: 0 0;
-    width: 100%;
-    height: 100%;
+    grid-template-columns: 60px 1fr 180px;
   }
 }
 
 @media screen and (max-width: 460px) {
-  .header-container {
-    display: grid;
-    grid-template-columns: 60px 1fr 60px;
-    grid-template-rows: none;
-    align-items: center;
-    background: #eaf1f5;
-    padding: 0 0;
-    width: 100%;
-    height: 100%;
-  }
-
   .header-drop-down {
     display: inline-block;
     justify-self: flex-end;

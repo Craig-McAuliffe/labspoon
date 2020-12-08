@@ -17,13 +17,15 @@ const Header = () => {
         <span className="header-home-text">Home</span>
       </Link>
       <SearchBar />
-      <div className="header-add-button">
-        <Link to="/create">
-          <CreateButton />
-        </Link>
-      </div>
-      <div className="header-drop-down">
-        <AvatarDropDown />
+      <div className="header-right-section">
+        <div className="header-add-button">
+          <Link to="/create">
+            <CreateButton />
+          </Link>
+        </div>
+        <div className="header-drop-down">
+          <AvatarDropDown />
+        </div>
       </div>
     </div>
   );
