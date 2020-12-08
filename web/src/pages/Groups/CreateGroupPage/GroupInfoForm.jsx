@@ -6,6 +6,7 @@ import {
   SearchBox,
   Hits,
   Configure,
+  connectStateResults,
 } from 'react-instantsearch-dom';
 import ImageUploader from 'react-images-upload';
 
@@ -23,10 +24,14 @@ import CreatePost from '../../../components/Posts/Post/CreatePost/CreatePost';
 import GroupAvatar from '../../../components/Avatar/GroupAvatar';
 import {AddMemberIcon, AddProfilePhoto} from '../../../assets/CreateGroupIcons';
 import UserListItem, {
+  UserListItemEmailOnly,
   UserSmallResultItem,
 } from '../../../components/User/UserListItem';
 
 import './CreateGroupPage.css';
+import TabbedContainer from '../../../components/TabbedContainer/TabbedContainer';
+import {faSearch, faEnvelope} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 
 // To do: check if the group exists OR pass argument that declares if editing or creating
 // Change onSubmit function depending on editing or creating
@@ -184,7 +189,7 @@ function SelectUsers({selectedUsers, addSelectedUsers, setSelectedUsers}) {
         setSelectedUsers={setSelectedUsers}
       />
       {selectingUser ? (
-        <AddMemberSearch
+        <AddMemberContainer
           addSelectedUsers={addSelectedUsers}
           setSelecting={setSelectingUser}
         />
@@ -196,10 +201,17 @@ function SelectUsers({selectedUsers, addSelectedUsers, setSelectedUsers}) {
 }
 
 function SelectedMembers({selectedUsers, setSelectedUsers}) {
-  const removeSelectedUser = (selectedUserID) => {
-    const indexToBeRemoved = selectedUsers.findIndex(
-      (previouslySelectedUser) => previouslySelectedUser.id === selectedUserID
-    );
+  const removeSelectedUser = (user) => {
+    let indexToBeRemoved;
+    if (user.id) {
+      indexToBeRemoved = selectedUsers.findIndex(
+        (previouslySelectedUser) => previouslySelectedUser.id === user.id
+      );
+    } else if (user.email) {
+      indexToBeRemoved = selectedUsers.findIndex(
+        (previouslySelectedUser) => previouslySelectedUser.email === user.email
+      );
+    }
     setSelectedUsers((previouslySelectedMembers) => {
       const curatedSelectedMembers = [...previouslySelectedMembers];
       curatedSelectedMembers.splice(indexToBeRemoved, 1);
@@ -207,19 +219,25 @@ function SelectedMembers({selectedUsers, setSelectedUsers}) {
       return curatedSelectedMembers;
     });
   };
-  return (
-    <>
-      {selectedUsers.map((user) => (
+  const userListItems = selectedUsers.map((user) => {
+    if (user.id) {
+      return (
         <UserListItem user={user} key={user.id}>
-          {user.resourceType ? (
-            <NegativeButton onClick={() => removeSelectedUser(user.id)}>
-              Remove
-            </NegativeButton>
-          ) : null}
+          <NegativeButton onClick={() => removeSelectedUser(user)}>
+            Remove
+          </NegativeButton>
         </UserListItem>
-      ))}
-    </>
-  );
+      );
+    }
+    return (
+      <UserListItemEmailOnly user={user} key={user.email}>
+        <NegativeButton onClick={() => removeSelectedUser(user)}>
+          Remove
+        </NegativeButton>
+      </UserListItemEmailOnly>
+    );
+  });
+  return <>{userListItems}</>;
 }
 
 function AddMemberButton({setSelecting}) {
@@ -227,6 +245,75 @@ function AddMemberButton({setSelecting}) {
     <button onClick={() => setSelecting(true)} type="button">
       <AddMemberIcon />
     </button>
+  );
+}
+
+function AddMemberContainer({addSelectedUsers, setSelecting}) {
+  const tabDetails = [
+    {
+      name: 'Search on Labspoon',
+      icon: <FontAwesomeIcon icon={faSearch} />,
+      contents: (
+        <AddMemberSearch
+          addSelectedUsers={addSelectedUsers}
+          setSelecting={setSelecting}
+        />
+      ),
+    },
+    {
+      name: 'Invite By Email',
+      icon: <FontAwesomeIcon icon={faEnvelope} />,
+      contents: (
+        <AddMemberByEmail
+          addSelectedUsers={addSelectedUsers}
+          setSelecting={setSelecting}
+        />
+      ),
+    },
+  ];
+
+  return <TabbedContainer tabDetails={tabDetails} />;
+}
+
+const NoQueryNoResults = connectStateResults(({searchState, children}) => {
+  if (!searchState.query) return <></>;
+  return children;
+});
+
+function AddMemberByEmail({addSelectedUsers, setSelecting}) {
+  const validationSchema = Yup.object({
+    email: Yup.string().email().required('Email required'),
+  });
+  function onSubmit(res) {
+    addSelectedUsers({
+      email: res.email,
+    });
+    setSelecting(false);
+  }
+  return (
+    <>
+      <Formik
+        validationSchema={validationSchema}
+        onSubmit={onSubmit}
+        initialValues={{
+          email: '',
+        }}
+      >
+        <Form id="email-form">
+          <FormTextInput label="Email" name="email" sideLabel />
+        </Form>
+      </Formik>
+      <div className="create-group-submit-cancel-container">
+        <div className="create-group-cancel">
+          <CancelButton cancelAction={() => setSelecting(false)} />
+        </div>
+        <div className="create-group-submit">
+          <PrimaryButton submit formID="email-form">
+            Send
+          </PrimaryButton>
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -244,17 +331,19 @@ function AddMemberSearch({addSelectedUsers, setSelecting}) {
           indexName={abbrEnv + '_USERS'}
         >
           <SearchBox />
-          <Hits
-            hitComponent={({hit}) => {
-              return (
-                <UserSmallResultItem
-                  user={hit}
-                  selectUser={selectUserAndStopSelecting}
-                  key={hit.id + 'user'}
-                />
-              );
-            }}
-          />
+          <NoQueryNoResults>
+            <Hits
+              hitComponent={({hit}) => {
+                return (
+                  <UserSmallResultItem
+                    user={hit}
+                    selectUser={selectUserAndStopSelecting}
+                    key={hit.id + 'user'}
+                  />
+                );
+              }}
+            />
+          </NoQueryNoResults>
           <Configure hitsPerPage={10} />
         </InstantSearch>
       </div>

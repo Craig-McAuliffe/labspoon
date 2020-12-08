@@ -63,6 +63,49 @@ export default function UserListItem({
   );
 }
 
+export function UserListItemEmailOnly({user, children}) {
+  return (
+    <div className="user-listItem-container">
+      <div className="user-listItem-link">
+        <AvatarSection />
+        <div className="user-listItem-email">
+          <h2>{user.email}</h2>
+        </div>
+      </div>
+      <div className="Follow">{children}</div>
+    </div>
+  );
+}
+
+function AvatarSection({avatar}) {
+  return (
+    <>
+      <div className="Avatar">
+        {avatar ? (
+          <UserAvatar src={avatar} width="60px" height="60px" />
+        ) : (
+          <img
+            src={DefaultUserIcon}
+            alt="default user icon"
+            className="user-list-item-default-avatar"
+          />
+        )}
+      </div>
+      <div className="AvatarSmall">
+        {avatar ? (
+          <UserAvatar src={avatar} width="40px" height="40px" />
+        ) : (
+          <img
+            src={DefaultUserIcon}
+            alt="default user icon"
+            className="user-list-item-default-small"
+          />
+        )}
+      </div>
+    </>
+  );
+}
+
 export function UserSmallResultItem({user, selectUser}) {
   const select = () => selectUser(user);
   return (
