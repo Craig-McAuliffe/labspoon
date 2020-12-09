@@ -73,11 +73,21 @@ export default function GroupInfoForm({
 
   const addSelectedUsers = (chosenUser) => {
     if (
-      selectedUsers.some((selectedUser) => selectedUser.id === chosenUser.id) ||
-      chosenUser.id === user.uid
-    )
+      chosenUser.id &&
+      (selectedUsers.some(
+        (selectedUser) => selectedUser.id === chosenUser.id
+      ) ||
+        chosenUser.id === user.uid)
+    ) {
       return;
-    else setSelectedUsers([...selectedUsers, chosenUser]);
+    } else if (
+      chosenUser.email &&
+      selectedUsers.some(
+        (selectedUser) => selectedUser.email === chosenUser.email
+      )
+    ) {
+      return;
+    } else setSelectedUsers([...selectedUsers, chosenUser]);
   };
 
   const onAvatarSelect = (selectedAvatar) => {
