@@ -8,6 +8,7 @@ import FilterableResults, {
   ResourceTabs,
 } from '../FilterableResults/FilterableResults';
 import {SelectableResults} from '../Results/Results';
+import {FeedContent} from '../Layout/Content';
 
 export const ADD = 'add';
 export const REMOVE = 'remove';
@@ -70,7 +71,7 @@ export default function FilteredSelector({
       />
       <FilterManager>
         <Sider getDefaultFilter={getDefaultFilter} />
-        <Content>
+        <FeedContent>
           {children}
           <ResourceTabs tabs={tabs} affectsFilter={true} />
           <SelectionConfirmation
@@ -88,17 +89,9 @@ export default function FilteredSelector({
             selectedItems={selectedItems}
             setSelectedItems={setSelectedItems}
           />
-        </Content>
+        </FeedContent>
       </FilterManager>
     </FilterableResults>
-  );
-}
-
-function Content({children}) {
-  return (
-    <div className="content-layout">
-      <div className="feed-container">{children}</div>
-    </div>
   );
 }
 

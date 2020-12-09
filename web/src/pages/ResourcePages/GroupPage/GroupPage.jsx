@@ -10,6 +10,7 @@ import {getPaginatedUserReferencesFromCollectionRef} from '../../../helpers/user
 import {getPaginatedTopicsFromCollectionRef} from '../../../helpers/topics';
 import {getPaginatedPublicationsFromCollectionRef} from '../../../helpers/publications';
 import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
+import {getPaginatedImagesFromCollectionRef} from '../../../helpers/images';
 import EditGroup from './EditGroup';
 import groups from '../../../mockdata/groups';
 import GroupPageSider from './GroupPageSider';
@@ -28,6 +29,8 @@ import SeeMore from '../../../components/SeeMore';
 
 import './GroupPage.css';
 
+const PHOTOS = 'media';
+
 function fetchGroupDataFromDB(id) {
   return db
     .doc(`groups/${id}`)
@@ -40,7 +43,7 @@ function fetchGroupDataFromDB(id) {
     .catch((err) => console.log(err));
 }
 
-function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions) {
+function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip) {
   const activeTab = filterOptions ? getActiveTabID(filterOptions) : null;
   let results;
   switch (activeTab) {
@@ -55,9 +58,6 @@ function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions) {
         getPaginatedPostsFromCollectionRef(postsCollection, limit, last),
         null,
       ];
-    case 'media':
-      results = [];
-      break;
     case 'publications':
       const publicationsCollection = db.collection(
         `groups/${groupID}/publications`
@@ -84,6 +84,12 @@ function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions) {
       const topicsCollection = db.collection(`groups/${groupID}/topics`);
       return [
         getPaginatedTopicsFromCollectionRef(topicsCollection, limit, last),
+        null,
+      ];
+    case PHOTOS:
+      const photosCollection = db.collection(`groups/${groupID}/photos`);
+      return [
+        getPaginatedImagesFromCollectionRef(photosCollection, limit, last),
         null,
       ];
     default:
@@ -135,7 +141,7 @@ export default function GroupPage() {
   );
 
   const fetchFeedData = (skip, limit, filterOptions, last) =>
-    fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions);
+    fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip);
 
   const relationshipFilter = [
     {
@@ -167,6 +173,13 @@ export default function GroupPage() {
           data: {
             id: 'topics',
             name: 'Topics',
+          },
+        },
+        {
+          enabled: false,
+          data: {
+            id: PHOTOS,
+            name: 'Photos',
           },
         },
       ],
@@ -227,7 +240,7 @@ export default function GroupPage() {
               setEditingGroup={setEditingGroup}
             />
           </div>
-          <FilterableResults fetchResults={fetchFeedData} limit={10}>
+          <FilterableResults fetchResults={fetchFeedData} limit={9}>
             <div className="feed-container">
               <FilterManager>
                 <ResourceTabs tabs={relationshipFilter} />

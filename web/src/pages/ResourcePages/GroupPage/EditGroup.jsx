@@ -2,11 +2,12 @@ import React, {useState} from 'react';
 import EditGroupInfo from './EditGroupInfo';
 import EditGroupPosts from './EditGroupPosts';
 import EditGroupPublications from './EditGroupPublications';
+import EditGroupPhotos from './EditGroupPhotos';
 
 import './GroupPage.css';
 
 export default function EditGroup({groupData, setEditingGroup}) {
-  const tabs = ['Info', 'Posts', 'Publications'];
+  const tabs = ['Info', 'Posts', 'Publications', 'Photos'];
   const [editType, setEditType] = useState(tabs[0]);
   switch (editType) {
     case tabs[0]:
@@ -47,6 +48,17 @@ export default function EditGroup({groupData, setEditingGroup}) {
           />
           <ReturnToGroupPageButton setEditingGroup={setEditingGroup} />
         </EditGroupPublications>
+      );
+    case tabs[3]:
+      return (
+        <EditGroupPhotos>
+          <EditGroupTabs
+            editType={editType}
+            tabs={tabs}
+            setEditType={setEditType}
+          />
+          <ReturnToGroupPageButton setEditingGroup={setEditingGroup} />
+        </EditGroupPhotos>
       );
     default:
       return <></>;
