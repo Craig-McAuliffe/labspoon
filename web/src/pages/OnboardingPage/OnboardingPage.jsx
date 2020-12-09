@@ -7,6 +7,7 @@ import {getPaginatedTopicsFromCollectionRef} from '../../helpers/topics';
 import {getPaginatedGroupReferencesFromCollectionRef} from '../../helpers/groups';
 import TopicListItem from '../../components/Topics/TopicListItem';
 import FollowTopicButton from '../../components/Topics/FollowTopicButton';
+import FollowGroupButton from '../../components/Group/FollowGroupButton';
 import GroupListItem from '../../components/Group/GroupListItem';
 import FollowUserButton from '../../components/User/FollowUserButton/FollowUserButton';
 import SecondaryButton from '../../components/Buttons/SecondaryButton';
@@ -323,7 +324,9 @@ function OnboardingGroup({user}) {
               group={displayedGroup}
               key={displayedGroup.id}
               LinkOverride={WarnOnClick}
-            />
+            >
+              <FollowGroupButton targetGroup={displayedGroup} />
+            </GroupListItem>
           ))}
         </div>
       </div>

@@ -1,12 +1,15 @@
 import React, {useRef, useState} from 'react';
 import {Link} from 'react-router-dom';
 import SeeMore from '../SeeMore';
-import FollowGroupButton from './FollowGroupButton';
 import GroupAvatar from '../Avatar/GroupAvatar';
 
 import './GroupListItem.css';
 
-export default function GroupListItem({group, LinkOverride = undefined}) {
+export default function GroupListItem({
+  group,
+  LinkOverride = undefined,
+  children,
+}) {
   const [displayFullDescription, setDisplayFullDescription] = useState({
     display: false,
     size: 100,
@@ -23,15 +26,6 @@ export default function GroupListItem({group, LinkOverride = undefined}) {
     return <Link to={`/group/${group.id}`}>{children}</Link>;
   }
 
-  const avatar = (
-    <WrapWithLinkOrOverride>
-      <div className="group-list-item-icon-and-name">
-        <GroupAvatar src={group.avatar} height="100" width="100" />
-        <p>{group.name}</p>
-      </div>
-    </WrapWithLinkOrOverride>
-  );
-
   const name = (
     <WrapWithLinkOrOverride>
       <h3>{group.name}</h3>
@@ -40,7 +34,7 @@ export default function GroupListItem({group, LinkOverride = undefined}) {
 
   return (
     <div className="group-list-item-container">
-      {avatar}
+      {groupAvatar(group.avatar, group.name, WrapWithLinkOrOverride)}
       <div className="group-list-item-text-container">
         {name}
         <div
@@ -57,9 +51,27 @@ export default function GroupListItem({group, LinkOverride = undefined}) {
           id={group.id}
         />
       </div>
-      <div className="follow-group-button">
-        <FollowGroupButton targetGroup={group} />
-      </div>
+      <div className="follow-group-button">{children}</div>
+    </div>
+  );
+}
+
+function groupAvatar(groupAvatar, groupName, WrapWithLinkOrOverride) {
+  const avatarDisplay = (
+    <div className="group-list-item-icon-and-name">
+      <GroupAvatar src={groupAvatar} height="130" width="130" />
+    </div>
+  );
+  if (WrapWithLinkOrOverride === undefined) return avatarDisplay;
+  return <WrapWithLinkOrOverride>{avatarDisplay}</WrapWithLinkOrOverride>;
+}
+
+export function GroupDropdownItem({group}) {
+  return (
+    <div className="group-dropdown-item">
+      {groupAvatar(group.avatar, group.name)}
+      <h3 className="group-dropdown-item-name">{group.name}</h3>
+      <h4>{group.institution}</h4>
     </div>
   );
 }

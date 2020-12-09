@@ -16,7 +16,6 @@ import {AuthContext, FeatureFlags} from '../../../App';
 import FormTextInput, {
   FormTextArea,
 } from '../../../components/Forms/FormTextInput';
-import PrimaryButton from '../../../components/Buttons/PrimaryButton';
 import CancelButton from '../../../components/Buttons/CancelButton';
 import NegativeButton from '../../../components/Buttons/NegativeButton';
 import CreatePost from '../../../components/Posts/Post/CreatePost/CreatePost';
@@ -25,6 +24,7 @@ import {AddMemberIcon, AddProfilePhoto} from '../../../assets/CreateGroupIcons';
 import UserListItem, {
   UserSmallResultItem,
 } from '../../../components/User/UserListItem';
+import CreateResourceFormActions from '../../../components/Forms/CreateResourceFormActions';
 
 import './CreateGroupPage.css';
 
@@ -106,7 +106,7 @@ export default function GroupInfoForm({
             </div>
             <div className="create-group-group-photos"></div>
 
-            <FormTextArea height="200" label="About" name="about" bigLabel />
+            <FormTextArea height="200px" label="About" name="about" bigLabel />
           </Form>
         </Formik>
         <SelectUsers
@@ -123,20 +123,11 @@ export default function GroupInfoForm({
             </div>
           </>
         ) : null}
-        <div className="create-group-submit-cancel-container">
-          <div className="create-group-cancel">
-            <CancelButton cancelAction={cancelForm} />
-          </div>
-          <div className="create-group-submit">
-            <PrimaryButton
-              submit
-              formID="create-group-form"
-              disabled={submitted}
-            >
-              {submitText}
-            </PrimaryButton>
-          </div>
-        </div>
+        <CreateResourceFormActions
+          submitText={submitText}
+          submitted={submitted}
+          cancelForm={cancelForm}
+        />
       </div>
     </div>
   );

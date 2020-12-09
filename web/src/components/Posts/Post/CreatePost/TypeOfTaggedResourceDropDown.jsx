@@ -1,4 +1,4 @@
-import React, {useRef, useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   PublicationIcon,
   LinkPostToAResourceIcon,
@@ -6,6 +6,7 @@ import {
 import {RemoveIcon} from '../../../../assets/GeneralActionIcons';
 import {DropDownTriangle} from '../../../../assets/GeneralActionIcons';
 import {PUBLICATION_POST, DEFAULT_POST} from './CreatePost';
+import DropDown, {DropdownOption} from '../../../Dropdown';
 
 import './CreatePost.css';
 
@@ -14,16 +15,7 @@ export default function TypeOfTaggedResourceDropDown({
   setTaggedResourceType,
 }) {
   const [openDropdown, setOpenDropdown] = useState(false);
-  const dropdownRef = useRef();
-  useEffect(() => {
-    const handleDocumentClick = (e) => {
-      if (dropdownRef.current) {
-        if (!dropdownRef.current.contains(e.target) && openDropdown === true)
-          setOpenDropdown(false);
-      }
-    };
-    document.addEventListener('mousedown', handleDocumentClick);
-  });
+  const resourceTypeOptions = [PUBLICATION_POST];
 
   const matchResourceTypeToIcon = (resourceType) => {
     switch (resourceType) {
@@ -45,7 +37,10 @@ export default function TypeOfTaggedResourceDropDown({
       </button>
     ));
 
-  const resourceTypeOptions = [PUBLICATION_POST];
+  const customTaggedResourceToggle = () => (
+    <TaggedResourceDropdownToggle setOpenDropdown={setOpenDropdown} />
+  );
+
   return (
     <div
       className={
@@ -56,7 +51,6 @@ export default function TypeOfTaggedResourceDropDown({
     >
       {taggedResourceType === DEFAULT_POST ? (
         <>
-          {' '}
           <div className="create-post-post-resource-type-dropdown-tag">
             <LinkPostToAResourceIcon /> <span>Tag a...</span>
           </div>
@@ -76,43 +70,59 @@ export default function TypeOfTaggedResourceDropDown({
           </div>
         </button>
       )}
-      <div className="create-post-resource-type-dropdown-container">
-        <div className="create-post-post-resource-dropdown-toggle-container">
-          <button
-            className="create-post-post-resource-dropdown-toggle"
-            onClick={() => setOpenDropdown((openState) => !openState)}
-            type="button"
-          >
-            Other options
-          </button>
-          <button
-            onClick={() => setOpenDropdown((openState) => !openState)}
-            type="button"
-          >
-            <DropDownTriangle />
-          </button>
-        </div>
-        {openDropdown ? (
-          <div className="create-post-resource-type-dropdown" ref={dropdownRef}>
-            {resourceTypeOptions.map((resourceType) => (
-              <button
-                onClick={() => setTaggedResourceType(resourceType)}
-                className="create-post-resource-type-dropdown-option-button"
-                type="button"
-                key={resourceType}
-              >
-                <div
-                  key={resourceType}
-                  className="create-post-resource-type-dropdown-option-svg-container"
-                >
-                  {matchResourceTypeToIcon(resourceType)}
-                </div>
-                <h4>{resourceType}</h4>
-              </button>
-            ))}
-          </div>
-        ) : null}
-      </div>
+      <DropDown
+        customToggle={customTaggedResourceToggle}
+        setOpenDropdown={setOpenDropdown}
+        openDropdown={openDropdown}
+      >
+        <ResourceTypesDropDownOptions
+          setOpenDropdown={setOpenDropdown}
+          setTaggedResourceType={setTaggedResourceType}
+          matchResourceTypeToIcon={matchResourceTypeToIcon}
+          resourceTypeOptions={resourceTypeOptions}
+        />
+      </DropDown>
     </div>
   );
+}
+
+function TaggedResourceDropdownToggle({setOpenDropdown}) {
+  return (
+    <div className="create-post-post-resource-dropdown-toggle-container">
+      <button
+        className="create-post-post-resource-dropdown-toggle"
+        onClick={() => setOpenDropdown((openState) => !openState)}
+        type="button"
+      >
+        Other options
+      </button>
+      <button
+        onClick={() => setOpenDropdown((openState) => !openState)}
+        type="button"
+        className="create-post-resource-dropdown-toggle-triangle"
+      >
+        <DropDownTriangle />
+      </button>
+    </div>
+  );
+}
+
+function ResourceTypesDropDownOptions({
+  setOpenDropdown,
+  setTaggedResourceType,
+  matchResourceTypeToIcon,
+  resourceTypeOptions,
+}) {
+  return resourceTypeOptions.map((resourceType) => (
+    <DropdownOption
+      key={resourceType}
+      onSelect={() => setTaggedResourceType(resourceType)}
+      height="70px"
+    >
+      <div>{matchResourceTypeToIcon(resourceType)}</div>
+      <h4 className="create-post-resource-tag-dropdown-option-name">
+        {resourceType}
+      </h4>
+    </DropdownOption>
+  ));
 }
