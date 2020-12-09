@@ -337,12 +337,16 @@ function DeactivateAccountMessage({cancelChanges}) {
       <br />
       <p>
         To deactivate or delete your account, please email us at{' '}
-        <a href="mailto:help@labspoon.com">help@labspoon.com</a> quoting{' '}
+        <a href="mailto:help@labspoon.com">help@labspoon.com</a> quoting the
+        following:
+      </p>
+      <p>
         <q>
-          {name}
-          {userID}
+          {name} {userID}
         </q>
-        . Please use the email you use to sign into your Labspoon account so we
+      </p>
+      <p>
+        Please use the email you use to sign into your Labspoon account so we
         can verify it is really you.
       </p>
 
