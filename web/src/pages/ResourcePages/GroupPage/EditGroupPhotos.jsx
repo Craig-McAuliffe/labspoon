@@ -6,15 +6,16 @@ import firebase, {storage, db} from '../../../firebase';
 import {getPaginatedImagesFromCollectionRef} from '../../../helpers/images';
 
 import PrimaryButton from '../../../components/Buttons/PrimaryButton';
-import SecondaryButton from '../../../components/Buttons/SecondaryButton';
+import NegativeButton from '../../../components/Buttons/NegativeButton';
 import {FeedContent} from '../../../components/Layout/Content';
 import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 import Results from '../../../components/Results/Results';
-
-import './EditGroupPhotos.css';
+import {AddButton} from '../../../assets/GeneralActionIcons';
 import ImageListItem from '../../../components/Media/ImageListItem';
 import SuccessMessage from '../../../components/Forms/SuccessMessage';
 import ErrorMessage from '../../../components/Forms/ErrorMessage';
+
+import './EditGroupPhotos.css';
 
 export default function EditGroupPhotos({children}) {
   const limit = 9;
@@ -84,7 +85,6 @@ function ImageUpload({groupID, refresh}) {
     false
   );
   const [displayErrorMessage, setDisplayErrorMessage] = useState(false);
-
   function onChange(e) {
     setFiles(Array.from(e.target.files));
   }
@@ -152,40 +152,53 @@ function ImageUpload({groupID, refresh}) {
     setFiles([]);
   }
 
-  const images = imageURLs
+  const imagePreviews = imageURLs
     .slice(0, MAX_IMAGE_PREVIEWS)
-    .map((imageURL, idx) => <ImageListItem src={imageURL} key={idx} />);
+    .map((imageURL, idx) => (
+      <ImageListItem
+        src={imageURL}
+        key={idx}
+        spinner={uploading === UPLOADING ? true : false}
+      />
+    ));
 
   if (files.length === 0)
     return (
-      <div>
-        <input
-          type="file"
-          onChange={onChange}
-          multiple
-          className="image-upload-select"
-        />
-        {displaySuccessMessage ? <UploadSuccessMessage /> : <></>}
-        {displayErrorMessage ? <UploadErrorMessage /> : <></>}
-        {displayValidationMessage ? <UploadValidationMessage /> : <></>}
+      <div className="image-upload-section">
+        <div className="image-upload-container">
+          <label className="image-upload-label">
+            <AddButton />
+            <h4>Choose files</h4>
+            <input
+              type="file"
+              onChange={onChange}
+              multiple
+              name="uploaded-image"
+            />
+          </label>
+        </div>
+        <div className="after-upload-message-container">
+          {displaySuccessMessage ? <UploadSuccessMessage /> : <></>}
+          {displayErrorMessage ? <UploadErrorMessage /> : <></>}
+          {displayValidationMessage ? <UploadValidationMessage /> : <></>}
+        </div>
       </div>
     );
 
   return (
     <div className="image-upload">
-      <div className="image-upload-previews">{images}</div>
+      <div className="image-upload-previews">{imagePreviews}</div>
       <span>
         {imageURLs.length > MAX_IMAGE_PREVIEWS
           ? `+ ${imageURLs.length - MAX_IMAGE_PREVIEWS} more`
           : ''}
       </span>
-      {uploading === UPLOADING ? <LoadingSpinner /> : <></>}
+      <NegativeButton onClick={cancel} disabled={uploading === UPLOADING}>
+        Cancel
+      </NegativeButton>
       <PrimaryButton onClick={uploadImages} disabled={uploading === UPLOADING}>
         Upload
       </PrimaryButton>
-      <SecondaryButton onClick={cancel} disabled={uploading === UPLOADING}>
-        Cancel
-      </SecondaryButton>
     </div>
   );
 }
