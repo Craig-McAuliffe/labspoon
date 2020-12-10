@@ -90,9 +90,11 @@ function ImageUpload({groupID, refresh}) {
   }
 
   useEffect(() => {
-    setDisplaySuccessMessage(false);
-    setDisplayValidationMessage(false);
-    setDisplayErrorMessage(false);
+    if (files.length !== 0) {
+      setDisplaySuccessMessage(false);
+      setDisplayValidationMessage(false);
+      setDisplayErrorMessage(false);
+    }
     setImageURLs(files.map((file) => URL.createObjectURL(file)));
     setUploading(NOT_STARTED);
     return () => setImageURLs(files.map((file) => URL.revokeObjectURL(file)));
