@@ -62,10 +62,7 @@ export default function Results({results, hasMore, fetchMore, activeTabID}) {
     );
 
   let content = resultComponents;
-  if (
-    resourceTypes.size === 1 &&
-    (resourceTypes.has('media') || resourceTypes.has('image'))
-  ) {
+  if (resourceTypes.size === 1 && resourceTypes.has('image')) {
     content = <div className="feed-images-container">{resultComponents}</div>;
   }
 

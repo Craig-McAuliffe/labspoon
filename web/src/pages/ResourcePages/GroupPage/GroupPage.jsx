@@ -29,7 +29,7 @@ import SeeMore from '../../../components/SeeMore';
 
 import './GroupPage.css';
 
-const PHOTOS = 'media';
+const PHOTOS = 'photos';
 
 function fetchGroupDataFromDB(id) {
   return db
@@ -192,8 +192,8 @@ export default function GroupPage() {
     relationshipFilter[0].options.push({
       enabled: false,
       data: {
-        id: 'media',
-        name: 'Media',
+        id: 'images',
+        name: 'Images',
       },
     });
   }

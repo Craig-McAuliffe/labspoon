@@ -62,7 +62,7 @@ export default function EditGroupPhotos({children}) {
         results={photos}
         hasMore={hasMore}
         fetchMore={fetchMore}
-        activeTabID="media"
+        activeTabID="images"
       />
       {loading ? <LoadingSpinner /> : <></>}
     </FeedContent>
