@@ -289,3 +289,11 @@
   path {
   stroke: #00507c;
 }
+
+.create-post-resource-tag-dropdown-option {
+  display: grid;
+  grid-template-columns: 50px 1fr;
+  align-items: center;
+  justify-content: flex-start;
+  justify-items: flex-start;
+}

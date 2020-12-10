@@ -71,7 +71,7 @@ export function GroupDropdownItem({group}) {
     <div className="group-dropdown-item">
       {groupAvatar(group.avatar, group.name)}
       <h3 className="group-dropdown-item-name">{group.name}</h3>
-      <h4>{group.institution}</h4>
+      <h4 className="group-dropdown-item-institution">{group.institution}</h4>
     </div>
   );
 }

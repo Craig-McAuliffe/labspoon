@@ -119,10 +119,12 @@ function ResourceTypesDropDownOptions({
       onSelect={() => setTaggedResourceType(resourceType)}
       height="70px"
     >
-      <div>{matchResourceTypeToIcon(resourceType)}</div>
-      <h4 className="create-post-resource-tag-dropdown-option-name">
-        {resourceType}
-      </h4>
+      <div className="create-post-resource-tag-dropdown-option">
+        <div>{matchResourceTypeToIcon(resourceType)}</div>
+        <h4 className="create-post-resource-tag-dropdown-option-name">
+          {resourceType}
+        </h4>
+      </div>
     </DropdownOption>
   ));
 }
