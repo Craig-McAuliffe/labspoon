@@ -102,24 +102,20 @@ export default function CreateOpenPosition() {
         <FormTextInput
           name="address-line-2"
           sideLabel={true}
-          label="1st line address"
+          label="2nd line address"
         />
-        <FormTextInput
-          name="address-city"
-          sideLabel={true}
-          label="1st line address"
-        />
+        <FormTextInput name="address-city" sideLabel={true} label="City" />
         <FormTextInput
           name="address-country"
           sideLabel={true}
-          label="1st line address"
+          label="Country"
         />
         <FormTextInput
           name="address-post-code"
           sideLabel={true}
-          label="1st line address"
+          label="Post Code"
         />
-        <FormTextInput name="salary" label="1st line address" />
+        <FormTextInput name="salary" label="Salary" />
         <FormDateInput sideLabel={true} name="start-date" label="Start Date" />
         {selectedGroup === undefined ? (
           <div className="open-position-group-dropdown">
