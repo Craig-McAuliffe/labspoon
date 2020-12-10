@@ -99,6 +99,11 @@ service cloud.firestore {
       match /invitations/{invitationID} {
         allow read, write: if request.auth != null && existsAfter(/databases/$(database)/documents/groups/$(groupID)/members/$(request.auth.uid));
       }
+
+      match /photos/{photoID} {
+        allow read;
+        allow write: if request.auth != null && exists(/databases/$(database)/documents/groups/$(groupID)/members/$(request.auth.uid));
+      }
     }
 
     match /topics/{topicID} {

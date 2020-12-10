@@ -114,3 +114,22 @@ export function InvertedDropDownTriangle() {
     </svg>
   );
 }
+
+export function AddButton() {
+  return (
+    <svg
+      width="50"
+      height="50"
+      viewBox="0 0 50 50"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle cx="25" cy="25" r="25" />
+      <path
+        d="M25.5185 11V24.4815M25.5185 39V24.4815M25.5185 24.4815H39M25.5185 24.4815H11"
+        stroke="#00507C"
+        strokeWidth="4"
+      />
+    </svg>
+  );
+}

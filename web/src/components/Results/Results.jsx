@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import {useLocation} from 'react-router-dom';
@@ -16,6 +16,7 @@ import './Results.css';
 import FollowUserButton from '../User/FollowUserButton/FollowUserButton';
 import {FilterableResultsContext} from '../FilterableResults/FilterableResults';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
+import {PageContentContainer} from '../Layout/Content';
 
 /**
  * Displays an infinitely scrolling list of posts.
@@ -25,49 +26,59 @@ import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
  * @return {React.ReactElement}
  */
 export default function Results({results, hasMore, fetchMore, activeTabID}) {
+  const [resourceTypes, setResourceTypes] = useState(new Set());
+  const [resultComponents, setResultComponents] = useState([]);
   const currentLocation = useLocation().pathname;
-  const items = results.map((result) => (
-    <GenericListItem
-      key={result.id || result.microsoftID}
-      result={result}
-      bookmarkedVariation
-    />
-  ));
 
-  const resultTypes = [];
-  results.forEach((result) => {
-    if (resultTypes.some((resultType) => resultType === result.resourceType))
-      return;
-    resultTypes.push(result.resourceType);
-  });
+  useEffect(() => {
+    const currentResourceTypes = new Set();
+    setResultComponents(
+      results.map((result) => {
+        currentResourceTypes.add(result.resourceType);
+        return (
+          <GenericListItem
+            key={result.id || result.microsoftID}
+            result={result}
+            bookmarkedVariation
+          />
+        );
+      })
+    );
+    setResourceTypes(currentResourceTypes);
+  }, [results, setResultComponents, setResourceTypes]);
+
+  if (resourceTypes.size > 1)
+    return (
+      <PageContentContainer>
+        <MixedResultsPage results={resultComponents} />
+      </PageContentContainer>
+    );
+
+  const endMessage =
+    currentLocation === '/' ? (
+      <SearchBar bigSearchPrompt={true} />
+    ) : (
+      <p className="end-result">No more results</p>
+    );
+
+  let content = resultComponents;
+  if (resourceTypes.size === 1 && resourceTypes.has('image')) {
+    content = <div className="feed-images-container">{resultComponents}</div>;
+  }
 
   return (
-    <div className="page-content-container">
-      {resultTypes.length > 1 ? (
-        <MixedResultsPage results={results} />
-      ) : (
-        <InfiniteScroll
-          dataLength={items.length}
-          hasMore={hasMore}
-          next={fetchMore}
-          loader={<p>Loading...</p>}
-          endMessage={
-            currentLocation === '/' ? (
-              <SearchBar bigSearchPrompt={true} />
-            ) : (
-              <p className="end-result">No more results</p>
-            )
-          }
-          style={{minWidth: '100%'}}
-        >
-          {activeTabID === 'media' ? (
-            <div className="feed-images-container">{items}</div>
-          ) : (
-            items
-          )}
-        </InfiniteScroll>
-      )}
-    </div>
+    <PageContentContainer>
+      <InfiniteScroll
+        dataLength={resultComponents.length}
+        hasMore={hasMore}
+        next={fetchMore}
+        loader={<p>Loading...</p>}
+        endMessage={endMessage}
+        style={{minWidth: '100%'}}
+      >
+        {content}
+      </InfiniteScroll>
+    </PageContentContainer>
   );
 }
 Results.propTypes = {

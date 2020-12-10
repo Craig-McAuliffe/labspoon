@@ -8,6 +8,7 @@ import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 
 import './FilterableResults.css';
 import LatestPosts from '../Posts/LatestPosts/LatestPosts';
+import {getActiveTabID} from '../../helpers/filters';
 
 export const FilterableResultsContext = createContext({});
 export const FilterManagerContext = createContext({});
@@ -278,12 +279,14 @@ export function NewResultsWrapper() {
   const filterableResults = useContext(FilterableResultsContext);
   if (filterableResults.resultsError)
     return <h1>{filterableResults.resultsError}</h1>;
+  const activeTabID = getActiveTabID(filterableResults.filter);
   return (
     <>
       <Results
         results={filterableResults.results}
         hasMore={filterableResults.hasMore}
         fetchMore={filterableResults.fetchMore}
+        activeTabID={activeTabID}
       />
       {filterableResults.loadingResults ? <LoadingSpinner /> : null}
     </>

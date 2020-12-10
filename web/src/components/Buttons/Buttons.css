@@ -178,8 +178,7 @@
 }
 
 .secondary-button-active:hover {
-  border-width: 3px;
-  margin: 0px;
+  outline: 1px solid #00507c;
 }
 
 @media screen and (max-width: 800px) {
