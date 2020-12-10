@@ -1,4 +1,5 @@
 import {firebaseConfig} from '../config';
+import {db} from '../firebase';
 
 // Retrieves paginated group references from passed group reference collection
 // for use in results pages. Returns a promise that returns an array of results
@@ -33,4 +34,17 @@ export function getDefaultAvatar() {
 
 export function getAvatar(groupID) {
   return `https://storage.googleapis.com/${firebaseConfig.storageBucket}/groups/${groupID}/avatar`;
+}
+
+export function getGroup(id) {
+  return db
+    .doc(`groups/${id}`)
+    .get()
+    .then((groupData) => {
+      if (!groupData.exists) return undefined;
+      const data = groupData.data();
+      data.id = groupData.id;
+      return data;
+    })
+    .catch((err) => console.log(err));
 }

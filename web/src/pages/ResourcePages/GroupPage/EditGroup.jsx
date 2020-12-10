@@ -11,6 +11,7 @@ export default function EditGroup({groupData, setEditingGroup}) {
   const [editType, setEditType] = useState(tabs[0]);
   switch (editType) {
     case tabs[0]:
+      return <h1>Wrong one</h1>;
       return (
         <div className="content-layout">
           <div className="group-details">
@@ -28,6 +29,7 @@ export default function EditGroup({groupData, setEditingGroup}) {
         </div>
       );
     case tabs[1]:
+      return <h1>Wrong one</h1>;
       return (
         <EditGroupPosts groupID={groupData.id}>
           <EditGroupTabs
@@ -39,6 +41,7 @@ export default function EditGroup({groupData, setEditingGroup}) {
         </EditGroupPosts>
       );
     case tabs[2]:
+      return <h1>Wrong one</h1>;
       return (
         <EditGroupPublications groupID={groupData.id}>
           <EditGroupTabs
