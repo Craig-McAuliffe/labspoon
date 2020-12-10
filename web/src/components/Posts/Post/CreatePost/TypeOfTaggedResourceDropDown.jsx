@@ -116,7 +116,10 @@ function ResourceTypesDropDownOptions({
   return resourceTypeOptions.map((resourceType) => (
     <DropdownOption
       key={resourceType}
-      onSelect={() => setTaggedResourceType(resourceType)}
+      onSelect={() => {
+        setOpenDropdown(false);
+        setTaggedResourceType(resourceType);
+      }}
       height="70px"
     >
       <div className="create-post-resource-tag-dropdown-option">

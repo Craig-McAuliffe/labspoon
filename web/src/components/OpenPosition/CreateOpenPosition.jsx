@@ -134,6 +134,7 @@ export default function CreateOpenPosition() {
               <MemberOfGroupsDropdownOptions
                 memberOfGroups={memberOfGroups}
                 setSelectedGroup={setSelectedGroup}
+                setSelectingGroup={setSelectingGroup}
               />
             </Dropdown>
           </div>
@@ -161,9 +162,19 @@ export default function CreateOpenPosition() {
   );
 }
 
-function MemberOfGroupsDropdownOptions({memberOfGroups, setSelectedGroup}) {
+function MemberOfGroupsDropdownOptions({
+  memberOfGroups,
+  setSelectedGroup,
+  setSelectingGroup,
+}) {
   return memberOfGroups.map((group) => (
-    <DropdownOption key={group.id} onSelect={() => setSelectedGroup(group)}>
+    <DropdownOption
+      key={group.id}
+      onSelect={() => {
+        setSelectingGroup(false);
+        setSelectedGroup(group);
+      }}
+    >
       <GroupDropdownItem group={group} />
     </DropdownOption>
   ));
