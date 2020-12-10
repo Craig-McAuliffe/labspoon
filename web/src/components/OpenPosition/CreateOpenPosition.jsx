@@ -44,10 +44,9 @@ export default function CreateOpenPosition() {
   };
 
   const validationSchema = Yup.object({
-    title: Yup.string().required('You need to write something!'),
-    position: Yup.string().required(
-      'You need to provide a link to the publication'
-    ),
+    title: Yup.string().required('You need to provide a title.'),
+    position: Yup.string().required('You need to specify the position.'),
+    description: Yup.string().required('You need to write a description.'),
   });
 
   useEffect(() => {
@@ -89,7 +88,10 @@ export default function CreateOpenPosition() {
               customToggleTextOnly={selectedPosition}
               containerTopPosition="40px"
             >
-              {positionTypes(setSelectedPosition, setSelectingPosition)}
+              <PositionTypes
+                setSelectedPosition={setSelectedPosition}
+                setSelectingPosition={setSelectingPosition}
+              />
             </Dropdown>
           </div>
         </div>
@@ -176,7 +178,7 @@ function MemberOfGroupsDropdownOptions({
   ));
 }
 
-function positionTypes(setSelectedPosition, setSelectingPosition) {
+function PositionTypes({setSelectedPosition, setSelectingPosition}) {
   return POSITIONS.map((position) => (
     <DropdownOption
       key={position}
@@ -208,6 +210,7 @@ function HowToApply({setApplyMethod}) {
           className="open-position-apply-method-input"
           type="text"
           placeholder="Website url"
+          name="link-apply"
           onChange={(e) => handleApplyInput(e, URL)}
         />
       ),
@@ -221,6 +224,7 @@ function HowToApply({setApplyMethod}) {
             className="open-position-apply-method-input"
             type="text"
             placeholder="Email Address"
+            name="email-apply"
             onChange={(e) => handleApplyInput(e, EMAIL)}
           />
         </div>
