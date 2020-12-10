@@ -97,7 +97,10 @@ function ImageUpload({groupID, refresh}) {
     }
     setImageURLs(files.map((file) => URL.createObjectURL(file)));
     setUploading(NOT_STARTED);
-    return () => setImageURLs(files.map((file) => URL.revokeObjectURL(file)));
+    return () => {
+      imageURLs.map((url) => URL.revokeObjectURL(url));
+      setImageURLs([]);
+    };
   }, [files, setImageURLs, setUploading]);
 
   useEffect(() => {
