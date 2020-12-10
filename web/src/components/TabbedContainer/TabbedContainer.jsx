@@ -14,7 +14,7 @@ export default function TabbedContainer({tabDetails}) {
     />
   ));
   return (
-    <div>
+    <div className="tabbed-container-section">
       <TabGroup>{tabs}</TabGroup>
       <Container>{tabDetails[active].contents}</Container>
     </div>
@@ -34,10 +34,10 @@ function Tab({name, icon, active, setActive}) {
     <button
       onClick={setActive}
       className={'tabbed-container-button' + (active ? ' active' : '')}
+      type="button"
     >
-      <h3>
-        {icon} {name}
-      </h3>
+      {icon}
+      <h3 className="tabbed-container-text">{name}</h3>
     </button>
   );
 }

@@ -1,21 +1,45 @@
+.tabbed-container-section {
+  margin: 20px 0px;
+}
+
 .tabbed-container-button {
-  border: 1px solid #DCDCE0;
+  border: 1px solid #dcdce0;
   border-width: 1px 1px;
   background: white;
   position: relative;
-  padding: 10px 20px;
+  padding: 10px 20px 5px;
   transform: translateY(2px);
   margin-right: -1px;
   text-align: left;
+  color: #99999f;
+}
+
+.tabbed-container-button svg {
+  width: 25px;
+  position: relative;
+  top: -2px;
+}
+
+.tabbed-container-button path {
+  fill: #99999f;
 }
 
 .tabbed-container-button.active {
-  border-bottom-width: 0px;
-  color: #00507C;
+  border-bottom: 2px solid white;
+  color: #00507c;
+}
+
+.tabbed-container-button.active path {
+  fill: #00507c;
 }
 
 .tabbed-container-container {
-  border: 1px solid #DCDCE0;
+  border: 1px solid #dcdce0;
   background: white;
-  padding: 20px;
+  padding: 30px 20px 20px;
+}
+
+.tabbed-container-text {
+  display: inline-block;
+  margin-left: 5px;
 }

@@ -17,6 +17,7 @@ import {AuthContext, FeatureFlags} from '../../../App';
 import FormTextInput, {
   FormTextArea,
 } from '../../../components/Forms/FormTextInput';
+import PrimaryButton from '../../../components/Buttons/PrimaryButton';
 import CancelButton from '../../../components/Buttons/CancelButton';
 import NegativeButton from '../../../components/Buttons/NegativeButton';
 import CreatePost from '../../../components/Posts/Post/CreatePost/CreatePost';
@@ -27,11 +28,11 @@ import UserListItem, {
   UserSmallResultItem,
 } from '../../../components/User/UserListItem';
 import CreateResourceFormActions from '../../../components/Forms/CreateResourceFormActions';
+import TabbedContainer from '../../../components/TabbedContainer/TabbedContainer';
+import {EmailIcon} from '../../../assets/PostOptionalTagsIcons';
+import {SearchIconGrey} from '../../../assets/HeaderIcons';
 
 import './CreateGroupPage.css';
-import TabbedContainer from '../../../components/TabbedContainer/TabbedContainer';
-import {faSearch, faEnvelope} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 
 // To do: check if the group exists OR pass argument that declares if editing or creating
 // Change onSubmit function depending on editing or creating
@@ -253,7 +254,7 @@ function AddMemberContainer({addSelectedUsers, setSelecting}) {
   const tabDetails = [
     {
       name: 'Search on Labspoon',
-      icon: <FontAwesomeIcon icon={faSearch} />,
+      icon: <SearchIconGrey />,
       contents: (
         <AddMemberSearch
           addSelectedUsers={addSelectedUsers}
@@ -263,7 +264,7 @@ function AddMemberContainer({addSelectedUsers, setSelecting}) {
     },
     {
       name: 'Invite By Email',
-      icon: <FontAwesomeIcon icon={faEnvelope} />,
+      icon: <EmailIcon />,
       contents: (
         <AddMemberByEmail
           addSelectedUsers={addSelectedUsers}
@@ -331,7 +332,9 @@ function AddMemberSearch({addSelectedUsers, setSelecting}) {
           searchClient={searchClient}
           indexName={abbrEnv + '_USERS'}
         >
-          <SearchBox />
+          <div className="instant-search-searchbox-container">
+            <SearchBox />
+          </div>
           <NoQueryNoResults>
             <Hits
               hitComponent={({hit}) => {

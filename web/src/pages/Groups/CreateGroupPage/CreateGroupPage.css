@@ -92,3 +92,14 @@
 
 .edit-group-info-upload-photo-button-plus {
 }
+
+.instant-search-searchbox-container {
+  border-bottom: 1px solid #99999f;
+}
+
+.open-position-apply-method-input {
+  border: 1px solid #99999f;
+  line-height: 40px;
+  width: 100%;
+  padding-left: 2%;
+}
