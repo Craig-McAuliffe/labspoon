@@ -27,4 +27,5 @@
 .create-open-position-types-dropdown-option {
   white-space: nowrap;
   padding: 10px 0px;
+  text-align: start;
 }

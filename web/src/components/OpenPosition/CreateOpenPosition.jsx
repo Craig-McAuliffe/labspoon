@@ -79,22 +79,12 @@ export default function CreateOpenPosition() {
     >
       <Form>
         <FormTextInput name="title" label="Title" />
-        <div className="dropdown-positioning">
-          <h4 className="open-position-dropdown-label">Position</h4>
-          <div className="open-position-dropdown-container">
-            <Dropdown
-              openDropdown={selectingPosition}
-              setOpenDropdown={setSelectingPosition}
-              customToggleTextOnly={selectedPosition}
-              containerTopPosition="40px"
-            >
-              <PositionTypes
-                setSelectedPosition={setSelectedPosition}
-                setSelectingPosition={setSelectingPosition}
-              />
-            </Dropdown>
-          </div>
-        </div>
+        <SelectPosition
+          selectingPosition={selectingPosition}
+          setSelectingPosition={setSelectingPosition}
+          selectedPosition={selectedPosition}
+          setSelectedPosition={setSelectedPosition}
+        />
         <h4>Location</h4>
         <FormTextInput
           name="address-line-1"
@@ -119,30 +109,13 @@ export default function CreateOpenPosition() {
         />
         <FormTextInput name="salary" label="Salary" />
         <FormDateInput sideLabel={true} name="start-date" label="Start Date" />
-        {selectedGroup === undefined ? (
-          <div className="open-position-group-dropdown">
-            <h4 className="open-position-dropdown-label">Research Group</h4>
-            <Dropdown
-              customToggleWidth="100%"
-              customToggleTextOnly="Select from your groups"
-              openDropdown={selectingGroup}
-              setOpenDropdown={setSelectingGroup}
-              containerTopPosition="40px"
-            >
-              <MemberOfGroupsDropdownOptions
-                memberOfGroups={memberOfGroups}
-                setSelectedGroup={setSelectedGroup}
-                setSelectingGroup={setSelectingGroup}
-              />
-            </Dropdown>
-          </div>
-        ) : (
-          <GroupListItem group={selectedGroup}>
-            <NegativeButton onClick={() => setSelectedGroup(undefined)}>
-              Remove
-            </NegativeButton>
-          </GroupListItem>
-        )}
+        <TagGroup
+          selectingGroup={selectingGroup}
+          setSelectingGroup={setSelectingGroup}
+          memberOfGroups={memberOfGroups}
+          selectedGroup={selectedGroup}
+          setSelectedGroup={setSelectedGroup}
+        />
         <FormTextArea height="300px" name="description" label="Description" />
         <TagTopics
           submittingForm={submitting}
@@ -157,6 +130,39 @@ export default function CreateOpenPosition() {
         />
       </Form>
     </Formik>
+  );
+}
+
+function TagGroup({
+  selectingGroup,
+  setSelectingGroup,
+  memberOfGroups,
+  selectedGroup,
+  setSelectedGroup,
+}) {
+  return selectedGroup === undefined ? (
+    <div className="open-position-group-dropdown">
+      <h4 className="open-position-dropdown-label">Research Group</h4>
+      <Dropdown
+        customToggleWidth="100%"
+        customToggleTextOnly="Select from your groups"
+        openDropdown={selectingGroup}
+        setOpenDropdown={setSelectingGroup}
+        containerTopPosition="40px"
+      >
+        <MemberOfGroupsDropdownOptions
+          memberOfGroups={memberOfGroups}
+          setSelectedGroup={setSelectedGroup}
+          setSelectingGroup={setSelectingGroup}
+        />
+      </Dropdown>
+    </div>
+  ) : (
+    <GroupListItem group={selectedGroup}>
+      <NegativeButton onClick={() => setSelectedGroup(undefined)}>
+        Remove
+      </NegativeButton>
+    </GroupListItem>
   );
 }
 
@@ -176,6 +182,32 @@ function MemberOfGroupsDropdownOptions({
       <GroupDropdownItem group={group} />
     </DropdownOption>
   ));
+}
+
+function SelectPosition({
+  selectingPosition,
+  setSelectingPosition,
+  selectedPosition,
+  setSelectedPosition,
+}) {
+  return (
+    <div className="dropdown-positioning">
+      <h4 className="open-position-dropdown-label">Position</h4>
+      <div className="open-position-dropdown-container">
+        <Dropdown
+          openDropdown={selectingPosition}
+          setOpenDropdown={setSelectingPosition}
+          customToggleTextOnly={selectedPosition}
+          containerTopPosition="40px"
+        >
+          <PositionTypes
+            setSelectedPosition={setSelectedPosition}
+            setSelectingPosition={setSelectingPosition}
+          />
+        </Dropdown>
+      </div>
+    </div>
+  );
 }
 
 function PositionTypes({setSelectedPosition, setSelectingPosition}) {

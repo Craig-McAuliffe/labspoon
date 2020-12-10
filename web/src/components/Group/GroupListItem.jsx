@@ -34,7 +34,12 @@ export default function GroupListItem({
 
   return (
     <div className="group-list-item-container">
-      {groupAvatar(group.avatar, 130, 130, WrapWithLinkOrOverride)}
+      <GroupAvatarSection
+        groupAvatar={group.avatar}
+        height={130}
+        width={130}
+        WrapWithLinkOrOverride={WrapWithLinkOrOverride}
+      />
       <div className="group-list-item-text-container">
         {name}
         <div
@@ -56,7 +61,12 @@ export default function GroupListItem({
   );
 }
 
-function groupAvatar(groupAvatar, height, width, WrapWithLinkOrOverride) {
+function GroupAvatarSection({
+  groupAvatar,
+  height,
+  width,
+  WrapWithLinkOrOverride,
+}) {
   const avatarDisplay = (
     <div className="group-list-item-icon-and-name">
       <GroupAvatar src={groupAvatar} height={height} width={width} />
@@ -69,7 +79,7 @@ function groupAvatar(groupAvatar, height, width, WrapWithLinkOrOverride) {
 export function GroupDropdownItem({group}) {
   return (
     <div className="group-dropdown-item">
-      {groupAvatar(group.avatar, 80, 80)}
+      <GroupAvatarSection groupAvatar={group.avatar} height={80} width={80} />
       <h3 className="group-dropdown-item-name">{group.name}</h3>
       <h4 className="group-dropdown-item-institution">{group.institution}</h4>
     </div>
