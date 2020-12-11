@@ -10,8 +10,6 @@ import SettingsPage from './pages/SettingsPage';
 import BookmarksPage from './pages/BookmarksPage';
 import FollowingFeedPage from './pages/FollowingFeedPage';
 import GraphPage from './pages/GraphPage';
-import GroupPage from './pages/ResourcePages/GroupPage';
-import CreateGroupPage from './pages/Groups/CreateGroupPage/CreateGroupPage';
 import FollowsPage from './pages/FollowsPage';
 import SearchPage from './pages/SearchPage';
 import UserPage, {SkeletonUserPage} from './pages/ResourcePages/UserPage';
@@ -31,6 +29,7 @@ import NewsPage from './pages/NewsPage';
 import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
 import OnboardingPage from './pages/OnboardingPage';
 import CreatePage from './pages/ResourcePages/CreatePage';
+import Groups from './pages/Groups/Groups';
 
 /**
  * Top level routing structure for the app.
@@ -65,11 +64,8 @@ export default function Routes({user, setUser}) {
       <Route path="/graph">
         <GraphPage />
       </Route>
-      <AuthRoute user={user} path="/group/create">
-        <CreateGroupPage />
-      </AuthRoute>
-      <Route path="/group/:groupID">
-        <GroupPage />
+      <Route path="/group">
+        <Groups />
       </Route>
       <AuthRoute user={user} path="/follows">
         <FollowsPage />
@@ -125,7 +121,7 @@ export default function Routes({user, setUser}) {
  * authenticated
  * @return {Route}
  */
-function AuthRoute({children, redirect, ...rest}) {
+export function AuthRoute({children, redirect, ...rest}) {
   const {user} = useContext(AuthContext);
 
   function render({location}) {

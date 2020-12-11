@@ -15,11 +15,6 @@
   align-items: center;
 }
 
-.form-text-input-container-side-label label,
-.form-input-label {
-  font-size: 1.1em;
-}
-
 .form-text-input-container-side-label label {
   color: #5d5d65;
   flex-shrink: 0;

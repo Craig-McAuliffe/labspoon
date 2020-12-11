@@ -11,8 +11,6 @@ import {getPaginatedTopicsFromCollectionRef} from '../../../helpers/topics';
 import {getPaginatedPublicationsFromCollectionRef} from '../../../helpers/publications';
 import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
 import {getPaginatedImagesFromCollectionRef} from '../../../helpers/images';
-import EditGroup from './EditGroup';
-import groups from '../../../mockdata/groups';
 import GroupPageSider from './GroupPageSider';
 import FilterableResults, {
   NewResultsWrapper,
@@ -26,22 +24,11 @@ import MessageButton from '../../../components/Buttons/MessageButton';
 import EditButton from '../../../components/Buttons/EditButton';
 import {PinnedPost} from '../../../components/Posts/Post/Post';
 import SeeMore from '../../../components/SeeMore';
+import {getGroup} from '../../../helpers/groups';
 
 import './GroupPage.css';
 
 const PHOTOS = 'photos';
-
-function fetchGroupDataFromDB(id) {
-  return db
-    .doc(`groups/${id}`)
-    .get()
-    .then((groupData) => {
-      const data = groupData.data();
-      data.id = groupData.id;
-      return data;
-    })
-    .catch((err) => console.log(err));
-}
 
 function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip) {
   const activeTab = filterOptions ? getActiveTabID(filterOptions) : null;
@@ -103,7 +90,6 @@ export default function GroupPage() {
   const [groupID, setGroupID] = useState(undefined);
   const [groupData, setGroupData] = useState(undefined);
   const [userIsMember, setUserIsMember] = useState(false);
-  const [editingGroup, setEditingGroup] = useState(false);
   const history = useHistory();
   const {user} = useContext(AuthContext);
   const route = useRouteMatch();
@@ -113,15 +99,8 @@ export default function GroupPage() {
     setGroupID(groupIDParam);
   }
 
-  let fetchGroupData;
-  if (!featureFlags.has('disable-cloud-firestore')) {
-    fetchGroupData = () => fetchGroupDataFromDB(groupID);
-  } else {
-    fetchGroupData = () => groups().filter((group) => group.id === groupID)[0];
-  }
-
   useEffect(() => {
-    Promise.resolve(fetchGroupData())
+    Promise.resolve(getGroup(groupID))
       .then((groupData) => {
         if (!groupData) {
           history.push('/notfound');
@@ -227,30 +206,25 @@ export default function GroupPage() {
       ) : (
         <></>
       )}
-      {editingGroup ? (
-        <EditGroup groupData={groupData} setEditingGroup={setEditingGroup} />
-      ) : (
-        <div className="content-layout">
-          {previousPage()}
-          <div className="group-details">
-            <GroupDetails
-              group={groupData}
-              groupDescriptionRef={groupDescriptionRef}
-              userIsMember={userIsMember}
-              setEditingGroup={setEditingGroup}
-            />
-          </div>
-          <FilterableResults fetchResults={fetchFeedData} limit={9}>
-            <div className="feed-container">
-              <FilterManager>
-                <ResourceTabs tabs={relationshipFilter} />
-                <NewFilterMenuWrapper />
-              </FilterManager>
-              <NewResultsWrapper />
-            </div>
-          </FilterableResults>
+      <div className="content-layout">
+        {previousPage()}
+        <div className="group-details">
+          <GroupDetails
+            group={groupData}
+            groupDescriptionRef={groupDescriptionRef}
+            userIsMember={userIsMember}
+          />
         </div>
-      )}
+        <FilterableResults fetchResults={fetchFeedData} limit={9}>
+          <div className="feed-container">
+            <FilterManager>
+              <ResourceTabs tabs={relationshipFilter} />
+              <NewFilterMenuWrapper />
+            </FilterManager>
+            <NewResultsWrapper />
+          </div>
+        </FilterableResults>
+      </div>
     </>
   );
 }
@@ -268,12 +242,8 @@ function SuggestedGroups({groupData}) {
   );
 }
 
-const GroupDetails = ({
-  group,
-  groupDescriptionRef,
-  userIsMember,
-  setEditingGroup,
-}) => {
+const GroupDetails = ({group, groupDescriptionRef, userIsMember}) => {
+  const {url} = useRouteMatch();
   const featureFlags = useContext(FeatureFlags);
   const [displayFullDescription, setDisplayFullDescription] = useState({
     display: false,
@@ -321,9 +291,9 @@ const GroupDetails = ({
       </div>
       {userIsMember ? (
         <div className="group-page-edit-button-container">
-          <EditButton editAction={() => setEditingGroup(true)}>
-            Edit Group
-          </EditButton>
+          <Link to={`${url}/edit/info`}>
+            <EditButton editAction={() => {}}>Edit Group</EditButton>
+          </Link>
         </div>
       ) : null}
       {featureFlags.has('group-pinned-post') ? (

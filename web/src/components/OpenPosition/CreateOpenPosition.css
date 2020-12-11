@@ -1,0 +1,31 @@
+.open-position-group-dropdown {
+  margin-bottom: 50px;
+  width: 100%;
+  min-width: 100%;
+}
+
+.open-position-dropdown-container {
+  width: 25%;
+  min-width: 200px;
+  margin-bottom: 50px;
+}
+
+.open-position-dropdown path,
+.open-position-group-dropdown path {
+  fill: #00507c;
+}
+
+.open-position-dropdown-label,
+.open-position-dropdown-label {
+  margin-bottom: 0.5rem;
+}
+
+.dropdown-positioning {
+  position: relative;
+}
+
+.create-open-position-types-dropdown-option {
+  white-space: nowrap;
+  padding: 10px 0px;
+  text-align: start;
+}

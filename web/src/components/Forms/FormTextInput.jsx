@@ -42,7 +42,7 @@ export function TextInput({
       }
     >
       <label htmlFor={props.name} className="form-input-label">
-        {label}
+        <h4>{label}</h4>
       </label>
       <input
         className="form-text-input"
@@ -78,14 +78,13 @@ export function FormTextArea({height, label, bigLabel, ...props}) {
   return (
     <>
       <label htmlFor={props.name} className="form-input-label">
-        {bigLabel ? <h3>{label}</h3> : label}
+        {bigLabel ? <h3>{label}</h3> : <h4>{label}</h4>}
       </label>
       <textarea
         className="form-text-area"
-        autoFocus
         {...field}
         {...props}
-        style={{height: `${height}px`}}
+        style={{height: height}}
       />
       <div className="error-container">
         {meta.touched && meta.error ? <InputError error={meta.error} /> : null}

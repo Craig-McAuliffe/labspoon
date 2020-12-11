@@ -14,7 +14,12 @@ export default function PostForm({
   postType,
   setPostType,
 }) {
-  const {setSubmittingPost, submittingPost} = useContext(CreatingPostContext);
+  const {
+    setSubmittingPost,
+    submittingPost,
+    setSelectedTopics,
+    selectedTopics,
+  } = useContext(CreatingPostContext);
 
   const createPost = (res) => {
     if (submittingPost) return;
@@ -37,7 +42,11 @@ export default function PostForm({
         >
           <Form id="create-post-form">{children}</Form>
         </Formik>
-        <TagTopics submittingPost={submittingPost} />
+        <TagTopics
+          submittingForm={submittingPost}
+          setSelectedTopics={setSelectedTopics}
+          selectedTopics={selectedTopics}
+        />
         <CreatePostActions postType={postType} setPostType={setPostType} />
       </div>
     </div>

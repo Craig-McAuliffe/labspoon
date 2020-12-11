@@ -1,20 +1,23 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState, useEffect} from 'react';
 import PrimaryButton from '../../../Buttons/PrimaryButton';
 import TopicListItem from '../../../Topics/TopicListItem';
 import {RemoveIcon} from '../../../../assets/GeneralActionIcons';
-import {CreatingPostContext} from './CreatePost';
 import firebase from '../../../../firebase';
 import LoadingSpinner from '../../../LoadingSpinner/LoadingSpinner';
 import './CreatePost';
 
 const topicSearch = firebase.functions().httpsCallable('topics-topicSearch');
 
-export default function TagTopics({submittingPost}) {
+export default function TagTopics({
+  submittingForm,
+  selectedTopics,
+  setSelectedTopics,
+}) {
   const [displayedTopics, setDisplayedTopics] = useState([]);
   const [duplicateTopic, setDuplicateTopic] = useState(false);
   const [loadingTopics, setLoadingTopics] = useState(false);
   const [typedTopic, setTypedTopic] = useState('');
-  const {selectedTopics, setSelectedTopics} = useContext(CreatingPostContext);
+
   // Tells user that they are trying to input a duplicate topic
   useEffect(() => {
     if (duplicateTopic) {
@@ -23,7 +26,7 @@ export default function TagTopics({submittingPost}) {
   }, [duplicateTopic]);
 
   useEffect(() => {
-    if (typedTopic.length === 0 || submittingPost) {
+    if (typedTopic.length === 0 || submittingForm) {
       setDisplayedTopics([]);
       setLoadingTopics(false);
       return;
@@ -33,7 +36,7 @@ export default function TagTopics({submittingPost}) {
       setLoadingTopics,
       setDisplayedTopics
     );
-  }, [typedTopic, submittingPost]);
+  }, [typedTopic, submittingForm]);
 
   return (
     <div className="create-post-topic-section-container">
