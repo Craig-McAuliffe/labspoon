@@ -27,6 +27,7 @@ import UserListItem, {
   UserListItemEmailOnly,
   UserSmallResultItem,
 } from '../../../components/User/UserListItem';
+import {useLocation} from 'react-router-dom';
 
 import './CreateGroupPage.css';
 import TabbedContainer from '../../../components/TabbedContainer/TabbedContainer';
@@ -300,6 +301,8 @@ function AddMemberByEmail({addSelectedUsers, setSelecting}) {
     });
     setSelecting(false);
   }
+  const pathname = useLocation().pathname;
+
   return (
     <>
       <Formik
@@ -319,10 +322,16 @@ function AddMemberByEmail({addSelectedUsers, setSelecting}) {
         </div>
         <div className="create-group-submit">
           <PrimaryButton submit formID="email-form">
-            Send
+            Add
           </PrimaryButton>
         </div>
       </div>
+      <p className="create-group-invite-email-info">
+        The invite will only be sent once you have{' '}
+        {pathname.includes('create')
+          ? 'created your group'
+          : 'saved your changes'}
+      </p>
     </>
   );
 }
