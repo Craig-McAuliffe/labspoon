@@ -150,11 +150,11 @@ function TagGroup({
         setOpenDropdown={setSelectingGroup}
         containerTopPosition="40px"
       >
-        <MemberOfGroupsDropdownOptions
-          memberOfGroups={memberOfGroups}
-          setSelectedGroup={setSelectedGroup}
-          setSelectingGroup={setSelectingGroup}
-        />
+        {getMemberOfGroupsDropdownOptions(
+          memberOfGroups,
+          setSelectedGroup,
+          setSelectingGroup
+        )}
       </Dropdown>
     </div>
   ) : (
@@ -166,11 +166,11 @@ function TagGroup({
   );
 }
 
-function MemberOfGroupsDropdownOptions({
+function getMemberOfGroupsDropdownOptions(
   memberOfGroups,
   setSelectedGroup,
-  setSelectingGroup,
-}) {
+  setSelectingGroup
+) {
   return memberOfGroups.map((group) => (
     <DropdownOption
       key={group.id}
@@ -200,17 +200,14 @@ function SelectPosition({
           customToggleTextOnly={selectedPosition}
           containerTopPosition="40px"
         >
-          <PositionTypes
-            setSelectedPosition={setSelectedPosition}
-            setSelectingPosition={setSelectingPosition}
-          />
+          {getPositionTypes(setSelectedPosition, setSelectingPosition)}
         </Dropdown>
       </div>
     </div>
   );
 }
 
-function PositionTypes({setSelectedPosition, setSelectingPosition}) {
+function getPositionTypes(setSelectedPosition, setSelectingPosition) {
   return POSITIONS.map((position) => (
     <DropdownOption
       key={position}
