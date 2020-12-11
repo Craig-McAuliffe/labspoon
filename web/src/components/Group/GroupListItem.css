@@ -64,3 +64,24 @@
 .group-list-item-text-container h3 {
   margin-bottom: 5px;
 }
+
+.group-dropdown-item {
+  display: grid;
+  padding: 10px 5px;
+  grid-template-columns: 140px 4fr 4fr;
+  align-items: center;
+  justify-items: flex-start;
+  width: 100%;
+}
+
+.group-dropdown-item-name {
+  margin-left: 10px;
+  white-space: nowrap;
+  color: #00507c;
+}
+
+.group-dropdown-item-institution {
+  margin-left: 10px;
+  white-space: nowrap;
+  color: #00507c;
+}

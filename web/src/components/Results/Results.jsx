@@ -9,6 +9,7 @@ import PublicationListItem from '../Publication/PublicationListItem';
 import UserListItem from '../User/UserListItem';
 import ImageListItem from '../Media/ImageListItem';
 import GroupListItem from '../Group/GroupListItem';
+import FollowGroupButton from '../Group/FollowGroupButton';
 import TopicListItem from '../Topics/TopicListItem';
 import FollowTopicButton from '../Topics/FollowTopicButton';
 
@@ -116,7 +117,11 @@ export function GenericListItem({result, onBookmarkPage}) {
         </UserListItem>
       );
     case 'group':
-      return <GroupListItem key={result.id + 'group'} group={result} />;
+      return (
+        <GroupListItem key={result.id + 'group'} group={result}>
+          <FollowGroupButton targetGroup={result} />
+        </GroupListItem>
+      );
     case 'topic':
       return (
         <TopicListItem key={result.id + 'topic'} topic={result}>

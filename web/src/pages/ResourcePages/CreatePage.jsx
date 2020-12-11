@@ -1,24 +1,28 @@
 import React, {useContext} from 'react';
-import {Link, Redirect, Route, Switch, useLocation} from 'react-router-dom';
-import {AuthContext} from '../../App';
+import {Redirect, Route, Switch} from 'react-router-dom';
+import {AuthContext, FeatureFlags} from '../../App';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import CreatePost from '../../components/Posts/Post/CreatePost/CreatePost';
 import CreateGroupPage from '../Groups/CreateGroupPage/CreateGroupPage';
+import CreateOpenPosition from '../../components/OpenPosition/CreateOpenPosition';
+import LightTabLink from '../../components/Navigation/LightTabLink';
 
 import './CreatePage.css';
 
 export default function CreatePage() {
   const {userProfile} = useContext(AuthContext);
   const userID = userProfile ? userProfile.id : undefined;
-
+  const featureFlags = useContext(FeatureFlags);
   if (!userID) return <LoadingSpinner />;
-
   return (
     <div className="content-layout">
-      <div className="middle-column" style={{'grid-column': '2/3'}}>
+      <div className="feed-container">
         <div className="light-tab-group">
           <LightTabLink name="Post" link="/create/post" />
           <LightTabLink name="Group" link="/create/group" />
+          {featureFlags.has('create-open-position') ? (
+            <LightTabLink name="Open Position" link="/create/open-position" />
+          ) : null}
         </div>
         <div>
           <Switch>
@@ -31,6 +35,9 @@ export default function CreatePage() {
             <Route path="/create/group">
               <CreateGroupPage />
             </Route>
+            <Route path="/create/open-position">
+              <CreateOpenPosition />
+            </Route>
             <Route path="/create">
               <Redirect to="/create/post" />
             </Route>
@@ -38,24 +45,5 @@ export default function CreatePage() {
         </div>
       </div>
     </div>
-  );
-}
-
-function LightTabLink({name, link}) {
-  const location = useLocation();
-  return (
-    <Link to={link}>
-      <button type="button">
-        <h2
-          className={
-            location.pathname === link
-              ? 'light-tab-active'
-              : 'light-tab-inactive'
-          }
-        >
-          {name}
-        </h2>
-      </button>
-    </Link>
   );
 }

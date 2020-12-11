@@ -27,11 +27,12 @@ import UserListItem, {
   UserListItemEmailOnly,
   UserSmallResultItem,
 } from '../../../components/User/UserListItem';
+import CreateResourceFormActions from '../../../components/Forms/CreateResourceFormActions';
+import TabbedContainer from '../../../components/TabbedContainer/TabbedContainer';
+import {EmailIcon} from '../../../assets/PostOptionalTagsIcons';
+import {SearchIconGrey} from '../../../assets/HeaderIcons';
 
 import './CreateGroupPage.css';
-import TabbedContainer from '../../../components/TabbedContainer/TabbedContainer';
-import {faSearch, faEnvelope} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 
 // To do: check if the group exists OR pass argument that declares if editing or creating
 // Change onSubmit function depending on editing or creating
@@ -121,7 +122,7 @@ export default function GroupInfoForm({
             </div>
             <div className="create-group-group-photos"></div>
 
-            <FormTextArea height="200" label="About" name="about" bigLabel />
+            <FormTextArea height="200px" label="About" name="about" bigLabel />
           </Form>
         </Formik>
         <SelectUsers
@@ -138,20 +139,11 @@ export default function GroupInfoForm({
             </div>
           </>
         ) : null}
-        <div className="create-group-submit-cancel-container">
-          <div className="create-group-cancel">
-            <CancelButton cancelAction={cancelForm} />
-          </div>
-          <div className="create-group-submit">
-            <PrimaryButton
-              submit
-              formID="create-group-form"
-              disabled={submitted}
-            >
-              {submitText}
-            </PrimaryButton>
-          </div>
-        </div>
+        <CreateResourceFormActions
+          submitText={submitText}
+          submitted={submitted}
+          cancelForm={cancelForm}
+        />
       </div>
     </div>
   );
@@ -262,7 +254,7 @@ function AddMemberContainer({addSelectedUsers, setSelecting}) {
   const tabDetails = [
     {
       name: 'Search on Labspoon',
-      icon: <FontAwesomeIcon icon={faSearch} />,
+      icon: <SearchIconGrey />,
       contents: (
         <AddMemberSearch
           addSelectedUsers={addSelectedUsers}
@@ -272,7 +264,7 @@ function AddMemberContainer({addSelectedUsers, setSelecting}) {
     },
     {
       name: 'Invite By Email',
-      icon: <FontAwesomeIcon icon={faEnvelope} />,
+      icon: <EmailIcon />,
       contents: (
         <AddMemberByEmail
           addSelectedUsers={addSelectedUsers}
@@ -340,7 +332,9 @@ function AddMemberSearch({addSelectedUsers, setSelecting}) {
           searchClient={searchClient}
           indexName={abbrEnv + '_USERS'}
         >
-          <SearchBox />
+          <div className="instant-search-searchbox-container">
+            <SearchBox />
+          </div>
           <NoQueryNoResults>
             <Hits
               hitComponent={({hit}) => {
