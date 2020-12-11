@@ -14,22 +14,20 @@ import {searchClient} from '../../../algolia';
 import {abbrEnv} from '../../../config';
 
 import {AuthContext, FeatureFlags} from '../../../App';
-import FormTextInput, {
-  FormTextArea,
-} from '../../../components/Forms/FormTextInput';
-import PrimaryButton from '../../../components/Buttons/PrimaryButton';
-import CancelButton from '../../../components/Buttons/CancelButton';
-import NegativeButton from '../../../components/Buttons/NegativeButton';
-import CreatePost from '../../../components/Posts/Post/CreatePost/CreatePost';
-import GroupAvatar from '../../../components/Avatar/GroupAvatar';
+import FormTextInput, {FormTextArea} from '../../Forms/FormTextInput';
+import PrimaryButton from '../../Buttons/PrimaryButton';
+import CancelButton from '../../Buttons/CancelButton';
+import NegativeButton from '../../Buttons/NegativeButton';
+import CreatePost from '../../Posts/Post/CreatePost/CreatePost';
+import GroupAvatar from '../../Avatar/GroupAvatar';
 import {AddMemberIcon, AddProfilePhoto} from '../../../assets/CreateGroupIcons';
 import UserListItem, {
   UserListItemEmailOnly,
   UserSmallResultItem,
-} from '../../../components/User/UserListItem';
+} from '../../User/UserListItem';
 import {useLocation} from 'react-router-dom';
-import CreateResourceFormActions from '../../../components/Forms/CreateResourceFormActions';
-import TabbedContainer from '../../../components/TabbedContainer/TabbedContainer';
+import CreateResourceFormActions from '../../Forms/CreateResourceFormActions';
+import TabbedContainer from '../../TabbedContainer/TabbedContainer';
 import {EmailIcon} from '../../../assets/PostOptionalTagsIcons';
 import {SearchIconGrey} from '../../../assets/HeaderIcons';
 

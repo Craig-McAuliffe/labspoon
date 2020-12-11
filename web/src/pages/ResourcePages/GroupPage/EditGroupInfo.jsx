@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react';
-import GroupInfoForm from '../../Groups/CreateGroupPage/GroupInfoForm';
+import GroupInfoForm from '../../../components/Group/CreateGroupPage/GroupInfoForm';
 import firebase, {db, storage} from '../../../firebase';
 import {Alert} from 'react-bootstrap';
 import {v4 as uuid} from 'uuid';
@@ -7,7 +7,7 @@ import {v4 as uuid} from 'uuid';
 import './GroupPage.css';
 import {AuthContext} from '../../../App';
 
-export default function EditingGroupInfo({groupData, setEditingGroup}) {
+export default function EditingGroupInfo({groupData}) {
   const groupID = groupData.id;
   const [groupMembers, setGroupMembers] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
@@ -120,7 +120,7 @@ export default function EditingGroupInfo({groupData, setEditingGroup}) {
         .commit()
         .catch((err) => alert(err, 'batch failed to commit'))
         .then(() => {
-          setEditingGroup(false);
+          window.location.reload();
         });
     };
     const avatarStorageRef = storage.ref(`groups/${groupID}/avatar_fullSize`);
@@ -157,7 +157,6 @@ export default function EditingGroupInfo({groupData, setEditingGroup}) {
         setSelectedUsers={setSelectedUsers}
         setAvatar={setAvatar}
         existingAvatar={groupData.avatar}
-        cancelForm={() => setEditingGroup(false)}
         submitText="Save Changes"
       />
     </div>

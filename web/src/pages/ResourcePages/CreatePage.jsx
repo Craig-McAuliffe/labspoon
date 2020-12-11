@@ -3,7 +3,7 @@ import {Redirect, Route, Switch} from 'react-router-dom';
 import {AuthContext, FeatureFlags} from '../../App';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import CreatePost from '../../components/Posts/Post/CreatePost/CreatePost';
-import CreateGroupPage from '../Groups/CreateGroupPage/CreateGroupPage';
+import CreateGroupPage from '../../components/Group/CreateGroupPage/CreateGroupPage';
 import CreateOpenPosition from '../../components/OpenPosition/CreateOpenPosition';
 import LightTabLink from '../../components/Navigation/LightTabLink';
 

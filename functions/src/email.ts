@@ -192,8 +192,24 @@ export async function sendGroupInvitationEmail(
   invitationID: string,
   invitation: Invitation
 ) {
-  if (!mailgun) return;
-
+  if (!mailgun) {
+    console.error(
+      'mailgun has not been defined. For local, add mailgun to .runtimeconfig, found within the functions directory, by following instructions in README.md. For the cloud, add mailgun to config file.'
+    );
+    throw new Error(
+      'Unable to send email invite. Sorry about that. Please try again later.'
+    );
+    return;
+  }
+  if (!url) {
+    console.error(
+      'the env url has not been defined. For local, add a url to the env of .runtimeconfig found within the functions directory, by following instructions in README.md. For the cloud, add a value for config env.'
+    );
+    throw new Error(
+      'Unable to send email invite. Sorry about that. Please try again later.'
+    );
+    return;
+  }
   const emailAddress = invitation.email;
 
   const groupID = invitation.resourceID;

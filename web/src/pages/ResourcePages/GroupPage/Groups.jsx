@@ -1,9 +1,9 @@
 import React from 'react';
 import {Route, Switch, useRouteMatch} from 'react-router-dom';
-import {AuthRoute} from '../../routes';
-import NotFoundPage from '../NotFoundPage/NotFoundPage';
-import GroupPage from '../ResourcePages/GroupPage';
-import CreateGroupPage from './CreateGroupPage/CreateGroupPage';
+import {AuthRoute} from '../../../routes';
+import NotFoundPage from '../../NotFoundPage/NotFoundPage';
+import GroupPage from '.';
+import CreateGroupPage from '../../../components/Group/CreateGroupPage/CreateGroupPage';
 import EditGroupPage from './EditGroupPage';
 
 export default function Groups() {

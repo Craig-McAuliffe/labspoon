@@ -13,7 +13,7 @@ import FollowUserButton from '../../components/User/FollowUserButton/FollowUserB
 import SecondaryButton from '../../components/Buttons/SecondaryButton';
 import PrimaryButton from '../../components/Buttons/PrimaryButton';
 import {CreateGroupIcon} from '../../assets/MenuIcons';
-import CreateGroupPage from '../Groups/CreateGroupPage/CreateGroupPage';
+import CreateGroupPage from '../../components/Group/CreateGroupPage/CreateGroupPage';
 import UserListItem from '../../components/User/UserListItem';
 import FormDatabaseSearch from '../../components/Forms/FormDatabaseSearch';
 import SuccessMessage from '../../components/Forms/SuccessMessage';
