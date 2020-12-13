@@ -8,6 +8,7 @@ import BookmarkListItem from '../Bookmarks/BookmarkListItem/BookmarkListItem';
 import PublicationListItem from '../Publication/PublicationListItem';
 import UserListItem from '../User/UserListItem';
 import ImageListItem from '../Media/ImageListItem';
+import VideoListItem from '../Media/VideoListItem';
 import GroupListItem from '../Group/GroupListItem';
 import FollowGroupButton from '../Group/FollowGroupButton';
 import TopicListItem from '../Topics/TopicListItem';
@@ -131,6 +132,14 @@ export function GenericListItem({result, onBookmarkPage}) {
     case 'image':
       return (
         <ImageListItem
+          src={result.src}
+          alt={result.alt}
+          key={result.id + 'image'}
+        />
+      );
+    case 'video':
+      return (
+        <VideoListItem
           src={result.src}
           alt={result.alt}
           key={result.id + 'image'}

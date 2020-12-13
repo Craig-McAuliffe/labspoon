@@ -58,12 +58,7 @@ export default function EditGroupPhotos({children}) {
     <FeedContent>
       {children}
       <ImageUpload groupID={groupID} refresh={refresh} />
-      <Results
-        results={photos}
-        hasMore={hasMore}
-        fetchMore={fetchMore}
-        activeTabID="images"
-      />
+      <Results results={photos} hasMore={hasMore} fetchMore={fetchMore} />
       {loading ? <LoadingSpinner /> : <></>}
     </FeedContent>
   );

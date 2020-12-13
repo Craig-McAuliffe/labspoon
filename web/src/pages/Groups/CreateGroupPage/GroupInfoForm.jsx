@@ -31,6 +31,7 @@ import CreateResourceFormActions from '../../../components/Forms/CreateResourceF
 import TabbedContainer from '../../../components/TabbedContainer/TabbedContainer';
 import {EmailIcon} from '../../../assets/PostOptionalTagsIcons';
 import {SearchIconGrey} from '../../../assets/HeaderIcons';
+import {FeedContent} from '../../../components/Layout/Content';
 
 import './CreateGroupPage.css';
 
@@ -95,57 +96,50 @@ export default function GroupInfoForm({
     setAvatar(selectedAvatar);
   };
   return (
-    <div className="content-layout">
-      <div className="feed-container">
-        <Formik
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-          onSubmit={onSubmitAndPreventDuplicate}
-        >
-          <Form id="create-group-form">
-            <div className="create-group-profile-info-container">
-              <EditAvatar
-                existingAvatar={existingAvatar}
-                onAvatarSelect={onAvatarSelect}
-              />
-              <div className="create-group-meta-info">
-                <h3>Basic Info</h3>
-                <FormTextInput label="Name" name="name" sideLabel />
-                <FormTextInput label="Location" name="location" sideLabel />
-                <FormTextInput
-                  label="Institution"
-                  name="institution"
-                  sideLabel
-                />
-                <FormTextInput label="Website" name="website" sideLabel />
-              </div>
+    <FeedContent>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={onSubmitAndPreventDuplicate}
+      >
+        <Form id="create-group-form">
+          <div className="create-group-profile-info-container">
+            <EditAvatar
+              existingAvatar={existingAvatar}
+              onAvatarSelect={onAvatarSelect}
+            />
+            <div className="create-group-meta-info">
+              <h3>Basic Info</h3>
+              <FormTextInput label="Name" name="name" sideLabel />
+              <FormTextInput label="Location" name="location" sideLabel />
+              <FormTextInput label="Institution" name="institution" sideLabel />
+              <FormTextInput label="Website" name="website" sideLabel />
             </div>
-            <div className="create-group-group-photos"></div>
+          </div>
+          <div className="create-group-group-photos"></div>
+          <FormTextArea height="200" label="About" name="about" bigLabel />
+        </Form>
+      </Formik>
+      <SelectUsers
+        selectedUsers={selectedUsers}
+        addSelectedUsers={addSelectedUsers}
+        setSelectedUsers={setSelectedUsers}
+      />
 
-            <FormTextArea height="200px" label="About" name="about" bigLabel />
-          </Form>
-        </Formik>
-        <SelectUsers
-          selectedUsers={selectedUsers}
-          addSelectedUsers={addSelectedUsers}
-          setSelectedUsers={setSelectedUsers}
-        />
-
-        {featureFlags.has('create-pinned-post') ? (
-          <>
-            <h4>{`If there's a post you'd like to appear at the top of your group page, you can add it here:`}</h4>
-            <div className="create-group-pinned-post-container">
-              <CreatePost pinnedPost />
-            </div>
-          </>
-        ) : null}
-        <CreateResourceFormActions
-          submitText={submitText}
-          submitted={submitted}
-          cancelForm={cancelForm}
-        />
-      </div>
-    </div>
+      {featureFlags.has('create-pinned-post') ? (
+        <>
+          <h4>{`If there's a post you'd like to appear at the top of your group page, you can add it here:`}</h4>
+          <div className="create-group-pinned-post-container">
+            <CreatePost pinnedPost />
+          </div>
+        </>
+      ) : null}
+      <CreateResourceFormActions
+        submitText={submitText}
+        submitted={submitted}
+        cancelForm={cancelForm}
+      />
+    </FeedContent>
   );
 }
 
