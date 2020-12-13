@@ -7,17 +7,20 @@ import EditGroupInfo from '../ResourcePages/GroupPage/EditGroupInfo';
 import EditGroupPosts from '../ResourcePages/GroupPage/EditGroupPosts';
 import EditGroupPublications from '../ResourcePages/GroupPage/EditGroupPublications';
 import EditGroupPhotos from '../ResourcePages/GroupPage/EditGroupPhotos';
+import EditGroupVideos from '../ResourcePages/GroupPage/EditGroupVideos';
 
 const INFO_TAB = 'info';
 const POSTS_TAB = 'posts';
 const PUBLICATIONS_TAB = 'publications';
 const PHOTOS_TAB = 'photos';
+const VIDEOS_TAB = 'videos';
 
 const tabIDToDisplayName = {
   [INFO_TAB]: 'Info',
   [POSTS_TAB]: 'Posts',
   [PUBLICATIONS_TAB]: 'Publications',
   [PHOTOS_TAB]: 'Photos',
+  [VIDEOS_TAB]: 'Videos',
 };
 
 export default function EditGroupPage() {
@@ -26,7 +29,7 @@ export default function EditGroupPage() {
   const [group, setGroup] = useState();
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
-  const tabs = [INFO_TAB, POSTS_TAB, PUBLICATIONS_TAB, PHOTOS_TAB];
+  const tabs = [INFO_TAB, POSTS_TAB, PUBLICATIONS_TAB, PHOTOS_TAB, VIDEOS_TAB];
   const groupURL = url.slice(0, url.length - '/edit'.length);
 
   useEffect(() => {
@@ -72,6 +75,12 @@ export default function EditGroupPage() {
           <EditGroupTabs tabs={tabs} activeTab={PHOTOS_TAB} />
           <ReturnToGroupPageButton url={groupURL} />
         </EditGroupPhotos>
+      </Route>
+      <Route path={`${path}/${VIDEOS_TAB}`}>
+        <EditGroupVideos>
+          <EditGroupTabs tabs={tabs} activeTab={VIDEOS_TAB} />
+          <ReturnToGroupPageButton url={groupURL} />
+        </EditGroupVideos>
       </Route>
       <Route path={`${path}`}>
         <NotFoundPage />

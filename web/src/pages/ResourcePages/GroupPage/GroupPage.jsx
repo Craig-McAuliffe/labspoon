@@ -27,8 +27,10 @@ import SeeMore from '../../../components/SeeMore';
 import {getGroup} from '../../../helpers/groups';
 
 import './GroupPage.css';
+import {getPaginatedVideosFromCollectionRef} from '../../../helpers/videos';
 
 const PHOTOS = 'photos';
+const VIDEOS = 'videos';
 
 function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip) {
   const activeTab = filterOptions ? getActiveTabID(filterOptions) : null;
@@ -77,6 +79,12 @@ function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip) {
       const photosCollection = db.collection(`groups/${groupID}/photos`);
       return [
         getPaginatedImagesFromCollectionRef(photosCollection, limit, last),
+        null,
+      ];
+    case VIDEOS:
+      const videosCollection = db.collection(`groups/${groupID}/videos`);
+      return [
+        getPaginatedVideosFromCollectionRef(videosCollection, limit, last),
         null,
       ];
     default:
@@ -159,6 +167,13 @@ export default function GroupPage() {
           data: {
             id: PHOTOS,
             name: 'Photos',
+          },
+        },
+        {
+          enabled: false,
+          data: {
+            id: VIDEOS,
+            name: 'Videos',
           },
         },
       ],
