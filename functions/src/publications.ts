@@ -601,9 +601,6 @@ export const addMicrosoftPublicationByID = functions.https.onRequest(
   }
 );
 
-// Authors are associated with a publication after the publication's creation,
-// so this function updates references to that publication when the authors are
-// added.
 export const updateReferencesToPublication = functions.firestore
   .document('publications/{publicationID}')
   .onUpdate(async (change, _) => {
@@ -622,6 +619,21 @@ export const updateReferencesToPublication = functions.firestore
       writePromises.push(writePromise);
     });
     return Promise.all(writePromises);
+  });
+
+// Update the publication in the collections of the authors.
+export const updateAuthorsPublication = functions.firestore
+  .document('publications/{publicationID}')
+  .onUpdate(async (change, _) => {
+    const publicationID = change.after.id;
+    const publication = change.after.data() as Publication;
+    const authors = publication.authors;
+    if (!authors) return;
+    const users = authors.filter((author) => Boolean(author.id));
+    const promises = users.map(async (user) => {
+      db.doc(`users/${user.id}/publications/${publicationID}`).set(toPublicationRef(publicationID, publication));
+    });
+    return Promise.all(promises);
   });
 
 export const retrieveReferencesFromMicrosoft = functions.https.onCall(
