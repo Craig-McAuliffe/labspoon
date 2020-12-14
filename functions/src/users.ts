@@ -139,7 +139,7 @@ export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall
     if (context.auth === undefined) {
       throw new functions.https.HttpsError(
         'unauthenticated',
-        'Must be authenticated to create a post'
+        'Must be authenticated to associate a user account with a microsoft academic author ID.'
       );
     }
     const userID = context.auth.uid;
