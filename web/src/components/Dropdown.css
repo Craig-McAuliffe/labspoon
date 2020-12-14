@@ -41,12 +41,15 @@
   width: 100%;
   border-bottom: 1px solid #5d5d65;
   padding: 0px 5px 1px 10px;
+  color: #00507c;
+  text-align: start;
 }
 
 .dropdown-option-button:hover,
 .dropdown-option-button:focus {
   background-color: #00507c;
   border-bottom: 1px solid #00507c;
+  color: #ffffff;
 }
 
 .dropdown-option-button:hover h4,

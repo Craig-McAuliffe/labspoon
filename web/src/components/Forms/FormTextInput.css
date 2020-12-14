@@ -2,6 +2,7 @@
   border: 1px solid #99999f;
   line-height: 40px;
   width: 100%;
+  padding-left: 10px;
 }
 
 .form-text-input-container {
@@ -49,6 +50,5 @@
   resize: none;
   border: none;
   font-size: 1.1em;
-  margin: 0px 0px 40px 0px;
   border: 1px solid #99999f;
 }

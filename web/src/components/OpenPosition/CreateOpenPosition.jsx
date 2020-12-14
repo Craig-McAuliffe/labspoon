@@ -1,11 +1,12 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {Form, Formik} from 'formik';
+import firebase from '../../firebase';
 import * as Yup from 'yup';
 import FormTextInput, {FormTextArea} from '../Forms/FormTextInput';
 import FormDateInput from '../Forms/FormDateInput';
 import {GroupDropdownItem, GroupHeadlineItem} from '../Group/GroupListItem';
 import TagTopics from '../Posts/Post/CreatePost/TagTopics';
-// import {handlePostTopics} from '../Posts/Post/CreatePost/PostForm';
+import {handlePostTopics} from '../Posts/Post/CreatePost/PostForm';
 import CreateResourceFormActions from '../Forms/CreateResourceFormActions';
 import Dropdown, {DropdownOption} from '../Dropdown';
 import {AuthContext} from '../../App';
@@ -14,10 +15,10 @@ import {WebsiteIcon, EmailIcon} from '../../assets/PostOptionalTagsIcons';
 import TabbedContainer from '../TabbedContainer/TabbedContainer';
 import {CreateButton} from '../../assets/HeaderIcons';
 import SecondaryButton from '../Buttons/SecondaryButton';
+import {Link, useHistory} from 'react-router-dom';
+import {DropDownTriangle} from '../../assets/GeneralActionIcons';
 
 import './CreateOpenPosition.css';
-import {Link} from 'react-router-dom';
-import {DropDownTriangle} from '../../assets/GeneralActionIcons';
 
 const POSITIONS = ['Masters', 'Phd', 'Post Doc'];
 
@@ -27,16 +28,33 @@ export default function CreateOpenPosition() {
   const [memberOfGroups, setMemberOfGroups] = useState([]);
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [submitting, setSubmitting] = useState(false);
-  const [applyMethod, setApplyMethod] = useState(undefined);
+  const history = useHistory();
 
   const {userProfile} = useContext(AuthContext);
   const userID = userProfile.id;
 
-  const onSubmit = () => {
+  const createOpenPosition = firebase
+    .functions()
+    .httpsCallable('openPositions-createOpenPosition');
+
+  const onSubmit = (res) => {
     setSubmitting(true);
-    // ignore the line below, it is just to prevent lint error
-    console.log(applyMethod);
-    // const taggedTopics = handlePostTopics();
+    const {customTopics, DBTopics} = handlePostTopics(selectedTopics);
+    res.customTopics = customTopics;
+    res.topics = DBTopics;
+    createOpenPosition(res)
+      .then(() => {
+        setSubmitting(false);
+        history.push('/groups/${selectedGroup.id}');
+      })
+      .catch((err) => {
+        console.log(err);
+        alert(
+          'Something went wrong trying to create the open position. Sorry about that. Please try again later.'
+        );
+        setSubmitting(false);
+        history.push('/groups/${selectedGroup.id}');
+      });
   };
 
   useEffect(() => {
@@ -63,15 +81,31 @@ export default function CreateOpenPosition() {
 
   const initialValues = {
     title: '',
-    position: '',
+    address: '',
+    salary: '',
+    startDate: '',
+    applyEmail: '',
+    applyLink: '',
   };
 
   const validationSchema = Yup.object({
     title: Yup.string().required('You need to provide a title.'),
-    position: Yup.string().required('You need to specify the position.'),
     description: Yup.string().required('You need to write a description.'),
-    apply: Yup.string().required(
-      'You need to provide a link or email for applications'
+    applyEmail: Yup.string().test(
+      'one-apply-method',
+      'You need to provide a link or email for applications',
+      function (value) {
+        // eslint-disable-next-line no-invalid-this
+        if (this.parent.applyLink || value) return true;
+      }
+    ),
+    applyLink: Yup.string().test(
+      'one-apply-method',
+      'You need to provide a link or email for applications',
+      function (value) {
+        // eslint-disable-next-line no-invalid-this
+        if (this.parent.applyEmail || value) return true;
+      }
     ),
   });
 
@@ -100,31 +134,9 @@ export default function CreateOpenPosition() {
           selectedPosition={selectedPosition}
           setSelectedPosition={setSelectedPosition}
         />
-        <h4>Location</h4>
-        <FormTextInput
-          name="address-line-1"
-          sideLabel={true}
-          label="1st line address"
-        />
-        <FormTextInput
-          name="address-line-2"
-          sideLabel={true}
-          label="2nd line address"
-        />
-        <FormTextInput name="address-city" sideLabel={true} label="City" />
-        <FormTextInput
-          name="address-country"
-          sideLabel={true}
-          label="Country"
-        />
-        <FormTextInput
-          name="address-post-code"
-          sideLabel={true}
-          label="Post Code"
-        />
+        <FormTextArea height="100px" name="address" label="Address" />
         <FormTextInput name="salary" label="Salary" />
-        <FormDateInput sideLabel={true} name="start-date" label="Start Date" />
-
+        <FormDateInput sideLabel={true} name="startDate" label="Start Date" />
         <FormTextArea height="300px" name="description" label="Description" />
         <TagTopics
           submittingForm={submitting}
@@ -132,7 +144,7 @@ export default function CreateOpenPosition() {
           setSelectedTopics={setSelectedTopics}
         />
         <h4>How to Apply</h4>
-        <HowToApply setApplyMethod={setApplyMethod} />
+        <HowToApply />
         <CreateResourceFormActions
           submitted={submitting}
           submitText="Create Position"
@@ -150,16 +162,28 @@ function MandatoryGroupSelection({memberOfGroups, setSelectedGroup}) {
         setSelectedGroup={setSelectedGroup}
       />
       <div className="mandatory-select-group-container">
-        <h3>Open positions can only be created for groups.</h3>
-        <h3>Choose a group or...</h3>
-        <div className="mandatory-select-group-button-container">
-          <Link to="/create/group">
-            <SecondaryButton>
-              <CreateButton hoverControl={true} />
-              Create Group Now
-            </SecondaryButton>
-          </Link>
-        </div>
+        <h3 className="mandatory-select-group-explanation">
+          Open positions can only be created for groups.
+        </h3>
+        {memberOfGroups.length > 0 ? (
+          <h3 className="mandatory-select-group-explanation">
+            Select one of your groups above before creating the position.
+          </h3>
+        ) : (
+          <>
+            <h3 className="mandatory-select-group-explanation">
+              Choose a group or...
+            </h3>
+            <div className="mandatory-select-group-button-container">
+              <Link to="/create/group">
+                <SecondaryButton>
+                  <CreateButton hoverControl={true} />
+                  Create Group Now
+                </SecondaryButton>
+              </Link>
+            </div>
+          </>
+        )}
       </div>
     </>
   );
@@ -250,41 +274,19 @@ function getPositionTypes(setSelectedPosition) {
   ));
 }
 
-function HowToApply({setApplyMethod}) {
-  const EMAIL = 'email';
-  const URL = 'url';
-  const handleApplyInput = (e, method) => {
-    setApplyMethod({
-      method: method,
-      value: e.target.value,
-    });
-  };
+function HowToApply({}) {
   const tabDetails = [
     {
       name: 'Apply through link',
       icon: <WebsiteIcon />,
-      contents: (
-        <input
-          className="open-position-apply-method-input"
-          type="text"
-          placeholder="Website url"
-          name="apply"
-          onChange={(e) => handleApplyInput(e, URL)}
-        />
-      ),
+      contents: <FormTextInput placeholder="Website url" name="applyEmail" />,
     },
     {
       name: 'Apply By Email',
       icon: <EmailIcon />,
       contents: (
         <div>
-          <input
-            className="open-position-apply-method-input"
-            type="text"
-            placeholder="Email Address"
-            name="apply"
-            onChange={(e) => handleApplyInput(e, EMAIL)}
-          />
+          <FormTextInput placeholder="Email Address" name="applyLink" />
         </div>
       ),
     },

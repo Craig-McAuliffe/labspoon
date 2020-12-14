@@ -20,24 +20,7 @@ db.settings({
 });
 
 export const createPost = functions.https.onCall(async (data, context) => {
-  if (context.auth === undefined) {
-    throw new functions.https.HttpsError(
-      'unauthenticated',
-      'Must be authenticated to create a post'
-    );
-  }
-
-  const userID = context.auth.uid;
-  const userDoc = await admin.firestore().collection('users').doc(userID).get();
-  if (!userDoc.exists) {
-    throw new functions.https.HttpsError('not-found', 'User not found');
-  }
-  const userData = userDoc.data()!;
-  const author: UserRef = {
-    id: userData.id,
-    name: userData.name,
-    avatar: userData.avatar,
-  };
+  const author = await authorFromContext(context);
 
   const postID = uuid();
 
@@ -78,14 +61,7 @@ export const createPost = functions.https.onCall(async (data, context) => {
               'no Labspoon topic corresponding to MSField ' +
                 taggedTopicNoID.microsoftID
             );
-            db.collection('topics')
-              .doc()
-              .set(makFieldToTopic(MSFieldData))
-              .catch((err) =>
-                console.error(
-                  `could not create labspoon topic from existing MSField, ${err}`
-                )
-              );
+            createMSTopic(MSFieldData);
           }
         } else {
           createFieldAndTopic(taggedTopicNoID)
@@ -136,6 +112,42 @@ export const createPost = functions.https.onCall(async (data, context) => {
       );
     });
 });
+
+export async function authorFromContext(
+  context: functions.https.CallableContext
+) {
+  if (context.auth === undefined) {
+    throw new functions.https.HttpsError(
+      'unauthenticated',
+      'Must be authenticated to create a post'
+    );
+  }
+  const userID = context.auth.uid;
+  const userDoc = await admin.firestore().collection('users').doc(userID).get();
+  if (!userDoc.exists) {
+    throw new functions.https.HttpsError('not-found', 'User not found');
+  }
+  const userData = userDoc.data()!;
+
+  const author: UserRef = {
+    id: userData.id,
+    name: userData.name,
+    avatar: userData.avatar,
+  };
+
+  return author;
+}
+
+export function createMSTopic(MSFieldData: MAKField) {
+  db.collection('topics')
+    .doc()
+    .set(makFieldToTopic(MSFieldData))
+    .catch((err) =>
+      console.error(
+        `could not create labspoon topic from existing MSField, ${err}`
+      )
+    );
+}
 
 export const writePostToAuthorPosts = functions.firestore
   .document(`posts/{postID}`)

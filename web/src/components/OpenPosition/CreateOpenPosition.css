@@ -35,24 +35,11 @@
   margin-top: 10vh;
 }
 
-.mandatory-select-group-container h3 {
-  margin: 1vh;
-  color: #5d5d65;
-}
-
 .mandatory-select-group-button-container {
   margin-top: 5vh;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.mandatory-select-group-container h3 {
-  display: inline-block;
-  margin-left: 10px;
-  position: relative;
-  top: 4px;
-  color: #00507c;
 }
 
 .change-group-section {
@@ -76,4 +63,12 @@
 
 .change-mandatory-group-toggle path {
   fill: #00507c;
+}
+
+.mandatory-select-group-explanation {
+  color: #5d5d65;
+  margin-left: 10px;
+  position: relative;
+  top: 4px;
+  margin: 1vh;
 }

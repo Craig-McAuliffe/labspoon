@@ -16,7 +16,7 @@ export default function CreateResourceFormActions({
         {cancelForm ? <CancelButton cancelAction={cancelForm} /> : null}
       </div>
       <div>
-        <PrimaryButton submit formID={formID} disabled={submitted}>
+        <PrimaryButton submit={true} formID={formID} disabled={submitted}>
           {submitText}
         </PrimaryButton>
       </div>

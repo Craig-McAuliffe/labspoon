@@ -6,4 +6,4 @@ exports.publications = require('./publications');
 exports.topics = require('./topics');
 exports.email = require('./email');
 exports.invitations = require('./invitations');
-exports.openpositions = require('./openpositions');
+exports.openPositions = require('./openPositions');

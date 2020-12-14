@@ -143,6 +143,7 @@ function SelectedTopics({selectedTopics, setSelectedTopics}) {
     <div className="create-post-tagged-topics-container">
       {selectedTopics.map((selectedTopic) => (
         <button
+          type="button"
           key={selectedTopic.name}
           className="create-post-tagged-topic"
           onClick={() =>
@@ -172,6 +173,7 @@ const TypedTopic = ({
     <div className="create-post-typed-topic-container">
       <h4>{typedTopic}</h4>
       <button
+        type="button"
         onClick={() =>
           addTopicToPost(
             setSelectedTopics,

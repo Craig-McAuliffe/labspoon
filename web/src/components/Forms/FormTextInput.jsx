@@ -8,6 +8,7 @@ export default function FormTextInput({
   label,
   passwordInput,
   sideLabel,
+  placeholder,
   ...props
 }) {
   const [field, meta] = useField(props);
@@ -18,6 +19,7 @@ export default function FormTextInput({
       error={error}
       field={field}
       label={label}
+      placeholder={placeholder}
       passwordInput={passwordInput}
       sideLabel={sideLabel}
       {...props}
@@ -31,6 +33,7 @@ export function TextInput({
   label,
   passwordInput,
   sideLabel,
+  placeholder,
   ...props
 }) {
   return (
@@ -49,6 +52,7 @@ export function TextInput({
         type={passwordInput ? 'password' : 'text'}
         {...field}
         {...props}
+        placeholder={placeholder}
       />
       <div className="error-container">{error}</div>
     </div>

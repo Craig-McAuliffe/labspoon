@@ -89,16 +89,21 @@ export function GroupHeadlineItem({group}) {
   return (
     <div className="group-headline-item-container">
       <GroupAvatarSection groupAvatar={group.avatar} height={80} width={80} />
-      <GroupNameInstitution name={group.name} institution={group.institution} />
+      <div>
+        <GroupNameInstitution
+          name={group.name}
+          institution={group.institution}
+        />
+      </div>
     </div>
   );
 }
 
 function GroupNameInstitution({name, institution}) {
   return (
-    <div>
+    <>
       <h3 className="group-dropdown-item-name">{name}</h3>
       <h4 className="group-dropdown-item-institution">{institution}</h4>
-    </div>
+    </>
   );
 }
