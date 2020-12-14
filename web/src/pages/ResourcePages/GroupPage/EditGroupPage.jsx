@@ -1,13 +1,15 @@
 import React, {useState, useEffect} from 'react';
 import {Link, Route, Switch, useParams, useRouteMatch} from 'react-router-dom';
-import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
-import {getGroup} from '../../helpers/groups';
-import NotFoundPage from '../NotFoundPage/NotFoundPage';
-import EditGroupInfo from '../ResourcePages/GroupPage/EditGroupInfo';
-import EditGroupPosts from '../ResourcePages/GroupPage/EditGroupPosts';
-import EditGroupPublications from '../ResourcePages/GroupPage/EditGroupPublications';
-import EditGroupPhotos from '../ResourcePages/GroupPage/EditGroupPhotos';
-import EditGroupVideos from '../ResourcePages/GroupPage/EditGroupVideos';
+import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
+import {getGroup} from '../../../helpers/groups';
+import NotFoundPage from '../../NotFoundPage/NotFoundPage';
+import EditGroupInfo from './EditGroupInfo';
+import EditGroupPosts from './EditGroupPosts';
+import EditGroupPublications from './EditGroupPublications';
+import EditGroupPhotos from './EditGroupPhotos';
+import EditGroupVideos from './EditGroupVideos';
+
+import './GroupPage.css';
 
 const INFO_TAB = 'info';
 const POSTS_TAB = 'posts';
@@ -93,7 +95,7 @@ function ReturnToGroupPageButton({url}) {
   return (
     <div className="edit-group-posts-cancel">
       <Link to={url}>
-        <button>
+        <button className="edit-group-page-back">
           <h4>Back to Public View</h4>
         </button>
       </Link>

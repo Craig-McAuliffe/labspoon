@@ -29,7 +29,7 @@ import NewsPage from './pages/NewsPage';
 import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
 import OnboardingPage from './pages/OnboardingPage';
 import CreatePage from './pages/ResourcePages/CreatePage';
-import Groups from './pages/Groups/Groups';
+import Groups from './pages/ResourcePages/GroupPage/Groups';
 
 /**
  * Top level routing structure for the app.

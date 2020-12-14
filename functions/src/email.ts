@@ -26,7 +26,7 @@ const dayInMS = hourInMS * 24;
 
 // Triggers an update email.
 export const triggerEmail = functions.https.onCall(async () => {
-  const messageString = JSON.stringify({'day': 'sunday'});
+  const messageString = JSON.stringify({day: 'sunday'});
   const messageBuffer = Buffer.from(messageString);
   return pubSubClient
     .topic('update-email')
@@ -46,16 +46,21 @@ export const sendUpdateEmail = functions.pubsub
 
     // remember to make this idempotent
     const promises: Promise<undefined>[] = [];
-    usersSnapshot.forEach((ds) => promises.push(sendUserNotificationEmail(ds, day)));
+    usersSnapshot.forEach((ds) =>
+      promises.push(sendUserNotificationEmail(ds, day))
+    );
     return Promise.all(promises);
   });
 
 const DEFAULT_UPDATE_EMAIL_SETTINGS = {
   wednesday: false,
   sunday: true,
-}
+};
 
-async function sendUserNotificationEmail(ds: DocumentSnapshot, day: string): Promise<undefined> {
+async function sendUserNotificationEmail(
+  ds: DocumentSnapshot,
+  day: string
+): Promise<undefined> {
   if (!mailgun) return;
   const userID = ds.id;
   const user = ds.data();
@@ -68,7 +73,8 @@ async function sendUserNotificationEmail(ds: DocumentSnapshot, day: string): Pro
   // If the user doesn't have any update email settings yet, set them to the
   // default of getting an email once a week on a sunday
   if (!user.updateEmailSettings) {
-    await db.doc(`users/${userID}`)
+    await db
+      .doc(`users/${userID}`)
       .update({
         updateEmailSettings: DEFAULT_UPDATE_EMAIL_SETTINGS,
       })
@@ -85,21 +91,28 @@ async function sendUserNotificationEmail(ds: DocumentSnapshot, day: string): Pro
   // this function is idempotent over a timeframe.
   if (
     previousUpdateEmailTimestamp &&
-    currentTime.getTime() - previousUpdateEmailTimestamp.toMillis() <=
-    hourInMS
+    currentTime.getTime() - previousUpdateEmailTimestamp.toMillis() <= hourInMS
   )
     return;
 
   if (!previousUpdateEmailTimestamp) {
-    previousUpdateEmailTimestamp = new Date(currentTime.getTime() - dayInMS * 3);
+    previousUpdateEmailTimestamp = new Date(
+      currentTime.getTime() - dayInMS * 3
+    );
   }
 
-  const newUserPostsSnapshot = await db.collection(`users/${userID}/feeds/followingFeed/posts`).orderBy('timestamp').where('timestamp', '>', previousUpdateEmailTimestamp).limit(10).get();
+  const newUserPostsSnapshot = await db
+    .collection(`users/${userID}/feeds/followingFeed/posts`)
+    .orderBy('timestamp')
+    .where('timestamp', '>', previousUpdateEmailTimestamp)
+    .limit(10)
+    .get();
   // If there are no posts don't send an email.
   if (newUserPostsSnapshot.empty) return;
   const templateData = getTemplateDataFromPostsSnapshot(newUserPostsSnapshot);
 
-  const authUserResult = await auth.getUser(userID)
+  const authUserResult = await auth
+    .getUser(userID)
     .catch((err: any) =>
       console.error(
         `Unable to retrieve user information for user with ID ${ds.id}:`,
@@ -115,7 +128,7 @@ async function sendUserNotificationEmail(ds: DocumentSnapshot, day: string): Pro
   if (!email) return;
   mailgun.messages().send(
     {
-      from: 'Labspoon <updates@labspoon.com>',
+      from: 'Labspoon <updates-noreply@mail.labspoon.com>',
       to: email,
       subject: 'Labspoon Updates',
       template: 'update_email',
@@ -143,13 +156,19 @@ function getTemplateDataFromPostsSnapshot(postsQS: any) {
   postsQS.forEach((ds: DocumentSnapshot) => {
     const post = ds.data();
     activeUsersMap.set(post!.author.id, post!.author);
-    post!.topics.forEach((topic: TaggedTopic) => activeTopicsMap.set(topic.id, topic));
+    post!.topics.forEach((topic: TaggedTopic) =>
+      activeTopicsMap.set(topic.id, topic)
+    );
   });
   const activeUsers = Array.from(activeUsersMap.values()).slice(0, 10);
   const activeTopics = Array.from(activeTopicsMap.values()).slice(0, 10);
 
-  activeUsers.forEach((user, idx) => activeUsers[idx].url = getUserURLFromID(user.id));
-  activeTopics.forEach((topic, idx) => activeTopics[idx].url = getTopicURLFromID(topic.id));
+  activeUsers.forEach(
+    (user, idx) => (activeUsers[idx].url = getUserURLFromID(user.id))
+  );
+  activeTopics.forEach(
+    (topic, idx) => (activeTopics[idx].url = getTopicURLFromID(topic.id))
+  );
 
   const activeUsersHalfwayIndex = Math.ceil(activeUsers.length / 2);
   const activeTopicsHalfwayIndex = Math.ceil(activeTopics.length / 2);
@@ -157,7 +176,7 @@ function getTemplateDataFromPostsSnapshot(postsQS: any) {
     users_left: activeUsers.slice(0, activeUsersHalfwayIndex),
     users_right: activeUsers.slice(activeUsersHalfwayIndex),
     topics_left: activeTopics.slice(0, activeTopicsHalfwayIndex),
-    topics_right: activeTopics.slice(activeTopicsHalfwayIndex)
+    topics_right: activeTopics.slice(activeTopicsHalfwayIndex),
   };
 }
 
@@ -169,9 +188,24 @@ function getTopicURLFromID(id: string) {
   return `${url}topic/${id}`;
 }
 
-export async function sendGroupInvitationEmail(invitationID: string, invitation: Invitation) {
-  if (!mailgun) return;
-
+export async function sendGroupInvitationEmail(
+  invitationID: string,
+  invitation: Invitation
+) {
+  if (!mailgun) {
+    console.error('mailgun has not been initialised for the env.');
+    throw new Error('Unable to send email invite: mailgun not initialised.');
+    return;
+  }
+  if (!url) {
+    console.error(
+      'the env url has not been defined. For local, add a url to the env of .runtimeconfig found within the functions directory, by following instructions in README.md. For the cloud, add a value for config env.'
+    );
+    throw new Error(
+      'Unable to send email invite. Sorry about that. Please try again later.'
+    );
+    return;
+  }
   const emailAddress = invitation.email;
 
   const groupID = invitation.resourceID;
@@ -192,9 +226,13 @@ export async function sendGroupInvitationEmail(invitationID: string, invitation:
   if (authUser) {
     const authUserID = authUser.uid;
     const authUserDS = await db.doc(`users/${authUserID}`).get();
-    if (!authUserDS.exists) throw new Error(`No user found in DB for auth User ID ${authUserID}`);
+    if (!authUserDS.exists)
+      throw new Error(`No user found in DB for auth User ID ${authUserID}`);
     const batch = db.batch();
-    batch.set(groupRef.collection('members').doc(authUserID), toUserRef(authUserID, authUserDS.data()));
+    batch.set(
+      groupRef.collection('members').doc(authUserID),
+      toUserRef(authUserID, authUserDS.data())
+    );
     batch.delete(groupRef.collection('invitations').doc(invitationID));
     await batch.commit();
     return;
@@ -210,11 +248,13 @@ export async function sendGroupInvitationEmail(invitationID: string, invitation:
     url: encodeURI(`${url}login?referrer=groupInvite`),
   };
 
-  const subject = `${invitingUser!.name} is inviting you to join ${group.name} on Labspoon!`;
+  const subject = `${invitingUser!.name} is inviting you to join ${
+    group.name
+  } on Labspoon!`;
 
   mailgun.messages().send(
     {
-      from: 'Labspoon <updates@labspoon.com>',
+      from: 'Labspoon <invites-noreply@mail.labspoon.com>',
       to: emailAddress,
       subject: subject,
       template: 'group-invitation-email',
@@ -225,4 +265,4 @@ export async function sendGroupInvitationEmail(invitationID: string, invitation:
     }
   );
   return;
-};
+}

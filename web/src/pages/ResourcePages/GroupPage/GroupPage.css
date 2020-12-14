@@ -155,3 +155,7 @@
 .edit-group-posts-cancel button {
   color: #00507c;
 }
+
+.edit-group-page-back:hover {
+  color: #3099d3;
+}
