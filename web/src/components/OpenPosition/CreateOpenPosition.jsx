@@ -19,8 +19,6 @@ import TabbedContainer from '../TabbedContainer/TabbedContainer';
 const POSITIONS = ['Masters', 'Phd', 'Post Doc'];
 
 export default function CreateOpenPosition() {
-  const [selectingPosition, setSelectingPosition] = useState(false);
-  const [selectingGroup, setSelectingGroup] = useState(false);
   const [selectedPosition, setSelectedPosition] = useState('');
   const [selectedGroup, setSelectedGroup] = useState(undefined);
   const [memberOfGroups, setMemberOfGroups] = useState([]);
@@ -80,8 +78,6 @@ export default function CreateOpenPosition() {
       <Form>
         <FormTextInput name="title" label="Title" />
         <SelectPosition
-          selectingPosition={selectingPosition}
-          setSelectingPosition={setSelectingPosition}
           selectedPosition={selectedPosition}
           setSelectedPosition={setSelectedPosition}
         />
@@ -110,8 +106,6 @@ export default function CreateOpenPosition() {
         <FormTextInput name="salary" label="Salary" />
         <FormDateInput sideLabel={true} name="start-date" label="Start Date" />
         <TagGroup
-          selectingGroup={selectingGroup}
-          setSelectingGroup={setSelectingGroup}
           memberOfGroups={memberOfGroups}
           selectedGroup={selectedGroup}
           setSelectedGroup={setSelectedGroup}
@@ -133,28 +127,16 @@ export default function CreateOpenPosition() {
   );
 }
 
-function TagGroup({
-  selectingGroup,
-  setSelectingGroup,
-  memberOfGroups,
-  selectedGroup,
-  setSelectedGroup,
-}) {
+function TagGroup({memberOfGroups, selectedGroup, setSelectedGroup}) {
   return selectedGroup === undefined ? (
     <div className="open-position-group-dropdown">
       <h4 className="open-position-dropdown-label">Research Group</h4>
       <Dropdown
         customToggleWidth="100%"
         customToggleTextOnly="Select from your groups"
-        openDropdown={selectingGroup}
-        setOpenDropdown={setSelectingGroup}
         containerTopPosition="40px"
       >
-        <MemberOfGroupsDropdownOptions
-          memberOfGroups={memberOfGroups}
-          setSelectedGroup={setSelectedGroup}
-          setSelectingGroup={setSelectingGroup}
-        />
+        {getMemberOfGroupsDropdownOptions(memberOfGroups, setSelectedGroup)}
       </Dropdown>
     </div>
   ) : (
@@ -166,16 +148,11 @@ function TagGroup({
   );
 }
 
-function MemberOfGroupsDropdownOptions({
-  memberOfGroups,
-  setSelectedGroup,
-  setSelectingGroup,
-}) {
+function getMemberOfGroupsDropdownOptions(memberOfGroups, setSelectedGroup) {
   return memberOfGroups.map((group) => (
     <DropdownOption
       key={group.id}
       onSelect={() => {
-        setSelectingGroup(false);
         setSelectedGroup(group);
       }}
     >
@@ -184,39 +161,28 @@ function MemberOfGroupsDropdownOptions({
   ));
 }
 
-function SelectPosition({
-  selectingPosition,
-  setSelectingPosition,
-  selectedPosition,
-  setSelectedPosition,
-}) {
+function SelectPosition({selectedPosition, setSelectedPosition}) {
   return (
     <div className="dropdown-positioning">
       <h4 className="open-position-dropdown-label">Position</h4>
       <div className="open-position-dropdown-container">
         <Dropdown
-          openDropdown={selectingPosition}
-          setOpenDropdown={setSelectingPosition}
           customToggleTextOnly={selectedPosition}
           containerTopPosition="40px"
         >
-          <PositionTypes
-            setSelectedPosition={setSelectedPosition}
-            setSelectingPosition={setSelectingPosition}
-          />
+          {getPositionTypes(setSelectedPosition)}
         </Dropdown>
       </div>
     </div>
   );
 }
 
-function PositionTypes({setSelectedPosition, setSelectingPosition}) {
+function getPositionTypes(setSelectedPosition) {
   return POSITIONS.map((position) => (
     <DropdownOption
       key={position}
       onSelect={() => {
         setSelectedPosition(position);
-        setSelectingPosition(false);
       }}
     >
       <h4 className="create-open-position-types-dropdown-option">{position}</h4>

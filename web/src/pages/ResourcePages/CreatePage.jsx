@@ -8,6 +8,7 @@ import CreateOpenPosition from '../../components/OpenPosition/CreateOpenPosition
 import LightTabLink from '../../components/Navigation/LightTabLink';
 
 import './CreatePage.css';
+import {FeedContent} from '../../components/Layout/Content';
 
 export default function CreatePage() {
   const {userProfile} = useContext(AuthContext);
@@ -15,35 +16,33 @@ export default function CreatePage() {
   const featureFlags = useContext(FeatureFlags);
   if (!userID) return <LoadingSpinner />;
   return (
-    <div className="content-layout">
-      <div className="feed-container">
-        <div className="light-tab-group">
-          <LightTabLink name="Post" link="/create/post" />
-          <LightTabLink name="Group" link="/create/group" />
-          {featureFlags.has('create-open-position') ? (
-            <LightTabLink name="Open Position" link="/create/open-position" />
-          ) : null}
-        </div>
-        <div>
-          <Switch>
-            <Route path="/create/post">
-              <CreatePost
-                keepExpanded
-                redirect={<Redirect to={`/user/${userID}`} />}
-              />
-            </Route>
-            <Route path="/create/group">
-              <CreateGroupPage />
-            </Route>
-            <Route path="/create/open-position">
-              <CreateOpenPosition />
-            </Route>
-            <Route path="/create">
-              <Redirect to="/create/post" />
-            </Route>
-          </Switch>
-        </div>
+    <FeedContent>
+      <div className="light-tab-group">
+        <LightTabLink name="Post" link="/create/post" />
+        <LightTabLink name="Group" link="/create/group" />
+        {featureFlags.has('create-open-position') ? (
+          <LightTabLink name="Open Position" link="/create/open-position" />
+        ) : null}
       </div>
-    </div>
+      <div>
+        <Switch>
+          <Route path="/create/post">
+            <CreatePost
+              keepExpanded
+              redirect={<Redirect to={`/user/${userID}`} />}
+            />
+          </Route>
+          <Route path="/create/group">
+            <CreateGroupPage />
+          </Route>
+          <Route path="/create/open-position">
+            <CreateOpenPosition />
+          </Route>
+          <Route path="/create">
+            <Redirect to="/create/post" />
+          </Route>
+        </Switch>
+      </div>
+    </FeedContent>
   );
 }
