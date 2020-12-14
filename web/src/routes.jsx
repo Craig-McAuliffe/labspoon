@@ -29,6 +29,7 @@ import NewsPage from './pages/NewsPage';
 import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
 import OnboardingPage from './pages/OnboardingPage';
 import CreatePage from './pages/ResourcePages/CreatePage';
+import Articles from './pages/Articles/Articles';
 import Groups from './pages/ResourcePages/GroupPage/Groups';
 
 /**
@@ -103,6 +104,9 @@ export default function Routes({user, setUser}) {
       <AuthRoute user={user} path="/onboarding/:onboardingStage">
         <OnboardingPage />
       </AuthRoute>
+      <Route path="/articles">
+        <Articles />
+      </Route>
       <Route exact path="/about">
         <AboutPage />
       </Route>
