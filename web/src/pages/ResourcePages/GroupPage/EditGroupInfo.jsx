@@ -53,6 +53,7 @@ export default function EditingGroupInfo({groupData}) {
     institution: groupData.institution,
     website: groupData.website,
     about: groupData.about,
+    groupType: groupData.groupType,
   };
 
   const onSubmitEdit = (values) => {

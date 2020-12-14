@@ -215,6 +215,19 @@ export async function setGroupOnTopic(
     .catch((err) => console.log(err, 'could not search for group'));
 }
 
+// Adds group types to existing groups. Can be removed when issue #608 is
+// promoted into all environments and this function has been run.
+export const addGroupTypeToExistingGroups = functions.https.onCall(async () => {
+  const groupCollectionRef = await db.collection('groups').get();
+  const updatePromises: Promise<void | firestore.WriteResult>[] = [];
+  groupCollectionRef.forEach((doc) => {
+    const groupRef = doc.ref;
+    const updatePromise = groupRef.update({groupType: 'researchGroup'}).catch((err) => console.error(err));
+    updatePromises.push(updatePromise);
+  });
+  await Promise.all(updatePromises);
+});
+
 // Rank relates to how often the group posts about this topic
 export interface GroupRef {
   id: string;
