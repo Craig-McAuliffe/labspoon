@@ -1,4 +1,5 @@
 import * as functions from 'firebase-functions';
+import {firestore} from 'firebase-admin';
 import {admin} from './config';
 import {
   interpretQuery,
@@ -144,7 +145,7 @@ export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall
     }
     const userID = context.auth.uid;
 
-    const microsoftAcademicAuthorID: string = data.microsoftAcademicAuthorID;
+    const microsoftAcademicAuthorID = data.microsoftAcademicAuthorID.toString();
     if (microsoftAcademicAuthorID === undefined)
       throw new functions.https.HttpsError(
         'invalid-argument',
@@ -152,21 +153,23 @@ export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall
       );
 
     const batch = db.batch();
-    async function linkUserToMicrosoftID() {
-      const userToBeLinkedDBRef = db.doc(`users/${userID}`);
-      await userToBeLinkedDBRef
-        .get()
-        .then((qs) => {
-          if (!qs.exists) return;
-          const userToBeLinked = qs.data() as UserDB;
-          if (userToBeLinked.microsoftAcademicAuthorID !== undefined) return;
-          batch.update(userToBeLinkedDBRef, {
-            microsoftAcademicAuthorID: microsoftAcademicAuthorID,
-          });
-        })
-        .catch((err) => console.log(err, 'could not fetch user to be linked'));
-    }
-    await linkUserToMicrosoftID();
+    const userToBeLinkedDBRef = db.doc(`users/${userID}`);
+    const user = await userToBeLinkedDBRef
+      .get()
+      .then((qs) => {
+        if (!qs.exists) return;
+        const userToBeLinked = qs.data() as UserDB;
+        if (userToBeLinked.microsoftAcademicAuthorID !== undefined) return userToBeLinked;
+        batch.update(userToBeLinkedDBRef, {
+          microsoftAcademicAuthorID: microsoftAcademicAuthorID,
+        });
+        return userToBeLinked;
+      })
+      .catch((err) => console.log(err, 'could not fetch user to be linked'));
+    if (!user) throw new functions.https.HttpsError(
+      'not-found',
+      `No user found with ID ${userID}`
+    );
     const msPublicationsForUserQS = await db
       .collection(`MSUsers/${microsoftAcademicAuthorID}/publications`)
       .get();
@@ -188,9 +191,26 @@ export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall
             );
           }
           const publicationDS = publicationsQS.docs[0];
+          const publication = publicationDS.data();
           batch.set(
             db.doc(`users/${userID}/publications/${publicationDS.id}`),
-            publicationDS.data()
+            publication
+          );
+          const authorItem = publication.authors.filter((author: any) => author.microsoftID === microsoftAcademicAuthorID)[0];
+          if (!authorItem) {
+            return null;
+          }
+          batch.update(
+            db.doc(`publications/${publicationDS.id}`),
+            {
+              authors: firestore.FieldValue.arrayRemove(authorItem),
+            }
+          );
+          batch.update(
+            db.doc(`publications/${publicationDS.id}`),
+            {
+              authors: firestore.FieldValue.arrayUnion(toUserRef(userID, user)),
+            }
           );
           return null;
         })()
@@ -199,6 +219,7 @@ export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall
     await Promise.all(publicationWritePromises).catch((err) =>
       console.error(err)
     );
+
     await batch.commit().catch((err) => console.error(err));
   }
 );
