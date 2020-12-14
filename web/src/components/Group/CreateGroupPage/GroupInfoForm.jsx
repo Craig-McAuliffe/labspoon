@@ -126,7 +126,7 @@ export default function GroupInfoForm({
             </div>
           </div>
           <div className="create-group-group-photos"></div>
-          <FormTextArea height="200" label="About" name="about" bigLabel />
+          <FormTextArea height="200px" label="About" name="about" bigLabel />
         </Form>
       </Formik>
       <SelectUsers
@@ -147,6 +147,7 @@ export default function GroupInfoForm({
         submitText={submitText}
         submitted={submitted}
         cancelForm={cancelForm}
+        formID="create-group-form"
       />
     </FeedContent>
   );

@@ -8,6 +8,7 @@ export default function CreateResourceFormActions({
   submitText,
   submitted,
   cancelForm,
+  formID,
 }) {
   return (
     <div className="create-group-submit-cancel-container">
@@ -15,7 +16,7 @@ export default function CreateResourceFormActions({
         {cancelForm ? <CancelButton cancelAction={cancelForm} /> : null}
       </div>
       <div>
-        <PrimaryButton submit formID="create-group-form" disabled={submitted}>
+        <PrimaryButton submit formID={formID} disabled={submitted}>
           {submitText}
         </PrimaryButton>
       </div>

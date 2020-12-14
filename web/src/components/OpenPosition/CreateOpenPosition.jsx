@@ -3,18 +3,21 @@ import {Form, Formik} from 'formik';
 import * as Yup from 'yup';
 import FormTextInput, {FormTextArea} from '../Forms/FormTextInput';
 import FormDateInput from '../Forms/FormDateInput';
-import GroupListItem, {GroupDropdownItem} from '../Group/GroupListItem';
+import {GroupDropdownItem, GroupHeadlineItem} from '../Group/GroupListItem';
 import TagTopics from '../Posts/Post/CreatePost/TagTopics';
 // import {handlePostTopics} from '../Posts/Post/CreatePost/PostForm';
 import CreateResourceFormActions from '../Forms/CreateResourceFormActions';
 import Dropdown, {DropdownOption} from '../Dropdown';
 import {AuthContext} from '../../App';
 import {db} from '../../firebase';
-import NegativeButton from '../Buttons/NegativeButton';
 import {WebsiteIcon, EmailIcon} from '../../assets/PostOptionalTagsIcons';
+import TabbedContainer from '../TabbedContainer/TabbedContainer';
+import {CreateButton} from '../../assets/HeaderIcons';
+import SecondaryButton from '../Buttons/SecondaryButton';
 
 import './CreateOpenPosition.css';
-import TabbedContainer from '../TabbedContainer/TabbedContainer';
+import {Link} from 'react-router-dom';
+import {DropDownTriangle} from '../../assets/GeneralActionIcons';
 
 const POSITIONS = ['Masters', 'Phd', 'Post Doc'];
 
@@ -35,17 +38,6 @@ export default function CreateOpenPosition() {
     console.log(applyMethod);
     // const taggedTopics = handlePostTopics();
   };
-
-  const initialValues = {
-    title: '',
-    position: '',
-  };
-
-  const validationSchema = Yup.object({
-    title: Yup.string().required('You need to provide a title.'),
-    position: Yup.string().required('You need to specify the position.'),
-    description: Yup.string().required('You need to write a description.'),
-  });
 
   useEffect(() => {
     db.collection(`users/${userID}/groups`)
@@ -69,6 +61,28 @@ export default function CreateOpenPosition() {
       });
   }, [userID]);
 
+  const initialValues = {
+    title: '',
+    position: '',
+  };
+
+  const validationSchema = Yup.object({
+    title: Yup.string().required('You need to provide a title.'),
+    position: Yup.string().required('You need to specify the position.'),
+    description: Yup.string().required('You need to write a description.'),
+    apply: Yup.string().required(
+      'You need to provide a link or email for applications'
+    ),
+  });
+
+  if (selectedGroup === undefined)
+    return (
+      <MandatoryGroupSelection
+        memberOfGroups={memberOfGroups}
+        setSelectedGroup={setSelectedGroup}
+      />
+    );
+
   return (
     <Formik
       initialValues={initialValues}
@@ -76,6 +90,11 @@ export default function CreateOpenPosition() {
       onSubmit={onSubmit}
     >
       <Form>
+        <ChangeGroup
+          memberOfGroups={memberOfGroups}
+          selectedGroup={selectedGroup}
+          setSelectedGroup={setSelectedGroup}
+        />
         <FormTextInput name="title" label="Title" />
         <SelectPosition
           selectedPosition={selectedPosition}
@@ -105,11 +124,7 @@ export default function CreateOpenPosition() {
         />
         <FormTextInput name="salary" label="Salary" />
         <FormDateInput sideLabel={true} name="start-date" label="Start Date" />
-        <TagGroup
-          memberOfGroups={memberOfGroups}
-          selectedGroup={selectedGroup}
-          setSelectedGroup={setSelectedGroup}
-        />
+
         <FormTextArea height="300px" name="description" label="Description" />
         <TagTopics
           submittingForm={submitting}
@@ -127,8 +142,31 @@ export default function CreateOpenPosition() {
   );
 }
 
-function TagGroup({memberOfGroups, selectedGroup, setSelectedGroup}) {
-  return selectedGroup === undefined ? (
+function MandatoryGroupSelection({memberOfGroups, setSelectedGroup}) {
+  return (
+    <>
+      <SelectGroup
+        memberOfGroups={memberOfGroups}
+        setSelectedGroup={setSelectedGroup}
+      />
+      <div className="mandatory-select-group-container">
+        <h3>Open positions can only be created for groups.</h3>
+        <h3>Choose a group or...</h3>
+        <div className="mandatory-select-group-button-container">
+          <Link to="/create/group">
+            <SecondaryButton>
+              <CreateButton hoverControl={true} />
+              Create Group Now
+            </SecondaryButton>
+          </Link>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function SelectGroup({memberOfGroups, setSelectedGroup}) {
+  return (
     <div className="open-position-group-dropdown">
       <h4 className="open-position-dropdown-label">Research Group</h4>
       <Dropdown
@@ -139,12 +177,34 @@ function TagGroup({memberOfGroups, selectedGroup, setSelectedGroup}) {
         {getMemberOfGroupsDropdownOptions(memberOfGroups, setSelectedGroup)}
       </Dropdown>
     </div>
-  ) : (
-    <GroupListItem group={selectedGroup}>
-      <NegativeButton onClick={() => setSelectedGroup(undefined)}>
-        Remove
-      </NegativeButton>
-    </GroupListItem>
+  );
+}
+
+function ChangeGroup({selectedGroup, setSelectedGroup, memberOfGroups}) {
+  return (
+    <div className="change-group-section">
+      <div className="change-mandatory-group-dropdown-container">
+        <Dropdown customToggle={ChangeGroupToggle}>
+          {getMemberOfGroupsDropdownOptions(memberOfGroups, setSelectedGroup)}
+        </Dropdown>
+      </div>
+      <div>
+        <GroupHeadlineItem group={selectedGroup} />
+      </div>
+    </div>
+  );
+}
+
+function ChangeGroupToggle({setOpen}) {
+  return (
+    <button
+      className="change-mandatory-group-toggle"
+      type="button"
+      onClick={setOpen}
+    >
+      <p>Change Group</p>
+      <DropDownTriangle />
+    </button>
   );
 }
 
@@ -208,7 +268,7 @@ function HowToApply({setApplyMethod}) {
           className="open-position-apply-method-input"
           type="text"
           placeholder="Website url"
-          name="link-apply"
+          name="apply"
           onChange={(e) => handleApplyInput(e, URL)}
         />
       ),
@@ -222,7 +282,7 @@ function HowToApply({setApplyMethod}) {
             className="open-position-apply-method-input"
             type="text"
             placeholder="Email Address"
-            name="email-apply"
+            name="apply"
             onChange={(e) => handleApplyInput(e, EMAIL)}
           />
         </div>
