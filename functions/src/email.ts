@@ -128,7 +128,7 @@ async function sendUserNotificationEmail(
   if (!email) return;
   mailgun.messages().send(
     {
-      from: 'Labspoon <update@mail.labspoon.com>',
+      from: 'Labspoon <updates-noreply@mail.labspoon.com>',
       to: email,
       subject: 'Labspoon Updates',
       template: 'update_email',
@@ -193,12 +193,8 @@ export async function sendGroupInvitationEmail(
   invitation: Invitation
 ) {
   if (!mailgun) {
-    console.error(
-      'mailgun has not been defined. For local, add mailgun to .runtimeconfig, found within the functions directory, by following instructions in README.md. For the cloud, add mailgun to config file.'
-    );
-    throw new Error(
-      'Unable to send email invite. Sorry about that. Please try again later.'
-    );
+    console.error('mailgun has not been initialised for the env.');
+    throw new Error('Unable to send email invite: mailgun not initialised.');
     return;
   }
   if (!url) {
@@ -258,7 +254,7 @@ export async function sendGroupInvitationEmail(
 
   mailgun.messages().send(
     {
-      from: 'Labspoon <invite@mail.labspoon.com>',
+      from: 'Labspoon <invites-noreply@mail.labspoon.com>',
       to: emailAddress,
       subject: subject,
       template: 'group-invitation-email',
