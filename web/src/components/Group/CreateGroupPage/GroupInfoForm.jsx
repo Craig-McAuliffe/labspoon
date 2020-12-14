@@ -33,6 +33,11 @@ import {SearchIconGrey} from '../../../assets/HeaderIcons';
 import {FeedContent} from '../../../components/Layout/Content';
 
 import './CreateGroupPage.css';
+import Select, {LabelledDropdownContainer} from '../../Forms/Select/Select';
+import {DropdownOption} from '../../Dropdown';
+
+const CHARITY = 'charity';
+const RESEARCH_GROUP = 'researchGroup';
 
 // To do: check if the group exists OR pass argument that declares if editing or creating
 // Change onSubmit function depending on editing or creating
@@ -56,6 +61,10 @@ export default function GroupInfoForm({
     institution: Yup.string(),
     website: Yup.string(),
     about: Yup.string().max(1000, 'Must have fewer than 1000 characters'),
+    groupType: Yup.mixed().oneOf(
+      [RESEARCH_GROUP, CHARITY],
+      'You must select a group type'
+    ),
   });
 
   function onSubmitAndPreventDuplicate(values) {
@@ -102,6 +111,7 @@ export default function GroupInfoForm({
         onSubmit={onSubmitAndPreventDuplicate}
       >
         <Form id="create-group-form">
+          <GroupTypeSelect name="groupType" />
           <div className="create-group-profile-info-container">
             <EditAvatar
               existingAvatar={existingAvatar}
@@ -354,5 +364,16 @@ function AddMemberSearch({addSelectedUsers, setSelecting}) {
       </div>
       <CancelButton cancelAction={() => setSelecting(false)} />
     </>
+  );
+}
+
+function GroupTypeSelect({...props}) {
+  return (
+    <LabelledDropdownContainer label="Group Type">
+      <Select {...props}>
+        <DropdownOption value={RESEARCH_GROUP} text="Research Group" />
+        <DropdownOption value={CHARITY} text="Charity" />
+      </Select>
+    </LabelledDropdownContainer>
   );
 }
