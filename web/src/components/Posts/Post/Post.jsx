@@ -8,7 +8,6 @@ import DefaultUserIcon from '../../../assets/DefaultUserIcon.svg';
 import ListItemTopics from '../../CommonListItemParts/ListItemTopics';
 import PublicationListItem from '../../Publication/PublicationListItem';
 import UserAvatar from '../../Avatar/UserAvatar';
-import publications from '../../../mockdata/publications';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -19,45 +18,6 @@ import './Post.css';
  * @return {React.ReactElement}
  */
 export default function Post({post, dedicatedPage, bookmarkedVariation}) {
-  const referencedResourceWrapper = () => {
-    if (dedicatedPage) return postContent();
-    const referencedPublication = publications().filter(
-      (publication) => publication.url === post.url
-    )[0];
-    if (referencedPublication)
-      return (
-        <div className="post-referenced-resource-container">
-          <PublicationListItem
-            publication={referencedPublication}
-            removeBorder={true}
-          />
-          {postContent()}
-        </div>
-      );
-    else return postContent();
-  };
-
-  const postContent = () => (
-    <div
-      className={
-        dedicatedPage ? 'post-container-dedicated-page' : 'post-container'
-      }
-    >
-      {bookmarkedVariation ? <BookmarkedPostSymbol post={post} /> : null}
-      <PostHeader
-        postAuthor={post.author}
-        postCreationDate={post.createdAt}
-        dedicatedPage={dedicatedPage}
-      />
-      <PostTextContent post={post} />
-      <PostOptionalTags optionalTags={post.optionaltags} />
-      <ListItemTopics dbTopics={post.topics} customTopics={post.customTopics} />
-      {bookmarkedVariation ? null : (
-        <PostActions post={post} dedicatedPage={dedicatedPage} />
-      )}
-    </div>
-  );
-
   if (post.generated)
     return (
       <div className="post-referenced-resource-container">
@@ -74,7 +34,27 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
         </div>
       </div>
     );
-  return referencedResourceWrapper();
+
+  return (
+    <div
+      className={
+        dedicatedPage ? 'post-container-dedicated-page' : 'post-container'
+      }
+    >
+      {bookmarkedVariation ? <BookmarkedPostSymbol post={post} /> : null}
+      <PostHeader
+        postAuthor={post.author}
+        postCreationDate={post.createdAt}
+        dedicatedPage={dedicatedPage}
+      />
+      <PostTextContent post={post} dedicatedPage={dedicatedPage} />
+      <PostOptionalTags optionalTags={post.optionaltags} />
+      <ListItemTopics dbTopics={post.topics} customTopics={post.customTopics} />
+      {bookmarkedVariation ? null : (
+        <PostActions post={post} dedicatedPage={dedicatedPage} />
+      )}
+    </div>
+  );
 }
 
 Post.propTypes = {
@@ -123,12 +103,19 @@ function PostHeader({postAuthor, postCreationDate, dedicatedPage}) {
  * Display content for a post text
  * @return {React.ReactElement}
  */
-function PostTextContent({post}) {
+function PostTextContent({post, dedicatedPage}) {
+  if (dedicatedPage)
+    return (
+      <div className="post-text-content">
+        <Linkify tagName="p">{post.content.text}</Linkify>
+      </div>
+    );
+
   return (
     <div className="post-text-content">
-      {/* <Link to={`/post/${post.id}`}> */}
-      <Linkify tagName="p">{post.content.text}</Linkify>
-      {/* </Link> */}
+      <Link to={`/post/${post.id}`}>
+        <Linkify tagName="p">{post.content.text}</Linkify>
+      </Link>
     </div>
   );
 }
