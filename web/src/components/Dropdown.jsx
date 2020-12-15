@@ -3,6 +3,7 @@ import React, {cloneElement, useEffect, useRef, useState} from 'react';
 import {DropDownTriangle} from '../assets/GeneralActionIcons';
 
 import './Dropdown.css';
+import LoadingSpinner from './LoadingSpinner/LoadingSpinner';
 
 export default function Dropdown({
   customToggle,
@@ -96,8 +97,22 @@ function DropdownOptions({dropdownRef, containerTopPosition, children}) {
   );
 }
 
-export function DropdownOption({children, onSelect, height, onSomethingElse}) {
+export function DropdownOption({
+  children,
+  onSelect,
+  height,
+  onSomethingElse,
+  loading,
+}) {
   if (onSomethingElse) onSomethingElse();
+  let optionContent;
+  if (loading)
+    optionContent = (
+      <div className="dropdown-option-loading-content">
+        <LoadingSpinner />
+      </div>
+    );
+  if (!loading && children) optionContent = children;
   return (
     <button
       onClick={onSelect}
@@ -105,7 +120,7 @@ export function DropdownOption({children, onSelect, height, onSomethingElse}) {
       type="button"
       style={{height: height}}
     >
-      {children}
+      {optionContent}
     </button>
   );
 }

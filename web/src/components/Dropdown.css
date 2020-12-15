@@ -77,3 +77,8 @@
 .dropdown-option-button svg {
   width: 50px;
 }
+
+.dropdown-option-loading-content {
+  height: 80px;
+  padding-top: 10px;
+}

@@ -16,6 +16,8 @@ import {CreateButton} from '../../assets/HeaderIcons';
 import SecondaryButton from '../Buttons/SecondaryButton';
 import {Link, useHistory} from 'react-router-dom';
 import {DropDownTriangle} from '../../assets/GeneralActionIcons';
+import GeneralError from '../GeneralError';
+import {convertGroupToGroupRef} from '../../helpers/groups';
 
 import './CreateOpenPosition.css';
 
@@ -31,6 +33,8 @@ export default function CreateOpenPosition() {
   const [memberOfGroups, setMemberOfGroups] = useState([]);
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [pageError, setPageError] = useState(false);
+  const [loading, setLoading] = useState(true);
   const history = useHistory();
 
   const {userProfile} = useContext(AuthContext);
@@ -41,6 +45,7 @@ export default function CreateOpenPosition() {
     const {customTopics, DBTopics} = handlePostTopics(selectedTopics);
     res.customTopics = customTopics;
     res.topics = DBTopics;
+    res.group = convertGroupToGroupRef(selectedGroup);
     createOpenPosition(res)
       .then(() => {
         setSubmitting(false);
@@ -60,6 +65,7 @@ export default function CreateOpenPosition() {
     db.collection(`users/${userID}/groups`)
       .get()
       .then((qs) => {
+        setLoading(false);
         if (qs.empty) return;
         qs.forEach((groupDoc) => {
           const fetchedGroup = groupDoc.data();
@@ -72,9 +78,7 @@ export default function CreateOpenPosition() {
           `could not fetch groups for user ID ${userID} from db`,
           err
         );
-        setMemberOfGroups([
-          "We cannot fetch your groups at the moment. We'll look into it. Please try again later.",
-        ]);
+        setPageError(true);
       });
   }, [userID]);
 
@@ -108,14 +112,24 @@ export default function CreateOpenPosition() {
     ),
   });
 
+  if (pageError)
+    return (
+      <GeneralError>
+        <h4>
+          Something went wrong trying to fetch your groups. We&#39;ll look into
+          it. Please try again later.
+        </h4>
+      </GeneralError>
+    );
+
   if (selectedGroup === undefined)
     return (
       <MandatoryGroupSelection
         memberOfGroups={memberOfGroups}
         setSelectedGroup={setSelectedGroup}
+        loading={loading}
       />
     );
-
   return (
     <Formik
       initialValues={initialValues}
@@ -153,12 +167,13 @@ export default function CreateOpenPosition() {
   );
 }
 
-function MandatoryGroupSelection({memberOfGroups, setSelectedGroup}) {
+function MandatoryGroupSelection({memberOfGroups, setSelectedGroup, loading}) {
   return (
     <>
       <SelectGroup
         memberOfGroups={memberOfGroups}
         setSelectedGroup={setSelectedGroup}
+        loading={loading}
       />
       <div className="mandatory-select-group-container">
         <h3 className="mandatory-select-group-explanation">
@@ -188,7 +203,7 @@ function MandatoryGroupSelection({memberOfGroups, setSelectedGroup}) {
   );
 }
 
-function SelectGroup({memberOfGroups, setSelectedGroup}) {
+function SelectGroup({memberOfGroups, setSelectedGroup, loading}) {
   return (
     <div className="open-position-group-dropdown">
       <h4 className="open-position-dropdown-label">Research Group</h4>
@@ -197,7 +212,11 @@ function SelectGroup({memberOfGroups, setSelectedGroup}) {
         customToggleTextOnly="Select from your groups"
         containerTopPosition="40px"
       >
-        {getMemberOfGroupsDropdownOptions(memberOfGroups, setSelectedGroup)}
+        {getMemberOfGroupsDropdownOptions(
+          memberOfGroups,
+          setSelectedGroup,
+          loading
+        )}
       </Dropdown>
     </div>
   );
@@ -231,7 +250,13 @@ function ChangeGroupToggle({setOpen}) {
   );
 }
 
-function getMemberOfGroupsDropdownOptions(memberOfGroups, setSelectedGroup) {
+function getMemberOfGroupsDropdownOptions(
+  memberOfGroups,
+  setSelectedGroup,
+  loading
+) {
+  if (loading) return <DropdownOption onSelect={() => {}} loading={true} />;
+  if (memberOfGroups.length === 0) return;
   return memberOfGroups.map((group) => (
     <DropdownOption
       key={group.id}

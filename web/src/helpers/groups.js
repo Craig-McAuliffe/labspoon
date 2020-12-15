@@ -48,3 +48,13 @@ export function getGroup(id) {
     })
     .catch((err) => console.log(err));
 }
+
+export function convertGroupToGroupRef(group) {
+  return {
+    id: group.id,
+    name: group.name,
+    avatar: group.avatar,
+    about: group.about,
+    institution: group.institution,
+  };
+}
