@@ -1,6 +1,6 @@
 import React from 'react';
 
-import './Buttons.css';
+import './PrimaryButton.css';
 
 export default function PrimaryButton({
   submit,
@@ -9,18 +9,21 @@ export default function PrimaryButton({
   children,
   formID,
   disabled,
+  light,
   ...props
 }) {
+  let className = 'primary-button';
+  if (small) {
+    className = className + '-small';
+    if (light) className = className + '-light';
+  } else {
+    if (disabled) className = className + '-inactive';
+  }
+
   return (
     <button
       type={submit ? 'submit' : 'button'}
-      className={
-        small
-          ? 'primary-button-small'
-          : disabled
-          ? 'primary-button-inactive'
-          : 'primary-button'
-      }
+      className={className}
       onClick={onClick ? onClick : null}
       form={formID ? formID : null}
       disabled={disabled}

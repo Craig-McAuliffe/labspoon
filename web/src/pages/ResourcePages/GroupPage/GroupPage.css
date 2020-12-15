@@ -159,3 +159,52 @@
 .edit-group-page-back:hover {
   color: #3099d3;
 }
+
+.donation-link-container {
+  margin: 20px 0px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.donation-link-donate-container p {
+  color: #99999f;
+  margin-top: 5px;
+}
+
+.donation-link-verified-container {
+  width: 50%;
+}
+
+.donation-link-donate-container {
+  display: inline-block;
+  width: 40%;
+  text-align: right;
+}
+
+.registered-charity-text {
+  color: #00507c;
+}
+
+.donate-button {
+  border-radius: 4%;
+  text-decoration: none;
+  border: 2px solid #00507c;
+  background: #eaf5fb;
+  color: #00507c;
+  cursor: pointer;
+  text-align: center;
+  padding: 10px 10px;
+}
+
+.donate-button:hover {
+  border-width: 3px;
+  padding: 9px 9px;
+}
+
+.donate-button h3 {
+  margin-bottom: 0px;
+}
+
+.group-verification-confirmation-explanation {
+  color: #5d5d65;
+}

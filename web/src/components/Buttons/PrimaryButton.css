@@ -1,0 +1,152 @@
+.primary-button,
+.primary-button-small,
+.primary-button-inactive,
+.primary-button-spinner {
+  border: none;
+  border-radius: 4%;
+  text-decoration: none;
+  background: #00507c;
+  color: #ffffff;
+  cursor: pointer;
+  text-align: center;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.primary-button-spinner {
+  padding: 10px 10px 10px 10px;
+}
+
+.primary-button,
+.primary-button-inactive {
+  padding: 10px 10px 5px 10px;
+}
+
+.primary-button-small {
+  padding: 8px 10px 7px 10px;
+}
+
+.primary-button:hover,
+.primary-button:focus,
+.primary-button-inactive:hover,
+.primary-button-inactive:focus,
+.primary-button-small:hover,
+.primary-button-small:focus {
+  background: #023b5a;
+}
+
+.primary-button-inactive {
+  opacity: 40%;
+}
+
+.primary-button-clicked {
+  padding: 10px 5px 5px 5px;
+  border-radius: 4%;
+  text-decoration: none;
+  background: #ffffff;
+  color: #99999f;
+  cursor: pointer;
+  text-align: center;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  outline: none;
+}
+
+.primary-button-clicked:hover,
+.primary-button-clicked:focus {
+  color: #00507c;
+  cursor: pointer;
+}
+
+.primary-button-small-light {
+  border: none;
+  text-decoration: none;
+  cursor: pointer;
+  text-align: center;
+}
+
+.primary-button-small-light h4 {
+  color: #00507c;
+}
+
+.primary-button-small-light h4:hover {
+  color: #001f30;
+}
+
+@media screen and (max-width: 800px) {
+  .primary-button-text {
+    font-size: 1.2em;
+  }
+
+  .primary-button-text-small {
+    font-size: 1em;
+  }
+
+  .primary-button,
+  .primary-button:hover,
+  .primary-button-inactive:hover,
+  .primary-button-inactive,
+  .FollowButton:hover h2 {
+    padding: 7px 13px 2px 13px;
+    border-radius: 3%;
+  }
+
+  .primary-button-clicked,
+  .primary-button-clicked:hover,
+  .primary-button-clicked:focus h2 {
+    padding: 7px 13px 2px 13px;
+    border-radius: 3%;
+  }
+}
+
+@media only screen and (max-width: 500px) {
+  .primary-button-text {
+    font-size: 1em;
+  }
+
+  .primary-button-text-small {
+    font-size: 0.8em;
+  }
+
+  .primary-button,
+  .primary-button:hover,
+  .primary-button-inactive:hover,
+  .primary-button-inactive,
+  .FollowButton:hover h2 {
+    padding: 5px 11px 0px 11px;
+    border-radius: 2%;
+  }
+
+  .primary-button-clicked,
+  .primary-button-clicked:hover,
+  .primary-button-clicked:focus h2 {
+    padding: 5px 11px 0px 11px;
+    border-radius: 2%;
+  }
+}
+
+@media only screen and (max-width: 378px) {
+  .primary-button-text {
+    font-size: 0.8em;
+  }
+
+  .primary-button-text-small {
+    font-size: 0.6em;
+  }
+
+  .primary-button,
+  .primary-button:hover,
+  .primary-button-inactive:hover,
+  .primary-button-inactive,
+  .FollowButton:hover h2 {
+    padding: 7px 9px 0px 9px;
+    border-radius: 2%;
+  }
+
+  .primary-button-clicked,
+  .primary-button-clicked:hover,
+  .primary-button-clicked:focus h2 {
+    padding: 7px 9px 0px 9px;
+    border-radius: 2%;
+  }
+}
