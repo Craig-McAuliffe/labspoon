@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import PropTypes from 'prop-types';
 import {SearchIconGrey} from '../../assets/HeaderIcons';
 import {FeatureFlags} from '../../App';
@@ -48,6 +48,9 @@ FilterMenu.propTypes = {
   resetFilterCollection: PropTypes.func.isRequired,
 };
 
+// How many filter options to display on each page of the filter.
+const FILTER_PAGE_COUNT = 20;
+
 /**
  * A collection of selectable filter options with a heading describing the collection
  * @param {string} name - name of the collection
@@ -63,6 +66,8 @@ function FilterCollection({
   resetFilterCollection,
   radio,
 }) {
+  const [count, setCount] = useState(10);
+
   /**
    * Callback used for updating the enabled status of an option within this
    * filter collection.
@@ -72,6 +77,29 @@ function FilterCollection({
   function updateFilterCollectionOption(optionIndex) {
     updateFilterOption(index, optionIndex);
   }
+
+  let showMoreButton;
+  if (options.length > count)
+    showMoreButton = (
+      <button
+        onClick={() => setCount((oldCount) => oldCount + FILTER_PAGE_COUNT)}
+        className="filter-option-pagination-button"
+      >
+        Show more
+      </button>
+    );
+
+  let showLessButton;
+  if (count > FILTER_PAGE_COUNT)
+    showLessButton = (
+      <button
+        onClick={() => setCount((oldCount) => oldCount - FILTER_PAGE_COUNT)}
+        className="filter-option-pagination-button"
+      >
+        Show fewer
+      </button>
+    );
+
   return (
     <div className="filter-collection">
       <div className="filter-collection-header">
@@ -85,7 +113,7 @@ function FilterCollection({
           </button>
         ) : null}
       </div>
-      {options.map((option, index) => (
+      {options.slice(0, count).map((option, index) => (
         <FilterOption
           key={name + option.data.id}
           index={index}
@@ -95,6 +123,10 @@ function FilterCollection({
           radio={radio}
         />
       ))}
+      <div className="filter-options-pagination-container">
+        {showMoreButton}
+        {showLessButton}
+      </div>
     </div>
   );
 }

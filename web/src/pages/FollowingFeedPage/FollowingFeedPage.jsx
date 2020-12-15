@@ -111,7 +111,6 @@ function getFiltersFromFilterCollection(filterCollection) {
     const filterOptionsPromise = filterCollectionDoc.ref
       .collection('filterOptions')
       .orderBy('rank')
-      .limit(10)
       .get()
       .then((qs) => {
         const filterCollection = {

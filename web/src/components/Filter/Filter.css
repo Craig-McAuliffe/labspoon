@@ -185,3 +185,14 @@
 .filter-radio:checked + .filter-radio-design {
   border-radius: 50%;
 }
+
+.filter-option-pagination-button {
+  padding-left: 0px;
+  float: right;
+  color: #5D5D65;
+}
+
+.filter-options-pagination-container {
+  display: inline-block;
+  width: 100%;
+}
