@@ -34,16 +34,14 @@
   padding: 0px;
 }
 
-.existing-group-avatar {
-  min-width: 100%;
-  height: 400px;
-  background-position: center;
-  background-repeat: none;
-  background-size: cover;
+.edit-group-info-upload-photo-button .rounded-circle {
+  width: 30vw;
+  height: 30vw;
 }
 
 .fileContainer {
   box-shadow: none;
+  background: none;
 }
 
 .create-group-add-members-container {
@@ -58,36 +56,12 @@
   opacity: 50%;
 }
 
+.edit-group-info-upload-photo-button:hover h3 {
+  color: #3099d3;
+}
+
 .edit-group-info-upload-photo-button {
   position: relative;
-}
-
-.edit-group-info-upload-photo-button::after {
-  content: '';
-  background: #00507c;
-  position: absolute;
-  bottom: 52%;
-  right: 25%;
-  height: 20px;
-  width: 50%;
-  opacity: 0%;
-}
-
-.edit-group-info-upload-photo-button-plus {
-  content: '';
-  background: #00507c;
-  position: absolute;
-  right: 45%;
-  bottom: 37%;
-  width: 20px;
-  height: 40%;
-  opacity: 0%;
-}
-
-.edit-group-info-upload-photo-button:hover::after,
-.edit-group-info-upload-photo-button:hover
-  .edit-group-info-upload-photo-button-plus {
-  opacity: 100%;
 }
 
 .edit-group-info-upload-photo-button h3 {
@@ -126,5 +100,10 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+  }
+
+  .edit-group-info-upload-photo-button .rounded-circle {
+    width: 50vw;
+    height: 50vw;
   }
 }

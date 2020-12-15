@@ -172,16 +172,14 @@ function EditAvatar({existingAvatar, onAvatarSelect}) {
             <CancelButton cancelAction={() => setEditingAvatar(false)} />
           </div>
         ) : (
-          <div>
-            <button
-              className="edit-group-info-upload-photo-button"
-              onClick={() => setEditingAvatar(true)}
-            >
-              <GroupAvatar src={existingAvatar} height="190px" width="190px" />
-              <h3>Upload New Photo</h3>
-              <div className="edit-group-info-upload-photo-button-plus"></div>
-            </button>
-          </div>
+          <button
+            className="edit-group-info-upload-photo-button"
+            onClick={() => setEditingAvatar(true)}
+          >
+            <GroupAvatar src={existingAvatar} />
+            <h3>Upload New Photo</h3>
+            <div className="edit-group-info-upload-photo-button-plus"></div>
+          </button>
         )}
       </div>
     </>
