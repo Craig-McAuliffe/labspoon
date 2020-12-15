@@ -14,7 +14,6 @@ export const createOpenPosition = functions.https.onCall(
     const groupID = data.group.id;
     // change to check user is admin when we introduce group roles
     const userIsAuthorised = await checkUserIsMemberOfGroup(authorID, groupID);
-
     if (!userIsAuthorised) {
       throw new functions.https.HttpsError(
         'internal',
