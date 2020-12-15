@@ -27,7 +27,7 @@
 
 .dropdown-container {
   position: absolute;
-  top: 26px;
+  top: 100%;
   width: 100%;
   background: white;
   z-index: 1;
