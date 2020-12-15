@@ -3,14 +3,12 @@ import {v4 as uuid} from 'uuid';
 import {admin, ResourceTypes} from './config';
 import {firestore} from 'firebase-admin';
 
-import {UserRef} from './users';
-import {Publication, MAKField, makFieldToTopic} from './microsoft';
+import {UserRef, checkAuthAndGetUserFromContext} from './users';
+import {Publication} from './microsoft';
 import {
-  Topic,
   TaggedTopic,
-  createFieldAndTopic,
   convertTaggedTopicToTopic,
-  convertTopicToTaggedTopic,
+  handleTaggedTopics,
 } from './topics';
 
 const db = admin.firestore();
@@ -20,7 +18,7 @@ db.settings({
 });
 
 export const createPost = functions.https.onCall(async (data, context) => {
-  const author = await authorFromContext(context);
+  const author = await checkAuthAndGetUserFromContext(context);
 
   const postID = uuid();
 
@@ -37,54 +35,7 @@ export const createPost = functions.https.onCall(async (data, context) => {
   if (data.publicationURL) content.publicationURL = data.publicationURL;
 
   const postTopics: TaggedTopic[] = [];
-  const matchedTopicsPromises = data.topics.map((taggedTopicNoID: Topic) => {
-    return db
-      .doc(`MSFields/${taggedTopicNoID.microsoftID}`)
-      .get()
-      .then((ds) => {
-        function addTopicToPost(correspondingLabspoonTopicID: string) {
-          postTopics.push(
-            convertTopicToTaggedTopic(
-              taggedTopicNoID,
-              correspondingLabspoonTopicID
-            )
-          );
-        }
-        if (ds.exists) {
-          const MSFieldData = ds.data() as MAKField;
-          if (MSFieldData.processed) {
-            addTopicToPost(MSFieldData.processed);
-          } else {
-            // This should not be possible. All dbMSFields should be processed
-            // upon creation.
-            console.error(
-              'no Labspoon topic corresponding to MSField ' +
-                taggedTopicNoID.microsoftID
-            );
-            createMSTopic(MSFieldData);
-          }
-        } else {
-          createFieldAndTopic(taggedTopicNoID)
-            .then((labspoonTopicID) => {
-              if (labspoonTopicID === undefined) {
-                console.error(
-                  `topic with microsoftID ${taggedTopicNoID.microsoftID} was created but did not return the corresponding labspoon ID`
-                );
-                return false;
-              } else {
-                addTopicToPost(labspoonTopicID);
-                return true;
-              }
-            })
-            .catch((err) =>
-              console.error(
-                `field ${taggedTopicNoID.microsoftID} is not in database and could not be created ${err}`
-              )
-            );
-        }
-      });
-  });
-
+  const matchedTopicsPromises = handleTaggedTopics(data.topics, postTopics);
   await Promise.all(matchedTopicsPromises);
   return db
     .runTransaction((transaction) => {
@@ -112,42 +63,6 @@ export const createPost = functions.https.onCall(async (data, context) => {
       );
     });
 });
-
-export async function authorFromContext(
-  context: functions.https.CallableContext
-) {
-  if (context.auth === undefined) {
-    throw new functions.https.HttpsError(
-      'unauthenticated',
-      'Must be authenticated to create a post'
-    );
-  }
-  const userID = context.auth.uid;
-  const userDoc = await admin.firestore().collection('users').doc(userID).get();
-  if (!userDoc.exists) {
-    throw new functions.https.HttpsError('not-found', 'User not found');
-  }
-  const userData = userDoc.data()!;
-
-  const author: UserRef = {
-    id: userData.id,
-    name: userData.name,
-    avatar: userData.avatar,
-  };
-
-  return author;
-}
-
-export function createMSTopic(MSFieldData: MAKField) {
-  db.collection('topics')
-    .doc()
-    .set(makFieldToTopic(MSFieldData))
-    .catch((err) =>
-      console.error(
-        `could not create labspoon topic from existing MSField, ${err}`
-      )
-    );
-}
 
 export const writePostToAuthorPosts = functions.firestore
   .document(`posts/{postID}`)

@@ -5,7 +5,7 @@ import FormTextInput, {CreatePostTextArea} from '../../../Forms/FormTextInput';
 import FormDateInput from '../../../Forms/FormDateInput';
 import PostForm from './PostForm';
 import TypeOfTaggedResourceDropDown from './TypeOfTaggedResourceDropDown';
-import {handlePostTopics} from './PostForm';
+import {handlePostTopics} from '../../../Topics/TagTopics';
 import {CreatingPostContext} from './CreatePost';
 
 import './CreatePost.css';

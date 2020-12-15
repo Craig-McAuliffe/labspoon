@@ -12,7 +12,10 @@ import {
 import {Post} from './posts';
 import {Topic} from './topics';
 import {generateThumbnail} from './helpers/images';
-import {publishAddPublicationRequests, allPublicationFields} from './publications';
+import {
+  publishAddPublicationRequests,
+  allPublicationFields,
+} from './publications';
 
 const db = admin.firestore();
 
@@ -62,6 +65,31 @@ export const instantiateFollowingFeedForNewUser = functions.firestore
       id: 'followingFeed',
     });
   });
+
+export async function checkAuthAndGetUserFromContext(
+  context: functions.https.CallableContext
+) {
+  if (context.auth === undefined) {
+    throw new functions.https.HttpsError(
+      'unauthenticated',
+      'Must be authenticated to create a post'
+    );
+  }
+  const userID = context.auth.uid;
+  const userDoc = await admin.firestore().collection('users').doc(userID).get();
+  if (!userDoc.exists) {
+    throw new functions.https.HttpsError('not-found', 'User not found');
+  }
+  const userData = userDoc.data()!;
+
+  const author: UserRef = {
+    id: userData.id,
+    name: userData.name,
+    avatar: userData.avatar,
+  };
+
+  return author;
+}
 
 export const setUserIsFollowedBySelfOnCreation = functions.firestore
   .document('users/{userID}')
@@ -159,17 +187,19 @@ export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall
       .then((qs) => {
         if (!qs.exists) return;
         const userToBeLinked = qs.data() as UserDB;
-        if (userToBeLinked.microsoftAcademicAuthorID !== undefined) return userToBeLinked;
+        if (userToBeLinked.microsoftAcademicAuthorID !== undefined)
+          return userToBeLinked;
         batch.update(userToBeLinkedDBRef, {
           microsoftAcademicAuthorID: microsoftAcademicAuthorID,
         });
         return userToBeLinked;
       })
       .catch((err) => console.log(err, 'could not fetch user to be linked'));
-    if (!user) throw new functions.https.HttpsError(
-      'not-found',
-      `No user found with ID ${userID}`
-    );
+    if (!user)
+      throw new functions.https.HttpsError(
+        'not-found',
+        `No user found with ID ${userID}`
+      );
     const msPublicationsForUserQS = await db
       .collection(`MSUsers/${microsoftAcademicAuthorID}/publications`)
       .get();
@@ -196,22 +226,18 @@ export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall
             db.doc(`users/${userID}/publications/${publicationDS.id}`),
             publication
           );
-          const authorItem = publication.authors.filter((author: any) => author.microsoftID === microsoftAcademicAuthorID)[0];
+          const authorItem = publication.authors.filter(
+            (author: any) => author.microsoftID === microsoftAcademicAuthorID
+          )[0];
           if (!authorItem) {
             return null;
           }
-          batch.update(
-            db.doc(`publications/${publicationDS.id}`),
-            {
-              authors: firestore.FieldValue.arrayRemove(authorItem),
-            }
-          );
-          batch.update(
-            db.doc(`publications/${publicationDS.id}`),
-            {
-              authors: firestore.FieldValue.arrayUnion(toUserRef(userID, user)),
-            }
-          );
+          batch.update(db.doc(`publications/${publicationDS.id}`), {
+            authors: firestore.FieldValue.arrayRemove(authorItem),
+          });
+          batch.update(db.doc(`publications/${publicationDS.id}`), {
+            authors: firestore.FieldValue.arrayUnion(toUserRef(userID, user)),
+          });
           return null;
         })()
       )
@@ -370,7 +396,6 @@ export const addPostsInTopicToFollowingFeeds = functions.firestore
     };
     return updateFollowersOfTopic();
   });
-
 
 interface PublicationSuggestion {
   microsoftAcademicIDMatch: string;

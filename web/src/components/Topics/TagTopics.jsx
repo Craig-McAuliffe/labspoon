@@ -1,10 +1,10 @@
 import React, {useState, useEffect} from 'react';
-import PrimaryButton from '../../../Buttons/PrimaryButton';
-import TopicListItem from '../../../Topics/TopicListItem';
-import {RemoveIcon} from '../../../../assets/GeneralActionIcons';
-import firebase from '../../../../firebase';
-import LoadingSpinner from '../../../LoadingSpinner/LoadingSpinner';
-import './CreatePost';
+import PrimaryButton from '../Buttons/PrimaryButton';
+import TopicListItem from './TopicListItem';
+import {RemoveIcon} from '../../assets/GeneralActionIcons';
+import firebase from '../../firebase';
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
+import '../Posts/Post/CreatePost/CreatePost';
 
 const topicSearch = firebase.functions().httpsCallable('topics-topicSearch');
 
@@ -257,3 +257,14 @@ const removeSelectedTopic = (
     return curatedSelectedTopics;
   });
 };
+
+export function handlePostTopics(selectedTopics) {
+  const customTopics = [];
+  const DBTopics = [];
+  selectedTopics.forEach((selectedTopic) => {
+    if (selectedTopic.isCustom) {
+      customTopics.push({name: selectedTopic.name});
+    } else DBTopics.push(selectedTopic);
+  });
+  return {customTopics: customTopics, DBTopics: DBTopics};
+}

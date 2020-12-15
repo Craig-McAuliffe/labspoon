@@ -129,13 +129,11 @@ export default function GroupInfoForm({
           <FormTextArea height="200px" label="About" name="about" bigLabel />
         </Form>
       </Formik>
-      <div className="create-group-select-users-container">
-        <SelectUsers
-          selectedUsers={selectedUsers}
-          addSelectedUsers={addSelectedUsers}
-          setSelectedUsers={setSelectedUsers}
-        />
-      </div>
+      <SelectUsers
+        selectedUsers={selectedUsers}
+        addSelectedUsers={addSelectedUsers}
+        setSelectedUsers={setSelectedUsers}
+      />
 
       {featureFlags.has('create-pinned-post') ? (
         <>

@@ -5,8 +5,7 @@ import * as Yup from 'yup';
 import FormTextInput, {FormTextArea} from '../Forms/FormTextInput';
 import FormDateInput from '../Forms/FormDateInput';
 import {GroupDropdownItem, GroupHeadlineItem} from '../Group/GroupListItem';
-import TagTopics from '../Posts/Post/CreatePost/TagTopics';
-import {handlePostTopics} from '../Posts/Post/CreatePost/PostForm';
+import TagTopics, {handlePostTopics} from '../Topics/TagTopics';
 import CreateResourceFormActions from '../Forms/CreateResourceFormActions';
 import Dropdown, {DropdownOption} from '../Dropdown';
 import {AuthContext} from '../../App';
@@ -22,6 +21,10 @@ import './CreateOpenPosition.css';
 
 const POSITIONS = ['Masters', 'Phd', 'Post Doc'];
 
+const createOpenPosition = firebase
+  .functions()
+  .httpsCallable('openPositions-createOpenPosition');
+
 export default function CreateOpenPosition() {
   const [selectedPosition, setSelectedPosition] = useState('');
   const [selectedGroup, setSelectedGroup] = useState(undefined);
@@ -32,10 +35,6 @@ export default function CreateOpenPosition() {
 
   const {userProfile} = useContext(AuthContext);
   const userID = userProfile.id;
-
-  const createOpenPosition = firebase
-    .functions()
-    .httpsCallable('openPositions-createOpenPosition');
 
   const onSubmit = (res) => {
     setSubmitting(true);
