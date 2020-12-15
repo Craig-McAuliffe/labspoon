@@ -39,7 +39,8 @@ export const SearchIconGrey = () => (
     />
   </svg>
 );
-
+// hoverControl means that the component using CreateButton is controlling its style
+// when CreateButton is used within buttons it cannot have an independent hover state
 export function CreateButton({hoverControl}) {
   return (
     <svg
