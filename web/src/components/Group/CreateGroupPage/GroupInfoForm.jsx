@@ -36,6 +36,8 @@ import './CreateGroupPage.css';
 import Select, {LabelledDropdownContainer} from '../../Forms/Select/Select';
 import {DropdownOption} from '../../Dropdown';
 
+import './GroupInfoForm.css';
+
 const CHARITY = 'charity';
 const RESEARCH_GROUP = 'researchGroup';
 
@@ -51,6 +53,7 @@ export default function GroupInfoForm({
   existingAvatar,
   cancelForm,
   submitText,
+  verified,
 }) {
   const [submitted, setSubmitted] = useState(false);
   const {user, userProfile} = useContext(AuthContext);
@@ -65,6 +68,7 @@ export default function GroupInfoForm({
       [RESEARCH_GROUP, CHARITY],
       'You must select a group type'
     ),
+    donationLink: Yup.string().url(),
   });
 
   function onSubmitAndPreventDuplicate(values) {
@@ -110,22 +114,41 @@ export default function GroupInfoForm({
         validationSchema={validationSchema}
         onSubmit={onSubmitAndPreventDuplicate}
       >
-        <Form id="create-group-form">
-          <GroupTypeSelect name="groupType" />
-          <EditAvatar
-            existingAvatar={existingAvatar}
-            onAvatarSelect={onAvatarSelect}
-          />
-          <div className="create-group-meta-info">
-            <h3>Basic Info</h3>
-            <FormTextInput label="Name" name="name" sideLabel />
-            <FormTextInput label="Location" name="location" sideLabel />
-            <FormTextInput label="Institution" name="institution" sideLabel />
-            <FormTextInput label="Website" name="website" sideLabel />
-          </div>
-          <div className="create-group-group-photos"></div>
-          <FormTextArea height="200px" label="About" name="about" bigLabel />
-        </Form>
+        {(props) => (
+          <>
+            <Form id="create-group-form">
+              <GroupTypeSelect name="groupType" />
+              <EditAvatar
+                existingAvatar={existingAvatar}
+                onAvatarSelect={onAvatarSelect}
+              />
+              <div className="create-group-meta-info">
+                <h3>Basic Info</h3>
+                <FormTextInput label="Name" name="name" sideLabel />
+                <FormTextInput label="Location" name="location" sideLabel />
+                <FormTextInput
+                  label="Institution"
+                  name="institution"
+                  sideLabel
+                />
+                <FormTextInput label="Website" name="website" sideLabel />
+              </div>
+              <div className="create-group-group-photos"></div>
+              <FormTextArea
+                height="200px"
+                label="About"
+                name="about"
+                bigLabel
+              />
+              {props.values.groupType === CHARITY &&
+              featureFlags.has('donate-link') ? (
+                <VerificationFormOrDonationLinkField verified={verified} />
+              ) : (
+                <></>
+              )}
+            </Form>
+          </>
+        )}
       </Formik>
       <SelectUsers
         selectedUsers={selectedUsers}
@@ -377,5 +400,40 @@ function GroupTypeSelect({...props}) {
         <DropdownOption value={CHARITY} text="Charity" />
       </Select>
     </LabelledDropdownContainer>
+  );
+}
+
+function VerificationFormOrDonationLinkField({verified}) {
+  if (!verified) return <VerificationRequest />;
+
+  return <FormTextInput label="Donation Link" name="donationLink" sideLabel />;
+}
+
+function VerificationRequest() {
+  const [open, setOpen] = useState(false);
+
+  let content = (
+    <PrimaryButton onClick={() => setOpen(true)} light small>
+      Request Verification
+    </PrimaryButton>
+  );
+  if (open)
+    content = (
+      <p>
+        Please email{' '}
+        <a href="mailto:verify@labspoon.com">verify@labspoon.com</a> with your
+        institutional email address.
+      </p>
+    );
+
+  return (
+    <div className="request-verification-container">
+      <h3>Donations</h3>
+      <h4>
+        Your group must be verified before you can display a donate link on your
+        page
+      </h4>
+      <div className="request-verification-button-container">{content}</div>
+    </div>
   );
 }

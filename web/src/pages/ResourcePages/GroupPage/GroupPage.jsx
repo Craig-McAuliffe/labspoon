@@ -1,6 +1,8 @@
 import React, {useRef, useEffect, useState, useContext} from 'react';
 import {useRouteMatch, Link, useParams, useHistory} from 'react-router-dom';
 import Linkify from 'linkifyjs/react';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faCheckCircle} from '@fortawesome/free-solid-svg-icons';
 
 import {FeatureFlags, AuthContext} from '../../../App';
 import {db} from '../../../firebase';
@@ -97,6 +99,7 @@ export default function GroupPage() {
   const featureFlags = useContext(FeatureFlags);
   const [groupID, setGroupID] = useState(undefined);
   const [groupData, setGroupData] = useState(undefined);
+  const [verified, setVerified] = useState(false);
   const [userIsMember, setUserIsMember] = useState(false);
   const history = useHistory();
   const {user} = useContext(AuthContext);
@@ -118,6 +121,14 @@ export default function GroupPage() {
       .catch((err) => console.log(err));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupID, route]);
+
+  useEffect(() => {
+    if (!featureFlags.has('donate-link')) return;
+    db.doc(`verifiedGroups/${groupID}`)
+      .get()
+      .then((ds) => setVerified(ds.exists))
+      .catch((err) => console.error(err));
+  }, [groupID]);
 
   const groupDescriptionRef = useRef();
 
@@ -228,6 +239,7 @@ export default function GroupPage() {
             group={groupData}
             groupDescriptionRef={groupDescriptionRef}
             userIsMember={userIsMember}
+            verified={verified}
           />
         </div>
         <FilterableResults fetchResults={fetchFeedData} limit={9}>
@@ -257,7 +269,7 @@ function SuggestedGroups({groupData}) {
   );
 }
 
-const GroupDetails = ({group, groupDescriptionRef, userIsMember}) => {
+const GroupDetails = ({group, groupDescriptionRef, userIsMember, verified}) => {
   const {url} = useRouteMatch();
   const featureFlags = useContext(FeatureFlags);
   const [displayFullDescription, setDisplayFullDescription] = useState({
@@ -304,6 +316,17 @@ const GroupDetails = ({group, groupDescriptionRef, userIsMember}) => {
           />
         </div>
       </div>
+
+      {featureFlags.has('donate-link') ? (
+        <DonationLink verified={verified} donationLink={group.donationLink} />
+      ) : (
+        <></>
+      )}
+      {featureFlags.has('group-pinned-post') ? (
+        <div className="pinned-post-container">
+          <PinnedPost post={group.pinnedPost} />
+        </div>
+      ) : null}
       {userIsMember ? (
         <div className="group-page-edit-button-container">
           <Link to={`${url}/edit/info`}>
@@ -311,11 +334,40 @@ const GroupDetails = ({group, groupDescriptionRef, userIsMember}) => {
           </Link>
         </div>
       ) : null}
-      {featureFlags.has('group-pinned-post') ? (
-        <div className="pinned-post-container">
-          <PinnedPost post={group.pinnedPost} />
-        </div>
-      ) : null}
     </>
   );
 };
+
+function DonationLink({verified, donationLink}) {
+  if (!verified || !donationLink) return <></>;
+
+  return (
+    <div className="donation-link-container">
+      <div className="donation-link-verified-container">
+        <h4 className="registered-charity-text">
+          Registered Charity{' '}
+          <sup>
+            <FontAwesomeIcon icon={faCheckCircle} />
+          </sup>
+        </h4>
+        <p className="group-verification-confirmation-explanation">
+          This charity page has been verified and can be trusted.
+        </p>
+      </div>
+      <div className="donation-link-donate-container">
+        <a target="_blank" href={donationLink} rel="noreferrer">
+          <DonateButton />
+        </a>
+        <p>This will take you to an external site.</p>
+      </div>
+    </div>
+  );
+}
+
+function DonateButton() {
+  return (
+    <button type="button" className="donate-button">
+      <h3>Donate</h3>
+    </button>
+  );
+}

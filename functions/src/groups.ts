@@ -248,3 +248,22 @@ export function toGroupRef(groupID: string, group: any) {
   if (group.institution) groupRef.institution = group.institution;
   return groupRef;
 }
+
+export const verifyGroup = functions.https.onRequest(async (req, res) => {
+  const groupID = req.body.data.groupID;
+  if (!groupID) {
+    throw new functions.https.HttpsError('invalid-argument', `A group ID must be provided.`);
+  }
+  const verification: VerifiedGroup = {
+    timestamp: new Date(),
+  };
+  await db.doc(`verifiedGroups/${groupID}`).set(verification).catch((err) => {
+    console.error(`Unable to verify group ${groupID}:`, err);
+    throw new functions.https.HttpsError('internal', `Unable to verify group with ID ${groupID}.`);
+  });
+  res.status(200).send();
+});
+
+interface VerifiedGroup {
+  timestamp: Date;
+}

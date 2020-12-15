@@ -11,9 +11,17 @@ export default function EditingGroupInfo({groupData}) {
   const groupID = groupData.id;
   const [groupMembers, setGroupMembers] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
+  const [verified, setVerified] = useState(undefined);
   const [avatar, setAvatar] = useState([]);
   const {user} = useContext(AuthContext);
   const userID = user.uid;
+
+  useEffect(() => {
+    db.doc(`verifiedGroups/${groupID}`)
+      .get()
+      .then((ds) => setVerified(ds.exists))
+      .catch((err) => alert(err));
+  }, [groupID]);
 
   useEffect(() => {
     async function fetchGroupMembers() {
@@ -54,6 +62,7 @@ export default function EditingGroupInfo({groupData}) {
     website: groupData.website,
     about: groupData.about,
     groupType: groupData.groupType,
+    donationLink: groupData.donationLink || '',
   };
 
   const onSubmitEdit = (values) => {
@@ -159,6 +168,7 @@ export default function EditingGroupInfo({groupData}) {
         setAvatar={setAvatar}
         existingAvatar={groupData.avatar}
         submitText="Save Changes"
+        verified={verified}
       />
     </div>
   );
