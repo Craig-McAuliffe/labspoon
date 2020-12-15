@@ -112,18 +112,16 @@ export default function GroupInfoForm({
       >
         <Form id="create-group-form">
           <GroupTypeSelect name="groupType" />
-          <div className="create-group-profile-info-container">
-            <EditAvatar
-              existingAvatar={existingAvatar}
-              onAvatarSelect={onAvatarSelect}
-            />
-            <div className="create-group-meta-info">
-              <h3>Basic Info</h3>
-              <FormTextInput label="Name" name="name" sideLabel />
-              <FormTextInput label="Location" name="location" sideLabel />
-              <FormTextInput label="Institution" name="institution" sideLabel />
-              <FormTextInput label="Website" name="website" sideLabel />
-            </div>
+          <EditAvatar
+            existingAvatar={existingAvatar}
+            onAvatarSelect={onAvatarSelect}
+          />
+          <div className="create-group-meta-info">
+            <h3>Basic Info</h3>
+            <FormTextInput label="Name" name="name" sideLabel />
+            <FormTextInput label="Location" name="location" sideLabel />
+            <FormTextInput label="Institution" name="institution" sideLabel />
+            <FormTextInput label="Website" name="website" sideLabel />
           </div>
           <div className="create-group-group-photos"></div>
           <FormTextArea height="200px" label="About" name="about" bigLabel />
@@ -155,33 +153,38 @@ export default function GroupInfoForm({
 
 function EditAvatar({existingAvatar, onAvatarSelect}) {
   const [editingAvatar, setEditingAvatar] = useState(false);
-  if (!existingAvatar || editingAvatar)
-    return (
-      <div className="group-profile-avatar">
-        <AddProfilePhoto />
-        <ImageUploader
-          onChange={onAvatarSelect}
-          imgExtension={['.jpg', '.png']}
-          singleImage
-          withPreview
-          withIcon={false}
-          buttonStyles={{background: '#00507c'}}
-        />
-        <CancelButton cancelAction={() => setEditingAvatar(false)} />
-      </div>
-    );
+
   return (
-    <div>
+    <>
       <h3>Group Picture </h3>
-      <button
-        className="edit-group-info-upload-photo-button"
-        onClick={() => setEditingAvatar(true)}
-      >
-        <GroupAvatar src={existingAvatar} height="190px" width="190px" />
-        <h3>Upload New Photo</h3>
-        <div className="edit-group-info-upload-photo-button-plus"></div>
-      </button>
-    </div>
+      <div className="edit-group-avatar-section">
+        {!existingAvatar || editingAvatar ? (
+          <div className="change-group-avatar-container">
+            <AddProfilePhoto />
+            <ImageUploader
+              onChange={onAvatarSelect}
+              imgExtension={['.jpg', '.png']}
+              singleImage
+              withPreview
+              withIcon={false}
+              buttonStyles={{background: '#00507c'}}
+            />
+            <CancelButton cancelAction={() => setEditingAvatar(false)} />
+          </div>
+        ) : (
+          <div>
+            <button
+              className="edit-group-info-upload-photo-button"
+              onClick={() => setEditingAvatar(true)}
+            >
+              <GroupAvatar src={existingAvatar} height="190px" width="190px" />
+              <h3>Upload New Photo</h3>
+              <div className="edit-group-info-upload-photo-button-plus"></div>
+            </button>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 
