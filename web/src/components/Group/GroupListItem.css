@@ -76,12 +76,27 @@
 
 .group-dropdown-item-name {
   margin-left: 10px;
-  white-space: nowrap;
+  white-space: pre-wrap;
+  text-align: start;
   color: #00507c;
 }
 
 .group-dropdown-item-institution {
   margin-left: 10px;
-  white-space: nowrap;
+  white-space: pre-wrap;
   color: #00507c;
+  text-align: start;
+}
+
+.group-headline-item-container {
+  width: 100%;
+  display: flex;
+}
+
+.group-headline-item-container h3 {
+  color: #000000;
+}
+
+.group-headline-item-container h4 {
+  color: #99999f;
 }

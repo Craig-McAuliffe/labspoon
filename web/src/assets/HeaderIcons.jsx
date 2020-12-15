@@ -39,8 +39,9 @@ export const SearchIconGrey = () => (
     />
   </svg>
 );
-
-export function CreateButton() {
+// hoverControl means that the component using CreateButton is controlling its style
+// when CreateButton is used within buttons it cannot have an independent hover state
+export function CreateButton({hoverControl}) {
   return (
     <svg
       width="50"
@@ -49,7 +50,12 @@ export function CreateButton() {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <circle className="create-button-circle" cx="25" cy="25" r="25" />
+      <circle
+        className={`create-button-circle${hoverControl ? '-controlled' : ''}`}
+        cx="25"
+        cy="25"
+        r="25"
+      />
       <path
         d="M25.5185 11V24.4815M25.5185 39V24.4815M25.5185 24.4815H39M25.5185 24.4815H11"
         stroke="#00507C"

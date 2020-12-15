@@ -22,7 +22,7 @@ export default function SecondaryButton({
       style={widthAndHeight()}
       onClick={onClick}
     >
-      <h3>{children}</h3>
+      <h3 className="secondary-button-text">{children}</h3>
     </button>
   );
 }

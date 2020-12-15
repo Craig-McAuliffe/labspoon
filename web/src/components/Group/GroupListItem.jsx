@@ -80,8 +80,30 @@ export function GroupDropdownItem({group}) {
   return (
     <div className="group-dropdown-item">
       <GroupAvatarSection groupAvatar={group.avatar} height={80} width={80} />
-      <h3 className="group-dropdown-item-name">{group.name}</h3>
-      <h4 className="group-dropdown-item-institution">{group.institution}</h4>
+      <GroupNameInstitution name={group.name} institution={group.institution} />
     </div>
+  );
+}
+
+export function GroupHeadlineItem({group}) {
+  return (
+    <div className="group-headline-item-container">
+      <GroupAvatarSection groupAvatar={group.avatar} height={80} width={80} />
+      <div>
+        <GroupNameInstitution
+          name={group.name}
+          institution={group.institution}
+        />
+      </div>
+    </div>
+  );
+}
+
+function GroupNameInstitution({name, institution}) {
+  return (
+    <>
+      <h3 className="group-dropdown-item-name">{name}</h3>
+      <h4 className="group-dropdown-item-institution">{institution}</h4>
+    </>
   );
 }

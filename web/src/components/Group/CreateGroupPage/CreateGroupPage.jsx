@@ -101,11 +101,7 @@ export default function CreateGroupPage({
       setAvatar={setAvatar}
       selectedUsers={selectedUsers}
       setSelectedUsers={setSelectedUsers}
-      cancelForm={
-        onboardingCancelOrSubmitAction
-          ? onboardingCancelOrSubmitAction
-          : () => history.push('/')
-      }
+      cancelForm={onboardingCancelOrSubmitAction}
       submitText="Create Group"
     />
   );

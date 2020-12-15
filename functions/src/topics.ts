@@ -6,6 +6,7 @@ import {
   MAKPublication,
   makPublicationToPublication,
   MAKField,
+  makFieldToTopic,
 } from './microsoft';
 import {
   allPublicationFields,
@@ -113,7 +114,7 @@ export async function createFieldAndTopic(topic: Topic) {
     .catch((err) => {
       console.error(
         `Could not create topic and field ${topic} from MSPublication:`,
-        err,
+        err
       );
       throw new functions.https.HttpsError(
         'internal',
@@ -143,6 +144,70 @@ export function convertTopicToTaggedTopic(topic: Topic, topicID: string) {
     microsoftID: topic.microsoftID,
   };
   return taggedTopic;
+}
+
+export function createMSTopic(msFieldData: MAKField) {
+  db.collection('topics')
+    .doc()
+    .set(makFieldToTopic(msFieldData))
+    .catch((err) =>
+      console.error(
+        `could not create labspoon topic from existing MSField, ${err}`
+      )
+    );
+}
+
+export function handleTaggedTopics(
+  taggedResourceTopics: Topic[],
+  collectedTopics: TaggedTopic[]
+) {
+  return taggedResourceTopics.map((taggedTopicNoID: Topic) => {
+    return db
+      .doc(`MSFields/${taggedTopicNoID.microsoftID}`)
+      .get()
+      .then((ds) => {
+        function addLabspoonTopicToTaggedResource(
+          correspondingLabspoonTopicID: string
+        ) {
+          collectedTopics.push(
+            convertTopicToTaggedTopic(
+              taggedTopicNoID,
+              correspondingLabspoonTopicID
+            )
+          );
+        }
+        if (ds.exists) {
+          const MSFieldData = ds.data() as MAKField;
+          if (MSFieldData.processed) {
+            addLabspoonTopicToTaggedResource(MSFieldData.processed);
+          } else {
+            // This should not be possible. All dbMSFields should be processed
+            // upon creation.
+            console.error(
+              'no Labspoon topic corresponding to MSField ' +
+                taggedTopicNoID.microsoftID
+            );
+            createMSTopic(MSFieldData);
+          }
+        } else {
+          createFieldAndTopic(taggedTopicNoID)
+            .then((labspoonTopicID) => {
+              if (labspoonTopicID === undefined) {
+                console.error(
+                  `topic with microsoftID ${taggedTopicNoID.microsoftID} was created but did not return the corresponding labspoon ID`
+                );
+              } else {
+                addLabspoonTopicToTaggedResource(labspoonTopicID);
+              }
+            })
+            .catch((err) =>
+              console.error(
+                `field ${taggedTopicNoID.microsoftID} is not in database and could not be created ${err}`
+              )
+            );
+        }
+      });
+  });
 }
 
 interface expressionField {

@@ -17,8 +17,7 @@ export default function Dropdown({
   useEffect(() => {
     const handleDocumentClick = (e) => {
       if (dropdownRef.current) {
-        if (!dropdownRef.current.contains(e.target) && open === true)
-          setOpen(false);
+        if (!dropdownRef.current.contains(e.target)) setOpen(false);
       }
     };
     document.addEventListener('mousedown', handleDocumentClick);

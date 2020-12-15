@@ -164,7 +164,7 @@
 
 .secondary-button-active {
   color: #00507c;
-  padding: 8px 16px 4px 16px;
+  padding: 8px 16px;
   border: 2px solid #00507c;
   cursor: pointer;
   box-sizing: border-box;
@@ -179,6 +179,10 @@
 
 .secondary-button-active:hover {
   outline: 1px solid #00507c;
+}
+
+.secondary-button-text {
+  margin-bottom: 0px;
 }
 
 @media screen and (max-width: 800px) {

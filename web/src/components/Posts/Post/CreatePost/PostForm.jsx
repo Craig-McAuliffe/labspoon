@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import {Form, Formik} from 'formik';
-import TagTopics from './TagTopics';
+import TagTopics from '../../../Topics/TagTopics';
 import CreatePostActions from './CreatePostActions';
 import {CreatingPostContext} from './CreatePost';
 import './CreatePost';
@@ -51,15 +51,4 @@ export default function PostForm({
       </div>
     </div>
   );
-}
-
-export function handlePostTopics(selectedTopics) {
-  const customTopics = [];
-  const DBTopics = [];
-  selectedTopics.forEach((selectedTopic) => {
-    if (selectedTopic.isCustom) {
-      customTopics.push({name: selectedTopic.name});
-    } else DBTopics.push(selectedTopic);
-  });
-  return {customTopics: customTopics, DBTopics: DBTopics};
 }

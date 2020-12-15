@@ -6,7 +6,7 @@ import {CreatePostTextArea, TextInput} from '../../../Forms/FormTextInput';
 import PostForm from './PostForm';
 import {CreatingPostContext} from './CreatePost';
 import {FormPublicationResults} from '../../../Publication/MicrosoftResults';
-import {handlePostTopics} from './PostForm';
+import {handlePostTopics} from '../../../Topics/TagTopics';
 import TypeOfTaggedResourceDropDown from './TypeOfTaggedResourceDropDown';
 import {SmallPublicationListItem} from '../../../Publication/PublicationListItem';
 
