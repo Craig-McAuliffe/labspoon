@@ -19,13 +19,13 @@ export const createOpenPosition = functions.https.onCall(
     } catch {
       throw new functions.https.HttpsError(
         'internal',
-        'could not create open position'
+        'An error occurred while creating the open position.'
       );
     }
     if (!userIsAuthorised) {
       throw new functions.https.HttpsError(
         'permission-denied',
-        'user is not authorised to modify this group'
+        'User is not permitted to modify this group'
       );
     }
     const openPositionRef = db.collection('openPositions').doc();
