@@ -1,0 +1,66 @@
+.open-position-headline-section {
+  display: flex;
+  justify-content: space-between;
+}
+
+.open-position-headline-section-left-container {
+  padding-right: 10px;
+}
+
+.open-position-headline-section-institution {
+  color: #5d5d65;
+}
+
+.open-position-headline-sub-title-container {
+  display: flex;
+  margin: 10px 0px;
+}
+
+.open-position-headline-sub-title {
+  color: #99999f;
+}
+
+.open-position-headline-sub-title-value {
+  margin-left: 10px;
+}
+
+.open-position-description-container {
+  margin: 60px 0px;
+}
+
+.open-position-section-title {
+  color: #99999f;
+  margin: 30px 0px 10px;
+}
+
+.open-position-apply-title {
+  color: #99999f;
+  margin: 40px 0px;
+}
+
+.open-position-apply-title span {
+  color: #00507c;
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.open-position-apply-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 80px;
+}
+
+.open-position-created-by {
+  color: #99999f;
+  margin-right: 10px;
+}
+
+.open-position-created-by-name {
+}
+
+.open-position-headline-address {
+  margin-top: 5px;
+  max-width: 150px;
+  text-align: right;
+  color: #5d5d65;
+}

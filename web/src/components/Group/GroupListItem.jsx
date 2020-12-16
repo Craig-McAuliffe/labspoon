@@ -8,6 +8,7 @@ import './GroupListItem.css';
 export default function GroupListItem({
   group,
   LinkOverride = undefined,
+  noBorder,
   children,
 }) {
   const [displayFullDescription, setDisplayFullDescription] = useState({
@@ -33,7 +34,7 @@ export default function GroupListItem({
   );
 
   return (
-    <div className="group-list-item-container">
+    <div className={`group-list-item-container${noBorder ? '-no-border' : ''}`}>
       <GroupAvatarSection
         groupAvatar={group.avatar}
         height={130}
