@@ -5,6 +5,10 @@ service cloud.firestore {
       allow read;
     }
 
+    match /openPositions/{openPositionID} {
+        allow read;
+      }
+
     match /users/{userID} {
       allow read;
       allow update: if request.auth != null && request.auth.uid == userID;
