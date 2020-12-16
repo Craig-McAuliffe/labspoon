@@ -1,7 +1,7 @@
 import React from 'react';
 import errorIcon from '../assets/errorIcon.svg';
 
-export default function GeneralError() {
+export default function GeneralError({children}) {
   return (
     <div className="error-container">
       <img
@@ -9,10 +9,14 @@ export default function GeneralError() {
         src={errorIcon}
         alt="Bug fixing illustration"
       />
-      <h2>
-        Oops, something went wrong. Patrick and Craig personally apologise for
-        the inconvenience.
-      </h2>
+      {children ? (
+        children
+      ) : (
+        <h2>
+          Hmmm, something went wrong. Don&#39;t worry, it&#39;s us not you. Try
+          refreshing your page.
+        </h2>
+      )}
     </div>
   );
 }

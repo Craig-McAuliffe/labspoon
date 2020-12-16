@@ -55,7 +55,7 @@ export default function GroupInfoForm({
   submitText,
   verified,
 }) {
-  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const {user, userProfile} = useContext(AuthContext);
   const featureFlags = useContext(FeatureFlags);
   const validationSchema = Yup.object({
@@ -72,8 +72,8 @@ export default function GroupInfoForm({
   });
 
   function onSubmitAndPreventDuplicate(values) {
-    if (submitted) return;
-    setSubmitted(true);
+    if (submitting) return;
+    setSubmitting(true);
     onSubmit(values);
   }
 
@@ -166,7 +166,7 @@ export default function GroupInfoForm({
       ) : null}
       <CreateResourceFormActions
         submitText={submitText}
-        submitted={submitted}
+        submitting={submitting}
         cancelForm={cancelForm}
         formID="create-group-form"
       />

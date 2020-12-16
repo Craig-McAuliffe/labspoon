@@ -228,16 +228,6 @@ export const addGroupTypeToExistingGroups = functions.https.onCall(async () => {
   await Promise.all(updatePromises);
 });
 
-// Rank relates to how often the group posts about this topic
-export interface GroupRef {
-  id: string;
-  name: string;
-  avatar?: string;
-  about?: string;
-  institution?: string;
-  rank?: number;
-}
-
 export function toGroupRef(groupID: string, group: any) {
   const groupRef: GroupRef = {
     id: groupID,
@@ -266,4 +256,14 @@ export const verifyGroup = functions.https.onRequest(async (req, res) => {
 
 interface VerifiedGroup {
   timestamp: Date;
+}
+
+// Rank relates to how often the group posts about this topic
+export interface GroupRef {
+  id: string;
+  name: string;
+  avatar?: string;
+  about?: string;
+  institution?: string;
+  rank?: number;
 }

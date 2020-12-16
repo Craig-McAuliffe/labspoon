@@ -3,12 +3,14 @@ import React, {cloneElement, useEffect, useRef, useState} from 'react';
 import {DropDownTriangle} from '../assets/GeneralActionIcons';
 
 import './Dropdown.css';
+import LoadingSpinner from './LoadingSpinner/LoadingSpinner';
 
 export default function Dropdown({
   customToggle,
   customToggleWidth,
   customToggleTextOnly,
   containerTopPosition,
+  loading,
   children,
 }) {
   const [open, setOpen] = useState(false);
@@ -35,6 +37,15 @@ export default function Dropdown({
     return child;
   });
 
+  let dropdownContent;
+  if (loading)
+    dropdownContent = (
+      <div className="dropdown-loading-content">
+        <LoadingSpinner />
+      </div>
+    );
+  if (!loading && children) dropdownContent = menuChildren;
+
   return (
     <div className="dropdown-relative-position">
       <DropdownToggle
@@ -48,7 +59,7 @@ export default function Dropdown({
           dropdownRef={dropdownRef}
           containerTopPosition={containerTopPosition}
         >
-          {menuChildren}
+          {dropdownContent}
         </DropdownOptions>
       ) : null}
     </div>

@@ -6,7 +6,7 @@ import './CreateResourceFormActions.css';
 
 export default function CreateResourceFormActions({
   submitText,
-  submitted,
+  submitting,
   cancelForm,
   formID,
 }) {
@@ -16,7 +16,7 @@ export default function CreateResourceFormActions({
         {cancelForm ? <CancelButton cancelAction={cancelForm} /> : null}
       </div>
       <div>
-        <PrimaryButton submit={true} formID={formID} disabled={submitted}>
+        <PrimaryButton submit={true} formID={formID} disabled={submitting}>
           {submitText}
         </PrimaryButton>
       </div>
