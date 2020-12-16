@@ -112,15 +112,7 @@ export default function CreateOpenPosition() {
     ),
   });
 
-  if (pageError)
-    return (
-      <GeneralError>
-        <h4>
-          Something went wrong trying to fetch your groups. We&#39;ll look into
-          it. Please try again later.
-        </h4>
-      </GeneralError>
-    );
+  if (pageError) return <GeneralError />;
 
   if (selectedGroup === undefined)
     return (
