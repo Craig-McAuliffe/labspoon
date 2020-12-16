@@ -97,7 +97,12 @@ async function checkUserIsMemberOfGroup(authorID: string, groupID: string) {
           groupID,
         err
       );
-      throw new functions.https.HttpsError('internal', 'something went wrong');
+      throw new Error(
+        'unable to verify if user with id' +
+          authorID +
+          'is a member of group with id' +
+          groupID
+      );
     });
 }
 
