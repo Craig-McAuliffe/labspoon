@@ -10,6 +10,7 @@ export default function Dropdown({
   customToggleWidth,
   customToggleTextOnly,
   containerTopPosition,
+  loading,
   children,
 }) {
   const [open, setOpen] = useState(false);
@@ -36,6 +37,15 @@ export default function Dropdown({
     return child;
   });
 
+  let dropdownContent;
+  if (loading)
+    dropdownContent = (
+      <div className="dropdown-loading-content">
+        <LoadingSpinner />
+      </div>
+    );
+  if (!loading && children) dropdownContent = menuChildren;
+
   return (
     <div className="dropdown-relative-position">
       <DropdownToggle
@@ -49,7 +59,7 @@ export default function Dropdown({
           dropdownRef={dropdownRef}
           containerTopPosition={containerTopPosition}
         >
-          {menuChildren}
+          {dropdownContent}
         </DropdownOptions>
       ) : null}
     </div>
@@ -97,22 +107,8 @@ function DropdownOptions({dropdownRef, containerTopPosition, children}) {
   );
 }
 
-export function DropdownOption({
-  children,
-  onSelect,
-  height,
-  onSomethingElse,
-  loading,
-}) {
+export function DropdownOption({children, onSelect, height, onSomethingElse}) {
   if (onSomethingElse) onSomethingElse();
-  let optionContent;
-  if (loading)
-    optionContent = (
-      <div className="dropdown-option-loading-content">
-        <LoadingSpinner />
-      </div>
-    );
-  if (!loading && children) optionContent = children;
   return (
     <button
       onClick={onSelect}
@@ -120,7 +116,7 @@ export function DropdownOption({
       type="button"
       style={{height: height}}
     >
-      {optionContent}
+      {children}
     </button>
   );
 }

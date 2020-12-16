@@ -211,12 +211,9 @@ function SelectGroup({memberOfGroups, setSelectedGroup, loading}) {
         customToggleWidth="100%"
         customToggleTextOnly="Select from your groups"
         containerTopPosition="40px"
+        loading={loading}
       >
-        {getMemberOfGroupsDropdownOptions(
-          memberOfGroups,
-          setSelectedGroup,
-          loading
-        )}
+        {getMemberOfGroupsDropdownOptions(memberOfGroups, setSelectedGroup)}
       </Dropdown>
     </div>
   );
@@ -250,12 +247,7 @@ function ChangeGroupToggle({setOpen}) {
   );
 }
 
-function getMemberOfGroupsDropdownOptions(
-  memberOfGroups,
-  setSelectedGroup,
-  loading
-) {
-  if (loading) return <DropdownOption onSelect={() => {}} loading={true} />;
+function getMemberOfGroupsDropdownOptions(memberOfGroups, setSelectedGroup) {
   if (memberOfGroups.length === 0) return;
   return memberOfGroups.map((group) => (
     <DropdownOption
