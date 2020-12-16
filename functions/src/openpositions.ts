@@ -13,7 +13,15 @@ export const createOpenPosition = functions.https.onCall(
     const authorID = author.id;
     const groupID = data.group.id;
     // change to check user is admin when we introduce group roles
-    const userIsAuthorised = await checkUserIsMemberOfGroup(authorID, groupID);
+    let userIsAuthorised;
+    try {
+      userIsAuthorised = await checkUserIsMemberOfGroup(authorID, groupID);
+    } catch {
+      throw new functions.https.HttpsError(
+        'internal',
+        'could not create open position'
+      );
+    }
     if (!userIsAuthorised) {
       throw new functions.https.HttpsError(
         'permission-denied',
@@ -65,7 +73,7 @@ export const createOpenPosition = functions.https.onCall(
       );
       throw new functions.https.HttpsError(
         'internal',
-        'An error occured while creating the open position.'
+        'An error occurred while creating the open position.'
       );
     });
   }
@@ -89,13 +97,7 @@ async function checkUserIsMemberOfGroup(authorID: string, groupID: string) {
           groupID,
         err
       );
-      throw new functions.https.HttpsError(
-        'internal',
-        'unable to ascertain whether user with id' +
-          authorID +
-          'is member of group with id' +
-          groupID
-      );
+      throw new functions.https.HttpsError('internal', 'something went wrong');
     });
 }
 
