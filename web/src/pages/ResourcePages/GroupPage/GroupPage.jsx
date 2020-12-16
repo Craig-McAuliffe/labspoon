@@ -132,12 +132,6 @@ export default function GroupPage() {
 
   const groupDescriptionRef = useRef();
 
-  const previousPage = () => (
-    <Link to="/search" className="vertical-breadcrumb">
-      Search Results
-    </Link>
-  );
-
   const fetchFeedData = (skip, limit, filterOptions, last) =>
     fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip);
 
@@ -233,7 +227,6 @@ export default function GroupPage() {
         <></>
       )}
       <div className="content-layout">
-        {previousPage()}
         <div className="group-details">
           <GroupDetails
             group={groupData}

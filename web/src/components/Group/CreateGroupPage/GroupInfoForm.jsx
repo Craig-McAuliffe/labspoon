@@ -31,11 +31,10 @@ import TabbedContainer from '../../TabbedContainer/TabbedContainer';
 import {EmailIcon} from '../../../assets/PostOptionalTagsIcons';
 import {SearchIconGrey} from '../../../assets/HeaderIcons';
 import {FeedContent} from '../../../components/Layout/Content';
-
-import './CreateGroupPage.css';
 import Select, {LabelledDropdownContainer} from '../../Forms/Select/Select';
 import {DropdownOption} from '../../Dropdown';
 
+import './CreateGroupPage.css';
 import './GroupInfoForm.css';
 
 const CHARITY = 'charity';
@@ -54,6 +53,7 @@ export default function GroupInfoForm({
   cancelForm,
   submitText,
   verified,
+  editingGroup,
 }) {
   const [submitting, setSubmitting] = useState(false);
   const {user, userProfile} = useContext(AuthContext);
@@ -117,7 +117,7 @@ export default function GroupInfoForm({
         {(props) => (
           <>
             <Form id="create-group-form">
-              <GroupTypeSelect name="groupType" />
+              {editingGroup ? null : <GroupTypeSelect name="groupType" />}
               <EditAvatar
                 existingAvatar={existingAvatar}
                 onAvatarSelect={onAvatarSelect}

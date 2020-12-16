@@ -61,7 +61,6 @@ export default function EditingGroupInfo({groupData}) {
     institution: groupData.institution,
     website: groupData.website,
     about: groupData.about,
-    groupType: groupData.groupType,
     donationLink: groupData.donationLink || '',
   };
 
@@ -169,6 +168,7 @@ export default function EditingGroupInfo({groupData}) {
         existingAvatar={groupData.avatar}
         submitText="Save Changes"
         verified={verified}
+        editingGroup={true}
       />
     </div>
   );
