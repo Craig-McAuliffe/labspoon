@@ -13,8 +13,8 @@ export default function GeneralError({children}) {
         children
       ) : (
         <h2>
-          Oops, something went wrong. Patrick and Craig personally apologise for
-          the inconvenience.
+          Hmmm, something went wrong. Don&#39;t worry, it&#39;s us not you. Try
+          refreshing your page.
         </h2>
       )}
     </div>

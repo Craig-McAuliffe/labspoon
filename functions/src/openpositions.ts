@@ -16,8 +16,8 @@ export const createOpenPosition = functions.https.onCall(
     const userIsAuthorised = await checkUserIsMemberOfGroup(authorID, groupID);
     if (!userIsAuthorised) {
       throw new functions.https.HttpsError(
-        'internal',
-        'user is not authorised to make modify this group'
+        'permission-denied',
+        'user is not authorised to modify this group'
       );
     }
     const openPositionRef = db.collection('openPositions').doc();
@@ -77,12 +77,6 @@ async function checkUserIsMemberOfGroup(authorID: string, groupID: string) {
     .get()
     .then((ds) => {
       if (!ds.exists) {
-        console.error(
-          'group with id' +
-            groupID +
-            'does not exist on userdoc for author with id' +
-            authorID
-        );
         return false;
       }
       return true;
@@ -95,7 +89,13 @@ async function checkUserIsMemberOfGroup(authorID: string, groupID: string) {
           groupID,
         err
       );
-      return false;
+      throw new functions.https.HttpsError(
+        'internal',
+        'unable to ascertain whether user with id' +
+          authorID +
+          'is member of group with id' +
+          groupID
+      );
     });
 }
 
