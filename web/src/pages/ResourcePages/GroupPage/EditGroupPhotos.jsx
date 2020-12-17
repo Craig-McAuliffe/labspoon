@@ -40,6 +40,7 @@ export default function EditGroupPhotos({children}) {
   useEffect(() => {
     if (last !== undefined) return;
     fetchMore();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [last]);
 
   function refresh() {

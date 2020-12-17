@@ -91,6 +91,7 @@ const withLayout = (editor) => {
 
 export const yupArticleValidation = Yup.array().test(
   'isArticle',
+  // eslint-disable-next-line no-template-curly-in-string
   '${path} is not an article',
   (value) => {
     if (value.length !== 2) return false;

@@ -128,7 +128,7 @@ export default function GroupPage() {
       .get()
       .then((ds) => setVerified(ds.exists))
       .catch((err) => console.error(err));
-  }, [groupID]);
+  }, [groupID, featureFlags]);
 
   const groupDescriptionRef = useRef();
 
@@ -348,7 +348,7 @@ function DonationLink({verified, donationLink}) {
         </p>
       </div>
       <div className="donation-link-donate-container">
-        <a target="_blank" href={donationLink} rel="noreferrer">
+        <a target="_blank" href={donationLink} rel="noopener noreferrer">
           <DonateButton />
         </a>
         <p>This will take you to an external site.</p>

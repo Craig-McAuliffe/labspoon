@@ -40,6 +40,7 @@ export default function ImageUpload({storageDir, successCallback, refresh}) {
       imageURLs.map((url) => URL.revokeObjectURL(url));
       setImageURLs([]);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [files, setImageURLs, setUploading]);
 
   useEffect(() => {
@@ -48,6 +49,7 @@ export default function ImageUpload({storageDir, successCallback, refresh}) {
       setDisplaySuccessMessage(true);
       if (refresh) refresh();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uploading, setImageURLs, setFiles]);
 
   useEffect(() => {

@@ -285,7 +285,7 @@ function getPositionTypes(setSelectedPosition) {
   ));
 }
 
-function HowToApply({}) {
+function HowToApply() {
   const tabDetails = [
     {
       name: 'Apply through link',

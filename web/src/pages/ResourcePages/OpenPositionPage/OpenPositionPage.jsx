@@ -29,7 +29,7 @@ export default function OpenPositionPage() {
         console.error('unable to retrieve open position from db' + err);
         setPageError(true);
       });
-  }, [openPositionID]);
+  }, [openPositionID, history]);
 
   if (pageError) return <GeneralError />;
 
@@ -99,7 +99,7 @@ export default function OpenPositionPage() {
             <a
               target="_blank"
               href={openPosition.content.applyLink}
-              rel="noreferrer"
+              rel="noopener noreferrer"
             >
               {openPosition.content.applyLink}
             </a>

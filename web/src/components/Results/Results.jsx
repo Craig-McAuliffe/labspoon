@@ -141,8 +141,8 @@ export function GenericListItem({result, onBookmarkPage}) {
       return (
         <VideoListItem
           src={result.src}
-          alt={result.alt}
-          key={result.id + 'image'}
+          key={result.id + 'video'}
+          title={`video from ${result.src}`}
         />
       );
     default:

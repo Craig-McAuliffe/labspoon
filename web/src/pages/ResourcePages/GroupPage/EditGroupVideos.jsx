@@ -46,6 +46,7 @@ export default function EditGroupVideos({children}) {
   useEffect(() => {
     if (last !== undefined) return;
     fetchMore();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [last]);
 
   function refresh() {
