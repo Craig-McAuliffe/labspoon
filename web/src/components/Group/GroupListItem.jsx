@@ -53,7 +53,7 @@ export default function GroupListItem({
         <SeeMore
           displayFullDescription={displayFullDescription}
           setDisplayFullDescription={setDisplayFullDescription}
-          groupDescriptionRef={groupDescriptionRef}
+          descriptionRef={groupDescriptionRef}
           id={group.id}
         />
       </div>

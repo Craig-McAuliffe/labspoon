@@ -1,9 +1,10 @@
 import React, {useEffect, useState} from 'react';
 
+import './SeeMore.css';
 export default function SeeMore({
   displayFullDescription,
   setDisplayFullDescription,
-  groupDescriptionRef,
+  descriptionRef,
   id,
 }) {
   const [displaySeeMore, setDisplaySeeMore] = useState();
@@ -11,9 +12,9 @@ export default function SeeMore({
 
   useEffect(() => {
     setDisplaySeeMore(
-      groupDescriptionRef.current.firstElementChild.scrollHeight > 100
+      descriptionRef.current.firstElementChild.scrollHeight > 100
     );
-  }, [windowWidth, id, groupDescriptionRef]);
+  }, [windowWidth, id, descriptionRef]);
 
   if (!displaySeeMore) return null;
   return (
@@ -25,8 +26,7 @@ export default function SeeMore({
             ? setDisplayFullDescription({display: false, size: 100})
             : setDisplayFullDescription({
                 display: true,
-                size:
-                  groupDescriptionRef.current.firstElementChild.scrollHeight,
+                size: descriptionRef.current.firstElementChild.scrollHeight,
               })
         }
       >

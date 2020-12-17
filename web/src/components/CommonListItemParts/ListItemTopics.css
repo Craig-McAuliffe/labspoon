@@ -18,4 +18,5 @@
 .tagged-topic-names {
   display: inline-block;
   margin: 0px 30px 5px;
+  padding-top: 1px;
 }

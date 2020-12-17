@@ -1,0 +1,22 @@
+.group-signature-container {
+  display: flex;
+  justify-content: flex-end;
+  margin: 20px 0px;
+}
+
+.group-signature-link:hover .group-signature-name {
+  color: #3099d3;
+}
+
+.group-signature-link:hover img {
+  opacity: 50%;
+}
+
+.group-signature-text-container {
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.group-signature-institution {
+  color: #99999f;
+}

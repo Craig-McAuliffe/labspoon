@@ -53,20 +53,6 @@
   justify-content: flex-end;
 }
 
-.see-more-button {
-  border: none;
-  background: none;
-  outline: none;
-  color: #00507c;
-}
-
-.see-more-button:hover,
-.see-more-button:focus {
-  border: none;
-  background: none;
-  outline: none;
-}
-
 .pinned-post-container {
   margin: 10px 0px;
 }

@@ -18,8 +18,9 @@ import './Results.css';
 import FollowUserButton from '../User/FollowUserButton/FollowUserButton';
 import {FilterableResultsContext} from '../FilterableResults/FilterableResults';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
-import {PageContentContainer} from '../Layout/Content';
+import OpenPositionListItem from '../OpenPosition/OpenPositionListItem';
 
+const OPENPOSITION = 'openPosition';
 /**
  * Displays an infinitely scrolling list of posts.
  * @param {Array} results - results to render
@@ -50,11 +51,7 @@ export default function Results({results, hasMore, fetchMore, activeTabID}) {
   }, [results, setResultComponents, setResourceTypes]);
 
   if (resourceTypes.size > 1)
-    return (
-      <PageContentContainer>
-        <MixedResultsPage results={resultComponents} />
-      </PageContentContainer>
-    );
+    return <MixedResultsPage results={resultComponents} />;
 
   const endMessage =
     currentLocation === '/' ? (
@@ -69,18 +66,16 @@ export default function Results({results, hasMore, fetchMore, activeTabID}) {
   }
 
   return (
-    <PageContentContainer>
-      <InfiniteScroll
-        dataLength={resultComponents.length}
-        hasMore={hasMore}
-        next={fetchMore}
-        loader={<p>Loading...</p>}
-        endMessage={endMessage}
-        style={{minWidth: '100%'}}
-      >
-        {content}
-      </InfiniteScroll>
-    </PageContentContainer>
+    <InfiniteScroll
+      dataLength={resultComponents.length}
+      hasMore={hasMore}
+      next={fetchMore}
+      loader={<p>Loading...</p>}
+      endMessage={endMessage}
+      style={{minWidth: '100%'}}
+    >
+      {content}
+    </InfiniteScroll>
   );
 }
 Results.propTypes = {
@@ -144,6 +139,10 @@ export function GenericListItem({result, onBookmarkPage}) {
           key={result.id + 'video'}
           title={`video from ${result.src}`}
         />
+      );
+    case OPENPOSITION:
+      return (
+        <OpenPositionListItem openPosition={result} key={result.id + 'video'} />
       );
     default:
       return null;
