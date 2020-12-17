@@ -3,9 +3,10 @@ import GroupInfoForm from '../../../components/Group/CreateGroupPage/GroupInfoFo
 import firebase, {db, storage} from '../../../firebase';
 import {Alert} from 'react-bootstrap';
 import {v4 as uuid} from 'uuid';
+import {AuthContext} from '../../../App';
+import {useHistory} from 'react-router-dom';
 
 import './GroupPage.css';
-import {AuthContext} from '../../../App';
 
 export default function EditingGroupInfo({groupData}) {
   const groupID = groupData.id;
@@ -14,6 +15,7 @@ export default function EditingGroupInfo({groupData}) {
   const [verified, setVerified] = useState(undefined);
   const [avatar, setAvatar] = useState([]);
   const {user} = useContext(AuthContext);
+  const history = useHistory();
   const userID = user.uid;
 
   useEffect(() => {
@@ -129,7 +131,7 @@ export default function EditingGroupInfo({groupData}) {
         .commit()
         .catch((err) => alert(err, 'batch failed to commit'))
         .then(() => {
-          window.location.reload();
+          history.push(`/group/${groupID}`);
         });
     };
     const avatarStorageRef = storage.ref(`groups/${groupID}/avatar_fullSize`);
@@ -169,6 +171,7 @@ export default function EditingGroupInfo({groupData}) {
         submitText="Save Changes"
         verified={verified}
         editingGroup={true}
+        cancelForm={() => history.push(`/group/${groupID}`)}
       />
     </div>
   );
