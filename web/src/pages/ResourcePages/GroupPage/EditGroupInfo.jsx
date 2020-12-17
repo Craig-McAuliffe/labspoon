@@ -56,11 +56,11 @@ export default function EditingGroupInfo({groupData}) {
   }, [groupMembers]);
 
   const initialValues = {
-    name: groupData.name,
-    location: groupData.location,
-    institution: groupData.institution,
-    website: groupData.website,
-    about: groupData.about,
+    name: groupData.name ? groupData.name : '',
+    location: groupData.location ? groupData.location : '',
+    institution: groupData.institution ? groupData.institution : '',
+    website: groupData.website ? groupData.website : '',
+    about: groupData.about ? groupData.about : '',
     donationLink: groupData.donationLink || '',
   };
 
