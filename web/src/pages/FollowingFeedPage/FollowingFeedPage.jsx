@@ -169,12 +169,10 @@ export default function FollowingFeedPage() {
     );
   return (
     <FilterableResults fetchResults={fetchResults} limit={10} loadingFilter>
-      <div className="sider-layout">
-        <FilterManager>
-          <NewFilterMenuWrapper getDefaultFilter={getDefaultFilter} />
-          <ResourceTabs />
-        </FilterManager>
-      </div>
+      <FilterManager>
+        <NewFilterMenuWrapper getDefaultFilter={getDefaultFilter} />
+        <ResourceTabs />
+      </FilterManager>
       <div className="content-layout">
         <div className="feed-container">
           {featureFlags.has('create-post') ? <CreatePost /> : <></>}

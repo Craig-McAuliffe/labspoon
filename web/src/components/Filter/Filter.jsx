@@ -35,12 +35,14 @@ export function FilterMenu({
       />
     );
   });
-
+  if (options.length === 0) return null;
   return (
-    <div className="filter-container">
-      <FilterSearch />
-      {filterCollections}
-      <AdminLinks />
+    <div className="sider-layout">
+      <div className="filter-container">
+        <FilterSearch />
+        {filterCollections}
+        <AdminLinks />
+      </div>
     </div>
   );
 }

@@ -249,25 +249,25 @@ export default function GroupPage() {
       ) : (
         <></>
       )}
-      <div className="content-layout">
-        <div className="group-details">
-          <GroupDetails
-            group={groupData}
-            groupDescriptionRef={groupDescriptionRef}
-            userIsMember={userIsMember}
-            verified={verified}
-          />
-        </div>
-        <FilterableResults fetchResults={fetchFeedData} limit={9}>
-          <div className="feed-container">
-            <FilterManager>
+      <FilterableResults fetchResults={fetchFeedData} limit={9}>
+        <FilterManager>
+          <NewFilterMenuWrapper />
+          <div className="content-layout">
+            <div className="group-details">
+              <GroupDetails
+                group={groupData}
+                groupDescriptionRef={groupDescriptionRef}
+                userIsMember={userIsMember}
+                verified={verified}
+              />
+            </div>
+            <div className="feed-container">
               <ResourceTabs tabs={relationshipFilter} />
-              <NewFilterMenuWrapper />
-            </FilterManager>
-            <NewResultsWrapper />
+              <NewResultsWrapper />
+            </div>
           </div>
-        </FilterableResults>
-      </div>
+        </FilterManager>
+      </FilterableResults>
     </>
   );
 }

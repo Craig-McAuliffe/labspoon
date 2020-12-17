@@ -139,24 +139,24 @@ export default function PublicationPage() {
       ) : (
         <div></div>
       )}
-      <div className="content-layout">
-        <div className="details-container">
-          <PublicationDetails publicationDetails={publicationDetails} />
-        </div>
-        <FilterableResults fetchResults={fetchFeedData} limit={10}>
-          <div className="feed-container">
-            <FilterManager>
+      <FilterableResults fetchResults={fetchFeedData} limit={10}>
+        <FilterManager>
+          <NewFilterMenuWrapper />
+          <div className="content-layout">
+            <div className="details-container">
+              <PublicationDetails publicationDetails={publicationDetails} />
+            </div>
+            <div className="feed-container">
               <ResourceTabs tabs={relationshipFilter} />
-              <NewFilterMenuWrapper />
-            </FilterManager>
-            <RetrieveMoreReferences
-              publicationID={publicationID}
-              publication={publicationDetails}
-            />
-            <NewResultsWrapper />
+              <RetrieveMoreReferences
+                publicationID={publicationID}
+                publication={publicationDetails}
+              />
+              <NewResultsWrapper />
+            </div>
           </div>
-        </FilterableResults>
-      </div>
+        </FilterManager>
+      </FilterableResults>
       <SuggestedContentSider
         resourceType={'publication'}
         resourceID={publicationID}

@@ -175,22 +175,22 @@ export default function TopicPage() {
       ) : (
         <></>
       )}
-      <div className="content-layout">
-        <div className="details-container">
-          <TopicListItem topic={topicDetails} dedicatedPage={true}>
-            <FollowTopicButton targetTopic={topicDetails} />
-          </TopicListItem>
-        </div>
-        <FilterableResults fetchResults={fetchFeedData} limit={10}>
-          <div className="feed-container">
-            <FilterManager>
+      <FilterableResults fetchResults={fetchFeedData} limit={10}>
+        <FilterManager>
+          <NewFilterMenuWrapper />
+          <div className="content-layout">
+            <div className="details-container">
+              <TopicListItem topic={topicDetails} dedicatedPage={true}>
+                <FollowTopicButton targetTopic={topicDetails} />
+              </TopicListItem>
+            </div>
+            <div className="feed-container">
               <ResourceTabs tabs={relationshipFilter} />
-              <NewFilterMenuWrapper />
-            </FilterManager>
-            <NewResultsWrapper />
+              <NewResultsWrapper />
+            </div>
           </div>
-        </FilterableResults>
-      </div>
+        </FilterManager>
+      </FilterableResults>
     </>
   );
 }

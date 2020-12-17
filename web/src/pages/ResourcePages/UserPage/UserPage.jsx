@@ -148,25 +148,25 @@ export default function UserPage() {
         <EditUserPage user={userDetails} />;
       </Route>
       <Route path={route.path}>
-        <div className="content-layout">
-          {featureFlags.has('related-resources') ? (
-            <SuggestedUsers userID={userID} />
-          ) : (
-            <></>
-          )}
-          <div className="details-container">
-            <UserInfo user={userDetails} />
-          </div>
-          <FilterableResults fetchResults={fetchFeedData} limit={10}>
-            <div className="feed-container">
-              <FilterManager>
+        <FilterableResults fetchResults={fetchFeedData} limit={10}>
+          <FilterManager>
+            <NewFilterMenuWrapper />
+            <div className="content-layout">
+              {featureFlags.has('related-resources') ? (
+                <SuggestedUsers userID={userID} />
+              ) : (
+                <></>
+              )}
+              <div className="details-container">
+                <UserInfo user={userDetails} />
+              </div>
+              <div className="feed-container">
                 <ResourceTabs tabs={relationshipFilter} />
-                <NewFilterMenuWrapper />
-              </FilterManager>
-              <NewResultsWrapper />
+                <NewResultsWrapper />
+              </div>
             </div>
-          </FilterableResults>
-        </div>
+          </FilterManager>
+        </FilterableResults>
       </Route>
     </Switch>
   );
