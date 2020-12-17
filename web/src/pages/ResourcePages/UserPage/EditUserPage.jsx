@@ -54,8 +54,8 @@ export default function EditUserPage({user}) {
   });
 
   const initialValues = {
-    institution: userDetails.institution,
-    position: userDetails.position,
+    institution: userDetails.institution ? userDetails.institution : '',
+    position: userDetails.position ? userDetails.position : '',
   };
   return (
     <div className="content-layout">
