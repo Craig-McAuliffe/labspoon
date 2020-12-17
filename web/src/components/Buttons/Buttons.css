@@ -70,34 +70,3 @@
 .button-position {
   position: relative;
 }
-
-.sign-up-prompt {
-  position: absolute;
-  right: 50px;
-  padding: 20px 16px;
-  box-shadow: 0px 0px 4px rgba(0, 7, 12, 0.6);
-  border: 1px solid #00507c;
-  width: 200px;
-  top: 10px;
-  background: white;
-  display: flex;
-  justify-content: center;
-  z-index: 10;
-}
-
-.sign-up-prompt-center {
-  position: absolute;
-  padding: 20px 16px;
-  box-shadow: 0px 0px 4px rgba(0, 7, 12, 0.6);
-  border: 1px solid #00507c;
-  width: 240px;
-  top: 10px;
-  background: white;
-  display: flex;
-  justify-content: center;
-}
-
-.sign-up-prompt p,
-.sign-up-prompt-center p {
-  line-height: 16px;
-}

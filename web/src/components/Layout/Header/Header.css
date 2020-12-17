@@ -33,6 +33,7 @@
   grid-column: 4 / 5;
   max-height: 100%;
   max-width: 100%;
+  margin-left: 5px;
 }
 
 .header-home-text {

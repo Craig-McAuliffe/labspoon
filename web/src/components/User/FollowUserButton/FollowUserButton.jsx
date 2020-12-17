@@ -11,6 +11,10 @@ export default function FollowUserButton({targetUser}) {
 
   useEffect(() => {
     if (!targetUser.id) return;
+    if (!authUser) {
+      setFollowing(false);
+      return;
+    }
     if (!featureFlags.has('disable-cloud-firestore') && authUser) {
       db.doc(`users/${authUser.uid}/followsUsers/${targetUser.id}`)
         .get()
