@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import {admin} from './config';
-import {GroupRef} from './groups';
+import {GroupRef, toGroupRef} from './groups';
 
 import {TaggedTopic, handleTaggedTopics} from './topics';
 import {UserRef, checkAuthAndGetUserFromContext} from './users';
@@ -105,6 +105,106 @@ async function checkUserIsMemberOfGroup(authorID: string, groupID: string) {
       );
     });
 }
+
+export const updateOpenPosUponUserChange = functions.firestore
+  .document('users/{userID}')
+  .onUpdate(async (change, context) => {
+    const userID = context.params.userID;
+    const user = change.after.data() as UserRef;
+    const openPositionsIDsToBeUpdated: string[] = [];
+    await db
+      .collection(`users/${userID}/openPositions`)
+      .get()
+      .then((qs) => {
+        if (qs.empty) return;
+        qs.forEach((ds) => {
+          const openPositionID = ds.id;
+          openPositionsIDsToBeUpdated.push(openPositionID);
+        });
+      })
+      .catch((err) =>
+        console.error(
+          'unable to retrieve openPositions by user with id' + userID
+        )
+      );
+    const openPositionUpdatesPromises = openPositionsIDsToBeUpdated.map(
+      (openPositionIDToBeUpdated) =>
+        db
+          .doc(`openPositions/${openPositionIDToBeUpdated}`)
+          .update({author: user})
+          .catch((err) =>
+            console.error(
+              'unable to update openPosition with id' +
+                openPositionIDToBeUpdated +
+                'with new userRef for user with id' +
+                userID
+            )
+          )
+    );
+    return Promise.all(openPositionUpdatesPromises);
+  });
+
+export const updateOpenPosUponGroupChange = functions.firestore
+  .document('groups/{groupID}')
+  .onUpdate(async (change, context) => {
+    const groupID = context.params.groupID;
+    const group = toGroupRef(groupID, change.after.data());
+    const openPositionsIDsToBeUpdated: string[] = [];
+    await db
+      .collection(`groups/${groupID}/openPositions`)
+      .get()
+      .then((qs) => {
+        if (qs.empty) return;
+        qs.forEach((ds) => {
+          const openPositionID = ds.id;
+          openPositionsIDsToBeUpdated.push(openPositionID);
+        });
+      })
+      .catch((err) =>
+        console.error(
+          'unable to retrieve openPositions by group with id' + groupID
+        )
+      );
+    const openPositionUpdatesPromises = openPositionsIDsToBeUpdated.map(
+      (openPositionIDToBeUpdated) =>
+        db
+          .doc(`openPositions/${openPositionIDToBeUpdated}`)
+          .update({group: group})
+          .catch((err) =>
+            console.error(
+              'unable to update openPosition with id' +
+                openPositionIDToBeUpdated +
+                'with new groupRef for group with id' +
+                groupID
+            )
+          )
+    );
+    return Promise.all(openPositionUpdatesPromises);
+  });
+
+export const syncOpenPosUpdateToUserAndGroup = functions.firestore
+  .document('openPositions/{openPositionID}')
+  .onUpdate(async (change, context) => {
+    const openPosition = change.after.data();
+    const openPositionID = context.params.openPositionID;
+    const authorID = openPosition.author.id;
+    const groupID = openPosition.group.id;
+    const batch = db.batch();
+    batch.set(
+      db.doc(`users/${authorID}/openPositions/${openPositionID}`),
+      openPosition
+    );
+    batch.set(
+      db.doc(`groups/${groupID}/openPositions/${openPositionID}`),
+      openPosition
+    );
+    await batch.commit().catch((err) => {
+      console.error(
+        `could not update open position with id ${openPositionID} on user doc with id ${authorID} and on group with id ${groupID}` +
+          err
+      );
+    });
+  });
 
 interface OpenPosition {
   content: OpenPositionContent;
