@@ -27,9 +27,10 @@ import EditButton from '../../../components/Buttons/EditButton';
 import {PinnedPost} from '../../../components/Posts/Post/Post';
 import SeeMore from '../../../components/SeeMore';
 import {getGroup} from '../../../helpers/groups';
+import {getPaginatedVideosFromCollectionRef} from '../../../helpers/videos';
+import {WebsiteIcon} from '../../../assets/PostOptionalTagsIcons';
 
 import './GroupPage.css';
-import {getPaginatedVideosFromCollectionRef} from '../../../helpers/videos';
 
 const PHOTOS = 'photos';
 const VIDEOS = 'videos';
@@ -263,7 +264,6 @@ function SuggestedGroups({groupData}) {
 }
 
 const GroupDetails = ({group, groupDescriptionRef, userIsMember, verified}) => {
-  const {url} = useRouteMatch();
   const featureFlags = useContext(FeatureFlags);
   const [displayFullDescription, setDisplayFullDescription] = useState({
     display: false,
@@ -320,16 +320,37 @@ const GroupDetails = ({group, groupDescriptionRef, userIsMember, verified}) => {
           <PinnedPost post={group.pinnedPost} />
         </div>
       ) : null}
-      {userIsMember ? (
-        <div className="group-page-edit-button-container">
-          <Link to={`${url}/edit/info`}>
-            <EditButton editAction={() => {}}>Edit Group</EditButton>
-          </Link>
-        </div>
-      ) : null}
+      <div className="group-email-edit-container">
+        <WebsiteLink link={group.website} />
+        {userIsMember ? <EditResource /> : null}
+      </div>
     </>
   );
 };
+
+function WebsiteLink({link}) {
+  if (!link) return <div></div>;
+  if (link.length === 0) return <div></div>;
+  return (
+    <a
+      className="group-website-link"
+      href={link}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <WebsiteIcon /> <span>Website</span>
+    </a>
+  );
+}
+
+function EditResource() {
+  const {url} = useRouteMatch();
+  return (
+    <Link to={`${url}/edit/info`}>
+      <EditButton editAction={() => {}}>Edit Group</EditButton>
+    </Link>
+  );
+}
 
 function DonationLink({verified, donationLink}) {
   if (!verified || !donationLink) return <></>;

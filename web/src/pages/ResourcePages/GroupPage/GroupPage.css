@@ -71,11 +71,6 @@
   margin: 10px 0px;
 }
 
-.group-page-edit-button-container {
-  display: flex;
-  justify-content: flex-end;
-}
-
 .edit-group-tabs-container {
   margin-left: -5px;
 }
@@ -207,4 +202,33 @@
 
 .group-verification-confirmation-explanation {
   color: #5d5d65;
+}
+
+.group-email-edit-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.group-website-link {
+  margin-bottom: 4px;
+}
+
+.group-website-link svg {
+  height: 25px;
+}
+
+.group-website-link path {
+  fill: #00507c;
+}
+
+.group-website-link span {
+  position: relative;
+  display: inline-block;
+  top: 1px;
+}
+
+.group-website-link:hover {
+  text-decoration: none;
+  color: #3099d3;
 }
