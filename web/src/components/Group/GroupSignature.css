@@ -1,7 +1,7 @@
 .group-signature-container {
   display: flex;
   justify-content: flex-end;
-  margin: 20px 0px;
+  margin: 20px 0px 0px;
 }
 
 .group-signature-link:hover .group-signature-name {

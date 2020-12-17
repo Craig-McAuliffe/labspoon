@@ -7,9 +7,10 @@ import GroupSignature from '../Group/GroupSignature';
 
 import './OpenPositionListItem.css';
 export default function OpenPositionListItem({openPosition}) {
+  const content = openPosition.content;
   const [displayFullDescription, setDisplayFullDescription] = useState({
     display: false,
-    size: 150,
+    size: content.description.length < 200 ? 100 : 150,
   });
   const descriptionRef = useRef();
 
@@ -18,25 +19,31 @@ export default function OpenPositionListItem({openPosition}) {
   };
 
   if (!openPosition) return null;
-  const content = openPosition.content;
   return (
     <ListItemContainer>
       <Link to={`/openPosition/${openPosition.id}`}>
         <h3>{content.title}</h3>
       </Link>
-      <h4 className="resource-list-item-inline-subtitle">
-        Salary
-        <span>{content.salary}</span>
-      </h4>
-      <h4 className="resource-list-item-inline-subtitle">
-        Start date
-        <span>{content.startDate}</span>
-      </h4>
-      <ListItemTopics
-        dbTopics={openPosition.topics}
-        customTopics={openPosition.customTopics}
-      />
-      <h4>Description of Role</h4>
+      {content.salary.length > 0 ? (
+        <h4 className="resource-list-item-inline-subtitle">
+          Salary
+          <span>{content.salary}</span>
+        </h4>
+      ) : null}
+      {content.startDate.length > 0 ? (
+        <h4 className="resource-list-item-inline-subtitle">
+          Start date
+          <span>{content.startDate}</span>
+        </h4>
+      ) : null}
+      {openPosition.topics.length > 0 ||
+      openPosition.customTopics.length > 0 ? (
+        <ListItemTopics
+          dbTopics={openPosition.topics}
+          customTopics={openPosition.customTopics}
+        />
+      ) : null}
+      <h4 className="resource-list-item-subtitle">Description of Role</h4>
       <div
         ref={descriptionRef}
         style={descriptionSize}
