@@ -2,6 +2,7 @@ import React, {useContext, useState} from 'react';
 import PropTypes from 'prop-types';
 import {SearchIconGrey} from '../../assets/HeaderIcons';
 import {FeatureFlags} from '../../App';
+import {Link} from 'react-router-dom';
 import './Filter.css';
 
 /**
@@ -39,6 +40,7 @@ export function FilterMenu({
     <div className="filter-container">
       <FilterSearch />
       {filterCollections}
+      <AdminLinks />
     </div>
   );
 }
@@ -200,4 +202,12 @@ function FilterSearch() {
       </div>
     );
   else return null;
+}
+
+function AdminLinks() {
+  return (
+    <div className="filter-section-with-border">
+      <Link to="/privacyPolicy">Privacy Policy</Link>
+    </div>
+  );
 }
