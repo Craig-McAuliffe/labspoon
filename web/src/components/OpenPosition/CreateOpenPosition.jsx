@@ -94,6 +94,9 @@ export default function CreateOpenPosition() {
   const validationSchema = Yup.object({
     title: Yup.string().required('You need to provide a title.'),
     description: Yup.string().required('You need to write a description.'),
+    address: Yup.string(),
+    salary: Yup.string(),
+    startDate: Yup.string(),
     applyEmail: Yup.string().test(
       'one-apply-method',
       'You need to provide a link or email for applications',
