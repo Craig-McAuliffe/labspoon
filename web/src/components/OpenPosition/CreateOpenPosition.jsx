@@ -12,12 +12,12 @@ import {AuthContext} from '../../App';
 import {db} from '../../firebase';
 import {WebsiteIcon, EmailIcon} from '../../assets/PostOptionalTagsIcons';
 import TabbedContainer from '../TabbedContainer/TabbedContainer';
-import {CreateButton} from '../../assets/HeaderIcons';
 import SecondaryButton from '../Buttons/SecondaryButton';
 import {Link, useHistory} from 'react-router-dom';
 import {DropDownTriangle} from '../../assets/GeneralActionIcons';
 import GeneralError from '../GeneralError';
 import {convertGroupToGroupRef} from '../../helpers/groups';
+import CreateButton from '../Buttons/CreateButton';
 
 import './CreateOpenPosition.css';
 

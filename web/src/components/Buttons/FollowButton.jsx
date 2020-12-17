@@ -1,33 +1,25 @@
-import React, {useState, useContext, useRef, useEffect} from 'react';
-import {Link, useLocation} from 'react-router-dom';
+import React, {useContext} from 'react';
 import {AuthContext} from '../../App';
+import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
+import {FOLLOW, SignUpPopoverOverride} from '../Popovers/Popover';
 import './Buttons.css';
 import './FollowButton.css';
-import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 
 const FollowButton = ({following, setFollowing}) => {
-  const [signUpPrompt, setSignUpPrompt] = useState(false);
   const {user} = useContext(AuthContext);
-  const locationPathName = useLocation().pathname;
-  const signUpPromptRef = useRef();
-
   const followAction = () => {
-    user ? setFollowing() : setSignUpPrompt(true);
+    if (!user) return;
+    setFollowing();
   };
 
-  useEffect(() => {
-    const handleDocumentClick = (e) => {
-      if (signUpPromptRef.current) {
-        if (
-          !signUpPromptRef.current.contains(e.target) &&
-          signUpPrompt === true
-        )
-          setSignUpPrompt(false);
-      }
-    };
-    document.addEventListener('mousedown', handleDocumentClick);
-  });
+  return (
+    <SignUpPopoverOverride text="Sign up to follow this." actionTaken={FOLLOW}>
+      <FollowButtonContent followAction={followAction} following={following} />
+    </SignUpPopoverOverride>
+  );
+};
 
+function FollowButtonContent({followAction, following}) {
   return (
     <div className="button-position">
       <button
@@ -41,27 +33,15 @@ const FollowButton = ({following, setFollowing}) => {
         onClick={followAction}
       >
         <div className="primary-button-text">
-          {following != null ? (
-            <h2>{following ? 'Unfollow' : 'Follow'}</h2>
-          ) : (
+          {following === undefined ? (
             <LoadingSpinner />
+          ) : (
+            <h2>{following ? 'Unfollow' : 'Follow'}</h2>
           )}
         </div>
       </button>
-      {signUpPrompt ? (
-        <div className="sign-up-prompt" ref={signUpPromptRef}>
-          <Link
-            to={{
-              pathname: '/signup',
-              state: {returnLocation: locationPathName},
-            }}
-          >
-            Sign up to follow this.
-          </Link>
-        </div>
-      ) : null}
     </div>
   );
-};
+}
 
 export default FollowButton;

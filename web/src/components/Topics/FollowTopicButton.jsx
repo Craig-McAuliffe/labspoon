@@ -9,6 +9,10 @@ export default function FollowTopicButton({targetTopic}) {
   const featureFlags = useContext(FeatureFlags);
   const {user: authUser, userProfile} = useContext(AuthContext);
   useEffect(() => {
+    if (!authUser) {
+      setFollowing(false);
+      return;
+    }
     if (!featureFlags.has('disable-cloud-firestore') && authUser) {
       db.doc(`users/${authUser.uid}/followsTopics/${targetTopic.id}`)
         .get()

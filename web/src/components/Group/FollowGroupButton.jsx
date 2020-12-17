@@ -10,6 +10,10 @@ export default function FollowGroupButton({targetGroup}) {
   const {user: authUser, userProfile} = useContext(AuthContext);
 
   useEffect(() => {
+    if (!authUser) {
+      setFollowing(false);
+      return;
+    }
     if (!featureFlags.has('disable-cloud-firestore') && authUser) {
       db.doc(`users/${authUser.uid}/followsGroups/${targetGroup.id}`)
         .get()

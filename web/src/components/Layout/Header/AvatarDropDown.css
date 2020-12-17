@@ -19,6 +19,12 @@
 
 .dropdown {
   margin-right: 0px;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown h3 {
+  margin-bottom: 0px;
 }
 
 .DropDownMenu {
