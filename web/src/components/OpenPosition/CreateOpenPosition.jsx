@@ -49,7 +49,7 @@ export default function CreateOpenPosition() {
     createOpenPosition(res)
       .then(() => {
         setSubmitting(false);
-        history.push(`/groups/${selectedGroup.id}`);
+        history.push(`/group/${selectedGroup.id}`);
       })
       .catch((err) => {
         console.log(err);
@@ -57,7 +57,7 @@ export default function CreateOpenPosition() {
           'Something went wrong trying to create the open position. Sorry about that. Please try again later.'
         );
         setSubmitting(false);
-        history.push(`/groups/${selectedGroup.id}`);
+        history.push(`/group/${selectedGroup.id}`);
       });
   };
 
