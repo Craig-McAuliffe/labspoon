@@ -1,0 +1,14 @@
+.see-more-button {
+  border: none;
+  background: none;
+  outline: none;
+  color: #00507c;
+}
+
+.see-more-button:hover,
+.see-more-button:focus {
+  border: none;
+  background: none;
+  outline: none;
+  color: #3099d3;
+}

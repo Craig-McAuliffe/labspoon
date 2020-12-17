@@ -13,6 +13,7 @@ import {getPaginatedTopicsFromCollectionRef} from '../../../helpers/topics';
 import {getPaginatedPublicationsFromCollectionRef} from '../../../helpers/publications';
 import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
 import {getPaginatedImagesFromCollectionRef} from '../../../helpers/images';
+import {getPaginatedOpenPositionsFromCollectionRef} from '../../../helpers/openPositions';
 import GroupPageSider from './GroupPageSider';
 import FilterableResults, {
   NewResultsWrapper,
@@ -34,6 +35,7 @@ import './GroupPage.css';
 
 const PHOTOS = 'photos';
 const VIDEOS = 'videos';
+const OPENPOSITIONS = 'openPositions';
 
 function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip) {
   const activeTab = filterOptions ? getActiveTabID(filterOptions) : null;
@@ -88,6 +90,19 @@ function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip) {
       const videosCollection = db.collection(`groups/${groupID}/videos`);
       return [
         getPaginatedVideosFromCollectionRef(videosCollection, limit, last),
+        null,
+      ];
+    case OPENPOSITIONS:
+      const openPositionsCollection = db.collection(
+        `groups/${groupID}/openPositions`
+      );
+
+      return [
+        getPaginatedOpenPositionsFromCollectionRef(
+          openPositionsCollection,
+          limit,
+          last
+        ),
         null,
       ];
     default:
@@ -159,6 +174,13 @@ export default function GroupPage() {
           data: {
             id: 'members',
             name: 'Members',
+          },
+        },
+        {
+          enabled: false,
+          data: {
+            id: OPENPOSITIONS,
+            name: 'Open Positions',
           },
         },
         {
@@ -304,7 +326,7 @@ const GroupDetails = ({group, groupDescriptionRef, userIsMember, verified}) => {
           <SeeMore
             displayFullDescription={displayFullDescription}
             setDisplayFullDescription={setDisplayFullDescription}
-            groupDescriptionRef={groupDescriptionRef}
+            descriptionRef={groupDescriptionRef}
             id={group.id}
           />
         </div>
