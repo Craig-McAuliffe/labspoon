@@ -32,6 +32,7 @@ import OpenPositionPage from './pages/ResourcePages/OpenPositionPage/OpenPositio
 import CreatePage from './pages/ResourcePages/CreatePage';
 import Articles from './pages/Articles/Articles';
 import Groups from './pages/ResourcePages/GroupPage/Groups';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage/PrivacyPolicyPage';
 
 /**
  * Top level routing structure for the app.
@@ -110,6 +111,9 @@ export default function Routes({user, setUser}) {
       </AuthRoute>
       <Route path="/articles">
         <Articles />
+      </Route>
+      <Route path="/privacyPolicy">
+        <PrivacyPolicyPage />
       </Route>
       <Route exact path="/about">
         <AboutPage />
