@@ -5,6 +5,7 @@ import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import CreatePost from '../../components/Posts/Post/CreatePost/CreatePost';
 import CreateGroupPage from '../../components/Group/CreateGroupPage/CreateGroupPage';
 import CreateOpenPosition from '../../components/OpenPosition/CreateOpenPosition';
+import CreateTechnique from '../../components/Techniques/CreateTechnique';
 import LightTabLink from '../../components/Navigation/LightTabLink';
 
 import './CreatePage.css';
@@ -23,6 +24,9 @@ export default function CreatePage() {
         {featureFlags.has('create-open-position') ? (
           <LightTabLink name="Open Position" link="/create/open-position" />
         ) : null}
+        {featureFlags.has('techniques') && (
+          <LightTabLink name="Technique" link="/create/technique" />
+        )}
       </div>
       <div>
         <Switch>
@@ -38,6 +42,11 @@ export default function CreatePage() {
           <Route path="/create/open-position">
             <CreateOpenPosition />
           </Route>
+          {featureFlags.has('techniques') && (
+            <Route path="/create/technique">
+              <CreateTechnique />
+            </Route>
+          )}
           <Route path="/create">
             <Redirect to="/create/post" />
           </Route>

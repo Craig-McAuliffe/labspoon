@@ -1,4 +1,5 @@
 import {firebaseConfig} from '../config';
+import {db} from '../firebase';
 
 // Retrieves paginated user references from passed user reference collection
 // for use in results pages. Returns a promise that returns an array of results
@@ -40,4 +41,20 @@ export function getAvatar(userID) {
 
 export function getCoverPhoto(userID) {
   return `https://storage.googleapis.com/${firebaseConfig.storageBucket}/users/${userID}/coverPhoto`;
+}
+
+export function getUserGroups(userID) {
+  return db
+    .collection(`users/${userID}/groups`)
+    .get()
+    .then((qs) => {
+      if (qs.empty) return [];
+      const groups = [];
+      qs.forEach((groupDoc) => {
+        const fetchedGroup = groupDoc.data();
+        fetchedGroup.id = groupDoc.id;
+        groups.push(fetchedGroup);
+      });
+      return groups;
+    });
 }

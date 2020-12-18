@@ -442,14 +442,13 @@ export const triggerFulfillReferencesOnLabspoon = functions.https.onRequest(
     let lastDate;
     publicationsQS.forEach((ds) => {
       lastDate = ds.data().date;
-      promises.push(fulfillOutgoingReferencesOnLabspoon(ds.id, ds))
+      promises.push(fulfillOutgoingReferencesOnLabspoon(ds.id, ds));
     });
-    await Promise.all(promises)
-      .catch((err) =>
-        res
-          .status(500)
-          .send('An error occurred whilst fulfilling references: ' + err)
-      );
+    await Promise.all(promises).catch((err) =>
+      res
+        .status(500)
+        .send('An error occurred whilst fulfilling references: ' + err)
+    );
     res.status(200).send(lastDate);
     return;
   }
@@ -631,7 +630,14 @@ export const updateAuthorsPublication = functions.firestore
     if (!authors) return;
     const users = authors.filter((author) => Boolean(author.id));
     const promises = users.map(async (user) => {
-      db.doc(`users/${user.id}/publications/${publicationID}`).set(toPublicationRef(publicationID, publication));
+      db.doc(`users/${user.id}/publications/${publicationID}`)
+        .set(toPublicationRef(publicationID, publication))
+        .catch((err) =>
+          console.error(
+            `Unable to set reference to publication ${publicationID} to user ${user.id} publication collection:`,
+            err
+          )
+        );
     });
     return Promise.all(promises);
   });

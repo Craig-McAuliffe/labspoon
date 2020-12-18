@@ -12,18 +12,14 @@ const NOT_STARTED = 0;
 const UPLOADING = 1;
 const FINISHED = 2;
 
-const MAX_IMAGE_PREVIEWS = 3;
-
 export default function ImageUpload({storageDir, successCallback, refresh}) {
   const [files, setFiles] = useState([]);
   const [imageURLs, setImageURLs] = useState([]);
   const [uploading, setUploading] = useState(NOT_STARTED);
   const [uploadingCount, setUploadingCount] = useState(0);
   const [displaySuccessMessage, setDisplaySuccessMessage] = useState(false);
-  const [displayValidationMessage, setDisplayValidationMessage] = useState(
-    false
-  );
   const [displayErrorMessage, setDisplayErrorMessage] = useState(false);
+
   function onChange(e) {
     setFiles(Array.from(e.target.files));
   }
@@ -31,7 +27,6 @@ export default function ImageUpload({storageDir, successCallback, refresh}) {
   useEffect(() => {
     if (files.length !== 0) {
       setDisplaySuccessMessage(false);
-      setDisplayValidationMessage(false);
       setDisplayErrorMessage(false);
     }
     setImageURLs(files.map((file) => URL.createObjectURL(file)));
@@ -58,18 +53,10 @@ export default function ImageUpload({storageDir, successCallback, refresh}) {
 
   function uploadImages() {
     setUploading(UPLOADING);
-    const anyNonImages = files.filter(
-      (file) => file.type.split('/')[0] !== 'image'
-    );
-    setUploadingCount(files.length);
-    if (anyNonImages.length !== 0) {
-      setDisplayValidationMessage(true);
-      cancel();
-      return;
-    }
     files.forEach((file) => {
       const photoID = uuid();
       const photoStorageRef = storage.ref(storageDir + '/' + photoID);
+      setUploadingCount((count) => count + 1);
       photoStorageRef.put(file, {contentType: file.type}).on(
         firebase.storage.TaskEvent.STATE_CHANGED,
         () => {},
@@ -80,8 +67,8 @@ export default function ImageUpload({storageDir, successCallback, refresh}) {
         () => {
           photoStorageRef
             .getDownloadURL()
-            .then((url) => successCallback(url, photoID));
-          setUploadingCount((count) => count - 1);
+            .then((url) => successCallback(url, photoID))
+            .then(() => setUploadingCount((count) => count - 1));
         }
       );
     });
@@ -91,7 +78,70 @@ export default function ImageUpload({storageDir, successCallback, refresh}) {
     setFiles([]);
   }
 
-  const imagePreviews = imageURLs
+  if (files.length === 0)
+    return (
+      <div className="image-upload-section">
+        <SelectImages onChange={onChange} />
+        <div className="after-upload-message-container">
+          {displaySuccessMessage ? <UploadSuccessMessage /> : <></>}
+          {displayErrorMessage ? <UploadErrorMessage /> : <></>}
+        </div>
+      </div>
+    );
+
+  return (
+    <div className="image-upload">
+      <ImagePreviews urls={imageURLs} uploading={uploading === UPLOADING} />
+      <NegativeButton onClick={cancel} disabled={uploading === UPLOADING}>
+        Cancel
+      </NegativeButton>
+      <PrimaryButton onClick={uploadImages} disabled={uploading === UPLOADING}>
+        Upload
+      </PrimaryButton>
+    </div>
+  );
+}
+
+export function SelectImages({onChange}) {
+  const [displayValidationMessage, setDisplayValidationMessage] = useState(
+    false
+  );
+  function validatedOnChange(e) {
+    setDisplayValidationMessage(false);
+    const files = Array.from(e.target.files);
+    const anyNonImages = files.filter(
+      (file) => file.type.split('/')[0] !== 'image'
+    );
+    if (anyNonImages.length !== 0) {
+      setDisplayValidationMessage(true);
+      return;
+    }
+    return onChange(e);
+  }
+
+  return (
+    <>
+      <div className="image-upload-container">
+        <label className="image-upload-label">
+          <AddButton />
+          <h4>Choose images</h4>
+          <input
+            type="file"
+            onChange={validatedOnChange}
+            multiple
+            name="uploaded-image"
+          />
+        </label>
+      </div>
+      {displayValidationMessage && <UploadValidationMessage />}
+    </>
+  );
+}
+
+const MAX_IMAGE_PREVIEWS = 3;
+
+export function ImagePreviews({urls, uploading}) {
+  const imagePreviews = urls
     .slice(0, MAX_IMAGE_PREVIEWS)
     .map((imageURL, idx) => (
       <ImageListItem
@@ -101,44 +151,15 @@ export default function ImageUpload({storageDir, successCallback, refresh}) {
       />
     ));
 
-  if (files.length === 0)
-    return (
-      <div className="image-upload-section">
-        <div className="image-upload-container">
-          <label className="image-upload-label">
-            <AddButton />
-            <h4>Choose files</h4>
-            <input
-              type="file"
-              onChange={onChange}
-              multiple
-              name="uploaded-image"
-            />
-          </label>
-        </div>
-        <div className="after-upload-message-container">
-          {displaySuccessMessage ? <UploadSuccessMessage /> : <></>}
-          {displayErrorMessage ? <UploadErrorMessage /> : <></>}
-          {displayValidationMessage ? <UploadValidationMessage /> : <></>}
-        </div>
-      </div>
-    );
-
   return (
-    <div className="image-upload">
+    <>
       <div className="image-upload-previews">{imagePreviews}</div>
       <span>
-        {imageURLs.length > MAX_IMAGE_PREVIEWS
-          ? `+ ${imageURLs.length - MAX_IMAGE_PREVIEWS} more`
+        {urls.length > MAX_IMAGE_PREVIEWS
+          ? `+ ${urls.length - MAX_IMAGE_PREVIEWS} more`
           : ''}
       </span>
-      <NegativeButton onClick={cancel} disabled={uploading === UPLOADING}>
-        Cancel
-      </NegativeButton>
-      <PrimaryButton onClick={uploadImages} disabled={uploading === UPLOADING}>
-        Upload
-      </PrimaryButton>
-    </div>
+    </>
   );
 }
 

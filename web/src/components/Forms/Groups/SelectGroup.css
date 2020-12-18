@@ -1,0 +1,30 @@
+.select-group-field-container {
+  margin-bottom: 50px;
+  width: 100%;
+  min-width: 100%;
+}
+
+.select-group-field-label {
+  margin-bottom: 0.5rem;
+}
+
+.must-select-group-container {
+  text-align: center;
+  margin-top: 10vh;
+}
+
+.must-select-group-explanation {
+  color: #5d5d65;
+  margin-left: 10px;
+  position: relative;
+  top: 4px;
+  margin: 1vh;
+}
+
+.must-select-group-button-container {
+  margin-top: 5vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+

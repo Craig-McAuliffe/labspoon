@@ -7,7 +7,6 @@ import PrimaryButton from '../../components/Buttons/PrimaryButton';
 import HeaderAndBodyArticleInput, {
   yupArticleValidation,
   initialValue,
-  splitTitle,
 } from '../../components/Forms/Articles/HeaderAndBodyArticleInput';
 
 const validationSchema = Yup.object({
@@ -19,12 +18,10 @@ export default function CreateArticlePage() {
     <FeedContent>
       <Formik
         initialValues={{
-          article: JSON.stringify(initialValue),
+          article: initialValue,
         }}
         validationSchema={validationSchema}
-        onSubmit={(vals) => {
-          console.log(splitTitle(vals.article));
-        }}
+        onSubmit={(vals) => {}}
       >
         <Form>
           <HeaderAndBodyArticleInput name="article" />

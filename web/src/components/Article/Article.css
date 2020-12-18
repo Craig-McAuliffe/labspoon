@@ -1,0 +1,11 @@
+.author-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 80px;
+}
+
+.field-label {
+  color: #99999f;
+  margin-right: 10px;
+}
+
