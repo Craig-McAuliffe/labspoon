@@ -4,22 +4,25 @@ import firebase from '../../firebase';
 import * as Yup from 'yup';
 import FormTextInput, {FormTextArea} from '../Forms/FormTextInput';
 import FormDateInput from '../Forms/FormDateInput';
-import {GroupDropdownItem, GroupHeadlineItem} from '../Group/GroupListItem';
 import TagTopics, {handlePostTopics} from '../Topics/TagTopics';
 import CreateResourceFormActions from '../Forms/CreateResourceFormActions';
 import Dropdown, {DropdownOption} from '../Dropdown';
 import {AuthContext} from '../../App';
-import {db} from '../../firebase';
 import {WebsiteIcon, EmailIcon} from '../../assets/PostOptionalTagsIcons';
 import TabbedContainer from '../TabbedContainer/TabbedContainer';
-import SecondaryButton from '../Buttons/SecondaryButton';
-import {Link, useHistory} from 'react-router-dom';
-import {DropDownTriangle} from '../../assets/GeneralActionIcons';
+import {useHistory} from 'react-router-dom';
+import SelectGroup from '../Group/SelectGroup';
+import {
+  MustSelectGroup,
+  SelectedGroup,
+  SelectGroupLabel,
+} from '../Forms/Groups/SelectGroup';
 import GeneralError from '../GeneralError';
 import {convertGroupToGroupRef} from '../../helpers/groups';
-import CreateButton from '../Buttons/CreateButton';
 
 import './CreateOpenPosition.css';
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
+import {getUserGroups} from '../../helpers/users';
 
 const POSITIONS = ['Masters', 'Phd', 'Post Doc'];
 
@@ -31,12 +34,12 @@ export default function CreateOpenPosition() {
   const [selectedPosition, setSelectedPosition] = useState('');
   const [selectedGroup, setSelectedGroup] = useState(undefined);
   const [memberOfGroups, setMemberOfGroups] = useState([]);
+  const [loadingMemberOfGroups, setLoadingMemberOfGroups] = useState(false);
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [pageError, setPageError] = useState(false);
   const [loading, setLoading] = useState(true);
   const history = useHistory();
-
   const {userProfile} = useContext(AuthContext);
   const userID = userProfile.id;
 
@@ -62,19 +65,16 @@ export default function CreateOpenPosition() {
   };
 
   useEffect(() => {
-    db.collection(`users/${userID}/groups`)
-      .get()
-      .then((qs) => {
+    setLoadingMemberOfGroups(true);
+    if (!userID) return;
+    getUserGroups(userID)
+      .then((groups) => {
+        setMemberOfGroups(groups);
+        setLoadingMemberOfGroups(false);
         setLoading(false);
-        if (qs.empty) return;
-        qs.forEach((groupDoc) => {
-          const fetchedGroup = groupDoc.data();
-          fetchedGroup.id = groupDoc.id;
-          setMemberOfGroups((currentState) => [...currentState, fetchedGroup]);
-        });
       })
       .catch((err) => {
-        console.log(
+        console.error(
           `could not fetch groups for user ID ${userID} from db`,
           err
         );
@@ -117,13 +117,24 @@ export default function CreateOpenPosition() {
 
   if (pageError) return <GeneralError />;
 
+  if (loadingMemberOfGroups) return <LoadingSpinner />;
+
   if (selectedGroup === undefined)
     return (
-      <MandatoryGroupSelection
-        memberOfGroups={memberOfGroups}
-        setSelectedGroup={setSelectedGroup}
-        loading={loading}
-      />
+      <>
+        <SelectGroupLabel fieldName="Group">
+          <SelectGroup
+            groups={memberOfGroups}
+            setSelectedGroup={setSelectedGroup}
+            toggleText="Select from your groups"
+            loading={loading}
+          />
+        </SelectGroupLabel>
+        <MustSelectGroup
+          userHasGroups={memberOfGroups.length > 0}
+          explanation="Open positions can only be created for groups."
+        />
+      </>
     );
   return (
     <Formik
@@ -132,8 +143,8 @@ export default function CreateOpenPosition() {
       onSubmit={onSubmit}
     >
       <Form>
-        <ChangeGroup
-          memberOfGroups={memberOfGroups}
+        <SelectedGroup
+          groups={memberOfGroups}
           selectedGroup={selectedGroup}
           setSelectedGroup={setSelectedGroup}
         />
@@ -160,100 +171,6 @@ export default function CreateOpenPosition() {
       </Form>
     </Formik>
   );
-}
-
-function MandatoryGroupSelection({memberOfGroups, setSelectedGroup, loading}) {
-  return (
-    <>
-      <SelectGroup
-        memberOfGroups={memberOfGroups}
-        setSelectedGroup={setSelectedGroup}
-        loading={loading}
-      />
-      <div className="mandatory-select-group-container">
-        <h3 className="mandatory-select-group-explanation">
-          Open positions can only be created for groups.
-        </h3>
-        {memberOfGroups.length > 0 ? (
-          <h3 className="mandatory-select-group-explanation">
-            Select one of your groups above before creating the position.
-          </h3>
-        ) : (
-          <>
-            <h3 className="mandatory-select-group-explanation">
-              Choose a group or...
-            </h3>
-            <div className="mandatory-select-group-button-container">
-              <Link to="/create/group">
-                <SecondaryButton>
-                  <CreateButton hoverControl={true} />
-                  Create Group Now
-                </SecondaryButton>
-              </Link>
-            </div>
-          </>
-        )}
-      </div>
-    </>
-  );
-}
-
-function SelectGroup({memberOfGroups, setSelectedGroup, loading}) {
-  return (
-    <div className="open-position-group-dropdown">
-      <h4 className="open-position-dropdown-label">Research Group</h4>
-      <Dropdown
-        customToggleWidth="100%"
-        customToggleTextOnly="Select from your groups"
-        containerTopPosition="40px"
-        loading={loading}
-      >
-        {getMemberOfGroupsDropdownOptions(memberOfGroups, setSelectedGroup)}
-      </Dropdown>
-    </div>
-  );
-}
-
-function ChangeGroup({selectedGroup, setSelectedGroup, memberOfGroups}) {
-  return (
-    <div className="change-group-section">
-      <div className="change-mandatory-group-dropdown-container">
-        <Dropdown customToggle={ChangeGroupToggle}>
-          {getMemberOfGroupsDropdownOptions(memberOfGroups, setSelectedGroup)}
-        </Dropdown>
-      </div>
-      <div>
-        <GroupHeadlineItem group={selectedGroup} />
-      </div>
-    </div>
-  );
-}
-
-function ChangeGroupToggle({setOpen}) {
-  return (
-    <button
-      className="change-mandatory-group-toggle"
-      type="button"
-      onClick={setOpen}
-    >
-      <p>Change Group</p>
-      <DropDownTriangle />
-    </button>
-  );
-}
-
-function getMemberOfGroupsDropdownOptions(memberOfGroups, setSelectedGroup) {
-  if (memberOfGroups.length === 0) return;
-  return memberOfGroups.map((group) => (
-    <DropdownOption
-      key={group.id}
-      onSelect={() => {
-        setSelectedGroup(group);
-      }}
-    >
-      <GroupDropdownItem group={group} />
-    </DropdownOption>
-  ));
 }
 
 function SelectPosition({selectedPosition, setSelectedPosition}) {

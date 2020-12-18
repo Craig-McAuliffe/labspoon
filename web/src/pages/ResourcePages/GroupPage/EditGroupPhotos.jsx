@@ -60,7 +60,8 @@ export default function EditGroupPhotos({children}) {
 
 function GroupImageUpload({groupID, refresh}) {
   function successCallback(url, id) {
-    db.doc(`groups/${groupID}/photos/${id}`)
+    return db
+      .doc(`groups/${groupID}/photos/${id}`)
       .set({
         src: url,
         timestamp: new Date(),

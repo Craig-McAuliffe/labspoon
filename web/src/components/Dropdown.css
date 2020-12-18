@@ -78,6 +78,22 @@
   width: 50px;
 }
 
+.small-dropdown-toggle {
+  padding: 0px;
+  min-width: 100%;
+  text-align: right;
+  color: #00507c;
+}
+
+.small-dropdown-toggle p {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.small-dropdown-toggle path {
+  fill: #00507c;
+}
+
 .dropdown-loading-content {
   height: 80px;
   padding-top: 10px;

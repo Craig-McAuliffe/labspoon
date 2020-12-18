@@ -7,3 +7,4 @@ exports.topics = require('./topics');
 exports.email = require('./email');
 exports.invitations = require('./invitations');
 exports.openPositions = require('./openPositions');
+exports.techniques = require('./techniques');

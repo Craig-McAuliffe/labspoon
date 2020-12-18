@@ -1,13 +1,15 @@
-import React, {useMemo, useCallback, useState} from 'react';
+import React, {useMemo, useCallback} from 'react';
 import {useField} from 'formik';
 import * as Yup from 'yup';
 import {createEditor, Transforms, Node, Element as SlateElement} from 'slate';
 import {Slate, Editable, withReact} from 'slate-react';
 import {withHistory} from 'slate-history';
+import InputError from '../InputError';
+
+import './HeaderAndBodyArticleInput.css';
 
 export default function HeaderAndBodyArticleInput({label, ...props}) {
-  const [field, , helpers] = useField(props);
-  const [value, setValue] = useState(JSON.parse(field.value));
+  const [field, meta, helpers] = useField(props);
   const editor = useMemo(
     () => withLayout(withHistory(withReact(createEditor()))),
     []
@@ -15,17 +17,22 @@ export default function HeaderAndBodyArticleInput({label, ...props}) {
   const renderElement = useCallback((props) => <Element {...props} />, []);
 
   field.onChange = (content) => {
-    setValue(content);
-    const json = JSON.stringify(content);
-    helpers.setValue(json);
+    helpers.setValue(content);
   };
 
-  field.value = value;
-
   return (
-    <Slate editor={editor} {...field} {...props}>
-      <Editable renderElement={renderElement} autoFocus spellCheck />
-    </Slate>
+    <>
+      <div className="editor-container">
+        <Slate editor={editor} {...field} {...props}>
+          <Editable renderElement={renderElement} autoFocus spellCheck />
+        </Slate>
+      </div>
+      {meta.error && meta.touched ? (
+        <InputError error="You must provide a header and a description" />
+      ) : (
+        <></>
+      )}
+    </>
   );
 }
 
@@ -94,25 +101,25 @@ export const yupArticleValidation = Yup.array().test(
   // eslint-disable-next-line no-template-curly-in-string
   '${path} is not an article',
   (value) => {
-    if (value.length !== 2) return false;
+    if (value.length < 2) return false;
 
     // Check title is not empty
     if (value[0].type !== 'title') return false;
     if (value[0].children.length !== 1) return false;
+    if (!value[0].children[0].text) return false;
     if (value[0].children[0].text.length === 0) return false;
 
     // Check body is not empty
     if (value[1].type !== 'paragraph') return false;
     if (value[1].children.length !== 1) return false;
+    if (!value[1].children[0].text) return false;
     if (value[1].children[0].text.length === 0) return false;
 
     return true;
   }
 );
 
-// assumes input is properly validated
-export function splitTitle(jsonString) {
-  const article = JSON.parse(jsonString);
-  const title = article[0].children[0].text;
-  return title, JSON.stringify(article.slice(1));
+// assumes the article is properly validated
+export function getTitleTextAndBody(article) {
+  return [article[0].children[0].text, article.slice(1)];
 }

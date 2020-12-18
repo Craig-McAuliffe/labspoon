@@ -120,3 +120,12 @@ export function DropdownOption({children, onSelect, height, onSomethingElse}) {
     </button>
   );
 }
+
+export function SmallDropdownToggle({setOpen, text}) {
+  return (
+    <button className="small-dropdown-toggle" type="button" onClick={setOpen}>
+      <p>{text}</p>
+      <DropDownTriangle />
+    </button>
+  );
+}

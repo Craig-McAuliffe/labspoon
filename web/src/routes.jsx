@@ -32,6 +32,7 @@ import OpenPositionPage from './pages/ResourcePages/OpenPositionPage/OpenPositio
 import CreatePage from './pages/ResourcePages/CreatePage';
 import Articles from './pages/Articles/Articles';
 import Groups from './pages/ResourcePages/GroupPage/Groups';
+import TechniquePage from './pages/ResourcePages/TechniquePage/TechniquePage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage/PrivacyPolicyPage';
 
 /**
@@ -117,6 +118,9 @@ export default function Routes({user, setUser}) {
       </Route>
       <Route exact path="/about">
         <AboutPage />
+      </Route>
+      <Route exact path="/technique/:techniqueID">
+        <TechniquePage />
       </Route>
       <Route path="/notfound">
         <NotFoundPage />

@@ -2,7 +2,7 @@ import React from 'react';
 
 import './Buttons.css';
 
-export default function PrimaryButton({onClick, children, small, ...props}) {
+export default function NegativeButton({onClick, children, small, ...props}) {
   return (
     <button
       type="button"
