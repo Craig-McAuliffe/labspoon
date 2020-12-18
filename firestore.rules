@@ -123,6 +123,10 @@ service cloud.firestore {
           && groupID == request.resource.data.group.id
         );
       }
+
+      match /openPositions/{openPositionID} {
+        allow read;
+      }
     }
 
     match /topics/{topicID} {
