@@ -10,6 +10,8 @@ import FilterableResults, {
 import {SelectableResults} from '../Results/Results';
 import {FeedContent} from '../Layout/Content';
 
+import './FilteredSelector.css';
+
 export const ADD = 'add';
 export const REMOVE = 'remove';
 
@@ -146,13 +148,11 @@ function SelectionConfirmation({
 
 function Sider({getDefaultFilter}) {
   return (
-    <div className="sider-layout">
-      <NewFilterMenuWrapper
-        getDefaultFilter={getDefaultFilter}
-        radio={true}
-        dependentOnTab={true}
-      />
-    </div>
+    <NewFilterMenuWrapper
+      getDefaultFilter={getDefaultFilter}
+      radio={true}
+      dependentOnTab={true}
+    />
   );
 }
 
