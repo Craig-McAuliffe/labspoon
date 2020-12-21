@@ -37,6 +37,8 @@ import {
   RESEARCHFOCUSES,
   OPENPOSITION,
   RESEARCHFOCUS,
+  TECHNIQUE,
+  TECHNIQUES,
 } from '../../../helpers/resourceTypeDefinitions';
 
 import './GroupPage.css';
@@ -121,6 +123,20 @@ function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip) {
           limit,
           last,
           RESEARCHFOCUS
+        ),
+        null,
+      ];
+    case TECHNIQUES:
+      const techniquesCollection = db.collection(
+        `groups/${groupID}/techniques`
+      );
+
+      return [
+        getPaginatedResourcesFromCollectionRef(
+          techniquesCollection,
+          limit,
+          last,
+          TECHNIQUE
         ),
         null,
       ];
@@ -252,6 +268,16 @@ export default function GroupPage() {
       data: {
         id: 'overview',
         name: 'Overview',
+      },
+    });
+  }
+
+  if (featureFlags.has('techniques')) {
+    relationshipFilter[0].options.push({
+      enabled: false,
+      data: {
+        id: TECHNIQUES,
+        name: 'Techniques',
       },
     });
   }

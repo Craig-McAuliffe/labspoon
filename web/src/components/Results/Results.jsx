@@ -18,9 +18,11 @@ import {FilterableResultsContext} from '../FilterableResults/FilterableResults';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import OpenPositionListItem from '../OpenPosition/OpenPositionListItem';
 import ResearchFocusListItem from '../ResearchFocus/ResearchFocusListItem';
+import TechniqueListItem from '../Techniques/TechniqueListItem';
 import {
   OPENPOSITION,
   RESEARCHFOCUS,
+  TECHNIQUE,
 } from '../../helpers/resourceTypeDefinitions';
 
 import './Results.css';
@@ -157,6 +159,10 @@ export function GenericListItem({result, onBookmarkPage}) {
           researchFocus={result}
           key={result.id + RESEARCHFOCUS}
         />
+      );
+    case TECHNIQUE:
+      return (
+        <TechniqueListItem technique={result} key={result.id + TECHNIQUE} />
       );
     default:
       return null;
