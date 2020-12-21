@@ -56,7 +56,7 @@ export default function CreateTechnique() {
           "We cannot fetch your groups at the moment. We'll look into it. Please try again later.",
         ]);
       });
-  }, [userID]);
+  }, [userID, preSelectedGroupID]);
 
   if (loadingMemberOfGroups || submitting) return <LoadingSpinner />;
 

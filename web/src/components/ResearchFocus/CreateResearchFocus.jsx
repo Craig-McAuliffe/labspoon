@@ -58,7 +58,7 @@ export default function CreateResearchFocus() {
           "We cannot fetch your groups at the moment. We'll look into it. Please try again later.",
         ]);
       });
-  }, [userID]);
+  }, [userID, preSelectedGroupID]);
 
   if (submitting) return <LoadingSpinner />;
 

@@ -87,7 +87,7 @@ export default function CreateOpenPosition() {
         );
         setPageError(true);
       });
-  }, [userID]);
+  }, [userID, preSelectedGroupID]);
 
   const initialValues = {
     title: '',
