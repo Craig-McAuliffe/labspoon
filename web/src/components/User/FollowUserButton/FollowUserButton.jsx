@@ -9,6 +9,7 @@ export default function FollowUserButton({targetUser}) {
   const featureFlags = useContext(FeatureFlags);
   const {user: authUser, userProfile} = useContext(AuthContext);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!targetUser.id) return;
     if (!authUser) {

@@ -43,7 +43,7 @@ export default function ResearchFocusPage() {
         setError(true);
       })
       .finally(() => setLoading(false));
-  }, [researchFocusID]);
+  }, [researchFocusID, history]);
 
   if (error) return <GeneralError />;
 

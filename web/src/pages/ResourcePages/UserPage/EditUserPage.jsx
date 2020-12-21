@@ -196,7 +196,7 @@ function UploadImage({storageRef}) {
   );
 }
 
-function LinkUserToPublications({}) {
+function LinkUserToPublications() {
   const [linkingAuthor, setLinkingAuthor] = useState(false);
   const cancel = () => setLinkingAuthor(false);
   if (linkingAuthor)

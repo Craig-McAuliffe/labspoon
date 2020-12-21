@@ -9,6 +9,7 @@ export default function FollowGroupButton({targetGroup}) {
   const featureFlags = useContext(FeatureFlags);
   const {user: authUser, userProfile} = useContext(AuthContext);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!authUser) {
       setFollowing(false);

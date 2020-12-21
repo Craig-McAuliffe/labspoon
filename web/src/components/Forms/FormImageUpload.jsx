@@ -12,10 +12,11 @@ export default function FormImageUpload({...props}) {
   useEffect(() => {
     if (!imageFiles) return;
     setURLs(Array.from(imageFiles).map((file) => URL.createObjectURL(file)));
-    return () => {
-      urls.map((url) => URL.revokeObjectURL(url));
-      setURLs([]);
-    };
+    return () =>
+      setURLs((urls) => {
+        urls.map((url) => URL.revokeObjectURL(url));
+        return [];
+      });
   }, [imageFiles]);
 
   function onChange(e) {

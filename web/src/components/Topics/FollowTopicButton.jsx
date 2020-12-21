@@ -8,6 +8,7 @@ export default function FollowTopicButton({targetTopic}) {
   const [following, setFollowing] = useState();
   const featureFlags = useContext(FeatureFlags);
   const {user: authUser, userProfile} = useContext(AuthContext);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!authUser) {
       setFollowing(false);

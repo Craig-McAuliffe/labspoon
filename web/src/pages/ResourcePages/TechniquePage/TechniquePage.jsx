@@ -43,7 +43,7 @@ export default function TechniquePage() {
         setError(true);
       })
       .finally(() => setLoading(false));
-  }, [techniqueID]);
+  }, [techniqueID, history]);
 
   if (error) return <GeneralError />;
 
