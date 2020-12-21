@@ -9,6 +9,8 @@ export default function SecondaryButton({
   height,
   children,
   light,
+  type,
+  className,
 }) {
   const widthAndHeight = () => {
     if (width && height) return {width: width, height: height};
@@ -17,12 +19,18 @@ export default function SecondaryButton({
     return null;
   };
 
-  let className = 'secondary-button';
-  if (inactive) className = className + '-disabled';
-  if (light) className = className + '-light';
+  let buttonClass = 'secondary-button';
+  if (inactive) buttonClass = buttonClass + '-disabled';
+  if (light) buttonClass = buttonClass + '-light';
+  buttonClass = `${buttonClass} ${className}`;
 
   return (
-    <button className={className} style={widthAndHeight()} onClick={onClick}>
+    <button
+      className={buttonClass}
+      style={widthAndHeight()}
+      onClick={onClick}
+      type={type ? 'button' : 'submit'}
+    >
       <h3 className="secondary-button-text">{children}</h3>
     </button>
   );

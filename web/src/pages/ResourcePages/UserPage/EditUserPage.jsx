@@ -13,6 +13,9 @@ import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 import {fetchUserDetailsFromDB} from './UserPage';
 
 import './UserPage.css';
+import './EditUserPage.css';
+import SecondaryButton from '../../../components/Buttons/SecondaryButton';
+import LinkAuthorIDForm from '../../../components/Publication/ConnectToPublications/ConnectToPublications';
 
 export default function EditUserPage({user}) {
   const [userDetails, setUserDetails] = useState(user);
@@ -92,6 +95,7 @@ export default function EditUserPage({user}) {
             <FormTextInput label="Position" name="position" />
           </Form>
         </Formik>
+        <LinkUserToPublications />
         <div className="create-group-submit-cancel-container">
           <div className="create-group-cancel">
             <CancelButton
@@ -188,6 +192,20 @@ function UploadImage({storageRef}) {
       )}
       {uploading ? <LoadingSpinner /> : <></>}
       {uploaded ? <h1>Success</h1> : <></>}
+    </div>
+  );
+}
+
+function LinkUserToPublications({}) {
+  const [linkingAuthor, setLinkingAuthor] = useState(false);
+  const cancel = () => setLinkingAuthor(false);
+  if (linkingAuthor)
+    return <LinkAuthorIDForm cancel={cancel} submitBehaviour={cancel} />;
+  return (
+    <div className="link-user-to-publications-button-container">
+      <SecondaryButton onClick={() => setLinkingAuthor(true)}>
+        Connect publications to profile
+      </SecondaryButton>
     </div>
   );
 }
