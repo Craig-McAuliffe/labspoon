@@ -1,7 +1,6 @@
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useHistory, useParams} from 'react-router-dom';
-import {FeatureFlags} from '../../../App';
 import {db} from '../../../firebase';
 import {getActiveTabID} from '../../../helpers/filters';
 import FilterableResults, {
@@ -20,14 +19,11 @@ import {dbPublicationToJSPublication} from '../../../helpers/publications';
 const PUBLICATIONS_TAB = 'publications';
 
 export default function SkeletonUserPage() {
-  const featureFlags = useContext(FeatureFlags);
   const [userID, setUserID] = useState(undefined);
   const [userDetails, setUserDetails] = useState(undefined);
   const [loading, setLoading] = useState(true);
   const params = useParams();
   const history = useHistory();
-
-  if (!featureFlags.has('skeleton-users')) history.push('/notfound');
 
   if (userID !== params.userID) setUserID(params.userID);
 
