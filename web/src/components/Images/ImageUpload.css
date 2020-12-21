@@ -66,12 +66,3 @@
   justify-items: center;
   align-items: center;
 }
-
-.image-upload-previews {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  column-gap: 10px;
-  width: 100%;
-  justify-items: center;
-  align-items: center;
-}

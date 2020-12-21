@@ -1,6 +1,6 @@
 import React from 'react';
 
-import './Buttons.css';
+import './PrimaryButton.css';
 
 export default function NegativeButton({onClick, children, small, ...props}) {
   return (
@@ -9,7 +9,11 @@ export default function NegativeButton({onClick, children, small, ...props}) {
       className={small ? 'negative-button-small' : 'negative-button'}
       onClick={onClick ? onClick : null}
     >
-      {small ? <h4>{children}</h4> : <h2>{children}</h2>}
+      {small ? (
+        <h4 className="primary-button-text">{children}</h4>
+      ) : (
+        <h2 className="primary-button-text-small">{children}</h2>
+      )}
     </button>
   );
 }
