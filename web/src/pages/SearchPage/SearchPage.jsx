@@ -103,9 +103,11 @@ export default function SearchPage() {
       results = <OverviewResults setTab={updateTab} />;
       break;
     case PUBLICATIONS:
-      <MicrosoftAcademicKnowledgeAPIPublicationResults
-        query={searchState.query}
-      />;
+      results = (
+        <MicrosoftAcademicKnowledgeAPIPublicationResults
+          query={searchState.query}
+        />
+      );
       break;
     case POSTS:
       results = <PostsResults />;
