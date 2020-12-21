@@ -245,7 +245,7 @@ export async function sendGroupInvitationEmail(
   const templateData = {
     invitingUser: invitingUserRef,
     group: toGroupRef(groupID, group),
-    url: encodeURI(`${url}login?referrer=groupInvite`),
+    url: encodeURI(`${url}signup?referrer=groupInvite`),
   };
 
   const subject = `${invitingUser!.name} is inviting you to join ${
