@@ -10,6 +10,7 @@ import LightTabLink from '../../components/Navigation/LightTabLink';
 
 import './CreatePage.css';
 import {FeedContent} from '../../components/Layout/Content';
+import CreateResearchFocus from '../../components/ResearchFocus/CreateResearchFocus';
 
 export default function CreatePage() {
   const {userProfile} = useContext(AuthContext);
@@ -22,10 +23,13 @@ export default function CreatePage() {
         <LightTabLink name="Post" link="/create/post" />
         <LightTabLink name="Group" link="/create/group" />
         {featureFlags.has('create-open-position') ? (
-          <LightTabLink name="Open Position" link="/create/open-position" />
+          <LightTabLink name="Open Position" link="/create/openPosition" />
         ) : null}
         {featureFlags.has('techniques') && (
           <LightTabLink name="Technique" link="/create/technique" />
+        )}
+        {featureFlags.has('research-focus') && (
+          <LightTabLink name="Research Focus" link="/create/researchFocus" />
         )}
       </div>
       <div>
@@ -39,12 +43,17 @@ export default function CreatePage() {
           <Route path="/create/group">
             <CreateGroupPage />
           </Route>
-          <Route path="/create/open-position">
+          <Route path="/create/openPosition">
             <CreateOpenPosition />
           </Route>
           {featureFlags.has('techniques') && (
             <Route path="/create/technique">
               <CreateTechnique />
+            </Route>
+          )}
+          {featureFlags.has('research-focus') && (
+            <Route path="/create/researchFocus">
+              <CreateResearchFocus />
             </Route>
           )}
           <Route path="/create">

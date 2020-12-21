@@ -302,20 +302,20 @@ export const getSuggestedPublicationsForAuthorName = functions.https.onCall(
           // get the first capturing group in the regex match
           const normalisedAuthorName = authorMatches[1];
           const makPublications: MAKPublication[] = resp.data.entities;
-          const publications: PublicationSuggestion[] = makPublications.map(
-            (entity: MAKPublication) => {
-              const publication = makPublicationToPublication(entity);
-              const authors = publication.authors!;
-              const matchingAuthor = authors.find(
-                (author) => author.normalisedName === normalisedAuthorName
-              )!;
-              const publicationSuggestion: PublicationSuggestion = {
-                microsoftAcademicIDMatch: matchingAuthor.microsoftID,
-                publicationInfo: publication,
-              };
-              return publicationSuggestion;
-            }
-          );
+          const publications: PublicationSuggestion[] = [];
+          makPublications.forEach((entity: MAKPublication) => {
+            const publication = makPublicationToPublication(entity);
+            const authors = publication.authors!;
+            const matchingAuthor = authors.find(
+              (author) => author.normalisedName === normalisedAuthorName
+            )!;
+            if (!matchingAuthor.microsoftID) return;
+            const publicationSuggestion: PublicationSuggestion = {
+              microsoftAcademicIDMatch: matchingAuthor.microsoftID,
+              publicationInfo: publication,
+            };
+            publications.push(publicationSuggestion);
+          });
           // want to return a maximum of two papers per author
           const seenAuthorIDs = new Map();
           return publications.filter((publicationSuggestion) => {

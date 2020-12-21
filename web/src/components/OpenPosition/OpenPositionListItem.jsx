@@ -1,9 +1,9 @@
 import React, {useState, useRef} from 'react';
 import {Link} from 'react-router-dom';
 import SeeMore from '../SeeMore';
-import ListItemTopics from '../CommonListItemParts/ListItemTopics';
-import ListItemContainer from '../ListItemContainers/ListItemContainer';
+import ListItemTopics from '../ListItem/ListItemTopics';
 import GroupSignature from '../Group/GroupSignature';
+import {ListItemContainer} from '../ListItem/ListItemCommonComponents';
 
 import './OpenPositionListItem.css';
 export default function OpenPositionListItem({openPosition}) {

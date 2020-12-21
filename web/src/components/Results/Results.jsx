@@ -7,20 +7,24 @@ import Post from '../Posts/Post/Post';
 import BookmarkListItem from '../Bookmarks/BookmarkListItem/BookmarkListItem';
 import PublicationListItem from '../Publication/PublicationListItem';
 import UserListItem from '../User/UserListItem';
-import ImageListItem from '../Media/ImageListItem';
+import ImageListItem, {ImagesSection} from '../Media/ImageListItem';
 import VideoListItem from '../Media/VideoListItem';
 import GroupListItem from '../Group/GroupListItem';
 import FollowGroupButton from '../Group/FollowGroupButton';
 import TopicListItem from '../Topics/TopicListItem';
 import FollowTopicButton from '../Topics/FollowTopicButton';
-
-import './Results.css';
 import FollowUserButton from '../User/FollowUserButton/FollowUserButton';
 import {FilterableResultsContext} from '../FilterableResults/FilterableResults';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import OpenPositionListItem from '../OpenPosition/OpenPositionListItem';
+import ResearchFocusListItem from '../ResearchFocus/ResearchFocusListItem';
+import {
+  OPENPOSITION,
+  RESEARCHFOCUS,
+} from '../../helpers/resourceTypeDefinitions';
 
-const OPENPOSITION = 'openPosition';
+import './Results.css';
+
 /**
  * Displays an infinitely scrolling list of posts.
  * @param {Array} results - results to render
@@ -142,7 +146,17 @@ export function GenericListItem({result, onBookmarkPage}) {
       );
     case OPENPOSITION:
       return (
-        <OpenPositionListItem openPosition={result} key={result.id + 'video'} />
+        <OpenPositionListItem
+          openPosition={result}
+          key={result.id + OPENPOSITION}
+        />
+      );
+    case RESEARCHFOCUS:
+      return (
+        <ResearchFocusListItem
+          researchFocus={result}
+          key={result.id + RESEARCHFOCUS}
+        />
       );
     default:
       return null;
@@ -168,15 +182,7 @@ function MixedResultsPage({results}) {
       {imageResults.length > 0 ? (
         <div className="mixed-tab-section">
           <h3 className="mixed-tab-section-header">Images</h3>
-          <div className="feed-images-container">
-            {imageResults.map((image) => (
-              <ImageListItem
-                key={image.id + 'image'}
-                src={image.src}
-                alt={image.alt}
-              />
-            ))}
-          </div>
+          <ImagesSection images={imageResults} />
         </div>
       ) : null}
       {publicationResults.length > 0 ? (

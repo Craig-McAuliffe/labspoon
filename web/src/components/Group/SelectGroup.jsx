@@ -14,6 +14,7 @@ export default function SelectGroup({
       customToggle={customToggle}
       customToggleTextOnly={toggleText}
       loading={loading}
+      customToggleWidth="100%"
     >
       {getGroupOptions(groups, setSelectedGroup)}
     </Dropdown>

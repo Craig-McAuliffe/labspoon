@@ -10,7 +10,7 @@ import {
   getPaginatedPublicationsFromCollectionRef,
 } from '../../../helpers/publications';
 
-import ListItemTopics from '../../../components/CommonListItemParts/ListItemTopics';
+import ListItemTopics from '../../../components/ListItem/ListItemTopics';
 import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
 import FilterableResults, {
   ResourceTabs,

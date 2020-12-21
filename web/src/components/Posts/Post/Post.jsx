@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import PostOptionalTags from './PostParts/PostOptionalTags';
 import PostActions, {BookmarkedPostSymbol} from './PostParts/PostActions';
 import DefaultUserIcon from '../../../assets/DefaultUserIcon.svg';
-import ListItemTopics from '../../CommonListItemParts/ListItemTopics';
+import ListItemTopics from '../../ListItem/ListItemTopics';
 import PublicationListItem from '../../Publication/PublicationListItem';
 import UserAvatar from '../../Avatar/UserAvatar';
 

@@ -13,7 +13,7 @@ import {getPaginatedTopicsFromCollectionRef} from '../../../helpers/topics';
 import {getPaginatedPublicationsFromCollectionRef} from '../../../helpers/publications';
 import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
 import {getPaginatedImagesFromCollectionRef} from '../../../helpers/images';
-import {getPaginatedOpenPositionsFromCollectionRef} from '../../../helpers/openPositions';
+import {getPaginatedResourcesFromCollectionRef} from '../../../helpers/resources';
 import GroupPageSider from './GroupPageSider';
 import FilterableResults, {
   NewResultsWrapper,
@@ -30,12 +30,16 @@ import SeeMore from '../../../components/SeeMore';
 import {getGroup} from '../../../helpers/groups';
 import {getPaginatedVideosFromCollectionRef} from '../../../helpers/videos';
 import {WebsiteIcon} from '../../../assets/PostOptionalTagsIcons';
+import {
+  PHOTOS,
+  VIDEOS,
+  OPENPOSITIONS,
+  RESEARCHFOCUSES,
+  OPENPOSITION,
+  RESEARCHFOCUS,
+} from '../../../helpers/resourceTypeDefinitions';
 
 import './GroupPage.css';
-
-const PHOTOS = 'photos';
-const VIDEOS = 'videos';
-const OPENPOSITIONS = 'openPositions';
 
 function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip) {
   const activeTab = filterOptions ? getActiveTabID(filterOptions) : null;
@@ -98,10 +102,25 @@ function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip) {
       );
 
       return [
-        getPaginatedOpenPositionsFromCollectionRef(
+        getPaginatedResourcesFromCollectionRef(
           openPositionsCollection,
           limit,
-          last
+          last,
+          OPENPOSITION
+        ),
+        null,
+      ];
+    case RESEARCHFOCUSES:
+      const researchFocusesCollection = db.collection(
+        `groups/${groupID}/${RESEARCHFOCUSES}`
+      );
+
+      return [
+        getPaginatedResourcesFromCollectionRef(
+          researchFocusesCollection,
+          limit,
+          last,
+          RESEARCHFOCUS
         ),
         null,
       ];
@@ -186,8 +205,8 @@ export default function GroupPage() {
         {
           enabled: false,
           data: {
-            id: 'topics',
-            name: 'Topics',
+            id: RESEARCHFOCUSES,
+            name: 'Research Focuses',
           },
         },
         {
@@ -202,6 +221,13 @@ export default function GroupPage() {
           data: {
             id: VIDEOS,
             name: 'Videos',
+          },
+        },
+        {
+          enabled: false,
+          data: {
+            id: 'topics',
+            name: 'Topics',
           },
         },
       ],

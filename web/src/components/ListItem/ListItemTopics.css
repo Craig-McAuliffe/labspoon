@@ -1,7 +1,10 @@
 .post-topics {
-  margin: 10px 0px 0px;
   display: grid;
   grid-template-columns: 30px 1fr;
+}
+
+.post-topics p {
+  margin-bottom: 0px;
 }
 
 .topics-sub-title {

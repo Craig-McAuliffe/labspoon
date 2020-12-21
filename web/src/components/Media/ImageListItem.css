@@ -19,3 +19,14 @@
   justify-content: center;
   opacity: 1;
 }
+
+.images-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  row-gap: 20px;
+  column-gap: 20px;
+  grid-template-rows: auto;
+  justify-items: center;
+  align-items: center;
+  margin: 20px 0px;
+}

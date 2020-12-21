@@ -1,5 +1,5 @@
 import React from 'react';
-import {MessageIcon} from '../../assets/ResourceIcons';
+import {MessageIcon} from '../../assets/GeneralActionIcons';
 
 import './MessageButton.css';
 

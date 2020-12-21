@@ -6,16 +6,6 @@
   min-width: 100%;
 }
 
-.feed-images-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  row-gap: 20px;
-  column-gap: 20px;
-  grid-template-rows: auto;
-  justify-items: center;
-  align-items: center;
-}
-
 .mixed-tab-section {
   padding-bottom: 50px;
 }
