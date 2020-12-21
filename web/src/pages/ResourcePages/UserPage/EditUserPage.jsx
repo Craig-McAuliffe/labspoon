@@ -11,11 +11,11 @@ import {useHistory, useParams} from 'react-router-dom';
 import ImageUploader from 'react-images-upload';
 import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 import {fetchUserDetailsFromDB} from './UserPage';
+import SecondaryButton from '../../../components/Buttons/SecondaryButton';
+import LinkAuthorIDForm from '../../../components/Publication/ConnectToPublications/ConnectToPublications';
 
 import './UserPage.css';
 import './EditUserPage.css';
-import SecondaryButton from '../../../components/Buttons/SecondaryButton';
-import LinkAuthorIDForm from '../../../components/Publication/ConnectToPublications/ConnectToPublications';
 
 export default function EditUserPage({user}) {
   const [userDetails, setUserDetails] = useState(user);

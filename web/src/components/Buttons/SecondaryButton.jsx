@@ -29,7 +29,7 @@ export default function SecondaryButton({
       className={buttonClass}
       style={widthAndHeight()}
       onClick={onClick}
-      type={type ? 'button' : 'submit'}
+      type={type ? type : 'button'}
     >
       <h3 className="secondary-button-text">{children}</h3>
     </button>
