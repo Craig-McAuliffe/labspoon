@@ -95,15 +95,14 @@ export default function PublicationPage() {
     },
   ];
 
-  if (featureFlags.has('publication-references')) {
-    relationshipFilter[0].options.push({
-      enabled: false,
-      data: {
-        id: REFERENCES_TAB,
-        name: 'References',
-      },
-    });
-  }
+  relationshipFilter[0].options.push({
+    enabled: false,
+    data: {
+      id: REFERENCES_TAB,
+      name: 'References',
+    },
+  });
+
   if (featureFlags.has('publication-cited-by')) {
     relationshipFilter[0].options.push({
       enabled: false,

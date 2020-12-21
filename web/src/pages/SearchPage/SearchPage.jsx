@@ -23,7 +23,6 @@ import {dbPublicationToJSPublication} from '../../helpers/publications';
 
 import 'instantsearch.css/themes/algolia.css';
 import {useContext} from 'react';
-import {FeatureFlags} from '../../App';
 import SecondaryButton from '../../components/Buttons/SecondaryButton';
 import SearchBar from '../../components/SearchBar';
 
@@ -61,7 +60,6 @@ export default function SearchPage() {
   const location = useLocation();
   const [tab, setTab] = useState(OVERVIEW);
   const [searchState, setSearchState] = useState(urlToSearchState(location));
-  const fflags = useContext(FeatureFlags);
   const history = useHistory();
 
   useEffect(() => {
@@ -105,13 +103,9 @@ export default function SearchPage() {
       results = <OverviewResults setTab={updateTab} />;
       break;
     case PUBLICATIONS:
-      results = fflags.has('microsoft-academic-knowledge-api-publications') ? (
-        <MicrosoftAcademicKnowledgeAPIPublicationResults
-          query={searchState.query}
-        />
-      ) : (
-        <PublicationsResults />
-      );
+      <MicrosoftAcademicKnowledgeAPIPublicationResults
+        query={searchState.query}
+      />;
       break;
     case POSTS:
       results = <PostsResults />;
@@ -354,16 +348,6 @@ const OverviewResults = ({setTab}) => (
       </OverviewResultsSection>
     </AllResults>
   </>
-);
-
-const PublicationsResults = () => (
-  <IndexResults>
-    <Hits
-      hitComponent={({hit}) => (
-        <GenericListItem result={dbPublicationToJSPublication(hit)} />
-      )}
-    />
-  </IndexResults>
 );
 
 const UsersResults = () => (
