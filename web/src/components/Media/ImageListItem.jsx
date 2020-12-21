@@ -9,7 +9,11 @@ export default function ImageListItem({src, alt, spinner}) {
     imageContainerRef.current.style.backgroundImage = `url(${src})`;
   });
   return (
-    <div className="image-list-item-container" ref={imageContainerRef}>
+    <div
+      className="image-list-item-container"
+      ref={imageContainerRef}
+      title={alt}
+    >
       {spinner ? (
         <div className="image-spinner-container">
           <LoadingSpinner />
@@ -17,4 +21,25 @@ export default function ImageListItem({src, alt, spinner}) {
       ) : null}
     </div>
   );
+}
+
+export function ImagesSection({images}) {
+  if (images.length === 0) return null;
+  return (
+    <div className="images-section">
+      {images.map((image) => (
+        <ImageListItem
+          key={image.id + 'image'}
+          src={image.src}
+          alt={image.alt ? image.alt : `image from source ${image.src}`}
+        />
+      ))}
+    </div>
+  );
+}
+
+export function formatTaggedImages(photoURLs) {
+  return photoURLs.map((photoURL) => {
+    return {src: photoURL, alt: 'image from source photoURL'};
+  });
 }

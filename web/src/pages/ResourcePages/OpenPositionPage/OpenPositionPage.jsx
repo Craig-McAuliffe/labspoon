@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useHistory, useParams, Link} from 'react-router-dom';
-import ListItemTopics from '../../../components/CommonListItemParts/ListItemTopics';
+import ListItemTopics from '../../../components/ListItem/ListItemTopics';
 import GeneralError from '../../../components/GeneralError';
 import FollowGroupButton from '../../../components/Group/FollowGroupButton';
 import GroupListItem from '../../../components/Group/GroupListItem';

@@ -2,7 +2,7 @@ import React from 'react';
 import {
   PublicationIcon,
   LinkPostToAResourceIcon,
-} from '../../../../assets/PostTypeIcons';
+} from '../../../../assets/ResourceTypeIcons';
 import {RemoveIcon} from '../../../../assets/GeneralActionIcons';
 import {DropDownTriangle} from '../../../../assets/GeneralActionIcons';
 import {PUBLICATION_POST, DEFAULT_POST} from './CreatePost';

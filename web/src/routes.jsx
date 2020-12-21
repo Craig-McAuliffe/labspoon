@@ -34,6 +34,7 @@ import Articles from './pages/Articles/Articles';
 import Groups from './pages/ResourcePages/GroupPage/Groups';
 import TechniquePage from './pages/ResourcePages/TechniquePage/TechniquePage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage/PrivacyPolicyPage';
+import ResearchFocusPage from './pages/ResourcePages/ResearchFocusPage/ResearchFocusPage';
 
 /**
  * Top level routing structure for the app.
@@ -101,7 +102,7 @@ export default function Routes({user, setUser}) {
       <Route path="/topic/:topicID">
         <TopicPage />
       </Route>
-      <Route path="/openPosition/:openPositionID">
+      <Route exact path="/openPosition/:openPositionID">
         <OpenPositionPage />
       </Route>
       <Route path="/magField/:magFieldID">
@@ -121,6 +122,9 @@ export default function Routes({user, setUser}) {
       </Route>
       <Route exact path="/technique/:techniqueID">
         <TechniquePage />
+      </Route>
+      <Route exact path="/researchFocus/:researchFocusID">
+        <ResearchFocusPage />
       </Route>
       <Route path="/notfound">
         <NotFoundPage />

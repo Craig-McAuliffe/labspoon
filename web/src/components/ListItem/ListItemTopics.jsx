@@ -5,6 +5,7 @@ import './ListItemTopics.css';
 
 export default function ListItemTopics({dbTopics, customTopics}) {
   if (!dbTopics && !customTopics) return null;
+  if (dbTopics.length === 0 && customTopics.length === 0) return null;
 
   const topicLinks = (topics) => {
     if (!topics) return null;

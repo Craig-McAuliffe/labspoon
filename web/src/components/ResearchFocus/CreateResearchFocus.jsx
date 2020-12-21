@@ -1,6 +1,7 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {useHistory} from 'react-router-dom';
-import {Form, Formik} from 'formik';
+import {db} from '../../firebase';
+import {Formik, Form} from 'formik';
 import * as Yup from 'yup';
 import {AuthContext} from '../../App';
 import SelectGroup from '../Group/SelectGroup';
@@ -17,12 +18,13 @@ import HeaderAndBodyArticleInput, {
 } from '../Forms/Articles/HeaderAndBodyArticleInput';
 import TagTopics from '../Topics/TagTopics';
 import CreateResourceFormActions from '../Forms/CreateResourceFormActions';
-import {db} from '../../firebase';
 import {uploadImagesAndGetURLs} from '../../helpers/images';
 import FormImageUpload from '../Forms/FormImageUpload';
 import addArticleToDB from '../../helpers/articles';
 
-export default function CreateTechnique() {
+import './CreateResearchFocus.css';
+
+export default function CreateResearchFocus() {
   const [selectedGroup, setSelectedGroup] = useState(undefined);
   const [memberOfGroups, setMemberOfGroups] = useState([]);
   const [loadingMemberOfGroups, setLoadingMemberOfGroups] = useState(false);
@@ -51,7 +53,7 @@ export default function CreateTechnique() {
       });
   }, [userID]);
 
-  if (loadingMemberOfGroups || submitting) return <LoadingSpinner />;
+  if (submitting) return <LoadingSpinner />;
 
   if (selectedGroup === undefined)
     return (
@@ -61,30 +63,31 @@ export default function CreateTechnique() {
             groups={memberOfGroups}
             setSelectedGroup={setSelectedGroup}
             toggleText="Select from your groups"
+            loading={loadingMemberOfGroups}
           />
         </SelectGroupLabel>
         <MustSelectGroup
           userHasGroups={memberOfGroups.length > 0}
-          explanation="Techniques can only be created for groups."
+          explanation="Research focus articles can only be created for groups."
         />
       </>
     );
 
   function onSubmit(res) {
     setSubmitting(true);
-    const techniqueDBRef = db
-      .collection(`groups/${selectedGroup.id}/techniques`)
+    const researchFocusDBRef = db
+      .collection(`groups/${selectedGroup.id}/researchFocuses`)
       .doc();
-    const techniqueID = techniqueDBRef.id;
+    const researchFocusID = researchFocusDBRef.id;
 
     if (res.photos.length === 0) {
       addArticleToDB(
-        res.technique,
+        res.researchFocus,
         [],
         selectedTopics,
         selectedGroup,
         userProfile,
-        techniqueDBRef,
+        researchFocusDBRef,
         setSubmitting,
         history
       );
@@ -92,29 +95,28 @@ export default function CreateTechnique() {
     }
     uploadImagesAndGetURLs(
       Array.from(res.photos),
-      `groups/${selectedGroup.id}/techniques/${techniqueID}`
+      `groups/${selectedGroup.id}/researchFocuses/${researchFocusID}`
     ).then((photoURLs) =>
       addArticleToDB(
-        res.technique,
+        res.researchFocus,
         photoURLs,
         selectedTopics,
         selectedGroup,
         userProfile,
-        techniqueDBRef,
+        researchFocusDBRef,
         setSubmitting,
         history
       )
     );
   }
-
   return (
     <Formik
       initialValues={{
-        technique: initialValue,
+        researchFocus: initialValue,
         photos: [],
       }}
       validationSchema={Yup.object({
-        technique: yupArticleValidation,
+        researchFocus: yupArticleValidation,
       })}
       onSubmit={onSubmit}
     >
@@ -124,7 +126,7 @@ export default function CreateTechnique() {
           selectedGroup={selectedGroup}
           setSelectedGroup={setSelectedGroup}
         />
-        <HeaderAndBodyArticleInput name="technique" />
+        <HeaderAndBodyArticleInput name="researchFocus" />
         <TagTopics
           submittingForm={submitting}
           selectedTopics={selectedTopics}

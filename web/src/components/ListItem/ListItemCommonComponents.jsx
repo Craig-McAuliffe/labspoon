@@ -1,7 +1,7 @@
 import React from 'react';
 
-import './ListItemContainer.css';
+import './ListItemCommonComponents.css';
 
-export default function ListItemContainer({children}) {
+export function ListItemContainer({children}) {
   return <div className="general-list-item-container">{children}</div>;
 }

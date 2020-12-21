@@ -7,6 +7,7 @@ import NegativeButton from '../Buttons/NegativeButton';
 import ImageListItem from '../Media/ImageListItem';
 import SuccessMessage from '../Forms/SuccessMessage';
 import ErrorMessage from '../Forms/ErrorMessage';
+import './ImageUpload.css';
 
 const NOT_STARTED = 0;
 const UPLOADING = 1;

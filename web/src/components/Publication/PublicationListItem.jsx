@@ -4,7 +4,7 @@ import {v4 as uuid} from 'uuid';
 import {ExpandIcon, HideIcon} from '../../assets/PostActionIcons';
 import PostActions from '../Posts/Post/PostParts/PostActions';
 import detectJournal from '../Publication/DetectJournal';
-import ListItemTopics from '../CommonListItemParts/ListItemTopics';
+import ListItemTopics from '../ListItem/ListItemTopics';
 import {FeatureFlags} from '../../App';
 
 import './PublicationListItem.css';

@@ -1,11 +1,11 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
-import CreateButton from '../../Buttons/CreateButton';
 import SecondaryButton from '../../Buttons/SecondaryButton';
 import {SmallDropdownToggle} from '../../Dropdown';
 import SelectGroup from '../../Group/SelectGroup';
 import {GroupHeadlineItem} from '../../Group/GroupListItem';
 import './SelectGroup.css';
+import {CreateIcon} from '../../../assets/HeaderIcons';
 
 export function SelectGroupLabel({fieldName, children}) {
   return (
@@ -25,9 +25,9 @@ export function MustSelectGroup({userHasGroups, explanation}) {
       ) : (
         <>
           <div className="must-select-group-button-container">
-            <Link to="/create/group">
+            <Link to="/create">
               <SecondaryButton>
-                <CreateButton hoverControl={true} />
+                <CreateIcon hoverControl={true} />
                 Create Group Now
               </SecondaryButton>
             </Link>

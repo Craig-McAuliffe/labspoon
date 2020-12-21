@@ -16,56 +16,60 @@ import {
   formatTaggedImages,
   ImagesSection,
 } from '../../../components/Media/ImageListItem';
-import {TechniqueIcon} from '../../../assets/ResourceTypeIcons';
-import {TECHNIQUE} from '../../../helpers/resourceTypeDefinitions';
+import {ResearchFocusIcon} from '../../../assets/ResourceTypeIcons';
+import {RESEARCHFOCUS} from '../../../helpers/resourceTypeDefinitions';
 
-export default function TechniquePage() {
-  const [technique, setTechnique] = useState();
+export default function ResearchFocusPage() {
+  const [researchFocus, setResearchFocus] = useState();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const techniqueID = useParams().techniqueID;
+  const researchFocusID = useParams().researchFocusID;
   const history = useHistory();
 
   useEffect(() => {
     setLoading(true);
-    db.doc(`techniques/${techniqueID}`)
+    db.doc(`researchFocuses/${researchFocusID}`)
       .get()
       .then((ds) => {
         if (!ds.exists) {
           history.push('/notfound');
         }
-        const techniqueFromDB = ds.data();
-        techniqueFromDB.resourceType = TECHNIQUE;
-        setTechnique(techniqueFromDB);
+        const researchFocusFromDB = ds.data();
+        researchFocusFromDB.resourceType = RESEARCHFOCUS;
+        setResearchFocus(researchFocusFromDB);
       })
       .catch((err) => {
         console.error('Unable to retrieve technique:', err);
         setError(true);
       })
       .finally(() => setLoading(false));
-  }, [techniqueID]);
+  }, [researchFocusID]);
 
   if (error) return <GeneralError />;
 
   if (loading) return <LoadingSpinner />;
+
   return (
     <FeedContent>
       <ArticleHeaderAndType
-        title={technique.title}
-        resourceType={technique.resourceType}
-        icon={<TechniqueIcon />}
+        title={researchFocus.title}
+        resourceType={researchFocus.resourceType}
+        icon={<ResearchFocusIcon />}
         dedicatedPage={true}
       />
       <ListItemTopics
-        dbTopics={technique.topics}
-        customTopics={technique.customTopics}
+        dbTopics={researchFocus.topics}
+        customTopics={researchFocus.customTopics}
       />
-      <GroupListItem group={technique.group} noBorder={true}>
-        <FollowGroupButton targetGroup={technique.group} />
+      <GroupListItem group={researchFocus.group} noBorder={true}>
+        <FollowGroupButton targetGroup={researchFocus.group} />
       </GroupListItem>
-      <ImagesSection images={formatTaggedImages(technique.photoURLs)} />
-      <RichTextBody body={technique.body} />
-      <Author authorID={technique.author.id} name={technique.author.name} />
+      <ImagesSection images={formatTaggedImages(researchFocus.photoURLs)} />
+      <RichTextBody body={researchFocus.body} />
+      <Author
+        authorID={researchFocus.author.id}
+        name={researchFocus.author.name}
+      />
     </FeedContent>
   );
 }

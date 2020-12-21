@@ -6,18 +6,13 @@ import './LightTabLink.css';
 export default function LightTabLink({name, link}) {
   const location = useLocation();
   return (
-    <Link to={link}>
-      <button type="button">
-        <h2
-          className={
-            location.pathname === link
-              ? 'light-tab-active'
-              : 'light-tab-inactive'
-          }
-        >
-          {name}
-        </h2>
-      </button>
+    <Link
+      to={link}
+      className={
+        location.pathname === link ? 'light-tab-active' : 'light-tab-inactive'
+      }
+    >
+      <h2>{name}</h2>
     </Link>
   );
 }

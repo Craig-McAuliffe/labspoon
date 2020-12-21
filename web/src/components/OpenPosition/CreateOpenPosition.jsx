@@ -164,10 +164,7 @@ export default function CreateOpenPosition() {
         />
         <h4>How to Apply</h4>
         <HowToApply />
-        <CreateResourceFormActions
-          submitted={submitting}
-          submitText="Create Position"
-        />
+        <CreateResourceFormActions submitted={submitting} submitText="Create" />
       </Form>
     </Formik>
   );

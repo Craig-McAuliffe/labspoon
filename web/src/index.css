@@ -43,9 +43,11 @@ a {
 }
 
 button,
-input {
+input,
+input[type='file']::-webkit-file-upload-button {
   background: none;
   border: none;
+  cursor: pointer;
 }
 
 button:focus,

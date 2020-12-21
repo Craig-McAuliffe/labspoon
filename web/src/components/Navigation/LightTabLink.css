@@ -2,9 +2,20 @@
   color: #000000;
   text-decoration: underline;
   margin: 0px 20px 20px 0px;
+  flex-shrink: 0;
 }
 
 .light-tab-inactive {
   color: #5d5d65;
   margin: 0px 20px 20px 0px;
+  flex-shrink: 0;
+}
+
+.light-tab-active:hover {
+  text-decoration: none;
+  color: #000000;
+}
+.light-tab-inactive:hover {
+  color: #000000;
+  text-decoration: none;
 }

@@ -6,8 +6,21 @@ service cloud.firestore {
     }
 
     match /openPositions/{openPositionID} {
-        allow read;
-      }
+      allow read;
+      allow write: if (
+          request.auth != null
+          && exists(/databases/$(database)/documents/groups/$(request.resource.data.group.id)/members/$(request.auth.uid))
+          && request.auth.uid == request.resource.data.author.id
+        );
+    }
+
+    match /researchFocuses/{researchFocusID}{
+      allow read;
+    }
+
+    match /techniques/{techniqueID}{
+      allow read;
+    }
 
     match /users/{userID} {
       allow read;
@@ -124,8 +137,24 @@ service cloud.firestore {
         );
       }
 
+      match /researchFocuses/{researchFocusID} {
+        allow read;
+        allow write: if (
+          request.auth != null
+          && exists(/databases/$(database)/documents/groups/$(groupID)/members/$(request.auth.uid))
+          && request.auth.uid == request.resource.data.author.id
+          && groupID == request.resource.data.group.id
+        );
+      }
+      
       match /openPositions/{openPositionID} {
         allow read;
+        allow write: if (
+          request.auth != null
+          && exists(/databases/$(database)/documents/groups/$(groupID)/members/$(request.auth.uid))
+          && request.auth.uid == request.resource.data.author.id
+          && groupID == request.resource.data.group.id
+        );
       }
     }
 
