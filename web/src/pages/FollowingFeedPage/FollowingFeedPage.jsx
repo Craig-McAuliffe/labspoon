@@ -175,7 +175,7 @@ export default function FollowingFeedPage() {
       </FilterManager>
       <div className="content-layout">
         <div className="feed-container">
-          {featureFlags.has('create-post') ? <CreatePost /> : <></>}
+          <CreatePost />
           {featureFlags.has('news') ? <HomePageTabs /> : <></>}
           <NewResultsWrapper />
         </div>
