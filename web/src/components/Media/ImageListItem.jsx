@@ -23,19 +23,8 @@ export default function ImageListItem({src, alt, spinner}) {
   );
 }
 
-export function ImagesSection({images}) {
-  if (images.length === 0) return null;
-  return (
-    <div className="images-section">
-      {images.map((image) => (
-        <ImageListItem
-          key={image.id + 'image'}
-          src={image.src}
-          alt={image.alt ? image.alt : `image from source ${image.src}`}
-        />
-      ))}
-    </div>
-  );
+export function ImagesSection({children}) {
+  return <div className="images-section">{children}</div>;
 }
 
 export function formatTaggedImages(photoURLs) {

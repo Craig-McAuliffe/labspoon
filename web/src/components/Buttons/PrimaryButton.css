@@ -1,16 +1,30 @@
 .primary-button,
 .primary-button-small,
 .primary-button-inactive,
-.primary-button-spinner {
+.primary-button-spinner,
+.negative-button,
+.negative-button-small {
   border: none;
   border-radius: 4%;
   text-decoration: none;
-  background: #00507c;
-  color: #ffffff;
   cursor: pointer;
   text-align: center;
   -webkit-appearance: none;
   -moz-appearance: none;
+}
+
+.primary-button,
+.primary-button-small,
+.primary-button-inactive,
+.primary-button-spinner {
+  background: #00507c;
+  color: #ffffff;
+}
+
+.negative-button,
+.negative-button-small {
+  background: #dcdce0;
+  color: #000000;
 }
 
 .primary-button-spinner {
@@ -18,12 +32,14 @@
 }
 
 .primary-button,
-.primary-button-inactive {
-  padding: 10px 10px 5px 10px;
+.primary-button-inactive,
+.negative-button {
+  padding: 10px 10px;
 }
 
-.primary-button-small {
-  padding: 8px 10px 7px 10px;
+.primary-button-small,
+.negative-button-small {
+  padding: 10px 10px;
 }
 
 .primary-button:hover,
@@ -35,12 +51,27 @@
   background: #023b5a;
 }
 
+.negative-button:hover,
+.negative-button:focus,
+.negative-button-small:hover,
+.negative-button-small:focus {
+  background: #99999f;
+}
+
 .primary-button-inactive {
   opacity: 40%;
 }
 
+.primary-button-text {
+  margin-bottom: 0px;
+}
+
+.primary-button-text-small {
+  margin-bottom: 0px;
+}
+
 .primary-button-clicked {
-  padding: 10px 5px 5px 5px;
+  padding: 10px 5px;
   border-radius: 4%;
   text-decoration: none;
   background: #ffffff;
@@ -83,18 +114,11 @@
   }
 
   .primary-button,
-  .primary-button:hover,
-  .primary-button-inactive:hover,
   .primary-button-inactive,
-  .FollowButton:hover h2 {
-    padding: 7px 13px 2px 13px;
-    border-radius: 3%;
-  }
-
-  .primary-button-clicked,
-  .primary-button-clicked:hover,
-  .primary-button-clicked:focus h2 {
-    padding: 7px 13px 2px 13px;
+  .negative-button,
+  .negative-button-small,
+  .primary-button-clicked {
+    padding: 10px 10px;
     border-radius: 3%;
   }
 }
@@ -109,18 +133,12 @@
   }
 
   .primary-button,
-  .primary-button:hover,
-  .primary-button-inactive:hover,
   .primary-button-inactive,
-  .FollowButton:hover h2 {
-    padding: 5px 11px 0px 11px;
-    border-radius: 2%;
-  }
-
+  .FollowButton:hover h2,
   .primary-button-clicked,
-  .primary-button-clicked:hover,
-  .primary-button-clicked:focus h2 {
-    padding: 5px 11px 0px 11px;
+  .negative-button,
+  .negative-button-small {
+    padding: 8px 8px;
     border-radius: 2%;
   }
 }
@@ -135,18 +153,11 @@
   }
 
   .primary-button,
-  .primary-button:hover,
-  .primary-button-inactive:hover,
-  .primary-button-inactive,
-  .FollowButton:hover h2 {
-    padding: 7px 9px 0px 9px;
-    border-radius: 2%;
-  }
-
   .primary-button-clicked,
-  .primary-button-clicked:hover,
-  .primary-button-clicked:focus h2 {
-    padding: 7px 9px 0px 9px;
+  .primary-button-inactive,
+  .negative-button,
+  .negative-button-small {
+    padding: 7px 9px;
     border-radius: 2%;
   }
 }

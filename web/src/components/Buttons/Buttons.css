@@ -34,34 +34,6 @@
   align-items: center;
 }
 
-.negative-button,
-.negative-button-small {
-  border: none;
-  border-radius: 4%;
-  text-decoration: none;
-  background: #dcdce0;
-  color: #000000;
-  cursor: pointer;
-  text-align: center;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-}
-
-.negative-button {
-  padding: 10px 10px 5px 10px;
-}
-
-.negative-button-small {
-  padding: 8px 10px 7px 10px;
-}
-
-.negative-button:hover,
-.negative-button:focus,
-.negative-button-small:hover,
-.negative-button-small:focus {
-  background: #99999f;
-}
-
 .action-button-text {
   display: inline-block;
   margin-left: 5px;
