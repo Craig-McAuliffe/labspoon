@@ -57,29 +57,6 @@
   margin: 10px 0px;
 }
 
-.edit-group-tabs-container {
-  margin-left: -5px;
-}
-
-.edit-group-tabs-container button:hover {
-  color: #000000;
-}
-
-.edit-group-tab-active {
-  color: #000000;
-  text-decoration: underline;
-  margin: 0px 20px 20px 0px;
-}
-
-.edit-group-tab-inactive {
-  color: #5d5d65;
-  margin: 0px 20px 20px 0px;
-}
-
-.edit-group-page-back:hover {
-  color: #3099d3;
-}
-
 .donation-link-container {
   margin: 20px 0px;
   display: flex;

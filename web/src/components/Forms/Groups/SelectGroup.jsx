@@ -45,15 +45,17 @@ function Explanation({children}) {
 export function SelectedGroup({selectedGroup, setSelectedGroup, groups}) {
   return (
     <div className="change-group-section">
-      <div className="change-mandatory-group-dropdown-container">
-        <SelectGroup
-          groups={groups}
-          setSelectedGroup={setSelectedGroup}
-          customToggle={({setOpen}) => (
-            <SmallDropdownToggle setOpen={setOpen} text="Change Group" />
-          )}
-        />
-      </div>
+      {groups.length > 1 ? (
+        <div className="change-mandatory-group-dropdown-container">
+          <SelectGroup
+            groups={groups}
+            setSelectedGroup={setSelectedGroup}
+            customToggle={({setOpen}) => (
+              <SmallDropdownToggle setOpen={setOpen} text="Change Group" />
+            )}
+          />
+        </div>
+      ) : null}
       <div>
         <GroupHeadlineItem group={selectedGroup} />
       </div>

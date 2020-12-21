@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react';
-import {useHistory} from 'react-router-dom';
+import {useHistory, useParams} from 'react-router-dom';
 import {db} from '../../firebase';
 import {Formik, Form} from 'formik';
 import * as Yup from 'yup';
@@ -25,6 +25,7 @@ import addArticleToDB from '../../helpers/articles';
 import './CreateResearchFocus.css';
 
 export default function CreateResearchFocus() {
+  const preSelectedGroupID = useParams().groupID;
   const [selectedGroup, setSelectedGroup] = useState(undefined);
   const [memberOfGroups, setMemberOfGroups] = useState([]);
   const [loadingMemberOfGroups, setLoadingMemberOfGroups] = useState(false);
@@ -41,6 +42,12 @@ export default function CreateResearchFocus() {
       .then((groups) => {
         setMemberOfGroups(groups);
         setLoadingMemberOfGroups(false);
+        if (preSelectedGroupID)
+          setSelectedGroup(
+            groups.filter(
+              (fetchedGroup) => fetchedGroup.id === preSelectedGroupID
+            )[0]
+          );
       })
       .catch((err) => {
         console.error(

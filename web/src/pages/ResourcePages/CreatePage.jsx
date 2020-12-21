@@ -6,11 +6,13 @@ import CreatePost from '../../components/Posts/Post/CreatePost/CreatePost';
 import CreateGroupPage from '../../components/Group/CreateGroupPage/CreateGroupPage';
 import CreateOpenPosition from '../../components/OpenPosition/CreateOpenPosition';
 import CreateTechnique from '../../components/Techniques/CreateTechnique';
-import LightTabLink from '../../components/Navigation/LightTabLink';
-
-import './CreatePage.css';
+import LightTabLink, {
+  LightTabContainer,
+} from '../../components/Navigation/LightTab';
 import {FeedContent} from '../../components/Layout/Content';
 import CreateResearchFocus from '../../components/ResearchFocus/CreateResearchFocus';
+
+import './CreatePage.css';
 
 export default function CreatePage() {
   const {userProfile} = useContext(AuthContext);
@@ -19,7 +21,7 @@ export default function CreatePage() {
   if (!userID) return <LoadingSpinner />;
   return (
     <FeedContent>
-      <div className="light-tab-group">
+      <LightTabContainer>
         <LightTabLink name="Post" link="/create/post" />
         <LightTabLink name="Group" link="/create/group" />
         {featureFlags.has('create-open-position') ? (
@@ -31,7 +33,7 @@ export default function CreatePage() {
         {featureFlags.has('research-focus') && (
           <LightTabLink name="Research Focus" link="/create/researchFocus" />
         )}
-      </div>
+      </LightTabContainer>
       <div>
         <Switch>
           <Route path="/create/post">
@@ -43,16 +45,16 @@ export default function CreatePage() {
           <Route path="/create/group">
             <CreateGroupPage />
           </Route>
-          <Route path="/create/openPosition">
+          <Route path="/create/openPosition/:groupID?">
             <CreateOpenPosition />
           </Route>
           {featureFlags.has('techniques') && (
-            <Route path="/create/technique">
+            <Route path="/create/technique/:groupID?">
               <CreateTechnique />
             </Route>
           )}
           {featureFlags.has('research-focus') && (
-            <Route path="/create/researchFocus">
+            <Route path="/create/researchFocus/:groupID?">
               <CreateResearchFocus />
             </Route>
           )}

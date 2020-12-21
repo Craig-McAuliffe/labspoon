@@ -3,7 +3,7 @@ import {Link} from 'react-router-dom';
 import SearchBar from '../../SearchBar';
 import AvatarDropDown from './AvatarDropDown';
 import HeaderLogo from '../../../assets/HeaderLogo';
-import CreateButton from '../../Buttons/CreateButton';
+import {HeaderCreateButton} from '../../Buttons/CreateButton';
 import './Header.css';
 
 const Header = () => {
@@ -18,7 +18,7 @@ const Header = () => {
       <SearchBar />
       <div className="header-right-section">
         <div className="header-add-button">
-          <CreateButton />
+          <HeaderCreateButton />
         </div>
         <div className="header-drop-down">
           <AvatarDropDown />
