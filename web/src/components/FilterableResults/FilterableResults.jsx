@@ -139,7 +139,6 @@ export function FilterManager({children}) {
   const [displayedSiderFilter, setDisplayedSiderFilter] = useState([]);
   const [siderFilterLoading, setSiderFilterLoading] = useState(true);
   const [tabsFilterLoading, setTabsFilterLoading] = useState(true);
-
   useEffect(() => {
     const pageFilter = [...displayedTabFilter, ...displayedSiderFilter];
     filterableResults.setFilter(pageFilter);
@@ -244,15 +243,15 @@ export function ResourceTabs({tabs, affectsFilter}) {
   const filterManager = useContext(FilterManagerContext);
   const setTabFilter = filterManager.setDisplayedTabFilter;
   const tabFilter = filterManager.displayedTabFilter;
+  const setTabsFilterLoading = filterManager.setTabsFilterLoading;
   useEffect(() => {
-    filterManager.setTabsFilterLoading(true);
-
+    setTabsFilterLoading(true);
     if (tabs === undefined) {
-      filterManager.setTabsFilterLoading(false);
+      setTabsFilterLoading(false);
     }
     if (tabs) {
       setTabFilter(tabs);
-      filterManager.setTabsFilterLoading(false);
+      setTabsFilterLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

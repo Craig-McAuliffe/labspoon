@@ -10,7 +10,7 @@ import Dropdown, {DropdownOption} from '../Dropdown';
 import {AuthContext} from '../../App';
 import {WebsiteIcon, EmailIcon} from '../../assets/PostOptionalTagsIcons';
 import TabbedContainer from '../TabbedContainer/TabbedContainer';
-import {useHistory} from 'react-router-dom';
+import {useHistory, useParams} from 'react-router-dom';
 import SelectGroup from '../Group/SelectGroup';
 import {
   MustSelectGroup,
@@ -31,6 +31,7 @@ const createOpenPosition = firebase
   .httpsCallable('openPositions-createOpenPosition');
 
 export default function CreateOpenPosition() {
+  const preSelectedGroupID = useParams().groupID;
   const [selectedPosition, setSelectedPosition] = useState('');
   const [selectedGroup, setSelectedGroup] = useState(undefined);
   const [memberOfGroups, setMemberOfGroups] = useState([]);
@@ -72,6 +73,12 @@ export default function CreateOpenPosition() {
         setMemberOfGroups(groups);
         setLoadingMemberOfGroups(false);
         setLoading(false);
+        if (preSelectedGroupID)
+          setSelectedGroup(
+            groups.filter(
+              (fetchedGroup) => fetchedGroup.id === preSelectedGroupID
+            )[0]
+          );
       })
       .catch((err) => {
         console.error(

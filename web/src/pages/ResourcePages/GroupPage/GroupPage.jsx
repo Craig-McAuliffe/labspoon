@@ -15,12 +15,6 @@ import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
 import {getPaginatedImagesFromCollectionRef} from '../../../helpers/images';
 import {getPaginatedResourcesFromCollectionRef} from '../../../helpers/resources';
 import GroupPageSider from './GroupPageSider';
-import FilterableResults, {
-  NewResultsWrapper,
-  ResourceTabs,
-  FilterManager,
-  NewFilterMenuWrapper,
-} from '../../../components/FilterableResults/FilterableResults';
 import GroupAvatar from '../../../components/Avatar/GroupAvatar';
 import FollowGroupButton from '../../../components/Group/FollowGroupButton';
 import MessageButton from '../../../components/Buttons/MessageButton';
@@ -40,6 +34,7 @@ import {
   TECHNIQUE,
   TECHNIQUES,
 } from '../../../helpers/resourceTypeDefinitions';
+import ResourcesFeed from '../ResourcesFeeds';
 
 import './GroupPage.css';
 
@@ -301,25 +296,20 @@ export default function GroupPage() {
       ) : (
         <></>
       )}
-      <FilterableResults fetchResults={fetchFeedData} limit={9}>
-        <FilterManager>
-          <NewFilterMenuWrapper />
-          <div className="content-layout">
-            <div className="group-details">
-              <GroupDetails
-                group={groupData}
-                groupDescriptionRef={groupDescriptionRef}
-                userIsMember={userIsMember}
-                verified={verified}
-              />
-            </div>
-            <div className="feed-container">
-              <ResourceTabs tabs={relationshipFilter} />
-              <NewResultsWrapper />
-            </div>
-          </div>
-        </FilterManager>
-      </FilterableResults>
+      <ResourcesFeed
+        fetchResults={fetchFeedData}
+        limit={9}
+        tabs={relationshipFilter}
+      >
+        <div className="group-details">
+          <GroupDetails
+            group={groupData}
+            groupDescriptionRef={groupDescriptionRef}
+            userIsMember={userIsMember}
+            verified={verified}
+          />
+        </div>
+      </ResourcesFeed>
     </>
   );
 }

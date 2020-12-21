@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {Link, Route, Switch, useParams, useRouteMatch} from 'react-router-dom';
 import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 import {getGroup} from '../../../helpers/groups';
@@ -8,14 +8,24 @@ import EditGroupPosts from './EditGroupPosts';
 import EditGroupPublications from './EditGroupPublications';
 import EditGroupPhotos from './EditGroupPhotos';
 import EditGroupVideos from './EditGroupVideos';
+import {FeatureFlags} from '../../../App';
+import EditGroupTechniques from './EditGroupTechniques';
+import EditGroupResearchFocuses from './EditGroupResearchFocuses';
+import EditGroupOpenPositions from './EditGroupOpenPositions';
 
-import './GroupPage.css';
+import './EditGroupPage.css';
+import LightTabLink, {
+  LightTabContainer,
+} from '../../../components/Navigation/LightTab';
 
 const INFO_TAB = 'info';
 const POSTS_TAB = 'posts';
 const PUBLICATIONS_TAB = 'publications';
 const PHOTOS_TAB = 'photos';
 const VIDEOS_TAB = 'videos';
+const TECHNIQUES_TAB = 'techniques';
+const RESEARCHFOCUSES_TAB = 'researchFocuses';
+const OPENPOSITIONS_TAB = 'openPositions';
 
 const tabIDToDisplayName = {
   [INFO_TAB]: 'Info',
@@ -23,6 +33,9 @@ const tabIDToDisplayName = {
   [PUBLICATIONS_TAB]: 'Publications',
   [PHOTOS_TAB]: 'Photos',
   [VIDEOS_TAB]: 'Videos',
+  [TECHNIQUES_TAB]: 'Techniques',
+  [RESEARCHFOCUSES_TAB]: 'Research Focuses',
+  [OPENPOSITIONS_TAB]: 'Open Positions',
 };
 
 export default function EditGroupPage() {
@@ -31,8 +44,18 @@ export default function EditGroupPage() {
   const [group, setGroup] = useState();
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
-  const tabs = [INFO_TAB, POSTS_TAB, PUBLICATIONS_TAB, PHOTOS_TAB, VIDEOS_TAB];
+  const tabs = [
+    INFO_TAB,
+    POSTS_TAB,
+    PUBLICATIONS_TAB,
+    PHOTOS_TAB,
+    VIDEOS_TAB,
+    TECHNIQUES_TAB,
+    RESEARCHFOCUSES_TAB,
+    OPENPOSITIONS_TAB,
+  ];
   const groupURL = url.slice(0, url.length - '/edit'.length);
+  const flags = useContext(FeatureFlags);
 
   useEffect(() => {
     Promise.resolve(getGroup(groupID))
@@ -84,6 +107,26 @@ export default function EditGroupPage() {
           <ReturnToGroupPageButton url={groupURL} />
         </EditGroupVideos>
       </Route>
+      {flags.has('techniques') ? (
+        <Route path={`${path}/${TECHNIQUES_TAB}`}>
+          <EditGroupTechniques>
+            <EditGroupTabs tabs={tabs} activeTab={TECHNIQUES_TAB} />
+            <ReturnToGroupPageButton url={groupURL} />
+          </EditGroupTechniques>
+        </Route>
+      ) : null}
+      <Route path={`${path}/${RESEARCHFOCUSES_TAB}`}>
+        <EditGroupResearchFocuses>
+          <EditGroupTabs tabs={tabs} activeTab={RESEARCHFOCUSES_TAB} />
+          <ReturnToGroupPageButton url={groupURL} />
+        </EditGroupResearchFocuses>
+      </Route>
+      <Route path={`${path}/${OPENPOSITIONS_TAB}`}>
+        <EditGroupOpenPositions>
+          <EditGroupTabs tabs={tabs} activeTab={OPENPOSITIONS_TAB} />
+          <ReturnToGroupPageButton url={groupURL} />
+        </EditGroupOpenPositions>
+      </Route>
       <Route path={`${path}`}>
         <NotFoundPage />
       </Route>
@@ -104,30 +147,16 @@ function ReturnToGroupPageButton({url}) {
 }
 
 export function EditGroupTabs({tabs, activeTab}) {
-  return tabs.map((tab) => {
-    return (
-      <EditGroupTab
-        key={tab}
-        value={tabIDToDisplayName[tab]}
-        active={tab === activeTab}
-        route={`${tab}`}
-      />
-    );
-  });
-}
-
-function EditGroupTab({value, active, route}) {
   return (
-    <Link to={route}>
-      <button>
-        <h2
-          className={
-            active ? 'edit-group-tab-active' : 'edit-group-tab-inactive'
-          }
-        >
-          {value}
-        </h2>
-      </button>
-    </Link>
+    <LightTabContainer>
+      {tabs.map((tab) => (
+        <LightTabLink
+          key={tab}
+          name={tabIDToDisplayName[tab]}
+          active={tab === activeTab}
+          link={`${tab}`}
+        />
+      ))}
+    </LightTabContainer>
   );
 }

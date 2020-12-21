@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {useHistory} from 'react-router-dom';
+import {useHistory, useParams} from 'react-router-dom';
 import {Form, Formik} from 'formik';
 import * as Yup from 'yup';
 import {AuthContext} from '../../App';
@@ -23,6 +23,7 @@ import FormImageUpload from '../Forms/FormImageUpload';
 import addArticleToDB from '../../helpers/articles';
 
 export default function CreateTechnique() {
+  const preSelectedGroupID = useParams().groupID;
   const [selectedGroup, setSelectedGroup] = useState(undefined);
   const [memberOfGroups, setMemberOfGroups] = useState([]);
   const [loadingMemberOfGroups, setLoadingMemberOfGroups] = useState(false);
@@ -39,6 +40,12 @@ export default function CreateTechnique() {
       .then((groups) => {
         setMemberOfGroups(groups);
         setLoadingMemberOfGroups(false);
+        if (preSelectedGroupID)
+          setSelectedGroup(
+            groups.filter(
+              (fetchedGroup) => fetchedGroup.id === preSelectedGroupID
+            )[0]
+          );
       })
       .catch((err) => {
         console.error(
