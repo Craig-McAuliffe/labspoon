@@ -1,5 +1,5 @@
 import React, {useState, useContext, useEffect} from 'react';
-import {Formik, Form} from 'formik';
+import {Formik, Form, useField} from 'formik';
 import * as Yup from 'yup';
 import {
   InstantSearch,
@@ -33,6 +33,7 @@ import {SearchIconGrey} from '../../../assets/HeaderIcons';
 import {FeedContent} from '../../../components/Layout/Content';
 import Select, {LabelledDropdownContainer} from '../../Forms/Select/Select';
 import {DropdownOption} from '../../Dropdown';
+import InputError from '../../../components/Forms/InputError';
 
 import './CreateGroupPage.css';
 import './GroupInfoForm.css';
@@ -58,18 +59,20 @@ export default function GroupInfoForm({
   const [submitting, setSubmitting] = useState(false);
   const {user, userProfile} = useContext(AuthContext);
   const featureFlags = useContext(FeatureFlags);
-  const validationSchema = Yup.object({
+
+  const validationObj = {
     name: Yup.string().required('Name is required'),
     location: Yup.string(),
     institution: Yup.string(),
     website: Yup.string().url('Must be a valid url'),
     about: Yup.string().max(1000, 'Must have fewer than 1000 characters'),
-    groupType: Yup.mixed().oneOf(
-      [RESEARCH_GROUP, CHARITY],
-      'You must select a group type'
-    ),
     donationLink: Yup.string().url('Must be a valid url'),
-  });
+  };
+  if (!editingGroup)
+    validationObj.groupType = Yup.mixed()
+      .oneOf([RESEARCH_GROUP, CHARITY])
+      .required('You must select a group type');
+  const validationSchema = Yup.object(validationObj);
 
   function onSubmitAndPreventDuplicate(values) {
     if (submitting) return;
@@ -117,7 +120,9 @@ export default function GroupInfoForm({
         {(props) => (
           <>
             <Form id="create-group-form">
-              {editingGroup ? null : <GroupTypeSelect name="groupType" />}
+              {editingGroup ? null : (
+                <GroupTypeSelect name="groupType" {...props} />
+              )}
               <EditAvatar
                 existingAvatar={existingAvatar}
                 onAvatarSelect={onAvatarSelect}
@@ -393,12 +398,16 @@ function AddMemberSearch({addSelectedUsers, setSelecting}) {
 }
 
 function GroupTypeSelect({...props}) {
+  const [, meta] = useField(props);
+  let error;
+  if (meta.error) error = <InputError error={meta.error} />;
   return (
     <LabelledDropdownContainer label="Group Type">
       <Select {...props}>
         <DropdownOption value={RESEARCH_GROUP} text="Research Group" />
         <DropdownOption value={CHARITY} text="Charity" />
       </Select>
+      {error}
     </LabelledDropdownContainer>
   );
 }

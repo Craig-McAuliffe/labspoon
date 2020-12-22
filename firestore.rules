@@ -73,7 +73,7 @@ service cloud.firestore {
 
     match /groups/{groupID} {
       allow read;
-      allow create: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.keys().hasAny(['groupType']);
       allow update: if request.auth != null && existsAfter(/databases/$(database)/documents/groups/$(groupID)/members/$(request.auth.uid));
 
       match /followedByUsers/{userID} {
@@ -141,7 +141,7 @@ service cloud.firestore {
           && groupID == request.resource.data.group.id
         );
       }
-      
+
       match /openPositions/{openPositionID} {
         allow read;
       }
