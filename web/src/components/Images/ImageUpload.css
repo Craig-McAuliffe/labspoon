@@ -60,9 +60,20 @@
 
 .image-upload {
   margin-bottom: 10px;
-  display: grid;
-  grid-template-columns: 5fr 1fr 1fr 1fr;
-  column-gap: 20px;
-  justify-items: center;
-  align-items: center;
+}
+
+.image-previews-overflow {
+  text-align: right;
+}
+
+.confirm-cancel-upload-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 40px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #dcdce0;
+}
+
+.confirm-cancel-upload-container button {
+  margin-left: 10px;
 }

@@ -4,7 +4,7 @@ import {v4 as uuid} from 'uuid';
 import {AddButton} from '../../assets/GeneralActionIcons';
 import PrimaryButton from '../Buttons/PrimaryButton';
 import NegativeButton from '../Buttons/NegativeButton';
-import ImageListItem from '../Media/ImageListItem';
+import ImageListItem, {ImagesSection} from '../Media/ImageListItem';
 import SuccessMessage from '../Forms/SuccessMessage';
 import ErrorMessage from '../Forms/ErrorMessage';
 import './ImageUpload.css';
@@ -91,17 +91,31 @@ export default function ImageUpload({storageDir, successCallback, refresh}) {
     );
 
   return (
-    <div className="image-upload">
-      <ImagePreviews urls={imageURLs} uploading={uploading === UPLOADING} />
-      <NegativeButton onClick={cancel} disabled={uploading === UPLOADING}>
-        Cancel
-      </NegativeButton>
-      <PrimaryButton onClick={uploadImages} disabled={uploading === UPLOADING}>
-        Upload
-      </PrimaryButton>
-    </div>
+    <>
+      <ImagesSection>
+        <ImagePreviews urls={imageURLs} uploading={uploading === UPLOADING} />
+      </ImagesSection>
+      <p className="image-previews-overflow">
+        {imageURLs.length > MAX_IMAGE_PREVIEWS
+          ? `+ ${imageURLs.length - MAX_IMAGE_PREVIEWS} more`
+          : ''}
+      </p>
+      <div className="confirm-cancel-upload-container">
+        <NegativeButton onClick={cancel} disabled={uploading === UPLOADING}>
+          Cancel
+        </NegativeButton>
+        <PrimaryButton
+          onClick={uploadImages}
+          disabled={uploading === UPLOADING}
+        >
+          Upload
+        </PrimaryButton>
+      </div>
+    </>
   );
 }
+
+const MAX_IMAGE_PREVIEWS = 3;
 
 export function SelectImages({onChange}) {
   const [displayValidationMessage, setDisplayValidationMessage] = useState(
@@ -139,29 +153,12 @@ export function SelectImages({onChange}) {
   );
 }
 
-const MAX_IMAGE_PREVIEWS = 3;
-
 export function ImagePreviews({urls, uploading}) {
-  const imagePreviews = urls
+  return urls
     .slice(0, MAX_IMAGE_PREVIEWS)
     .map((imageURL, idx) => (
-      <ImageListItem
-        src={imageURL}
-        key={idx}
-        spinner={uploading === UPLOADING ? true : false}
-      />
+      <ImageListItem src={imageURL} key={idx} spinner={uploading} />
     ));
-
-  return (
-    <>
-      <div className="image-upload-previews">{imagePreviews}</div>
-      <span>
-        {urls.length > MAX_IMAGE_PREVIEWS
-          ? `+ ${urls.length - MAX_IMAGE_PREVIEWS} more`
-          : ''}
-      </span>
-    </>
-  );
 }
 
 function UploadSuccessMessage() {
