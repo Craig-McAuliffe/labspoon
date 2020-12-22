@@ -172,6 +172,7 @@ export default function EditingGroupInfo({groupData}) {
         verified={verified}
         editingGroup={true}
         cancelForm={() => history.push(`/group/${groupID}`)}
+        groupType={groupData.groupType}
       />
     </div>
   );

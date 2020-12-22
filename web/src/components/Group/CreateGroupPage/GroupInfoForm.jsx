@@ -55,6 +55,7 @@ export default function GroupInfoForm({
   submitText,
   verified,
   editingGroup,
+  groupType,
 }) {
   const [submitting, setSubmitting] = useState(false);
   const {user, userProfile} = useContext(AuthContext);
@@ -145,7 +146,10 @@ export default function GroupInfoForm({
                 name="about"
                 bigLabel
               />
-              {props.values.groupType === CHARITY &&
+              {
+                // If the group is being created, the group type is specified by the user in the form. Otherwise it should be passed to this component.
+              }
+              {(props.values.groupType === CHARITY || groupType === CHARITY) &&
               featureFlags.has('donate-link') ? (
                 <VerificationFormOrDonationLinkField verified={verified} />
               ) : (
