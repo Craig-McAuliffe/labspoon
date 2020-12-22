@@ -35,6 +35,9 @@ export default function LinkAuthorIDForm({submitBehaviour, cancel}) {
       <h3 className="onboarding-author-link-explain">
         Connect your Labspoon account to your publications
       </h3>
+      <p className="onboarding-author-link-explain">
+        Note: You can only do this once.
+      </p>
       <form
         className="onboarding-author-link-form"
         onSubmit={(e) => {

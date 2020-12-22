@@ -95,7 +95,9 @@ export default function EditUserPage({user}) {
             <FormTextInput label="Position" name="position" />
           </Form>
         </Formik>
-        <LinkUserToPublications />
+        <LinkUserToPublications
+          authorID={userDetails.microsoftAcademicAuthorID}
+        />
         <div className="create-group-submit-cancel-container">
           <div className="create-group-cancel">
             <CancelButton
@@ -196,11 +198,25 @@ function UploadImage({storageRef}) {
   );
 }
 
-function LinkUserToPublications() {
+function LinkUserToPublications({authorID}) {
   const [linkingAuthor, setLinkingAuthor] = useState(false);
   const cancel = () => setLinkingAuthor(false);
   if (linkingAuthor)
     return <LinkAuthorIDForm cancel={cancel} submitBehaviour={cancel} />;
+
+  if (authorID)
+    return (
+      <div className="link-user-to-publications-button-container">
+        <h3>You have linked publications to your user profile</h3>
+        <p>
+          We are constantly indexing more publications, so if any are missing
+          they will probably appear soon. If you want to speed up this process
+          for a specific publication, just search for it in the header search
+          bar
+        </p>
+      </div>
+    );
+
   return (
     <div className="link-user-to-publications-button-container">
       <SecondaryButton onClick={() => setLinkingAuthor(true)}>
