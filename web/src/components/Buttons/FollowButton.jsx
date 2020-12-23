@@ -12,9 +12,19 @@ const FollowButton = ({following, setFollowing}) => {
     setFollowing();
   };
 
+  const buttonContent = (
+    <FollowButtonContent followAction={followAction} following={following} />
+  );
+
+  if (user) return buttonContent;
+
   return (
-    <SignUpPopoverOverride text="Sign up to follow this." actionTaken={FOLLOW}>
-      <FollowButtonContent followAction={followAction} following={following} />
+    <SignUpPopoverOverride
+      text="Sign up to follow this."
+      actionTaken={FOLLOW}
+      active={!!user}
+    >
+      {buttonContent}
     </SignUpPopoverOverride>
   );
 };
