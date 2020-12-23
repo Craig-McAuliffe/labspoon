@@ -104,22 +104,26 @@ export default function CreateOpenPosition() {
     address: Yup.string(),
     salary: Yup.string(),
     startDate: Yup.string(),
-    applyEmail: Yup.string().test(
-      'one-apply-method',
-      'You need to provide a link or email for applications',
-      function (value) {
-        // eslint-disable-next-line no-invalid-this
-        if (this.parent.applyLink || value) return true;
-      }
-    ),
-    applyLink: Yup.string().test(
-      'one-apply-method',
-      'You need to provide a link or email for applications',
-      function (value) {
-        // eslint-disable-next-line no-invalid-this
-        if (this.parent.applyEmail || value) return true;
-      }
-    ),
+    applyEmail: Yup.string()
+      .test(
+        'one-apply-method',
+        'You need to provide a link or email for applications',
+        function (value) {
+          // eslint-disable-next-line no-invalid-this
+          if (this.parent.applyLink || value) return true;
+        }
+      )
+      .email('Must be a valid email address'),
+    applyLink: Yup.string()
+      .test(
+        'one-apply-method',
+        'You need to provide a link or email for applications',
+        function (value) {
+          // eslint-disable-next-line no-invalid-this
+          if (this.parent.applyEmail || value) return true;
+        }
+      )
+      .url('Must be a valid url'),
   });
 
   if (pageError) return <GeneralError />;
@@ -211,14 +215,14 @@ function HowToApply() {
     {
       name: 'Apply through link',
       icon: <WebsiteIcon />,
-      contents: <FormTextInput placeholder="Website url" name="applyEmail" />,
+      contents: <FormTextInput placeholder="Website url" name="applyLink" />,
     },
     {
       name: 'Apply By Email',
       icon: <EmailIcon />,
       contents: (
         <div>
-          <FormTextInput placeholder="Email Address" name="applyLink" />
+          <FormTextInput placeholder="Email Address" name="applyEmail" />
         </div>
       ),
     },
