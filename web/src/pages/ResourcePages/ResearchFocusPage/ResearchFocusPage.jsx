@@ -64,7 +64,10 @@ export default function ResearchFocusPage() {
       <GroupListItem group={researchFocus.group} noBorder={true}>
         <FollowGroupButton targetGroup={researchFocus.group} />
       </GroupListItem>
-      <ImagesSection images={formatTaggedImages(researchFocus.photoURLs)} />
+      <ImagesSection
+        images={formatTaggedImages(researchFocus.photoURLs)}
+        customMargin="30px"
+      />
       <RichTextBody body={researchFocus.body} />
       <Author
         authorID={researchFocus.author.id}

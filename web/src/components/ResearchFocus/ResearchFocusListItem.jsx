@@ -1,7 +1,10 @@
 import React from 'react';
 import {formatTaggedImages, ImagesSection} from '../Media/ImageListItem';
 import {ResearchFocusIcon} from '../../assets/ResourceTypeIcons';
-import {ListItemContainer} from '../ListItem/ListItemCommonComponents';
+import {
+  ExpandableText,
+  ListItemContainer,
+} from '../ListItem/ListItemCommonComponents';
 import {RichTextBody, ArticleHeaderAndType} from '../Article/Article';
 import ListItemTopics from '../ListItem/ListItemTopics';
 import GroupSignature from '../Group/GroupSignature';
@@ -19,8 +22,13 @@ export default function ResearchFocusListItem({researchFocus}) {
         icon={<ResearchFocusIcon />}
         resourceID={researchFocus.id}
       />
-      <ImagesSection images={formatTaggedImages(researchFocus.photoURLs)} />
-      <RichTextBody body={body} />
+      <ImagesSection
+        images={formatTaggedImages(researchFocus.photoURLs)}
+        customMargin="20px"
+      />
+      <ExpandableText resourceID={researchFocus.id}>
+        <RichTextBody body={body} expandable={true} id={researchFocus.id} />
+      </ExpandableText>
       <ListItemTopics
         dbTopics={researchFocus.topics}
         customTopics={researchFocus.customTopics}

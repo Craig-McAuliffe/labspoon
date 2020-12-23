@@ -23,9 +23,21 @@ export default function ImageListItem({src, alt, spinner}) {
   );
 }
 
-export function ImagesSection({children, images, spinner}) {
+export function ImagesSection({children, images, spinner, customMargin}) {
+  if (!children && !images) return null;
+  if (images) {
+    if (images.length === 0) return null;
+  }
+
+  const customMarginStyle = customMargin
+    ? {
+        'margin-top': customMargin,
+        'margin-bottom': customMargin,
+      }
+    : null;
+
   return (
-    <div className="images-section">
+    <div className="images-section" style={customMarginStyle}>
       {images
         ? images.map((image, i) => (
             <ImageListItem

@@ -1,22 +1,15 @@
-import React, {useState, useRef} from 'react';
+import React from 'react';
 import {Link} from 'react-router-dom';
-import SeeMore from '../SeeMore';
 import ListItemTopics from '../ListItem/ListItemTopics';
 import GroupSignature from '../Group/GroupSignature';
-import {ListItemContainer} from '../ListItem/ListItemCommonComponents';
+import {
+  ExpandableText,
+  ListItemContainer,
+} from '../ListItem/ListItemCommonComponents';
 
 import './OpenPositionListItem.css';
 export default function OpenPositionListItem({openPosition}) {
   const content = openPosition.content;
-  const [displayFullDescription, setDisplayFullDescription] = useState({
-    display: false,
-    size: content.description.length < 200 ? 100 : 150,
-  });
-  const descriptionRef = useRef();
-
-  const descriptionSize = {
-    height: `${displayFullDescription.size}px`,
-  };
 
   if (!openPosition) return null;
   return (
@@ -44,19 +37,9 @@ export default function OpenPositionListItem({openPosition}) {
         />
       ) : null}
       <h4 className="resource-list-item-subtitle">Description of Role</h4>
-      <div
-        ref={descriptionRef}
-        style={descriptionSize}
-        className="open-position-description"
-      >
+      <ExpandableText resourceID={openPosition.id}>
         <p>{content.description}</p>
-      </div>
-      <SeeMore
-        displayFullDescription={displayFullDescription}
-        setDisplayFullDescription={setDisplayFullDescription}
-        descriptionRef={descriptionRef}
-        id={openPosition.id}
-      />
+      </ExpandableText>
       <GroupSignature group={openPosition.group} />
     </ListItemContainer>
   );

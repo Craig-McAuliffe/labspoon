@@ -63,7 +63,10 @@ export default function TechniquePage() {
       <GroupListItem group={technique.group} noBorder={true}>
         <FollowGroupButton targetGroup={technique.group} />
       </GroupListItem>
-      <ImagesSection images={formatTaggedImages(technique.photoURLs)} />
+      <ImagesSection
+        images={formatTaggedImages(technique.photoURLs)}
+        customMargin="30px"
+      />
       <RichTextBody body={technique.body} />
       <Author authorID={technique.author.id} name={technique.author.name} />
     </FeedContent>
