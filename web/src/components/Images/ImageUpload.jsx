@@ -4,7 +4,7 @@ import {v4 as uuid} from 'uuid';
 import {AddButton} from '../../assets/GeneralActionIcons';
 import PrimaryButton from '../Buttons/PrimaryButton';
 import NegativeButton from '../Buttons/NegativeButton';
-import ImageListItem, {ImagesSection} from '../Media/ImageListItem';
+import {formatTaggedImages, ImagesSection} from '../Media/ImageListItem';
 import SuccessMessage from '../Forms/SuccessMessage';
 import ErrorMessage from '../Forms/ErrorMessage';
 import './ImageUpload.css';
@@ -92,14 +92,7 @@ export default function ImageUpload({storageDir, successCallback, refresh}) {
 
   return (
     <>
-      <ImagesSection>
-        <ImagePreviews urls={imageURLs} uploading={uploading === UPLOADING} />
-      </ImagesSection>
-      <p className="image-previews-overflow">
-        {imageURLs.length > MAX_IMAGE_PREVIEWS
-          ? `+ ${imageURLs.length - MAX_IMAGE_PREVIEWS} more`
-          : ''}
-      </p>
+      <ImagePreviews urls={imageURLs} uploading={uploading === UPLOADING} />
       <div className="confirm-cancel-upload-container">
         <NegativeButton onClick={cancel} disabled={uploading === UPLOADING}>
           Cancel
@@ -154,11 +147,19 @@ export function SelectImages({onChange}) {
 }
 
 export function ImagePreviews({urls, uploading}) {
-  return urls
-    .slice(0, MAX_IMAGE_PREVIEWS)
-    .map((imageURL, idx) => (
-      <ImageListItem src={imageURL} key={idx} spinner={uploading} />
-    ));
+  return (
+    <>
+      <ImagesSection
+        images={formatTaggedImages(urls.slice(0, MAX_IMAGE_PREVIEWS))}
+        spinner={uploading}
+      />
+      <p className="image-previews-overflow">
+        {urls.length > MAX_IMAGE_PREVIEWS
+          ? `+ ${urls.length - MAX_IMAGE_PREVIEWS} more`
+          : ''}
+      </p>
+    </>
+  );
 }
 
 function UploadSuccessMessage() {

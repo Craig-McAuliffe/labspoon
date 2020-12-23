@@ -5,7 +5,6 @@ import {
   GroupMenuIcon,
   SettingsMenuIcon,
   UserProfileMenuIcon,
-  CreateGroupIcon,
   FollowIcon,
 } from '../../../assets/MenuIcons';
 
@@ -39,25 +38,25 @@ const AvatarDropDown = () => {
           <Dropdown.Item href="/bookmarks">
             <div className="avatar-dropdown-item-container">
               <BookmarksMenuIcon />
-              <p className="link-item">Bookmarks</p>
+              <p className="dropdown-link-item">Bookmarks</p>
             </div>
           </Dropdown.Item>
           <Dropdown.Item href="/follows">
             <div className="avatar-dropdown-item-container">
               <FollowIcon />
-              <p className="link-item">Things I follow</p>
+              <p className="dropdown-link-item">Things I follow</p>
             </div>
           </Dropdown.Item>
           <Dropdown.Item href={`/user/${user.uid}`}>
             <div className="avatar-dropdown-item-container">
               <UserProfileMenuIcon />
-              <p className="link-item">Profile</p>
+              <p className="dropdown-link-item">Profile</p>
             </div>
           </Dropdown.Item>
           <Dropdown.Item href="/settings">
             <div className="avatar-dropdown-item-container">
               <SettingsMenuIcon />
-              <p className="link-item">Settings</p>
+              <p className="dropdown-link-item">Settings</p>
             </div>
           </Dropdown.Item>
           <div className="log-out-container">
@@ -85,10 +84,6 @@ const AvatarDropDown = () => {
             <div className="dropdown-group-subtitle">My Groups</div>
           </Dropdown.Header>
           <UserGroups userID={user.uid} />
-          <Dropdown.Item href="/group/create">
-            <CreateGroupIcon />
-            <p className="link-item">Create Group</p>
-          </Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>
     );
@@ -109,7 +104,9 @@ function UserGroups({userID}) {
     ? null
     : listOfGroups.map((group) => (
         <Dropdown.Item key={group.id} href={`/group/${group.id}`}>
-          <p className="link-item">{group.name}</p>
+          <p className="dropdown-link-item">
+            {group.name.slice(0, 32)} {group.name.length > 32 ? '...' : null}
+          </p>
         </Dropdown.Item>
       ));
 }
@@ -122,7 +119,7 @@ const AvatarToggle = ({user, userProfile}) => {
       ) : (
         <UserAvatar width="50" height="50" />
       )}
-      <p className="dropdown-name">{user.displayName}</p>
+      <p className="dropdown-name">Me</p>
     </div>
   );
 };
