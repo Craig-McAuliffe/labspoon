@@ -1,4 +1,5 @@
 import * as functions from 'firebase-functions';
+import axios from 'axios';
 import {admin, config, url} from './config';
 import {PubSub} from '@google-cloud/pubsub';
 import {DocumentSnapshot} from 'firebase-functions/lib/providers/firestore';
@@ -238,9 +239,35 @@ export async function sendGroupInvitationEmail(
     return;
   }
 
+  try {
+    await axios({
+      method: 'get',
+      url: invitingUserRef.avatar,
+    });
+  } catch (err) {
+    if (err.response.status === 403) {
+      invitingUserRef.avatar = getDefaultUserAvatar(config.env.storageBucket)
+    } else {
+      throw err;
+    }
+  }
+
   const groupDS = await groupRef.get();
   if (!groupDS.exists) throw new Error(`No group found with ID ${groupID}`);
   const group = groupDS.data() as GroupRef;
+
+  try {
+    await axios({
+      method: 'get',
+      url: group.avatar,
+    });
+  } catch (err) {
+    if (err.response.status === 403) {
+      group.avatar = getDefaultGroupAvatar(config.env.storageBucket)
+    } else {
+      throw err;
+    }
+  }
 
   const templateData = {
     invitingUser: invitingUserRef,
@@ -265,4 +292,12 @@ export async function sendGroupInvitationEmail(
     }
   );
   return;
+}
+
+function getDefaultUserAvatar(storageBucket: string) {
+  return `https://storage.googleapis.com/${storageBucket}/avatars/default_avatar.jpg`;
+}
+
+function getDefaultGroupAvatar(storageBucket: string) {
+  return `https://storage.googleapis.com/${storageBucket}/avatars/default_group_avatar.jpg`;
 }
