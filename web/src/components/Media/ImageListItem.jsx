@@ -23,8 +23,21 @@ export default function ImageListItem({src, alt, spinner}) {
   );
 }
 
-export function ImagesSection({children}) {
-  return <div className="images-section">{children}</div>;
+export function ImagesSection({children, images, spinner}) {
+  return (
+    <div className="images-section">
+      {images
+        ? images.map((image, i) => (
+            <ImageListItem
+              src={image.src}
+              alt={image.alt}
+              spinner={spinner}
+              key={image.src + i}
+            />
+          ))
+        : children}
+    </div>
+  );
 }
 
 export function formatTaggedImages(photoURLs) {

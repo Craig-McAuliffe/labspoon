@@ -42,13 +42,13 @@ function FollowButtonContent({followAction, following}) {
         }
         onClick={followAction}
       >
-        <div className="primary-button-text">
-          {following === undefined ? (
-            <LoadingSpinner />
-          ) : (
-            <h2>{following ? 'Unfollow' : 'Follow'}</h2>
-          )}
-        </div>
+        {following === undefined ? (
+          <LoadingSpinner />
+        ) : (
+          <h2 className="primary-button-text">
+            {following ? 'Unfollow' : 'Follow'}
+          </h2>
+        )}
       </button>
     </div>
   );

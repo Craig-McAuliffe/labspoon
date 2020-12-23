@@ -1,8 +1,3 @@
-.MenuIcons {
-  display: inline-block;
-  width: 15%;
-}
-
 .dropdown-header {
   color: #00507c;
   display: flex;
@@ -21,22 +16,35 @@
   margin-right: 0px;
   display: flex;
   align-items: center;
+  max-width: 100%;
 }
 
 .dropdown h3 {
   margin-bottom: 0px;
 }
 
-.DropDownMenu {
-  height: auto;
+.dropdown-menu {
+  width: 300px;
+  overflow-x: hidden;
 }
 
-.link-item {
-  width: 100%;
-  display: inline-block;
-  height: 10px;
+/* bootstrap classes */
+.dropdown-item {
+  max-width: 295px;
+  width: 295px;
+  overflow-x: hidden;
+  padding-right: 5px;
+}
+
+/* labspoon classes */
+.dropdown-menu .dropdown-link-item {
+  width: 295px;
+  max-width: 295px;
+  height: 28px;
+  overflow-x: hidden;
   color: #00507c;
   margin-left: 6px;
+  margin-bottom: 0px;
 }
 
 .DropDownHeaderSmall {
