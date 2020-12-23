@@ -246,7 +246,7 @@ export async function sendGroupInvitationEmail(
     });
   } catch (err) {
     if (err.response.status === 403) {
-      invitingUserRef.avatar = getDefaultUserAvatar(config.env.storageBucket)
+      invitingUserRef.avatar = getDefaultUserAvatar(config.env.storagebucket)
     } else {
       throw err;
     }
@@ -263,7 +263,7 @@ export async function sendGroupInvitationEmail(
     });
   } catch (err) {
     if (err.response.status === 403) {
-      group.avatar = getDefaultGroupAvatar(config.env.storageBucket)
+      group.avatar = getDefaultGroupAvatar(config.env.storagebucket)
     } else {
       throw err;
     }
