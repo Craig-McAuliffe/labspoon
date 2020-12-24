@@ -178,7 +178,7 @@ export const addGroupToUserGroups = functions.firestore.document('groups/{groupI
 });
 
 // Converse of addGroupToUserGroups.
-export const removeGroupFromUserGroups = functions.firestore.document('groups/{groupID}/members/{userID}').onCreate(async (_, context) => {
+export const removeGroupFromUserGroups = functions.firestore.document('groups/{groupID}/members/{userID}').onDelete(async (_, context) => {
   const groupID = context.params.groupID;
   const userID = context.params.userID;
   await db.doc(`users/${userID}/groups/${groupID}`).delete().catch((err) => {
