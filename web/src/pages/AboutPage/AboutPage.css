@@ -101,6 +101,18 @@
   margin-top: 100px;
   min-width: 100%;
   max-width: 100%;
+  position: relative;
+  display: block;
+}
+
+.about-page-features-section::after {
+  content: '';
+  position: absolute;
+  width: 1px;
+  background: #dcdce0;
+  min-height: 100%;
+  left: 50%;
+  bottom: 60px;
 }
 
 .about-page-features-section-title {
@@ -122,8 +134,6 @@
 
 .about-page-feature-left-container {
   padding-right: 50px;
-  border-right: 1px solid #99999f;
-  min-height: 100%;
   display: flex;
   align-items: center;
   margin-bottom: 120px;
@@ -132,7 +142,6 @@
 
 .about-page-feature-right-container {
   padding-left: 50px;
-  min-height: 100%;
   display: flex;
   align-items: center;
   margin-bottom: 120px;
@@ -435,6 +444,10 @@
 
 @media only screen and (max-width: 605px) {
   .about-page-action-news {
+    display: none;
+  }
+
+  .about-page-features-section::after {
     display: none;
   }
 

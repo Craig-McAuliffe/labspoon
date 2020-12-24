@@ -66,7 +66,7 @@ export default function GroupInfoForm({
     location: Yup.string(),
     institution: Yup.string(),
     website: Yup.string().url('Must be a valid url'),
-    about: Yup.string().max(1000, 'Must have fewer than 1000 characters'),
+    about: Yup.string().max(3000, 'Must have fewer than 3000 characters'),
     donationLink: Yup.string().url('Must be a valid url'),
   };
   if (!editingGroup)
