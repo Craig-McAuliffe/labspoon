@@ -1,13 +1,12 @@
 import React from 'react';
 
 import './Buttons.css';
+import PrimaryButton from './PrimaryButton';
 
 export default function SubmitButton({inputText, ...props}) {
   return (
-    <button type="submit" className="primary-button" {...props}>
-      <div className="primary-button-text">
-        <h2>{inputText}</h2>
-      </div>
-    </button>
+    <PrimaryButton submit={true} {...props}>
+      {inputText}
+    </PrimaryButton>
   );
 }

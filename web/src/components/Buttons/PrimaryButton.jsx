@@ -27,6 +27,7 @@ export default function PrimaryButton({
       onClick={onClick ? onClick : null}
       form={formID ? formID : null}
       disabled={disabled}
+      {...props}
     >
       {small ? (
         <h4 className="primary-button-text-small">{children}</h4>
