@@ -140,11 +140,13 @@ export function FormPublicationResults({query, setPublication}) {
   const [expression, setExpression] = useState();
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [error, setError] = useState(false);
   const {interpretCache, interpretDispatch} = useContext(
     MicrosoftPublicationSearchCache
   );
   useEffect(
-    () =>
+    () => {
+      setResults([]);
       microsoftPublicationSearchByQuery(
         query,
         limit,
@@ -154,25 +156,29 @@ export function FormPublicationResults({query, setPublication}) {
         setExpression,
         setHasMore,
         interpretCache,
-        interpretDispatch
-      ),
+        interpretDispatch,
+        setError
+      );
+      if (error) setError(false);
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [query]
   );
-  const fetchPageByOffset = (offset) => {
+  const fetchPageByOffset = (searchOffset) => {
     setResults([]);
     microsoftPublicationSearchByExpression(
       query,
       expression,
       limit,
-      offset,
+      searchOffset,
       setOffset,
       setResults,
       setLoading,
       setExpression,
       setHasMore,
       interpretCache,
-      interpretDispatch
+      interpretDispatch,
+      setError
     );
   };
 
@@ -190,19 +196,33 @@ export function FormPublicationResults({query, setPublication}) {
 
   function previousOnClick() {
     if (offset < limit) return;
-    const newOffset = offset - limit;
+    // The offset is set at the next page start point
+    // We therefore have to go back twice the limit to get to the start
+    // point of the previous page
+    const newOffset = offset - 2 * limit;
     fetchPageByOffset(newOffset);
-    setOffset(newOffset);
   }
 
   function nextOnClick() {
     if (!hasMore) return;
-    const newOffset = offset + limit;
-    fetchPageByOffset(newOffset);
-    setOffset(newOffset);
+    fetchPageByOffset(offset);
   }
 
   if (loading) return <LoadingSpinner />;
+  if (error)
+    return (
+      <h4>
+        Something went wrong. Try a variation of your search or look for one of
+        the authors instead.
+      </h4>
+    );
+  if (results.length === 0)
+    return (
+      <h4>
+        We could not find any publications for that search term. Try a variation
+        of your search or look for one of the authors instead.
+      </h4>
+    );
   const publicationResults = results.map((publication) => (
     <div
       key={publication.id || publication.microsoftID}
@@ -219,15 +239,19 @@ export function FormPublicationResults({query, setPublication}) {
   return (
     <>
       {publicationResults}
-      {offset - limit >= 0 ? (
-        <button type="button" onClick={previousOnClick}>
+      {offset - limit > 0 ? (
+        <button
+          type="button"
+          onClick={previousOnClick}
+          className="tertiary-button"
+        >
           Previous Page
         </button>
       ) : (
         <></>
       )}
       {hasMore ? (
-        <button type="button" onClick={nextOnClick}>
+        <button type="button" onClick={nextOnClick} className="tertiary-button">
           Next Page
         </button>
       ) : (
@@ -248,7 +272,8 @@ function microsoftPublicationSearchByExpression(
   setExpression,
   setHasMore,
   interpretCache,
-  interpretDispatch
+  interpretDispatch,
+  setError
 ) {
   setLoading(true);
   return getMicrosoftAcademicKnowledgeAPIPublications(
@@ -275,6 +300,7 @@ function microsoftPublicationSearchByExpression(
     })
     .catch((err) => {
       console.error(err);
+      setError(true);
     })
     .finally(() => setLoading(false));
 }
@@ -289,7 +315,8 @@ function microsoftPublicationSearchByQuery(
   setExpression,
   setHasMore,
   interpretCache,
-  interpretDispatch
+  interpretDispatch,
+  setError
 ) {
   if (!query) {
     setResults([]);
@@ -323,6 +350,7 @@ function microsoftPublicationSearchByQuery(
       })
       .catch((err) => {
         console.error(err);
+        setError(true);
       })
       .finally(() => setLoading(false));
   if (interpretCache.has(paramsString)) {
