@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import {firestore} from 'firebase-admin';
-import {admin} from './config';
+import {admin, environment} from './config';
 import {
   interpretQuery,
   executeExpression,
@@ -250,6 +250,12 @@ export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall
   }
 );
 
+// If we are running the functions locally, we don't want to brick the
+// emulators with too many add publication requests, so we use a smaller number
+// of interpretations and smaller page size for each of those interpretations.
+const SUGGESTED_PUBLICATIONS_INTERPRETATIONS_COUNT = environment === 'local' ? 1 : 10;
+const SUGGESTED_PUBLICATIONS_EXECUTION_PAGE_SIZE = environment === 'local' ? 10 : 100;
+
 // for a given name, return potential matching publications so the user can select theirs
 export const getSuggestedPublicationsForAuthorName = functions.https.onCall(
   async (data) => {
@@ -263,7 +269,7 @@ export const getSuggestedPublicationsForAuthorName = functions.https.onCall(
     const expressions: Array<string> = await interpretQuery({
       query: name as string,
       complete: 1,
-      count: 10,
+      count: SUGGESTED_PUBLICATIONS_INTERPRETATIONS_COUNT,
     })
       .then((resp) =>
         resp.data.interpretations.map(
@@ -278,7 +284,7 @@ export const getSuggestedPublicationsForAuthorName = functions.https.onCall(
     const executePromises = expressions.map(async (expression) => {
       return executeExpression({
         expr: expression,
-        count: 100,
+        count: SUGGESTED_PUBLICATIONS_EXECUTION_PAGE_SIZE,
         attributes: allPublicationFields,
       })
         .then(async (resp) => {
