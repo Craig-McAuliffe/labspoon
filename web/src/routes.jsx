@@ -12,12 +12,8 @@ import FollowingFeedPage from './pages/FollowingFeedPage';
 import GraphPage from './pages/GraphPage';
 import FollowsPage from './pages/FollowsPage';
 import SearchPage from './pages/SearchPage';
-import UserPage, {SkeletonUserPage} from './pages/ResourcePages/UserPage';
+import {SkeletonUserPage} from './pages/ResourcePages/UserPage';
 import AboutPage from './pages/AboutPage';
-import {
-  EditUserProfilePicturePage,
-  EditUserCoverPhotoPage,
-} from './pages/ResourcePages/UserPage/EditUserPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import PublicationPage, {
@@ -35,6 +31,7 @@ import Groups from './pages/ResourcePages/GroupPage/Groups';
 import TechniquePage from './pages/ResourcePages/TechniquePage/TechniquePage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage/PrivacyPolicyPage';
 import ResearchFocusPage from './pages/ResourcePages/ResearchFocusPage/ResearchFocusPage';
+import Users from './pages/ResourcePages/UserPage/Users';
 
 /**
  * Top level routing structure for the app.
@@ -78,14 +75,8 @@ export default function Routes({user, setUser}) {
       <Route path="/search/:tab?/:query?">
         <SearchPage />
       </Route>
-      <AuthRoute user={user} path="/user/:userID/edit/profilePicture">
-        <EditUserProfilePicturePage />
-      </AuthRoute>
-      <AuthRoute user={user} path="/user/:userID/edit/coverPhoto">
-        <EditUserCoverPhotoPage />
-      </AuthRoute>
-      <Route user={user} path="/user/:userID">
-        <UserPage />
+      <Route user={user} path="/user">
+        <Users />
       </Route>
       <Route user={user} path="/externaluser/:userID">
         <SkeletonUserPage />

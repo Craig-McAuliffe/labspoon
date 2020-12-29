@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react';
-import {Link, Route, Switch, useParams, useRouteMatch} from 'react-router-dom';
+import {Route, Switch, useParams, useRouteMatch} from 'react-router-dom';
 import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 import {getGroup} from '../../../helpers/groups';
 import NotFoundPage from '../../NotFoundPage/NotFoundPage';
@@ -17,6 +17,7 @@ import './EditGroupPage.css';
 import LightTabLink, {
   LightTabContainer,
 } from '../../../components/Navigation/LightTab';
+import ReturnToPublicViewButton from '../../../components/Buttons/ReturnToPublicViewButton';
 
 const INFO_TAB = 'info';
 const POSTS_TAB = 'posts';
@@ -78,7 +79,7 @@ export default function EditGroupPage() {
         <div className="content-layout">
           <div className="group-details">
             <EditGroupTabs tabs={tabs} activeTab={INFO_TAB} />
-            <ReturnToGroupPageButton url={groupURL} />
+            <ReturnToPublicViewButton url={groupURL} />
             <EditGroupInfo groupData={group} />
           </div>
         </div>
@@ -86,63 +87,51 @@ export default function EditGroupPage() {
       <Route path={`${path}/${POSTS_TAB}`}>
         <EditGroupPosts groupID={groupID}>
           <EditGroupTabs tabs={tabs} activeTab={POSTS_TAB} />
-          <ReturnToGroupPageButton url={groupURL} />
+          <ReturnToPublicViewButton url={groupURL} />
         </EditGroupPosts>
       </Route>
       <Route path={`${path}/${PUBLICATIONS_TAB}`}>
         <EditGroupPublications groupID={groupID}>
           <EditGroupTabs tabs={tabs} activeTab={PUBLICATIONS_TAB} />
-          <ReturnToGroupPageButton url={groupURL} />
+          <ReturnToPublicViewButton url={groupURL} />
         </EditGroupPublications>
       </Route>
       <Route path={`${path}/${PHOTOS_TAB}`}>
         <EditGroupPhotos>
           <EditGroupTabs tabs={tabs} activeTab={PHOTOS_TAB} />
-          <ReturnToGroupPageButton url={groupURL} />
+          <ReturnToPublicViewButton url={groupURL} />
         </EditGroupPhotos>
       </Route>
       <Route path={`${path}/${VIDEOS_TAB}`}>
         <EditGroupVideos>
           <EditGroupTabs tabs={tabs} activeTab={VIDEOS_TAB} />
-          <ReturnToGroupPageButton url={groupURL} />
+          <ReturnToPublicViewButton url={groupURL} />
         </EditGroupVideos>
       </Route>
       {flags.has('techniques') ? (
         <Route path={`${path}/${TECHNIQUES_TAB}`}>
           <EditGroupTechniques>
             <EditGroupTabs tabs={tabs} activeTab={TECHNIQUES_TAB} />
-            <ReturnToGroupPageButton url={groupURL} />
+            <ReturnToPublicViewButton url={groupURL} />
           </EditGroupTechniques>
         </Route>
       ) : null}
       <Route path={`${path}/${RESEARCHFOCUSES_TAB}`}>
         <EditGroupResearchFocuses>
           <EditGroupTabs tabs={tabs} activeTab={RESEARCHFOCUSES_TAB} />
-          <ReturnToGroupPageButton url={groupURL} />
+          <ReturnToPublicViewButton url={groupURL} />
         </EditGroupResearchFocuses>
       </Route>
       <Route path={`${path}/${OPENPOSITIONS_TAB}`}>
         <EditGroupOpenPositions>
           <EditGroupTabs tabs={tabs} activeTab={OPENPOSITIONS_TAB} />
-          <ReturnToGroupPageButton url={groupURL} />
+          <ReturnToPublicViewButton url={groupURL} />
         </EditGroupOpenPositions>
       </Route>
       <Route path={`${path}`}>
         <NotFoundPage />
       </Route>
     </Switch>
-  );
-}
-
-function ReturnToGroupPageButton({url}) {
-  return (
-    <div className="edit-group-posts-cancel">
-      <Link to={url}>
-        <button className="edit-group-page-back">
-          <h4>Back to Public View</h4>
-        </button>
-      </Link>
-    </div>
   );
 }
 

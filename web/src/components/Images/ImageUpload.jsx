@@ -8,12 +8,20 @@ import {formatTaggedImages, ImagesSection} from '../Media/ImageListItem';
 import SuccessMessage from '../Forms/SuccessMessage';
 import ErrorMessage from '../Forms/ErrorMessage';
 import './ImageUpload.css';
+import UserCoverPhoto from '../User/UserCoverPhoto';
 
 const NOT_STARTED = 0;
 const UPLOADING = 1;
 const FINISHED = 2;
 
-export default function ImageUpload({storageDir, successCallback, refresh}) {
+export default function ImageUpload({
+  storageDir,
+  successCallback,
+  refresh,
+  storageRef,
+  multipleImages,
+  cover,
+}) {
   const [files, setFiles] = useState([]);
   const [imageURLs, setImageURLs] = useState([]);
   const [uploading, setUploading] = useState(NOT_STARTED);
@@ -56,7 +64,9 @@ export default function ImageUpload({storageDir, successCallback, refresh}) {
     setUploading(UPLOADING);
     files.forEach((file) => {
       const photoID = uuid();
-      const photoStorageRef = storage.ref(storageDir + '/' + photoID);
+      const photoStorageRef = storageRef
+        ? storageRef
+        : storage.ref(storageDir + '/' + photoID);
       setUploadingCount((count) => count + 1);
       photoStorageRef.put(file, {contentType: file.type}).on(
         firebase.storage.TaskEvent.STATE_CHANGED,
@@ -68,7 +78,10 @@ export default function ImageUpload({storageDir, successCallback, refresh}) {
         () => {
           photoStorageRef
             .getDownloadURL()
-            .then((url) => successCallback(url, photoID))
+            .then((url) => {
+              if (!successCallback) return;
+              successCallback(url, photoID);
+            })
             .then(() => setUploadingCount((count) => count - 1));
         }
       );
@@ -82,7 +95,7 @@ export default function ImageUpload({storageDir, successCallback, refresh}) {
   if (files.length === 0)
     return (
       <div className="image-upload-section">
-        <SelectImages onChange={onChange} />
+        <SelectImages onChange={onChange} multipleImages={multipleImages} />
         <div className="after-upload-message-container">
           {displaySuccessMessage ? <UploadSuccessMessage /> : <></>}
           {displayErrorMessage ? <UploadErrorMessage /> : <></>}
@@ -92,7 +105,11 @@ export default function ImageUpload({storageDir, successCallback, refresh}) {
 
   return (
     <>
-      <ImagePreviews urls={imageURLs} uploading={uploading === UPLOADING} />
+      <ImagePreviews
+        urls={imageURLs}
+        uploading={uploading === UPLOADING}
+        cover={cover}
+      />
       <div className="confirm-cancel-upload-container">
         <NegativeButton onClick={cancel} disabled={uploading === UPLOADING}>
           Cancel
@@ -110,7 +127,7 @@ export default function ImageUpload({storageDir, successCallback, refresh}) {
 
 const MAX_IMAGE_PREVIEWS = 3;
 
-export function SelectImages({onChange}) {
+export function SelectImages({onChange, multipleImages}) {
   const [displayValidationMessage, setDisplayValidationMessage] = useState(
     false
   );
@@ -132,11 +149,11 @@ export function SelectImages({onChange}) {
       <div className="image-upload-container">
         <label className="image-upload-label">
           <AddButton />
-          <h4>Choose images</h4>
+          <h4>Choose image{multipleImages ? 's' : ''}</h4>
           <input
             type="file"
             onChange={validatedOnChange}
-            multiple
+            multiple={multipleImages}
             name="uploaded-image"
           />
         </label>
@@ -146,7 +163,20 @@ export function SelectImages({onChange}) {
   );
 }
 
-export function ImagePreviews({urls, uploading}) {
+export function ImagePreviews({urls, uploading, cover}) {
+  if (cover)
+    return (
+      <div className="image-upload-preview-container">
+        {urls.map((url, i) => (
+          <UserCoverPhoto
+            src={urls[0]}
+            alt={`photo from source ${url}`}
+            spinner={uploading}
+            key={url + i}
+          />
+        ))}
+      </div>
+    );
   return (
     <>
       <ImagesSection

@@ -77,3 +77,7 @@
 .confirm-cancel-upload-container button {
   margin-left: 10px;
 }
+
+.image-upload-preview-container {
+  margin-bottom: 20px;
+}

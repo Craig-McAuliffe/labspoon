@@ -24,7 +24,7 @@ export default function FormImageUpload({...props}) {
   }
 
   if (!imageFiles || imageFiles.length === 0) {
-    return <SelectImages onChange={onChange} />;
+    return <SelectImages onChange={onChange} multipleImages={true} />;
   }
 
   return (

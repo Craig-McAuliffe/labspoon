@@ -1,3 +1,47 @@
 .link-user-to-publications-button-container {
   text-align: center;
 }
+
+.edit-user-profile-submit-image-button-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.edit-user-profile-upload-image-container {
+  width: 30vw;
+  min-width: 250px;
+  min-height: 100px;
+  height: 15vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #5d5d65;
+  overflow: hidden;
+}
+
+.edit-user-profile-change-picture-section {
+  padding: 20px 0px;
+  border-bottom: 1px solid #dcdce0;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+}
+
+.update-picture-button {
+  color: #00507c;
+  text-align: start;
+  border: none;
+}
+
+.photo-cache-notice {
+  color: #5d5d65;
+}
+
+.edit-user-photos-section {
+  margin: 20px 0px 40px;
+}
+
+.link-to-pubs-already-linked-note {
+  color: #5d5d65;
+  margin-top: 40px;
+}
