@@ -99,3 +99,11 @@
 .form-publication-list-item-select-container {
   padding: 0px 20px;
 }
+
+.tertiary-button {
+  color: #00507c;
+}
+
+.tertiary-button:hover {
+  color: #3099d3;
+}
