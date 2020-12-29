@@ -1,3 +1,110 @@
 .search-cancel-button {
   margin-bottom: 0.5em;
 }
+
+.onboarding-author-papers-choice-container {
+  display: flex;
+  min-width: 100%;
+  justify-content: center;
+}
+
+.onboarding-author-link-form {
+  margin: 30px 0px 60px;
+  justify-content: center;
+}
+
+.connect-to-pubs-search-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.onboarding-author-papers-choice-button-container {
+  margin: 20px 10px;
+}
+.onboarding-author-link-form h4 {
+  margin-bottom: 10px;
+}
+
+.connect-to-pubs-name-input {
+  border: 1px solid #00507c;
+  padding: 10px 10px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.connect-to-pubs-search-button-text {
+  display: inline-block;
+  margin-left: 5px;
+  color: #00507c;
+}
+
+.connect-to-pubs-search-icon-container {
+  display: inline-block;
+}
+.connect-to-pubs-search-icon-container svg {
+  position: relative;
+  bottom: 2px;
+}
+
+.connect-to-pubs-search-icon-container path {
+  fill: #00507c;
+}
+
+.connect-to-pubs-search-label {
+  display: block;
+}
+
+.onboarding-suggested-publication-title {
+}
+
+.onboarding-suggested-publication-title-container {
+  margin: 20px 0px;
+}
+
+.onboarding-suggested-publications-container {
+  display: grid;
+  grid-template-columns: 1fr 100px;
+}
+
+.onboarding-publication-selector-button,
+.onboarding-publication-selector-button-selected {
+  width: 50px;
+  height: 50px;
+  border: 2px solid #00507c;
+  border-radius: 6%;
+}
+
+.onboarding-publication-selector-button:hover,
+.onboarding-publication-selector-button:focus {
+  border: 3px solid #00507c;
+}
+
+.onboarding-publication-selector-button:active {
+  background: #00507c;
+}
+
+.onboarding-publication-selector-button-selected {
+  background: #00507c;
+}
+
+.onboarding-publication-selector-button-selected:hover {
+  opacity: 50%;
+}
+
+.onboarding-publication-selector-button-selected:focus {
+  border: #3099d3;
+}
+
+.onboarding-suggested-publications-submit-container {
+  margin: 40px 0px 0px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.onboarding-suggested-publication-authors {
+  display: inline-block;
+  margin-right: 10px;
+  color: #5d5d65;
+  line-height: 0px;
+  margin-bottom: 0px;
+}

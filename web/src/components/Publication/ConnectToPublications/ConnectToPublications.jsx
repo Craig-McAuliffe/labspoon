@@ -4,9 +4,10 @@ import PrimaryButton from '../../../components/Buttons/PrimaryButton';
 import {SearchIconGrey} from '../../../assets/HeaderIcons';
 import SecondaryButton from '../../Buttons/SecondaryButton';
 
-import './ConnectToPublications.css';
 import LoadingSpinner from '../../LoadingSpinner/LoadingSpinner';
 import GeneralError from '../../GeneralError';
+import {Alert} from 'react-bootstrap';
+import './ConnectToPublications.css';
 
 const getSuggestedPublicationsForAuthorName = firebase
   .functions()
@@ -32,12 +33,8 @@ export default function LinkAuthorIDForm({submitBehaviour, cancel}) {
 
   return (
     <div>
-      <h3 className="onboarding-author-link-explain">
-        Connect your Labspoon account to your publications
-      </h3>
-      <p className="onboarding-author-link-explain">
-        Note: You can only do this once.
-      </p>
+      <h3>Connect your Labspoon account to your publications</h3>
+      <Alert variant="warning">Note: You can only do this once.</Alert>
       <form
         className="onboarding-author-link-form"
         onSubmit={(e) => {
@@ -56,26 +53,23 @@ export default function LinkAuthorIDForm({submitBehaviour, cancel}) {
             });
         }}
       >
-        <label>
-          Your name as it appears on publications
-          <input
-            type="text"
-            className="onboarding-author-name-input"
-            name="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <button
-            type="submit"
-            value="Submit Search"
-            className="onboarding-author-link-button"
-          >
-            <SearchIconGrey />
-            <span className="onboarding-author-link-search-button-text">
-              Search
-            </span>
-          </button>
-        </label>
+        <h4>Search for your publications:</h4>
+        <input
+          type="text"
+          className="connect-to-pubs-name-input"
+          name="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Your name as it appears on publications"
+        />
+        <div className="connect-to-pubs-search-container">
+          <SecondaryButton type="submit">
+            <div className="connect-to-pubs-search-icon-container">
+              <SearchIconGrey />
+            </div>
+            <span className="connect-to-pubs-search-button-text">Search</span>
+          </SecondaryButton>
+        </div>
         {cancel && (
           <SecondaryButton
             className="search-cancel-button"
@@ -106,13 +100,17 @@ function SuggestedPublications({suggestedPublications, submitBehaviour}) {
 
   return (
     <>
-      <div className="onboarding-suggested-publications-container">
-        <SuggestedPublicationItems
-          suggestedPublications={suggestedPublications}
-          selectedPublicationsAuthorID={selectedPublicationsAuthorID}
-          setSelectedPublicationsAuthorID={setSelectedPublicationsAuthorID}
-        />
-      </div>
+      {submitting ? (
+        <LoadingSpinner />
+      ) : (
+        <div className="onboarding-suggested-publications-container">
+          <SuggestedPublicationItems
+            suggestedPublications={suggestedPublications}
+            selectedPublicationsAuthorID={selectedPublicationsAuthorID}
+            setSelectedPublicationsAuthorID={setSelectedPublicationsAuthorID}
+          />
+        </div>
+      )}
       <div className="onboarding-suggested-publications-submit-container">
         <PrimaryButton
           type="button"

@@ -1,12 +1,5 @@
 import React, {useContext, useState, useEffect} from 'react';
-import {
-  useParams,
-  useHistory,
-  Link,
-  Switch,
-  Route,
-  useRouteMatch,
-} from 'react-router-dom';
+import {useParams, useHistory, Link, useRouteMatch} from 'react-router-dom';
 import {FeatureFlags, AuthContext} from '../../../App';
 import {db} from '../../../firebase';
 
@@ -30,12 +23,9 @@ import FilterableResults, {
 } from '../../../components/FilterableResults/FilterableResults';
 import MessageButton from '../../../components/Buttons/MessageButton';
 import EditButton from '../../../components/Buttons/EditButton';
-import {
-  UserPageAvatar,
-  CoverPhoto,
-} from '../../../components/Avatar/UserAvatar';
+import {UserPageAvatar} from '../../../components/Avatar/UserAvatar';
 import FollowUserButton from '../../../components/User/FollowUserButton/FollowUserButton';
-import EditUserPage from './EditUserPage';
+import UserCoverPhoto from '../../../components/User/UserCoverPhoto';
 
 import './UserPage.css';
 
@@ -143,32 +133,25 @@ export default function UserPage() {
     });
   }
   return (
-    <Switch>
-      <Route path={`${route.path}/edit`}>
-        <EditUserPage user={userDetails} />;
-      </Route>
-      <Route path={route.path}>
-        <FilterableResults fetchResults={fetchFeedData} limit={10}>
-          <FilterManager>
-            <NewFilterMenuWrapper />
-            <div className="content-layout">
-              {featureFlags.has('related-resources') ? (
-                <SuggestedUsers userID={userID} />
-              ) : (
-                <></>
-              )}
-              <div className="details-container">
-                <UserInfo user={userDetails} />
-              </div>
-              <div className="feed-container">
-                <ResourceTabs tabs={relationshipFilter} />
-                <NewResultsWrapper />
-              </div>
-            </div>
-          </FilterManager>
-        </FilterableResults>
-      </Route>
-    </Switch>
+    <FilterableResults fetchResults={fetchFeedData} limit={10}>
+      <FilterManager>
+        <NewFilterMenuWrapper />
+        <div className="content-layout">
+          {featureFlags.has('related-resources') ? (
+            <SuggestedUsers userID={userID} />
+          ) : (
+            <></>
+          )}
+          <div className="details-container">
+            <UserInfo user={userDetails} />
+          </div>
+          <div className="feed-container">
+            <ResourceTabs tabs={relationshipFilter} />
+            <NewResultsWrapper />
+          </div>
+        </div>
+      </FilterManager>
+    </FilterableResults>
   );
 }
 
@@ -193,7 +176,10 @@ function UserInfo({user}) {
   return (
     <div>
       <div className="user-cover-photo-container">
-        <CoverPhoto src={user.coverPhoto} />
+        <UserCoverPhoto
+          src={user.coverPhoto}
+          alt={`user cover picture from source ${user.coverPhoto}`}
+        />
       </div>
       <div className="user-headline">
         <div className="user-page-avatar-container">
@@ -209,7 +195,7 @@ function UserInfo({user}) {
         {ownProfile ? (
           <>
             <div></div>
-            <Link to={`/user/${user.id}/edit`}>
+            <Link to={`/user/${user.id}/edit/info`}>
               <EditButton>Edit Profile</EditButton>
             </Link>
           </>

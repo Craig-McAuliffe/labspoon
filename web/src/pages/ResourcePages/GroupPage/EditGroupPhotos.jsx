@@ -73,6 +73,7 @@ function GroupImageUpload({groupID, refresh}) {
       storageDir={`groups/${groupID}/photos`}
       successCallback={successCallback}
       refresh={refresh}
+      multipleImages={true}
     />
   );
 }

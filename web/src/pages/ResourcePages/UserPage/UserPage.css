@@ -1,5 +1,4 @@
 .user-cover-photo-container {
-  height: 200px;
   width: 100%;
 }
 
@@ -79,43 +78,4 @@
 
 .suggested-user div {
   margin-left: 10px;
-}
-
-.edit-user-profile-submit-image-button-container {
-  display: flex;
-  justify-content: space-between;
-}
-
-.edit-user-profile-upload-image-container {
-  width: 30vw;
-  min-width: 250px;
-  min-height: 100px;
-  height: 15vw;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 1px solid #5d5d65;
-  overflow: hidden;
-}
-
-.edit-user-profile-change-picture-section {
-  padding: 20px 0px;
-  border-bottom: 1px solid #dcdce0;
-  display: grid;
-  grid-template-columns: 1fr;
-  align-items: center;
-}
-
-.update-picture-button {
-  color: #00507c;
-  text-align: start;
-}
-
-.edit-user-profile-expanded-upload-picture-section {
-  display: grid;
-  grid-template-columns: 8fr minmax(150px, 1fr);
-  overflow-x: hidden;
-  align-items: center;
-  justify-content: flex-start;
-  margin-top: 5px;
 }
