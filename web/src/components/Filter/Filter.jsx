@@ -1,9 +1,10 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useState, useRef, useEffect} from 'react';
 import PropTypes from 'prop-types';
-import {SearchIconGrey} from '../../assets/HeaderIcons';
+import {FiltersIcon, SearchIconGrey} from '../../assets/HeaderIcons';
 import {FeatureFlags} from '../../App';
-import {Link} from 'react-router-dom';
+import withSizes from 'react-sizes';
 import './Filter.css';
+import {RemoveIcon} from '../../assets/GeneralActionIcons';
 
 /**
  * Filter menu that allows the users to refine what is displayed in the feed
@@ -15,11 +16,12 @@ import './Filter.css';
  * @param {func} resetFilterCollection - reset the state of a filter collection
  * @return {React.ReactElement}
  */
-export function FilterMenu({
+function FilterMenu({
   options,
   updateFilterOption,
   resetFilterCollection,
   radio,
+  isMobile,
 }) {
   const filterCollections = options.map((optionCollection, index) => {
     if (!optionCollection.mutable) return null;
@@ -36,12 +38,13 @@ export function FilterMenu({
     );
   });
   if (options.length === 0) return null;
+  if (isMobile) return <MobileFilter filterCollections={filterCollections} />;
+
   return (
     <div className="sider-layout">
       <div className="filter-container">
         <FilterSearch />
         {filterCollections}
-        <AdminLinks />
       </div>
     </div>
   );
@@ -51,6 +54,12 @@ FilterMenu.propTypes = {
   updateFilterOption: PropTypes.func.isRequired,
   resetFilterCollection: PropTypes.func.isRequired,
 };
+
+const mapSizesToPropsForFilter = ({width}) => ({
+  isMobile: width && width <= 1197,
+});
+
+export default withSizes(mapSizesToPropsForFilter)(FilterMenu);
 
 // How many filter options to display on each page of the filter.
 const FILTER_PAGE_COUNT = 20;
@@ -206,10 +215,53 @@ function FilterSearch() {
   else return null;
 }
 
-function AdminLinks() {
+function MobileFilter({filterCollections}) {
+  const [mobileFilterIsOpen, setMobileFilterIsOpen] = useState(false);
+  const mobileFilterRef = useRef();
+
+  useEffect(() => {
+    const handleDocumentClick = (e) => {
+      if (mobileFilterRef.current) {
+        if (!mobileFilterRef.current.contains(e.target))
+          setMobileFilterIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleDocumentClick);
+  });
+
+  if (mobileFilterIsOpen)
+    return (
+      <div className="mobile-sider-layout" ref={mobileFilterRef}>
+        <div className="hide-filter-buttons-container">
+          <button
+            className="mobile-filter-button-active"
+            onClick={() => setMobileFilterIsOpen(false)}
+          >
+            <FiltersIcon />
+            <h4>Filters</h4>
+          </button>
+          <button
+            className="remove-icon-button"
+            onClick={() => setMobileFilterIsOpen(false)}
+          >
+            <RemoveIcon />
+          </button>
+        </div>
+        <div className="filter-container">
+          <FilterSearch />
+          {filterCollections}
+        </div>
+      </div>
+    );
   return (
-    <div className="filter-section-with-border">
-      <Link to="/privacyPolicy">Privacy Policy</Link>
+    <div className="mobile-actions-header-container">
+      <button
+        className="mobile-filter-button"
+        onClick={() => setMobileFilterIsOpen(true)}
+      >
+        <FiltersIcon />
+        <h4>Filters</h4>
+      </button>
     </div>
   );
 }

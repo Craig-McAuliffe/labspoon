@@ -86,3 +86,21 @@
     padding: none;
   }
 }
+
+@media screen and (max-width: 500px) {
+  .dropdown-header {
+    padding-right: 0px;
+    padding-left: 0px;
+  }
+
+  .dropdown-header img {
+    height: 40px;
+    width: 40px;
+  }
+  .dropdown {
+    margin-right: 0px;
+    display: flex;
+    align-items: center;
+    max-width: 100%;
+  }
+}

@@ -1,9 +1,17 @@
-svg .create-button-circle {
-  fill: #3099D3;
+.create-icon-svg .create-button-circle {
+  fill: #3099d3;
   fill-opacity: 0;
   transition: 0.3s;
 }
 
-svg:hover .create-button-circle, svg:focus .create-button-circle {
+.create-icon-svg:hover .create-button-circle,
+.create-icon-svg:focus .create-button-circle {
   fill-opacity: 0.21;
+}
+
+@media screen and (max-width: 500px) {
+  .create-icon-svg {
+    height: 45px;
+    width: 45px;
+  }
 }

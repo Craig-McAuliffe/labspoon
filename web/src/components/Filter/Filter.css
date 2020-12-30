@@ -1,19 +1,27 @@
+.sider-layout,
+.sider-layout-no-border {
+  min-height: 100%;
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+  display: inline-block;
+  position: fixed;
+  width: 250px;
+  padding: 30px 10px 0px 10px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 100%;
+}
+
+.sider-layout {
+  border-right: 1px solid #dcdce0;
+}
+
+.sider-layout-no-border {
+  border: none;
+}
+
 .filter-container {
   min-width: 100%;
-}
-
-.filter-section-with-border {
-  border-top: 1px solid #dcdce0;
-  padding-top: 20px;
-}
-
-.filter-section-with-border a {
-  color: #99999f;
-}
-
-.filter-section-with-border a:hover {
-  color: #5d5d65;
-  text-decoration: none;
 }
 
 .filter-search {
@@ -209,4 +217,97 @@
 .filter-options-pagination-container {
   display: inline-block;
   width: 100%;
+}
+
+.mobile-filter-button,
+.mobile-filter-button-active {
+  display: flex;
+  align-items: center;
+}
+
+.mobile-filter-button {
+  color: #00507c;
+  padding: 8px;
+  border: 1px solid #5d5d65;
+  box-shadow: 0px 0px 4px rgba(0, 80, 124, 100%);
+}
+.mobile-filter-button-active {
+  color: #3099d3;
+}
+
+.mobile-filter-button:hover {
+  color: #3099d3;
+}
+
+.mobile-filter-button-active:hover {
+  color: #00507c;
+}
+
+.mobile-filter-button:hover path,
+.mobile-filter-button-active path {
+  fill: #3099d3;
+}
+.mobile-filter-button-active:hover path {
+  fill: #00507c;
+}
+
+.mobile-filter-button h4,
+.mobile-filter-button-active h4 {
+  margin-bottom: 0px;
+  margin-left: 5px;
+}
+
+.remove-icon-button:hover path {
+  stroke: #5d5d65;
+}
+
+.remove-icon-button {
+  padding: 0px;
+}
+
+.mobile-actions-header-container {
+  width: 100%;
+  position: fixed;
+  background: #ffffff;
+  /* border-bottom: 1px solid #00507c; */
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 30%);
+  top: 65px;
+  height: 55px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  z-index: 2;
+}
+
+.hide-filter-buttons-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.mobile-sider-layout {
+  position: fixed;
+  top: 65px;
+  padding: 20px 20px 20px 10px;
+  background: #ffffff;
+  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.4);
+  width: 500px;
+  max-width: 400px;
+  min-height: 100%;
+  z-index: 1;
+}
+
+@media screen and (max-width: 1197px) {
+  .sider-layout-no-border,
+  .sider-layout {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .mobile-sider-layout {
+    max-width: 75%;
+    min-height: 100%;
+  }
 }
