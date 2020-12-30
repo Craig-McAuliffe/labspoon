@@ -59,6 +59,11 @@ const AvatarDropDown = () => {
               <p className="dropdown-link-item">Settings</p>
             </div>
           </Dropdown.Item>
+          <Dropdown.Item href="/privacyPolicy">
+            <div className="avatar-dropdown-item-container">
+              <p className="dropdown-link-item">Privacy Policy</p>
+            </div>
+          </Dropdown.Item>
           <div className="log-out-container">
             <button
               onClick={() => {
@@ -111,7 +116,7 @@ function UserGroups({userID}) {
       ));
 }
 
-const AvatarToggle = ({user, userProfile}) => {
+const AvatarToggle = ({userProfile}) => {
   return (
     <div className="dropdown-header">
       {userProfile ? (

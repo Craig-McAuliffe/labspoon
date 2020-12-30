@@ -79,7 +79,7 @@ export default function CreatePost({
       <div className="not-creating-post-container">
         <button onClick={() => setCreatingPost(true)}>
           <WriteIcon />
-          <p className="not-creating-post-text">Post to your followers</p>
+          <p className="not-creating-post-text">Post to your followers...</p>
         </button>
         {postSuccess ? (
           <h4 className="post-success-message">Post Created!</h4>

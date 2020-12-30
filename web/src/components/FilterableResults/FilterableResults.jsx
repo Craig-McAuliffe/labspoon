@@ -2,7 +2,7 @@ import React, {useState, useEffect, useContext, createContext} from 'react';
 import {useLocation} from 'react-router-dom';
 import SearchBar from '../SearchBar';
 import update from 'immutability-helper';
-import {FilterMenu} from '../Filter/Filter';
+import FilterMenu from '../Filter/Filter';
 import ResultsList from '../Results/Results';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 
