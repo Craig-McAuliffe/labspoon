@@ -90,3 +90,37 @@ export function FiltersIcon() {
     </svg>
   );
 }
+
+export function SimilarContentIcon() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0.5" y="0.5" width="11.5424" height="11.5424" stroke="white" />
+      <rect
+        x="10.1356"
+        y="10.1356"
+        width="6.2712"
+        height="6.2712"
+        fill="#00507C"
+        stroke="white"
+        strokeWidth="6.2712"
+      />
+    </svg>
+  );
+}
+
+export function MainItemIcon() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0.5" y="0.5" width="15" height="15" stroke="white" />
+    </svg>
+  );
+}
+
+export function FeedIcon() {
+  return (
+    <svg viewBox="0 0 13 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0.5" y="0.5" width="11.75" height="6.89286" stroke="white" />
+      <rect x="0.5" y="9.60715" width="11.75" height="6.89286" stroke="white" />
+    </svg>
+  );
+}

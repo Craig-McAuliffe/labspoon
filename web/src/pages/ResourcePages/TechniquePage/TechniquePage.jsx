@@ -3,7 +3,7 @@ import {useParams, useHistory} from 'react-router-dom';
 import {db} from '../../../firebase';
 import GeneralError from '../../../components/GeneralError';
 import {LoadingSpinnerPage} from '../../../components/LoadingSpinner/LoadingSpinner';
-import {PageContainer} from '../../../components/Layout/Content';
+import {PaddedPageContainer} from '../../../components/Layout/Content';
 import ListItemTopics from '../../../components/ListItem/ListItemTopics';
 import GroupListItem from '../../../components/Group/GroupListItem';
 import FollowGroupButton from '../../../components/Group/FollowGroupButton';
@@ -49,7 +49,7 @@ export default function TechniquePage() {
 
   if (loading) return <LoadingSpinnerPage />;
   return (
-    <PageContainer>
+    <PaddedPageContainer>
       <ArticleHeaderAndType
         title={technique.title}
         resourceType={technique.resourceType}
@@ -69,6 +69,6 @@ export default function TechniquePage() {
       />
       <RichTextBody body={technique.body} />
       <Author authorID={technique.author.id} name={technique.author.name} />
-    </PageContainer>
+    </PaddedPageContainer>
   );
 }

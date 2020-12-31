@@ -62,6 +62,7 @@ input:focus {
 @media screen and (max-width: 500px) {
   body {
     font-size: 15px;
+    scrollbar-width: none;
   }
 
   h1 {

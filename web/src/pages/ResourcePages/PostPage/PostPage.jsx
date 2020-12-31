@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {db} from '../../../firebase';
 import Post from '../../../components/Posts/Post/Post';
 import {Redirect, useParams, useRouteMatch} from 'react-router-dom';
-import Content from '../../../components/Layout/Content';
+import {UnpaddedPageContainer} from '../../../components/Layout/Content';
 
 import './PostPage.css';
 import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
@@ -39,11 +39,9 @@ export default function PostPage() {
 
   return (
     <>
-      <Content>
-        <div className="post-page-details-container">
-          <Post post={post} dedicatedPage={true} />
-        </div>
-      </Content>
+      <UnpaddedPageContainer>
+        <Post post={post} dedicatedPage={true} />
+      </UnpaddedPageContainer>
     </>
   );
 }

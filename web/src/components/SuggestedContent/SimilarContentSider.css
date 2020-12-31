@@ -1,8 +1,8 @@
 .suggested-content-sider-container {
-  margin-left: 2%;
   border-left: 1px solid #dcdce0;
   padding: 0px 2%;
   height: 100%;
+  grid-column: 3/4;
 }
 
 .suggested-content-sider-container p {
@@ -51,4 +51,53 @@
 .suggested-publications-author-name {
   color: #99999f;
   margin: 0px 10px 0px 0px;
+}
+
+.mobile-footer-button-container {
+  display: flex;
+  align-items: center;
+  color: #ffffff;
+}
+
+.mobile-footer-button-container svg {
+  height: 20px;
+}
+
+.mobile-footer-button-container h3 {
+  margin-bottom: 0px;
+  margin-left: 5px;
+}
+
+.mobile-footer-button-text-active {
+  border-bottom: 1px solid #ffffff;
+}
+
+.mobile-suggested-content-footer {
+  position: fixed;
+  bottom: 0px;
+  display: flex;
+  justify-content: space-evenly;
+  height: 55px;
+  background: #00507c;
+  padding: 15px 10px 10px;
+  width: 100%;
+}
+
+.mobile-suggested-content-footer a:hover {
+  text-decoration: none;
+}
+
+.mobile-suggested-content-footer a:hover h3 {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.mobile-suggested-content-footer a:hover rect {
+  fill: rgba(255, 255, 255, 0.6);
+  stroke: rgba(255, 255, 255, 0.6);
+}
+
+@media screen and (min-width: 1197) {
+}
+
+@media screen and (max-width: 500px) {
 }

@@ -3,7 +3,7 @@ import {useParams} from 'react-router-dom';
 
 import {db} from '../../../firebase';
 import {getPaginatedImagesFromCollectionRef} from '../../../helpers/images';
-import {FeedContent} from '../../../components/Layout/Content';
+import {PaddedPageContainer} from '../../../components/Layout/Content';
 import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 import Results from '../../../components/Results/Results';
 import ImageUpload from '../../../components/Images/ImageUpload';
@@ -49,12 +49,12 @@ export default function EditGroupPhotos({children}) {
   }
 
   return (
-    <FeedContent>
+    <PaddedPageContainer>
       {children}
       <GroupImageUpload groupID={groupID} refresh={refresh} />
       <Results results={photos} hasMore={hasMore} fetchMore={fetchMore} />
       {loading ? <LoadingSpinner /> : <></>}
-    </FeedContent>
+    </PaddedPageContainer>
   );
 }
 

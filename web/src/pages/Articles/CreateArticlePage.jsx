@@ -2,7 +2,7 @@ import React from 'react';
 import {Formik, Form} from 'formik';
 import * as Yup from 'yup';
 
-import {FeedContent} from '../../components/Layout/Content';
+import {PaddedPageContainer} from '../../components/Layout/Content';
 import PrimaryButton from '../../components/Buttons/PrimaryButton';
 import HeaderAndBodyArticleInput, {
   yupArticleValidation,
@@ -15,7 +15,7 @@ const validationSchema = Yup.object({
 
 export default function CreateArticlePage() {
   return (
-    <FeedContent>
+    <PaddedPageContainer>
       <Formik
         initialValues={{
           article: initialValue,
@@ -28,6 +28,6 @@ export default function CreateArticlePage() {
           <PrimaryButton submit>Submit</PrimaryButton>
         </Form>
       </Formik>
-    </FeedContent>
+    </PaddedPageContainer>
   );
 }

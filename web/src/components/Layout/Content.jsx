@@ -10,7 +10,7 @@ export function FeedContainer({children}) {
   return <div className="feed-container">{children}</div>;
 }
 
-export function FeedContent({children}) {
+export function UnpaddedPageContainer({children}) {
   return (
     <Content>
       <FeedContainer>{children}</FeedContainer>
@@ -18,14 +18,14 @@ export function FeedContent({children}) {
   );
 }
 
-export function PageContainer({children}) {
+export function PaddedPageContainer({children}) {
   return (
-    <Content>
-      <div className="padded-page-container">{children}</div>
-    </Content>
+    <UnpaddedPageContainer>
+      <PaddedContent>{children}</PaddedContent>
+    </UnpaddedPageContainer>
   );
 }
 
-export function PaddedPageContent({children}) {
+export function PaddedContent({children}) {
   return <div className="padded-page-container">{children}</div>;
 }

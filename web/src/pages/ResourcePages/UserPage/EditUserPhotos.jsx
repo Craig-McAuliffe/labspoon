@@ -2,14 +2,14 @@ import React from 'react';
 import {Alert} from 'react-bootstrap';
 import {storage} from '../../../firebase';
 import {useParams} from 'react-router-dom';
-import {FeedContent} from '../../../components/Layout/Content';
+import {PaddedPageContainer} from '../../../components/Layout/Content';
 import ImageUpload from '../../../components/Images/ImageUpload';
 
 import './EditUserPage.css';
 
 export default function EditUserPhotos({children}) {
   return (
-    <FeedContent>
+    <PaddedPageContainer>
       {children}
       <EditUserProfilePicture />
       <EditUserCoverPicture />
@@ -19,7 +19,7 @@ export default function EditUserPhotos({children}) {
         the reload, you can clear your browser cache or view your profile in an
         incognito window.
       </p>
-    </FeedContent>
+    </PaddedPageContainer>
   );
 }
 

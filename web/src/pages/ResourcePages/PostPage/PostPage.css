@@ -3,11 +3,6 @@
   padding: 10px;
 }
 
-.post-page-details-container {
-  grid-column: 2/3;
-  min-width: 100%;
-}
-
 .post-page-resource-container {
   display: flex;
   margin-top: 40px;
