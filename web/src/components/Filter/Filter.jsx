@@ -254,14 +254,12 @@ function MobileFilter({filterCollections}) {
       </div>
     );
   return (
-    <div className="mobile-actions-header-container">
-      <button
-        className="mobile-filter-button"
-        onClick={() => setMobileFilterIsOpen(true)}
-      >
-        <FiltersIcon />
-        <h4>Filters</h4>
-      </button>
-    </div>
+    <button
+      className="mobile-filter-button"
+      onClick={() => setMobileFilterIsOpen(true)}
+    >
+      <FiltersIcon />
+      <h4>Filters</h4>
+    </button>
   );
 }

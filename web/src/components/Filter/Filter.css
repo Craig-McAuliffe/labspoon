@@ -230,6 +230,15 @@
   padding: 8px;
   border: 1px solid #5d5d65;
   box-shadow: 0px 0px 4px rgba(0, 80, 124, 100%);
+  position: fixed;
+  background: #ffffff;
+  /* border-bottom: 1px solid #00507c; */
+  top: 75px;
+  padding: 10px 10px 10px 16px;
+  border-top-right-radius: 5%;
+  border-bottom-right-radius: 5%;
+  left: -4px;
+  z-index: 1;
 }
 .mobile-filter-button-active {
   color: #3099d3;
@@ -263,20 +272,6 @@
 
 .remove-icon-button {
   padding: 0px;
-}
-
-.mobile-actions-header-container {
-  width: 100%;
-  position: fixed;
-  background: #ffffff;
-  /* border-bottom: 1px solid #00507c; */
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 30%);
-  top: 65px;
-  height: 55px;
-  padding: 10px;
-  display: flex;
-  align-items: center;
-  z-index: 2;
 }
 
 .hide-filter-buttons-container {
