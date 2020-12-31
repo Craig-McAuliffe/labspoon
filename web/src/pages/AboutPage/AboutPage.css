@@ -587,4 +587,8 @@
   .carousel {
     height: 200px;
   }
+
+  .about-page-header-actions h2 {
+    font-size: 0.9em;
+  }
 }

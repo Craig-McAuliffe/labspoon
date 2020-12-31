@@ -18,6 +18,14 @@ export function FeedContent({children}) {
   );
 }
 
-export function PageContentContainer({children}) {
-  return <div className="page-content-container">{children}</div>;
+export function PageContainer({children}) {
+  return (
+    <Content>
+      <div className="page-content-container">{children}</div>
+    </Content>
+  );
+}
+
+export function ResourcePageDetailsContainer({children}) {
+  return <div className="resources-details-container">{children}</div>;
 }

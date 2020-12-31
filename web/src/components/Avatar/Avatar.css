@@ -16,3 +16,10 @@
   border: 2px solid white;
   background: white;
 }
+
+@media screen and (max-width: 500px) {
+  .userPage-avatar {
+    top: -20px;
+    left: -92px;
+  }
+}

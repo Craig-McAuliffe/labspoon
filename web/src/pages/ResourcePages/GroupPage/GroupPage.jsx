@@ -35,6 +35,7 @@ import {
   TECHNIQUES,
 } from '../../../helpers/resourceTypeDefinitions';
 import ResourcesFeed from '../ResourcesFeeds';
+import {ResourcePageDetailsContainer} from '../../../components/Layout/Content';
 
 import './GroupPage.css';
 
@@ -301,14 +302,14 @@ export default function GroupPage() {
         limit={9}
         tabs={relationshipFilter}
       >
-        <div className="group-details">
+        <ResourcePageDetailsContainer>
           <GroupDetails
             group={groupData}
             groupDescriptionRef={groupDescriptionRef}
             userIsMember={userIsMember}
             verified={verified}
           />
-        </div>
+        </ResourcePageDetailsContainer>
       </ResourcesFeed>
     </>
   );
@@ -331,7 +332,7 @@ const GroupDetails = ({group, groupDescriptionRef, userIsMember, verified}) => {
   const featureFlags = useContext(FeatureFlags);
   const [displayFullDescription, setDisplayFullDescription] = useState({
     display: false,
-    size: 100,
+    size: 90,
   });
 
   if (group === undefined) return <></>;
@@ -348,31 +349,27 @@ const GroupDetails = ({group, groupDescriptionRef, userIsMember, verified}) => {
           {featureFlags.has('group-message-button') ? <MessageButton /> : null}
         </div>
         <div className="group-header-info">
-          <div className="group-header-info-headline">
-            <div className="group-headline-name-insitution">
-              <h2>{group.name}</h2>
-              <h3>{group.institution}</h3>
-            </div>
-            <div className="group-follow-container">
-              <FollowGroupButton targetGroup={group} />
-            </div>
+          <div className="group-header-name-insitution">
+            <h2>{group.name}</h2>
+            <h3>{group.institution}</h3>
           </div>
-          <div
-            className={'group-description'}
-            style={descriptionSize}
-            ref={groupDescriptionRef}
-          >
-            <Linkify tagName="p">{group.about}</Linkify>
-          </div>
-
-          <SeeMore
-            displayFullDescription={displayFullDescription}
-            setDisplayFullDescription={setDisplayFullDescription}
-            descriptionRef={groupDescriptionRef}
-            id={group.id}
-          />
+          <FollowGroupButton targetGroup={group} />
         </div>
       </div>
+      <div
+        className={'group-description'}
+        style={descriptionSize}
+        ref={groupDescriptionRef}
+      >
+        <Linkify tagName="p">{group.about}</Linkify>
+      </div>
+
+      <SeeMore
+        displayFullDescription={displayFullDescription}
+        setDisplayFullDescription={setDisplayFullDescription}
+        descriptionRef={groupDescriptionRef}
+        id={group.id}
+      />
 
       {featureFlags.has('donate-link') ? (
         <DonationLink verified={verified} donationLink={group.donationLink} />

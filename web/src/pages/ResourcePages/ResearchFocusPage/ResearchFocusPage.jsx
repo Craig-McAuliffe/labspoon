@@ -2,8 +2,8 @@ import React, {useState, useEffect} from 'react';
 import {useParams, useHistory} from 'react-router-dom';
 import {db} from '../../../firebase';
 import GeneralError from '../../../components/GeneralError';
-import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
-import {FeedContent} from '../../../components/Layout/Content';
+import {LoadingSpinnerPage} from '../../../components/LoadingSpinner/LoadingSpinner';
+import {PageContainer} from '../../../components/Layout/Content';
 import ListItemTopics from '../../../components/ListItem/ListItemTopics';
 import GroupListItem from '../../../components/Group/GroupListItem';
 import FollowGroupButton from '../../../components/Group/FollowGroupButton';
@@ -47,10 +47,10 @@ export default function ResearchFocusPage() {
 
   if (error) return <GeneralError />;
 
-  if (loading) return <LoadingSpinner />;
+  if (loading) return <LoadingSpinnerPage />;
 
   return (
-    <FeedContent>
+    <PageContainer>
       <ArticleHeaderAndType
         title={researchFocus.title}
         resourceType={researchFocus.resourceType}
@@ -73,6 +73,6 @@ export default function ResearchFocusPage() {
         authorID={researchFocus.author.id}
         name={researchFocus.author.name}
       />
-    </FeedContent>
+    </PageContainer>
   );
 }

@@ -2,8 +2,8 @@ import React, {useState, useEffect} from 'react';
 import {useParams, useHistory} from 'react-router-dom';
 import {db} from '../../../firebase';
 import GeneralError from '../../../components/GeneralError';
-import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
-import {FeedContent} from '../../../components/Layout/Content';
+import {LoadingSpinnerPage} from '../../../components/LoadingSpinner/LoadingSpinner';
+import {PageContainer} from '../../../components/Layout/Content';
 import ListItemTopics from '../../../components/ListItem/ListItemTopics';
 import GroupListItem from '../../../components/Group/GroupListItem';
 import FollowGroupButton from '../../../components/Group/FollowGroupButton';
@@ -47,9 +47,9 @@ export default function TechniquePage() {
 
   if (error) return <GeneralError />;
 
-  if (loading) return <LoadingSpinner />;
+  if (loading) return <LoadingSpinnerPage />;
   return (
-    <FeedContent>
+    <PageContainer>
       <ArticleHeaderAndType
         title={technique.title}
         resourceType={technique.resourceType}
@@ -69,6 +69,6 @@ export default function TechniquePage() {
       />
       <RichTextBody body={technique.body} />
       <Author authorID={technique.author.id} name={technique.author.name} />
-    </FeedContent>
+    </PageContainer>
   );
 }

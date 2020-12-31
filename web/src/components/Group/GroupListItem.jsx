@@ -41,23 +41,32 @@ export default function GroupListItem({
         width={130}
         WrapWithLinkOrOverride={WrapWithLinkOrOverride}
       />
-      <div className="group-list-item-text-container">
-        {name}
-        <div
-          ref={groupDescriptionRef}
-          style={descriptionSize}
-          className="group-list-item-description"
-        >
-          <p>{group.about}</p>
+      <div>
+        <div className="group-list-item-name-follow">
+          <div className="group-list-item-name-institution-container">
+            {name}
+            <h4>{group.institution}</h4>
+          </div>
+          <div className="group-list-item-follow-button-container">
+            {children}
+          </div>
         </div>
-        <SeeMore
-          displayFullDescription={displayFullDescription}
-          setDisplayFullDescription={setDisplayFullDescription}
-          descriptionRef={groupDescriptionRef}
-          id={group.id}
-        />
+        <div className="group-list-item-text-container">
+          <div
+            ref={groupDescriptionRef}
+            style={descriptionSize}
+            className="group-list-item-description"
+          >
+            <p>{group.about}</p>
+          </div>
+          <SeeMore
+            displayFullDescription={displayFullDescription}
+            setDisplayFullDescription={setDisplayFullDescription}
+            descriptionRef={groupDescriptionRef}
+            id={group.id}
+          />
+        </div>
       </div>
-      <div className="follow-group-button">{children}</div>
     </div>
   );
 }
@@ -69,7 +78,7 @@ function GroupAvatarSection({
   WrapWithLinkOrOverride,
 }) {
   const avatarDisplay = (
-    <div className="group-list-item-icon-and-name">
+    <div className="group-list-item-icon">
       <GroupAvatar src={groupAvatar} height={height} width={width} />
     </div>
   );

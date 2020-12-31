@@ -11,10 +11,6 @@
   margin-left: 10px;
 }
 
-.group-details {
-  grid-column: 2/3;
-}
-
 .group-header {
   display: grid;
   grid-template-columns: 130px 1fr;
@@ -31,19 +27,17 @@
 .group-header-info {
   grid-column: 2/3;
   margin-left: 5px;
-}
-
-.group-header-info-headline {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
 }
 
-.group-header-info-headline h3 {
+.group-header-info h3 {
   color: #5d5d65;
 }
 
 .group-description {
-  margin: 10px 0px 0px;
+  margin: 10px 0px;
   overflow-x: none;
   overflow-y: hidden;
 }
@@ -110,6 +104,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
+  flex-wrap: wrap;
 }
 
 .group-website-link {
@@ -141,4 +136,14 @@
 
 .edit-group-posts-cancel button {
   color: #00507c;
+}
+
+@media screen and (max-width: 600px) {
+  .group-icon-and-message img {
+    width: 90px;
+    height: 90px;
+  }
+  .group-header {
+    grid-template-columns: 100px 1fr;
+  }
 }

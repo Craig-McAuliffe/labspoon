@@ -105,14 +105,6 @@
 }
 
 @media screen and (max-width: 800px) {
-  .primary-button-text {
-    font-size: 1.2em;
-  }
-
-  .primary-button-text-small {
-    font-size: 1em;
-  }
-
   .primary-button,
   .primary-button-inactive,
   .negative-button,
@@ -125,11 +117,7 @@
 
 @media only screen and (max-width: 500px) {
   .primary-button-text {
-    font-size: 1em;
-  }
-
-  .primary-button-text-small {
-    font-size: 0.8em;
+    font-size: 1.1em;
   }
 
   .primary-button,
@@ -139,25 +127,6 @@
   .negative-button,
   .negative-button-small {
     padding: 8px 8px;
-    border-radius: 2%;
-  }
-}
-
-@media only screen and (max-width: 378px) {
-  .primary-button-text {
-    font-size: 0.8em;
-  }
-
-  .primary-button-text-small {
-    font-size: 0.6em;
-  }
-
-  .primary-button,
-  .primary-button-clicked,
-  .primary-button-inactive,
-  .negative-button,
-  .negative-button-small {
-    padding: 7px 9px;
     border-radius: 2%;
   }
 }

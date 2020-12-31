@@ -43,11 +43,6 @@
     );
 }
 
-.page-content-container {
-  grid-column: 2 / 3;
-  min-width: 100%;
-}
-
 .right-sider {
   grid-column: 3 / 4;
   grid-row: 1 / 2;
@@ -103,6 +98,13 @@
 .not-found-title {
   color: #5d5d65;
 }
+.secondary-link {
+  color: #5d5d65;
+}
+
+.secondary-link:hover {
+  color: #3f3f45;
+}
 
 @media screen and (max-width: 1550px) {
   .main-layout {
@@ -145,10 +147,8 @@
   }
 }
 
-.secondary-link {
-  color: #5d5d65;
-}
-
-.secondary-link:hover {
-  color: #3f3f45;
+@media screen and (max-width: 500px) {
+  .content-layout {
+    display: block;
+  }
 }

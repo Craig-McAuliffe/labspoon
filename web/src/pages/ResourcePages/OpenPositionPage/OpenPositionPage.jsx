@@ -4,8 +4,8 @@ import ListItemTopics from '../../../components/ListItem/ListItemTopics';
 import GeneralError from '../../../components/GeneralError';
 import FollowGroupButton from '../../../components/Group/FollowGroupButton';
 import GroupListItem from '../../../components/Group/GroupListItem';
-import {FeedContent} from '../../../components/Layout/Content';
-import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
+import {PageContainer} from '../../../components/Layout/Content';
+import {LoadingSpinnerPage} from '../../../components/LoadingSpinner/LoadingSpinner';
 import {db} from '../../../firebase';
 
 import './OpenPositionPage.css';
@@ -33,14 +33,9 @@ export default function OpenPositionPage() {
 
   if (pageError) return <GeneralError />;
 
-  if (!openPosition)
-    return (
-      <FeedContent>
-        <LoadingSpinner />
-      </FeedContent>
-    );
+  if (!openPosition) return <LoadingSpinnerPage />;
   return (
-    <FeedContent>
+    <PageContainer>
       <div className="open-position-headline-section">
         <div className="open-position-headline-section-left-container">
           <h2>{openPosition.content.title}</h2>
@@ -115,6 +110,6 @@ export default function OpenPositionPage() {
           {openPosition.author.name}
         </Link>
       </div>
-    </FeedContent>
+    </PageContainer>
   );
 }

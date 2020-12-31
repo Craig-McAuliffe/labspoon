@@ -79,3 +79,10 @@
 .suggested-user div {
   margin-left: 10px;
 }
+
+@media screen and (max-width: 500px) {
+  .user-page-avatar-container img {
+    width: 90px;
+    height: 90px;
+  }
+}

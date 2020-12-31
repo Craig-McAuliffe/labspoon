@@ -10,7 +10,18 @@
   grid-template-columns: minmax(5px, 1fr) minmax(408px, 1070px) minmax(5px, 1fr);
 }
 
-.feed-container {
+.feed-container,
+.resources-details-container,
+.page-content-container {
   grid-column: 2/3;
   min-width: 100%;
+}
+
+@media screen and (max-width: 500px) {
+  .content-layout {
+    display: block;
+  }
+  .resources-details-container {
+    padding: 0px 5px;
+  }
 }

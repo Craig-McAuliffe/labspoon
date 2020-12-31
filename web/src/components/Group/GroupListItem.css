@@ -1,7 +1,7 @@
 .group-list-item-container,
 .group-list-item-container-no-border {
   display: grid;
-  grid-template-columns: 150px 1fr 150px;
+  grid-template-columns: 150px 1fr;
   grid-template-rows: none;
   max-width: 100%;
 }
@@ -22,35 +22,46 @@
 }
 
 .group-list-item-description {
-  margin: 10px 0px 0px;
   overflow-x: none;
   overflow-y: hidden;
 }
 
-.group-list-item-icon-and-name {
+.group-list-item-name-institution-container {
+  margin-right: 5px;
+}
+
+.group-list-item-name-follow {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.group-list-item-name-follow h4 {
+  margin-bottom: 10px;
+}
+
+.group-list-item-follow-button-container {
+  margin-bottom: 10px;
+}
+
+.group-list-item-icon {
   grid-column: 1/2;
   display: flex;
   flex-direction: column;
   margin-right: 10px;
 }
 
-.group-list-item-icon-and-name img {
+.group-list-item-icon img {
   align-self: center;
 }
 
-.group-list-item-icon-and-name p {
+.group-list-item-icon p {
   text-align: center;
   color: #99999f;
   margin-top: 4px;
 }
 
-.follow-group-button {
-  max-height: 200px;
-  align-self: center;
-  justify-self: flex-end;
-}
-
-.group-list-item-icon-and-name:hover p {
+.group-list-item-icon:hover p {
   color: #000000;
 }
 
@@ -108,4 +119,26 @@
 
 .group-headline-item-container h4 {
   color: #99999f;
+}
+
+@media screen and (max-width: 600px) {
+  .group-list-item-icon img {
+    width: 80px;
+    height: 80px;
+  }
+
+  .group-list-item-container,
+  .group-list-item-container-no-border {
+    grid-template-columns: 100px 1fr;
+  }
+}
+@media screen and (max-width: 360px) {
+  .group-list-item-container,
+  .group-list-item-container-no-border {
+    display: block;
+    padding-left: 10px;
+  }
+  .group-list-item-icon {
+    margin: 0px 0px 15px 0px;
+  }
 }
