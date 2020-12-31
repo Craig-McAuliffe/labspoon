@@ -1,10 +1,10 @@
 import React from 'react';
 import errorIcon from '../assets/errorIcon.svg';
-import {FeedContent} from './Layout/Content';
+import {UnpaddedPageContainer} from './Layout/Content';
 
 export default function GeneralError({children}) {
   return (
-    <FeedContent>
+    <UnpaddedPageContainer>
       <div className="error-container">
         <img
           style={{maxWidth: '20%', height: 'auto'}}
@@ -20,6 +20,6 @@ export default function GeneralError({children}) {
           </h3>
         )}
       </div>
-    </FeedContent>
+    </UnpaddedPageContainer>
   );
 }

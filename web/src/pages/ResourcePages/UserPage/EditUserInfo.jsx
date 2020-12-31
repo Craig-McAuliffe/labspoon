@@ -6,7 +6,7 @@ import CancelButton from '../../../components/Buttons/CancelButton';
 import {db} from '../../../firebase';
 import FormTextInput from '../../../components/Forms/FormTextInput';
 import {useHistory, useParams} from 'react-router-dom';
-import {FeedContent} from '../../../components/Layout/Content';
+import {UnpaddedPageContainer} from '../../../components/Layout/Content';
 import {AuthContext} from '../../../App';
 import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 import GeneralError from '../../../components/GeneralError';
@@ -53,7 +53,7 @@ export default function EditUserInfo({children}) {
   };
 
   return (
-    <FeedContent>
+    <UnpaddedPageContainer>
       {children}
       <Formik
         initialValues={initialValues}
@@ -76,6 +76,6 @@ export default function EditUserInfo({children}) {
           </PrimaryButton>
         </div>
       </div>
-    </FeedContent>
+    </UnpaddedPageContainer>
   );
 }

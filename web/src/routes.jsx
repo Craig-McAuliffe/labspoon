@@ -16,9 +16,8 @@ import {SkeletonUserPage} from './pages/ResourcePages/UserPage';
 import AboutPage from './pages/AboutPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
-import PublicationPage, {
-  MAGPublicationRouter,
-} from './pages/ResourcePages/PublicationPage/PublicationPage';
+import {MAGPublicationRouter} from './pages/ResourcePages/PublicationPage/PublicationPage';
+import Publications from './pages/ResourcePages/PublicationPage/Publications';
 import PostPage from './pages/ResourcePages/PostPage';
 import TopicPage, {MAGFieldRouter} from './pages/TopicPage';
 import NewsPage from './pages/NewsPage';
@@ -81,8 +80,8 @@ export default function Routes({user, setUser}) {
       <Route user={user} path="/externaluser/:userID">
         <SkeletonUserPage />
       </Route>
-      <Route path="/publication/:publicationID">
-        <PublicationPage />
+      <Route path="/publication">
+        <Publications />
       </Route>
       <Route path="/magPublication/:magPublicationID">
         <MAGPublicationRouter />

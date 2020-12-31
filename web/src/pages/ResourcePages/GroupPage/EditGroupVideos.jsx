@@ -4,7 +4,7 @@ import {useParams} from 'react-router-dom';
 import * as Yup from 'yup';
 import {db} from '../../../firebase';
 
-import {FeedContent} from '../../../components/Layout/Content';
+import {PaddedPageContainer} from '../../../components/Layout/Content';
 import FormTextInput from '../../../components/Forms/FormTextInput';
 import PrimaryButton from '../../../components/Buttons/PrimaryButton';
 import SuccessMessage from '../../../components/Forms/SuccessMessage';
@@ -58,12 +58,12 @@ export default function EditGroupVideos({children}) {
   }
 
   return (
-    <FeedContent>
+    <PaddedPageContainer>
       {children}
       <VideoUploadForm refresh={refresh} />
       <Results results={videos} hasMore={hasMore} fetchMore={fetchMore} />
       {loading ? <LoadingSpinner /> : <></>}
-    </FeedContent>
+    </PaddedPageContainer>
   );
 }
 

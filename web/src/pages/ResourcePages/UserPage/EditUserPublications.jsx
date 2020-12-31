@@ -1,7 +1,7 @@
 import React, {useContext, useState} from 'react';
 import SecondaryButton from '../../../components/Buttons/SecondaryButton';
 import LinkAuthorIDForm from '../../../components/Publication/ConnectToPublications/ConnectToPublications';
-import {FeedContent} from '../../../components/Layout/Content';
+import {PaddedPageContainer} from '../../../components/Layout/Content';
 import {AuthContext} from '../../../App';
 import GeneralError from '../../../components/GeneralError';
 import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
@@ -17,7 +17,7 @@ export default function EditUserPublications({children}) {
 
   if (userProfile.microsoftAcademicAuthorID)
     return (
-      <FeedContent>
+      <PaddedPageContainer>
         {children}
         <h3>You have already linked publications to your user profile</h3>
         <p>
@@ -28,11 +28,11 @@ export default function EditUserPublications({children}) {
           <b>Note:</b> We are constantly indexing more publications, so if any
           are missing they will probably appear soon.
         </p>
-      </FeedContent>
+      </PaddedPageContainer>
     );
 
   return (
-    <FeedContent>
+    <PaddedPageContainer>
       {children}
       {linkingAuthor ? (
         <LinkUserToPublications setLinkingAuthor={setLinkingAuthor} />
@@ -43,7 +43,7 @@ export default function EditUserPublications({children}) {
           </SecondaryButton>
         </div>
       )}
-    </FeedContent>
+    </PaddedPageContainer>
   );
 }
 

@@ -1,11 +1,11 @@
 import React from 'react';
-import {FeedContent} from '../../components/Layout/Content';
+import {PaddedPageContainer} from '../../components/Layout/Content';
 
 import './PrivacyPolicyPage.css';
 
 export default function PrivacyPolicyPage() {
   return (
-    <FeedContent>
+    <PaddedPageContainer>
       <div className="labspoon-privacy-policy-container">
         <h1>Labspoon Privacy Policy</h1>
         <p>
@@ -385,6 +385,6 @@ export default function PrivacyPolicyPage() {
           your information in ways that comply with it.
         </p>
       </div>
-    </FeedContent>
+    </PaddedPageContainer>
   );
 }

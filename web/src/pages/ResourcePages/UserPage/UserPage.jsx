@@ -3,7 +3,6 @@ import {useParams, useHistory, Link, useRouteMatch} from 'react-router-dom';
 import {FeatureFlags, AuthContext} from '../../../App';
 import {db} from '../../../firebase';
 
-import UserPageSider from './UserPageSider';
 import {getActiveTabID} from '../../../helpers/filters';
 import {
   getPaginatedPostsFromCollectionRef,
@@ -14,13 +13,6 @@ import {getPaginatedPublicationsFromCollectionRef} from '../../../helpers/public
 import {getPaginatedGroupReferencesFromCollectionRef} from '../../../helpers/groups';
 import {getPaginatedUserReferencesFromCollectionRef} from '../../../helpers/users';
 import {getPaginatedRecommendationsFromCollectionRef} from '../../../helpers/recommendations';
-
-import FilterableResults, {
-  ResourceTabs,
-  NewResultsWrapper,
-  NewFilterMenuWrapper,
-  FilterManager,
-} from '../../../components/FilterableResults/FilterableResults';
 import MessageButton from '../../../components/Buttons/MessageButton';
 import EditButton from '../../../components/Buttons/EditButton';
 import {UserPageAvatar} from '../../../components/Avatar/UserAvatar';
@@ -28,6 +20,7 @@ import FollowUserButton from '../../../components/User/FollowUserButton/FollowUs
 import UserCoverPhoto from '../../../components/User/UserCoverPhoto';
 
 import './UserPage.css';
+import ResourcesFeed from '../ResourcesFeeds';
 
 export default function UserPage() {
   const featureFlags = useContext(FeatureFlags);
@@ -133,38 +126,13 @@ export default function UserPage() {
     });
   }
   return (
-    <FilterableResults fetchResults={fetchFeedData} limit={10}>
-      <FilterManager>
-        <NewFilterMenuWrapper />
-        <div className="content-layout">
-          {featureFlags.has('related-resources') ? (
-            <SuggestedUsers userID={userID} />
-          ) : (
-            <></>
-          )}
-          <div className="details-container">
-            <UserInfo user={userDetails} />
-          </div>
-          <div className="feed-container">
-            <ResourceTabs tabs={relationshipFilter} />
-            <NewResultsWrapper />
-          </div>
-        </div>
-      </FilterManager>
-    </FilterableResults>
-  );
-}
-
-function SuggestedUsers({userID}) {
-  return (
-    <div className="sider-layout">
-      <div className="resource-sider">
-        <h3 className="resource-sider-title">Suggested Researchers</h3>
-        <div className="suggested-resources-container">
-          <UserPageSider currentUserID={userID} />
-        </div>
-      </div>
-    </div>
+    <ResourcesFeed
+      fetchResults={fetchFeedData}
+      limit={10}
+      tabs={relationshipFilter}
+    >
+      <UserInfo user={userDetails} />
+    </ResourcesFeed>
   );
 }
 

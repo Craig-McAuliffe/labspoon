@@ -6,6 +6,7 @@
   background: #eaf1f5;
   width: 100%;
   height: 100%;
+  max-width: 100%;
 }
 
 .header-logo {
@@ -56,6 +57,12 @@
   }
 }
 
+@media screen and (max-width: 1300px) {
+  .header-container {
+    grid-template-columns: 250px 1fr 280px;
+  }
+}
+
 @media screen and (max-width: 1197px) {
   .header-container {
     grid-template-columns: 60px 1fr 350px;
@@ -99,8 +106,6 @@
   }
   .header-right-section {
     width: 100px;
-  }
-  .header-add-button {
   }
 }
 

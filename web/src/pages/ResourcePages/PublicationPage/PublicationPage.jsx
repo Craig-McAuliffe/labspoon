@@ -12,15 +12,8 @@ import {
 
 import ListItemTopics from '../../../components/ListItem/ListItemTopics';
 import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
-import FilterableResults, {
-  ResourceTabs,
-  NewResultsWrapper,
-  FilterManager,
-  NewFilterMenuWrapper,
-  FilterableResultsContext,
-} from '../../../components/FilterableResults/FilterableResults';
-import PublicationSider from './PublicationPageSider';
-import SuggestedContentSider from '../../../components/SuggestedContentSider/SuggestedContentSider';
+import {FilterableResultsContext} from '../../../components/FilterableResults/FilterableResults';
+import SimilarContentSider from '../../../components/SuggestedContent/SimilarContentSider';
 import {getActiveTabID} from '../../../helpers/filters';
 import MAGRouterDisplay from '../../../components/MAGRouter';
 import PrimaryButton from '../../../components/Buttons/PrimaryButton';
@@ -28,6 +21,10 @@ import {
   DropDownTriangle,
   InvertedDropDownTriangle,
 } from '../../../assets/GeneralActionIcons';
+import ResourcesFeed from '../ResourcesFeeds';
+import {PaddedContent} from '../../../components/Layout/Content';
+import {LoadingSpinnerPage} from '../../../components/LoadingSpinner/LoadingSpinner';
+import NotFoundPage from '../../NotFoundPage/NotFoundPage';
 
 import './PublicationPage.css';
 
@@ -47,28 +44,40 @@ export function MAGPublicationRouter() {
   );
 }
 
-function fetchPublicationDetailsFromDB(publicationID) {
+function fetchPublicationDetailsFromDB(publicationID, setNotFound, setLoading) {
   return db
     .doc(`publications/${publicationID}`)
     .get()
     .then((doc) => {
+      setLoading(false);
+      if (!doc.exists) {
+        setNotFound(true);
+        return;
+      }
       return dbPublicationToJSPublication(doc.data());
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      setLoading(false);
+      console.log(err);
+      setNotFound(true);
+    });
 }
 
 export default function PublicationPage() {
   const featureFlags = useContext(FeatureFlags);
   const [publicationID, setPublicationID] = useState(undefined);
   const [publicationDetails, setPublicationDetails] = useState(undefined);
-
+  const [notFound, setNotFound] = useState(false);
+  const [loading, setLoading] = useState(true);
   const publicationIDParam = useParams().publicationID;
   if (publicationID !== publicationIDParam) {
     setPublicationID(publicationIDParam);
   }
 
   useEffect(() => {
-    Promise.resolve(fetchPublicationDetailsFromDB(publicationID))
+    Promise.resolve(
+      fetchPublicationDetailsFromDB(publicationID, setNotFound, setLoading)
+    )
       .then((newPublicationDetails) => {
         setPublicationDetails(newPublicationDetails);
       })
@@ -131,32 +140,25 @@ export default function PublicationPage() {
     });
   }
 
+  if (loading) return <LoadingSpinnerPage />;
+  if (notFound) return <NotFoundPage />;
+
   return (
     <>
-      {featureFlags.has('related-resources') ? (
-        <PublicationsFromSearch publicationDetails={publicationDetails} />
-      ) : (
-        <div></div>
-      )}
-      <FilterableResults fetchResults={fetchFeedData} limit={10}>
-        <FilterManager>
-          <NewFilterMenuWrapper />
-          <div className="content-layout">
-            <div className="details-container">
-              <PublicationDetails publicationDetails={publicationDetails} />
-            </div>
-            <div className="feed-container">
-              <ResourceTabs tabs={relationshipFilter} />
-              <RetrieveMoreReferences
-                publicationID={publicationID}
-                publication={publicationDetails}
-              />
-              <NewResultsWrapper />
-            </div>
-          </div>
-        </FilterManager>
-      </FilterableResults>
-      <SuggestedContentSider
+      <ResourcesFeed
+        fetchResults={fetchFeedData}
+        limit={10}
+        tabs={relationshipFilter}
+      >
+        <PaddedContent>
+          <PublicationDetails publicationDetails={publicationDetails} />
+        </PaddedContent>
+        <RetrieveMoreReferences
+          publicationID={publicationID}
+          publication={publicationDetails}
+        />
+      </ResourcesFeed>
+      <SimilarContentSider
         resourceType={'publication'}
         resourceID={publicationID}
       />
@@ -213,21 +215,6 @@ function RetrieveMoreReferences({publicationID, publication}) {
         ) : (
           <></>
         )}
-      </div>
-    </div>
-  );
-}
-
-function PublicationsFromSearch({publicationDetails}) {
-  return (
-    <div className="sider-layout">
-      <div className="resource-sider">
-        <h3 className="resource-sider-title">
-          Other publications from previous page
-        </h3>
-        <div className="suggested-resources-container">
-          <PublicationSider currentPublication={publicationDetails} />
-        </div>
       </div>
     </div>
   );

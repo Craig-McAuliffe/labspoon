@@ -5,18 +5,18 @@ import FilterableResults, {
   NewResultsWrapper,
   ResourceTabs,
 } from '../../components/FilterableResults/FilterableResults';
-import {FeedContent} from '../../components/Layout/Content';
+import {UnpaddedPageContainer} from '../../components/Layout/Content';
 
 export default function ResourcesFeed({children, fetchResults, limit, tabs}) {
   return (
     <FilterableResults fetchResults={fetchResults} limit={limit}>
       <FilterManager>
         <NewFilterMenuWrapper />
-        <FeedContent>
+        <UnpaddedPageContainer>
           {children}
           <ResourceTabs tabs={tabs} />
           <NewResultsWrapper />
-        </FeedContent>
+        </UnpaddedPageContainer>
       </FilterManager>
     </FilterableResults>
   );

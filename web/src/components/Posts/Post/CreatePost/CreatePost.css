@@ -300,6 +300,12 @@
   justify-items: flex-start;
 }
 
+@media screen and (max-width: 1197px) {
+  .not-creating-post-container {
+    margin-top: 65px;
+  }
+}
+
 @media screen and (max-width: 800px) {
   .not-creating-post-container {
     margin-bottom: 30px;

@@ -3,7 +3,7 @@ import {useParams, useHistory} from 'react-router-dom';
 import {db} from '../../../firebase';
 import GeneralError from '../../../components/GeneralError';
 import {LoadingSpinnerPage} from '../../../components/LoadingSpinner/LoadingSpinner';
-import {PageContainer} from '../../../components/Layout/Content';
+import {PaddedPageContainer} from '../../../components/Layout/Content';
 import ListItemTopics from '../../../components/ListItem/ListItemTopics';
 import GroupListItem from '../../../components/Group/GroupListItem';
 import FollowGroupButton from '../../../components/Group/FollowGroupButton';
@@ -50,7 +50,7 @@ export default function ResearchFocusPage() {
   if (loading) return <LoadingSpinnerPage />;
 
   return (
-    <PageContainer>
+    <PaddedPageContainer>
       <ArticleHeaderAndType
         title={researchFocus.title}
         resourceType={researchFocus.resourceType}
@@ -73,6 +73,6 @@ export default function ResearchFocusPage() {
         authorID={researchFocus.author.id}
         name={researchFocus.author.name}
       />
-    </PageContainer>
+    </PaddedPageContainer>
   );
 }

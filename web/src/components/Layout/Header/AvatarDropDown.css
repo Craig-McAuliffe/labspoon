@@ -80,7 +80,7 @@
   grid-template-columns: 15px 1fr;
   align-items: center;
 }
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 850px) {
   .dropdown-name {
     display: none;
     padding: none;

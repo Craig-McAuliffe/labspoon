@@ -1,6 +1,6 @@
 import React from 'react';
 import Spinner from 'react-bootstrap/Spinner';
-import {FeedContent} from '../Layout/Content';
+import {UnpaddedPageContainer} from '../Layout/Content';
 
 import './LoadingSpinner.css';
 
@@ -16,8 +16,8 @@ export default function LoadingSpinner() {
 
 export function LoadingSpinnerPage() {
   return (
-    <FeedContent>
+    <UnpaddedPageContainer>
       <LoadingSpinner />
-    </FeedContent>
+    </UnpaddedPageContainer>
   );
 }

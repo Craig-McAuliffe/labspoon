@@ -79,30 +79,28 @@ const RecommendButton = ({post}) => {
 
   return (
     <div className="button-container">
-      <div className="button-position">
-        <button className="action-button" href="/" onClick={onClick}>
-          {recommendationID ? (
-            <RecommendIconSelected />
-          ) : (
-            <RecommendIconUnselected />
-          )}
-          <span className="action-button-text">
-            Recommend {loading ? '(loading...)' : ''}
-          </span>
-        </button>
-        {signUpPrompt ? (
-          <div className="sign-up-prompt-center" ref={signUpPromptRef}>
-            <Link
-              to={{
-                pathname: '/signup',
-                state: {returnLocation: locationPathName},
-              }}
-            >
-              Sign up to recommend this.
-            </Link>
-          </div>
-        ) : null}
-      </div>
+      <button className="action-button" href="/" onClick={onClick}>
+        {recommendationID ? (
+          <RecommendIconSelected />
+        ) : (
+          <RecommendIconUnselected />
+        )}
+        <span className="action-button-text">
+          Recommend {loading ? '(loading...)' : ''}
+        </span>
+      </button>
+      {signUpPrompt ? (
+        <div className="sign-up-prompt-center" ref={signUpPromptRef}>
+          <Link
+            to={{
+              pathname: '/signup',
+              state: {returnLocation: locationPathName},
+            }}
+          >
+            Sign up to recommend this.
+          </Link>
+        </div>
+      ) : null}
     </div>
   );
 };

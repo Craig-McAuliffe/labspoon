@@ -8,7 +8,7 @@ import FilterableResults, {
   ResourceTabs,
 } from '../FilterableResults/FilterableResults';
 import {SelectableResults} from '../Results/Results';
-import {FeedContent} from '../Layout/Content';
+import {UnpaddedPageContainer} from '../Layout/Content';
 
 import './FilteredSelector.css';
 
@@ -73,7 +73,7 @@ export default function FilteredSelector({
       />
       <FilterManager>
         <Sider getDefaultFilter={getDefaultFilter} />
-        <FeedContent>
+        <UnpaddedPageContainer>
           {children}
           <ResourceTabs tabs={tabs} affectsFilter={true} />
           <SelectionConfirmation
@@ -91,7 +91,7 @@ export default function FilteredSelector({
             selectedItems={selectedItems}
             setSelectedItems={setSelectedItems}
           />
-        </FeedContent>
+        </UnpaddedPageContainer>
       </FilterManager>
     </FilterableResults>
   );
