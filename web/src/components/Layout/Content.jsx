@@ -21,11 +21,11 @@ export function FeedContent({children}) {
 export function PageContainer({children}) {
   return (
     <Content>
-      <div className="page-content-container">{children}</div>
+      <div className="padded-page-container">{children}</div>
     </Content>
   );
 }
 
-export function ResourcePageDetailsContainer({children}) {
-  return <div className="resources-details-container">{children}</div>;
+export function PaddedPageContent({children}) {
+  return <div className="padded-page-container">{children}</div>;
 }

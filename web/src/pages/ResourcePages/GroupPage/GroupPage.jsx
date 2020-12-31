@@ -35,7 +35,7 @@ import {
   TECHNIQUES,
 } from '../../../helpers/resourceTypeDefinitions';
 import ResourcesFeed from '../ResourcesFeeds';
-import {ResourcePageDetailsContainer} from '../../../components/Layout/Content';
+import {PaddedPageContent} from '../../../components/Layout/Content';
 
 import './GroupPage.css';
 
@@ -302,14 +302,14 @@ export default function GroupPage() {
         limit={9}
         tabs={relationshipFilter}
       >
-        <ResourcePageDetailsContainer>
+        <PaddedPageContent>
           <GroupDetails
             group={groupData}
             groupDescriptionRef={groupDescriptionRef}
             userIsMember={userIsMember}
             verified={verified}
           />
-        </ResourcePageDetailsContainer>
+        </PaddedPageContent>
       </ResourcesFeed>
     </>
   );

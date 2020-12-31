@@ -9,7 +9,7 @@ import CreateTechnique from '../../components/Techniques/CreateTechnique';
 import LightTabLink, {
   LightTabContainer,
 } from '../../components/Navigation/LightTab';
-import {FeedContent} from '../../components/Layout/Content';
+import {PageContainer} from '../../components/Layout/Content';
 import CreateResearchFocus from '../../components/ResearchFocus/CreateResearchFocus';
 
 import './CreatePage.css';
@@ -20,7 +20,7 @@ export default function CreatePage() {
   const featureFlags = useContext(FeatureFlags);
   if (!userID) return <LoadingSpinner />;
   return (
-    <FeedContent>
+    <PageContainer>
       <LightTabContainer>
         <LightTabLink name="Post" link="/create/post" />
         <LightTabLink name="Group" link="/create/group" />
@@ -63,6 +63,6 @@ export default function CreatePage() {
           </Route>
         </Switch>
       </div>
-    </FeedContent>
+    </PageContainer>
   );
 }

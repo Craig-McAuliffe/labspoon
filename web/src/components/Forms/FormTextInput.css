@@ -16,12 +16,6 @@
   align-items: center;
 }
 
-.form-text-input-container-side-label label {
-  color: #5d5d65;
-  flex-shrink: 0;
-  margin-right: 15px;
-}
-
 .error-container {
   grid-column: 2/3;
   justify-self: flex-start;
@@ -51,4 +45,10 @@
   border: none;
   font-size: 1.1em;
   border: 1px solid #99999f;
+}
+
+@media screen and (max-width: 800px) {
+  .form-text-input-container-side-label {
+    display: block;
+  }
 }

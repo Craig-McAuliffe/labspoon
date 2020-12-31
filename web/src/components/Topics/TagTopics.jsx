@@ -4,7 +4,8 @@ import TopicListItem from './TopicListItem';
 import {RemoveIcon} from '../../assets/GeneralActionIcons';
 import firebase from '../../firebase';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
-import '../Posts/Post/CreatePost/CreatePost';
+
+import '../Posts/Post/CreatePost/CreatePost.css';
 
 const topicSearch = firebase.functions().httpsCallable('topics-topicSearch');
 

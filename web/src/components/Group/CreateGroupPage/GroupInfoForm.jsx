@@ -30,7 +30,7 @@ import CreateResourceFormActions from '../../Forms/CreateResourceFormActions';
 import TabbedContainer from '../../TabbedContainer/TabbedContainer';
 import {EmailIcon} from '../../../assets/PostOptionalTagsIcons';
 import {SearchIconGrey} from '../../../assets/HeaderIcons';
-import {FeedContent} from '../../../components/Layout/Content';
+import {PaddedPageContent} from '../../../components/Layout/Content';
 import Select, {LabelledDropdownContainer} from '../../Forms/Select/Select';
 import {DropdownOption} from '../../Dropdown';
 import InputError from '../../../components/Forms/InputError';
@@ -112,7 +112,7 @@ export default function GroupInfoForm({
     setAvatar(selectedAvatar);
   };
   return (
-    <FeedContent>
+    <PaddedPageContent>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -179,7 +179,7 @@ export default function GroupInfoForm({
         cancelForm={cancelForm}
         formID="create-group-form"
       />
-    </FeedContent>
+    </PaddedPageContent>
   );
 }
 
@@ -281,7 +281,11 @@ function SelectedMembers({selectedUsers, setSelectedUsers}) {
 
 function AddMemberButton({setSelecting}) {
   return (
-    <button onClick={() => setSelecting(true)} type="button">
+    <button
+      onClick={() => setSelecting(true)}
+      type="button"
+      className="add-member-button"
+    >
       <AddMemberIcon />
     </button>
   );

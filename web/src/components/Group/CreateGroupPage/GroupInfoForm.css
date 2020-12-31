@@ -100,6 +100,10 @@
 .request-verification-button-container {
   float: right;
 }
+.add-member-button svg {
+  height: 80px;
+  width: 80px;
+}
 
 @media screen and (max-width: 1500px) {
   .change-group-avatar-container {
@@ -122,6 +126,22 @@
   .edit-group-info-upload-photo-button .rounded-circle {
     width: 50vw;
     height: 50vw;
+  }
+
+  .add-member-button svg {
+    height: 60px;
+    width: 60px;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .add-member-button {
+    display: flex;
+    margin: auto;
+  }
+
+  .fileContainer p {
+    display: none;
   }
 }
 

@@ -1,6 +1,4 @@
 .not-creating-post-container {
-  /* border-left: 1px solid #99999f; */
-  /* border-bottom: 1px solid #99999f; */
   box-shadow: 0px 0px 4px rgba(0, 0, 0, 30%);
   padding: 15px;
   margin-bottom: 40px;
@@ -201,6 +199,7 @@
   grid-template-columns: minmax(90px, 1fr) 1fr minmax(170px, 2fr);
   align-items: center;
   margin-top: 20px;
+  max-width: 100%;
 }
 
 .create-post-post-resource-type-dropdown-section svg {
@@ -304,5 +303,13 @@
 @media screen and (max-width: 800px) {
   .not-creating-post-container {
     margin-bottom: 30px;
+  }
+  .create-post-post-resource-type-dropdown-section {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .create-post-post-resource-type-dropdown-section-active {
+    display: flex;
+    flex-wrap: wrap;
   }
 }

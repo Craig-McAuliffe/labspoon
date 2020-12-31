@@ -2,13 +2,7 @@ import React from 'react';
 
 export function AddMemberIcon() {
   return (
-    <svg
-      width="80"
-      height="80"
-      viewBox="0 0 80 80"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="40" cy="40" r="38" stroke="#99999F" strokeWidth="4" />
       <path
         d="M40 67V40M40 13V40M40 40H13M40 40H67"
