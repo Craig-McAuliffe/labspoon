@@ -112,8 +112,13 @@
 }
 
 @media screen and (max-width: 1197px) {
-  .main-layout {
+  /* Implement this when we have similar content to show */
+  /* .main-layout {
     grid-template-columns: 0px 1fr 350px;
+  } */
+  .main-layout {
+    display: block;
+    max-width: 100%;
   }
 }
 

@@ -60,7 +60,9 @@ function SimilarContentSider({resourceType, resourceID, isMobile, footerOnly}) {
 }
 
 const mapSuggestedSiderSizesToProps = ({width}) => ({
-  isMobile: width && width <= 800,
+  // When the whole site has similar content, we will only switch to this view at 800
+  // isMobile: width && width <= 800,
+  isMobile: width && width <= 1197,
 });
 
 // Tracks window width and sends boolean prop to
