@@ -2,8 +2,6 @@ import React, {useEffect, useState, useContext, useRef} from 'react';
 import {useHistory, useLocation, useParams} from 'react-router-dom';
 import {AuthContext} from '../../App';
 import {db} from '../../firebase';
-import {getPaginatedUserReferencesFromCollectionRef} from '../../helpers/users';
-import {getPaginatedTopicsFromCollectionRef} from '../../helpers/topics';
 import {getPaginatedGroupReferencesFromCollectionRef} from '../../helpers/groups';
 import TopicListItem from '../../components/Topics/TopicListItem';
 import FollowTopicButton from '../../components/Topics/FollowTopicButton';
@@ -17,6 +15,8 @@ import UserListItem from '../../components/User/UserListItem';
 import FormDatabaseSearch from '../../components/Forms/FormDatabaseSearch';
 import SuccessMessage from '../../components/Forms/SuccessMessage';
 import LinkAuthorIDForm from '../../components/Publication/ConnectToPublications/ConnectToPublications';
+import {UnpaddedPageContainer} from '../../components/Layout/Content';
+import SearchMSFields from '../../components/Topics/SearchMSFields';
 
 import './OnboardingPage.css';
 
@@ -79,75 +79,37 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="content-layout">
-      <div className="page-content-container">
-        <h2 className="onboarding-main-title">Welcome to Labspoon!</h2>
-        <OnboardingStageDisplay />
-        <div className="onboarding-skip-next-container">
-          <button
-            className="onboarding-skip-button"
-            onClick={() => nextOnboardingStage()}
-          >
-            Skip
-          </button>
-          <div>
-            {onboardingStage !== FOLLOW ? (
-              <button
-                className="onboarding-back-button"
-                onClick={() => previousOnboardingStage()}
-              >
-                Back
-              </button>
-            ) : null}
-            <SecondaryButton onClick={() => nextOnboardingStage()}>
-              {onboardingStage === GROUPS ? 'Finish' : 'Next'}
-            </SecondaryButton>
-          </div>
+    <UnpaddedPageContainer>
+      <h2 className="onboarding-main-title">Welcome to Labspoon!</h2>
+      <OnboardingStageDisplay />
+      <div className="onboarding-skip-next-container">
+        <button
+          className="onboarding-skip-button"
+          onClick={() => nextOnboardingStage()}
+        >
+          Skip
+        </button>
+        <div>
+          {onboardingStage !== FOLLOW ? (
+            <button
+              className="onboarding-back-button"
+              onClick={() => previousOnboardingStage()}
+            >
+              Back
+            </button>
+          ) : null}
+          <SecondaryButton onClick={() => nextOnboardingStage()}>
+            {onboardingStage === GROUPS ? 'Finish' : 'Next'}
+          </SecondaryButton>
         </div>
       </div>
-    </div>
+    </UnpaddedPageContainer>
   );
 }
 
 function OnboardingFollow({user}) {
   const [displayedUsers, setDisplayedUsers] = useState([]);
   const [displayedTopics, setDisplayedTopics] = useState([]);
-  const userSearchRef = useRef();
-  const topicSearchRef = useRef();
-
-  // Initial Suggested Users without search
-  const getUsers = () => {
-    const usersCollection = db.collection(`users`);
-    return getPaginatedUserReferencesFromCollectionRef(usersCollection, 10);
-  };
-
-  const getTopics = () => {
-    const topicsCollection = db.collection(`topics`);
-    return getPaginatedTopicsFromCollectionRef(topicsCollection, 10).then(
-      (res) => {
-        return res;
-      }
-    );
-  };
-
-  useEffect(() => {
-    getUsers().then((res) => setDisplayedUsers(res));
-    getTopics().then((res) => setDisplayedTopics(res));
-  }, [user]);
-
-  // This checks whether the search input has any values and re-populates list if not.
-  useEffect(() => {
-    if (
-      userSearchRef.current.lastChild.firstChild.firstChild.value.length < 1 &&
-      displayedUsers.length === 0
-    )
-      getUsers().then((res) => setDisplayedUsers(res));
-    if (
-      topicSearchRef.current.lastChild.firstChild.firstChild.value.length < 1 &&
-      displayedTopics.length === 0
-    )
-      getTopics().then((res) => setDisplayedTopics(res));
-  }, [displayedUsers, displayedTopics]);
 
   return (
     <div className="onboarding-page-container">
@@ -162,10 +124,10 @@ function OnboardingFollow({user}) {
         <div className="onboarding-user-container">
           <FormDatabaseSearch
             setDisplayedItems={setDisplayedUsers}
-            inputRef={userSearchRef}
             indexName="_USERS"
             placeholderText="Find researchers"
             displayedItems={displayedUsers}
+            clearListOnNoResults={true}
           />
           <div>
             <div className="onboarding-users-to-follow-container">
@@ -187,28 +149,24 @@ function OnboardingFollow({user}) {
           Or try looking for a specific topic:
         </h4>
         <div className="onboarding-topic-search-container">
-          <FormDatabaseSearch
-            setDisplayedItems={setDisplayedTopics}
-            inputRef={topicSearchRef}
-            indexName="_TOPICS"
-            placeholderText="Find topics"
-            displayedItems={displayedTopics}
+          <SearchMSFields
+            setFetchedTopics={setDisplayedTopics}
+            placeholder="Search for topics"
+            searchIcon={true}
           />
-          <div className="onboarding-topics-to-follow-container">
-            {displayedTopics.map((displayedTopic) => {
-              if (displayedTopic.objectID)
-                displayedTopic.id = displayedTopic.objectID;
-              return (
-                <TopicListItem
-                  topic={displayedTopic}
-                  key={displayedTopic.id}
-                  LinkOverride={WarnOnClick}
-                >
-                  <FollowTopicButton targetTopic={displayedTopic} />
-                </TopicListItem>
-              );
-            })}
-          </div>
+        </div>
+        <div className="onboarding-topics-to-follow-container">
+          {displayedTopics.map((displayedTopic) => {
+            return (
+              <TopicListItem
+                topic={displayedTopic}
+                key={displayedTopic.microsoftID}
+                LinkOverride={WarnOnClick}
+              >
+                <FollowTopicButton targetTopic={displayedTopic} />
+              </TopicListItem>
+            );
+          })}
         </div>
       </div>
     </div>

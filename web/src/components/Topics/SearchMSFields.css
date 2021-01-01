@@ -1,0 +1,13 @@
+.ms-fields-search-loading-spinner-container {
+  margin-top: 10px;
+}
+
+.ms-fields-search-container {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.ms-fields-search-container input {
+  flex-grow: 1;
+}

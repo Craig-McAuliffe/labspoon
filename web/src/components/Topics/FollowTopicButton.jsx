@@ -1,12 +1,12 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {AuthContext, FeatureFlags} from '../../App';
+import {AuthContext} from '../../App';
 import {db} from '../../firebase';
 
 import FollowButton from '../Buttons/FollowButton';
 
 export default function FollowTopicButton({targetTopic}) {
-  const [following, setFollowing] = useState();
-  const featureFlags = useContext(FeatureFlags);
+  const [following, setFollowing] = useState(null);
+  const [topicID, setTopicID] = useState();
   const {user: authUser, userProfile} = useContext(AuthContext);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -14,46 +14,67 @@ export default function FollowTopicButton({targetTopic}) {
       setFollowing(false);
       return;
     }
-    if (!featureFlags.has('disable-cloud-firestore') && authUser) {
-      db.doc(`users/${authUser.uid}/followsTopics/${targetTopic.id}`)
+    if (!targetTopic.id && !topicID) {
+      db.doc(`MSFields/${targetTopic.microsoftID}`)
         .get()
-        .then((doc) => setFollowing(doc.exists))
-        .catch((err) => console.log(err));
+        .then((doc) => {
+          if (!doc.exists) {
+            setFollowing(false);
+            return;
+          }
+          const fetchedMSTopic = doc.data();
+          if (fetchedMSTopic.processed) {
+            setTopicID(fetchedMSTopic.processed);
+          }
+        });
     }
-  });
+    if (!topicID && !targetTopic.id) return;
+
+    db.doc(
+      `users/${authUser.uid}/followsTopics/${
+        targetTopic.id ? targetTopic.id : topicID
+      }`
+    )
+      .get()
+      .then((doc) => {
+        setFollowing(doc.exists);
+        if (!topicID) setTopicID(doc.id);
+      })
+      .catch((err) => console.error(err));
+  }, [authUser, targetTopic, topicID]);
 
   function setFollowingAndUpdateDB() {
-    if (following == null) return;
-
-    const batch = db.batch();
-    const followsTopicsDoc = db.doc(
-      `users/${authUser.uid}/followsTopics/${targetTopic.id}`
-    );
-    const followedByUsersDoc = db.doc(
-      `topics/${targetTopic.id}/followedByUsers/${authUser.uid}`
-    );
-    if (!following) {
-      batch.set(followsTopicsDoc, {
-        id: targetTopic.id,
-        name: targetTopic.name,
-      });
-      batch.set(followedByUsersDoc, {
-        id: authUser.uid,
-        name: authUser.displayName,
-        avatar: userProfile.avatar,
-      });
-      batch
-        .commit()
-        .then(() => setFollowing(true))
+    if (!authUser) return;
+    if (!topicID) {
+      db.doc(`MSFields/${targetTopic.microsoftID}`)
+        .get()
+        .then((doc) => {
+          if (!doc.exists) return;
+          const fetchedMSTopic = doc.data();
+          if (fetchedMSTopic.processed) {
+            topicSubmitFollowRequest(
+              fetchedMSTopic.processed,
+              targetTopic.name,
+              setFollowing,
+              following,
+              authUser,
+              userProfile
+            );
+            return;
+          }
+          return;
+        })
         .catch((err) => console.log(err));
-    } else {
-      batch.delete(followsTopicsDoc);
-      batch.delete(followedByUsersDoc);
-      batch
-        .commit()
-        .then(() => setFollowing(false))
-        .catch((err) => console.log(err));
+      return;
     }
+    return topicSubmitFollowRequest(
+      topicID,
+      targetTopic.name,
+      setFollowing,
+      following,
+      authUser,
+      userProfile
+    );
   }
 
   return (
@@ -62,4 +83,43 @@ export default function FollowTopicButton({targetTopic}) {
       setFollowing={setFollowingAndUpdateDB}
     />
   );
+}
+
+function topicSubmitFollowRequest(
+  topicID,
+  topicName,
+  setFollowing,
+  following,
+  authUser,
+  userProfile
+) {
+  const batch = db.batch();
+  const followsTopicsDoc = db.doc(
+    `users/${authUser.uid}/followsTopics/${topicID}`
+  );
+  const followedByUsersDoc = db.doc(
+    `topics/${topicID}/followedByUsers/${authUser.uid}`
+  );
+  if (!following) {
+    batch.set(followsTopicsDoc, {
+      id: topicID,
+      name: topicName,
+    });
+    batch.set(followedByUsersDoc, {
+      id: authUser.uid,
+      name: authUser.displayName,
+      avatar: userProfile.avatar,
+    });
+    batch
+      .commit()
+      .then(() => setFollowing(true))
+      .catch((err) => console.log(err));
+  } else {
+    batch.delete(followsTopicsDoc);
+    batch.delete(followedByUsersDoc);
+    batch
+      .commit()
+      .then(() => setFollowing(false))
+      .catch((err) => console.log(err));
+  }
 }
