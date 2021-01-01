@@ -11,7 +11,7 @@ export default function TopicListItem({
   LinkOverride = undefined,
 }) {
   if (!topic) {
-    return <></>;
+    return null;
   }
   const displayType = () => {
     if (dedicatedPage) return <h2>{topic.name}</h2>;

@@ -24,3 +24,8 @@
 .ais-SearchBox {
   flex-grow: 1;
 }
+
+.ais-SearchBox-input::placeholder {
+  font-family: 'Roboto', 'Helvetica Neue', sans-serif;
+  color: #99999f;
+}

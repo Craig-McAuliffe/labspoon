@@ -50,11 +50,10 @@
   min-width: 100%;
 }
 
-.create-post-topic-search-input {
+.create-post-topic-search-container input {
   border-bottom: 1px solid #00507c;
   margin-top: 7px;
   padding-top: 20px;
-  flex-grow: 1;
 }
 
 .topic-tag-duplicate-topic-warning {
@@ -172,10 +171,6 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-}
-
-.create-post-loading-spinner-container {
-  margin-top: 10px;
 }
 
 .create-post-loading-greyed-out {

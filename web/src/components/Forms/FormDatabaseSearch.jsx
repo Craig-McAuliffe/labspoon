@@ -21,23 +21,23 @@ export default function FormDatabaseSearch({
   displayedItems,
   clearListOnNoResults,
 }) {
-  const UsersResults = ({searchResults}) => {
+  const resourceResults = ({searchResults}) => {
+    if (
+      (!searchResults || searchResults.query.length === 0) &&
+      displayedItems.length > 0 &&
+      clearListOnNoResults
+    ) {
+      setDisplayedItems([]);
+    }
     if (searchResults) {
       if (searchResults.nbHits !== 0 && searchResults.query.length > 0) {
         setDisplayedItems(searchResults.hits);
-      }
-      if (
-        searchResults.query.length === 0 &&
-        displayedItems.length > 0 &&
-        clearListOnNoResults
-      ) {
-        setDisplayedItems([]);
       }
     }
     return null;
   };
 
-  const CustomStateUsers = connectStateResults(UsersResults);
+  const CustomStateResourceResults = connectStateResults(resourceResults);
   return (
     <div
       className="form-database-search-container"
@@ -55,7 +55,7 @@ export default function FormDatabaseSearch({
           }}
         />
 
-        <CustomStateUsers />
+        <CustomStateResourceResults />
         <Configure hitsPerPage={10} />
       </InstantSearch>
     </div>

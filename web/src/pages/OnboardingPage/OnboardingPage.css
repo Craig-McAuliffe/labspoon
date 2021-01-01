@@ -78,3 +78,27 @@
 .warn-on-click:hover {
   text-decoration: underline;
 }
+
+.onboarding-topic-search-container {
+  margin: 20px 0px;
+}
+
+.onboarding-topic-search-container input {
+  height: 40px;
+  border-bottom: 1px solid #00507c;
+  border-radius: 0%;
+  background: white;
+  padding-left: 0px;
+}
+
+.onboarding-topic-search-container input::placeholder {
+  color: #99999f;
+}
+
+.onboarding-topic-search-container path {
+  fill: #00507c;
+}
+
+.onboarding-topic-search-container svg {
+  margin-right: 10px;
+}

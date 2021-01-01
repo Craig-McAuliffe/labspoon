@@ -2,12 +2,9 @@ import React, {useState, useEffect} from 'react';
 import PrimaryButton from '../Buttons/PrimaryButton';
 import TopicListItem from './TopicListItem';
 import {RemoveIcon} from '../../assets/GeneralActionIcons';
-import firebase from '../../firebase';
-import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
+import SearchMSFields from './SearchMSFields';
 
 import '../Posts/Post/CreatePost/CreatePost.css';
-
-const topicSearch = firebase.functions().httpsCallable('topics-topicSearch');
 
 export default function TagTopics({
   submittingForm,
@@ -16,7 +13,6 @@ export default function TagTopics({
 }) {
   const [displayedTopics, setDisplayedTopics] = useState([]);
   const [duplicateTopic, setDuplicateTopic] = useState(false);
-  const [loadingTopics, setLoadingTopics] = useState(false);
   const [typedTopic, setTypedTopic] = useState('');
 
   // Tells user that they are trying to input a duplicate topic
@@ -27,17 +23,11 @@ export default function TagTopics({
   }, [duplicateTopic]);
 
   useEffect(() => {
-    if (typedTopic.length === 0 || submittingForm) {
+    if (submittingForm) {
       setDisplayedTopics([]);
-      setLoadingTopics(false);
       return;
     }
-    return searchMicrosoftTopics(
-      typedTopic,
-      setLoadingTopics,
-      setDisplayedTopics
-    );
-  }, [typedTopic, submittingForm]);
+  }, [submittingForm]);
 
   return (
     <div className="create-post-topic-section-container">
@@ -48,34 +38,25 @@ export default function TagTopics({
       {duplicateTopic ? <DuplicateTopicWarning /> : null}
       <div className="create-post-topic-search-container">
         <h4 className="create-post-topic-tag-title">Add related topics</h4>
-        <input
-          type="text"
-          className="create-post-topic-search-input"
-          onChange={(e) => {
-            setTypedTopic(e.target.value);
-          }}
+        <SearchMSFields
           placeholder="this post is about..."
+          setFetchedTopics={setDisplayedTopics}
+          setCurrentInputValue={setTypedTopic}
         />
-        <div></div>
-        <div className="create-post-searched-topics-container">
-          {loadingTopics === true ? (
-            <div className="create-post-loading-spinner-container">
-              <LoadingSpinner />
-            </div>
-          ) : null}
-          <TopicsList
-            topics={displayedTopics}
-            setSelectedTopics={setSelectedTopics}
-            setDuplicateTopic={setDuplicateTopic}
-            displayedTopics={displayedTopics}
-          />
-          <TypedTopic
-            typedTopic={typedTopic}
-            setSelectedTopics={setSelectedTopics}
-            setDuplicateTopic={setDuplicateTopic}
-            displayedTopics={displayedTopics}
-          />
-        </div>
+      </div>
+      <div>
+        <TopicsList
+          topics={displayedTopics}
+          setSelectedTopics={setSelectedTopics}
+          setDuplicateTopic={setDuplicateTopic}
+          displayedTopics={displayedTopics}
+        />
+        <TypedTopic
+          typedTopic={typedTopic}
+          setSelectedTopics={setSelectedTopics}
+          setDuplicateTopic={setDuplicateTopic}
+          displayedTopics={displayedTopics}
+        />
       </div>
     </div>
   );
@@ -118,26 +99,6 @@ function DuplicateTopicWarning() {
     </div>
   );
 }
-
-// clearTimeout is called on unmount from useEffect hook
-const searchMicrosoftTopics = (query, setLoadingTopics, setDisplayedTopics) => {
-  setLoadingTopics(true);
-  const apiCallTimeout = setTimeout(
-    () =>
-      topicSearch({topicQuery: query})
-        .then((microsoftTopics) => {
-          setLoadingTopics(false);
-          setDisplayedTopics(microsoftTopics.data);
-        })
-        .catch((err) => {
-          setLoadingTopics(false);
-          setDisplayedTopics([]);
-          console.log(err, 'could not search topics');
-        }),
-    1400
-  );
-  return () => clearTimeout(apiCallTimeout);
-};
 
 function SelectedTopics({selectedTopics, setSelectedTopics}) {
   return (
