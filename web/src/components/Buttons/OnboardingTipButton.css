@@ -1,0 +1,16 @@
+.onboarding-tip-button {
+  display: flex;
+  align-items: center;
+  color: #ffffff;
+  padding: 10px;
+  border-radius: 2%;
+}
+
+.onboarding-tip-button h2 {
+  margin-bottom: 0px;
+}
+
+.onboarding-tip-button:hover,
+.onboarding-tip-button:focus {
+  background: #00507c;
+}

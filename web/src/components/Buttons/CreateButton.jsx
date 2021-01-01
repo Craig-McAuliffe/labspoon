@@ -2,17 +2,30 @@ import React, {useContext} from 'react';
 import {Link} from 'react-router-dom';
 import {AuthContext} from '../../App';
 import {CreateIcon} from '../../assets/HeaderIcons';
+import OnboardingTip from '../OnboardingTips/OnboardingTip';
 import {CREATE, SignUpPopoverOverride} from '../Popovers/Popover';
 import './CreateButton.css';
 
 export function HeaderCreateButton({hoverControl}) {
   const {user} = useContext(AuthContext);
   return (
-    <SignUpPopoverOverride text="Sign up to create." actionTaken={CREATE}>
-      <HeaderCreateButtonContent user={user} hoverControl={hoverControl} />
-    </SignUpPopoverOverride>
+    <>
+      <SignUpPopoverOverride text="Sign up to create." actionTaken={CREATE}>
+        <HeaderCreateButtonContent user={user} hoverControl={hoverControl} />
+      </SignUpPopoverOverride>
+      {user ? (
+        <OnboardingTip
+          text={OnboardingCreateTipText}
+          onboardingCheckFieldName="checkedCreateOnboardingTip"
+          userID={user.uid}
+        />
+      ) : null}
+    </>
   );
 }
+
+const OnboardingCreateTipText =
+  'Create posts, groups, and articles. Share to your Twitter page.';
 
 function HeaderCreateButtonContent({createAction, user, hoverControl}) {
   if (!user)
