@@ -17,7 +17,6 @@ export function HeaderCreateButton({hoverControl}) {
         <OnboardingTip
           text={OnboardingCreateTipText}
           onboardingCheckFieldName="checkedCreateOnboardingTip"
-          userID={user.uid}
         />
       ) : null}
     </>

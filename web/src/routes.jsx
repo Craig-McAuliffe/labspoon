@@ -14,8 +14,8 @@ import FollowsPage from './pages/FollowsPage';
 import SearchPage from './pages/SearchPage';
 import {SkeletonUserPage} from './pages/ResourcePages/UserPage';
 import AboutPage from './pages/AboutPage';
-import LoginPage from './pages/LoginPage';
-import SignupPage from './pages/SignupPage';
+import LoginPage from './pages/LoginSignup/LoginPage';
+import SignupPage from './pages/LoginSignup/SignupPage';
 import {MAGPublicationRouter} from './pages/ResourcePages/PublicationPage/PublicationPage';
 import Publications from './pages/ResourcePages/PublicationPage/Publications';
 import PostPage from './pages/ResourcePages/PostPage';
@@ -31,6 +31,7 @@ import TechniquePage from './pages/ResourcePages/TechniquePage/TechniquePage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage/PrivacyPolicyPage';
 import ResearchFocusPage from './pages/ResourcePages/ResearchFocusPage/ResearchFocusPage';
 import Users from './pages/ResourcePages/UserPage/Users';
+import ChooseUserName from './pages/LoginSignup/ChooseUserName/ChooseUserName';
 
 /**
  * Top level routing structure for the app.
@@ -47,11 +48,14 @@ export default function Routes({user, setUser}) {
           <NewsPage />
         </Route>
       ) : undefined}
-      <Route path="/login">
+      <Route exact path="/login">
         <LoginPage />
       </Route>
-      <Route path="/signup">
+      <Route exact path="/signup">
         <SignupPage />
+      </Route>
+      <Route path="/userName">
+        <ChooseUserName />
       </Route>
       <AuthRoute user={user} path="/settings">
         <SettingsPage />

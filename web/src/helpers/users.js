@@ -1,5 +1,5 @@
 import {firebaseConfig} from '../config';
-import {db} from '../firebase';
+import firebase, {db} from '../firebase';
 
 // Retrieves paginated user references from passed user reference collection
 // for use in results pages. Returns a promise that returns an array of results
@@ -56,5 +56,40 @@ export function getUserGroups(userID) {
         groups.push(fetchedGroup);
       });
       return groups;
+    });
+}
+
+export function createUserDocOnSignUp(
+  result,
+  setLoading,
+  userName,
+  updateUserDetails
+) {
+  result.user
+    .updateProfile({displayName: userName})
+    .then(() =>
+      db.doc(`users/${result.user.uid}`).set({
+        id: result.user.uid,
+        name: result.user.displayName,
+        coverPhoto: getCoverPhoto(result.user.uid),
+        avatar: getAvatar(result.user.uid),
+      })
+    )
+    .catch((err) => {
+      setLoading(false);
+      console.log(err);
+      firebase.auth().currentUser.delete.catch((err) => {
+        console.error(
+          'unable to delete auth user with id' + result.user.uid,
+          err
+        );
+        alert(
+          'Something went wrong. Please contact our support team at help@labspoon.com from the email address that you are trying to sign up with. We apologise for the inconvenience.'
+        );
+      });
+    })
+    .then(() => {
+      setLoading(false);
+      updateUserDetails(result.user);
     });
 }

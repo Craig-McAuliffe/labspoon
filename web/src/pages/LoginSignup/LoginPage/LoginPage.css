@@ -8,11 +8,11 @@
 }
 
 .signin-form-title {
-  color: #00507c;
 }
 
 .sign-in-option {
   margin-top: 20px;
+  color: #5d5d65;
 }
 
 .sign-in-option button {
@@ -25,4 +25,11 @@
   box-shadow: 0px 1px 4px rgba(29, 89, 255, 0.4);
   margin-bottom: 20px;
   padding: 20px 10px;
+}
+
+.login-submit-button-container {
+  display: flex;
+  min-width: 100%;
+  justify-content: flex-end;
+  margin-bottom: 10px;
 }

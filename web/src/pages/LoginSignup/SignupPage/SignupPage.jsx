@@ -1,92 +1,101 @@
 import React, {useContext, useState} from 'react';
 import qs from 'qs';
-import firebase, {db} from '../../firebase.js';
+import firebase from '../../../firebase.js';
 import {Redirect, useHistory, useLocation} from 'react-router';
-import {AuthContext} from '../../App';
+import {AuthContext} from '../../../App';
 import {Form, Formik} from 'formik';
-import PrimaryButton from '../../components/Buttons/PrimaryButton';
-import FormTextInput from '../../components/Forms/FormTextInput';
-import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
+import PrimaryButton from '../../../components/Buttons/PrimaryButton';
+import FormTextInput from '../../../components/Forms/FormTextInput';
+import {LoadingSpinnerPage} from '../../../components/LoadingSpinner/LoadingSpinner';
 import * as Yup from 'yup';
+import {createUserDocOnSignUp} from '../../../helpers/users.js';
+import GoogleButton from 'react-google-button';
+import {PaddedPageContainer} from '../../../components/Layout/Content.jsx';
+import GoogleSignIn from '../GoogleSignIn.jsx';
 
 import './SignupPage.css';
-import {getAvatar, getCoverPhoto} from '../../helpers/users.js';
 
 /**
  * Sign up page using the Firebase authentication handler
  * @return {React.ReactElement}
  */
 function SignupPage() {
+  const [loading, setLoading] = useState(false);
   const location = useLocation().state;
   const search = useLocation().search;
   const returnLocation = location ? location.returnLocation : undefined;
-  // This prevents the redirect to '/' being triggered.
-  const [goToOnboarding, setGoToOnboarding] = useState(false);
-  const {user} = useContext(AuthContext);
+  const {userProfile} = useContext(AuthContext);
   const history = useHistory();
-
+  const {updateUserDetails} = useContext(AuthContext);
   const searchParams = qs.parse(search.slice(1));
   const referrer = searchParams.referrer;
-  if (!user) {
+  const [googleSignInFlow, setGoogleSignInFlow] = useState(false);
+
+  if (loading) return <LoadingSpinnerPage />;
+  if (!userProfile) {
     return (
-      <div className="content-layout">
-        <div className="page-content-container">
-          <div>
-            <ReferrerAlert referrer={referrer} />
-            <h2 className="signup-form-title">{`Sign up to Labspoon`}</h2>
-            <p className="signup-option">
-              Already have an account?{' '}
-              <button onClick={() => history.push('/login')}>
-                Sign in here
-              </button>
-            </p>
-            <div className="sign-up-form">
-              <SignUpForm setGoToOnboarding={setGoToOnboarding} />
-            </div>
+      <PaddedPageContainer>
+        {googleSignInFlow && (
+          <GoogleSignIn
+            updateUserDetails={updateUserDetails}
+            setLoading={setLoading}
+          />
+        )}
+        <ReferrerAlert referrer={referrer} />
+        <h2 className="signup-form-title">{`Sign up to Labspoon`}</h2>
+        <p className="signup-option">
+          Already have an account?{' '}
+          <button onClick={() => history.push('/login')}>Login here</button>
+        </p>
+        <div className="sign-up-form">
+          <SignUpForm setLoading={setLoading} />
+          <div className="signup-submit-button-container">
+            <GoogleButton
+              onClick={() => {
+                setGoogleSignInFlow(true);
+              }}
+            />
           </div>
         </div>
-      </div>
+      </PaddedPageContainer>
     );
   } else {
-    return goToOnboarding ? (
+    if (!userProfile.name || userProfile.name.length === 0)
+      return (
+        <Redirect
+          to={{
+            pathname: '/userName',
+            state: {returnLocation: returnLocation},
+          }}
+        />
+      );
+    if (googleSignInFlow) return <Redirect to="/" />;
+    return (
       <Redirect
         to={{
           pathname: '/onboarding/follow',
           state: {returnLocation: returnLocation},
         }}
       />
-    ) : (
-      <Redirect to="/" />
     );
   }
 }
 
-const SignUpForm = ({setGoToOnboarding}) => {
-  const [loading, setLoading] = useState(false);
+const SignUpForm = ({setLoading}) => {
   const {updateUserDetails} = useContext(AuthContext);
+
   const submitChanges = (values) => {
     setLoading(true);
     firebase
       .auth()
       .createUserWithEmailAndPassword(values.email, values.password)
       .then((result) => {
-        setLoading(false);
-        setGoToOnboarding(true);
-        result.user
-          .updateProfile({displayName: values.userName})
-          .then(() =>
-            db.doc(`users/${result.user.uid}`).set({
-              id: result.user.uid,
-              name: result.user.displayName,
-              coverPhoto: getCoverPhoto(result.user.uid),
-              avatar: getAvatar(result.user.uid),
-            })
-          )
-          .then(() => updateUserDetails(result.user))
-          .catch((error) => {
-            setLoading(false);
-            console.log(error, 'Could not create display name');
-          });
+        createUserDocOnSignUp(
+          result,
+          setLoading,
+          values.userName,
+          updateUserDetails
+        );
       })
       .catch((error) => {
         setLoading(false);
@@ -99,7 +108,7 @@ const SignUpForm = ({setGoToOnboarding}) => {
           alert(`There is already a Labspoon account linked to that address.`);
         } else {
           alert(
-            'Something went wrong. We will look into it. Please try signing up later.'
+            'Something went wrong. Please try refreshing the page and signing up again.'
           );
         }
       });
@@ -148,19 +157,13 @@ const SignUpForm = ({setGoToOnboarding}) => {
           name="userName"
           label="Your Full Name (this will be displayed on your profile)"
         />
-        <div className="cancel-or-submit">
-          <div></div>
-          <div className="submit-button-container">
-            <PrimaryButton submit={true}>Sign Up</PrimaryButton>
-          </div>
+        <div className="signup-submit-button-container">
+          <PrimaryButton submit={true}>Sign Up</PrimaryButton>
         </div>
-        {loading ? <LoadingSpinner /> : null}
       </Form>
     </Formik>
   );
 };
-
-export default SignupPage;
 
 function ReferrerAlert({referrer}) {
   switch (referrer) {
@@ -177,3 +180,5 @@ function ReferrerAlert({referrer}) {
       return <></>;
   }
 }
+
+export default SignupPage;

@@ -15,7 +15,7 @@ import UserListItem from '../../components/User/UserListItem';
 import FormDatabaseSearch from '../../components/Forms/FormDatabaseSearch';
 import SuccessMessage from '../../components/Forms/SuccessMessage';
 import LinkAuthorIDForm from '../../components/Publication/ConnectToPublications/ConnectToPublications';
-import {UnpaddedPageContainer} from '../../components/Layout/Content';
+import {PaddedPageContainer} from '../../components/Layout/Content';
 import SearchMSFields from '../../components/Topics/SearchMSFields';
 
 import './OnboardingPage.css';
@@ -79,7 +79,7 @@ export default function OnboardingPage() {
   };
 
   return (
-    <UnpaddedPageContainer>
+    <PaddedPageContainer>
       <h2 className="onboarding-main-title">Welcome to Labspoon!</h2>
       <OnboardingStageDisplay />
       <div className="onboarding-skip-next-container">
@@ -103,7 +103,7 @@ export default function OnboardingPage() {
           </SecondaryButton>
         </div>
       </div>
-    </UnpaddedPageContainer>
+    </PaddedPageContainer>
   );
 }
 
