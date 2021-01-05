@@ -10,14 +10,21 @@
 }
 
 .signup-form-title {
-  color: #00507c;
 }
 
 .signup-option {
   margin-top: 20px;
+  color: #5d5d65;
 }
 
 .signup-option button {
   color: #00507c;
   font-size: 1.2em;
+}
+
+.signup-submit-button-container {
+  display: flex;
+  min-width: 100%;
+  justify-content: flex-end;
+  margin-bottom: 10px;
 }

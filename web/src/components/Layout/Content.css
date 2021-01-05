@@ -15,6 +15,13 @@
   grid-column: 2/3;
 }
 
+/* TODO: remove once we have similar content sider */
+@media screen and (max-width: 1107px) {
+  .padded-page-container {
+    padding: 0px 5px;
+  }
+}
+
 @media screen and (max-width: 800px) {
   .content-layout {
     padding: 10px;

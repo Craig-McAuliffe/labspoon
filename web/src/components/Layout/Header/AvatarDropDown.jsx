@@ -15,11 +15,13 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import CustomToggle from '../../CustomToggle';
 import {getPaginatedGroupReferencesFromCollectionRef} from '../../../helpers/groups';
 import firebase from '../../../firebase';
+import LoadingSpinner from '../../LoadingSpinner/LoadingSpinner';
 
 import './AvatarDropDown.css';
 
 const AvatarDropDown = () => {
-  const {user, userProfile} = useContext(AuthContext);
+  const {user, userProfile, authLoaded} = useContext(AuthContext);
+  if (!authLoaded) return <LoadingSpinner />;
   if (!user) {
     return (
       <Dropdown variant="success" id="dropdown-basic">

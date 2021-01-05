@@ -23,6 +23,7 @@ export default function SearchMSFields({
       return;
     }
     return searchMicrosoftTopics(typedTopic, setLoading, setFetchedTopics);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [typedTopic]);
 
   return (

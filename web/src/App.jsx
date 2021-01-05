@@ -2,11 +2,10 @@ import React, {createContext, useState, useEffect, useReducer} from 'react';
 import {BrowserRouter as Router, useLocation} from 'react-router-dom';
 import Routes from './routes.jsx';
 import {auth, db} from './firebase';
-
 import Header from './components/Layout/Header/Header';
+import {getCoverPhoto, getDefaultAvatar} from './helpers/users.js';
 
 import './App.css';
-import {getDefaultAvatar} from './helpers/users.js';
 
 /**
  * Primary entry point into the app
@@ -72,6 +71,8 @@ function AuthProvider({children}) {
         }
         const userData = profile.data();
         if (userData && !userData.avatar) userData.avatar = getDefaultAvatar();
+        if (userData && !userData.coverPhoto)
+          userData.coverPhoto = getCoverPhoto();
         setUserProfile(userData);
       })
       .catch((err) => console.log(err, 'could not retrieve user profile'));
@@ -80,6 +81,7 @@ function AuthProvider({children}) {
   useEffect(() => {
     updateUserDetails(user);
   }, [user]);
+
   return (
     <AuthContext.Provider
       value={{user, userProfile, authLoaded, updateUserDetails}}
