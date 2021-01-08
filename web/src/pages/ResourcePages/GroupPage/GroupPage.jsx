@@ -170,12 +170,11 @@ export default function GroupPage() {
   }, [groupID, route]);
 
   useEffect(() => {
-    if (!featureFlags.has('donate-link')) return;
     db.doc(`verifiedGroups/${groupID}`)
       .get()
       .then((ds) => setVerified(ds.exists))
       .catch((err) => console.error(err));
-  }, [groupID, featureFlags]);
+  }, [groupID]);
 
   const groupDescriptionRef = useRef();
 
@@ -248,16 +247,6 @@ export default function GroupPage() {
     },
   ];
 
-  if (featureFlags.has('group-media')) {
-    relationshipFilter[0].options.push({
-      enabled: false,
-      data: {
-        id: 'images',
-        name: 'Images',
-      },
-    });
-  }
-
   if (featureFlags.has('overview')) {
     relationshipFilter[0].options.push({
       enabled: false,
@@ -268,15 +257,13 @@ export default function GroupPage() {
     });
   }
 
-  if (featureFlags.has('techniques')) {
-    relationshipFilter[0].options.push({
-      enabled: false,
-      data: {
-        id: TECHNIQUES,
-        name: 'Techniques',
-      },
-    });
-  }
+  relationshipFilter[0].options.push({
+    enabled: false,
+    data: {
+      id: TECHNIQUES,
+      name: 'Techniques',
+    },
+  });
 
   if (user) {
     db.collection(`groups/${groupID}/members`)
@@ -371,11 +358,7 @@ const GroupDetails = ({group, groupDescriptionRef, userIsMember, verified}) => {
         id={group.id}
       />
 
-      {featureFlags.has('donate-link') ? (
-        <DonationLink verified={verified} donationLink={group.donationLink} />
-      ) : (
-        <></>
-      )}
+      <DonationLink verified={verified} donationLink={group.donationLink} />
       {featureFlags.has('group-pinned-post') ? (
         <div className="pinned-post-container">
           <PinnedPost post={group.pinnedPost} />

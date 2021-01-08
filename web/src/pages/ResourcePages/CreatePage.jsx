@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import {Redirect, Route, Switch} from 'react-router-dom';
-import {AuthContext, FeatureFlags} from '../../App';
+import {AuthContext} from '../../App';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import CreatePost from '../../components/Posts/Post/CreatePost/CreatePost';
 import CreateGroupPage from '../../components/Group/CreateGroupPage/CreateGroupPage';
@@ -17,22 +17,16 @@ import './CreatePage.css';
 export default function CreatePage() {
   const {userProfile} = useContext(AuthContext);
   const userID = userProfile ? userProfile.id : undefined;
-  const featureFlags = useContext(FeatureFlags);
   if (!userID) return <LoadingSpinner />;
   return (
     <PaddedPageContainer>
       <LightTabContainer>
         <LightTabLink name="Post" link="/create/post" />
         <LightTabLink name="Group" link="/create/group" />
-        {featureFlags.has('create-open-position') ? (
-          <LightTabLink name="Open Position" link="/create/openPosition" />
-        ) : null}
-        {featureFlags.has('techniques') && (
-          <LightTabLink name="Technique" link="/create/technique" />
-        )}
-        {featureFlags.has('research-focus') && (
-          <LightTabLink name="Research Focus" link="/create/researchFocus" />
-        )}
+        <LightTabLink name="Open Position" link="/create/openPosition" />
+        <LightTabLink name="Technique" link="/create/technique" />
+
+        <LightTabLink name="Research Focus" link="/create/researchFocus" />
       </LightTabContainer>
       <div>
         <Switch>
@@ -48,16 +42,12 @@ export default function CreatePage() {
           <Route path="/create/openPosition/:groupID?">
             <CreateOpenPosition />
           </Route>
-          {featureFlags.has('techniques') && (
-            <Route path="/create/technique/:groupID?">
-              <CreateTechnique />
-            </Route>
-          )}
-          {featureFlags.has('research-focus') && (
-            <Route path="/create/researchFocus/:groupID?">
-              <CreateResearchFocus />
-            </Route>
-          )}
+          <Route path="/create/technique/:groupID?">
+            <CreateTechnique />
+          </Route>
+          <Route path="/create/researchFocus/:groupID?">
+            <CreateResearchFocus />
+          </Route>
           <Route path="/create">
             <Redirect to="/create/post" />
           </Route>

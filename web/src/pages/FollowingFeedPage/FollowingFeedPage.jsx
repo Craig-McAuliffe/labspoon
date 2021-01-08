@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 
 import {db} from '../../firebase';
-import {AuthContext, FeatureFlags} from '../../App';
+import {AuthContext} from '../../App';
 import {getEnabledIDsFromFilter} from '../../helpers/filters';
 import FilterableResults, {
   NewFilterMenuWrapper,
@@ -10,7 +10,6 @@ import FilterableResults, {
   FilterManager,
 } from '../../components/FilterableResults/FilterableResults';
 import CreatePost from '../../components/Posts/Post/CreatePost/CreatePost';
-import HomePageTabs from '../../components/HomePageTabs';
 import {translateOptionalFields} from '../../helpers/posts';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 
@@ -147,7 +146,6 @@ function fetchUserFeedFilters(uuid) {
 
 export default function FollowingFeedPage() {
   const {user, authLoaded} = useContext(AuthContext);
-  const featureFlags = useContext(FeatureFlags);
 
   const getDefaultFilter = () => {
     if (!user) return [];
@@ -176,7 +174,6 @@ export default function FollowingFeedPage() {
       <div className="content-layout">
         <div className="feed-container">
           <CreatePost />
-          {featureFlags.has('news') ? <HomePageTabs /> : <></>}
           <NewResultsWrapper />
         </div>
       </div>
