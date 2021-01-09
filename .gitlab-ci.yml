@@ -22,19 +22,6 @@ before_script:
   - npm i -g firebase-tools
   - npm i -g n
 
-deploy_dev_functions:
-  stage: deploy_dev
-  environment: dev
-  rules:
-    - changes:
-        - functions/**/*
-  script:
-    - cd functions
-    - npm install
-    - npm run build
-    - firebase use --token $FIREBASE_TOKEN dev
-    - firebase deploy -m "pipeline $CI_PIPELINE_ID build functions" --non-interactive --token $FIREBASE_TOKEN --only functions
-
 deploy_dev_firestore:
   stage: deploy_dev
   environment: dev
@@ -58,20 +45,6 @@ deploy_dev:
     - n 10
     - firebase use --token $FIREBASE_TOKEN dev
     - firebase deploy -m "pipeline $CI_PIPELINE_ID build $CI_BUILD_ID" --non-interactive --token $FIREBASE_TOKEN --only hosting, storage
-
-deploy_test_functions:
-  stage: deploy_test
-  environment: test
-  rules:
-    - changes:
-        - functions/**/*
-    - when: manual
-  script:
-    - cd functions
-    - npm install
-    - npm run build
-    - firebase use --token $FIREBASE_TOKEN test
-    - firebase deploy -m "pipeline $CI_PIPELINE_ID build functions" --non-interactive --token $FIREBASE_TOKEN --only functions
 
 deploy_test_firestore:
   stage: deploy_test
@@ -101,20 +74,6 @@ deploy_test:
     - npm run --prefix functions build
     - firebase use --token $FIREBASE_TOKEN test
     - firebase deploy -m "pipeline $CI_PIPELINE_ID build $CI_BUILD_ID" --non-interactive --token $FIREBASE_TOKEN --only hosting, storage
-
-deploy_prod_functions:
-  stage: deploy_prod
-  environment: prod
-  rules:
-    - changes:
-        - functions/**/*
-    - when: manual
-  script:
-    - cd functions
-    - npm install
-    - npm run build
-    - firebase use --token $FIREBASE_TOKEN prod
-    - firebase deploy -m "pipeline $CI_PIPELINE_ID build functions" --non-interactive --token $FIREBASE_TOKEN --only functions
 
 deploy_prod_firestore:
   stage: deploy_prod
