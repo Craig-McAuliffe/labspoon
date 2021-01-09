@@ -4,70 +4,147 @@ workflow:
       when: always
     - if: '$CI_PIPELINE_SOURCE == "web"'
       when: always
-    - when: never
+
+image: node:latest
 
 stages:
-  - build_and_deploy
+  - deploy_dev
+  - deploy_test
+  - deploy_prod
+
+cache:
+  key: default
+  paths:
+    - web/node_modules/
+    - functions/node_modules
 
 before_script:
   - npm i -g firebase-tools
   - npm i -g n
 
-cache:
-  paths:
-    - node_modules/
-    - functions/node_modules
+deploy_dev_functions:
+  stage: deploy_dev
+  environment: dev
+  rules:
+    - changes:
+        - functions/**/*
+  script:
+    - cd functions
+    - npm install
+    - npm run build
+    - firebase use --token $FIREBASE_TOKEN dev
+    - firebase deploy -m "pipeline $CI_PIPELINE_ID build functions" --non-interactive --token $FIREBASE_TOKEN --only functions
 
-deploy_test_env:on-schedule:
-  image: node:current
-  stage: build_and_deploy
-  environment:
-    name: test
-  only:
-    - master
-    - schedules
+deploy_dev_firestore:
+  stage: deploy_dev
+  environment: dev
+  rules:
+    - changes:
+        - firestore.rules
+        - firestore.indexes.json
+  script:
+    - firebase use --token $FIREBASE_TOKEN dev
+    - firebase deploy -m "pipeline $CI_PIPELINE_ID build firestore" --non-interactive --token $FIREBASE_TOKEN --only firestore
+
+deploy_dev:
+  stage: deploy_dev
+  environment: dev
   script:
     - n current
-    - npm --prefix web install
-    - npm run --prefix web build
+    - cd web
+    - npm install
+    - npm run build
+    - cd ..
+    - n 10
+    - firebase use --token $FIREBASE_TOKEN dev
+    - firebase deploy -m "pipeline $CI_PIPELINE_ID build $CI_BUILD_ID" --non-interactive --token $FIREBASE_TOKEN --only hosting, storage
+
+deploy_test_functions:
+  stage: deploy_test
+  environment: test
+  rules:
+    - changes:
+        - functions/**/*
+    - when: manual
+  script:
+    - cd functions
+    - npm install
+    - npm run build
+    - firebase use --token $FIREBASE_TOKEN test
+    - firebase deploy -m "pipeline $CI_PIPELINE_ID build functions" --non-interactive --token $FIREBASE_TOKEN --only functions
+
+deploy_test_firestore:
+  stage: deploy_test
+  environment: test
+  rules:
+    - changes:
+        - firestore.rules
+        - firestore.indexes.json
+    - when: manual
+  script:
+    - firebase use --token $FIREBASE_TOKEN test
+    - firebase deploy -m "pipeline $CI_PIPELINE_ID build firestore" --non-interactive --token $FIREBASE_TOKEN --only firestore
+
+deploy_test:
+  stage: deploy_test
+  rules:
+    - when: manual
+  environment: test
+  script:
+    - n current
+    - cd web
+    - npm install
+    - npm run build
+    - cd ..
     - n 10
     - npm --prefix functions install
     - npm run --prefix functions build
-    - firebase use --token $FIREBASE_DEPLOY_KEY labspoon-test
-    - firebase deploy -m "pipeline $CI_PIPELINE_ID build $CI_BUILD_ID" --non-interactive --token $FIREBASE_DEPLOY_KEY --except functions
+    - firebase use --token $FIREBASE_TOKEN test
+    - firebase deploy -m "pipeline $CI_PIPELINE_ID build $CI_BUILD_ID" --non-interactive --token $FIREBASE_TOKEN --only hosting, storage
 
-deploy_dev_env:on-schedule:
-  image: node:current
-  stage: build_and_deploy
-  environment:
-    name: dev
-  only:
-    - master
-    - schedules
+deploy_prod_functions:
+  stage: deploy_prod
+  environment: prod
+  rules:
+    - changes:
+        - functions/**/*
+    - when: manual
   script:
-    - n current
-    - npm --prefix web install
-    - npm run --prefix web build
-    - n 10
-    - npm --prefix functions install
-    - npm run --prefix functions build
-    - firebase use --token $FIREBASE_DEPLOY_KEY labspoon-dev-266bc
-    - firebase deploy -m "pipeline $CI_PIPELINE_ID build $CI_BUILD_ID" --non-interactive --token $FIREBASE_DEPLOY_KEY --except functions
+    - cd functions
+    - npm install
+    - npm run build
+    - firebase use --token $FIREBASE_TOKEN prod
+    - firebase deploy -m "pipeline $CI_PIPELINE_ID build functions" --non-interactive --token $FIREBASE_TOKEN --only functions
 
-deploy_prod_env:on-schedule:
-  image: node:current
-  stage: build_and_deploy
+deploy_prod_firestore:
+  stage: deploy_prod
+  environment: prod
+  rules:
+    - changes:
+        - firestore.rules
+        - firestore.indexes.json
+    - when: manual
+  script:
+    - firebase use --token $FIREBASE_TOKEN prod
+    - firebase deploy -m "pipeline $CI_PIPELINE_ID build firestore" --non-interactive --token $FIREBASE_TOKEN --only firestore
+
+deploy_prod:
+  stage: deploy_prod
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      when: manual
   environment:
     name: prod
-  only:
-    - master
-    - schedules
   script:
     - n current
-    - npm --prefix web install
-    - npm run --prefix web build
+    - cd web
+    - npm install
+    - npm run build
+    - cd ..
     - n 10
-    - npm --prefix functions install
-    - npm run --prefix functions build
-    - firebase use --token $FIREBASE_DEPLOY_KEY labspoon-prod-284615
-    - firebase deploy -m "pipeline $CI_PIPELINE_ID build $CI_BUILD_ID" --non-interactive --token $FIREBASE_DEPLOY_KEY --except functions
+    - cd functions
+    - npm install
+    - npm run build
+    - cd ..
+    - firebase use --token $FIREBASE_TOKEN prod
+    - firebase deploy -m "Pipeline $CI_PIPELINE_ID, Build $CI_BUILD_ID" --non-interactive --token $FIREBASE_TOKEN --only hosting, storage
