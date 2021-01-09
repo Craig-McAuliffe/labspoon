@@ -22,6 +22,15 @@ before_script:
   - npm i -g firebase-tools
   - npm i -g n
 
+deploy_dev_functions:
+  stage: deploy_dev
+  environment: dev
+  rules:
+    - changes:
+        - functions/**/*
+  script:
+    - echo "there are functions to deploy"
+
 deploy_dev_firestore:
   stage: deploy_dev
   environment: dev
@@ -31,7 +40,7 @@ deploy_dev_firestore:
         - firestore.indexes.json
   script:
     - firebase use --token $FIREBASE_TOKEN dev
-    - firebase deploy -m "pipeline $CI_PIPELINE_ID build firestore" --non-interactive --token $FIREBASE_TOKEN --only firestore
+    - firebase deploy -m "pipeline $CI_PIPELINE_ID build $CI_BUILD_ID firestore" --non-interactive --token $FIREBASE_TOKEN --only firestore
 
 deploy_dev:
   stage: deploy_dev
@@ -42,9 +51,8 @@ deploy_dev:
     - npm install
     - npm run build
     - cd ..
-    - n 10
     - firebase use --token $FIREBASE_TOKEN dev
-    - firebase deploy -m "pipeline $CI_PIPELINE_ID build $CI_BUILD_ID" --non-interactive --token $FIREBASE_TOKEN --only hosting, storage
+    - firebase deploy -m "pipeline $CI_PIPELINE_ID build $CI_BUILD_ID" --non-interactive --token $FIREBASE_TOKEN --only hosting
 
 deploy_test_firestore:
   stage: deploy_test
@@ -53,15 +61,12 @@ deploy_test_firestore:
     - changes:
         - firestore.rules
         - firestore.indexes.json
-    - when: manual
   script:
     - firebase use --token $FIREBASE_TOKEN test
     - firebase deploy -m "pipeline $CI_PIPELINE_ID build firestore" --non-interactive --token $FIREBASE_TOKEN --only firestore
 
 deploy_test:
   stage: deploy_test
-  rules:
-    - when: manual
   environment: test
   script:
     - n current
@@ -69,7 +74,6 @@ deploy_test:
     - npm install
     - npm run build
     - cd ..
-    - n 10
     - npm --prefix functions install
     - npm run --prefix functions build
     - firebase use --token $FIREBASE_TOKEN test
@@ -82,7 +86,7 @@ deploy_prod_firestore:
     - changes:
         - firestore.rules
         - firestore.indexes.json
-    - when: manual
+      when: manual
   script:
     - firebase use --token $FIREBASE_TOKEN prod
     - firebase deploy -m "pipeline $CI_PIPELINE_ID build firestore" --non-interactive --token $FIREBASE_TOKEN --only firestore
@@ -100,10 +104,9 @@ deploy_prod:
     - npm install
     - npm run build
     - cd ..
-    - n 10
     - cd functions
     - npm install
     - npm run build
     - cd ..
     - firebase use --token $FIREBASE_TOKEN prod
-    - firebase deploy -m "Pipeline $CI_PIPELINE_ID, Build $CI_BUILD_ID" --non-interactive --token $FIREBASE_TOKEN --only hosting, storage
+    - firebase deploy -m "Pipeline $CI_PIPELINE_ID, Build $CI_BUILD_ID" --non-interactive --token $FIREBASE_TOKEN --only hosting
