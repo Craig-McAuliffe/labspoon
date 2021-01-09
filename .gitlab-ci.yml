@@ -77,7 +77,7 @@ deploy_test:
     - npm --prefix functions install
     - npm run --prefix functions build
     - firebase use --token $FIREBASE_TOKEN test
-    - firebase deploy -m "pipeline $CI_PIPELINE_ID build $CI_BUILD_ID" --non-interactive --token $FIREBASE_TOKEN --only hosting, storage
+    - firebase deploy -m "pipeline $CI_PIPELINE_ID build $CI_BUILD_ID" --non-interactive --token $FIREBASE_TOKEN --only hosting
 
 deploy_prod_firestore:
   stage: deploy_prod
