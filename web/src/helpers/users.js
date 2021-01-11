@@ -65,31 +65,43 @@ export function createUserDocOnSignUp(
   userName,
   updateUserDetails
 ) {
-  result.user
-    .updateProfile({displayName: userName})
-    .then(() =>
-      db.doc(`users/${result.user.uid}`).set({
+  const addUserToDB = () =>
+    db
+      .doc(`users/${result.user.uid}`)
+      .set({
         id: result.user.uid,
         name: result.user.displayName,
         coverPhoto: getCoverPhoto(result.user.uid),
         avatar: getAvatar(result.user.uid),
       })
-    )
-    .catch((err) => {
-      setLoading(false);
-      console.log(err);
-      firebase.auth().currentUser.delete.catch((err) => {
-        console.error(
-          'unable to delete auth user with id' + result.user.uid,
-          err
-        );
-        alert(
-          'Something went wrong. Please contact our support team at help@labspoon.com from the email address that you are trying to sign up with. We apologise for the inconvenience.'
-        );
+      .then(() => {
+        setLoading(false);
+        updateUserDetails(result.user);
+      })
+      .catch((err) => {
+        setLoading(false);
+        console.log(err);
+        firebase
+          .auth()
+          .currentUser.delete.then(() =>
+            alert('Something went wrong. Please try again.')
+          )
+          .catch((err) => {
+            console.error(
+              'unable to delete auth user with id' + result.user.uid,
+              err
+            );
+            alert(
+              'Something went wrong. Please contact our support team at help@labspoon.com from the email address that you are trying to sign up with. We apologise for the inconvenience.'
+            );
+          });
       });
-    })
-    .then(() => {
-      setLoading(false);
-      updateUserDetails(result.user);
+
+  result.user
+    .updateProfile({displayName: userName})
+    .then(() => addUserToDB())
+    .catch((err) => {
+      console.error(err);
+      addUserToDB();
     });
 }

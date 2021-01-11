@@ -15,19 +15,14 @@ export default function GoogleSignIn({
 
     triggerGoogleSignInPopup()
       .then(async (result) => {
-        if (!isMounted) {
-          setGoogleSignInFlow(false);
-          return;
-        }
+        if (!isMounted) return;
+
         setSignInCompleted(true);
         await db
           .doc(`users/${result.user.uid}`)
           .get()
           .then((ds) => {
-            if (ds.exists) {
-              setGoogleSignInFlow(false);
-              return;
-            }
+            if (ds.exists) return;
             createUserDocOnSignUp(result, setLoading, '', updateUserDetails);
             setGoogleSignInFlow(false);
           })
