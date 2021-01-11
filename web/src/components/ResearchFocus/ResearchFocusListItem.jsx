@@ -1,5 +1,5 @@
 import React from 'react';
-import {formatTaggedImages, ImagesSection} from '../Media/ImageListItem';
+import {formatTaggedImages, ImagesSection} from '../Images/ImageListItem';
 import {ResearchFocusIcon} from '../../assets/ResourceTypeIcons';
 import {
   ExpandableText,

@@ -4,7 +4,7 @@ import {v4 as uuid} from 'uuid';
 import {AddButton} from '../../assets/GeneralActionIcons';
 import PrimaryButton from '../Buttons/PrimaryButton';
 import NegativeButton from '../Buttons/NegativeButton';
-import {formatTaggedImages, ImagesSection} from '../Media/ImageListItem';
+import {formatTaggedImages, ImagesSection} from './ImageListItem';
 import SuccessMessage from '../Forms/SuccessMessage';
 import ErrorMessage from '../Forms/ErrorMessage';
 import './ImageUpload.css';
@@ -166,7 +166,7 @@ export function SelectImages({onChange, multipleImages}) {
 export function ImagePreviews({urls, uploading, cover}) {
   if (cover)
     return (
-      <div className="image-upload-preview-container">
+      <div className="image-upload-cover-preview-container">
         {urls.map((url, i) => (
           <UserCoverPhoto
             src={urls[0]}

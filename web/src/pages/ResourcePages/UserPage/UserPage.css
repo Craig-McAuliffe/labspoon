@@ -22,6 +22,7 @@
   height: 80px;
   background: transparent;
   position: relative;
+  top: -20px;
 }
 
 .user-headline-text {
@@ -80,9 +81,29 @@
   margin-left: 10px;
 }
 
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 550px) {
   .user-page-avatar-container img {
     width: 90px;
     height: 90px;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .user-page-avatar-container {
+    top: -15px;
+  }
+  .user-page-avatar-container img {
+    width: 70px;
+    height: 70px;
+  }
+}
+
+@media screen and (max-width: 350px) {
+  .user-headline {
+    display: flex;
+  }
+  .user-page-avatar-container {
+    display: block;
+    top: -10px;
   }
 }

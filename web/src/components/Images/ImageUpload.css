@@ -81,3 +81,9 @@
 .image-upload-preview-container {
   margin-bottom: 20px;
 }
+
+.image-upload-cover-preview-container {
+  margin-bottom: 20px;
+  height: 200px;
+  position: relative;
+}

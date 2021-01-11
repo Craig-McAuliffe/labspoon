@@ -15,7 +15,7 @@ import {getPaginatedUserReferencesFromCollectionRef} from '../../../helpers/user
 import {getPaginatedRecommendationsFromCollectionRef} from '../../../helpers/recommendations';
 import MessageButton from '../../../components/Buttons/MessageButton';
 import EditButton from '../../../components/Buttons/EditButton';
-import {UserPageAvatar} from '../../../components/Avatar/UserAvatar';
+import UserAvatar from '../../../components/Avatar/UserAvatar';
 import FollowUserButton from '../../../components/User/FollowUserButton/FollowUserButton';
 import UserCoverPhoto from '../../../components/User/UserCoverPhoto';
 
@@ -151,7 +151,7 @@ function UserInfo({user}) {
       </div>
       <div className="user-headline">
         <div className="user-page-avatar-container">
-          <UserPageAvatar src={user.avatar} width="100px" height="100px" />
+          <UserAvatar src={user.avatar} width="100px" height="100px" />
         </div>
         <div className="user-headline-text">
           <h2>{user.name}</h2>

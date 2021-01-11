@@ -14,10 +14,12 @@ export default function EditUserPhotos({children}) {
       <EditUserProfilePicture />
       <EditUserCoverPicture />
       <p className="photo-cache-notice">
-        <b>Note:</b> Photos may not update immediately subject to your browser
-        cache. We are looking into a fix for this. In the meantime to speed up
-        the reload, you can clear your browser cache or view your profile in an
-        incognito window.
+        <Alert variant="warning">
+          <b>Note:</b> Photos may not update immediately subject to your browser
+          cache. We are looking into a fix for this. In the meantime to speed up
+          the reload, you can clear your browser cache or view your profile in
+          an incognito window.
+        </Alert>
       </p>
     </PaddedPageContainer>
   );
@@ -28,9 +30,6 @@ export function EditUserProfilePicture({setSuccess}) {
   return (
     <div className="edit-user-photos-section">
       <h2>Profile Picture</h2>
-      <Alert variant="warning">
-        Profile pictures will be cropped to a 200x200 pixel square.
-      </Alert>
       <ImageUpload
         storageRef={storage.ref(`users/${userID}/avatar_fullSize`)}
       />
@@ -43,9 +42,6 @@ export function EditUserCoverPicture({setSuccess}) {
   return (
     <div className="edit-user-photos-section">
       <h2>Cover Picture</h2>
-      <Alert variant="warning">
-        Cover photos will be cropped to a 1070x200 pixel rectangle.
-      </Alert>
       <ImageUpload
         storageRef={storage.ref(`users/${userID}/coverPhoto_fullSize`)}
         cover={true}

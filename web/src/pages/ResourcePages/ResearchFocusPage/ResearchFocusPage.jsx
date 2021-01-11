@@ -15,7 +15,7 @@ import {
 import {
   formatTaggedImages,
   ImagesSection,
-} from '../../../components/Media/ImageListItem';
+} from '../../../components/Images/ImageListItem';
 import {ResearchFocusIcon} from '../../../assets/ResourceTypeIcons';
 import {RESEARCHFOCUS} from '../../../helpers/resourceTypeDefinitions';
 

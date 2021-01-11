@@ -15,7 +15,7 @@ import {
 import {
   formatTaggedImages,
   ImagesSection,
-} from '../../../components/Media/ImageListItem';
+} from '../../../components/Images/ImageListItem';
 import {TechniqueIcon} from '../../../assets/ResourceTypeIcons';
 import {TECHNIQUE} from '../../../helpers/resourceTypeDefinitions';
 
