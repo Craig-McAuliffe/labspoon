@@ -35,6 +35,7 @@ function LoginPage() {
           <GoogleSignIn
             updateUserDetails={updateUserDetails}
             setLoading={setLoading}
+            setGoogleSignInFlow={setGoogleSignInFlow}
           />
         )}
         <h2 className="signin-form-title">{`Welcome Back`}</h2>

@@ -39,6 +39,7 @@ function SignupPage() {
           <GoogleSignIn
             updateUserDetails={updateUserDetails}
             setLoading={setLoading}
+            setGoogleSignInFlow={setGoogleSignInFlow}
           />
         )}
         <ReferrerAlert referrer={referrer} />

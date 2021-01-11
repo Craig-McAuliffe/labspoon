@@ -278,12 +278,10 @@ function OnboardingGroup({user}) {
         </div>
       </div>
       {creatingGroup ? (
-        <div className="onboarding-create-group-container">
-          <CreateGroupPage
-            onboardingCancelOrSubmitAction={() => setCreatingGroup(false)}
-            confirmGroupCreation={() => setConfirmGroupCreation(true)}
-          />
-        </div>
+        <CreateGroupPage
+          onboardingCancelOrSubmitAction={() => setCreatingGroup(false)}
+          confirmGroupCreation={() => setConfirmGroupCreation(true)}
+        />
       ) : (
         <>
           <h4 className="onboarding-page-instructions">
