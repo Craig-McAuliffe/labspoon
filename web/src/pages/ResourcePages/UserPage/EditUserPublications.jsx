@@ -3,18 +3,15 @@ import SecondaryButton from '../../../components/Buttons/SecondaryButton';
 import LinkAuthorIDForm from '../../../components/Publication/ConnectToPublications/ConnectToPublications';
 import {PaddedPageContainer} from '../../../components/Layout/Content';
 import {AuthContext} from '../../../App';
-import GeneralError from '../../../components/GeneralError';
-import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
+import {LoadingSpinnerPage} from '../../../components/LoadingSpinner/LoadingSpinner';
 
 import './UserPage.css';
 import './EditUserPage.css';
 
 export default function EditUserPublications({children}) {
   const [linkingAuthor, setLinkingAuthor] = useState(false);
-  const {userProfile, authLoaded} = useContext(AuthContext);
-  if (!userProfile && authLoaded === false) return <LoadingSpinner />;
-  if (!userProfile && authLoaded) return <GeneralError />;
-
+  const {userProfile} = useContext(AuthContext);
+  if (!userProfile) return <LoadingSpinnerPage />;
   if (userProfile.microsoftAcademicAuthorID)
     return (
       <PaddedPageContainer>

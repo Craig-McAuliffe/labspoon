@@ -71,8 +71,6 @@ export function createUserDocOnSignUp(
       .set({
         id: result.user.uid,
         name: result.user.displayName,
-        coverPhoto: getCoverPhoto(result.user.uid),
-        avatar: getAvatar(result.user.uid),
       })
       .then(() => {
         setLoading(false);

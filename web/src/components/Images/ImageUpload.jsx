@@ -7,8 +7,8 @@ import NegativeButton from '../Buttons/NegativeButton';
 import {formatTaggedImages, ImagesSection} from './ImageListItem';
 import SuccessMessage from '../Forms/SuccessMessage';
 import ErrorMessage from '../Forms/ErrorMessage';
-import './ImageUpload.css';
 import UserCoverPhoto from '../User/UserCoverPhoto';
+import './ImageUpload.css';
 
 const NOT_STARTED = 0;
 const UPLOADING = 1;
@@ -16,11 +16,11 @@ const FINISHED = 2;
 
 export default function ImageUpload({
   storageDir,
-  successCallback,
+  updateDB,
   refresh,
-  storageRef,
   multipleImages,
   cover,
+  conversionOptions,
 }) {
   const [files, setFiles] = useState([]);
   const [imageURLs, setImageURLs] = useState([]);
@@ -28,6 +28,7 @@ export default function ImageUpload({
   const [uploadingCount, setUploadingCount] = useState(0);
   const [displaySuccessMessage, setDisplaySuccessMessage] = useState(false);
   const [displayErrorMessage, setDisplayErrorMessage] = useState(false);
+  const [unsuccessfulUploadCount, setUnsuccessfulUploadCount] = useState(0);
 
   function onChange(e) {
     setFiles(Array.from(e.target.files));
@@ -50,7 +51,6 @@ export default function ImageUpload({
   useEffect(() => {
     if (uploading === FINISHED) {
       setFiles([]);
-      setDisplaySuccessMessage(true);
       if (refresh) refresh();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -62,30 +62,47 @@ export default function ImageUpload({
 
   function uploadImages() {
     setUploading(UPLOADING);
-    files.forEach((file) => {
+    setUnsuccessfulUploadCount(0);
+    setUploadingCount(files.length);
+
+    files.forEach(async (file) => {
+      setUploadingCount((count) => count - 1);
       const photoID = uuid();
-      const photoStorageRef = storageRef
-        ? storageRef
-        : storage.ref(storageDir + '/' + photoID);
-      setUploadingCount((count) => count + 1);
-      photoStorageRef.put(file, {contentType: file.type}).on(
+      const photoStorageRef = storage.ref(storageDir + '/' + photoID);
+      await photoStorageRef.put(file, {contentType: file.type}).on(
         firebase.storage.TaskEvent.STATE_CHANGED,
         () => {},
         (err) => {
           console.error(err);
-          setDisplayErrorMessage(true);
+          setUnsuccessfulUploadCount((count) => count + 1);
         },
-        () => {
-          photoStorageRef
-            .getDownloadURL()
-            .then((url) => {
-              if (!successCallback) return;
-              successCallback(url, photoID);
-            })
-            .then(() => setUploadingCount((count) => count - 1));
-        }
+        () => onSuccessfulStorageUpload(photoStorageRef, photoID)
       );
+      if (uploadingCount === 0) {
+        if (unsuccessfulUploadCount === 0) setDisplaySuccessMessage(true);
+        else setDisplayErrorMessage(true);
+      }
     });
+  }
+
+  function onSuccessfulStorageUpload(photoStorageRef, photoID) {
+    photoStorageRef
+      .getDownloadURL()
+      .then(async (url) => {
+        if (updateDB)
+          updateDB(url, photoID).catch((err) => {
+            console.error(err);
+            setUnsuccessfulUploadCount((count) => count + 1);
+          });
+      })
+      .catch((err) =>
+        console.error(
+          'failed to get download url for ' +
+            photoStorageRef +
+            ', therefore cannot update db',
+          err
+        )
+      );
   }
 
   function cancel() {
@@ -98,7 +115,11 @@ export default function ImageUpload({
         <SelectImages onChange={onChange} multipleImages={multipleImages} />
         <div className="after-upload-message-container">
           {displaySuccessMessage ? <UploadSuccessMessage /> : <></>}
-          {displayErrorMessage ? <UploadErrorMessage /> : <></>}
+          {displayErrorMessage ? (
+            <UploadErrorMessage count={unsuccessfulUploadCount} />
+          ) : (
+            <></>
+          )}
         </div>
       </div>
     );
@@ -196,7 +217,13 @@ function UploadSuccessMessage() {
   return <SuccessMessage>Photos successfully uploaded.</SuccessMessage>;
 }
 
-function UploadErrorMessage() {
+function UploadErrorMessage({count}) {
+  if (count)
+    return (
+      <ErrorMessage>
+        Something went wrong uploading {count} of your images.
+      </ErrorMessage>
+    );
   return (
     <ErrorMessage>Something went wrong. Please try again later.</ErrorMessage>
   );

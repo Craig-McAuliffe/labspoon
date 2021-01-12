@@ -7,10 +7,10 @@ import LightTabLink, {
   LightTabContainer,
 } from '../../../components/Navigation/LightTab';
 import ReturnToPublicViewButton from '../../../components/Buttons/ReturnToPublicViewButton';
+import NotFoundPage from '../../NotFoundPage/NotFoundPage';
 
 import './UserPage.css';
 import './EditUserPage.css';
-import NotFoundPage from '../../NotFoundPage/NotFoundPage';
 
 export const INFO_TAB = 'info';
 const PHOTOS_TAB = 'photos';

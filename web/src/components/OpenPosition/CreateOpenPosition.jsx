@@ -19,10 +19,10 @@ import {
 } from '../Forms/Groups/SelectGroup';
 import GeneralError from '../GeneralError';
 import {convertGroupToGroupRef} from '../../helpers/groups';
-
-import './CreateOpenPosition.css';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import {getUserGroups} from '../../helpers/users';
+
+import './CreateOpenPosition.css';
 
 const POSITIONS = ['Masters', 'Phd', 'Post Doc'];
 

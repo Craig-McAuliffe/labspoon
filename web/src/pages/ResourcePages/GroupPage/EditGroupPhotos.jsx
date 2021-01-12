@@ -59,19 +59,16 @@ export default function EditGroupPhotos({children}) {
 }
 
 function GroupImageUpload({groupID, refresh}) {
-  function successCallback(url, id) {
-    return db
-      .doc(`groups/${groupID}/photos/${id}`)
-      .set({
-        src: url,
-        timestamp: new Date(),
-      })
-      .catch((err) => console.error(err));
+  function updateDB(url, id) {
+    return db.doc(`groups/${groupID}/photos/${id}`).set({
+      src: url,
+      timestamp: new Date(),
+    });
   }
   return (
     <ImageUpload
       storageDir={`groups/${groupID}/photos`}
-      successCallback={successCallback}
+      updateDB={updateDB}
       refresh={refresh}
       multipleImages={true}
     />

@@ -19,16 +19,16 @@ import {
 
 const db = admin.firestore();
 
-const COVER_PHOTO_FILENAME = 'coverPhoto_fullSize';
+const COVER_PHOTO_FILENAME = 'coverPhoto';
 // Generates thumbnails for cover photos.
 export const generateThumbnailCoverPhotoOnFullSizeUpload = functions.storage
   .object()
   .onFinalize(async (object) => {
     if (!object.name) return;
-    if (!object.name.endsWith(COVER_PHOTO_FILENAME)) return;
+    if (!object.name.includes(COVER_PHOTO_FILENAME)) return;
 
     const fullSizeCoverPhotoPath = object.name;
-    await generateThumbnail(fullSizeCoverPhotoPath, 'coverPhoto', [
+    await generateThumbnail(fullSizeCoverPhotoPath, [
       '-thumbnail',
       '1070x200^',
       '-gravity',
@@ -38,16 +38,15 @@ export const generateThumbnailCoverPhotoOnFullSizeUpload = functions.storage
     ]);
   });
 
-const AVATAR_FILENAME = 'avatar_fullSize';
+const AVATAR_FILENAME = 'avatar';
 // Generates thumbnails for user and group avatars.
 export const generateThumbnailAvatarOnFullSizeUpload = functions.storage
   .object()
   .onFinalize(async (object) => {
     if (!object.name) return;
-    if (!object.name.endsWith(AVATAR_FILENAME)) return;
-
+    if (!object.name.includes(AVATAR_FILENAME)) return;
     const fullSizeAvatarPath = object.name;
-    await generateThumbnail(fullSizeAvatarPath, 'avatar', [
+    await generateThumbnail(fullSizeAvatarPath, [
       '-thumbnail',
       '200x200^',
       '-gravity',
@@ -253,8 +252,10 @@ export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall
 // If we are running the functions locally, we don't want to brick the
 // emulators with too many add publication requests, so we use a smaller number
 // of interpretations and smaller page size for each of those interpretations.
-const SUGGESTED_PUBLICATIONS_INTERPRETATIONS_COUNT = environment === 'local' ? 1 : 10;
-const SUGGESTED_PUBLICATIONS_EXECUTION_PAGE_SIZE = environment === 'local' ? 10 : 100;
+const SUGGESTED_PUBLICATIONS_INTERPRETATIONS_COUNT =
+  environment === 'local' ? 1 : 10;
+const SUGGESTED_PUBLICATIONS_EXECUTION_PAGE_SIZE =
+  environment === 'local' ? 10 : 100;
 
 // for a given name, return potential matching publications so the user can select theirs
 export const getSuggestedPublicationsForAuthorName = functions.https.onCall(

@@ -3,7 +3,7 @@ import {BrowserRouter as Router, useLocation} from 'react-router-dom';
 import Routes from './routes.jsx';
 import {auth, db} from './firebase';
 import Header from './components/Layout/Header/Header';
-import {getCoverPhoto, getDefaultAvatar} from './helpers/users.js';
+import {getDefaultAvatar, getDefaultCoverPhoto} from './helpers/users.js';
 
 import './App.css';
 
@@ -72,7 +72,7 @@ function AuthProvider({children}) {
         const userData = profile.data();
         if (userData && !userData.avatar) userData.avatar = getDefaultAvatar();
         if (userData && !userData.coverPhoto)
-          userData.coverPhoto = getCoverPhoto();
+          userData.coverPhoto = getDefaultCoverPhoto();
         setUserProfile(userData);
       })
       .catch((err) => console.log(err, 'could not retrieve user profile'));
