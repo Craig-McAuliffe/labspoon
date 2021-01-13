@@ -13,12 +13,11 @@ import ImageUploader from 'react-images-upload';
 import {searchClient} from '../../../algolia';
 import {abbrEnv} from '../../../config';
 
-import {AuthContext, FeatureFlags} from '../../../App';
+import {AuthContext} from '../../../App';
 import FormTextInput, {FormTextArea} from '../../Forms/FormTextInput';
 import PrimaryButton from '../../Buttons/PrimaryButton';
 import CancelButton from '../../Buttons/CancelButton';
 import NegativeButton from '../../Buttons/NegativeButton';
-import CreatePost from '../../Posts/Post/CreatePost/CreatePost';
 import GroupAvatar from '../../Avatar/GroupAvatar';
 import {AddMemberIcon, AddProfilePhoto} from '../../../assets/CreateGroupIcons';
 import UserListItem, {
@@ -59,7 +58,6 @@ export default function GroupInfoForm({
 }) {
   const [submitting, setSubmitting] = useState(false);
   const {user, userProfile} = useContext(AuthContext);
-  const featureFlags = useContext(FeatureFlags);
 
   const validationObj = {
     name: Yup.string().required('Name is required'),
@@ -149,11 +147,9 @@ export default function GroupInfoForm({
               {
                 // If the group is being created, the group type is specified by the user in the form. Otherwise it should be passed to this component.
               }
-              {(props.values.groupType === CHARITY || groupType === CHARITY) &&
-              featureFlags.has('donate-link') ? (
+              {(props.values.groupType === CHARITY ||
+                groupType === CHARITY) && (
                 <VerificationFormOrDonationLinkField verified={verified} />
-              ) : (
-                <></>
               )}
             </Form>
           </>
@@ -165,14 +161,6 @@ export default function GroupInfoForm({
         setSelectedUsers={setSelectedUsers}
       />
 
-      {featureFlags.has('create-pinned-post') ? (
-        <>
-          <h4>{`If there's a post you'd like to appear at the top of your group page, you can add it here:`}</h4>
-          <div className="create-group-pinned-post-container">
-            <CreatePost pinnedPost />
-          </div>
-        </>
-      ) : null}
       <CreateResourceFormActions
         submitText={submitText}
         submitting={submitting}

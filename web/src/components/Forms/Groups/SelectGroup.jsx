@@ -25,7 +25,7 @@ export function MustSelectGroup({userHasGroups, explanation}) {
       ) : (
         <>
           <div className="must-select-group-button-container">
-            <Link to="/create">
+            <Link to="/create/group">
               <SecondaryButton>
                 <CreateIcon hoverControl={true} />
                 Create Group Now

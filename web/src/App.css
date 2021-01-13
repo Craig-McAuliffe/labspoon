@@ -5,7 +5,7 @@
   grid-template-columns: 1fr;
   height: 100vh;
   min-height: 100%;
-  overflow: hidden;
+  overflow-y: scroll;
 }
 
 .header-layout {
@@ -26,8 +26,6 @@
   align-self: flex-start;
   max-width: 100vw;
   min-height: 100%;
-  height: 100vh;
-  overflow-y: auto;
 }
 
 .right-sider {
@@ -130,11 +128,5 @@
   .main-layout {
     display: block;
     max-width: 100%;
-  }
-}
-
-@media screen and (max-width: 500px) {
-  ::-webkit-scrollbar {
-    display: none;
   }
 }
