@@ -19,43 +19,6 @@ import {
 
 const db = admin.firestore();
 
-// const COVER_PHOTO_FILENAME = 'coverPhoto';
-// // Generates thumbnails for cover photos.
-// export const generateThumbnailCoverPhotoOnFullSizeUpload = functions.storage
-//   .object()
-//   .onFinalize(async (object) => {
-//     if (!object.name) return;
-//     if (!object.name.includes(COVER_PHOTO_FILENAME)) return;
-
-//     const fullSizeCoverPhotoPath = object.name;
-//     await generateThumbnail(fullSizeCoverPhotoPath, [
-//       '-thumbnail',
-//       '1070x200^',
-//       '-gravity',
-//       'center',
-//       '-extent',
-//       '1070x200',
-//     ]);
-//   });
-
-// const AVATAR_FILENAME = 'avatar';
-// // Generates thumbnails for user and group avatars.
-// export const generateThumbnailAvatarOnFullSizeUpload = functions.storage
-//   .object()
-//   .onFinalize(async (object) => {
-//     if (!object.name) return;
-//     if (!object.name.includes(AVATAR_FILENAME)) return;
-//     const fullSizeAvatarPath = object.name;
-//     await generateThumbnail(fullSizeAvatarPath, [
-//       '-thumbnail',
-//       '200x200^',
-//       '-gravity',
-//       'center',
-//       '-extent',
-//       '200x200',
-//     ]);
-//   });
-
 export const instantiateFollowingFeedForNewUser = functions.firestore
   .document('users/{userID}')
   .onCreate(async (change) => {
