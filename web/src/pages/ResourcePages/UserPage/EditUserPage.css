@@ -34,10 +34,18 @@
 }
 
 .edit-user-photos-section {
-  margin: 20px 0px 40px;
+  margin: 20px 0px 60px;
+}
+
+.edit-user-photos-section h2 {
+  margin-bottom: 0px;
 }
 
 .link-to-pubs-already-linked-note {
   color: #5d5d65;
   margin-top: 40px;
+}
+
+.resize-images-note {
+  color: #99999f;
 }

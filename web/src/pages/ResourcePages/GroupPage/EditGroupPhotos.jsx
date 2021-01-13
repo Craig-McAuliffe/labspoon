@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
-
 import {db} from '../../../firebase';
 import {getPaginatedImagesFromCollectionRef} from '../../../helpers/images';
 import {PaddedPageContainer} from '../../../components/Layout/Content';

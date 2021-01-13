@@ -14,13 +14,14 @@ const NOT_STARTED = 0;
 const UPLOADING = 1;
 const FINISHED = 2;
 
+const imageResize = firebase.functions().httpsCallable('images-resizeImage');
 export default function ImageUpload({
   storageDir,
   updateDB,
   refresh,
   multipleImages,
   cover,
-  conversionOptions,
+  resizeOptions,
 }) {
   const [files, setFiles] = useState([]);
   const [imageURLs, setImageURLs] = useState([]);
@@ -68,15 +69,24 @@ export default function ImageUpload({
     files.forEach(async (file) => {
       setUploadingCount((count) => count - 1);
       const photoID = uuid();
-      const photoStorageRef = storage.ref(storageDir + '/' + photoID);
-      await photoStorageRef.put(file, {contentType: file.type}).on(
+      const filePath = storageDir + '/' + photoID;
+      const photoStorageRef = storage.ref(filePath);
+      photoStorageRef.put(file, {contentType: file.type}).on(
         firebase.storage.TaskEvent.STATE_CHANGED,
         () => {},
         (err) => {
           console.error(err);
           setUnsuccessfulUploadCount((count) => count + 1);
         },
-        () => onSuccessfulStorageUpload(photoStorageRef, photoID)
+        () => {
+          onSuccessfulStorageUpload(
+            photoStorageRef,
+            photoID,
+            resizeOptions,
+            filePath,
+            setUnsuccessfulUploadCount
+          );
+        }
       );
       if (uploadingCount === 0) {
         if (unsuccessfulUploadCount === 0) setDisplaySuccessMessage(true);
@@ -85,15 +95,49 @@ export default function ImageUpload({
     });
   }
 
-  function onSuccessfulStorageUpload(photoStorageRef, photoID) {
+  function onSuccessfulStorageUpload(
+    photoStorageRef,
+    photoID,
+    resizeOptions,
+    filePath,
+    setUnsuccessfulUploadCount
+  ) {
     photoStorageRef
       .getDownloadURL()
       .then(async (url) => {
-        if (updateDB)
-          updateDB(url, photoID).catch((err) => {
+        if (resizeOptions) {
+          await imageResize({
+            filePath: filePath,
+            resizeOptions: resizeOptions,
+          })
+            .catch((err) => {
+              console.error(
+                'an error occurred while calling the resize functions',
+                err
+              );
+              setUnsuccessfulUploadCount((count) => count + 1);
+              photoStorageRef
+                .delete()
+                .catch((err) =>
+                  console.error(
+                    'could not delete cloud file for ref' + photoStorageRef,
+                    err
+                  )
+                );
+            })
+            .then(async () => {
+              if (updateDB)
+                await updateDB(url, photoID).catch((err) => {
+                  console.error(err);
+                  setUnsuccessfulUploadCount((count) => count + 1);
+                });
+            });
+        } else if (updateDB) {
+          await updateDB(url, photoID).catch((err) => {
             console.error(err);
             setUnsuccessfulUploadCount((count) => count + 1);
           });
+        }
       })
       .catch((err) =>
         console.error(

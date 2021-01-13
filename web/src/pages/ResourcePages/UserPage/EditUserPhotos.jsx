@@ -1,5 +1,4 @@
 import React, {useContext} from 'react';
-import {Alert} from 'react-bootstrap';
 import {db, storage} from '../../../firebase';
 import {useParams} from 'react-router-dom';
 import {PaddedPageContainer} from '../../../components/Layout/Content';
@@ -23,12 +22,6 @@ export default function EditUserPhotos({children}) {
         userID={userID}
         coverPhotoCloudID={coverPhotoCloudID}
       />
-      <Alert variant="warning">
-        <b>Note:</b> Photos may not update immediately subject to your browser
-        cache. We are looking into a fix for this. In the meantime to speed up
-        the reload, you can clear your browser cache or view your profile in an
-        incognito window.
-      </Alert>
     </PaddedPageContainer>
   );
 }
@@ -54,10 +47,11 @@ export function EditUserProfilePicture({userID, avatarCloudID}) {
   return (
     <div className="edit-user-photos-section">
       <h2>Profile Picture</h2>
+      <p className="resize-images-note">Cropped to a 200x200 pixel square.</p>
       <ImageUpload
         storageDir={`users/${userID}/avatar`}
         updateDB={addAvatarToUserDoc}
-        conversionOptions={[
+        resizeOptions={[
           '-thumbnail',
           '200x200^',
           '-gravity',
@@ -93,14 +87,18 @@ export function EditUserCoverPicture({userID, coverPhotoCloudID}) {
       'coverPhotoCloudID'
     );
   };
+
   return (
     <div className="edit-user-photos-section">
       <h2>Cover Picture</h2>
+      <p className="resize-images-note">
+        Cropped to a 1070x200 pixel rectangle.
+      </p>
       <ImageUpload
         storageDir={`users/${userID}/coverPhoto`}
         cover={true}
         updateDB={addCoverPhotoToUserDoc}
-        conversionOptions={[
+        resizeOptions={[
           '-thumbnail',
           '1070x200^',
           '-gravity',
