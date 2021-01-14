@@ -319,7 +319,7 @@ const GroupDetails = ({group, groupDescriptionRef, userIsMember, verified}) => {
   const featureFlags = useContext(FeatureFlags);
   const [displayFullDescription, setDisplayFullDescription] = useState({
     display: false,
-    size: 90,
+    size: 100,
   });
 
   if (group === undefined) return <></>;
@@ -332,7 +332,7 @@ const GroupDetails = ({group, groupDescriptionRef, userIsMember, verified}) => {
     <>
       <div className="group-header">
         <div className="group-icon-and-message">
-          <GroupAvatar src={group.avatar} height="120px" width="120px" />
+          <GroupAvatar src={group.avatar} height="160" width="160" />
           {featureFlags.has('group-message-button') ? <MessageButton /> : null}
         </div>
         <div className="group-header-info">

@@ -2,13 +2,12 @@ import React, {useState, useContext, useEffect} from 'react';
 import GroupInfoForm from './GroupInfoForm';
 import {useHistory} from 'react-router-dom';
 import {v4 as uuid} from 'uuid';
-import firebase, {db, storage} from '../../../firebase';
+import {db} from '../../../firebase';
 import {AuthContext} from '../../../App';
 import {LoadingSpinnerPage} from '../../LoadingSpinner/LoadingSpinner';
 
 import './CreateGroupPage.css';
-
-const resizeImage = firebase.functions().httpsCallable('images-resizeImage');
+import {editGroupAvatarStorageInForm} from '../../../helpers/groups';
 
 export default function CreateGroupPage({
   onboardingCancelOrSubmitAction,
@@ -30,7 +29,7 @@ export default function CreateGroupPage({
       setSelectedUsers([userProfile]);
       setError(false);
     }
-  }, [error]);
+  }, [error, setError, setSelectedUsers, userProfile]);
 
   const initialValues = {
     name: '',
@@ -96,62 +95,13 @@ export default function CreateGroupPage({
     };
 
     if (avatar.length > 0) {
-      const avatarFile = avatar[0];
-      const avatarID = uuid();
-      const avatarStoragePath = `groups/${groupID}/avatar/${avatarID}`;
-      const avatarStorageRef = storage.ref(avatarStoragePath);
-      const resizeOptions = [
-        '-thumbnail',
-        '200x200^',
-        '-gravity',
-        'center',
-        '-extent',
-        '200x200',
-      ];
-      return avatarStorageRef
-        .put(avatarFile, {
-          contentType: avatarFile.type,
-        })
-        .on(
-          firebase.storage.TaskEvent.STATE_CHANGED,
-          (snapshot) => {
-            // TODO: implement loading symbol
-            // console.log('snapshot', snapshot);
-          },
-          (err) => {
-            console.error(`failed to write avatar ${err}`);
-            setSubmitting(false);
-            setError(true);
-          },
-          () => {
-            avatarStorageRef
-              .getDownloadURL()
-              .then(async (url) => {
-                resizeImage({
-                  filePath: avatarStoragePath,
-                  resizeOptions: resizeOptions,
-                })
-                  .catch((err) => {
-                    setError(true);
-                    console.error(
-                      'an error occurred while resizing the image',
-                      err
-                    );
-                  })
-                  .then(() => writeToDB(avatarID, url));
-              })
-              .catch((err) => {
-                console.error(
-                  'failed to get download url for ' +
-                    avatarStorageRef +
-                    ', therefore cannot update db',
-                  err
-                );
-                setSubmitting(false);
-                setError(true);
-              });
-          }
-        );
+      editGroupAvatarStorageInForm(
+        avatar,
+        groupID,
+        setSubmitting,
+        setError,
+        writeToDB
+      );
     } else {
       return writeToDB();
     }

@@ -1,15 +1,14 @@
 import React, {useState, useEffect, useContext} from 'react';
 import GroupInfoForm from '../../../components/Group/CreateGroupPage/GroupInfoForm';
-import firebase, {db, storage} from '../../../firebase';
+import {db} from '../../../firebase';
 import {v4 as uuid} from 'uuid';
 import {AuthContext} from '../../../App';
 import {useHistory} from 'react-router-dom';
 import {PaddedPageContainer} from '../../../components/Layout/Content';
 import {LoadingSpinnerPage} from '../../../components/LoadingSpinner/LoadingSpinner';
+import {editGroupAvatarStorageInForm} from '../../../helpers/groups';
 
 import './GroupPage.css';
-
-const resizeImage = firebase.functions().httpsCallable('images-resizeImage');
 
 export default function EditingGroupInfo({groupData, children}) {
   const groupID = groupData.id;
@@ -31,7 +30,7 @@ export default function EditingGroupInfo({groupData, children}) {
       setSelectedUsers(groupMembers);
       setError(false);
     }
-  }, [error]);
+  }, [error, setSelectedUsers, setError, groupMembers]);
 
   useEffect(() => {
     db.doc(`verifiedGroups/${groupID}`)
@@ -160,76 +159,14 @@ export default function EditingGroupInfo({groupData, children}) {
     };
 
     if (avatar.length > 0) {
-      const avatarFile = avatar[0];
-      const avatarID = uuid();
-      const avatarStoragePath = `groups/${groupID}/avatar/${avatarID}`;
-      const avatarStorageRef = storage.ref(avatarStoragePath);
-      const resizeOptions = [
-        '-thumbnail',
-        '200x200^',
-        '-gravity',
-        'center',
-        '-extent',
-        '200x200',
-      ];
-
-      if (groupData.avatarCloudID) {
-        storage
-          .ref(`groups/${groupID}/avatar/${groupData.avatarCloudID}`)
-          .delete()
-          .catch((err) =>
-            console.error(
-              'could not delete existing group avatar, with id ' +
-                groupData.avatarCloudID +
-                ' from storage.',
-              err
-            )
-          );
-      }
-
-      return avatarStorageRef
-        .put(avatarFile, {
-          contentType: avatarFile.type,
-        })
-        .on(
-          firebase.storage.TaskEvent.STATE_CHANGED,
-          (snapshot) => {
-            // TODO: implement loading symbol
-            // console.log('snapshot', snapshot);
-          },
-          (err) => {
-            console.error(`failed to write avatar ${err}`);
-            setSubmitting(false);
-            setError(true);
-          },
-          () =>
-            avatarStorageRef
-              .getDownloadURL()
-              .then(async (url) => {
-                resizeImage({
-                  filePath: avatarStoragePath,
-                  resizeOptions: resizeOptions,
-                })
-                  .catch((err) => {
-                    setError(true);
-                    console.error(
-                      'an error occurred while resizing the image',
-                      err
-                    );
-                  })
-                  .then(() => writeToDB(avatarID, url));
-              })
-              .catch((err) => {
-                console.error(
-                  'failed to get download url for ' +
-                    avatarStorageRef +
-                    ', therefore cannot update db',
-                  err
-                );
-                setSubmitting(false);
-                setError(true);
-              })
-        );
+      editGroupAvatarStorageInForm(
+        avatar,
+        groupID,
+        setSubmitting,
+        setError,
+        writeToDB,
+        groupData.avatarCloudID
+      );
     } else {
       writeToDB();
     }
