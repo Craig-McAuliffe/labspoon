@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import {db, storage} from '../../../firebase';
+import {db} from '../../../firebase';
 import {useParams} from 'react-router-dom';
 import {PaddedPageContainer} from '../../../components/Layout/Content';
 import ImageUpload from '../../../components/Images/ImageUpload';
@@ -12,35 +12,17 @@ export default function EditUserPhotos({children}) {
   const {userProfile} = useContext(AuthContext);
   const userID = useParams().userID;
   if (!userProfile) return <LoadingSpinnerPage />;
-  const avatarCloudID = userProfile.avatarCloudID;
-  const coverPhotoCloudID = userProfile.coverPhotoCloudID;
   return (
     <PaddedPageContainer>
       {children}
-      <EditUserProfilePicture userID={userID} avatarCloudID={avatarCloudID} />
-      <EditUserCoverPicture
-        userID={userID}
-        coverPhotoCloudID={coverPhotoCloudID}
-      />
+      <EditUserProfilePicture userID={userID} />
+      <EditUserCoverPicture userID={userID} />
     </PaddedPageContainer>
   );
 }
 
-export function EditUserProfilePicture({userID, avatarCloudID}) {
+export function EditUserProfilePicture({userID}) {
   const addAvatarToUserDoc = async (url, photoID) => {
-    if (avatarCloudID) {
-      const currentAvatarRef = storage.ref(
-        `users/${userID}/avatar/${avatarCloudID}`
-      );
-      await currentAvatarRef
-        .delete()
-        .catch((err) =>
-          console.error(
-            'unable to delete avatar for user with id' + userID,
-            err
-          )
-        );
-    }
     return addToUserDoc(url, 'avatar', userID, photoID, 'avatarCloudID');
   };
 
@@ -64,21 +46,8 @@ export function EditUserProfilePicture({userID, avatarCloudID}) {
   );
 }
 
-export function EditUserCoverPicture({userID, coverPhotoCloudID}) {
+export function EditUserCoverPicture({userID}) {
   const addCoverPhotoToUserDoc = async (url, photoID) => {
-    if (coverPhotoCloudID) {
-      const currentCoverPhotoRef = storage.ref(
-        `users/${userID}/coverPhoto/${coverPhotoCloudID}`
-      );
-      await currentCoverPhotoRef
-        .delete()
-        .catch((err) =>
-          console.error(
-            'unable to delete cover photo for user with id' + userID,
-            err
-          )
-        );
-    }
     return addToUserDoc(
       url,
       'coverPhoto',

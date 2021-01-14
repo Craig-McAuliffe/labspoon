@@ -84,19 +84,19 @@ export function editGroupAvatarStorageInForm(
     '200x200',
   ];
 
-  if (existingAvatarCloudID) {
-    storage
-      .ref(`groups/${groupID}/avatar/${existingAvatarCloudID}`)
-      .delete()
-      .catch((err) =>
-        console.error(
-          'could not delete existing group avatar, with id ' +
-            existingAvatarCloudID +
-            ' from storage.',
-          err
-        )
-      );
-  }
+  // if (existingAvatarCloudID) {
+  //   storage
+  //     .ref(`groups/${groupID}/avatar/${existingAvatarCloudID}`)
+  //     .delete()
+  //     .catch((err) =>
+  //       console.error(
+  //         'could not delete existing group avatar, with id ' +
+  //           existingAvatarCloudID +
+  //           ' from storage.',
+  //         err
+  //       )
+  //     );
+  // }
 
   return avatarStorageRef
     .put(avatarFile, {

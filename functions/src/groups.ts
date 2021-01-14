@@ -7,17 +7,48 @@ import {Publication} from './microsoft';
 
 const db: firestore.Firestore = admin.firestore();
 
+const storage = admin.storage();
+
+export const removeOldGroupAvatar = functions.firestore
+  .document(`groups/{groupID}`)
+  .onUpdate(async (change, context) => {
+    const oldGroupData = change.before.data() as Group;
+    const newGroupData = change.after.data() as Group;
+    const groupID = context.params.groupID;
+    const oldAvatarCloudID = oldGroupData.avatarCloudID;
+    const newAvatarCloudID = newGroupData.avatarCloudID;
+    if (oldAvatarCloudID && oldAvatarCloudID !== newAvatarCloudID) {
+      const oldAvatarPath = `groups/${groupID}/avatar/${oldAvatarCloudID}`;
+      return storage
+        .bucket()
+        .file(oldAvatarPath)
+        .delete()
+        .catch((err) =>
+          console.error(
+            'unable to delete old avatar with id ' +
+              oldAvatarCloudID +
+              ' for group with id ' +
+              groupID,
+            err
+          )
+        );
+    }
+    return null;
+  });
+
 export const createGroupDocuments = functions.firestore
   .document(`groups/{groupID}`)
   .onCreate(async (change, context) => {
     const groupID = context.params.groupID;
-    await db.collection(`groups/${groupID}/feeds`)
+    await db
+      .collection(`groups/${groupID}/feeds`)
       .doc(`postsFeed`)
       .set({id: 'postsFeed'})
       .catch((err) =>
         console.log(err, 'could not create postsFeed for new group')
       );
-    await db.collection(`groups/${groupID}/feeds`)
+    await db
+      .collection(`groups/${groupID}/feeds`)
       .doc(`publicationsFeed`)
       .set({id: 'publicationsFeed'})
       .catch((err) =>
@@ -76,7 +107,9 @@ export const addGroupMembersToPublicationFilter = functions.firestore
   .onCreate(async (change, context) => {
     const groupID = context.params.groupID;
     const publication = change.data() as Publication;
-    const groupPublicationsFeedRef = db.doc(`groups/${groupID}/feeds/publicationsFeed`);
+    const groupPublicationsFeedRef = db.doc(
+      `groups/${groupID}/feeds/publicationsFeed`
+    );
     const updateFilterPromises = publication.authors!.map((author) => {
       if (!author.id) return;
       updateFilterCollection(
@@ -103,7 +136,9 @@ export const removeGroupMembersFromPublicationFilter = functions.firestore
   .onDelete(async (change, context) => {
     const groupID = context.params.groupID;
     const publication = change.data() as Publication;
-    const groupPublicationsFeedRef = db.doc(`groups/${groupID}/feeds/publicationsFeed`);
+    const groupPublicationsFeedRef = db.doc(
+      `groups/${groupID}/feeds/publicationsFeed`
+    );
     const updateFilterPromises = publication.authors!.map((author) => {
       if (!author.id) return;
       updateFilterCollection(
@@ -162,30 +197,58 @@ export const removeGroupOnRelatedTopicPage = functions.firestore
 // Mark is added to the group's members collection by Jenna. Jenna does not
 // have permission to modify Mark's groups collection, so this function
 // performs this reciprocal update.
-export const addGroupToUserGroups = functions.firestore.document('groups/{groupID}/members/{userID}').onCreate(async (_, context) => {
-  const groupID = context.params.groupID;
-  const userID = context.params.userID;
-  const groupDS = await db.doc(`groups/${groupID}`).get().catch((err) => {
-    console.log(`Unable to retrieve group with ID ${groupID}:`, err);
-    throw new functions.https.HttpsError('not-found', `Unable to retrieve group with ID ${groupID}.`);
+export const addGroupToUserGroups = functions.firestore
+  .document('groups/{groupID}/members/{userID}')
+  .onCreate(async (_, context) => {
+    const groupID = context.params.groupID;
+    const userID = context.params.userID;
+    const groupDS = await db
+      .doc(`groups/${groupID}`)
+      .get()
+      .catch((err) => {
+        console.log(`Unable to retrieve group with ID ${groupID}:`, err);
+        throw new functions.https.HttpsError(
+          'not-found',
+          `Unable to retrieve group with ID ${groupID}.`
+        );
+      });
+    const group = groupDS.data() as GroupRef;
+    await db
+      .doc(`users/${userID}/groups/${groupID}`)
+      .set(group)
+      .catch((err) => {
+        console.log(
+          `Unable to set group with ID ${groupID} on user ${userID} groups collection:`,
+          err
+        );
+        throw new functions.https.HttpsError(
+          'internal',
+          `Unable to set group with ID ${groupID} on user ${userID} groups collection.`
+        );
+      });
+    return true;
   });
-  const group = groupDS.data() as GroupRef;
-  await db.doc(`users/${userID}/groups/${groupID}`).set(group).catch((err) => {
-    console.log(`Unable to set group with ID ${groupID} on user ${userID} groups collection:`, err);
-    throw new functions.https.HttpsError('internal', `Unable to set group with ID ${groupID} on user ${userID} groups collection.`);
-  });
-  return true;
-});
 
 // Converse of addGroupToUserGroups.
-export const removeGroupFromUserGroups = functions.firestore.document('groups/{groupID}/members/{userID}').onDelete(async (_, context) => {
-  const groupID = context.params.groupID;
-  const userID = context.params.userID;
-  await db.doc(`users/${userID}/groups/${groupID}`).delete().catch((err) => {
-    console.log(`Unable to remove group with ID ${groupID} from user ${userID} groups collection:`, err);
-    throw new functions.https.HttpsError('internal', `Unable to remove group with ID ${groupID} from user ${userID} groups collection.`);
+export const removeGroupFromUserGroups = functions.firestore
+  .document('groups/{groupID}/members/{userID}')
+  .onDelete(async (_, context) => {
+    const groupID = context.params.groupID;
+    const userID = context.params.userID;
+    await db
+      .doc(`users/${userID}/groups/${groupID}`)
+      .delete()
+      .catch((err) => {
+        console.log(
+          `Unable to remove group with ID ${groupID} from user ${userID} groups collection:`,
+          err
+        );
+        throw new functions.https.HttpsError(
+          'internal',
+          `Unable to remove group with ID ${groupID} from user ${userID} groups collection.`
+        );
+      });
   });
-});
 
 export async function setGroupOnTopic(
   topic: Topic,
@@ -222,7 +285,9 @@ export const addGroupTypeToExistingGroups = functions.https.onCall(async () => {
   const updatePromises: Promise<void | firestore.WriteResult>[] = [];
   groupCollectionRef.forEach((doc) => {
     const groupRef = doc.ref;
-    const updatePromise = groupRef.update({groupType: 'researchGroup'}).catch((err) => console.error(err));
+    const updatePromise = groupRef
+      .update({groupType: 'researchGroup'})
+      .catch((err) => console.error(err));
     updatePromises.push(updatePromise);
   });
   await Promise.all(updatePromises);
@@ -232,7 +297,7 @@ export function toGroupRef(groupID: string, group: any) {
   const groupRef: GroupRef = {
     id: groupID,
     name: group.name,
-  }
+  };
   if (group.avatar) groupRef.avatar = group.avatar;
   if (group.about) groupRef.about = group.about;
   if (group.institution) groupRef.institution = group.institution;
@@ -242,15 +307,24 @@ export function toGroupRef(groupID: string, group: any) {
 export const verifyGroup = functions.https.onRequest(async (req, res) => {
   const groupID = req.body.data.groupID;
   if (!groupID) {
-    throw new functions.https.HttpsError('invalid-argument', `A group ID must be provided.`);
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      `A group ID must be provided.`
+    );
   }
   const verification: VerifiedGroup = {
     timestamp: new Date(),
   };
-  await db.doc(`verifiedGroups/${groupID}`).set(verification).catch((err) => {
-    console.error(`Unable to verify group ${groupID}:`, err);
-    throw new functions.https.HttpsError('internal', `Unable to verify group with ID ${groupID}.`);
-  });
+  await db
+    .doc(`verifiedGroups/${groupID}`)
+    .set(verification)
+    .catch((err) => {
+      console.error(`Unable to verify group ${groupID}:`, err);
+      throw new functions.https.HttpsError(
+        'internal',
+        `Unable to verify group with ID ${groupID}.`
+      );
+    });
   res.status(200).send();
 });
 
@@ -266,4 +340,17 @@ export interface GroupRef {
   about?: string;
   institution?: string;
   rank?: number;
+}
+
+interface Group {
+  id: string;
+  name: string;
+  groupType: string;
+  avatar?: string;
+  avatarCloudID?: string;
+  about?: string;
+  location?: string;
+  website?: string;
+  donationLink?: string;
+  institution?: string;
 }
