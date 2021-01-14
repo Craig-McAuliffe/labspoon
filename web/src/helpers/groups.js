@@ -68,8 +68,7 @@ export function editGroupAvatarStorageInForm(
   groupID,
   setSubmitting,
   setError,
-  writeToDB,
-  existingAvatarCloudID
+  writeToDB
 ) {
   const avatarFile = avatar[0];
   const avatarID = uuid();
@@ -83,20 +82,6 @@ export function editGroupAvatarStorageInForm(
     '-extent',
     '200x200',
   ];
-
-  // if (existingAvatarCloudID) {
-  //   storage
-  //     .ref(`groups/${groupID}/avatar/${existingAvatarCloudID}`)
-  //     .delete()
-  //     .catch((err) =>
-  //       console.error(
-  //         'could not delete existing group avatar, with id ' +
-  //           existingAvatarCloudID +
-  //           ' from storage.',
-  //         err
-  //       )
-  //     );
-  // }
 
   return avatarStorageRef
     .put(avatarFile, {

@@ -164,8 +164,7 @@ export default function EditingGroupInfo({groupData, children}) {
         groupID,
         setSubmitting,
         setError,
-        writeToDB,
-        groupData.avatarCloudID
+        writeToDB
       );
     } else {
       writeToDB();
