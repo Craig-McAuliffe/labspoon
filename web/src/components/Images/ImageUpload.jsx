@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import firebase, {storage} from '../../firebase';
 import {v4 as uuid} from 'uuid';
 import {AddButton} from '../../assets/GeneralActionIcons';
@@ -9,12 +9,14 @@ import SuccessMessage from '../Forms/SuccessMessage';
 import ErrorMessage from '../Forms/ErrorMessage';
 import UserCoverPhoto from '../User/UserCoverPhoto';
 import './ImageUpload.css';
+import GroupAvatar from '../Avatar/GroupAvatar';
+import {AddProfilePhoto} from '../../assets/CreateGroupIcons';
 
 const NOT_STARTED = 0;
 const UPLOADING = 1;
 const FINISHED = 2;
 
-const imageResize = firebase.functions().httpsCallable('images-resizeImage');
+const resizeImage = firebase.functions().httpsCallable('images-resizeImage');
 export default function ImageUpload({
   storageDir,
   updateDB,
@@ -40,14 +42,16 @@ export default function ImageUpload({
       setDisplaySuccessMessage(false);
       setDisplayErrorMessage(false);
     }
+
     setImageURLs(files.map((file) => URL.createObjectURL(file)));
-    setUploading(NOT_STARTED);
+    if (setUploading) setUploading(NOT_STARTED);
+
     return () => {
       imageURLs.map((url) => URL.revokeObjectURL(url));
       setImageURLs([]);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [files, setImageURLs, setUploading]);
+  }, [files, setDisplayErrorMessage, setDisplaySuccessMessage]);
 
   useEffect(() => {
     if (uploading === FINISHED) {
@@ -84,7 +88,8 @@ export default function ImageUpload({
             photoID,
             resizeOptions,
             filePath,
-            setUnsuccessfulUploadCount
+            setUnsuccessfulUploadCount,
+            updateDB
           );
         }
       );
@@ -95,120 +100,229 @@ export default function ImageUpload({
     });
   }
 
-  function onSuccessfulStorageUpload(
-    photoStorageRef,
-    photoID,
-    resizeOptions,
-    filePath,
-    setUnsuccessfulUploadCount
-  ) {
-    photoStorageRef
-      .getDownloadURL()
-      .then(async (url) => {
-        if (resizeOptions) {
-          await imageResize({
-            filePath: filePath,
-            resizeOptions: resizeOptions,
-          })
-            .catch((err) => {
-              console.error(
-                'an error occurred while calling the resize functions',
-                err
-              );
-              setUnsuccessfulUploadCount((count) => count + 1);
-              photoStorageRef
-                .delete()
-                .catch((err) =>
-                  console.error(
-                    'could not delete cloud file for ref' + photoStorageRef,
-                    err
-                  )
-                );
-            })
-            .then(async () => {
-              if (updateDB)
-                await updateDB(url, photoID).catch((err) => {
-                  console.error(err);
-                  setUnsuccessfulUploadCount((count) => count + 1);
-                });
-            });
-        } else if (updateDB) {
-          await updateDB(url, photoID).catch((err) => {
-            console.error(err);
+  function cancel() {
+    setFiles([]);
+  }
+  return imageURLs.length === 0 ? (
+    <NoImagesSelected
+      onChange={onChange}
+      multipleImages={multipleImages}
+      displaySuccessMessage={displaySuccessMessage}
+      displayErrorMessage={displayErrorMessage}
+      unsuccessfulUploadCount={unsuccessfulUploadCount}
+    />
+  ) : (
+    <ImagesSelected
+      imageURLs={imageURLs}
+      uploading={uploading}
+      cover={cover}
+      cancel={cancel}
+      uploadImages={uploadImages}
+    />
+  );
+}
+
+function onSuccessfulStorageUpload(
+  photoStorageRef,
+  photoID,
+  resizeOptions,
+  filePath,
+  setUnsuccessfulUploadCount,
+  updateDB
+) {
+  photoStorageRef
+    .getDownloadURL()
+    .then(async (url) => {
+      if (resizeOptions) {
+        await resizeImage({
+          filePath: filePath,
+          resizeOptions: resizeOptions,
+        })
+          .catch((err) => {
+            console.error(
+              'an error occurred while calling the resize functions',
+              err
+            );
             setUnsuccessfulUploadCount((count) => count + 1);
+            deleteUploadedFileOnError();
+          })
+          .then(async () => {
+            if (updateDB)
+              await updateDB(url, photoID).catch((err) => {
+                console.error(err);
+                setUnsuccessfulUploadCount((count) => count + 1);
+              });
           });
-        }
-      })
+      } else if (updateDB) {
+        await updateDB(url, photoID).catch((err) => {
+          console.error(err);
+          setUnsuccessfulUploadCount((count) => count + 1);
+        });
+      }
+    })
+    .catch((err) => {
+      console.error(
+        'failed to get download url for ' +
+          photoStorageRef +
+          ', therefore cannot update db',
+        err
+      );
+      deleteUploadedFileOnError();
+      setUnsuccessfulUploadCount((count) => count + 1);
+    });
+
+  const deleteUploadedFileOnError = () => {
+    photoStorageRef
+      .delete()
       .catch((err) =>
         console.error(
-          'failed to get download url for ' +
-            photoStorageRef +
-            ', therefore cannot update db',
+          'could not delete cloud file for ref' + photoStorageRef,
           err
         )
       );
-  }
+  };
+}
+
+export function ImageUploadInForm({
+  existingAvatar,
+  onSelect,
+  multiple,
+  submitting,
+}) {
+  const [files, setFiles] = useState([]);
+  const [imageURLs, setImageURLs] = useState([]);
+  const selectFileInputRef = useRef();
+  const [displayValidationMessage, setDisplayValidationMessage] = useState(
+    false
+  );
+  const onChange = (e) => {
+    setFiles(Array.from(e.target.files));
+  };
+
+  useEffect(() => {
+    onSelect(files);
+  }, [onSelect, files]);
+
+  useEffect(() => {
+    setImageURLs(files.map((file) => URL.createObjectURL(file)));
+
+    return () => {
+      imageURLs.map((url) => URL.revokeObjectURL(url));
+      setImageURLs([]);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [files, setImageURLs]);
+
+  if (imageURLs.length > 0)
+    return (
+      <ImagesSelected
+        imageURLs={imageURLs}
+        cancel={cancel}
+        uploading={submitting ? UPLOADING : false}
+        isAvatar={true}
+        cancelText="Remove"
+      />
+    );
 
   function cancel() {
     setFiles([]);
   }
 
-  if (files.length === 0)
-    return (
-      <div className="image-upload-section">
-        <SelectImages onChange={onChange} multipleImages={multipleImages} />
-        <div className="after-upload-message-container">
-          {displaySuccessMessage ? <UploadSuccessMessage /> : <></>}
-          {displayErrorMessage ? (
-            <UploadErrorMessage count={unsuccessfulUploadCount} />
-          ) : (
-            <></>
-          )}
-        </div>
-      </div>
-    );
+  return (
+    <div>
+      <input
+        type="file"
+        onChange={(e) =>
+          validatedOnChange(e, onChange, setDisplayValidationMessage)
+        }
+        name="uploaded-image"
+        multiple={multiple}
+        ref={selectFileInputRef}
+        style={{display: 'none'}}
+      />
+      <button
+        className="image-upload-avatar-button"
+        onClick={() => selectFileInputRef.current.click()}
+        type="button"
+      >
+        {existingAvatar ? (
+          <div className="image-upload-avatar-container">
+            <GroupAvatar src={existingAvatar} />
+            <AddButton />
+            <h3>Upload New Photo</h3>
+          </div>
+        ) : (
+          <div className="image-upload-no-avatar-container">
+            <AddProfilePhoto />
+          </div>
+        )}
+      </button>
+      {displayValidationMessage && <UploadValidationMessage />}
+    </div>
+  );
+}
 
+function NoImagesSelected({
+  onChange,
+  multipleImages,
+  displaySuccessMessage,
+  displayErrorMessage,
+  unsuccessfulUploadCount,
+}) {
+  return (
+    <div className="image-upload-section">
+      <SelectImages onChange={onChange} multipleImages={multipleImages} />
+      <div className="after-upload-message-container">
+        {displaySuccessMessage ? <UploadSuccessMessage /> : <></>}
+        {displayErrorMessage ? (
+          <UploadErrorMessage count={unsuccessfulUploadCount} />
+        ) : (
+          <></>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ImagesSelected({
+  imageURLs,
+  uploading,
+  cover,
+  cancel,
+  uploadImages,
+  isAvatar,
+  cancelText,
+}) {
   return (
     <>
       <ImagePreviews
         urls={imageURLs}
         uploading={uploading === UPLOADING}
         cover={cover}
+        rounded={isAvatar}
       />
       <div className="confirm-cancel-upload-container">
         <NegativeButton onClick={cancel} disabled={uploading === UPLOADING}>
-          Cancel
+          {cancelText ? cancelText : 'Cancel'}
         </NegativeButton>
-        <PrimaryButton
-          onClick={uploadImages}
-          disabled={uploading === UPLOADING}
-        >
-          Upload
-        </PrimaryButton>
+        {uploadImages && (
+          <PrimaryButton
+            onClick={uploadImages}
+            disabled={uploading === UPLOADING}
+          >
+            Upload
+          </PrimaryButton>
+        )}
       </div>
     </>
   );
 }
-
 const MAX_IMAGE_PREVIEWS = 3;
 
 export function SelectImages({onChange, multipleImages}) {
   const [displayValidationMessage, setDisplayValidationMessage] = useState(
     false
   );
-  function validatedOnChange(e) {
-    setDisplayValidationMessage(false);
-    const files = Array.from(e.target.files);
-    const anyNonImages = files.filter(
-      (file) => file.type.split('/')[0] !== 'image'
-    );
-    if (anyNonImages.length !== 0) {
-      setDisplayValidationMessage(true);
-      return;
-    }
-    return onChange(e);
-  }
-
   return (
     <>
       <div className="image-upload-container">
@@ -217,7 +331,9 @@ export function SelectImages({onChange, multipleImages}) {
           <h4>Choose image{multipleImages ? 's' : ''}</h4>
           <input
             type="file"
-            onChange={validatedOnChange}
+            onChange={(e) =>
+              validatedOnChange(e, onChange, setDisplayValidationMessage)
+            }
             multiple={multipleImages}
             name="uploaded-image"
           />
@@ -228,7 +344,7 @@ export function SelectImages({onChange, multipleImages}) {
   );
 }
 
-export function ImagePreviews({urls, uploading, cover}) {
+export function ImagePreviews({urls, uploading, cover, rounded}) {
   if (cover)
     return (
       <div className="image-upload-cover-preview-container">
@@ -239,6 +355,17 @@ export function ImagePreviews({urls, uploading, cover}) {
             spinner={uploading}
             key={url + i}
           />
+        ))}
+      </div>
+    );
+
+  if (rounded)
+    return (
+      <div>
+        {urls.map((url, i) => (
+          <div key={url + i} className="image-upload-rounded-preview-container">
+            <img src={url} alt={`uploaded avatar from source ${url}`} />
+          </div>
         ))}
       </div>
     );
@@ -275,4 +402,17 @@ function UploadErrorMessage({count}) {
 
 function UploadValidationMessage() {
   return <ErrorMessage>You can only upload images here.</ErrorMessage>;
+}
+
+function validatedOnChange(e, onChange, setDisplayValidationMessage) {
+  setDisplayValidationMessage(false);
+  const files = Array.from(e.target.files);
+  const anyNonImages = files.filter(
+    (file) => file.type.split('/')[0] !== 'image'
+  );
+  if (anyNonImages.length !== 0) {
+    setDisplayValidationMessage(true);
+    return;
+  }
+  return onChange(e);
 }

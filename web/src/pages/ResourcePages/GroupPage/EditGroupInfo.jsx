@@ -1,22 +1,37 @@
 import React, {useState, useEffect, useContext} from 'react';
 import GroupInfoForm from '../../../components/Group/CreateGroupPage/GroupInfoForm';
 import firebase, {db, storage} from '../../../firebase';
-import {Alert} from 'react-bootstrap';
 import {v4 as uuid} from 'uuid';
 import {AuthContext} from '../../../App';
 import {useHistory} from 'react-router-dom';
+import {PaddedPageContainer} from '../../../components/Layout/Content';
+import {LoadingSpinnerPage} from '../../../components/LoadingSpinner/LoadingSpinner';
 
 import './GroupPage.css';
 
-export default function EditingGroupInfo({groupData}) {
+const resizeImage = firebase.functions().httpsCallable('images-resizeImage');
+
+export default function EditingGroupInfo({groupData, children}) {
   const groupID = groupData.id;
   const [groupMembers, setGroupMembers] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [verified, setVerified] = useState(undefined);
   const [avatar, setAvatar] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(false);
   const {user} = useContext(AuthContext);
   const history = useHistory();
   const userID = user.uid;
+
+  useEffect(() => {
+    if (error) {
+      alert(
+        'Something went wrong while editing the group. Please try again. If the problem persists, please email help@labspoon.com'
+      );
+      setSelectedUsers(groupMembers);
+      setError(false);
+    }
+  }, [error]);
 
   useEffect(() => {
     db.doc(`verifiedGroups/${groupID}`)
@@ -67,6 +82,7 @@ export default function EditingGroupInfo({groupData}) {
   };
 
   const onSubmitEdit = (values) => {
+    setSubmitting(true);
     const memberIDsToBeRemoved = [];
     const invitationsToBeRemoved = [];
     groupMembers.forEach((existingGroupMember) => {
@@ -87,9 +103,12 @@ export default function EditingGroupInfo({groupData}) {
       )
         memberIDsToBeRemoved.push(existingGroupMember.id);
     });
-    const writeToDB = () => {
+
+    const writeToDB = (avatarID, downloadURL) => {
       const batch = db.batch();
       const groupDocRef = db.doc(`groups/${groupID}`);
+      if (downloadURL) values.avatar = downloadURL;
+      if (avatarID) values.avatarCloudID = avatarID;
       batch.update(groupDocRef, values);
       selectedUsers.forEach((newMember) => {
         if (!newMember.id) {
@@ -129,38 +148,97 @@ export default function EditingGroupInfo({groupData}) {
       });
       batch
         .commit()
-        .catch((err) => alert(err, 'batch failed to commit'))
+        .catch((err) => {
+          console.error('edit group batch failed', err);
+          setSubmitting(false);
+          setError(true);
+        })
         .then(() => {
+          setSubmitting(false);
           history.push(`/group/${groupID}`);
         });
     };
-    const avatarStorageRef = storage.ref(`groups/${groupID}/avatar_fullSize`);
+
     if (avatar.length > 0) {
-      return avatarStorageRef.put(avatar[0], {contentType: avatar[0].type}).on(
-        firebase.storage.TaskEvent.STATE_CHANGED,
-        (snapshot) => {
-          // TODO: implement loading symbol
-          console.log('snapshot', snapshot);
-        },
-        (err) => {
-          alert(`failed to write avatar ${err}`);
-        },
-        writeToDB
-      );
+      const avatarFile = avatar[0];
+      const avatarID = uuid();
+      const avatarStoragePath = `groups/${groupID}/avatar/${avatarID}`;
+      const avatarStorageRef = storage.ref(avatarStoragePath);
+      const resizeOptions = [
+        '-thumbnail',
+        '200x200^',
+        '-gravity',
+        'center',
+        '-extent',
+        '200x200',
+      ];
+
+      if (groupData.avatarCloudID) {
+        storage
+          .ref(`groups/${groupID}/avatar/${groupData.avatarCloudID}`)
+          .delete()
+          .catch((err) =>
+            console.error(
+              'could not delete existing group avatar, with id ' +
+                groupData.avatarCloudID +
+                ' from storage.',
+              err
+            )
+          );
+      }
+
+      return avatarStorageRef
+        .put(avatarFile, {
+          contentType: avatarFile.type,
+        })
+        .on(
+          firebase.storage.TaskEvent.STATE_CHANGED,
+          (snapshot) => {
+            // TODO: implement loading symbol
+            // console.log('snapshot', snapshot);
+          },
+          (err) => {
+            console.error(`failed to write avatar ${err}`);
+            setSubmitting(false);
+            setError(true);
+          },
+          () =>
+            avatarStorageRef
+              .getDownloadURL()
+              .then(async (url) => {
+                resizeImage({
+                  filePath: avatarStoragePath,
+                  resizeOptions: resizeOptions,
+                })
+                  .catch((err) => {
+                    setError(true);
+                    console.error(
+                      'an error occurred while resizing the image',
+                      err
+                    );
+                  })
+                  .then(() => writeToDB(avatarID, url));
+              })
+              .catch((err) => {
+                console.error(
+                  'failed to get download url for ' +
+                    avatarStorageRef +
+                    ', therefore cannot update db',
+                  err
+                );
+                setSubmitting(false);
+                setError(true);
+              })
+        );
+    } else {
+      writeToDB();
     }
-    writeToDB();
   };
 
+  if (submitting) return <LoadingSpinnerPage />;
   return (
-    <div>
-      <Alert variant="warning">
-        Profile pictures will be cropped to a 200x200 pixel square, we recommend
-        using a square source image to avoid loss of proportion. Profile
-        pictures may not update immediately subject to your browser cache, we
-        are looking into a fix for this. In the meantime to speed up the reload,
-        you can clear your browser cache or view your profile in an incognito
-        window.
-      </Alert>
+    <PaddedPageContainer>
+      {children}
       <GroupInfoForm
         initialValues={initialValues}
         onSubmit={onSubmitEdit}
@@ -173,7 +251,8 @@ export default function EditingGroupInfo({groupData}) {
         editingGroup={true}
         cancelForm={() => history.push(`/group/${groupID}`)}
         groupType={groupData.groupType}
+        submitting={submitting}
       />
-    </div>
+    </PaddedPageContainer>
   );
 }

@@ -8,7 +8,6 @@ import {
   Configure,
   connectStateResults,
 } from 'react-instantsearch-dom';
-import ImageUploader from 'react-images-upload';
 
 import {searchClient} from '../../../algolia';
 import {abbrEnv} from '../../../config';
@@ -18,8 +17,7 @@ import FormTextInput, {FormTextArea} from '../../Forms/FormTextInput';
 import PrimaryButton from '../../Buttons/PrimaryButton';
 import CancelButton from '../../Buttons/CancelButton';
 import NegativeButton from '../../Buttons/NegativeButton';
-import GroupAvatar from '../../Avatar/GroupAvatar';
-import {AddMemberIcon, AddProfilePhoto} from '../../../assets/CreateGroupIcons';
+import {AddMemberIcon} from '../../../assets/CreateGroupIcons';
 import UserListItem, {
   UserListItemEmailOnly,
   UserSmallResultItem,
@@ -33,6 +31,7 @@ import {PaddedContent} from '../../../components/Layout/Content';
 import Select, {LabelledDropdownContainer} from '../../Forms/Select/Select';
 import {DropdownOption} from '../../Dropdown';
 import InputError from '../../../components/Forms/InputError';
+import {ImageUploadInForm} from '../../Images/ImageUpload';
 
 import './CreateGroupPage.css';
 import './GroupInfoForm.css';
@@ -55,8 +54,8 @@ export default function GroupInfoForm({
   verified,
   editingGroup,
   groupType,
+  submitting,
 }) {
-  const [submitting, setSubmitting] = useState(false);
   const {user, userProfile} = useContext(AuthContext);
 
   const validationObj = {
@@ -72,12 +71,6 @@ export default function GroupInfoForm({
       .oneOf([RESEARCH_GROUP, CHARITY])
       .required('You must select a group type');
   const validationSchema = Yup.object(validationObj);
-
-  function onSubmitAndPreventDuplicate(values) {
-    if (submitting) return;
-    setSubmitting(true);
-    onSubmit(values);
-  }
 
   useEffect(() => {
     if (userProfile === undefined) return;
@@ -114,7 +107,7 @@ export default function GroupInfoForm({
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
-        onSubmit={onSubmitAndPreventDuplicate}
+        onSubmit={onSubmit}
       >
         {(props) => (
           <>
@@ -125,6 +118,7 @@ export default function GroupInfoForm({
               <EditAvatar
                 existingAvatar={existingAvatar}
                 onAvatarSelect={onAvatarSelect}
+                submitting={submitting}
               />
               <div className="create-group-meta-info">
                 <h3>Basic Info</h3>
@@ -171,38 +165,18 @@ export default function GroupInfoForm({
   );
 }
 
-function EditAvatar({existingAvatar, onAvatarSelect}) {
-  const [editingAvatar, setEditingAvatar] = useState(false);
-
+function EditAvatar({existingAvatar, onAvatarSelect, submitting}) {
   return (
-    <>
+    <div className="edit-group-avatar-section">
       <h3>Group Picture </h3>
-      <div className="edit-group-avatar-section">
-        {!existingAvatar || editingAvatar ? (
-          <div className="change-group-avatar-container">
-            <AddProfilePhoto />
-            <ImageUploader
-              onChange={onAvatarSelect}
-              imgExtension={['.jpg', '.png']}
-              singleImage
-              withPreview
-              withIcon={false}
-              buttonStyles={{background: '#00507c'}}
-            />
-            <CancelButton cancelAction={() => setEditingAvatar(false)} />
-          </div>
-        ) : (
-          <button
-            className="edit-group-info-upload-photo-button"
-            onClick={() => setEditingAvatar(true)}
-          >
-            <GroupAvatar src={existingAvatar} />
-            <h3>Upload New Photo</h3>
-            <div className="edit-group-info-upload-photo-button-plus"></div>
-          </button>
-        )}
+      <div>
+        <ImageUploadInForm
+          onSelect={onAvatarSelect}
+          existingAvatar={existingAvatar}
+          submitting={submitting}
+        />
       </div>
-    </>
+    </div>
   );
 }
 

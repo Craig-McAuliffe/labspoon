@@ -30,10 +30,6 @@ export const resizeImage = functions.https.onCall(async (data, context) => {
         cacheControl: 'no-cache public',
       },
     })
-    .then((resp) => {
-      console.log(resp);
-      //   resp[0].makePublic();
-    })
     .catch((err) => {
       console.error(err);
       throw new functions.https.HttpsError(

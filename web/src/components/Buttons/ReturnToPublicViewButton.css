@@ -1,3 +1,11 @@
-.edit-group-page-back:hover {
+.return-to-public-view-button {
+  color: #00507c;
+  text-align: left;
+  padding: 0px;
+  display: block;
+  margin-bottom: 40px;
+}
+
+.return-to-public-view-button:hover {
   color: #3099d3;
 }

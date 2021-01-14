@@ -87,3 +87,73 @@
   height: 200px;
   position: relative;
 }
+
+.image-upload-no-avatar-container,
+.image-upload-rounded-preview-container {
+  border-radius: 100%;
+  max-width: 200px;
+  max-height: 200px;
+  width: 30vw;
+  height: 30vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.image-upload-rounded-preview-container img {
+  max-width: 200px;
+  max-height: 200px;
+  width: 30vw;
+  height: 30vw;
+  object-fit: cover;
+}
+
+.image-upload-no-avatar-container {
+  border: 1px solid #99999f;
+  padding: 20px;
+}
+
+.image-upload-no-avatar-container:hover {
+  border: 1px solid #00507c;
+}
+
+.image-upload-no-avatar-container:hover path {
+  fill: #00507c;
+}
+
+.image-upload-avatar-button:hover img {
+  opacity: 50%;
+}
+
+.image-upload-avatar-button:hover h3 {
+  color: #3099d3;
+}
+
+.image-upload-avatar-button {
+  position: relative;
+}
+
+.image-upload-avatar-container svg {
+  display: none;
+}
+
+.image-upload-avatar-container path {
+  stroke: #00507c;
+}
+
+.image-upload-avatar-container:hover svg {
+  display: block;
+  position: absolute;
+  top: 25%;
+  left: 30%;
+  height: 40%;
+  width: 40%;
+}
+
+.image-upload-avatar-button h3 {
+  color: #00507c;
+  margin-top: 10px;
+  margin-left: 7px;
+}

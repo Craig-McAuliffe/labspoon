@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Route, Switch, useParams, useRouteMatch} from 'react-router-dom';
 import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 import {getGroup} from '../../../helpers/groups';
@@ -8,7 +8,6 @@ import EditGroupPosts from './EditGroupPosts';
 import EditGroupPublications from './EditGroupPublications';
 import EditGroupPhotos from './EditGroupPhotos';
 import EditGroupVideos from './EditGroupVideos';
-import {FeatureFlags} from '../../../App';
 import EditGroupTechniques from './EditGroupTechniques';
 import EditGroupResearchFocuses from './EditGroupResearchFocuses';
 import EditGroupOpenPositions from './EditGroupOpenPositions';
@@ -56,7 +55,6 @@ export default function EditGroupPage() {
     OPENPOSITIONS_TAB,
   ];
   const groupURL = url.slice(0, url.length - '/edit'.length);
-  const flags = useContext(FeatureFlags);
 
   useEffect(() => {
     Promise.resolve(getGroup(groupID))
@@ -76,13 +74,10 @@ export default function EditGroupPage() {
   return (
     <Switch>
       <Route path={`${path}/${INFO_TAB}`}>
-        <div className="content-layout">
-          <div className="group-details">
-            <EditGroupTabs tabs={tabs} activeTab={INFO_TAB} />
-            <ReturnToPublicViewButton url={groupURL} />
-            <EditGroupInfo groupData={group} />
-          </div>
-        </div>
+        <EditGroupInfo groupData={group}>
+          <EditGroupTabs tabs={tabs} activeTab={INFO_TAB} />
+          <ReturnToPublicViewButton url={groupURL} />
+        </EditGroupInfo>
       </Route>
       <Route path={`${path}/${POSTS_TAB}`}>
         <EditGroupPosts groupID={groupID}>
@@ -108,14 +103,12 @@ export default function EditGroupPage() {
           <ReturnToPublicViewButton url={groupURL} />
         </EditGroupVideos>
       </Route>
-      {flags.has('techniques') ? (
-        <Route path={`${path}/${TECHNIQUES_TAB}`}>
-          <EditGroupTechniques>
-            <EditGroupTabs tabs={tabs} activeTab={TECHNIQUES_TAB} />
-            <ReturnToPublicViewButton url={groupURL} />
-          </EditGroupTechniques>
-        </Route>
-      ) : null}
+      <Route path={`${path}/${TECHNIQUES_TAB}`}>
+        <EditGroupTechniques>
+          <EditGroupTabs tabs={tabs} activeTab={TECHNIQUES_TAB} />
+          <ReturnToPublicViewButton url={groupURL} />
+        </EditGroupTechniques>
+      </Route>
       <Route path={`${path}/${RESEARCHFOCUSES_TAB}`}>
         <EditGroupResearchFocuses>
           <EditGroupTabs tabs={tabs} activeTab={RESEARCHFOCUSES_TAB} />
