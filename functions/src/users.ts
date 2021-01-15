@@ -11,7 +11,6 @@ import {
 } from './microsoft';
 import {Post} from './posts';
 import {Topic} from './topics';
-// import {generateThumbnail} from './helpers/images';
 import {
   publishAddPublicationRequests,
   allPublicationFields,

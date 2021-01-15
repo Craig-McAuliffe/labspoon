@@ -7,6 +7,7 @@ import {
   makPublicationToPublication,
   MAKField,
   makFieldToTopic,
+  TopicToMAKField,
 } from './microsoft';
 import {
   allPublicationFields,
@@ -75,52 +76,28 @@ export const topicSearch = functions.https.onCall(async (data) => {
   return await Promise.all(executePromises);
 });
 
-export async function createFieldAndTopic(topic: Topic) {
+export async function createFieldAndTopic(
+  topic: Topic,
+  addTopicWithIDToTaggedResource: Function
+) {
   const MSFieldID = topic.microsoftID;
-  return db
-    .runTransaction((transaction) => {
-      const labspoonTopicRef = db.collection('topics').doc();
-      const labspoonTopicID = labspoonTopicRef.id;
+  const labspoonTopicRef = db.collection('topics').doc();
+  const labspoonTopicID = labspoonTopicRef.id;
+  const processedMSField: MAKField = TopicToMAKField(topic, labspoonTopicID);
 
-      return transaction.get(db.doc(`MSFields/${MSFieldID}`)).then((ds) => {
-        if (ds.exists) {
-          if (ds.data()!.processed === undefined) {
-            console.error(
-              `this MSField has no corresponding labspoon topic ${MSFieldID}`
-            );
-            transaction.set(labspoonTopicRef, topic);
-            transaction.update(db.doc(`MSFields/MSFieldID`), {
-              processed: labspoonTopicID,
-            });
-            return labspoonTopicID;
-          }
-          return ds.data()!.processed;
-        }
-        const processedMicrosoftField: MAKField = {
-          DFN: topic.name,
-          FId: Number(MSFieldID),
-          FN: topic.normalisedName,
-          processed: labspoonTopicID,
-        };
-
-        transaction.set(labspoonTopicRef, topic);
-        transaction.set(
-          db.collection('MSFields').doc(MSFieldID),
-          processedMicrosoftField
-        );
-        return labspoonTopicID;
-      });
-    })
+  const batch = db.batch();
+  batch.set(labspoonTopicRef, topic);
+  batch.set(db.collection('MSFields').doc(MSFieldID), processedMSField);
+  return batch
+    .commit()
     .catch((err) => {
-      console.error(
-        `Could not create topic and field ${topic} from MSPublication:`,
-        err
-      );
+      console.error(`could not create new field and topic` + err);
       throw new functions.https.HttpsError(
         'internal',
         `An error occurred while processing the field, ${topic}`
       );
-    });
+    })
+    .then(() => addTopicWithIDToTaggedResource(labspoonTopicID));
 }
 
 export function convertTaggedTopicToTopic(
@@ -146,10 +123,26 @@ export function convertTopicToTaggedTopic(topic: Topic, topicID: string) {
   return taggedTopic;
 }
 
-export function createMSTopic(msFieldData: MAKField) {
-  db.collection('topics')
-    .doc()
-    .set(makFieldToTopic(msFieldData))
+export async function createTopicFromMSField(
+  msFieldData: MAKField,
+  addTopicWithIDToTaggedResource: Function
+) {
+  const labspoonTopicRef = db.collection('topics').doc();
+  const labspoonTopicID = labspoonTopicRef.id;
+  const microsoftID = msFieldData.FId.toString();
+  const msFieldRef = db.doc(`MSFields/${microsoftID}`);
+  if (!microsoftID) {
+    console.error(
+      'msField did not have an id. Cannot create a corresponding topic.'
+    );
+    return;
+  }
+  const batch = db.batch();
+  batch.set(labspoonTopicRef, makFieldToTopic(msFieldData));
+  batch.update(msFieldRef, {processed: labspoonTopicID});
+  batch
+    .commit()
+    .then(() => addTopicWithIDToTaggedResource(labspoonTopicID))
     .catch((err) =>
       console.error(
         `could not create labspoon topic from existing MSField, ${err}`
@@ -157,57 +150,56 @@ export function createMSTopic(msFieldData: MAKField) {
     );
 }
 
-export function handleTaggedTopics(
-  taggedResourceTopics: Topic[],
+export function handleTopicsNoID(
+  taggedTopicsNoIDs: Topic[],
   collectedTopics: TaggedTopic[]
 ) {
-  return taggedResourceTopics.map((taggedTopicNoID: Topic) => {
-    return db
-      .doc(`MSFields/${taggedTopicNoID.microsoftID}`)
-      .get()
-      .then((ds) => {
-        function addLabspoonTopicToTaggedResource(
-          correspondingLabspoonTopicID: string
-        ) {
-          collectedTopics.push(
-            convertTopicToTaggedTopic(
-              taggedTopicNoID,
-              correspondingLabspoonTopicID
-            )
+  return taggedTopicsNoIDs.map(
+    async (taggedTopicNoID: Topic) =>
+      await addTopicIDToTaggedTopic(taggedTopicNoID, collectedTopics)
+  );
+}
+
+export async function addTopicIDToTaggedTopic(
+  topicNoID: Topic,
+  collectedTopics: TaggedTopic[]
+) {
+  return db
+    .doc(`MSFields/${topicNoID.microsoftID}`)
+    .get()
+    .then(async (ds) => {
+      function addTopicWithIDToTaggedResource(
+        correspondingLabspoonTopicID: string
+      ) {
+        collectedTopics.push(
+          convertTopicToTaggedTopic(topicNoID, correspondingLabspoonTopicID)
+        );
+      }
+      if (ds.exists) {
+        const MSFieldData = ds.data() as MAKField;
+        if (MSFieldData.processed) {
+          addTopicWithIDToTaggedResource(MSFieldData.processed);
+        } else {
+          // This should not be possible. All dbMSFields should be processed
+          // upon creation.
+          console.error(
+            'no Labspoon topic corresponding to MSField ' +
+              topicNoID.microsoftID
+          );
+          await createTopicFromMSField(
+            MSFieldData,
+            addTopicWithIDToTaggedResource
           );
         }
-        if (ds.exists) {
-          const MSFieldData = ds.data() as MAKField;
-          if (MSFieldData.processed) {
-            addLabspoonTopicToTaggedResource(MSFieldData.processed);
-          } else {
-            // This should not be possible. All dbMSFields should be processed
-            // upon creation.
-            console.error(
-              'no Labspoon topic corresponding to MSField ' +
-                taggedTopicNoID.microsoftID
-            );
-            createMSTopic(MSFieldData);
-          }
-        } else {
-          createFieldAndTopic(taggedTopicNoID)
-            .then((labspoonTopicID) => {
-              if (labspoonTopicID === undefined) {
-                console.error(
-                  `topic with microsoftID ${taggedTopicNoID.microsoftID} was created but did not return the corresponding labspoon ID`
-                );
-              } else {
-                addLabspoonTopicToTaggedResource(labspoonTopicID);
-              }
-            })
-            .catch((err) =>
-              console.error(
-                `field ${taggedTopicNoID.microsoftID} is not in database and could not be created ${err}`
-              )
-            );
-        }
-      });
-  });
+      } else {
+        await createFieldAndTopic(topicNoID, addTopicWithIDToTaggedResource);
+      }
+    })
+    .catch((err) =>
+      console.error(
+        `field ${topicNoID.microsoftID} is not in database and could not be created ${err}`
+      )
+    );
 }
 
 interface expressionField {

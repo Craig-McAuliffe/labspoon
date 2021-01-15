@@ -1,7 +1,9 @@
 import * as functions from 'firebase-functions';
 import {admin} from './config';
-import {toGroupRef} from './groups';
-import {toUserRef} from './users';
+import {GroupRef, toGroupRef} from './groups';
+import {TaggedTopic} from './topics';
+import {toUserRef, UserRef} from './users';
+import {ArticleBodyChild} from './researchFocuses';
 
 const db = admin.firestore();
 
@@ -93,3 +95,16 @@ export const updateTechniqueOnUserChange = functions.firestore
     });
     return Promise.all(techniqueUpdatePromises);
   });
+
+export interface Technique {
+  title: string;
+  author: UserRef;
+  topics?: TaggedTopic[];
+  customTopics?: string[];
+  timestamp: Date;
+  photoURLs?: string[];
+  group: GroupRef;
+  filterTopicIDs?: string[];
+  body: ArticleBodyChild[];
+  id?: string;
+}

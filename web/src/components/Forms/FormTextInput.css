@@ -16,11 +16,6 @@
   align-items: center;
 }
 
-.error-container {
-  grid-column: 2/3;
-  justify-self: flex-start;
-}
-
 .create-post-main-text {
   height: 100px;
   min-width: 100%;

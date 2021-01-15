@@ -21,3 +21,8 @@
 .change-group-section {
   margin: 1vh 0px;
 }
+
+.article-submitting-overlay .spinner-border {
+  top: 50%;
+  position: absolute;
+}
