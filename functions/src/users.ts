@@ -483,6 +483,40 @@ export const updateUserRefOnPost = functions.firestore
     return Promise.all(postsUpdatePromise);
   });
 
+export const updateUserRefOnTopic = functions.firestore
+  .document('users/{userID}')
+  .onUpdate(async (change, context) => {
+    const newUserData = change.after.data() as User;
+    const userID = context.params.userID;
+    const topicsQS = await db
+      .collection(`users/${userID}/topics`)
+      .get()
+      .catch((err) =>
+        console.error('unable to fetch topics for user with id ' + userID, err)
+      );
+    if (!topicsQS || topicsQS.empty) return;
+    const topicsIDs: string[] = [];
+    topicsQS.forEach((ds) => {
+      const topicID = ds.id;
+      topicsIDs.push(topicID);
+    });
+    const topicsUpdatePromise = topicsIDs.map(async (topicID) => {
+      return db
+        .doc(`topics/${topicID}/users/${userID}`)
+        .set(toUserRef(userID, newUserData))
+        .catch((err) =>
+          console.error(
+            'unable to update user ref on topic with id ' +
+              topicID +
+              ' for user with id ' +
+              userID,
+            err
+          )
+        );
+    });
+    return Promise.all(topicsUpdatePromise);
+  });
+
 export async function setUserOnTopic(
   topic: Topic,
   topicID: string,
