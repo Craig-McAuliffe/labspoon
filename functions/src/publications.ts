@@ -14,12 +14,7 @@ import {
   Source,
 } from './microsoft';
 import {Post} from './posts';
-import {
-  Topic,
-  createFieldAndTopic,
-  convertTopicToTaggedTopic,
-  TaggedTopic,
-} from './topics';
+import {Topic, handleTopicsNoID, TaggedTopic} from './topics';
 
 const pubSubClient = new PubSub();
 const db = admin.firestore();
@@ -129,7 +124,7 @@ export const addNewMSPublicationAsync = functions
   .runWith({timeoutSeconds: 120})
   .pubsub.topic('add-publication')
   .onPublish(async (message) => {
-    if (!message.json) return true;
+    if (!message.json) return;
     const microsoftPublication = message.json as MAKPublication;
 
     if (!microsoftPublication.Id)
@@ -144,7 +139,11 @@ export const addNewMSPublicationAsync = functions
 
     // check whether the publication has already been processed
     const microsoftPublicationDS = await microsoftPublicationRef.get();
-    if (microsoftPublicationDS.exists) return;
+    if (
+      microsoftPublicationDS.exists &&
+      (microsoftPublicationDS.data() as MAKPublication).processed
+    )
+      return;
 
     const publicationRef = db.collection('publications').doc();
     const publicationID = publicationRef.id;
@@ -156,48 +155,113 @@ export const addNewMSPublicationAsync = functions
     if (publication.authors)
       publication.authors = await resolveUserIDs(publication.authors);
 
-    const wrotePublicationToDB = await db.runTransaction(async (t) => {
-      // check whether the microsoft publication has been processed whilst we
-      // were resolving the authors and topics
-      const microsoftPublicationDSTransaction = await t.get(
-        microsoftPublicationRef
-      );
-      if (
-        microsoftPublicationDSTransaction.exists &&
-        (microsoftPublicationDSTransaction.data() as MAKPublication).processed
-      )
-        return false;
+    console.log(publication.topics);
 
-      t.set(microsoftPublicationRef, microsoftPublication);
-      t.set(publicationRef, publication);
-      return true;
-    });
-    if (!wrotePublicationToDB) return;
+    const batch = db.batch();
+    batch.set(microsoftPublicationRef, microsoftPublication);
+    batch.set(publicationRef, publication);
+    await batch
+      .commit()
+      .then(() => console.log('successfully created publication' + publication))
+      .catch((err) =>
+        console.error(
+          'failed to create mspublication and publication from mspublication with id ' +
+            microsoftPublicationID,
+          err
+        )
+      );
+  });
 
-    if (publication.topics)
-      await addPublicationToTopics(
-        publicationID,
-        publication,
-        publication.topics
-      );
-    if (publication.authors)
-      await addPublicationToAuthors(
-        publicationID,
-        publication,
-        publication.authors
-      );
-    await fulfillOutgoingReferencesOnLabspoon(publicationID);
-    await fulfillIncomingReferencesOnLabspoon(
+export const addNewPublicationToTopics = functions.firestore
+  .document(`publications/{publicationID}`)
+  .onCreate((publicationDS, context) => {
+    const publication = publicationDS.data() as Publication;
+    const publicationID = context.params.publicationID;
+    if (publication.topics) {
+      const writePublicationPromises = publication.topics.map(async (topic) => {
+        if (!topic.id) return;
+        return db
+          .doc(`topics/${topic.id}/publications/${publicationID}`)
+          .set(publication)
+          .then(() =>
+            console.log('successfully added publication to topic' + topic.id)
+          )
+          .catch((err) =>
+            console.error(
+              'failed to add publication with id ' +
+                publicationID +
+                ' to topic with id ' +
+                topic.id,
+              err
+            )
+          );
+      });
+      return Promise.all(writePublicationPromises);
+    }
+    return;
+  });
+
+export const addNewPublicationToAuthors = functions.firestore
+  .document(`publications/{publicationID}`)
+  .onCreate((publicationDS, context) => {
+    const publication = publicationDS.data() as Publication;
+    const publicationID = context.params.publicationID;
+    if (publication.authors) {
+      const writePublicationPromises = publication.authors
+        .filter((author) => author.id)
+        .map(async (author) => {
+          return db
+            .doc(`users/${author.id}/publications/${publicationID}`)
+            .set(publication)
+            .then(() =>
+              console.log(
+                'successfully added publication to author' + author.id
+              )
+            )
+            .catch((err) =>
+              console.error(
+                'failed to add publication with id ' +
+                  publicationID +
+                  ' to author with id ' +
+                  author.id,
+                err
+              )
+            );
+        });
+      return Promise.all(writePublicationPromises);
+    }
+    return;
+  });
+
+export const outgoingReferencesNewPub = functions.firestore
+  .document(`publications/{publicationID}`)
+  .onCreate((publicationDS, context) => {
+    const publicationID = context.params.publicationID;
+    return fulfillOutgoingReferencesOnLabspoon(publicationID);
+  });
+
+export const incomingReferencesNewPub = functions.firestore
+  .document(`publications/{publicationID}`)
+  .onCreate((publicationDS, context) => {
+    const publication = publicationDS.data() as Publication;
+    const publicationID = context.params.publicationID;
+    const microsoftPublicationID = publication.microsoftID!;
+    if (!microsoftPublicationID) return;
+    return fulfillIncomingReferencesOnLabspoon(
       publicationID,
       microsoftPublicationID
     );
+  });
 
-    await addMSPublicationToMSAuthors(
+export const addNewMSPubToMSAuthors = functions.firestore
+  .document(`MSPublications/{microsoftPublicationID}`)
+  .onCreate((publicationDS, context) => {
+    const microsoftPublication = publicationDS.data() as MAKPublication;
+    const microsoftPublicationID = context.params.publicationID;
+    return addMSPublicationToMSAuthors(
       microsoftPublicationID,
       microsoftPublication
     );
-
-    return true;
   });
 
 async function addMSPublicationToMSAuthors(
@@ -244,49 +308,10 @@ async function resolveUserIDs(users: User[]): Promise<User[]> {
   return await Promise.all(setUserPromises);
 }
 
-async function addPublicationToAuthors(
-  publicationID: string,
-  publication: Publication,
-  authors: User[]
-) {
-  const writePublicationPromises = authors
-    .filter((author) => author.id)
-    .map(async (author) => {
-      return db
-        .doc(`users/${author.id}/publications/${publicationID}`)
-        .set(publication);
-    });
-  return await Promise.all(writePublicationPromises);
-}
-
-async function resolveTopicIDs(topicsNoIDs: Topic[]): Promise<TaggedTopic[]> {
-  const topicPromises: Promise<TaggedTopic>[] = topicsNoIDs.map(
-    async (taggedTopicNoID): Promise<TaggedTopic> => {
-      const topicID = await createFieldAndTopic(taggedTopicNoID).catch(
-        (err) => {
-          console.error(
-            `Could not create field and topic for field with microsoft ID ${taggedTopicNoID.microsoftID}:`,
-            err
-          );
-        }
-      );
-      return convertTopicToTaggedTopic(taggedTopicNoID, topicID);
-    }
-  );
-  return await Promise.all(topicPromises);
-}
-
-async function addPublicationToTopics(
-  publicationID: string,
-  publication: Publication,
-  topics: Topic[]
-) {
-  const writePublicationPromises = topics.map(async (topic) => {
-    return db
-      .doc(`topics/${topic.id}/publications/${publicationID}`)
-      .set(publication);
-  });
-  return await Promise.all(writePublicationPromises);
+async function resolveTopicIDs(topicsNoIDs: Topic[]) {
+  const collectedTopicsWithIDs: TaggedTopic[] = [];
+  handleTopicsNoID(topicsNoIDs, collectedTopicsWithIDs);
+  return collectedTopicsWithIDs;
 }
 
 export const addPublicationPostToPublication = functions.firestore

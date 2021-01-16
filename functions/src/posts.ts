@@ -8,7 +8,7 @@ import {Publication} from './microsoft';
 import {
   TaggedTopic,
   convertTaggedTopicToTopic,
-  handleTaggedTopics,
+  handleTopicsNoID,
 } from './topics';
 
 const db = admin.firestore();
@@ -35,7 +35,7 @@ export const createPost = functions.https.onCall(async (data, context) => {
   if (data.publicationURL) content.publicationURL = data.publicationURL;
 
   const postTopics: TaggedTopic[] = [];
-  const matchedTopicsPromises = handleTaggedTopics(data.topics, postTopics);
+  const matchedTopicsPromises = handleTopicsNoID(data.topics, postTopics);
   await Promise.all(matchedTopicsPromises);
   return db
     .runTransaction((transaction) => {
@@ -371,80 +371,6 @@ export const linkPostTopicsToAuthor = functions.firestore
           }
         })
         .catch((err) => console.log(err, 'could not get user topic document'));
-    });
-  });
-
-// This also triggers the group to be added to the topic with the same rank
-export const addPostTopicsToGroup = functions.firestore
-  .document(`groups/{groupID}/posts/{postID}`)
-  .onCreate(async (change, context) => {
-    const post = change.data() as Post;
-    const postTopics = post.topics;
-    const groupID = context.params.groupID;
-    postTopics.forEach((postTopic) => {
-      const groupTopic = {
-        name: postTopic.name,
-        normalisedName: postTopic.normalisedName,
-        rank: 1,
-        microsoftID: postTopic.microsoftID,
-      };
-      const groupTopicDocRef = db.doc(
-        `groups/${groupID}/topics/${postTopic.id}`
-      );
-      return groupTopicDocRef.get().then((qs: any) => {
-        if (!qs.exists) {
-          groupTopicDocRef
-            .set(groupTopic)
-            .catch((err) =>
-              console.log(err, 'could not link post topics to group')
-            );
-        } else {
-          groupTopicDocRef
-            .update({
-              rank: firestore.FieldValue.increment(1),
-            })
-            .catch((err) =>
-              console.log(
-                err,
-                'could not update group topics ranks from post topics'
-              )
-            );
-        }
-      });
-    });
-  });
-
-// This also triggers the group to be added to the topic with the same rank
-export const removePostTopicsFromGroup = functions.firestore
-  .document(`groups/{groupID}/posts/{postID}`)
-  .onDelete(async (change, context) => {
-    const post = change.data() as Post;
-    const postTopics = post.topics;
-    const groupID = context.params.groupID;
-    postTopics.forEach((postTopic) => {
-      const groupTopicDocRef = db.doc(
-        `groups/${groupID}/topics/${postTopic.id}`
-      );
-      return groupTopicDocRef
-        .get()
-        .then((qs: any) => {
-          if (!qs.exists) return;
-          const topicRank = qs.data().rank;
-          if (topicRank === 1) {
-            groupTopicDocRef
-              .delete()
-              .catch((err) =>
-                console.log(err, 'could not delete topic on group')
-              );
-          } else {
-            groupTopicDocRef
-              .update({rank: topicRank - 1})
-              .catch((err) =>
-                console.log(err, 'could not decrease topic rank on group')
-              );
-          }
-        })
-        .catch((err) => console.log(err, 'could not fetch the group topic'));
     });
   });
 

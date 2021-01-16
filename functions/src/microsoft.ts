@@ -34,7 +34,11 @@ export function interpretQuery(params: interpretParams): AxiosPromise {
     },
     params,
   }).then((resp) => {
-    if (resp.data.timed_out) throw new functions.https.HttpsError('deadline-exceeded', 'Query timed out');
+    if (resp.data.timed_out)
+      throw new functions.https.HttpsError(
+        'deadline-exceeded',
+        'Query timed out'
+      );
     if (resp.data.interpretations.length === 0) return new Promise(() => null);
     return resp;
   });
@@ -70,8 +74,12 @@ export function makPublicationToPublication(
   if (makPublication.Id) publication.microsoftID = makPublication.Id.toString();
   if (makPublication.F)
     publication.topics = makPublication.F.map(makFieldToTopic);
-  if (makPublication.S) publication.sources = makPublication.S.map(makSourceToSource);
-  if (makPublication.RId) publication.referencedPublicationMicrosoftIDs = makPublication.RId.map((strid) => strid.toString());
+  if (makPublication.S)
+    publication.sources = makPublication.S.map(makSourceToSource);
+  if (makPublication.RId)
+    publication.referencedPublicationMicrosoftIDs = makPublication.RId.map(
+      (strid) => strid.toString()
+    );
   return publication;
 }
 
@@ -95,7 +103,7 @@ export interface Publication {
   authors?: User[];
   microsoftID?: string;
   topics?: Topic[];
-  sources: Source[],
+  sources: Source[];
   referencedPublicationMicrosoftIDs: string[];
 }
 
@@ -133,8 +141,8 @@ export function makSourceToSource(makSource: MAKSource) {
 }
 
 interface MAKSource {
-  Ty: number,
-  U: string,
+  Ty: number;
+  U: string;
 }
 
 enum SourceType {
@@ -148,8 +156,8 @@ enum SourceType {
 }
 
 export interface Source {
-  type: SourceType,
-  url: string,
+  type: SourceType;
+  url: string;
 }
 
 export function makAuthorToAuthor(makAuthor: MAKAuthor): User {
@@ -198,12 +206,6 @@ export interface MAKField {
   processed: string;
 }
 
-export interface MAKFieldUnProcessed {
-  DFN: string;
-  FId: number;
-  FN: string;
-}
-
 export interface MAKPublicationInDB {
   D?: string;
   DN?: string;
@@ -224,10 +226,14 @@ export function makFieldToTopic(field: MAKField): Topic {
   };
 }
 
-export function TopicToMAKField(topic: Topic): MAKFieldUnProcessed {
+export function TopicToMAKField(
+  topic: Topic,
+  labspoonTopicID: string
+): MAKField {
   return {
     FId: Number(topic.microsoftID),
     DFN: topic.name,
     FN: topic.normalisedName,
+    processed: labspoonTopicID,
   };
 }

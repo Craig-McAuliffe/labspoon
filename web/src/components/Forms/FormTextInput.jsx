@@ -54,7 +54,7 @@ export function TextInput({
         {...props}
         placeholder={placeholder}
       />
-      <div className="error-container">{error}</div>
+      {error}
     </div>
   );
 }
@@ -70,9 +70,7 @@ export function CreatePostTextArea({...props}) {
         {...field}
         {...props}
       />
-      <div className="error-container">
-        {meta.touched && meta.error ? <InputError error={meta.error} /> : null}
-      </div>
+      {meta.touched && meta.error ? <InputError error={meta.error} /> : null}
     </>
   );
 }
@@ -90,9 +88,7 @@ export function FormTextArea({height, label, bigLabel, ...props}) {
         {...props}
         style={{height: height}}
       />
-      <div className="error-container">
-        {meta.touched && meta.error ? <InputError error={meta.error} /> : null}
-      </div>
+      {meta.touched && meta.error ? <InputError error={meta.error} /> : null}
     </>
   );
 }

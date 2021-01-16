@@ -1,7 +1,8 @@
 import * as functions from 'firebase-functions';
 import {admin} from './config';
-import {toGroupRef} from './groups';
-import {toUserRef} from './users';
+import {GroupRef, toGroupRef} from './groups';
+import {TaggedTopic} from './topics';
+import {toUserRef, UserRef} from './users';
 
 const db = admin.firestore();
 
@@ -95,3 +96,25 @@ export const updateResearchFocusOnUserChange = functions.firestore
     });
     return Promise.all(researchFocusUpdatePromises);
   });
+
+export interface ResearchFocus {
+  title: string;
+  author: UserRef;
+  topics?: TaggedTopic[];
+  customTopics?: string[];
+  timestamp: Date;
+  photoURLs?: string[];
+  group: GroupRef;
+  filterTopicIDs?: string[];
+  body: ArticleBodyChild[];
+  id?: string;
+}
+
+export interface ArticleBodyChild {
+  children: ArticleRichTextSection[];
+  type: string;
+}
+
+export interface ArticleRichTextSection {
+  text: string;
+}

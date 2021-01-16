@@ -1,8 +1,9 @@
 import {getTitleTextAndBody} from '../components/Forms/Articles/HeaderAndBodyArticleInput';
 import {handlePostTopics} from '../components/Topics/TagTopics';
 import {convertGroupToGroupRef} from './groups';
+import {handleTaggedTopicsNoIDs} from './topics';
 
-export default function addArticleToDB(
+export default async function addArticleToDB(
   articleText,
   photoURLs,
   selectedTopics,
@@ -15,7 +16,9 @@ export default function addArticleToDB(
   const article = {};
   const {customTopics, DBTopics} = handlePostTopics(selectedTopics);
   article.customTopics = customTopics;
-  article.topics = DBTopics;
+  const taggedTopicsArray = [];
+  await handleTaggedTopicsNoIDs(DBTopics, taggedTopicsArray);
+  article.topics = taggedTopicsArray;
   article.group = convertGroupToGroupRef(selectedGroup);
   article.photoURLs = photoURLs;
   article.author = author;

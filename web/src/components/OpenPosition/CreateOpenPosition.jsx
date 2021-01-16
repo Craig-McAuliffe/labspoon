@@ -96,6 +96,7 @@ export default function CreateOpenPosition() {
     startDate: '',
     applyEmail: '',
     applyLink: '',
+    description: '',
   };
 
   const validationSchema = Yup.object({
@@ -154,6 +155,11 @@ export default function CreateOpenPosition() {
       onSubmit={onSubmit}
     >
       <Form>
+        {submitting && (
+          <div className="article-submitting-overlay">
+            <LoadingSpinner />
+          </div>
+        )}
         <SelectedGroup
           groups={memberOfGroups}
           selectedGroup={selectedGroup}
