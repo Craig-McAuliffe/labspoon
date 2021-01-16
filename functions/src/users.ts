@@ -295,6 +295,82 @@ export const updateUserRefOnMemberGroups = functions.firestore
     return Promise.all(groupsUpdatePromise);
   });
 
+export const updateUserRefOnFollowers = functions.firestore
+  .document('users/{userID}')
+  .onUpdate(async (change, context) => {
+    const newUserData = change.after.data() as User;
+    const userID = context.params.userID;
+    const followersQS = await db
+      .collection(`users/${userID}/followedByUsers`)
+      .get()
+      .catch((err) =>
+        console.error(
+          'unable to fetch followers of user with id ' + userID,
+          err
+        )
+      );
+    if (!followersQS || followersQS.empty) return;
+    const followersIDs: string[] = [];
+    followersQS.forEach((ds) => {
+      const followerID = ds.id;
+      followersIDs.push(followerID);
+    });
+    const followersUpdatePromise = followersIDs.map(async (followerID) => {
+      return db
+        .doc(`users/${followerID}/followsUsers/${userID}`)
+        .set(toUserRef(userID, newUserData))
+        .catch((err) =>
+          console.error(
+            'unable to update user ref on follower with id ' +
+              followerID +
+              ' for followed user with id ' +
+              userID,
+            err
+          )
+        );
+    });
+    return Promise.all(followersUpdatePromise);
+  });
+
+export const updateUserRefOnUsersYouFollow = functions.firestore
+  .document('users/{userID}')
+  .onUpdate(async (change, context) => {
+    const newUserData = change.after.data() as User;
+    const userID = context.params.userID;
+    const followsQS = await db
+      .collection(`users/${userID}/followsUsers`)
+      .get()
+      .catch((err) =>
+        console.error(
+          'unable to fetch people user follows for user with id ' + userID,
+          err
+        )
+      );
+    if (!followsQS || followsQS.empty) return;
+    const peopleFollowedIDs: string[] = [];
+    followsQS.forEach((ds) => {
+      const personFollowedID = ds.id;
+      peopleFollowedIDs.push(personFollowedID);
+    });
+    const followsUpdatePromise = peopleFollowedIDs.map(
+      async (personFollowedID) => {
+        return db
+          .doc(`users/${personFollowedID}/followedByUsers/${userID}`)
+          .set(toUserRef(userID, newUserData))
+          .catch((err) =>
+            console.error(
+              'unable to update user ref on user with id ' +
+                personFollowedID +
+                ' for follower with id ' +
+                userID,
+              err
+            )
+          );
+      }
+    );
+    return Promise.all(followsUpdatePromise);
+  });
+
 export async function setUserOnTopic(
   topic: Topic,
   topicID: string,
