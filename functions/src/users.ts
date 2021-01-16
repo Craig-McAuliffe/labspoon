@@ -169,7 +169,7 @@ export const updateUserRefOnResearchFocuses = functions.firestore
           .update({author: toUserRef(userID, newUserData)})
           .catch((err) =>
             console.error(
-              'unable to update group ref on research focus with id ' +
+              'unable to update user ref on research focus with id ' +
                 researchFocusID +
                 ' for user with id ' +
                 userID,
@@ -208,7 +208,7 @@ export const updateUserRefOnOpenPositions = functions.firestore
           .update({author: toUserRef(userID, newUserData)})
           .catch((err) =>
             console.error(
-              'unable to update group ref on open position with id ' +
+              'unable to update user ref on open position with id ' +
                 openPositionID +
                 ' for user with id ' +
                 userID,
@@ -245,7 +245,7 @@ export const updateUserRefOnTechniques = functions.firestore
         .update({author: toUserRef(userID, newUserData)})
         .catch((err) =>
           console.error(
-            'unable to update group ref on technique with id ' +
+            'unable to update user ref on technique with id ' +
               techniqueID +
               ' for user with id ' +
               userID,
@@ -254,6 +254,45 @@ export const updateUserRefOnTechniques = functions.firestore
         );
     });
     return Promise.all(techniquesUpdatePromise);
+  });
+
+export const updateUserRefOnMemberGroups = functions.firestore
+  .document('users/{userID}')
+  .onUpdate(async (change, context) => {
+    const newUserData = change.after.data() as User;
+    const userID = context.params.userID;
+    const groupsQS = await db
+      .collection(`users/${userID}/groups`)
+      .get()
+      .catch((err) =>
+        console.error(
+          'unable to fetch groups of which user with id ' +
+            userID +
+            ' is a member.',
+          err
+        )
+      );
+    if (!groupsQS || groupsQS.empty) return;
+    const groupsIDs: string[] = [];
+    groupsQS.forEach((ds) => {
+      const groupID = ds.id;
+      groupsIDs.push(groupID);
+    });
+    const groupsUpdatePromise = groupsIDs.map(async (groupID) => {
+      return db
+        .doc(`groups/${groupID}/members/${userID}`)
+        .set(toUserRef(userID, newUserData))
+        .catch((err) =>
+          console.error(
+            'unable to update user ref on group with id ' +
+              groupID +
+              ' for user with id ' +
+              userID,
+            err
+          )
+        );
+    });
+    return Promise.all(groupsUpdatePromise);
   });
 
 export async function setUserOnTopic(
