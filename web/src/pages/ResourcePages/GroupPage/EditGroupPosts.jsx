@@ -14,8 +14,9 @@ import {
 import {db} from '../../../firebase';
 
 import './GroupPage.css';
+import {convertGroupToGroupRef} from '../../../helpers/groups';
 
-export default function EditGroupPosts({children, groupID}) {
+export default function EditGroupPosts({children, groupID, group}) {
   function fetchItems(selected, skip, limit, filter, last) {
     const activeTab = filter ? getActiveTabID(filter) : null;
     switch (activeTab) {
@@ -47,8 +48,17 @@ export default function EditGroupPosts({children, groupID}) {
   function addPostsToGroup(selectedItems, resetSelection, setSuccess) {
     selectedItems.forEach((selectedPost) => {
       delete selectedPost._alreadyPresent;
-      db.doc(`groups/${groupID}/posts/${selectedPost.id}`)
-        .set(selectedPost)
+      const batch = db.batch();
+      batch.set(
+        db.doc(`groups/${groupID}/posts/${selectedPost.id}`),
+        selectedPost
+      );
+      batch.set(
+        db.doc(`posts/${selectedPost.id}/groups/${groupID}`),
+        convertGroupToGroupRef(group)
+      );
+      batch
+        .commit()
         .then(() => {
           resetSelection();
           setSuccess(true);
@@ -62,8 +72,12 @@ export default function EditGroupPosts({children, groupID}) {
 
   function removePostsFromGroup(selectedItems, resetSelection, setSuccess) {
     selectedItems.forEach((selectedPost) => {
-      db.doc(`groups/${groupID}/posts/${selectedPost.id}`)
-        .delete()
+      const batch = db.batch();
+
+      batch.delete(db.doc(`groups/${groupID}/posts/${selectedPost.id}`));
+      batch.delete(db.doc(`posts/${selectedPost.id}/groups/${groupID}`));
+      batch
+        .commit()
         .then(() => {
           resetSelection();
           setSuccess(true);

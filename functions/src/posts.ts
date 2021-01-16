@@ -84,6 +84,40 @@ export const writePostToAuthorPosts = functions.firestore
     return null;
   });
 
+export const updatePostOnGroup = functions.firestore
+  .document('posts/{postID}')
+  .onUpdate(async (change, context) => {
+    const newPostData = change.after.data() as Post;
+    const postID = context.params.postID;
+    const groupsQS = await db
+      .collection(`posts/${postID}/groups`)
+      .get()
+      .catch((err) =>
+        console.error('unable to fetch groups for post with id ' + postID, err)
+      );
+    if (!groupsQS || groupsQS.empty) return;
+    const groupsIDs: string[] = [];
+    groupsQS.forEach((ds) => {
+      const groupID = ds.id;
+      groupsIDs.push(groupID);
+    });
+    const groupsUpdatePromise = groupsIDs.map(async (groupID) => {
+      return db
+        .doc(`groups/${groupID}/posts/${postID}`)
+        .set(newPostData)
+        .catch((err) =>
+          console.error(
+            'unable to update post on group with id ' +
+              groupID +
+              ' for post with id ' +
+              postID,
+            err
+          )
+        );
+    });
+    return Promise.all(groupsUpdatePromise);
+  });
+
 export const writePostToUserFollowingFeeds = functions.firestore
   .document(`posts/{postID}`)
   .onWrite(async (change, context) => {

@@ -57,9 +57,9 @@ export function convertGroupToGroupRef(group) {
     id: group.id,
     name: group.name,
     avatar: group.avatar,
+    about: group.about,
+    institution: group.institution,
   };
-  if (group.about) groupRef.about = group.about;
-  if (group.institution) groupRef.institution = group.institution;
   return groupRef;
 }
 

@@ -371,6 +371,40 @@ export const updateUserRefOnUsersYouFollow = functions.firestore
     return Promise.all(followsUpdatePromise);
   });
 
+export const updateUserRefOnPost = functions.firestore
+  .document('users/{userID}')
+  .onUpdate(async (change, context) => {
+    const newUserData = change.after.data() as User;
+    const userID = context.params.userID;
+    const postsQS = await db
+      .collection(`users/${userID}/posts`)
+      .get()
+      .catch((err) =>
+        console.error('unable to fetch posts for user with id ' + userID, err)
+      );
+    if (!postsQS || postsQS.empty) return;
+    const postsIDs: string[] = [];
+    postsQS.forEach((ds) => {
+      const postID = ds.id;
+      postsIDs.push(postID);
+    });
+    const postsUpdatePromise = postsIDs.map(async (postID) => {
+      return db
+        .doc(`posts/${postID}`)
+        .update({author: toUserRef(userID, newUserData)})
+        .catch((err) =>
+          console.error(
+            'unable to update user ref on post with id ' +
+              postID +
+              ' for user with id ' +
+              userID,
+            err
+          )
+        );
+    });
+    return Promise.all(postsUpdatePromise);
+  });
+
 export async function setUserOnTopic(
   topic: Topic,
   topicID: string,

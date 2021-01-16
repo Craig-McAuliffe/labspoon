@@ -80,7 +80,7 @@ export default function EditGroupPage() {
         </EditGroupInfo>
       </Route>
       <Route path={`${path}/${POSTS_TAB}`}>
-        <EditGroupPosts groupID={groupID}>
+        <EditGroupPosts groupID={groupID} group={group}>
           <EditGroupTabs tabs={tabs} activeTab={POSTS_TAB} />
           <ReturnToPublicViewButton url={groupURL} />
         </EditGroupPosts>
