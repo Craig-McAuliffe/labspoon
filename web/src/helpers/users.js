@@ -103,3 +103,13 @@ export function createUserDocOnSignUp(
       addUserToDB();
     });
 }
+
+export function userToUserRef(user, userID) {
+  const userRef = {
+    id: userID,
+    name: user.name,
+  };
+  if (user.avatar) userRef.avatar = user.avatar;
+  if (user.rank) userRef.rank = user.rank;
+  return userRef;
+}

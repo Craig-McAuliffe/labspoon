@@ -481,7 +481,7 @@ export const updateGroupRefOnResearchFocuses = functions.firestore
           .update({group: groupToGroupRef(newGroupData, groupID)})
           .catch((err) =>
             console.error(
-              'unable to update group ref on technique with id ' +
+              'unable to update group ref on research focus with id ' +
                 researchFocusID +
                 ' for group with id ' +
                 groupID,

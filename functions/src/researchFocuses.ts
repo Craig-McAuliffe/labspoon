@@ -2,7 +2,7 @@ import * as functions from 'firebase-functions';
 import {admin} from './config';
 import {GroupRef} from './groups';
 import {TaggedTopic} from './topics';
-import {toUserRef, UserRef} from './users';
+import {UserRef} from './users';
 
 const db = admin.firestore();
 
@@ -40,33 +40,6 @@ export const syncUpdateToAuthorResearchFocusCollection = functions.firestore
     return db
       .doc(`users/${authorID}/researchFocuses/${researchFocusDS.after.id}`)
       .set(researchFocus);
-  });
-
-export const updateResearchFocusOnUserChange = functions.firestore
-  .document(`users/{userID}`)
-  .onUpdate(async (userDS) => {
-    const userID = userDS.after.id;
-    const researchFocusQS = await db
-      .collection(`users/${userID}/researchFocuses`)
-      .get();
-    const userRef = toUserRef(userID, userDS.after.data());
-    const researchFocusUpdatePromises: Promise<any>[] = [];
-    researchFocusQS.forEach((researchFocusDS) => {
-      const researchFocusID = researchFocusDS.id;
-      const updatePromise = db
-        .doc(`researchFocuses/${researchFocusID}`)
-        .update({
-          author: userRef,
-        })
-        .catch((err) =>
-          console.error(
-            `Failed to up user ${userID} on researchFocus ${researchFocusID}:`,
-            err
-          )
-        );
-      researchFocusUpdatePromises.push(updatePromise);
-    });
-    return Promise.all(researchFocusUpdatePromises);
   });
 
 export interface ResearchFocus {

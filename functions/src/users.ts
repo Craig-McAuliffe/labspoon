@@ -101,7 +101,7 @@ export async function checkAuthAndGetUserFromContext(
   const author: UserRef = {
     id: userData.id,
     name: userData.name,
-    avatar: userData.avatar,
+    avatar: userData.avatar ? userData.avatar : undefined,
   };
 
   return author;
@@ -140,6 +140,120 @@ export const updateUserOnRelatedTopicPage = functions.firestore
     setUserOnTopic(topic, topicID, userID).catch((err) =>
       console.log(err, 'could not update user rank on topic')
     );
+  });
+
+export const updateUserRefOnResearchFocuses = functions.firestore
+  .document('users/{userID}')
+  .onUpdate(async (change, context) => {
+    const newUserData = change.after.data() as User;
+    const userID = context.params.userID;
+    const researchFocusesQS = await db
+      .collection(`users/${userID}/researchFocuses`)
+      .get()
+      .catch((err) =>
+        console.error(
+          'unable to fetch research focuses of user with id ' + userID,
+          err
+        )
+      );
+    if (!researchFocusesQS || researchFocusesQS.empty) return;
+    const researchFocusesIDs: string[] = [];
+    researchFocusesQS.forEach((ds) => {
+      const researchFocusID = ds.id;
+      researchFocusesIDs.push(researchFocusID);
+    });
+    const researchFocusesUpdatePromise = researchFocusesIDs.map(
+      async (researchFocusID) => {
+        return db
+          .doc(`researchFocuses/${researchFocusID}`)
+          .update({author: toUserRef(userID, newUserData)})
+          .catch((err) =>
+            console.error(
+              'unable to update group ref on research focus with id ' +
+                researchFocusID +
+                ' for user with id ' +
+                userID,
+              err
+            )
+          );
+      }
+    );
+    return Promise.all(researchFocusesUpdatePromise);
+  });
+
+export const updateUserRefOnOpenPositions = functions.firestore
+  .document('users/{userID}')
+  .onUpdate(async (change, context) => {
+    const newUserData = change.after.data() as User;
+    const userID = context.params.userID;
+    const openPositionsQS = await db
+      .collection(`users/${userID}/openPositions`)
+      .get()
+      .catch((err) =>
+        console.error(
+          'unable to fetch open positions of user with id ' + userID,
+          err
+        )
+      );
+    if (!openPositionsQS || openPositionsQS.empty) return;
+    const openPositionsIDs: string[] = [];
+    openPositionsQS.forEach((ds) => {
+      const openPositionID = ds.id;
+      openPositionsIDs.push(openPositionID);
+    });
+    const openPositionsUpdatePromise = openPositionsIDs.map(
+      async (openPositionID) =>
+        db
+          .doc(`openPositions/${openPositionID}`)
+          .update({author: toUserRef(userID, newUserData)})
+          .catch((err) =>
+            console.error(
+              'unable to update group ref on open position with id ' +
+                openPositionID +
+                ' for user with id ' +
+                userID,
+              err
+            )
+          )
+    );
+    return Promise.all(openPositionsUpdatePromise);
+  });
+
+export const updateUserRefOnTechniques = functions.firestore
+  .document('users/{userID}')
+  .onUpdate(async (change, context) => {
+    const newUserData = change.after.data() as User;
+    const userID = context.params.userID;
+    const techniquesQS = await db
+      .collection(`users/${userID}/techniques`)
+      .get()
+      .catch((err) =>
+        console.error(
+          'unable to fetch techniques of user with id ' + userID,
+          err
+        )
+      );
+    if (!techniquesQS || techniquesQS.empty) return;
+    const techniquesIDs: string[] = [];
+    techniquesQS.forEach((ds) => {
+      const techniqueID = ds.id;
+      techniquesIDs.push(techniqueID);
+    });
+    const techniquesUpdatePromise = techniquesIDs.map(async (techniqueID) => {
+      return db
+        .doc(`techniques/${techniqueID}`)
+        .update({author: toUserRef(userID, newUserData)})
+        .catch((err) =>
+          console.error(
+            'unable to update group ref on technique with id ' +
+              techniqueID +
+              ' for user with id ' +
+              userID,
+            err
+          )
+        );
+    });
+    return Promise.all(techniquesUpdatePromise);
   });
 
 export async function setUserOnTopic(

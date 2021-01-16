@@ -2,13 +2,14 @@ import {getTitleTextAndBody} from '../components/Forms/Articles/HeaderAndBodyArt
 import {handlePostTopics} from '../components/Topics/TagTopics';
 import {convertGroupToGroupRef} from './groups';
 import {handleTaggedTopicsNoIDs} from './topics';
+import {userToUserRef} from './users';
 
 export default async function addArticleToDB(
   articleText,
   photoURLs,
   selectedTopics,
   selectedGroup,
-  author,
+  userProfile,
   researchFocusDBRef,
   setSubmitting,
   history
@@ -21,7 +22,7 @@ export default async function addArticleToDB(
   article.topics = taggedTopicsArray;
   article.group = convertGroupToGroupRef(selectedGroup);
   article.photoURLs = photoURLs;
-  article.author = author;
+  article.author = userToUserRef(userProfile, userProfile.id);
   const [title, body] = getTitleTextAndBody(articleText);
   article.title = title;
   article.body = body;
