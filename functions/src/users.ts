@@ -342,7 +342,7 @@ export const updateUserRefOnUsersYouFollow = functions.firestore
       .get()
       .catch((err) =>
         console.error(
-          'unable to fetch people user follows for user with id ' + userID,
+          'unable to fetch people that user follows for user with id ' + userID,
           err
         )
       );
@@ -361,6 +361,84 @@ export const updateUserRefOnUsersYouFollow = functions.firestore
             console.error(
               'unable to update user ref on user with id ' +
                 personFollowedID +
+                ' for follower with id ' +
+                userID,
+              err
+            )
+          );
+      }
+    );
+    return Promise.all(followsUpdatePromise);
+  });
+
+export const updateUserRefOnGroupsYouFollow = functions.firestore
+  .document('users/{userID}')
+  .onUpdate(async (change, context) => {
+    const newUserData = change.after.data() as User;
+    const userID = context.params.userID;
+    const followsQS = await db
+      .collection(`users/${userID}/followsGroups`)
+      .get()
+      .catch((err) =>
+        console.error(
+          'unable to fetch groups that user follows for user with id ' + userID,
+          err
+        )
+      );
+    if (!followsQS || followsQS.empty) return;
+    const groupFollowedIDs: string[] = [];
+    followsQS.forEach((ds) => {
+      const groupFollowedID = ds.id;
+      groupFollowedIDs.push(groupFollowedID);
+    });
+    const followsUpdatePromise = groupFollowedIDs.map(
+      async (groupFollowedID) => {
+        return db
+          .doc(`groups/${groupFollowedID}/followedByUsers/${userID}`)
+          .set(toUserRef(userID, newUserData))
+          .catch((err) =>
+            console.error(
+              'unable to update user ref on group with id ' +
+                groupFollowedID +
+                ' for follower with id ' +
+                userID,
+              err
+            )
+          );
+      }
+    );
+    return Promise.all(followsUpdatePromise);
+  });
+
+export const updateUserRefOnTopicsYouFollow = functions.firestore
+  .document('users/{userID}')
+  .onUpdate(async (change, context) => {
+    const newUserData = change.after.data() as User;
+    const userID = context.params.userID;
+    const followsQS = await db
+      .collection(`users/${userID}/followsTopics`)
+      .get()
+      .catch((err) =>
+        console.error(
+          'unable to fetch topics that user follows for user with id ' + userID,
+          err
+        )
+      );
+    if (!followsQS || followsQS.empty) return;
+    const topicsFollowedIDs: string[] = [];
+    followsQS.forEach((ds) => {
+      const topicFollowedID = ds.id;
+      topicsFollowedIDs.push(topicFollowedID);
+    });
+    const followsUpdatePromise = topicsFollowedIDs.map(
+      async (topicFollowedID) => {
+        return db
+          .doc(`topics/${topicFollowedID}/followedByUsers/${userID}`)
+          .set(toUserRef(userID, newUserData))
+          .catch((err) =>
+            console.error(
+              'unable to update user ref on topic with id ' +
+                topicFollowedID +
                 ' for follower with id ' +
                 userID,
               err
@@ -700,8 +778,8 @@ export function toUserRef(userID: string, user: any) {
   const userRef: UserRef = {
     id: userID,
     name: user.name,
+    avatar: user.avatar ? user.avatar : null,
   };
-  if (user.avatar) userRef.avatar = user.avatar;
   if (user.rank) userRef.rank = user.rank;
   return userRef;
 }

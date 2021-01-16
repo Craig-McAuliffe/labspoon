@@ -1,5 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {AuthContext, FeatureFlags} from '../../App';
+import {convertGroupToGroupRef} from '../../helpers/groups';
 import {db} from '../../firebase';
 
 import FollowButton from '../Buttons/FollowButton';
@@ -35,14 +36,11 @@ export default function FollowGroupButton({targetGroup}) {
         `groups/${targetGroup.id}/followedByUsers/${authUser.uid}`
       );
       if (!following) {
-        batch.set(followsGroupsDoc, {
-          id: targetGroup.id,
-          name: targetGroup.name,
-        });
+        batch.set(followsGroupsDoc, convertGroupToGroupRef(targetGroup));
         batch.set(followedByUsersDoc, {
           id: authUser.uid,
           name: authUser.displayName,
-          avatar: userProfile.avatar,
+          avatar: userProfile.avatar ? userProfile.avatar : null,
         });
         batch
           .commit()

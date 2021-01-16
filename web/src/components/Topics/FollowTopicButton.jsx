@@ -108,7 +108,7 @@ function topicSubmitFollowRequest(
     batch.set(followedByUsersDoc, {
       id: authUser.uid,
       name: authUser.displayName,
-      avatar: userProfile.avatar,
+      avatar: userProfile.avatar ? userProfile.avatar : null,
     });
     batch
       .commit()

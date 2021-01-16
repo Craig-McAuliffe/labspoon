@@ -38,12 +38,12 @@ export default function FollowUserButton({targetUser}) {
         batch.set(followsUsersDoc, {
           id: targetUser.id,
           name: targetUser.name,
-          avatar: targetUser.avatar,
+          avatar: targetUser.avatar ? targetUser.avatar : null,
         });
         batch.set(followedByUsersDoc, {
           id: authUser.uid,
           name: authUser.displayName,
-          avatar: userProfile.avatar,
+          avatar: userProfile.avatar ? userProfile.avatar : null,
         });
         batch
           .commit()
