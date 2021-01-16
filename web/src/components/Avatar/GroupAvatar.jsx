@@ -9,7 +9,7 @@ const GroupAvatar = ({src, width, height}) => {
   return (
     <Image
       className="avatar"
-      src={src}
+      src={src ? src : getDefaultAvatar()}
       roundedCircle
       width={width}
       height={height}
