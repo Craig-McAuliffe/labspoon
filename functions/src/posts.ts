@@ -118,6 +118,30 @@ export const updatePostOnGroup = functions.firestore
     return Promise.all(groupsUpdatePromise);
   });
 
+export const updatePostOnTopic = functions.firestore
+  .document('posts/{postID}')
+  .onUpdate(async (change, context) => {
+    const newPostData = change.after.data() as Post;
+    const postID = context.params.postID;
+    const topics = newPostData.topics;
+    if (!topics || topics.length === 0) return;
+    const topicsUpdatePromise = topics.map(async (topic) =>
+      db
+        .doc(`topics/${topic.id}/posts/${postID}`)
+        .set(newPostData)
+        .catch((err) =>
+          console.error(
+            'unable to update post on topic with id ' +
+              topic.id +
+              ' for post with id ' +
+              postID,
+            err
+          )
+        )
+    );
+    return Promise.all(topicsUpdatePromise);
+  });
+
 export const writePostToUserFollowingFeeds = functions.firestore
   .document(`posts/{postID}`)
   .onWrite(async (change, context) => {
