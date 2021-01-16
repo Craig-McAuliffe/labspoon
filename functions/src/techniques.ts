@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import {admin} from './config';
-import {GroupRef, toGroupRef} from './groups';
+import {GroupRef} from './groups';
 import {TaggedTopic} from './topics';
 import {toUserRef, UserRef} from './users';
 import {ArticleBodyChild} from './researchFocuses';
@@ -41,34 +41,6 @@ export const syncUpdateToAuthorTechniqueCollection = functions.firestore
     return db
       .doc(`users/${authorID}/techniques/${techniqueDS.after.id}`)
       .set(technique);
-  });
-
-export const updateTechniqueOnGroupChange = functions.firestore
-  .document(`groups/{groupID}`)
-  .onUpdate(async (groupDS) => {
-    const groupID = groupDS.after.id;
-    const techniqueQS = await db
-      .collection(`groups/${groupID}/techniques`)
-      .get();
-    if (techniqueQS.empty) return;
-    const groupRef = toGroupRef(groupID, groupDS.after.data());
-    const techniqueUpdatePromises: Promise<any>[] = [];
-    techniqueQS.forEach((techniqueDS) => {
-      const techniqueID = techniqueDS.id;
-      const updatePromise = db
-        .doc(`techniques/${techniqueID}`)
-        .update({
-          group: groupRef,
-        })
-        .catch((err) =>
-          console.error(
-            `Failed to up group ${groupID} on technique ${techniqueID}:`,
-            err
-          )
-        );
-      techniqueUpdatePromises.push(updatePromise);
-    });
-    return Promise.all(techniqueUpdatePromises);
   });
 
 export const updateTechniqueOnUserChange = functions.firestore

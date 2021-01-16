@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import {admin} from './config';
-import {GroupRef, toGroupRef} from './groups';
+import {GroupRef} from './groups';
 import {TaggedTopic} from './topics';
 import {toUserRef, UserRef} from './users';
 
@@ -40,34 +40,6 @@ export const syncUpdateToAuthorResearchFocusCollection = functions.firestore
     return db
       .doc(`users/${authorID}/researchFocuses/${researchFocusDS.after.id}`)
       .set(researchFocus);
-  });
-
-export const updateResearchFocusOnGroupChange = functions.firestore
-  .document(`groups/{groupID}`)
-  .onUpdate(async (groupDS) => {
-    const groupID = groupDS.after.id;
-    const researchFocusQS = await db
-      .collection(`groups/${groupID}/researchFocuses`)
-      .get();
-    if (researchFocusQS.empty) return;
-    const groupRef = toGroupRef(groupID, groupDS.after.data());
-    const researchFocusUpdatePromises: Promise<any>[] = [];
-    researchFocusQS.forEach((researchFocusDS) => {
-      const researchFocusID = researchFocusDS.id;
-      const updatePromise = db
-        .doc(`researchFocuses/${researchFocusID}`)
-        .update({
-          group: groupRef,
-        })
-        .catch((err) =>
-          console.error(
-            `Failed to up group ${groupID} on researchFocus ${researchFocusID}:`,
-            err
-          )
-        );
-      researchFocusUpdatePromises.push(updatePromise);
-    });
-    return Promise.all(researchFocusUpdatePromises);
   });
 
 export const updateResearchFocusOnUserChange = functions.firestore

@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import {admin} from './config';
-import {GroupRef, toGroupRef} from './groups';
+import {GroupRef} from './groups';
 
 import {TaggedTopic, handleTopicsNoID} from './topics';
 import {UserRef, checkAuthAndGetUserFromContext} from './users';
@@ -138,44 +138,6 @@ export const updateOpenPosUponUserChange = functions.firestore
                 openPositionIDToBeUpdated +
                 'with new userRef for user with id' +
                 userID
-            )
-          )
-    );
-    return Promise.all(openPositionUpdatesPromises);
-  });
-
-export const updateOpenPosUponGroupChange = functions.firestore
-  .document('groups/{groupID}')
-  .onUpdate(async (change, context) => {
-    const groupID = context.params.groupID;
-    const group = toGroupRef(groupID, change.after.data());
-    const openPositionsIDsToBeUpdated: string[] = [];
-    await db
-      .collection(`groups/${groupID}/openPositions`)
-      .get()
-      .then((qs) => {
-        if (qs.empty) return;
-        qs.forEach((ds) => {
-          const openPositionID = ds.id;
-          openPositionsIDsToBeUpdated.push(openPositionID);
-        });
-      })
-      .catch((err) =>
-        console.error(
-          'unable to retrieve openPositions by group with id' + groupID
-        )
-      );
-    const openPositionUpdatesPromises = openPositionsIDsToBeUpdated.map(
-      (openPositionIDToBeUpdated) =>
-        db
-          .doc(`openPositions/${openPositionIDToBeUpdated}`)
-          .update({group: group})
-          .catch((err) =>
-            console.error(
-              'unable to update openPosition with id' +
-                openPositionIDToBeUpdated +
-                'with new groupRef for group with id' +
-                groupID
             )
           )
     );

@@ -383,34 +383,31 @@ export const updateGroupRefOnOpenPositions = functions.firestore
   .onUpdate(async (change, context) => {
     const newGroupData = change.after.data() as Group;
     const groupID = context.params.groupID;
-    const openPositions: OpenPosition[] = [];
-    await db
+    const openPositionQS = await db
       .collection(`groups/${groupID}/openPositions`)
       .get()
-      .then((qs) => {
-        if (qs.empty) return;
-        qs.forEach((ds) => {
-          const openPosition = ds.data() as OpenPosition;
-          openPosition.id = ds.id;
-          openPositions.push(openPosition);
-        });
-      })
       .catch((err) =>
         console.error(
           'unable to fetch open positions of group with id ' + groupID,
           err
         )
       );
-    const openPositionsUpdatePromise = openPositions.map(
-      async (openPosition) => {
+    if (!openPositionQS || openPositionQS.empty) return;
+    const openPositionsIDs: string[] = [];
+    openPositionQS.forEach((ds) => {
+      const openPositionID = ds.id;
+      openPositionsIDs.push(openPositionID);
+    });
+    const openPositionsUpdatePromise = openPositionsIDs.map(
+      async (openPositionID) => {
         return db
-          .doc(`openPositions/${openPosition.id}/groups/${groupID}`)
-          .set(groupToGroupRef(newGroupData, groupID))
+          .doc(`openPositions/${openPositionID}`)
+          .update({group: groupToGroupRef(newGroupData, groupID)})
           .catch((err) =>
             console.error(
               'unable to update group ref on open position with id ' +
-                openPosition.id +
-                ' of group with id ' +
+                openPositionID +
+                ' for group with id ' +
                 groupID,
               err
             )
@@ -425,33 +422,30 @@ export const updateGroupRefOnTechniques = functions.firestore
   .onUpdate(async (change, context) => {
     const newGroupData = change.after.data() as Group;
     const groupID = context.params.groupID;
-    const techniques: Technique[] = [];
-    await db
+    const techniquesQS = await db
       .collection(`groups/${groupID}/techniques`)
       .get()
-      .then((qs) => {
-        if (qs.empty) return;
-        qs.forEach((ds) => {
-          const technique = ds.data() as Technique;
-          technique.id = ds.id;
-          techniques.push(technique);
-        });
-      })
       .catch((err) =>
         console.error(
           'unable to fetch techniques of group with id ' + groupID,
           err
         )
       );
-    const techniquesUpdatePromise = techniques.map(async (technique) => {
+    if (!techniquesQS || techniquesQS.empty) return;
+    const techniquesIDs: string[] = [];
+    techniquesQS.forEach((ds) => {
+      const techniqueID = ds.id;
+      techniquesIDs.push(techniqueID);
+    });
+    const techniquesUpdatePromise = techniquesIDs.map(async (techniqueID) => {
       return db
-        .doc(`techniques/${technique.id}/groups/${groupID}`)
-        .set(groupToGroupRef(newGroupData, groupID))
+        .doc(`techniques/${techniqueID}`)
+        .update({group: groupToGroupRef(newGroupData, groupID)})
         .catch((err) =>
           console.error(
             'unable to update group ref on technique with id ' +
-              technique.id +
-              ' of group with id ' +
+              techniqueID +
+              ' for group with id ' +
               groupID,
             err
           )
@@ -465,34 +459,31 @@ export const updateGroupRefOnResearchFocuses = functions.firestore
   .onUpdate(async (change, context) => {
     const newGroupData = change.after.data() as Group;
     const groupID = context.params.groupID;
-    const researchFocuses: ResearchFocus[] = [];
-    await db
+    const researchFocusesQS = await db
       .collection(`groups/${groupID}/researchFocuses`)
       .get()
-      .then((qs) => {
-        if (qs.empty) return;
-        qs.forEach((ds) => {
-          const researchFocus = ds.data() as ResearchFocus;
-          researchFocus.id = ds.id;
-          researchFocuses.push(researchFocus);
-        });
-      })
       .catch((err) =>
         console.error(
           'unable to fetch research focuses of group with id ' + groupID,
           err
         )
       );
-    const researchFocusesUpdatePromise = researchFocuses.map(
-      async (researchFocus) => {
+    if (!researchFocusesQS || researchFocusesQS.empty) return;
+    const researchFocusesIDs: string[] = [];
+    researchFocusesQS.forEach((ds) => {
+      const researchFocusID = ds.id;
+      researchFocusesIDs.push(researchFocusID);
+    });
+    const researchFocusesUpdatePromise = researchFocusesIDs.map(
+      async (researchFocusID) => {
         return db
-          .doc(`techniques/${researchFocus.id}/groups/${groupID}`)
-          .set(groupToGroupRef(newGroupData, groupID))
+          .doc(`researchFocuses/${researchFocusID}`)
+          .update({group: groupToGroupRef(newGroupData, groupID)})
           .catch((err) =>
             console.error(
-              'unable to update group ref on research focus with id ' +
-                researchFocus.id +
-                ' of group with id ' +
+              'unable to update group ref on technique with id ' +
+                researchFocusID +
+                ' for group with id ' +
                 groupID,
               err
             )
@@ -836,10 +827,11 @@ export function groupToGroupRef(group: Group, groupID: string) {
   const groupRef = {
     id: groupID,
     name: group.name,
-    avatar: group.avatar,
     about: group.about,
     institution: group.institution,
   } as GroupRef;
+
+  if (group.avatar) groupRef.avatar = group.avatar;
   return groupRef;
 }
 
