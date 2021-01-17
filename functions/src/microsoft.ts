@@ -164,6 +164,7 @@ export interface MAKAuthor {
   AuId: string;
   AuN?: string;
   DAuN: string;
+  processed?: string;
 }
 
 export interface User {

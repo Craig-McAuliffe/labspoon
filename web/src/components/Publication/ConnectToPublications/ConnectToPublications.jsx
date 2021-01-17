@@ -85,13 +85,18 @@ export default function LinkAuthorIDForm({submitBehaviour, cancel}) {
         <SuggestedPublications
           suggestedPublications={suggestedPublications}
           submitBehaviour={submitBehaviour}
+          setLoadingState={setLoadingState}
         />
       ) : null}
     </div>
   );
 }
 
-function SuggestedPublications({suggestedPublications, submitBehaviour}) {
+function SuggestedPublications({
+  suggestedPublications,
+  submitBehaviour,
+  setLoadingState,
+}) {
   const [
     selectedPublicationsAuthorID,
     setSelectedPublicationsAuthorID,
@@ -101,7 +106,10 @@ function SuggestedPublications({suggestedPublications, submitBehaviour}) {
   return (
     <>
       {submitting ? (
-        <LoadingSpinner />
+        <>
+          <LoadingSpinner />
+          <h4>This will take a few seconds.</h4>
+        </>
       ) : (
         <div className="onboarding-suggested-publications-container">
           <SuggestedPublicationItems
@@ -124,7 +132,14 @@ function SuggestedPublications({suggestedPublications, submitBehaviour}) {
                 submitBehaviour();
                 setSubmitting(false);
               })
-              .catch((err) => console.error(err));
+              .catch((err) => {
+                setSubmitting(false);
+                console.error(err);
+                alert(
+                  'Something went wrong while linking your account. Sorry about that. Please try again.'
+                );
+                setLoadingState(ERROR);
+              });
           }}
           inactive={selectedPublicationsAuthorID || submitting ? false : true}
         >

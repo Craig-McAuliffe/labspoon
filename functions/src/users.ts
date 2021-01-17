@@ -7,6 +7,7 @@ import {
   MAKPublication,
   makPublicationToPublication,
   interpretationResult,
+  MAKAuthor,
 } from './microsoft';
 import {Post} from './posts';
 import {Topic} from './topics';
@@ -571,19 +572,12 @@ export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall
         'Must provide selected publication suggestions'
       );
 
-    const batch = db.batch();
     const userToBeLinkedDBRef = db.doc(`users/${userID}`);
     const user = await userToBeLinkedDBRef
       .get()
-      .then((qs) => {
-        if (!qs.exists) return;
-        const userToBeLinked = qs.data() as UserDB;
-        if (userToBeLinked.microsoftAcademicAuthorID !== undefined)
-          return userToBeLinked;
-        batch.update(userToBeLinkedDBRef, {
-          microsoftAcademicAuthorID: microsoftAcademicAuthorID,
-        });
-        return userToBeLinked;
+      .then((ds) => {
+        if (!ds.exists) return;
+        return ds.data() as User;
       })
       .catch((err) => console.log(err, 'could not fetch user to be linked'));
     if (!user)
@@ -591,53 +585,133 @@ export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall
         'not-found',
         `No user found with ID ${userID}`
       );
+    if (user.microsoftID !== undefined)
+      throw new functions.https.HttpsError(
+        'already-exists',
+        `User with id ${userID} is already linked to a microsoft id`
+      );
+
+    const MSUser = await db
+      .doc(`MSUsers/${microsoftAcademicAuthorID}`)
+      .get()
+      .then((ds) => {
+        if (!ds.exists) return;
+        return ds.data() as MAKAuthor;
+      })
+      .catch((err) =>
+        console.log(
+          err,
+          'unable to verify if MSUser with id ' +
+            microsoftAcademicAuthorID +
+            'is already linked',
+          err
+        )
+      );
+    if (!MSUser)
+      throw new functions.https.HttpsError(
+        'not-found',
+        `No MSUser found with ID ${microsoftAcademicAuthorID}`
+      );
+
+    if (MSUser.processed)
+      throw new functions.https.HttpsError(
+        'already-exists',
+        `MSUser with id ${microsoftAcademicAuthorID} is already linked to a labspoon user`
+      );
+
+    // give functions some time to create publications
+    await new Promise((resolve) => {
+      setTimeout(() => resolve(true), 3000);
+    });
     const msPublicationsForUserQS = await db
       .collection(`MSUsers/${microsoftAcademicAuthorID}/publications`)
-      .get();
-    const publicationWritePromises: Promise<null>[] = [];
-    msPublicationsForUserQS.forEach((msPublicationDS) =>
-      publicationWritePromises.push(
-        (async () => {
-          // Find the publication
-          const publicationsQS = await db
-            .collection('publications')
-            .where('microsoftID', '==', msPublicationDS.id)
-            .limit(1)
-            .get();
-          if (publicationsQS.empty) {
-            console.log(
-              'No publication found with Microsoft Publication ID ',
-              msPublicationDS.id,
-              ' this should not happen and likely indicates a logic issue.'
-            );
-          }
-          const publicationDS = publicationsQS.docs[0];
-          const publication = publicationDS.data();
-          batch.set(
-            db.doc(`users/${userID}/publications/${publicationDS.id}`),
-            publication
-          );
-          const authorItem = publication.authors.filter(
-            (author: any) => author.microsoftID === microsoftAcademicAuthorID
-          )[0];
-          if (!authorItem) {
-            return null;
-          }
-          batch.update(db.doc(`publications/${publicationDS.id}`), {
-            authors: firestore.FieldValue.arrayRemove(authorItem),
-          });
-          batch.update(db.doc(`publications/${publicationDS.id}`), {
-            authors: firestore.FieldValue.arrayUnion(toUserRef(userID, user)),
-          });
-          return null;
-        })()
-      )
-    );
-    await Promise.all(publicationWritePromises).catch((err) =>
-      console.error(err)
-    );
+      .get()
+      .catch((err) => {
+        console.log(
+          'unable to fetch publications for MSUser with id ' +
+            microsoftAcademicAuthorID,
+          err
+        );
+        throw new functions.https.HttpsError(
+          'internal',
+          'unable to fetch publications for MSUser with id ' +
+            microsoftAcademicAuthorID,
+          err
+        );
+      });
 
-    await batch.commit().catch((err) => console.error(err));
+    const batch = db.batch();
+    batch.update(userToBeLinkedDBRef, {
+      microsoftID: microsoftAcademicAuthorID,
+    });
+    batch.update(db.doc(`MSUsers/${microsoftAcademicAuthorID}`), {
+      processed: userID,
+    });
+    if (msPublicationsForUserQS) {
+      const publicationWritePromises: Promise<null>[] = [];
+      msPublicationsForUserQS.forEach((msPublicationDS) =>
+        publicationWritePromises.push(
+          (async () => {
+            const msPublicationData = msPublicationDS.data();
+            if (!msPublicationData) return null;
+            const labspoonPublicationID = msPublicationData.processed;
+            if (!labspoonPublicationID) {
+              console.log(
+                'Processed field for Microsoft Publication with id ',
+                msPublicationDS.id,
+                ' is undefined. This should not happen and likely indicates a logic issue.'
+              );
+              return null;
+            }
+            const labspoonPublicationDS = await db
+              .doc(`publications/${labspoonPublicationID}`)
+              .get()
+              .catch((err) =>
+                console.error(
+                  'unable to fetch publication with id ' +
+                    labspoonPublicationID,
+                  err
+                )
+              );
+            if (!labspoonPublicationDS || !labspoonPublicationDS.exists)
+              return null;
+            const labspoonPublication = labspoonPublicationDS.data();
+            if (!labspoonPublication) return null;
+            batch.set(
+              db.doc(`users/${userID}/publications/${labspoonPublicationID}`),
+              labspoonPublication
+            );
+            const authorItem = labspoonPublication.authors.filter(
+              (author: any) => author.microsoftID === microsoftAcademicAuthorID
+            )[0];
+            user.microsoftID = microsoftAcademicAuthorID;
+            if (authorItem) {
+              batch.update(db.doc(`publications/${labspoonPublicationID}`), {
+                authors: firestore.FieldValue.arrayRemove(authorItem),
+              });
+              batch.update(db.doc(`publications/${labspoonPublicationID}`), {
+                authors: firestore.FieldValue.arrayUnion(
+                  toUserRef(userID, user)
+                ),
+              });
+            }
+            return null;
+          })()
+        )
+      );
+      await Promise.all(publicationWritePromises).catch((err) =>
+        console.error(err)
+      );
+    }
+
+    return batch.commit().catch((err) => {
+      console.error(err);
+      throw new functions.https.HttpsError(
+        'internal',
+        'batch commit failed',
+        err
+      );
+    });
   }
 );
 
@@ -818,10 +892,6 @@ export function toUserRef(userID: string, user: any) {
   return userRef;
 }
 
-interface UserDB {
-  microsoftAcademicAuthorID?: string;
-}
-
 interface User {
   id: string;
   name: string;
@@ -830,4 +900,5 @@ interface User {
   coverPhoto?: string;
   coverPhotoCloudID?: string;
   checkedCreateOnboardingTip?: boolean;
+  microsoftID?: string;
 }

@@ -158,7 +158,6 @@ export const addNewMSPublicationAsync = functions
     batch.set(publicationRef, publication);
     await batch
       .commit()
-      .then(() => console.log('successfully created publication' + publication))
       .catch((err) =>
         console.error(
           'failed to create mspublication and publication from mspublication with id ' +
@@ -179,9 +178,6 @@ export const addNewPublicationToTopics = functions.firestore
         return db
           .doc(`topics/${topic.id}/publications/${publicationID}`)
           .set(publication)
-          .then(() =>
-            console.log('successfully added publication to topic' + topic.id)
-          )
           .catch((err) =>
             console.error(
               'failed to add publication with id ' +
@@ -209,11 +205,6 @@ export const addNewPublicationToAuthors = functions.firestore
           return db
             .doc(`users/${author.id}/publications/${publicationID}`)
             .set(publication)
-            .then(() =>
-              console.log(
-                'successfully added publication to author' + author.id
-              )
-            )
             .catch((err) =>
               console.error(
                 'failed to add publication with id ' +
@@ -264,22 +255,41 @@ async function addMSPublicationToMSAuthors(
   publicationID: string,
   publication: MAKPublication
 ) {
-  const promises: Promise<any>[] = [];
-  publication.AA?.forEach((author) => {
+  if (!publication.AA || publication.AA.length === 0) return;
+  const msUserPromises = publication.AA.map(async (author) => {
     const authorID = author.AuId.toString();
-    const batch = db.batch();
-    batch.set(db.collection('MSUsers').doc(authorID), author);
-    batch.set(
-      db
-        .collection('MSUsers')
-        .doc(author.AuId.toString())
-        .collection('publications')
-        .doc(publicationID),
-      publication
-    );
-    promises.push(batch.commit());
+    if (!authorID) return;
+    return db
+      .doc(`MSUsers/${authorID}`)
+      .get()
+      .then((ds) => {
+        const batch = db.batch();
+        if (!ds.exists) {
+          batch.set(db.doc(`MSUsers/${authorID}`), author);
+        }
+        batch.set(
+          db.doc(`MSUsers/${authorID}/publications/${publicationID}`),
+          publication
+        );
+        return batch
+          .commit()
+          .catch((err) =>
+            console.error(
+              'batch failed while adding publication with id ' +
+                publicationID +
+                ' to msUser with id + authorID',
+              err
+            )
+          );
+      })
+      .catch((err) =>
+        console.error(
+          'unable to check if MSUser with id ' + authorID + ' exists',
+          err
+        )
+      );
   });
-  return Promise.all(promises);
+  return Promise.all(msUserPromises);
 }
 
 async function resolveUserIDs(users: User[]): Promise<User[]> {
