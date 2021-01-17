@@ -5,7 +5,6 @@ import {
   interpretQuery,
   executeExpression,
   MAKPublication,
-  Publication,
   makPublicationToPublication,
   interpretationResult,
 } from './microsoft';
@@ -14,6 +13,7 @@ import {Topic} from './topics';
 import {
   publishAddPublicationRequests,
   allPublicationFields,
+  Publication,
 } from './publications';
 
 const db = admin.firestore();

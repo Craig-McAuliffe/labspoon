@@ -2,9 +2,13 @@ import * as functions from 'firebase-functions';
 import {v4 as uuid} from 'uuid';
 import {admin, ResourceTypes} from './config';
 import {firestore} from 'firebase-admin';
+import {
+  PublicationRef,
+  toPublicationRef,
+  getPublicationByMicrosoftPublicationID,
+} from './publications';
 
 import {UserRef, checkAuthAndGetUserFromContext} from './users';
-import {Publication} from './microsoft';
 import {
   TaggedTopic,
   convertTaggedTopicToTopic,
@@ -24,19 +28,27 @@ export const createPost = functions.https.onCall(async (data, context) => {
 
   const content: PostContent = {
     text: data.title,
-    position: data.position,
-    location: data.location,
-    salary: data.salary,
-    methods: data.methods,
-    startDate: data.startDate,
   };
-
-  if (data.publication) content.publication = data.publication;
-  if (data.publicationURL) content.publicationURL = data.publicationURL;
 
   const postTopics: TaggedTopic[] = [];
   const matchedTopicsPromises = handleTopicsNoID(data.topics, postTopics);
   await Promise.all(matchedTopicsPromises);
+
+  if (data.publication) {
+    const publicationDS = await getPublicationByMicrosoftPublicationID(
+      data.publication.microsoftID!,
+      true
+    );
+    data.publication.id = publicationDS.id;
+
+    if (!data.publication.id) {
+      throw new functions.https.HttpsError(
+        'internal',
+        'An error occured while creating the post.'
+      );
+      return;
+    }
+  }
   return db
     .runTransaction((transaction) => {
       const post: Post = {
@@ -51,6 +63,13 @@ export const createPost = functions.https.onCall(async (data, context) => {
         ),
         id: postID,
       };
+      if (data.publication) {
+        post.publication = toPublicationRef(
+          data.publication,
+          data.publication.id
+        );
+      }
+      if (data.publicationURL) post.publicationURL = data.publicationURL;
       return Promise.all(matchedTopicsPromises).then(() => {
         transaction.set(db.collection('posts').doc(postID), post);
       });
@@ -116,6 +135,27 @@ export const updatePostOnGroup = functions.firestore
         );
     });
     return Promise.all(groupsUpdatePromise);
+  });
+
+export const updatePostOnPublication = functions.firestore
+  .document('posts/{postID}')
+  .onUpdate(async (change, context) => {
+    const newPostData = change.after.data() as Post;
+    const postID = context.params.postID;
+    const publication = newPostData.publication;
+    if (!publication || !publication.id) return;
+    return db
+      .doc(`publications/${publication.id}/posts/${postID}`)
+      .set(newPostData)
+      .catch((err) =>
+        console.error(
+          'unable to update post on publication with id ' +
+            publication.id +
+            ' for post with id ' +
+            postID,
+          err
+        )
+      );
   });
 
 export const updatePostOnTopic = functions.firestore
@@ -292,6 +332,27 @@ export const addPostToTopic = functions.firestore
     return Promise.all(topicsToTopicsPromisesArray);
   });
 
+export const addPublicationPostToPublication = functions.firestore
+  .document(`posts/{postID}`)
+  .onCreate(async (change) => {
+    const postID = change.id;
+    const post = change.data() as Post;
+    const publication = post.publication;
+    if (!publication) return;
+    return db
+      .doc(`publications/${publication.id}/posts/${postID}`)
+      .set(post)
+      .catch((err) =>
+        console.error(
+          'unable to set post with id ' +
+            postID +
+            ' on publication with id ' +
+            publication.id,
+          err
+        )
+      );
+  });
+
 async function updateFiltersByPost(
   followingFeedRef: firestore.DocumentReference<firestore.DocumentData>,
   post: Post
@@ -453,23 +514,14 @@ export interface Post {
   customTopics?: string[];
   timestamp: Date;
   id: string;
-
+  publicationURL?: string[];
+  publication?: PublicationRef;
   // filterable arrays must be array of strings
   filterTopicIDs: string[];
 }
 
 export interface PostContent {
-  text?: string;
-  location?: string;
-  methods?: Array<string>;
-  startDate?: string;
-  salary?: string;
-  funder?: string;
-  amount?: string;
-  researchers?: Array<UserRef>;
-  publicationURL?: string;
-  position?: string;
-  publication?: Publication;
+  text: string;
 }
 
 export interface PostType {

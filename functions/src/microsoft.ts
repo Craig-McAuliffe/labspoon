@@ -2,6 +2,7 @@ import * as functions from 'firebase-functions';
 import {config} from './config';
 import axios, {AxiosPromise} from 'axios';
 import {Topic} from './topics';
+import {Publication} from './publications';
 
 const baseURL = 'https://api.labs.cognitive.microsoft.com/academic/v1.0';
 
@@ -95,16 +96,6 @@ export interface MAKPublication {
   RId?: string[];
   // Tracks corresponding Labspoon publication.
   processed?: string;
-}
-
-export interface Publication {
-  date?: string;
-  title?: string;
-  authors?: User[];
-  microsoftID?: string;
-  topics?: Topic[];
-  sources: Source[];
-  referencedPublicationMicrosoftIDs: string[];
 }
 
 export function makSourceToSource(makSource: MAKSource) {

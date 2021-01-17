@@ -6,14 +6,12 @@ import {
   interpretQuery,
   executeExpression,
   makPublicationToPublication,
-  Publication,
   MAKPublication,
   MAKPublicationInDB,
   User,
   makSourceToSource,
   Source,
 } from './microsoft';
-import {Post} from './posts';
 import {Topic, handleTopicsNoID, TaggedTopic} from './topics';
 
 const pubSubClient = new PubSub();
@@ -154,8 +152,6 @@ export const addNewMSPublicationAsync = functions
       publication.topics = await resolveTopicIDs(publication.topics);
     if (publication.authors)
       publication.authors = await resolveUserIDs(publication.authors);
-
-    console.log(publication.topics);
 
     const batch = db.batch();
     batch.set(microsoftPublicationRef, microsoftPublication);
@@ -314,39 +310,37 @@ async function resolveTopicIDs(topicsNoIDs: Topic[]) {
   return collectedTopicsWithIDs;
 }
 
-export const addPublicationPostToPublication = functions.firestore
-  .document(`posts/{postID}`)
-  .onCreate(async (change) => {
-    const postID = change.id;
-    const post = change.data() as Post;
-    const publication = post.content.publication;
-    if (!publication) return null;
+export async function getPublicationByMicrosoftPublicationID(
+  msPublicationID: string,
+  retry?: boolean
+) {
+  const publicationsFetch = () =>
+    db
+      .collection('publications')
+      .where('microsoftID', '==', msPublicationID)
+      .limit(1)
+      .get();
 
-    // The publication on the post will not yet be associated with an ID as this is not provided
-    // at post creation so we need to find the publication ID based on the microsoft ID.
-    const publicationDS = await getPublicationByMicrosoftPublicationID(
-      publication.microsoftID!
-    );
-    const publicationID = publicationDS.id;
-
-    const batch = db.batch();
-    batch.update(change.ref, {'content.publication.id': publicationID});
-    batch.set(publicationDS.ref.collection('posts').doc(postID), post);
-    await batch.commit();
-    return null;
-  });
-
-async function getPublicationByMicrosoftPublicationID(msPublicationID: string) {
-  const publicationsQS = await db
-    .collection('publications')
-    .where('microsoftID', '==', msPublicationID)
-    .limit(1)
-    .get();
-  if (publicationsQS.empty) {
+  const throwError = () => {
     throw new Error(
       'Could not find publication with microsoft publication ID: ' +
         msPublicationID
     );
+  };
+
+  let publicationsQS = await publicationsFetch();
+  if (publicationsQS.empty) {
+    if (retry) {
+      await new Promise((resolve) => {
+        setTimeout(() => resolve(true), 5000);
+      });
+      publicationsQS = await publicationsFetch();
+      if (publicationsQS.empty) {
+        throwError();
+      }
+    } else {
+      throwError();
+    }
   }
   return publicationsQS.docs[0];
 }
@@ -537,7 +531,7 @@ async function fulfillOutgoingReferencesOnLabspoon(
     const batch = db.batch();
     batch.set(
       referencingPublicationRef.collection('references').doc(lsPublicationID!),
-      toPublicationRef(lsPublicationID!, lsPublication)
+      toPublicationRef(lsPublication, lsPublicationID!)
     );
     batch.update(referencingPublicationRef, {
       referencedPublicationMicrosoftIDs: adminNS.firestore.FieldValue.arrayRemove(
@@ -587,7 +581,7 @@ async function fulfillIncomingReferencesOnLabspoon(
     const batch = db.batch();
     batch.set(
       referencingPublicationRef.collection('references').doc(publicationID),
-      toPublicationRef(publicationID, publication)
+      toPublicationRef(publication, publicationID)
     );
     batch.update(referencingPublicationRef, {
       referencedPublicationMicrosoftIDs: adminNS.firestore.FieldValue.arrayRemove(
@@ -638,7 +632,7 @@ export const updateReferencesToPublication = functions.firestore
     const writePromises: Promise<any>[] = [];
     publicationRefQS.forEach((publicationDS) => {
       const writePromise = publicationDS.ref.set(
-        toPublicationRef(publicationID, publication)
+        toPublicationRef(publication, publicationID)
       );
       writePromises.push(writePromise);
     });
@@ -656,7 +650,7 @@ export const updateAuthorsPublication = functions.firestore
     const users = authors.filter((author) => Boolean(author.id));
     const promises = users.map(async (user) => {
       db.doc(`users/${user.id}/publications/${publicationID}`)
-        .set(toPublicationRef(publicationID, publication))
+        .set(toPublicationRef(publication, publicationID))
         .catch((err) =>
           console.error(
             `Unable to set reference to publication ${publicationID} to user ${user.id} publication collection:`,
@@ -759,8 +753,8 @@ export const suggestedPublications = functions.https.onCall(
       const suggestedPublicationsFromTopic = suggestedPublicationsForTopicQS.docs.map(
         (suggestedPublicationsForTopicDS) => {
           return toPublicationRef(
-            suggestedPublicationsForTopicDS.id,
-            suggestedPublicationsForTopicDS.data() as Publication
+            suggestedPublicationsForTopicDS.data() as Publication,
+            suggestedPublicationsForTopicDS.id
           );
         }
       );
@@ -801,25 +795,38 @@ export const suggestedPublications = functions.https.onCall(
   }
 );
 
-function toPublicationRef(
-  publicationID: string,
-  input: Publication
+export function toPublicationRef(
+  input: Publication,
+  publicationID?: string
 ): PublicationRef {
-  return {
-    id: publicationID,
+  const publicationRef: PublicationRef = {
     date: input.date!,
     title: input.title!,
     authors: input.authors!,
     topics: input.topics!,
+    microsoftID: input.microsoftID,
   };
+  if (publicationID) publicationRef.id = publicationID;
+  return publicationRef;
 }
 
-interface PublicationRef {
+export interface PublicationRef {
   // This field is required so we can find references to a publication in
   // a collection group.
-  id: string;
+  id?: string;
   date: string;
   title: string;
   authors: Array<User>;
   topics: Topic[];
+  microsoftID?: string;
+}
+
+export interface Publication {
+  date?: string;
+  title?: string;
+  authors?: User[];
+  microsoftID?: string;
+  topics?: Topic[];
+  sources: Source[];
+  referencedPublicationMicrosoftIDs: string[];
 }

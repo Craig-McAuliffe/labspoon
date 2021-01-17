@@ -3,7 +3,7 @@ import {admin, ResourceTypes} from './config';
 import {firestore} from 'firebase-admin';
 import {updateFilterCollection, Post} from './posts';
 import {addTopicIDToTaggedTopic, TaggedTopic, Topic} from './topics';
-import {Publication} from './microsoft';
+import {Publication} from './publications';
 import {OpenPosition} from './openPositions';
 import {ResearchFocus} from './researchFocuses';
 import {Technique} from './techniques';

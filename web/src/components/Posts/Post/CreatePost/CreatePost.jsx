@@ -1,7 +1,6 @@
 import React, {useState, useContext, createContext, useEffect} from 'react';
 import {AuthContext} from '../../../../App';
 import DefaultPost from './DefaultPost';
-import OpenPositionPostForm from './OpenPositionPostForm';
 import PublicationPostForm from './PublicationPostForm';
 import {WriteIcon} from '../../../../assets/GeneralActionIcons';
 
@@ -101,14 +100,6 @@ function PostTypeSpecificForm({setCreatingPost, postType, setPostType}) {
     case PUBLICATION_POST:
       return (
         <PublicationPostForm
-          setCreatingPost={setCreatingPost}
-          setPostType={setPostType}
-          postType={postType}
-        />
-      );
-    case OPEN_POSITION_POST:
-      return (
-        <OpenPositionPostForm
           setCreatingPost={setCreatingPost}
           setPostType={setPostType}
           postType={postType}

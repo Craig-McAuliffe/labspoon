@@ -1,8 +1,7 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 import Linkify from 'linkifyjs/react';
-import PropTypes from 'prop-types';
-import PostOptionalTags from './PostParts/PostOptionalTags';
+import PostTaggedContent from './PostParts/PostTaggedContent';
 import PostActions, {BookmarkedPostSymbol} from './PostParts/PostActions';
 import DefaultUserIcon from '../../../assets/DefaultUserIcon.svg';
 import ListItemTopics from '../../ListItem/ListItemTopics';
@@ -12,12 +11,13 @@ import UserAvatar from '../../Avatar/UserAvatar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import './Post.css';
-/**
- * Generic entry point for display any type of post within a feed or search
- * result
- * @return {React.ReactElement}
- */
+import {PUBLICATION} from '../../../helpers/resourceTypeDefinitions';
+
 export default function Post({post, dedicatedPage, bookmarkedVariation}) {
+  const taggedContent = [];
+  if (post.publication)
+    taggedContent.push({type: PUBLICATION, content: post.publication});
+
   if (post.generated)
     return (
       <div className="post-referenced-resource-container">
@@ -48,7 +48,7 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
         dedicatedPage={dedicatedPage}
       />
       <PostTextContent post={post} dedicatedPage={dedicatedPage} />
-      <PostOptionalTags optionalTags={post.optionaltags} />
+      <PostTaggedContent taggedContent={taggedContent} />
       <ListItemTopics dbTopics={post.topics} customTopics={post.customTopics} />
       {bookmarkedVariation ? null : (
         <PostActions post={post} dedicatedPage={dedicatedPage} />
@@ -57,23 +57,6 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
   );
 }
 
-Post.propTypes = {
-  post: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    author: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      avatar: PropTypes.string.isRequired,
-    }).isRequired,
-    content: PropTypes.object.isRequired,
-    optionaltags: PropTypes.arrayOf(PropTypes.object.isRequired),
-  }).isRequired,
-};
-
-/**
- * Display the header on a post
- * @return {React.ReactElement}
- */
 function PostHeader({postAuthor, postCreationDate, dedicatedPage}) {
   return (
     <div
@@ -99,10 +82,6 @@ function PostHeader({postAuthor, postCreationDate, dedicatedPage}) {
   );
 }
 
-/**
- * Display content for a post text
- * @return {React.ReactElement}
- */
 function PostTextContent({post, dedicatedPage}) {
   if (dedicatedPage)
     return (

@@ -1,10 +1,5 @@
-.optional-tag-container {
-  padding: 15px 0px;
-  /* border-left: 2px solid #3099d3;
-  border-right: 2px solid #3099d3; */
-  border-left: 2px solid #d0dee6;
-  border-right: 2px solid #d0dee6;
-  /* background-color: #e9eef1; */
+.tagged-content-container {
+  padding: 10px 0px;
 }
 
 .optional-tag {
@@ -46,6 +41,6 @@
   padding-right: 2vw;
 }
 
-.post-optional-tag-publication {
+.post-tagged-publication {
   margin: 0px 10px;
 }
