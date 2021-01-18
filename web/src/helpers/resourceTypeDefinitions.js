@@ -15,3 +15,4 @@ export const GROUP = 'group';
 export const TOPIC = 'topic';
 export const IMAGE = 'image';
 export const VIDEO = 'video';
+export const RECOMMENDATION = 'recommendation';

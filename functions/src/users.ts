@@ -518,6 +518,67 @@ export const updateUserRefOnTopic = functions.firestore
     return Promise.all(topicsUpdatePromise);
   });
 
+export const updateUserRefForRecommendations = functions.firestore
+  .document('users/{userID}')
+  .onUpdate(async (change, context) => {
+    const newUserData = change.after.data() as User;
+    const userID = context.params.userID;
+    const recommendationsQS = await db
+      .collection(`users/${userID}/recommendations`)
+      .get()
+      .catch((err) =>
+        console.error(
+          'unable to fetch recommendations for user with id ' + userID,
+          err
+        )
+      );
+    if (!recommendationsQS || recommendationsQS.empty) return;
+    const recommendationsIDsAndTypes: any[] = [];
+    recommendationsQS.forEach((ds) => {
+      const recommendationID = ds.id;
+      const recommendedResourceType = ds.data().recommendedResourceType;
+      recommendationsIDsAndTypes.push({
+        id: recommendationID,
+        type: recommendedResourceType,
+      });
+    });
+    const recommendationsUpdatePromise = recommendationsIDsAndTypes.map(
+      async (recommendedIDAndType) => {
+        let documentRef;
+        switch (recommendedIDAndType.type) {
+          case 'post':
+            documentRef = db.doc(
+              `posts/${recommendedIDAndType.id}/recommendedBy/${userID}`
+            );
+            break;
+          case 'publication':
+            documentRef = db.doc(
+              `publications/${recommendedIDAndType.id}/recommendedBy/${userID}`
+            );
+            break;
+
+          default:
+            documentRef = undefined;
+        }
+        if (!documentRef) return null;
+        return documentRef
+          .set(toUserRef(userID, newUserData))
+          .catch((err) =>
+            console.error(
+              'unable to update user ref on ' +
+                recommendedIDAndType.type +
+                ' recommendation with id ' +
+                recommendedIDAndType.id +
+                ' for user with id ' +
+                userID,
+              err
+            )
+          );
+      }
+    );
+    return Promise.all(recommendationsUpdatePromise);
+  });
+
 export async function setUserOnTopic(
   topic: Topic,
   topicID: string,

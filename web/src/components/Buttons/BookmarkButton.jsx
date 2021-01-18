@@ -6,11 +6,11 @@ import {
   BookmarkIconSelected,
 } from '../../assets/PostActionIcons';
 
-import './Buttons.css';
 import {SignUpPopoverOverride} from '../Popovers/Popover';
 import {BOOKMARK} from '../../helpers/resourceTypeDefinitions';
 import NegativeButton from './NegativeButton';
 import {LoadingSpinnerPage} from '../LoadingSpinner/LoadingSpinner';
+import './Buttons.css';
 
 function BookmarkButton({
   bookmarkedResource,
@@ -94,7 +94,7 @@ function BookmarkButton({
   if (!user)
     return (
       <SignUpPopoverOverride
-        text="Sign up to follow this."
+        text="Sign up to bookmark this."
         actionTaken={BOOKMARK}
         active={!!user}
       >

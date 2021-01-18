@@ -15,6 +15,9 @@ import './PostActions.css';
 const PostActions = ({post, dedicatedPage, bookmarkedVariation}) => {
   const featureFlags = useContext(FeatureFlags);
   const bookmarkedByCollection = db.collection(`posts/${post.id}/bookmarkedBy`);
+  const recommendedByCollection = db.collection(
+    `posts/${post.id}/recommendedBy`
+  );
 
   if (bookmarkedVariation)
     return (
@@ -30,10 +33,10 @@ const PostActions = ({post, dedicatedPage, bookmarkedVariation}) => {
       {featureFlags.has('repost-to-group') ? <RepostToGroupButton /> : <></>}
       {featureFlags.has('share-post') ? <ShareButton /> : <></>}
       <RecommendButton
-        bookmarkedResource={post}
-        bookmarkedResourceType={POST}
-        bookmarkedResourceID={post.id}
-        bookmarkedByCollection={bookmarkedByCollection}
+        recommendedResource={post}
+        recommendedResourceType={POST}
+        recommendedResourceID={post.id}
+        recommendedByCollection={recommendedByCollection}
       />
       <BookmarkButton
         bookmarkedResource={post}

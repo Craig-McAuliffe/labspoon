@@ -196,6 +196,45 @@ export const updatePostOnBookmarks = functions.firestore
     return Promise.all(bookmarkersUpdatePromise);
   });
 
+export const updatePostOnRecommenders = functions.firestore
+  .document('posts/{postID}')
+  .onUpdate(async (change, context) => {
+    const newPostData = change.after.data() as Post;
+    const postID = context.params.postID;
+    const recommendersQS = await db
+      .collection(`posts/${postID}/recommendedBy`)
+      .get()
+      .catch((err) =>
+        console.error(
+          'unable to fetch recommenders of post with id ' + postID,
+          err
+        )
+      );
+    if (!recommendersQS || recommendersQS.empty) return;
+    const recommendersIDs: string[] = [];
+    recommendersQS.forEach((ds) => {
+      const recommenderID = ds.id;
+      recommendersIDs.push(recommenderID);
+    });
+    const recommendersUpdatePromise = recommendersIDs.map(
+      async (recommenderID) => {
+        return db
+          .doc(`users/${recommenderID}/recommendations/${postID}`)
+          .update({recommendedResourceData: newPostData})
+          .catch((err) =>
+            console.error(
+              'unable to update post on recommender with id ' +
+                recommenderID +
+                ' for post with id ' +
+                postID,
+              err
+            )
+          );
+      }
+    );
+    return Promise.all(recommendersUpdatePromise);
+  });
+
 export const updatePostOnTopic = functions.firestore
   .document('posts/{postID}')
   .onUpdate(async (change, context) => {
