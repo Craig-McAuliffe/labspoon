@@ -1,5 +1,4 @@
 import * as functions from 'firebase-functions';
-import {v4 as uuid} from 'uuid';
 import {admin, ResourceTypes} from './config';
 import {firestore} from 'firebase-admin';
 import {
@@ -23,8 +22,8 @@ db.settings({
 
 export const createPost = functions.https.onCall(async (data, context) => {
   const author = await checkAuthAndGetUserFromContext(context);
-
-  const postID = uuid();
+  const postDocRef = db.collection('posts').doc();
+  const postID = postDocRef.id;
 
   const content: PostContent = {
     text: data.title,
@@ -71,7 +70,7 @@ export const createPost = functions.https.onCall(async (data, context) => {
       }
       if (data.publicationURL) post.publicationURL = data.publicationURL;
       return Promise.all(matchedTopicsPromises).then(() => {
-        transaction.set(db.collection('posts').doc(postID), post);
+        transaction.set(postDocRef, post);
       });
     })
     .catch((err) => {
@@ -103,7 +102,7 @@ export const writePostToAuthorPosts = functions.firestore
     return null;
   });
 
-export const updatePostOnGroup = functions.firestore
+export const updatePostOnGroups = functions.firestore
   .document('posts/{postID}')
   .onUpdate(async (change, context) => {
     const newPostData = change.after.data() as Post;
@@ -156,6 +155,45 @@ export const updatePostOnPublication = functions.firestore
           err
         )
       );
+  });
+
+export const updatePostOnBookmarks = functions.firestore
+  .document('posts/{postID}')
+  .onUpdate(async (change, context) => {
+    const newPostData = change.after.data() as Post;
+    const postID = context.params.postID;
+    const bookmarkersQS = await db
+      .collection(`posts/${postID}/bookmarkedBy`)
+      .get()
+      .catch((err) =>
+        console.error(
+          'unable to fetch bookmarkers of post with id ' + postID,
+          err
+        )
+      );
+    if (!bookmarkersQS || bookmarkersQS.empty) return;
+    const bookmarkersIDs: string[] = [];
+    bookmarkersQS.forEach((ds) => {
+      const bookmarkerID = ds.id;
+      bookmarkersIDs.push(bookmarkerID);
+    });
+    const bookmarkersUpdatePromise = bookmarkersIDs.map(
+      async (bookmarkerID) => {
+        return db
+          .doc(`users/${bookmarkerID}/bookmarks/${postID}`)
+          .update({bookmarkedResourceData: newPostData})
+          .catch((err) =>
+            console.error(
+              'unable to update post on bookmarker with id ' +
+                bookmarkerID +
+                ' for post with id ' +
+                postID,
+              err
+            )
+          );
+      }
+    );
+    return Promise.all(bookmarkersUpdatePromise);
   });
 
 export const updatePostOnTopic = functions.firestore

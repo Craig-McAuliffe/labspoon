@@ -7,7 +7,12 @@ import {
 import {FeatureFlags, AuthContext} from '../../App';
 import {db} from '../../firebase';
 
-const RecommendButton = ({post}) => {
+const RecommendButton = ({
+  bookmarkedResource,
+  bookmarkedResourceType,
+  bookmarkedResourceID,
+  bookmarkedByCollection,
+}) => {
   const [recommendationID, setRecommendationID] = useState(undefined);
   const [loading, setLoading] = useState(false);
   const [signUpPrompt, setSignUpPrompt] = useState(false);
@@ -27,9 +32,9 @@ const RecommendButton = ({post}) => {
       recommendationCollection
         .add({
           resourceType: 'recommendation',
-          recommendedResourceType: 'post',
-          recommendedResourceID: post.id,
-          recommendedResourceData: post,
+          recommendedResourceType: bookmarkedResourceType,
+          recommendedResourceID: bookmarkedResourceID,
+          recommendedResourceData: bookmarkedResource,
         })
         .then((docRef) => {
           setRecommendationID(docRef.id);
@@ -63,8 +68,8 @@ const RecommendButton = ({post}) => {
     if (!user) return;
     setLoading(true);
     db.collection(`users/${user.uid}/recommendations`)
-      .where('recommendedResourceType', '==', 'post')
-      .where('recommendedResourceID', '==', post.id)
+      .where('recommendedResourceType', '==', bookmarkedResourceType)
+      .where('recommendedResourceID', '==', bookmarkedResourceID)
       .get()
       .then((qs) => {
         if (!qs.empty) {
@@ -75,7 +80,7 @@ const RecommendButton = ({post}) => {
       })
       .catch((err) => console.log(err))
       .then(() => setLoading(false));
-  }, [featureFlags, post.id, user]);
+  }, [featureFlags, bookmarkedResourceID, user]);
 
   return (
     <div className="button-container">

@@ -2,7 +2,7 @@ import React from 'react';
 import {Link} from 'react-router-dom';
 import Linkify from 'linkifyjs/react';
 import PostTaggedContent from './PostParts/PostTaggedContent';
-import PostActions, {BookmarkedPostSymbol} from './PostParts/PostActions';
+import PostActions from './PostParts/PostActions';
 import DefaultUserIcon from '../../../assets/DefaultUserIcon.svg';
 import ListItemTopics from '../../ListItem/ListItemTopics';
 import PublicationListItem from '../../Publication/PublicationListItem';
@@ -41,7 +41,6 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
         dedicatedPage ? 'post-container-dedicated-page' : 'post-container'
       }
     >
-      {bookmarkedVariation ? <BookmarkedPostSymbol post={post} /> : null}
       <PostHeader
         postAuthor={post.author}
         postCreationDate={post.createdAt}
@@ -50,9 +49,11 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
       <PostTextContent post={post} dedicatedPage={dedicatedPage} />
       <PostTaggedContent taggedContent={taggedContent} />
       <ListItemTopics dbTopics={post.topics} customTopics={post.customTopics} />
-      {bookmarkedVariation ? null : (
-        <PostActions post={post} dedicatedPage={dedicatedPage} />
-      )}
+      <PostActions
+        post={post}
+        dedicatedPage={dedicatedPage}
+        bookmarkedVariation={bookmarkedVariation}
+      />
     </div>
   );
 }

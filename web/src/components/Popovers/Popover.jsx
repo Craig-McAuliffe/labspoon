@@ -1,5 +1,6 @@
 import React, {useRef, useState, useEffect, cloneElement} from 'react';
 import {Link, useLocation} from 'react-router-dom';
+import {BOOKMARK} from '../../helpers/resourceTypeDefinitions';
 
 import './Popover.css';
 
@@ -36,10 +37,15 @@ export function SignUpPopoverOverride({children, text, actionTaken}) {
               setOpen(true);
             },
           });
+        case BOOKMARK:
+          return cloneElement(child, {
+            onBookmark: () => {
+              setOpen(true);
+            },
+          });
         default:
           return cloneElement(child, {
             followAction: () => {
-              child.props.followAction();
               setOpen(true);
             },
           });

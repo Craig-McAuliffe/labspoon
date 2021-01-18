@@ -21,6 +21,8 @@ export default function PostOptionalTags({taggedContent}) {
 
         case PUBLICATION:
           return <PublicationListItem publication={taggedItem.content} />;
+        default:
+          return null;
       }
     });
     return <div className="tagged-content-container">{taggedContentItems}</div>;

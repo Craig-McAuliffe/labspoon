@@ -42,3 +42,8 @@
   display: flex;
   justify-content: flex-end;
 }
+
+.post-actions-actioned-page-container {
+  display: flex;
+  justify-content: flex-end;
+}
