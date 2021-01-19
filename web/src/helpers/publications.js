@@ -49,9 +49,9 @@ export function getPaginatedPublicationsFromCollectionRef(
     .catch((err) => console.log(err));
 }
 
-export function getLinkForAuthor(ID, microsoftID, nameStr) {
-  if (ID) {
-    return <Link to={`/user/${ID}`}>{nameStr}</Link>;
+export function getLinkForAuthor(id, microsoftID, nameStr) {
+  if (id) {
+    return <Link to={`/user/${id}`}>{nameStr}</Link>;
   } else if (microsoftID) {
     return (
       <Link className="secondary-link" to={`/externaluser/${microsoftID}`}>

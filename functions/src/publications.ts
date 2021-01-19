@@ -167,6 +167,35 @@ export const addNewMSPublicationAsync = functions
       );
   });
 
+async function resolveUserIDs(users: User[]): Promise<User[]> {
+  const setUserPromises = users.map(async (user) => {
+    if (!user.microsoftID) {
+      console.error('Cannot resolve user without microsoft ID:', user);
+      return user;
+    }
+    // check whether there is a labspoon user associated with the microsoft ID
+    const userQS = await db
+      .collection('users')
+      .where('microsoftID', '==', user.microsoftID)
+      .limit(1)
+      .get();
+    // if there is not a labspoon user, just return the unresolved user
+    if (userQS.empty) {
+      return user;
+    }
+    // if there is labspoon user, add the id to the user object
+    user.id = userQS.docs[0].id;
+    return user;
+  });
+  return await Promise.all(setUserPromises);
+}
+
+async function resolveTopicIDs(topicsNoIDs: Topic[]) {
+  const collectedTopicsWithIDs: TaggedTopic[] = [];
+  handleTopicsNoID(topicsNoIDs, collectedTopicsWithIDs);
+  return collectedTopicsWithIDs;
+}
+
 export const addNewPublicationToTopics = functions.firestore
   .document(`publications/{publicationID}`)
   .onCreate((publicationDS, context) => {
@@ -244,7 +273,7 @@ export const addNewMSPubToMSAuthors = functions.firestore
   .document(`MSPublications/{microsoftPublicationID}`)
   .onCreate((publicationDS, context) => {
     const microsoftPublication = publicationDS.data() as MAKPublication;
-    const microsoftPublicationID = context.params.publicationID;
+    const microsoftPublicationID = context.params.microsoftPublicationID;
     return addMSPublicationToMSAuthors(
       microsoftPublicationID,
       microsoftPublication
@@ -290,34 +319,6 @@ async function addMSPublicationToMSAuthors(
       );
   });
   return Promise.all(msUserPromises);
-}
-
-async function resolveUserIDs(users: User[]): Promise<User[]> {
-  const setUserPromises = users.map(async (user) => {
-    if (!user.microsoftID) {
-      console.error('Cannot resolve user without microsoft ID:', user);
-    }
-    // check whether there is a labspoon user associated with the microsoft ID
-    const userQS = await db
-      .collection('users')
-      .where('microsoftAcademicAuthorID', '==', user.microsoftID)
-      .limit(1)
-      .get();
-    // if there is not a labspoon user, just return the unresolved user
-    if (userQS.empty) {
-      return user;
-    }
-    // if there is labspoon user, add the id to the user object
-    user.id = userQS.docs[0].id;
-    return user;
-  });
-  return await Promise.all(setUserPromises);
-}
-
-async function resolveTopicIDs(topicsNoIDs: Topic[]) {
-  const collectedTopicsWithIDs: TaggedTopic[] = [];
-  handleTopicsNoID(topicsNoIDs, collectedTopicsWithIDs);
-  return collectedTopicsWithIDs;
 }
 
 export async function getPublicationByMicrosoftPublicationID(
@@ -402,54 +403,55 @@ export const addSourcesToExistingPublications = functions.https.onRequest(
 // not have this field populated. This function is idempotent, but should only
 // be run once after the updates to the add publication function are made that
 // add the referenced microsoft publication IDs for new publications.
-export const addReferencedMicrosoftIDsToExistingPublications = functions.https.onRequest(
-  async (_, res) => {
-    const msPublicationsQS = await db.collection('MSPublications').get();
-    if (msPublicationsQS.empty) {
-      res.status(200).send();
-      return;
-    }
-    const promises: Promise<any>[] = [];
-    msPublicationsQS.forEach((ds) => {
-      if (!ds.exists) return;
-      const msPublication = ds.data() as MAKPublicationInDB;
 
-      const publicationID = msPublication.processed;
-      // This should not happen as publications are created in a transaction.
-      if (!publicationID) return;
+// export const addReferencedMicrosoftIDsToExistingPublications = functions.https.onRequest(
+//   async (_, res) => {
+//     const msPublicationsQS = await db.collection('MSPublications').get();
+//     if (msPublicationsQS.empty) {
+//       res.status(200).send();
+//       return;
+//     }
+//     const promises: Promise<any>[] = [];
+//     msPublicationsQS.forEach((ds) => {
+//       if (!ds.exists) return;
+//       const msPublication = ds.data() as MAKPublicationInDB;
 
-      if (!msPublication.RId) return;
-      const referenceIDs: string[] = msPublication.RId.map((strid) =>
-        strid.toString()
-      );
+//       const publicationID = msPublication.processed;
+//       // This should not happen as publications are created in a transaction.
+//       if (!publicationID) return;
 
-      const promise = db
-        .runTransaction(async (t) => {
-          const publicationRef = db.doc(`publications/${publicationID}`);
-          const publicationDS = await t.get(publicationRef);
-          if (!publicationDS.exists) return;
-          const publication = publicationDS.data() as Publication;
-          // If the field is already populated we don't want to overwrite as this
-          // would incur additional reference resolution operations with no effect.
-          if (publication.referencedPublicationMicrosoftIDs) return;
-          t.update(publicationRef, {
-            referencedPublicationMicrosoftIDs: referenceIDs,
-          });
-        })
-        .catch((err) => {
-          console.error(
-            `An error occurred adding referenced microsoft publication IDs to the publication with ID ${publicationID}`,
-            err
-          );
-          throw new functions.https.HttpsError('internal', 'An error occured.');
-        });
-      promises.push(promise);
-    });
+//       if (!msPublication.RId) return;
+//       const referenceIDs: string[] = msPublication.RId.map((strid) =>
+//         strid.toString()
+//       );
 
-    await Promise.all(promises);
-    res.status(200).send();
-  }
-);
+//       const promise = db
+//         .runTransaction(async (t) => {
+//           const publicationRef = db.doc(`publications/${publicationID}`);
+//           const publicationDS = await t.get(publicationRef);
+//           if (!publicationDS.exists) return;
+//           const publication = publicationDS.data() as Publication;
+//           // If the field is already populated we don't want to overwrite as this
+//           // would incur additional reference resolution operations with no effect.
+//           if (publication.referencedPublicationMicrosoftIDs) return;
+//           t.update(publicationRef, {
+//             referencedPublicationMicrosoftIDs: referenceIDs,
+//           });
+//         })
+//         .catch((err) => {
+//           console.error(
+//             `An error occurred adding referenced microsoft publication IDs to the publication with ID ${publicationID}`,
+//             err
+//           );
+//           throw new functions.https.HttpsError('internal', 'An error occured.');
+//         });
+//       promises.push(promise);
+//     });
+
+//     await Promise.all(promises);
+//     res.status(200).send();
+//   }
+// );
 
 export const triggerFulfillReferencesOnLabspoon = functions.https.onRequest(
   async (req, res) => {
@@ -629,26 +631,7 @@ export const addMicrosoftPublicationByID = functions.https.onRequest(
   }
 );
 
-export const updateReferencesToPublication = functions.firestore
-  .document('publications/{publicationID}')
-  .onUpdate(async (change, _) => {
-    const publicationID = change.after.id;
-    const publication = change.after.data() as Publication;
-    const publicationRefQS = await db
-      .collectionGroup('references')
-      .where('id', '==', publicationID)
-      .get();
-    if (publicationRefQS.empty) return;
-    const writePromises: Promise<any>[] = [];
-    publicationRefQS.forEach((publicationDS) => {
-      const writePromise = publicationDS.ref.set(
-        toPublicationRef(publication, publicationID)
-      );
-      writePromises.push(writePromise);
-    });
-    return Promise.all(writePromises);
-  });
-
+// If we allow this, it will be inconsistent to publication list items found through references
 // Update the publication in the collections of the authors.
 export const updateAuthorsPublication = functions.firestore
   .document('publications/{publicationID}')
@@ -658,12 +641,13 @@ export const updateAuthorsPublication = functions.firestore
     const authors = publication.authors;
     if (!authors) return;
     const users = authors.filter((author) => Boolean(author.id));
+    if (!users || users.length === 0) return;
     const promises = users.map(async (user) => {
       db.doc(`users/${user.id}/publications/${publicationID}`)
         .set(toPublicationRef(publication, publicationID))
         .catch((err) =>
           console.error(
-            `Unable to set reference to publication ${publicationID} to user ${user.id} publication collection:`,
+            `Unable to set reference to publication ${publicationID} on user ${user.id} publication collection:`,
             err
           )
         );

@@ -1,5 +1,4 @@
 import * as functions from 'firebase-functions';
-import {firestore} from 'firebase-admin';
 import {admin, environment} from './config';
 import {
   interpretQuery,
@@ -10,12 +9,12 @@ import {
   MAKAuthor,
 } from './microsoft';
 import {Post} from './posts';
-import {Topic} from './topics';
 import {
   publishAddPublicationRequests,
   allPublicationFields,
   Publication,
 } from './publications';
+import {Topic} from './topics';
 
 const db = admin.firestore();
 
@@ -121,33 +120,119 @@ export const setUserIsFollowedBySelfOnCreation = functions.firestore
     await db.doc(`users/${userID}/followedByUsers/${userID}`).set(userRef);
   });
 
-export const addUserToRelatedTopicPage = functions.firestore
+export const addUserToRelatedTopic = functions.firestore
   .document('users/{userID}/topics/{topicID}')
   .onCreate(async (change, context) => {
-    const topic = change.data() as Topic;
     const userID = context.params.userID;
     const topicID = context.params.topicID;
-    setUserOnTopic(topic, topicID, userID).catch((err) =>
+    setUserOnTopic(topicID, userID).catch((err) =>
       console.log(err, 'could not add user to topic')
     );
   });
 
-export const updateUserOnRelatedTopicPage = functions.firestore
+export const updateUserTopicRankOnTopic = functions.firestore
   .document('users/{userID}/topics/{topicID}')
   .onUpdate(async (change, context) => {
-    const topic = change.after.data() as Topic;
     const topicID = context.params.topicID;
     const userID = context.params.userID;
-    setUserOnTopic(topic, topicID, userID).catch((err) =>
+    const topic = change.after.data() as Topic;
+    setUserOnTopic(topicID, userID, topic.rank).catch((err) =>
       console.log(err, 'could not update user rank on topic')
     );
+  });
+
+export async function setUserOnTopic(
+  topicID: string,
+  userID: string,
+  rank?: number
+) {
+  const userInTopicDocRef = db.doc(`topics/${topicID}/users/${userID}`);
+  await db
+    .doc(`users/${userID}`)
+    .get()
+    .then((ds) => {
+      if (!ds.exists) return;
+      const user = ds.data() as User;
+      const userRef = toUserRef(user.id, user);
+      userRef.rank = rank ? rank : 1;
+      userInTopicDocRef
+        .set(userRef)
+        .catch((err) =>
+          console.log(
+            err,
+            'could not set user with id ' +
+              userID +
+              ' on topic with id' +
+              topicID
+          )
+        );
+    })
+    .catch((err) =>
+      console.log(
+        err,
+        'could not search for user in order to add user ref to topic.'
+      )
+    );
+}
+
+export const updateUserRefOnTopics = functions.firestore
+  .document('users/{userID}')
+  .onUpdate(async (change, context) => {
+    const newUserData = change.after.data() as User;
+    const oldUserData = change.before.data() as User;
+    const userID = context.params.userID;
+    if (
+      JSON.stringify(toUserRef(userID, newUserData)) ===
+      JSON.stringify(toUserRef(userID, oldUserData))
+    )
+      return;
+    const topicsQS = await db
+      .collection(`users/${userID}/topics`)
+      .get()
+      .catch((err) =>
+        console.error('unable to fetch topics for user with id ' + userID, err)
+      );
+    if (!topicsQS || topicsQS.empty) return;
+    const topicsIDsAndRanks: any[] = [];
+    topicsQS.forEach((ds) => {
+      const topicID = ds.id;
+      const topic = ds.data();
+      topicsIDsAndRanks.push({id: topicID, rank: topic.rank});
+    });
+    const topicsUpdatePromise = topicsIDsAndRanks.map(
+      async (topicIDAndRank) => {
+        const topicRank = topicIDAndRank.rank;
+        const topicID = topicIDAndRank.id;
+        const userWithTopicSpecificRank = {...newUserData};
+        userWithTopicSpecificRank.rank = topicRank;
+        return db
+          .doc(`topics/${topicID}/users/${userID}`)
+          .set(toUserRef(userID, userWithTopicSpecificRank))
+          .catch((err) =>
+            console.error(
+              'unable to update user ref on topic with id ' +
+                topicID +
+                ' for user with id ' +
+                userID,
+              err
+            )
+          );
+      }
+    );
+    return Promise.all(topicsUpdatePromise);
   });
 
 export const updateUserRefOnResearchFocuses = functions.firestore
   .document('users/{userID}')
   .onUpdate(async (change, context) => {
     const newUserData = change.after.data() as User;
+    const oldUserData = change.before.data() as User;
     const userID = context.params.userID;
+    if (
+      JSON.stringify(toUserRef(userID, newUserData)) ===
+      JSON.stringify(toUserRef(userID, oldUserData))
+    )
+      return;
     const researchFocusesQS = await db
       .collection(`users/${userID}/researchFocuses`)
       .get()
@@ -186,7 +271,13 @@ export const updateUserRefOnOpenPositions = functions.firestore
   .document('users/{userID}')
   .onUpdate(async (change, context) => {
     const newUserData = change.after.data() as User;
+    const oldUserData = change.before.data() as User;
     const userID = context.params.userID;
+    if (
+      JSON.stringify(toUserRef(userID, newUserData)) ===
+      JSON.stringify(toUserRef(userID, oldUserData))
+    )
+      return;
     const openPositionsQS = await db
       .collection(`users/${userID}/openPositions`)
       .get()
@@ -224,7 +315,13 @@ export const updateUserRefOnTechniques = functions.firestore
   .document('users/{userID}')
   .onUpdate(async (change, context) => {
     const newUserData = change.after.data() as User;
+    const oldUserData = change.before.data() as User;
     const userID = context.params.userID;
+    if (
+      JSON.stringify(toUserRef(userID, newUserData)) ===
+      JSON.stringify(toUserRef(userID, oldUserData))
+    )
+      return;
     const techniquesQS = await db
       .collection(`users/${userID}/techniques`)
       .get()
@@ -261,7 +358,13 @@ export const updateUserRefOnMemberGroups = functions.firestore
   .document('users/{userID}')
   .onUpdate(async (change, context) => {
     const newUserData = change.after.data() as User;
+    const oldUserData = change.before.data() as User;
     const userID = context.params.userID;
+    if (
+      JSON.stringify(toUserRef(userID, newUserData)) ===
+      JSON.stringify(toUserRef(userID, oldUserData))
+    )
+      return;
     const groupsQS = await db
       .collection(`users/${userID}/groups`)
       .get()
@@ -300,7 +403,13 @@ export const updateUserRefOnFollowers = functions.firestore
   .document('users/{userID}')
   .onUpdate(async (change, context) => {
     const newUserData = change.after.data() as User;
+    const oldUserData = change.before.data() as User;
     const userID = context.params.userID;
+    if (
+      JSON.stringify(toUserRef(userID, newUserData)) ===
+      JSON.stringify(toUserRef(userID, oldUserData))
+    )
+      return;
     const followersQS = await db
       .collection(`users/${userID}/followedByUsers`)
       .get()
@@ -337,7 +446,13 @@ export const updateUserRefOnUsersYouFollow = functions.firestore
   .document('users/{userID}')
   .onUpdate(async (change, context) => {
     const newUserData = change.after.data() as User;
+    const oldUserData = change.before.data() as User;
     const userID = context.params.userID;
+    if (
+      JSON.stringify(toUserRef(userID, newUserData)) ===
+      JSON.stringify(toUserRef(userID, oldUserData))
+    )
+      return;
     const followsQS = await db
       .collection(`users/${userID}/followsUsers`)
       .get()
@@ -376,7 +491,13 @@ export const updateUserRefOnGroupsYouFollow = functions.firestore
   .document('users/{userID}')
   .onUpdate(async (change, context) => {
     const newUserData = change.after.data() as User;
+    const oldUserData = change.before.data() as User;
     const userID = context.params.userID;
+    if (
+      JSON.stringify(toUserRef(userID, newUserData)) ===
+      JSON.stringify(toUserRef(userID, oldUserData))
+    )
+      return;
     const followsQS = await db
       .collection(`users/${userID}/followsGroups`)
       .get()
@@ -415,7 +536,13 @@ export const updateUserRefOnTopicsYouFollow = functions.firestore
   .document('users/{userID}')
   .onUpdate(async (change, context) => {
     const newUserData = change.after.data() as User;
+    const oldUserData = change.before.data() as User;
     const userID = context.params.userID;
+    if (
+      JSON.stringify(toUserRef(userID, newUserData)) ===
+      JSON.stringify(toUserRef(userID, oldUserData))
+    )
+      return;
     const followsQS = await db
       .collection(`users/${userID}/followsTopics`)
       .get()
@@ -454,7 +581,13 @@ export const updateUserRefOnPost = functions.firestore
   .document('users/{userID}')
   .onUpdate(async (change, context) => {
     const newUserData = change.after.data() as User;
+    const oldUserData = change.before.data() as User;
     const userID = context.params.userID;
+    if (
+      JSON.stringify(toUserRef(userID, newUserData)) ===
+      JSON.stringify(toUserRef(userID, oldUserData))
+    )
+      return;
     const postsQS = await db
       .collection(`users/${userID}/posts`)
       .get()
@@ -484,45 +617,17 @@ export const updateUserRefOnPost = functions.firestore
     return Promise.all(postsUpdatePromise);
   });
 
-export const updateUserRefOnTopic = functions.firestore
-  .document('users/{userID}')
-  .onUpdate(async (change, context) => {
-    const newUserData = change.after.data() as User;
-    const userID = context.params.userID;
-    const topicsQS = await db
-      .collection(`users/${userID}/topics`)
-      .get()
-      .catch((err) =>
-        console.error('unable to fetch topics for user with id ' + userID, err)
-      );
-    if (!topicsQS || topicsQS.empty) return;
-    const topicsIDs: string[] = [];
-    topicsQS.forEach((ds) => {
-      const topicID = ds.id;
-      topicsIDs.push(topicID);
-    });
-    const topicsUpdatePromise = topicsIDs.map(async (topicID) => {
-      return db
-        .doc(`topics/${topicID}/users/${userID}`)
-        .set(toUserRef(userID, newUserData))
-        .catch((err) =>
-          console.error(
-            'unable to update user ref on topic with id ' +
-              topicID +
-              ' for user with id ' +
-              userID,
-            err
-          )
-        );
-    });
-    return Promise.all(topicsUpdatePromise);
-  });
-
 export const updateUserRefForRecommendations = functions.firestore
   .document('users/{userID}')
   .onUpdate(async (change, context) => {
     const newUserData = change.after.data() as User;
+    const oldUserData = change.before.data() as User;
     const userID = context.params.userID;
+    if (
+      JSON.stringify(toUserRef(userID, newUserData)) ===
+      JSON.stringify(toUserRef(userID, oldUserData))
+    )
+      return;
     const recommendationsQS = await db
       .collection(`users/${userID}/recommendations`)
       .get()
@@ -579,31 +684,6 @@ export const updateUserRefForRecommendations = functions.firestore
     return Promise.all(recommendationsUpdatePromise);
   });
 
-export async function setUserOnTopic(
-  topic: Topic,
-  topicID: string,
-  userID: string
-) {
-  const userInTopicDocRef = db.doc(`topics/${topicID}/users/${userID}`);
-  await db
-    .doc(`users/${userID}`)
-    .get()
-    .then((qs) => {
-      if (!qs.exists) return;
-      const user = qs.data() as UserRef;
-      const userRef = {
-        id: user.id,
-        name: user.name,
-        avatar: user.avatar,
-        rank: topic.rank,
-      };
-      userInTopicDocRef
-        .set(userRef)
-        .catch((err) => console.log(err, 'could not set user on topic'));
-    })
-    .catch((err) => console.log(err, 'could not search for user'));
-}
-
 export const removeGroupFromUser = functions.firestore
   .document('groups/{groupID}/members/{userID}')
   .onDelete(async (_, context) => {
@@ -651,55 +731,41 @@ export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall
         'already-exists',
         `User with id ${userID} is already linked to a microsoft id`
       );
-
-    const MSUser = await db
-      .doc(`MSUsers/${microsoftAcademicAuthorID}`)
-      .get()
-      .then((ds) => {
-        if (!ds.exists) return;
-        return ds.data() as MAKAuthor;
-      })
-      .catch((err) =>
-        console.log(
-          err,
-          'unable to verify if MSUser with id ' +
-            microsoftAcademicAuthorID +
-            'is already linked',
-          err
-        )
-      );
-    if (!MSUser)
-      throw new functions.https.HttpsError(
-        'not-found',
-        `No MSUser found with ID ${microsoftAcademicAuthorID}`
-      );
-
+    const fetchMSUser = () =>
+      db
+        .doc(`MSUsers/${microsoftAcademicAuthorID}`)
+        .get()
+        .then((ds) => {
+          if (!ds.exists) return;
+          return ds.data() as MAKAuthor;
+        })
+        .catch((err) =>
+          console.log(
+            err,
+            'unable to verify if MSUser with id ' +
+              microsoftAcademicAuthorID +
+              'is already linked',
+            err
+          )
+        );
+    let MSUser = await fetchMSUser();
+    if (!MSUser) {
+      await new Promise((resolve) => {
+        setTimeout(() => resolve(true), 3000);
+      });
+      MSUser = await fetchMSUser();
+      if (!MSUser) {
+        throw new functions.https.HttpsError(
+          'not-found',
+          `No MSUser found with ID ${microsoftAcademicAuthorID}`
+        );
+      }
+    }
     if (MSUser.processed)
       throw new functions.https.HttpsError(
         'already-exists',
         `MSUser with id ${microsoftAcademicAuthorID} is already linked to a labspoon user`
       );
-
-    // give functions some time to create publications
-    await new Promise((resolve) => {
-      setTimeout(() => resolve(true), 3000);
-    });
-    const msPublicationsForUserQS = await db
-      .collection(`MSUsers/${microsoftAcademicAuthorID}/publications`)
-      .get()
-      .catch((err) => {
-        console.log(
-          'unable to fetch publications for MSUser with id ' +
-            microsoftAcademicAuthorID,
-          err
-        );
-        throw new functions.https.HttpsError(
-          'internal',
-          'unable to fetch publications for MSUser with id ' +
-            microsoftAcademicAuthorID,
-          err
-        );
-      });
 
     const batch = db.batch();
     batch.update(userToBeLinkedDBRef, {
@@ -708,62 +774,6 @@ export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall
     batch.update(db.doc(`MSUsers/${microsoftAcademicAuthorID}`), {
       processed: userID,
     });
-    if (msPublicationsForUserQS) {
-      const publicationWritePromises: Promise<null>[] = [];
-      msPublicationsForUserQS.forEach((msPublicationDS) =>
-        publicationWritePromises.push(
-          (async () => {
-            const msPublicationData = msPublicationDS.data();
-            if (!msPublicationData) return null;
-            const labspoonPublicationID = msPublicationData.processed;
-            if (!labspoonPublicationID) {
-              console.log(
-                'Processed field for Microsoft Publication with id ',
-                msPublicationDS.id,
-                ' is undefined. This should not happen and likely indicates a logic issue.'
-              );
-              return null;
-            }
-            const labspoonPublicationDS = await db
-              .doc(`publications/${labspoonPublicationID}`)
-              .get()
-              .catch((err) =>
-                console.error(
-                  'unable to fetch publication with id ' +
-                    labspoonPublicationID,
-                  err
-                )
-              );
-            if (!labspoonPublicationDS || !labspoonPublicationDS.exists)
-              return null;
-            const labspoonPublication = labspoonPublicationDS.data();
-            if (!labspoonPublication) return null;
-            batch.set(
-              db.doc(`users/${userID}/publications/${labspoonPublicationID}`),
-              labspoonPublication
-            );
-            const authorItem = labspoonPublication.authors.filter(
-              (author: any) => author.microsoftID === microsoftAcademicAuthorID
-            )[0];
-            user.microsoftID = microsoftAcademicAuthorID;
-            if (authorItem) {
-              batch.update(db.doc(`publications/${labspoonPublicationID}`), {
-                authors: firestore.FieldValue.arrayRemove(authorItem),
-              });
-              batch.update(db.doc(`publications/${labspoonPublicationID}`), {
-                authors: firestore.FieldValue.arrayUnion(
-                  toUserRef(userID, user)
-                ),
-              });
-            }
-            return null;
-          })()
-        )
-      );
-      await Promise.all(publicationWritePromises).catch((err) =>
-        console.error(err)
-      );
-    }
 
     return batch.commit().catch((err) => {
       console.error(err);
@@ -941,6 +951,7 @@ export interface UserRef {
   name: string;
   avatar?: string;
   rank?: number;
+  microsoftID?: string;
 }
 
 export function toUserRef(userID: string, user: any) {
@@ -950,6 +961,7 @@ export function toUserRef(userID: string, user: any) {
     avatar: user.avatar ? user.avatar : null,
   };
   if (user.rank) userRef.rank = user.rank;
+  if (user.microsoftID) userRef.microsoftID = user.microsoftID;
   return userRef;
 }
 
@@ -962,4 +974,5 @@ interface User {
   coverPhotoCloudID?: string;
   checkedCreateOnboardingTip?: boolean;
   microsoftID?: string;
+  rank?: number;
 }

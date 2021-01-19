@@ -56,10 +56,10 @@ export function convertGroupToGroupRef(group) {
   const groupRef = {
     id: group.id,
     name: group.name,
-    avatar: group.avatar,
     about: group.about,
     institution: group.institution,
   };
+  if (group.avatar) groupRef.avatar = group.avatar;
   return groupRef;
 }
 

@@ -186,7 +186,15 @@ function RetrieveMoreReferences({publicationID, publication}) {
 
   function retrieveReferencesForPublication() {
     setClicked(true);
-    retrieveReferences({publicationID: publicationID});
+    retrieveReferences({publicationID: publicationID})
+      .catch((err) => {
+        console.error(err);
+        alert(
+          'Something went wrong fetching those references. Please try again or contact help@labspoon.com if the issue persists.'
+        );
+        setClicked(false);
+      })
+      .then(() => window.location.reload());
   }
 
   return (

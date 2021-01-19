@@ -172,38 +172,6 @@ export const addGroupToRelatedTopicPage = functions.firestore
     setGroupOnTopic(groupID, topicID);
   });
 
-export const updateGroupOnRelatedTopicPage = functions.firestore
-  .document('groups/{groupID}/topics/{topicID}')
-  .onUpdate(async (change, context) => {
-    const topic = change.after.data() as Topic;
-    const topicID = context.params.topicID;
-    const groupID = context.params.groupID;
-    db.doc(`topics/${topicID}/groups/${groupID}`)
-      .update({rank: topic.rank})
-      .catch((err) => {
-        db.doc(`topics/${topicID}/groups/${groupID}`)
-          .get()
-          .then((ds) => {
-            if (!ds.exists) setGroupOnTopic(groupID, topicID, topic.rank);
-          })
-          .catch(() =>
-            console.error(
-              'unable to check whether group with id ' +
-                groupID +
-                ' exists on topic with id ' +
-                topicID
-            )
-          );
-        console.error(
-          'unable to update rank on group with id ' +
-            groupID +
-            ' in topic with id' +
-            topicID,
-          err
-        );
-      });
-  });
-
 export const removeGroupOnRelatedTopicPage = functions.firestore
   .document('groups/{groupID}/topics/{topicID}')
   .onDelete(async (change, context) => {
@@ -260,11 +228,95 @@ export async function setGroupOnTopic(
     );
 }
 
+export const updateGroupTopicRankOnTopic = functions.firestore
+  .document('groups/{groupID}/topics/{topicID}')
+  .onUpdate(async (change, context) => {
+    const topic = change.after.data() as Topic;
+    const topicID = context.params.topicID;
+    const groupID = context.params.groupID;
+    db.doc(`topics/${topicID}/groups/${groupID}`)
+      .update({rank: topic.rank})
+      .catch((err) => {
+        db.doc(`topics/${topicID}/groups/${groupID}`)
+          .get()
+          .then((ds) => {
+            if (!ds.exists) setGroupOnTopic(groupID, topicID, topic.rank);
+          })
+          .catch(() =>
+            console.error(
+              'unable to check whether group with id ' +
+                groupID +
+                ' exists on topic with id ' +
+                topicID
+            )
+          );
+        console.error(
+          'unable to update rank on group with id ' +
+            groupID +
+            ' in topic with id' +
+            topicID,
+          err
+        );
+      });
+  });
+
+export const updateGroupRefOnTopics = functions.firestore
+  .document('groups/{groupID}')
+  .onUpdate(async (change, context) => {
+    const newGroupData = change.after.data() as Group;
+    const oldGroupData = change.before.data() as Group;
+    const groupID = context.params.groupID;
+    if (
+      JSON.stringify(groupToGroupRef(newGroupData, groupID)) ===
+      JSON.stringify(groupToGroupRef(oldGroupData, groupID))
+    )
+      return;
+    const topics: Topic[] = [];
+    await db
+      .collection(`groups/${groupID}/topics`)
+      .get()
+      .then((qs) => {
+        if (qs.empty) return;
+        qs.forEach((ds) => {
+          const topic = ds.data() as Topic;
+          const topicID = ds.id;
+          topic.id = topicID;
+          topics.push(topic);
+        });
+      })
+      .catch((err) =>
+        console.error('unable to fetch topics of group with id ' + groupID, err)
+      );
+    const topicsUpdatePromise = topics.map(async (topic) => {
+      const groupWithTopicSpecificRank = {...newGroupData};
+      groupWithTopicSpecificRank.rank = topic.rank;
+      return db
+        .doc(`topics/${topic.id}/groups/${groupID}`)
+        .set(groupToGroupRef(groupWithTopicSpecificRank, groupID))
+        .catch((err) =>
+          console.error(
+            'unable to update group ref on topic with id ' +
+              topic.id +
+              ' of group with id ' +
+              groupID,
+            err
+          )
+        );
+    });
+    return Promise.all(topicsUpdatePromise);
+  });
+
 export const updateGroupRefOnFollowers = functions.firestore
   .document('groups/{groupID}')
   .onUpdate(async (change, context) => {
     const newGroupData = change.after.data() as Group;
+    const oldGroupData = change.before.data() as Group;
     const groupID = context.params.groupID;
+    if (
+      JSON.stringify(groupToGroupRef(newGroupData, groupID)) ===
+      JSON.stringify(groupToGroupRef(oldGroupData, groupID))
+    )
+      return;
     const followers: UserRef[] = [];
     await db
       .collection(`groups/${groupID}/followedByUsers`)
@@ -304,7 +356,13 @@ export const updateGroupRefOnMembers = functions.firestore
   .document('groups/{groupID}')
   .onUpdate(async (change, context) => {
     const newGroupData = change.after.data() as Group;
+    const oldGroupData = change.before.data() as Group;
     const groupID = context.params.groupID;
+    if (
+      JSON.stringify(groupToGroupRef(newGroupData, groupID)) ===
+      JSON.stringify(groupToGroupRef(oldGroupData, groupID))
+    )
+      return;
     const members: UserRef[] = [];
     await db
       .collection(`groups/${groupID}/members`)
@@ -340,49 +398,17 @@ export const updateGroupRefOnMembers = functions.firestore
     return Promise.all(membersUpdatePromise);
   });
 
-export const updateGroupRefOnTopics = functions.firestore
-  .document('groups/{groupID}')
-  .onUpdate(async (change, context) => {
-    const newGroupData = change.after.data() as Group;
-    const groupID = context.params.groupID;
-    const topics: Topic[] = [];
-    await db
-      .collection(`groups/${groupID}/topics`)
-      .get()
-      .then((qs) => {
-        if (qs.empty) return;
-        qs.forEach((ds) => {
-          const topic = ds.data() as Topic;
-          const topicID = ds.id;
-          topic.id = topicID;
-          topics.push(topic);
-        });
-      })
-      .catch((err) =>
-        console.error('unable to fetch topics of group with id ' + groupID, err)
-      );
-    const topicsUpdatePromise = topics.map(async (topic) => {
-      return db
-        .doc(`topics/${topic.id}/groups/${groupID}`)
-        .set(groupToGroupRef(newGroupData, groupID))
-        .catch((err) =>
-          console.error(
-            'unable to update group ref on topic with id ' +
-              topic.id +
-              ' of group with id ' +
-              groupID,
-            err
-          )
-        );
-    });
-    return Promise.all(topicsUpdatePromise);
-  });
-
 export const updateGroupRefOnOpenPositions = functions.firestore
   .document('groups/{groupID}')
   .onUpdate(async (change, context) => {
     const newGroupData = change.after.data() as Group;
+    const oldGroupData = change.before.data() as Group;
     const groupID = context.params.groupID;
+    if (
+      JSON.stringify(groupToGroupRef(newGroupData, groupID)) ===
+      JSON.stringify(groupToGroupRef(oldGroupData, groupID))
+    )
+      return;
     const openPositionQS = await db
       .collection(`groups/${groupID}/openPositions`)
       .get()
@@ -421,7 +447,13 @@ export const updateGroupRefOnTechniques = functions.firestore
   .document('groups/{groupID}')
   .onUpdate(async (change, context) => {
     const newGroupData = change.after.data() as Group;
+    const oldGroupData = change.before.data() as Group;
     const groupID = context.params.groupID;
+    if (
+      JSON.stringify(groupToGroupRef(newGroupData, groupID)) ===
+      JSON.stringify(groupToGroupRef(oldGroupData, groupID))
+    )
+      return;
     const techniquesQS = await db
       .collection(`groups/${groupID}/techniques`)
       .get()
@@ -458,7 +490,13 @@ export const updateGroupRefOnResearchFocuses = functions.firestore
   .document('groups/{groupID}')
   .onUpdate(async (change, context) => {
     const newGroupData = change.after.data() as Group;
+    const oldGroupData = change.before.data() as Group;
     const groupID = context.params.groupID;
+    if (
+      JSON.stringify(groupToGroupRef(newGroupData, groupID)) ===
+      JSON.stringify(groupToGroupRef(oldGroupData, groupID))
+    )
+      return;
     const researchFocusesQS = await db
       .collection(`groups/${groupID}/researchFocuses`)
       .get()
@@ -832,6 +870,7 @@ export function groupToGroupRef(group: Group, groupID: string) {
   } as GroupRef;
 
   if (group.avatar) groupRef.avatar = group.avatar;
+  if (group.rank) groupRef.rank = group.rank;
   return groupRef;
 }
 
@@ -860,4 +899,5 @@ interface Group {
   website?: string;
   donationLink?: string;
   institution?: string;
+  rank?: number;
 }

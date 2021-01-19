@@ -274,9 +274,9 @@ export const writePostToUserFollowingFeeds = functions.firestore
       .get();
     if (followers.empty) return null;
     followers.forEach(async (followerSnapshot) => {
-      const follower = followerSnapshot.data() as UserRef;
+      const followerID = followerSnapshot.id;
       const followingFeedRef = db.doc(
-        `users/${follower.id}/feeds/followingFeed`
+        `users/${followerID}/feeds/followingFeed`
       );
       await followingFeedRef.collection('posts').doc(postID).set(post);
       await updateFiltersByPost(followingFeedRef, post);
@@ -540,7 +540,11 @@ export const linkPostTopicsToAuthor = functions.firestore
     const postTopics = post.topics;
     const authorID = post.author.id;
     postTopics.forEach((postTopic) => {
-      const userTopic = convertTaggedTopicToTopic(postTopic, true);
+      // this should not be possible
+      if (!postTopic.id) {
+        console.error('post topic found with no id');
+        return;
+      }
       const userTopicDocRef = db.doc(
         `users/${authorID}/topics/${postTopic.id}`
       );
@@ -548,6 +552,7 @@ export const linkPostTopicsToAuthor = functions.firestore
         .get()
         .then((qs: any) => {
           if (!qs.exists) {
+            const userTopic = convertTaggedTopicToTopic(postTopic, true);
             userTopicDocRef
               .set(userTopic)
               .catch((err) =>

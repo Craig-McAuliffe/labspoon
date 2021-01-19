@@ -136,7 +136,7 @@ function authorsToAuthorList(authors) {
   ));
 }
 
-function PublicationListItemAuthor({ID, microsoftID, name, first, last}) {
+function PublicationListItemAuthor({id, microsoftID, name, first, last}) {
   let nameStr;
   if (first && !last) {
     nameStr = `${name},`;
@@ -145,7 +145,7 @@ function PublicationListItemAuthor({ID, microsoftID, name, first, last}) {
   } else {
     nameStr = `and ${name}`;
   }
-  const authorLink = getLinkForAuthor(ID, microsoftID, nameStr);
+  const authorLink = getLinkForAuthor(id, microsoftID, nameStr);
   return (
     <h4 className="publication-list-item-content-author" key={uuid()}>
       {authorLink}&nbsp;

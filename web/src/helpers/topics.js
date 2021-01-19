@@ -30,7 +30,6 @@ export function getPaginatedTopicsFromCollectionRef(
 }
 
 export function handleTaggedTopicsNoIDs(taggedResourceTopics, collectedTopics) {
-  console.log('handling topics', collectedTopics);
   const mappingTopicsPromises = taggedResourceTopics.map(
     async (taggedTopicNoID) => {
       return db
@@ -40,10 +39,6 @@ export function handleTaggedTopicsNoIDs(taggedResourceTopics, collectedTopics) {
           function addLabspoonTopicToTaggedResource(
             correspondingLabspoonTopicID
           ) {
-            console.log(
-              'adding id ' + correspondingLabspoonTopicID + ' to topic',
-              taggedTopicNoID
-            );
             collectedTopics.push(
               convertTopicToTaggedTopic(
                 taggedTopicNoID,
@@ -52,7 +47,6 @@ export function handleTaggedTopicsNoIDs(taggedResourceTopics, collectedTopics) {
             );
           }
           if (ds.exists) {
-            console.log('MSField exists ');
             const MSFieldData = ds.data();
             if (MSFieldData.processed)
               addLabspoonTopicToTaggedResource(MSFieldData.processed);
@@ -65,7 +59,6 @@ export function handleTaggedTopicsNoIDs(taggedResourceTopics, collectedTopics) {
               );
             }
           } else {
-            console.log('MSField does not exist');
             await waitThenReFetchMSField(taggedTopicNoID)
               .then((labspoonTopicID) => {
                 console.log('created field and topic with id', labspoonTopicID);

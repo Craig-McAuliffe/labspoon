@@ -1,6 +1,6 @@
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import React, {useEffect, useState} from 'react';
-import {useHistory, useParams} from 'react-router-dom';
+import {useHistory, useParams, Redirect} from 'react-router-dom';
 import {db} from '../../../firebase';
 import {getActiveTabID} from '../../../helpers/filters';
 import FilterableResults, {
@@ -59,6 +59,8 @@ export default function SkeletonUserPage() {
     },
   ];
 
+  if (userDetails.processed)
+    return <Redirect to={`/user/${userDetails.processed}`} />;
   return (
     <div className="content-layout">
       <div className="details-container">

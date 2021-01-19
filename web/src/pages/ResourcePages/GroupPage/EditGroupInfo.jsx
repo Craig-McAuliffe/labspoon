@@ -1,7 +1,6 @@
 import React, {useState, useEffect, useContext} from 'react';
 import GroupInfoForm from '../../../components/Group/CreateGroupPage/GroupInfoForm';
 import {db} from '../../../firebase';
-import {v4 as uuid} from 'uuid';
 import {AuthContext} from '../../../App';
 import {useHistory} from 'react-router-dom';
 import {PaddedPageContainer} from '../../../components/Layout/Content';
@@ -113,14 +112,11 @@ export default function EditingGroupInfo({groupData, children}) {
         if (!newMember.id) {
           const invitation = {
             email: newMember.email,
-            type: 'group',
+            resourceType: 'group',
             resourceID: groupID,
             invitingUserID: userID,
           };
-          batch.set(
-            groupDocRef.collection('invitations').doc(uuid()),
-            invitation
-          );
+          batch.set(groupDocRef.collection('invitations').doc(), invitation);
           return;
         }
         const memberRef = {

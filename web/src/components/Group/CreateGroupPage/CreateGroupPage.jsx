@@ -1,7 +1,6 @@
 import React, {useState, useContext, useEffect} from 'react';
 import GroupInfoForm from './GroupInfoForm';
 import {useHistory} from 'react-router-dom';
-import {v4 as uuid} from 'uuid';
 import {db} from '../../../firebase';
 import {AuthContext} from '../../../App';
 import {LoadingSpinnerPage} from '../../LoadingSpinner/LoadingSpinner';
@@ -41,11 +40,12 @@ export default function CreateGroupPage({
 
   async function onSubmit(values) {
     setSubmitting(true);
-    const groupID = uuid();
+    const groupDocRef = db.collection('groups').doc();
+    const groupID = groupDocRef.id;
 
     const writeToDB = (avatarID, downloadURL) => {
       const batch = db.batch();
-      const groupDocRef = db.doc(`groups/${groupID}`);
+
       if (downloadURL) values.avatar = downloadURL;
       if (avatarID) values.avatarCloudID = avatarID;
       batch.set(groupDocRef, values);
@@ -59,14 +59,11 @@ export default function CreateGroupPage({
         if (!member.id) {
           const invitation = {
             email: member.email,
-            type: 'group',
+            resourceType: 'group',
             resourceID: groupID,
             invitingUserID: userID,
           };
-          batch.set(
-            groupDocRef.collection('invitations').doc(uuid()),
-            invitation
-          );
+          batch.set(groupDocRef.collection('invitations').doc(), invitation);
           return;
         }
         const memberRef = {

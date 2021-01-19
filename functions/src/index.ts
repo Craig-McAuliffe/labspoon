@@ -10,3 +10,4 @@ exports.openPositions = require('./openPositions');
 exports.techniques = require('./techniques');
 exports.researchFocuses = require('./researchFocuses');
 exports.images = require('./images');
+exports.msUser = require('./msUser');
