@@ -150,14 +150,14 @@ export async function createTopicFromMSField(
     );
 }
 
-export function handleTopicsNoID(
+export async function handleTopicsNoID(
   taggedTopicsNoIDs: Topic[],
   collectedTopics: TaggedTopic[]
 ) {
-  return taggedTopicsNoIDs.map(
-    async (taggedTopicNoID: Topic) =>
-      await addTopicIDToTaggedTopic(taggedTopicNoID, collectedTopics)
+  const promises = taggedTopicsNoIDs.map((taggedTopicNoID: Topic) =>
+    addTopicIDToTaggedTopic(taggedTopicNoID, collectedTopics)
   );
+  return Promise.all(promises);
 }
 
 export async function addTopicIDToTaggedTopic(

@@ -1,6 +1,5 @@
 import React, {useState, useContext} from 'react';
 import {Link} from 'react-router-dom';
-import {v4 as uuid} from 'uuid';
 import {ExpandIcon, HideIcon} from '../../assets/PostActionIcons';
 import PostActions from '../Posts/Post/PostParts/PostActions';
 import detectJournal from '../Publication/DetectJournal';
@@ -129,7 +128,7 @@ function authorsToAuthorList(authors) {
       ID={author.id}
       microsoftID={author.microsoftID}
       name={author.name}
-      key={author.id || author.microsoftID}
+      key={(author.id || author.microsoftID) + idx}
       first={idx === 0}
       last={idx === authors.length - 1}
     />
@@ -147,7 +146,7 @@ function PublicationListItemAuthor({id, microsoftID, name, first, last}) {
   }
   const authorLink = getLinkForAuthor(id, microsoftID, nameStr);
   return (
-    <h4 className="publication-list-item-content-author" key={uuid()}>
+    <h4 className="publication-list-item-content-author" key={id + ' ' + name}>
       {authorLink}&nbsp;
     </h4>
   );

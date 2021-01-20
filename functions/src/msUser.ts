@@ -2,7 +2,7 @@ import {firestore} from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import {admin} from './config';
 import {MAKAuthor} from './microsoft';
-import {toPublicationRef, Publication} from './publications';
+import {Publication} from './publications';
 import {toUserRef} from './users';
 
 const db = admin.firestore();
@@ -53,8 +53,10 @@ export const addMSUserPubsToNewLinkedUser = functions.firestore
       msPublicationsQS.forEach(async (msPublicationDS) => {
         if (!msPublicationDS.exists) return;
         const correspondingPublicationID = msPublicationDS.data().processed;
-        const correspondingPublicationDS = await db
-          .doc(`publications/${correspondingPublicationID}`)
+        const correspondingPublicationRef = db.doc(
+          `publications/${correspondingPublicationID}`
+        );
+        const correspondingPublicationDS = await correspondingPublicationRef
           .get()
           .catch((err) =>
             console.error(
@@ -74,32 +76,36 @@ export const addMSUserPubsToNewLinkedUser = functions.firestore
           return;
         }
         const correspondingPublication = correspondingPublicationDS.data()! as Publication;
-        const publicationOnUserRef = db.doc(
-          `users/${correspondingUserID}/publications/${correspondingPublicationID}`
-        );
         const batch = db.batch();
-        batch.set(
-          publicationOnUserRef,
-          toPublicationRef(correspondingPublication, correspondingPublicationID)
-        );
 
         if (correspondingUser) {
           const authorItem = correspondingPublication.authors!.filter(
             (author: any) => author.microsoftID === msUserID
           )[0];
-
+          // updating the publication will automatically set it on the associated user
+          if (correspondingPublication.filterAuthorIDs) {
+            batch.update(correspondingPublicationRef, {
+              filterAuthorIDs: firestore.FieldValue.arrayUnion(
+                correspondingUserID
+              ),
+            });
+          } else {
+            batch.set(correspondingPublicationRef, {
+              filterAuthorIDs: [correspondingUserID],
+            });
+          }
           if (authorItem) {
-            batch.update(db.doc(`publications/${correspondingPublicationID}`), {
+            batch.update(correspondingPublicationRef, {
               authors: firestore.FieldValue.arrayRemove(authorItem),
             });
-            batch.update(db.doc(`publications/${correspondingPublicationID}`), {
+            batch.update(correspondingPublicationRef, {
               authors: firestore.FieldValue.arrayUnion(
                 toUserRef(correspondingUserID, correspondingUser)
               ),
             });
           }
+          promises.push(batch.commit());
         }
-        promises.push(batch.commit());
       });
       return Promise.all(promises);
     }

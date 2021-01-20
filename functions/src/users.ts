@@ -1118,11 +1118,16 @@ export function toUserRef(userID: string, user: any) {
   return userRef;
 }
 
-export function toUserFilterRef(userName: string, userID: string) {
+export function toUserFilterRef(
+  userName: string,
+  userID: string,
+  rank?: number
+) {
   const userFilterRef: UserFilterRef = {
     id: userID,
     name: userName,
   };
+  if (rank) userFilterRef.rank = rank;
   return userFilterRef;
 }
 
@@ -1141,4 +1146,5 @@ interface User {
 export interface UserFilterRef {
   id: string;
   name: string;
+  rank?: number;
 }

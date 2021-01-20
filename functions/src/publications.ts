@@ -147,10 +147,18 @@ export const addNewMSPublicationAsync = functions
     const publication = makPublicationToPublication(microsoftPublication);
     microsoftPublication.processed = publicationID;
 
-    if (publication.topics)
+    if (publication.topics) {
       publication.topics = await resolveTopicIDs(publication.topics);
-    if (publication.authors)
+      publication.filterTopicIDs = publication.topics.map((topic: Topic) => {
+        return topic.id!;
+      });
+    }
+    if (publication.authors) {
       publication.authors = await resolveUserIDs(publication.authors);
+      publication.filterAuthorIDs = publication.authors
+        .filter((author: User) => author.id)
+        .map((author) => author.id!);
+    }
 
     const batch = db.batch();
     batch.set(microsoftPublicationRef, microsoftPublication);
@@ -191,8 +199,8 @@ async function resolveUserIDs(users: User[]): Promise<User[]> {
 
 async function resolveTopicIDs(topicsNoIDs: Topic[]) {
   const collectedTopicsWithIDs: TaggedTopic[] = [];
-  handleTopicsNoID(topicsNoIDs, collectedTopicsWithIDs);
-  return collectedTopicsWithIDs;
+  await handleTopicsNoID(topicsNoIDs, collectedTopicsWithIDs);
+  return await Promise.all(collectedTopicsWithIDs);
 }
 
 export const addNewPublicationToTopics = functions.firestore
@@ -319,6 +327,64 @@ async function addMSPublicationToMSAuthors(
   });
   return Promise.all(msUserPromises);
 }
+
+export const updateAuthorsPublication = functions.firestore
+  .document('publications/{publicationID}')
+  .onUpdate(async (change, _) => {
+    const publicationID = change.after.id;
+    const publication = change.after.data() as Publication;
+    const authors = publication.authors;
+    if (!authors) return;
+    const users = authors.filter((author) => Boolean(author.id));
+    if (!users || users.length === 0) return;
+    const promises = users.map(async (user) => {
+      db.doc(`users/${user.id}/publications/${publicationID}`)
+        .set(toPublicationRef(publication, publicationID))
+        .catch((err) =>
+          console.error(
+            `Unable to set reference to publication ${publicationID} on user ${user.id} publication collection:`,
+            err
+          )
+        );
+    });
+    return Promise.all(promises);
+  });
+
+export const updateGroupsPublication = functions.firestore
+  .document('publications/{publicationID}')
+  .onUpdate(async (change, _) => {
+    const publicationID = change.after.id;
+    const publication = change.after.data() as Publication;
+    const groupsQS = await db
+      .collection(`publications/${publicationID}/groups`)
+      .get()
+      .catch((err) =>
+        console.error(
+          'unable to fetch groups for publication with id ' + publicationID,
+          err
+        )
+      );
+    if (!groupsQS || groupsQS.empty) return;
+    const groupsToUpdateIDs: string[] = [];
+    groupsQS.forEach((groupDS) => {
+      groupsToUpdateIDs.push(groupDS.id);
+    });
+    const groupsPromises = groupsToUpdateIDs.map((groupID) =>
+      db
+        .doc(`groups/${groupID}/publications/${publicationID}`)
+        .set(toPublicationRef(publication, publicationID))
+        .catch((err) =>
+          console.error(
+            'unable to set updated pub ref with id ' +
+              publicationID +
+              ' on group with id ' +
+              groupID,
+            err
+          )
+        )
+    );
+    return Promise.all(groupsPromises);
+  });
 
 export async function getPublicationByMicrosoftPublicationID(
   msPublicationID: string,
@@ -775,6 +841,10 @@ export function toPublicationRef(
     topics: input.topics!,
     microsoftID: input.microsoftID,
   };
+  if (input.filterTopicIDs)
+    publicationRef.filterTopicIDs = input.filterTopicIDs;
+  if (input.filterAuthorIDs)
+    publicationRef.filterAuthorIDs = input.filterAuthorIDs;
   if (publicationID) publicationRef.id = publicationID;
   return publicationRef;
 }
@@ -788,6 +858,8 @@ export interface PublicationRef {
   authors: Array<User>;
   topics: Topic[];
   microsoftID?: string;
+  filterTopicIDs?: string[];
+  filterAuthorIDs?: string[];
 }
 
 export interface Publication {
@@ -798,4 +870,6 @@ export interface Publication {
   topics?: Topic[];
   sources: Source[];
   referencedPublicationMicrosoftIDs: string[];
+  filterTopicIDs?: string[];
+  filterAuthorIDs?: string[];
 }

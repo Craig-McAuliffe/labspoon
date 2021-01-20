@@ -65,7 +65,9 @@ export default function EditGroupPosts({children, groupID, group}) {
         })
         .catch((err) => {
           console.log(err);
-          alert(`Sorry, something went wrong. Please try again later.`);
+          alert(
+            `Sorry, something went wrong. Please try again. If the issue persists, email help@labspoon.com .`
+          );
         });
     });
   }
@@ -84,7 +86,9 @@ export default function EditGroupPosts({children, groupID, group}) {
         })
         .catch((err) => {
           console.log(err);
-          alert(`Sorry, something went wrong. Please try again later.`);
+          alert(
+            `Sorry, something went wrong. Please try again. If the issue persists, email help@labspoon.com .`
+          );
         });
     });
   }
@@ -194,7 +198,7 @@ export const getGroupPostsAuthorsFilter = (groupID) => {
   )
     .then((fetchedMembers) => ({
       collectionName: 'Group Members',
-      options: usersToFilterOptions(fetchedMembers, true),
+      options: usersToFilterOptions(fetchedMembers),
       mutable: true,
     }))
     .catch((err) => console.log('filter err', err));

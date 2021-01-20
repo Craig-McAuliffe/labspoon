@@ -41,7 +41,7 @@ export const createOpenPosition = functions.https.onCall(
     };
 
     const openPositionTopics: TaggedTopic[] = [];
-    const matchedTopicsPromises = handleTopicsNoID(
+    const matchedTopicsPromises = await handleTopicsNoID(
       data.topics,
       openPositionTopics
     );

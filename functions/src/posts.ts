@@ -30,7 +30,7 @@ export const createPost = functions.https.onCall(async (data, context) => {
   };
 
   const postTopics: TaggedTopic[] = [];
-  const matchedTopicsPromises = handleTopicsNoID(data.topics, postTopics);
+  const matchedTopicsPromises = await handleTopicsNoID(data.topics, postTopics);
   await Promise.all(matchedTopicsPromises);
 
   if (data.publication) {
@@ -502,7 +502,7 @@ export async function updateFilterCollection(
   await filterOptionDocRef.set(filterOption, {merge: true});
 
   if (removedResource) {
-    await filterOptionDocRef.get().then((qs) => {
+    await filterOptionDocRef.get().then(async (qs) => {
       if (!qs.exists) {
         console.log('could not find filter option');
         return;
@@ -511,19 +511,27 @@ export async function updateFilterCollection(
       if (!filterOptionData.rank) return;
       const filterOptionRank = filterOptionData.rank;
       if (filterOptionRank === 1) {
-        filterOptionDocRef
+        await filterOptionDocRef
           .delete()
-          .catch((err) => console.log(err, 'could not delete filter option'));
+          .catch((err) => console.error(err, 'could not delete filter option'));
       } else {
-        filterOptionDocRef
+        await filterOptionDocRef
           .update({rank: filterOptionRank - 1})
           .catch((err) =>
-            console.log(err, 'could not decrease filter option rank')
+            console.error(err, 'could not decrease filter option rank')
           );
       }
+      await filterCollectionDocRef
+        .update({
+          rank: firestore.FieldValue.increment(-1),
+        })
+        .catch((err) =>
+          console.log(err, 'could not increase filter collection rank')
+        );
     });
     return;
-  } else if (!noRankChange) {
+  }
+  if (!noRankChange) {
     // increment the rank of the filter collection and option
     await filterCollectionDocRef
       .update({

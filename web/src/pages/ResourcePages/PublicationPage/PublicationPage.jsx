@@ -235,10 +235,8 @@ const PublicationDetails = ({publicationDetails}) => {
       <h2 className="publication-page-title">{publicationDetails.title}</h2>
       <PublicationSources sources={publicationDetails.sources} />
       <div>
-        {publicationDetails.content.authors ? (
-          <PublicationAuthors
-            publicationAuthors={publicationDetails.content.authors}
-          />
+        {publicationDetails.authors ? (
+          <PublicationAuthors publicationAuthors={publicationDetails.authors} />
         ) : null}
       </div>
       <PublicationBodyAbstract abstract={publicationDetails.abstract} />

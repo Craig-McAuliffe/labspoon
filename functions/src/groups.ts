@@ -7,7 +7,7 @@ import {Publication} from './publications';
 import {OpenPosition} from './openPositions';
 import {ResearchFocus} from './researchFocuses';
 import {Technique} from './techniques';
-import {UserRef} from './users';
+import {toUserFilterRef, UserRef} from './users';
 
 const db: firestore.Firestore = admin.firestore();
 
@@ -49,14 +49,14 @@ export const createGroupDocuments = functions.firestore
       .doc(`postsFeed`)
       .set({id: 'postsFeed'})
       .catch((err) =>
-        console.log(err, 'could not create postsFeed for new group')
+        console.error(err, 'could not create postsFeed for new group')
       );
     await db
       .collection(`groups/${groupID}/feeds`)
       .doc(`publicationsFeed`)
       .set({id: 'publicationsFeed'})
       .catch((err) =>
-        console.log(err, 'could not create publicationsFeed for new group')
+        console.error(err, 'could not create publicationsFeed for new group')
       );
   });
 
@@ -75,7 +75,7 @@ export const addGroupMembersToPostFilter = functions.firestore
       },
       false
     ).catch((err) =>
-      console.log(
+      console.error(
         err,
         'could not update author option on group posts feed filter'
       )
@@ -97,11 +97,97 @@ export const removeGroupMembersFromPostFilter = functions.firestore
       },
       true
     ).catch((err) =>
-      console.log(
+      console.error(
         err,
         'could not remove author option on group posts feed filter'
       )
     );
+  });
+
+export const addNewMemberToPublicationFilter = functions.firestore
+  .document(`groups/{groupID}/members/{memberID}`)
+  .onCreate(async (change, context) => {
+    const groupID = context.params.groupID;
+    const memberID = context.params.memberID;
+    const member = await db
+      .doc(`users/${memberID}`)
+      .get()
+      .then((userDS) => userDS.data()!)
+      .catch((err) =>
+        console.error(
+          'unable to fetch user doc for member with id ' +
+            memberID +
+            ' who just joined group with id ' +
+            groupID,
+          err
+        )
+      );
+    if (!member) return;
+    const memberPublications = await db
+      .collection(`users/${memberID}/publications`)
+      .get()
+      .catch((err) =>
+        console.error(
+          'unable to fetch publications for new group member with id ' +
+            memberID,
+          err
+        )
+      );
+    if (!memberPublications || memberPublications.empty) return;
+    const memberPublicationsIDs: string[] = [];
+    memberPublications.forEach((publicationDS) => {
+      const publicationID = publicationDS.id;
+      memberPublicationsIDs.push(publicationID);
+    });
+    const matchedPublicationsOnGroup: string[] = [];
+    const publicationMatchingPromises = memberPublicationsIDs.map(
+      (newMemberPublicationID) =>
+        db
+          .doc(`groups/${groupID}/publications/${newMemberPublicationID}`)
+          .get()
+          .then((matchedPublicationDS) => {
+            if (!matchedPublicationDS.exists) return;
+            matchedPublicationsOnGroup.push(matchedPublicationDS.id);
+          })
+          .catch((err) =>
+            console.error(
+              'unable to fetch publication with id ' +
+                newMemberPublicationID +
+                ' on group with id ' +
+                groupID,
+              err
+            )
+          )
+    );
+    await Promise.all(publicationMatchingPromises);
+    if (matchedPublicationsOnGroup.length === 0) return;
+    const groupPublicationsUserCollectionRef = db.doc(
+      `groups/${groupID}/feeds/publicationsFeed/filterCollections/user`
+    );
+    const groupPublicationsUserOptionRef = groupPublicationsUserCollectionRef
+      .collection('filterOptions')
+      .doc(memberID);
+    const filterCollectionRank: number = await groupPublicationsUserCollectionRef
+      .get()
+      .then((ds) => ds.data()!.rank)
+      .catch((err) =>
+        console.error(
+          'unable to fetch publications user filter collection on group with id ' +
+            groupID,
+          err
+        )
+      );
+
+    const batch = db.batch();
+    batch.set(
+      groupPublicationsUserOptionRef,
+      toUserFilterRef(member.name, memberID, matchedPublicationsOnGroup.length)
+    );
+    if (filterCollectionRank)
+      batch.update(groupPublicationsUserCollectionRef, {
+        rank: filterCollectionRank + matchedPublicationsOnGroup.length,
+      });
+    return await batch.commit();
   });
 
 export const addGroupMembersToPublicationFilter = functions.firestore
@@ -131,7 +217,10 @@ export const addGroupMembersToPublicationFilter = functions.firestore
           );
         })
         .catch((err) =>
-          console.error('could not fetch groups for user with id ' + authorID)
+          console.error(
+            'could not fetch groups for user with id ' + authorID,
+            err
+          )
         );
     });
     await Promise.all(updateFilterPromises);
@@ -156,7 +245,7 @@ export const removeGroupMembersFromPublicationFilter = functions.firestore
         },
         true
       ).catch((err) =>
-        console.log(
+        console.error(
           err,
           'could not update author option on group publications feed filter'
         )
@@ -182,7 +271,7 @@ export const removeGroupOnRelatedTopicPage = functions.firestore
       .doc(`topics/${topicID}/groups/${groupID}`)
       .delete()
       .catch((err) =>
-        console.log(
+        console.error(
           err,
           'unable to remove group with id ' +
             groupID +
@@ -545,7 +634,7 @@ export const addGroupToUserGroups = functions.firestore
       .doc(`groups/${groupID}`)
       .get()
       .catch((err) => {
-        console.log(`Unable to retrieve group with ID ${groupID}:`, err);
+        console.error(`Unable to retrieve group with ID ${groupID}:`, err);
         throw new functions.https.HttpsError(
           'not-found',
           `Unable to retrieve group with ID ${groupID}.`
@@ -556,7 +645,7 @@ export const addGroupToUserGroups = functions.firestore
       .doc(`users/${userID}/groups/${groupID}`)
       .set(group)
       .catch((err) => {
-        console.log(
+        console.error(
           `Unable to set group with ID ${groupID} on user ${userID} groups collection:`,
           err
         );
@@ -578,7 +667,7 @@ export const removeGroupFromUserGroups = functions.firestore
       .doc(`users/${userID}/groups/${groupID}`)
       .delete()
       .catch((err) => {
-        console.log(
+        console.error(
           `Unable to remove group with ID ${groupID} from user ${userID} groups collection:`,
           err
         );

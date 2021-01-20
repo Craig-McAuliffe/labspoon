@@ -30,12 +30,11 @@ export function getEnabledIDsFromFilter(filter) {
   return IDsMap;
 }
 
-export function usersToFilterOptions(users, filter = false) {
+export function usersToFilterOptions(users) {
   return users.map((user, i) => {
-    const id = !filter ? user.id : user.resourceID;
     return {
       data: {
-        id: id,
+        id: user.id,
         name: user.name,
       },
       enabled: i === 0,

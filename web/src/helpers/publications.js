@@ -6,9 +6,6 @@ export function dbPublicationToJSPublication(dbPublication) {
   if (JSPublication.resourceType === undefined) {
     JSPublication.resourceType = 'publication';
   }
-  JSPublication.content = {};
-  JSPublication.content.authors = dbPublication.authors;
-  JSPublication.content.abstract = dbPublication.abstract;
   return JSPublication;
 }
 
@@ -46,7 +43,7 @@ export function getPaginatedPublicationsFromCollectionRef(
       });
       return publications;
     })
-    .catch((err) => console.log(err));
+    .catch((err) => console.error(err));
 }
 
 export function getLinkForAuthor(id, microsoftID, nameStr) {

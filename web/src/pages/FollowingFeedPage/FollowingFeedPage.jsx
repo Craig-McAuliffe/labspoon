@@ -121,7 +121,7 @@ function getFiltersFromFilterCollection(filterCollection) {
           const filterOptionData = doc.data();
           filterCollection.options.push({
             data: {
-              id: filterOptionData.resourceID,
+              id: filterOptionData.id,
               name: filterOptionData.name,
             },
             enabled: false,
