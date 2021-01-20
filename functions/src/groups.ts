@@ -113,21 +113,26 @@ export const addGroupMembersToPublicationFilter = functions.firestore
       `groups/${groupID}/feeds/publicationsFeed`
     );
     const updateFilterPromises = publication.authors!.map((author) => {
-      if (!author.id) return;
-      updateFilterCollection(
-        groupPublicationsFeedRef,
-        {resourceName: 'Author', resourceType: ResourceTypes.USER},
-        {
-          name: author.name,
-          id: author.id,
-        },
-        false
-      ).catch((err) =>
-        console.log(
-          err,
-          'could not update author option on group publications feed filter'
-        )
-      );
+      const authorID = author.id;
+      if (!authorID) return;
+      return db
+        .doc(`users/${authorID}/groups/${groupID}`)
+        .get()
+        .then((userGroupsDS) => {
+          if (!userGroupsDS.exists) return;
+          updateFilterCollection(
+            groupPublicationsFeedRef,
+            {resourceName: 'Author', resourceType: ResourceTypes.USER},
+            {
+              name: author.name,
+              id: authorID,
+            },
+            false
+          );
+        })
+        .catch((err) =>
+          console.error('could not fetch groups for user with id ' + authorID)
+        );
     });
     await Promise.all(updateFilterPromises);
   });

@@ -18,7 +18,7 @@ const pubSubClient = new PubSub();
 const db = admin.firestore();
 
 export const allPublicationFields =
-  'AA.AfId,AA.AfN,AA.AuId,AA.AuN,AA.DAuN,AA.DAfN,AA.S,AW,BT,BV,C.CId,C.CN,CC,CitCon,D,DN,DOI,E,ECC,F.DFN,F.FId,F.FN,FamId,FP,I,IA,Id,J.JId,J.JN,LP,PB,Pt,RId,S,Ti,V,VFN,VSN,W,Y';
+  'AA.AfId,AA.AfN,AA.AuId,AA.AuN,AA.DAuN,AA.DAfN,AA.S,AW,BT,BV,C.CId,C.CN,CC,CitCon,D,DN,DOI,ECC,F.DFN,F.FId,F.FN,FamId,FP,I,IA,Id,J.JId,J.JN,LP,PB,Pt,RId,S,Ti,V,VFN,VSN,W,Y';
 
 interface PublicationSearchResponse {
   results: Publication[];
@@ -48,7 +48,6 @@ export const microsoftAcademicKnowledgePublicationSearch = functions.https.onCal
     data: PublicationSearchRequest
   ): Promise<PublicationSearchResponse> => {
     const response: PublicationSearchResponse = {results: [], expression: ''};
-
     const count = data.limit;
     let expression: string;
     let offset: number;

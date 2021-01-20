@@ -32,6 +32,23 @@ async function getMicrosoftAcademicKnowledgeAPIPublications(
   return resp;
 }
 
+function updateStateForCachedResults(
+  newResults,
+  expression,
+  setHasMore,
+  setResults,
+  setExpression,
+  setOffset,
+  setMissedCache
+) {
+  setHasMore(true);
+  const mappedNewResults = newResults.map(dbPublicationToJSPublication);
+  setResults(mappedNewResults);
+  setExpression(expression);
+  setOffset(newResults.length);
+  setMissedCache(true);
+}
+
 function updateStateForResults(
   newResults,
   expression,
@@ -59,6 +76,7 @@ export function MicrosoftAcademicKnowledgeAPIPublicationResults({query}) {
   const [expression, setExpression] = useState();
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [error, setError] = useState(false);
   const [missedCache, setMissedCache] = useState(false);
   const {interpretCache, interpretDispatch} = useContext(
     MicrosoftPublicationSearchCache
@@ -75,15 +93,14 @@ export function MicrosoftAcademicKnowledgeAPIPublicationResults({query}) {
       setMissedCache(false);
       const cachedValues = interpretCache.get(paramsString);
 
-      updateStateForResults(
+      updateStateForCachedResults(
         cachedValues.data.results,
         cachedValues.data.expression,
-        offset,
-        limit,
         setHasMore,
         setResults,
         setExpression,
-        setOffset
+        setOffset,
+        setMissedCache
       );
       return;
     }
@@ -104,12 +121,16 @@ export function MicrosoftAcademicKnowledgeAPIPublicationResults({query}) {
       setExpression,
       setHasMore,
       interpretCache,
-      interpretDispatch
+      interpretDispatch,
+      setError
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, missedCache]);
   function fetchMore() {
-    if (!missedCache) return;
+    if (!missedCache) {
+      setMissedCache(true);
+      return;
+    }
     return microsoftPublicationSearchByExpression(
       query,
       expression,
@@ -121,9 +142,17 @@ export function MicrosoftAcademicKnowledgeAPIPublicationResults({query}) {
       setExpression,
       setHasMore,
       interpretCache,
-      interpretDispatch
+      interpretDispatch,
+      setError
     );
   }
+  if (error)
+    return (
+      <h4>
+        Something went wrong. Try a variation of your search or look for one of
+        the authors instead.
+      </h4>
+    );
   return (
     <>
       <Results results={results} hasMore={hasMore} fetchMore={fetchMore} />
@@ -300,7 +329,7 @@ function microsoftPublicationSearchByExpression(
     })
     .catch((err) => {
       console.error(err);
-      setError(true);
+      if (setError) setError(true);
     })
     .finally(() => setLoading(false));
 }
@@ -350,7 +379,7 @@ function microsoftPublicationSearchByQuery(
       })
       .catch((err) => {
         console.error(err);
-        setError(true);
+        if (setError) setError(true);
       })
       .finally(() => setLoading(false));
   if (interpretCache.has(paramsString)) {

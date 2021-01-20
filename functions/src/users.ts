@@ -761,6 +761,82 @@ export const updateGroupMemberPostFilter = functions.firestore
     return Promise.all(filterUpdatesPromises);
   });
 
+export const updateGroupMemberPublicationsFilter = functions.firestore
+  .document(`users/{userID}`)
+  .onUpdate(async (change, context) => {
+    const newUserName = change.after.data().name as string;
+    const oldUserName = change.before.data().name as string;
+    const userID = context.params.userID;
+    if (newUserName === oldUserName) return;
+    const groupsQS = await db
+      .collection(`users/${userID}/groups`)
+      .get()
+      .catch((err) =>
+        console.error('unable to fetch groups for user with id ' + userID, err)
+      );
+    if (!groupsQS || groupsQS.empty) return;
+    const groups: GroupRef[] = [];
+    groupsQS.forEach((groupDS) => {
+      if (!groupDS.exists) return;
+      const groupData = groupDS.data() as GroupRef;
+      groupData.id = groupDS.id;
+      groups.push(groupData);
+    });
+    const groupsIDsToUpdate: string[] = [];
+    const groupPromises = groups.map(async (group) => {
+      const groupID = group.id;
+      return db
+        .collection(
+          `groups/${groupID}/feeds/publicationsFeed/filterCollections/user/filterOptions`
+        )
+        .get()
+        .then((filterOptionQS) => {
+          if (filterOptionQS.empty) return;
+          let hasMatchingOption: boolean = false;
+          filterOptionQS.forEach((filterOption) => {
+            if (filterOption.id === userID) hasMatchingOption = true;
+          });
+          if (hasMatchingOption) {
+            groupsIDsToUpdate.push(groupID);
+          }
+          return;
+        })
+        .catch((err) =>
+          console.error(
+            'unable to fetch group postsFeed filter options with id for group with id' +
+              groupID +
+              ' while updating user filter ref',
+            err
+          )
+        );
+    });
+
+    await Promise.all(groupPromises);
+
+    const filterUpdatesPromises = groupsIDsToUpdate.map(
+      async (groupIDToUpdate) => {
+        const groupPublicationFeedRef = db.doc(
+          `groups/${groupIDToUpdate}/feeds/publicationsFeed`
+        );
+        return new Promise((resolve) =>
+          resolve(
+            updateFilterCollection(
+              groupPublicationFeedRef,
+              {resourceName: 'Author', resourceType: ResourceTypes.USER},
+              {
+                name: newUserName,
+                id: userID,
+              },
+              false,
+              true
+            )
+          )
+        );
+      }
+    );
+    return Promise.all(filterUpdatesPromises);
+  });
+
 export const removeGroupFromUser = functions.firestore
   .document('groups/{groupID}/members/{userID}')
   .onDelete(async (_, context) => {
