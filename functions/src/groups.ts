@@ -621,6 +621,51 @@ export const updateGroupRefOnResearchFocuses = functions.firestore
     return Promise.all(researchFocusesUpdatePromise);
   });
 
+export const updateGroupRefOnPublications = functions.firestore
+  .document('groups/{groupID}')
+  .onUpdate(async (change, context) => {
+    const newGroupData = change.after.data() as Group;
+    const oldGroupData = change.before.data() as Group;
+    const groupID = context.params.groupID;
+    if (
+      JSON.stringify(groupToGroupRef(newGroupData, groupID)) ===
+      JSON.stringify(groupToGroupRef(oldGroupData, groupID))
+    )
+      return;
+    const publicationsQS = await db
+      .collection(`groups/${groupID}/publications`)
+      .get()
+      .catch((err) =>
+        console.error(
+          'unable to fetch publications of group with id ' + groupID,
+          err
+        )
+      );
+    if (!publicationsQS || publicationsQS.empty) return;
+    const publicationsIDs: string[] = [];
+    publicationsQS.forEach((ds) => {
+      const publicationID = ds.id;
+      publicationsIDs.push(publicationID);
+    });
+    const publicationsUpdatePromise = publicationsIDs.map(
+      async (publicationID) => {
+        return db
+          .doc(`publications/${publicationID}/groups/${groupID}`)
+          .set(groupToGroupRef(newGroupData, groupID))
+          .catch((err) =>
+            console.error(
+              'unable to update group ref on publication with id ' +
+                publicationID +
+                ' for group with id ' +
+                groupID,
+              err
+            )
+          );
+      }
+    );
+    return Promise.all(publicationsUpdatePromise);
+  });
+
 // When a new member (Mark) is added to a group by an existing member (Jenna),
 // Mark is added to the group's members collection by Jenna. Jenna does not
 // have permission to modify Mark's groups collection, so this function
