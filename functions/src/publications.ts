@@ -630,30 +630,6 @@ export const addMicrosoftPublicationByID = functions.https.onRequest(
   }
 );
 
-// If we allow this, it will be inconsistent to publication list items found through references
-// Update the publication in the collections of the authors.
-export const updateAuthorsPublication = functions.firestore
-  .document('publications/{publicationID}')
-  .onUpdate(async (change, _) => {
-    const publicationID = change.after.id;
-    const publication = change.after.data() as Publication;
-    const authors = publication.authors;
-    if (!authors) return;
-    const users = authors.filter((author) => Boolean(author.id));
-    if (!users || users.length === 0) return;
-    const promises = users.map(async (user) => {
-      db.doc(`users/${user.id}/publications/${publicationID}`)
-        .set(toPublicationRef(publication, publicationID))
-        .catch((err) =>
-          console.error(
-            `Unable to set reference to publication ${publicationID} on user ${user.id} publication collection:`,
-            err
-          )
-        );
-    });
-    return Promise.all(promises);
-  });
-
 export const retrieveReferencesFromMicrosoft = functions.https.onCall(
   async (data) => {
     const publicationID = data.publicationID;
