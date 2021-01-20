@@ -348,11 +348,11 @@ export const addRecentPostsToFeedOnNewTopicFollow = functions.firestore
     }
   );
 
-// When a user starts following a new resource, they will not intially see any
+// When a user starts following a new resource, they will not initially see any
 // of that resource's posts in their following feed as the resource will
 // probably not have posted since the user started following it. This is not
 // engaging for new users as it means their following feed will be entirely
-// empty. To make the new user experience more engaging we add the most recents
+// empty. To make the new user experience more engaging we add the most recent
 // posts from that resource into the following feed.
 const POSTS_TO_ADD_ON_NEW_FOLLOW = 2;
 async function addRecentPostsToFollowingFeed(
@@ -430,32 +430,31 @@ export const addPublicationPostToPublication = functions.firestore
       );
   });
 
-async function updateFiltersByPost(
-  followingFeedRef: firestore.DocumentReference<firestore.DocumentData>,
+export async function updateFiltersByPost(
+  feedRef: firestore.DocumentReference<firestore.DocumentData>,
   post: Post
 ) {
   await updateFilterCollection(
-    followingFeedRef,
+    feedRef,
     {
       resourceName: 'Post Type',
       resourceType: ResourceTypes.POST_TYPE,
     },
     {
       name: post.postType.name,
-      resourceID: post.postType.id,
+      id: post.postType.id,
     },
     false
   );
   await updateFilterCollection(
-    followingFeedRef,
+    feedRef,
     {
       resourceName: 'Author',
       resourceType: ResourceTypes.USER,
     },
     {
       name: post.author.name,
-      resourceID: post.author.id,
-      avatar: post.author.avatar,
+      id: post.author.id,
     },
     false
   );
@@ -463,14 +462,14 @@ async function updateFiltersByPost(
   const topicFilterUpdatePromisesArray = post.topics.map(
     (taggedTopic: TaggedTopic) => {
       return updateFilterCollection(
-        followingFeedRef,
+        feedRef,
         {
           resourceName: 'Topics',
           resourceType: ResourceTypes.TOPIC,
         },
         {
           name: taggedTopic.name,
-          resourceID: taggedTopic.id,
+          id: taggedTopic.id,
         },
         false
       );
@@ -478,7 +477,7 @@ async function updateFiltersByPost(
   );
   await Promise.all(topicFilterUpdatePromisesArray).catch((err) =>
     console.error(
-      `could not add topics from post with id ${post.id} to following feed filter for ${followingFeedRef}, ${err}`
+      `could not add topics from post with id ${post.id} to following feed filter for ${feedRef}, ${err}`
     )
   );
 }
@@ -487,7 +486,8 @@ export async function updateFilterCollection(
   feedRef: firestore.DocumentReference<firestore.DocumentData>,
   filterCollection: FilterCollection,
   filterOption: FilterOption,
-  removedResource: boolean
+  removedResource?: boolean,
+  noRankChange?: boolean
 ) {
   const filterCollectionDocRef = feedRef
     .collection('filterCollections')
@@ -497,7 +497,7 @@ export async function updateFilterCollection(
 
   const filterOptionDocRef = filterCollectionDocRef
     .collection('filterOptions')
-    .doc(filterOption.resourceID);
+    .doc(filterOption.id);
   // create the filter option if it doesn't exist
   await filterOptionDocRef.set(filterOption, {merge: true});
 
@@ -523,12 +523,20 @@ export async function updateFilterCollection(
       }
     });
     return;
-  } else {
+  } else if (!noRankChange) {
     // increment the rank of the filter collection and option
-    await filterCollectionDocRef.update({
-      rank: firestore.FieldValue.increment(1),
-    });
-    await filterOptionDocRef.update({rank: firestore.FieldValue.increment(1)});
+    await filterCollectionDocRef
+      .update({
+        rank: firestore.FieldValue.increment(1),
+      })
+      .catch((err) =>
+        console.log(err, 'could not increase filter collection rank')
+      );
+    await filterOptionDocRef
+      .update({rank: firestore.FieldValue.increment(1)})
+      .catch((err) =>
+        console.log(err, 'could not increase filter option rank')
+      );
     return;
   }
 }
@@ -577,8 +585,7 @@ export const linkPostTopicsToAuthor = functions.firestore
 
 interface FilterOption {
   name: string;
-  avatar?: string;
-  resourceID: string;
+  id: string;
   rank?: number;
 }
 

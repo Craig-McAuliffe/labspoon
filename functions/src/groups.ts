@@ -71,8 +71,7 @@ export const addGroupMembersToPostFilter = functions.firestore
       {resourceName: 'Author', resourceType: ResourceTypes.USER},
       {
         name: post.author.name,
-        resourceID: post.author.id,
-        avatar: post.author.avatar,
+        id: post.author.id,
       },
       false
     ).catch((err) =>
@@ -94,8 +93,7 @@ export const removeGroupMembersFromPostFilter = functions.firestore
       {resourceName: 'Author', resourceType: ResourceTypes.USER},
       {
         name: post.author.name,
-        resourceID: post.author.id,
-        avatar: post.author.avatar,
+        id: post.author.id,
       },
       true
     ).catch((err) =>
@@ -121,8 +119,7 @@ export const addGroupMembersToPublicationFilter = functions.firestore
         {resourceName: 'Author', resourceType: ResourceTypes.USER},
         {
           name: author.name,
-          resourceID: author.id,
-          avatar: author.avatar,
+          id: author.id,
         },
         false
       ).catch((err) =>
@@ -150,8 +147,7 @@ export const removeGroupMembersFromPublicationFilter = functions.firestore
         {resourceName: 'Author', resourceType: ResourceTypes.USER},
         {
           name: author.name,
-          resourceID: author.id,
-          avatar: author.avatar,
+          id: author.id,
         },
         true
       ).catch((err) =>
