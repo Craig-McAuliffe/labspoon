@@ -9,12 +9,15 @@ import {
   interpretationResult,
   MAKAuthor,
 } from './microsoft';
+import {OpenPosition} from './openPositions';
 import {Post, updateFilterCollection} from './posts';
 import {
   publishAddPublicationRequests,
   allPublicationFields,
   Publication,
 } from './publications';
+import {ResearchFocus} from './researchFocuses';
+import {Technique} from './techniques';
 import {addTopicsToResource, removeTopicsFromResource, Topic} from './topics';
 
 const db = admin.firestore();
@@ -129,6 +132,42 @@ export const addUserToRelatedTopic = functions.firestore
     setUserOnTopic(topicID, userID).catch((err) =>
       console.log(err, 'could not add user to topic')
     );
+  });
+
+export const addOpenPositionTopicsToUser = functions.firestore
+  .document(`users/{userID}/openPositions/{openPositionID}`)
+  .onCreate(async (change, context) => {
+    const openPosition = change.data() as OpenPosition;
+    const openPositionTopics = openPosition.topics;
+    const userID = context.params.userID;
+    if (openPositionTopics && openPositionTopics.length > 0) {
+      return await addTopicsToResource(openPositionTopics, userID, 'user');
+    }
+    return null;
+  });
+
+export const addResearchFocusTopicsToUser = functions.firestore
+  .document(`users/{userID}/researchFocuses/{researchFocusID}`)
+  .onCreate(async (change, context) => {
+    const researchFocus = change.data() as ResearchFocus;
+    const researchFocusTopics = researchFocus.topics;
+    const userID = context.params.userID;
+    if (researchFocusTopics && researchFocusTopics.length > 0) {
+      return await addTopicsToResource(researchFocusTopics, userID, 'user');
+    }
+    return null;
+  });
+
+export const addTechniqueTopicsToUser = functions.firestore
+  .document(`users/{userID}/techniques/{techniqueID}`)
+  .onCreate(async (change, context) => {
+    const technique = change.data() as Technique;
+    const techniqueTopics = technique.topics;
+    const userID = context.params.userID;
+    if (techniqueTopics && techniqueTopics.length > 0) {
+      return await addTopicsToResource(techniqueTopics, userID, 'user');
+    }
+    return null;
   });
 
 export const updateUserTopicRankOnTopic = functions.firestore
