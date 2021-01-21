@@ -8,12 +8,11 @@ import {
   makPublicationToPublication,
   MAKPublication,
   MAKPublicationInDB,
-  User,
   makSourceToSource,
   Source,
 } from './microsoft';
 import {Topic, handleTopicsNoID, TaggedTopic} from './topics';
-
+import {toUserPublicationRef, UserPublicationRef} from './users';
 const pubSubClient = new PubSub();
 const db = admin.firestore();
 
@@ -156,7 +155,7 @@ export const addNewMSPublicationAsync = functions
     if (publication.authors) {
       publication.authors = await resolveUserIDs(publication.authors);
       publication.filterAuthorIDs = publication.authors
-        .filter((author: User) => author.id)
+        .filter((author: UserPublicationRef) => author.id)
         .map((author) => author.id!);
     }
 
@@ -174,7 +173,9 @@ export const addNewMSPublicationAsync = functions
       );
   });
 
-async function resolveUserIDs(users: User[]): Promise<User[]> {
+async function resolveUserIDs(
+  users: UserPublicationRef[]
+): Promise<UserPublicationRef[]> {
   const setUserPromises = users.map(async (user) => {
     if (!user.microsoftID) {
       console.error('Cannot resolve user without microsoft ID:', user);
@@ -191,8 +192,7 @@ async function resolveUserIDs(users: User[]): Promise<User[]> {
       return user;
     }
     // if there is labspoon user, add the id to the user object
-    user.id = userQS.docs[0].id;
-    return user;
+    return toUserPublicationRef(user, userQS.docs[0].id);
   });
   return await Promise.all(setUserPromises);
 }
@@ -896,7 +896,7 @@ export interface PublicationRef {
   id?: string;
   date: string;
   title: string;
-  authors: Array<User>;
+  authors: Array<UserPublicationRef>;
   topics: Topic[];
   microsoftID?: string;
   filterTopicIDs?: string[];
@@ -906,7 +906,7 @@ export interface PublicationRef {
 export interface Publication {
   date?: string;
   title?: string;
-  authors?: User[];
+  authors?: UserPublicationRef[];
   microsoftID?: string;
   topics?: Topic[];
   sources: Source[];

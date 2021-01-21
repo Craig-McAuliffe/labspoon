@@ -3,6 +3,7 @@ import {config} from './config';
 import axios, {AxiosPromise} from 'axios';
 import {Topic} from './topics';
 import {Publication} from './publications';
+import {UserPublicationRef} from './users';
 
 const baseURL = 'https://api.labs.cognitive.microsoft.com/academic/v1.0';
 
@@ -151,8 +152,8 @@ export interface Source {
   url: string;
 }
 
-export function makAuthorToAuthor(makAuthor: MAKAuthor): User {
-  const author: User = {
+export function makAuthorToAuthor(makAuthor: MAKAuthor): UserPublicationRef {
+  const author: UserPublicationRef = {
     microsoftID: makAuthor.AuId.toString(),
     name: makAuthor.DAuN,
   };

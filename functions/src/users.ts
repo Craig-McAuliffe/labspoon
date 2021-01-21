@@ -1,3 +1,4 @@
+import {firestore} from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import {admin, environment, ResourceTypes} from './config';
 import {GroupRef} from './groups';
@@ -657,6 +658,57 @@ export const updateUserRefOnPost = functions.firestore
     return Promise.all(postsUpdatePromise);
   });
 
+export const updateUserRefOnPublications = functions.firestore
+  .document('users/{userID}')
+  .onUpdate(async (change, context) => {
+    const newUserData = change.after.data() as UserPublicationRef;
+    const oldUserData = change.before.data() as UserPublicationRef;
+    const userID = context.params.userID;
+    if (newUserData.name === oldUserData.name || !newUserData.microsoftID)
+      return;
+    const oldPublicationUser = toUserPublicationRef(oldUserData, userID);
+    const newPublicationUser = toUserPublicationRef(newUserData, userID);
+    const publicationsQS = await db
+      .collection(`users/${userID}/publications`)
+      .get()
+      .catch((err) =>
+        console.error(
+          'unable to fetch publications for user with id ' + userID,
+          err
+        )
+      );
+    if (!publicationsQS || publicationsQS.empty) return;
+    const publicationsIDs: string[] = [];
+    publicationsQS.forEach((ds) => {
+      const publicationID = ds.id;
+      publicationsIDs.push(publicationID);
+    });
+    const publicationsUpdatePromise = publicationsIDs.map(
+      async (publicationID) => {
+        const publicationRef = db.doc(`publications/${publicationID}`);
+        const batch = db.batch();
+        batch.update(publicationRef, {
+          authors: firestore.FieldValue.arrayRemove(oldPublicationUser),
+        });
+        batch.update(publicationRef, {
+          authors: firestore.FieldValue.arrayUnion(newPublicationUser),
+        });
+        return batch
+          .commit()
+          .catch((err) =>
+            console.error(
+              'unable to update user ref on publication with id ' +
+                publicationID +
+                ' for user with id ' +
+                userID,
+              err
+            )
+          );
+      }
+    );
+    return await Promise.all(publicationsUpdatePromise);
+  });
+
 export const updateUserRefForRecommendations = functions.firestore
   .document('users/{userID}')
   .onUpdate(async (change, context) => {
@@ -1177,6 +1229,15 @@ export function toUserRef(userID: string, user: any) {
   return userRef;
 }
 
+export function toUserPublicationRef(user: UserPublicationRef, userID: string) {
+  const publicationUserRef: UserPublicationRef = {
+    id: userID,
+    name: user.name,
+    microsoftID: user.microsoftID,
+  };
+  return publicationUserRef;
+}
+
 export function toUserFilterRef(
   userName: string,
   userID: string,
@@ -1190,7 +1251,7 @@ export function toUserFilterRef(
   return userFilterRef;
 }
 
-interface User {
+export interface User {
   id: string;
   name: string;
   avatar?: string;
@@ -1206,4 +1267,11 @@ export interface UserFilterRef {
   id: string;
   name: string;
   rank?: number;
+}
+
+export interface UserPublicationRef {
+  id?: string;
+  name: string;
+  microsoftID: string;
+  normalisedName?: string;
 }
