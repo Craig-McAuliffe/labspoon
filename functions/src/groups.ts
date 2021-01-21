@@ -2,7 +2,7 @@ import * as functions from 'firebase-functions';
 import {admin, ResourceTypes} from './config';
 import {firestore} from 'firebase-admin';
 import {updateFilterCollection, Post} from './posts';
-import {addTopicIDToTaggedTopic, TaggedTopic, Topic} from './topics';
+import {Topic, removeTopicsFromResource, addTopicsToResource} from './topics';
 import {Publication} from './publications';
 import {OpenPosition} from './openPositions';
 import {ResearchFocus} from './researchFocuses';
@@ -780,7 +780,7 @@ export const addOpenPositionTopicsToGroup = functions.firestore
     const openPositionTopics = openPosition.topics;
     const groupID = context.params.groupID;
     if (openPositionTopics && openPositionTopics.length > 0) {
-      return addTopicsToGroup(openPositionTopics, groupID);
+      return await addTopicsToResource(openPositionTopics, groupID, 'group');
     }
     return null;
   });
@@ -792,7 +792,11 @@ export const removeOpenPositionTopicsFromGroup = functions.firestore
     const openPositionTopics = openPosition.topics;
     const groupID = context.params.groupID;
     if (openPositionTopics && openPositionTopics.length > 0) {
-      return removeTopicsFromGroup(openPositionTopics, groupID);
+      return await removeTopicsFromResource(
+        openPositionTopics,
+        groupID,
+        'group'
+      );
     }
     return null;
   });
@@ -804,7 +808,7 @@ export const addResearchFocusTopicsToGroup = functions.firestore
     const researchFocusTopics = researchFocus.topics;
     const groupID = context.params.groupID;
     if (researchFocusTopics && researchFocusTopics.length > 0) {
-      return addTopicsToGroup(researchFocusTopics, groupID);
+      return await addTopicsToResource(researchFocusTopics, groupID, 'group');
     }
     return null;
   });
@@ -816,7 +820,11 @@ export const removeResearchFocusTopicsFromGroup = functions.firestore
     const researchFocusTopics = researchFocus.topics;
     const groupID = context.params.groupID;
     if (researchFocusTopics && researchFocusTopics.length > 0) {
-      return removeTopicsFromGroup(researchFocusTopics, groupID);
+      return await removeTopicsFromResource(
+        researchFocusTopics,
+        groupID,
+        'group'
+      );
     }
     return null;
   });
@@ -828,7 +836,7 @@ export const addTechniqueTopicsToGroup = functions.firestore
     const techniqueTopics = technique.topics;
     const groupID = context.params.groupID;
     if (techniqueTopics && techniqueTopics.length > 0) {
-      return addTopicsToGroup(techniqueTopics, groupID);
+      return await addTopicsToResource(techniqueTopics, groupID, 'group');
     }
     return null;
   });
@@ -840,7 +848,7 @@ export const removeTechniqueTopicsFromGroup = functions.firestore
     const techniqueTopics = technique.topics;
     const groupID = context.params.groupID;
     if (techniqueTopics && techniqueTopics.length > 0) {
-      return removeTopicsFromGroup(techniqueTopics, groupID);
+      return await removeTopicsFromResource(techniqueTopics, groupID, 'group');
     }
     return null;
   });
@@ -853,7 +861,7 @@ export const addPostTopicsToGroup = functions.firestore
     const postTopics = post.topics;
     const groupID = context.params.groupID;
     if (postTopics && postTopics.length > 0) {
-      return addTopicsToGroup(postTopics, groupID);
+      return await addTopicsToResource(postTopics, groupID, 'group');
     }
     return null;
   });
@@ -866,135 +874,10 @@ export const removePostTopicsFromGroup = functions.firestore
     const postTopics = post.topics;
     const groupID = context.params.groupID;
     if (postTopics && postTopics.length > 0) {
-      return removeTopicsFromGroup(postTopics, groupID);
+      return await removeTopicsFromResource(postTopics, groupID, 'group');
     }
     return null;
   });
-
-function addTopicsToGroup(topics: TaggedTopic[], groupID: string) {
-  topics.forEach(async (topic) => {
-    const groupTopic: Topic = {
-      name: topic.name,
-      normalisedName: topic.normalisedName,
-      rank: 1,
-      microsoftID: topic.microsoftID,
-    };
-    let topicID: string;
-    if (!topic.id) {
-      const collectedTopics: TaggedTopic[] = [];
-      await addTopicIDToTaggedTopic(topic, collectedTopics);
-      if (collectedTopics[0]) {
-        topicID = collectedTopics[0].id;
-      } else {
-        return;
-      }
-    } else {
-      topicID = topic.id;
-    }
-    const groupTopicDocRef = db.doc(`groups/${groupID}/topics/${topicID}`);
-    return groupTopicDocRef
-      .get()
-      .then((ds: firestore.DocumentSnapshot) => {
-        if (!ds.exists) {
-          return groupTopicDocRef
-            .set(groupTopic)
-            .catch((err) =>
-              console.error(
-                'could not add topic with id ' +
-                  groupTopic.id +
-                  ' to group with id ' +
-                  groupID +
-                  ' while adding content to the group.',
-                err
-              )
-            );
-        } else {
-          return groupTopicDocRef
-            .update({
-              rank: firestore.FieldValue.increment(1),
-            })
-            .catch((err) =>
-              console.error(
-                'could not increase rank of topic with id ' +
-                  groupTopic.id +
-                  ' while adding content to group with id ' +
-                  groupID,
-                err
-              )
-            );
-        }
-      })
-      .catch((err) =>
-        console.error(
-          'could not fetch topic with id ' +
-            groupTopic.id +
-            ' while adding content to group with id ' +
-            groupID,
-          err
-        )
-      );
-  });
-}
-
-function removeTopicsFromGroup(topics: TaggedTopic[], groupID: string) {
-  topics.forEach(async (topic) => {
-    let topicID: string;
-    if (!topic.id) {
-      const collectedTopics: TaggedTopic[] = [];
-      await addTopicIDToTaggedTopic(topic, collectedTopics);
-      if (collectedTopics[0]) {
-        topicID = collectedTopics[0].id;
-      } else {
-        return;
-      }
-    } else {
-      topicID = topic.id;
-    }
-
-    const groupTopicDocRef = db.doc(`groups/${groupID}/topics/${topicID}`);
-    return groupTopicDocRef
-      .get()
-      .then((qs: any) => {
-        if (!qs.exists) return;
-        const topicRank = qs.data().rank;
-        if (!topicRank || topicRank === 1) {
-          groupTopicDocRef
-            .delete()
-            .catch((err) =>
-              console.error(
-                'could not delete topic with id ' +
-                  topic.id +
-                  ' on group with id ' +
-                  groupID,
-                err
-              )
-            );
-        } else {
-          groupTopicDocRef
-            .update({rank: topicRank - 1})
-            .catch((err) =>
-              console.error(
-                'could not decrease rank of topic with id ' +
-                  topic.id +
-                  ' on group with id ' +
-                  groupID,
-                err
-              )
-            );
-        }
-      })
-      .catch((err) =>
-        console.error(
-          'could not fetch topic with id ' +
-            topic.id +
-            ' on group with id ' +
-            groupID +
-            ' while removing content from the group.',
-          err
-        )
-      );
-  });
-}
 
 export function groupToGroupRef(group: Group, groupID: string) {
   const groupRef = {

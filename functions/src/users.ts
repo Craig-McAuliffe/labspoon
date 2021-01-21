@@ -15,7 +15,7 @@ import {
   allPublicationFields,
   Publication,
 } from './publications';
-import {Topic} from './topics';
+import {addTopicsToResource, removeTopicsFromResource, Topic} from './topics';
 
 const db = admin.firestore();
 
@@ -1052,6 +1052,26 @@ const flatten = function (arr: Array<any>, result: Array<any> = []) {
   }
   return result;
 };
+
+export const addPublicationTopicsToUser = functions.firestore
+  .document(`users/{userID}/publications/{publicationID}`)
+  .onCreate(async (change, context) => {
+    const userID = context.params.userID;
+    const publication = change.data();
+    const publicationTopics = publication.topics;
+    if (!publicationTopics || publicationTopics.length === 0) return null;
+    return await addTopicsToResource(publicationTopics, userID, 'user');
+  });
+
+export const removePublicationTopicsToUser = functions.firestore
+  .document(`users/{userID}/publications/{publicationID}`)
+  .onDelete(async (change, context) => {
+    const userID = context.params.userID;
+    const publication = change.data();
+    const publicationTopics = publication.topics;
+    if (!publicationTopics || publicationTopics.length === 0) return null;
+    return await removeTopicsFromResource(publicationTopics, userID, 'user');
+  });
 
 export const addPostsInTopicToFollowingFeeds = functions.firestore
   .document(`topics/{topicID}/posts/{postID}`)

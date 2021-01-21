@@ -14,6 +14,7 @@ import {
   publishAddPublicationRequests,
 } from './publications';
 import {admin} from './config';
+import {firestore} from 'firebase-admin';
 
 const db = admin.firestore();
 
@@ -200,6 +201,162 @@ export async function addTopicIDToTaggedTopic(
         `field ${topicNoID.microsoftID} is not in database and could not be created ${err}`
       )
     );
+}
+
+export function addTopicsToResource(
+  topics: TaggedTopic[],
+  resourceID: string,
+  resourceType: string
+) {
+  const topicsPromises = topics.map(async (topic) => {
+    const resourceTopic: Topic = {
+      name: topic.name,
+      normalisedName: topic.normalisedName,
+      rank: 1,
+      microsoftID: topic.microsoftID,
+    };
+    let topicID: string;
+    if (!topic.id) {
+      const collectedTopics: TaggedTopic[] = [];
+      await addTopicIDToTaggedTopic(topic, collectedTopics);
+      if (collectedTopics[0]) {
+        topicID = collectedTopics[0].id;
+      } else {
+        return;
+      }
+    } else {
+      topicID = topic.id;
+    }
+    if (resourceType !== 'group' && resourceType !== 'user') return;
+    let resourceTopicRef: firestore.DocumentReference;
+    if (resourceType === 'group')
+      resourceTopicRef = db.doc(`groups/${resourceID}/topics/${topicID}`);
+    else resourceTopicRef = db.doc(`users/${resourceID}/topics/${topicID}`);
+    return resourceTopicRef
+      .get()
+      .then((ds: firestore.DocumentSnapshot) => {
+        if (!ds.exists) {
+          return resourceTopicRef
+            .set(resourceTopic)
+            .catch((err) =>
+              console.error(
+                'could not add topic with id ' +
+                  resourceTopic.id +
+                  ' to ' +
+                  resourceType +
+                  ' with id ' +
+                  resourceID,
+                err
+              )
+            );
+        } else {
+          return resourceTopicRef
+            .update({
+              rank: firestore.FieldValue.increment(1),
+            })
+            .catch((err) =>
+              console.error(
+                'could not increase rank of topic with id ' +
+                  resourceTopic.id +
+                  ' while adding content to ' +
+                  resourceType +
+                  ' with id ' +
+                  resourceID,
+                err
+              )
+            );
+        }
+      })
+      .catch((err) =>
+        console.error(
+          'could not fetch topic with id ' +
+            resourceTopic.id +
+            ' while adding content to ' +
+            resourceType +
+            ' with id ' +
+            resourceID,
+          err
+        )
+      );
+  });
+  return Promise.all(topicsPromises);
+}
+
+export async function removeTopicsFromResource(
+  topics: TaggedTopic[],
+  resourceID: string,
+  resourceType: string
+) {
+  const topicsPromises = topics.map(async (topic) => {
+    let topicID: string;
+    if (!topic.id) {
+      const collectedTopics: TaggedTopic[] = [];
+      await addTopicIDToTaggedTopic(topic, collectedTopics);
+      if (collectedTopics[0]) {
+        topicID = collectedTopics[0].id;
+      } else {
+        return;
+      }
+    } else {
+      topicID = topic.id;
+    }
+    if (resourceType !== 'group' && resourceType !== 'user') return;
+    let resourceTopicRef: firestore.DocumentReference;
+    if (resourceType === 'group')
+      resourceTopicRef = db.doc(`groups/${resourceID}/topics/${topicID}`);
+    else resourceTopicRef = db.doc(`users/${resourceID}/topics/${topicID}`);
+
+    return resourceTopicRef
+      .get()
+      .then((qs: any) => {
+        if (!qs.exists) return;
+        const topicRank = qs.data().rank;
+        if (!topicRank || topicRank === 1) {
+          resourceTopicRef
+            .delete()
+            .catch((err) =>
+              console.error(
+                'could not delete topic with id ' +
+                  topic.id +
+                  ' on ' +
+                  resourceType +
+                  ' with id ' +
+                  resourceID,
+                err
+              )
+            );
+        } else {
+          resourceTopicRef
+            .update({rank: topicRank - 1})
+            .catch((err) =>
+              console.error(
+                'could not decrease rank of topic with id ' +
+                  topic.id +
+                  ' on ' +
+                  resourceType +
+                  ' with id ' +
+                  resourceID,
+                err
+              )
+            );
+        }
+      })
+      .catch((err) =>
+        console.error(
+          'could not fetch topic with id ' +
+            topic.id +
+            ' on ' +
+            resourceType +
+            ' with id ' +
+            resourceID +
+            ' while removing content from the ' +
+            resourceType +
+            '.',
+          err
+        )
+      );
+  });
+  return Promise.all(topicsPromises);
 }
 
 interface expressionField {
