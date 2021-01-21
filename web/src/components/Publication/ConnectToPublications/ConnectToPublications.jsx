@@ -135,10 +135,45 @@ function SuggestedPublications({
               .catch((err) => {
                 setSubmitting(false);
                 console.error(err);
+                setLoadingState(ERROR);
+                if (err.code.includes('unauthenticated')) {
+                  alert('You must login in order to link your account.');
+                  return;
+                }
+                if (err.code.includes('invalid-argument')) {
+                  alert(
+                    'You must select publications in order to link your account.'
+                  );
+                  return;
+                }
+                if (err.code.includes('not-found')) {
+                  alert(
+                    'You must select publications in order to link your account.'
+                  );
+                  return;
+                }
+                if (
+                  err.code.includes('already-exists') &&
+                  err.message.includes('linked to a microsoft id')
+                ) {
+                  alert(
+                    'You have already linked your account. If you made a mistake and would like to link to a different author, please contact our support team at help@labspoon.com.'
+                  );
+                  return;
+                }
+                if (
+                  err.code.includes('already-exists') &&
+                  err.message.includes('linked to a labspoon user')
+                ) {
+                  alert(
+                    'Someone has already linked to that author. If this is you, please contact help@labspoon.com.'
+                  );
+                  return;
+                }
                 alert(
                   'Something went wrong while linking your account. Sorry about that. Please try again.'
                 );
-                setLoadingState(ERROR);
+                return;
               });
           }}
           inactive={selectedPublicationsAuthorID || submitting ? false : true}
