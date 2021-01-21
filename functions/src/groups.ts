@@ -879,6 +879,26 @@ export const removePostTopicsFromGroup = functions.firestore
     return null;
   });
 
+export const addPublicationTopicsToGroup = functions.firestore
+  .document(`groups/{groupID}/publications/{publicationID}`)
+  .onCreate(async (change, context) => {
+    const groupID = context.params.groupID;
+    const publication = change.data();
+    const publicationTopics = publication.topics;
+    if (!publicationTopics || publicationTopics.length === 0) return null;
+    return await addTopicsToResource(publicationTopics, groupID, 'group');
+  });
+
+export const removePublicationTopicsToGroup = functions.firestore
+  .document(`groups/{groupID}/publications/{publicationID}`)
+  .onDelete(async (change, context) => {
+    const groupID = context.params.groupID;
+    const publication = change.data();
+    const publicationTopics = publication.topics;
+    if (!publicationTopics || publicationTopics.length === 0) return null;
+    return await removeTopicsFromResource(publicationTopics, groupID, 'group');
+  });
+
 export function groupToGroupRef(group: Group, groupID: string) {
   const groupRef = {
     id: groupID,
