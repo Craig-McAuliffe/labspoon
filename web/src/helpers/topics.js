@@ -59,29 +59,21 @@ export function handleTaggedTopicsNoIDs(taggedResourceTopics, collectedTopics) {
               );
             }
           } else {
-            await waitThenReFetchMSField(taggedTopicNoID)
-              .then((labspoonTopicID) => {
-                console.log('created field and topic with id', labspoonTopicID);
-                if (labspoonTopicID === undefined) {
-                  console.error(
-                    `could not find MSField with id ${taggedTopicNoID.microsoftID} after delayed refetch`
-                  );
-                } else {
-                  addLabspoonTopicToTaggedResource(labspoonTopicID);
-                }
-              })
-              .catch((err) =>
-                console.error(
-                  `field ${taggedTopicNoID.microsoftID} is not in database and could not be created ${err}`
-                )
+            const labspoonTopicID = await waitThenReFetchMSField(
+              taggedTopicNoID
+            );
+            if (labspoonTopicID === undefined) {
+              console.error(
+                `could not find MSField with id ${taggedTopicNoID.microsoftID} after delayed refetch`
               );
+            } else {
+              addLabspoonTopicToTaggedResource(labspoonTopicID);
+            }
           }
         })
         .catch((err) =>
           console.error(
-            'could not find MSField with microsoft ID ' +
-              taggedTopicNoID.microsoftID,
-            err
+            `could not fetch msfield with id ${taggedTopicNoID.microsoftID}, therefore the topic has not been added ${err}`
           )
         );
     }

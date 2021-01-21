@@ -7,14 +7,17 @@ import {ArticleBodyChild} from './researchFocuses';
 
 const db = admin.firestore();
 
-export const syncCreateToTechniqueCollection = functions.firestore
-  .document(`groups/{groupID}/techniques/{techniqueID}`)
-  .onCreate((techniqueDS) =>
-    db.doc(`techniques/${techniqueDS.id}`).set(techniqueDS.data())
-  );
+export const addTechniqueToGroup = functions.firestore
+  .document(`techniques/{techniqueID}`)
+  .onCreate((techniqueDS, context) => {
+    const technique = techniqueDS.data() as Technique;
+    const techniqueID = context.params.techniqueID;
+    const groupID = technique.group.id;
+    return db.doc(`groups/${groupID}/techniques/${techniqueID}`).set(technique);
+  });
 
-export const syncCreateToAuthorTechniqueCollection = functions.firestore
-  .document(`groups/{groupID}/techniques/{techniqueID}`)
+export const addTechniqueToAuthor = functions.firestore
+  .document(`techniques/{techniqueID}`)
   .onCreate((techniqueDS) => {
     const technique = techniqueDS.data();
     const authorID = technique.author.id;
@@ -23,7 +26,31 @@ export const syncCreateToAuthorTechniqueCollection = functions.firestore
       .set(technique);
   });
 
-export const syncUpdateToGroupTechniqueCollection = functions.firestore
+export const addTechniqueToTopics = functions.firestore
+  .document(`techniques/{techniqueID}`)
+  .onCreate(async (techniqueDS, context) => {
+    const technique = techniqueDS.data();
+    const techniqueID = context.params.techniqueID;
+    const techniqueTopics = technique.topics;
+    const topicsPromises = techniqueTopics.map((taggedTopic: TaggedTopic) => {
+      if (!taggedTopic.id) return;
+      return db
+        .doc(`topics/${taggedTopic.id}/techniques/${techniqueID}`)
+        .set(technique)
+        .catch((err) =>
+          console.error(
+            'unable to add technique with id ' +
+              techniqueID +
+              ' to topic with id ' +
+              taggedTopic.id,
+            err
+          )
+        );
+    });
+    return await Promise.all(topicsPromises);
+  });
+
+export const updateTechniqueOnGroup = functions.firestore
   .document(`techniques/{techniqueID}`)
   .onUpdate((techniqueDS) => {
     const technique = techniqueDS.after.data();
@@ -33,7 +60,7 @@ export const syncUpdateToGroupTechniqueCollection = functions.firestore
       .set(technique);
   });
 
-export const syncUpdateToAuthorTechniqueCollection = functions.firestore
+export const updateTechniqueOnAuthor = functions.firestore
   .document(`techniques/{techniqueID}`)
   .onUpdate((techniqueDS) => {
     const technique = techniqueDS.after.data();
@@ -41,6 +68,30 @@ export const syncUpdateToAuthorTechniqueCollection = functions.firestore
     return db
       .doc(`users/${authorID}/techniques/${techniqueDS.after.id}`)
       .set(technique);
+  });
+
+export const updateTechniqueOnTopics = functions.firestore
+  .document(`techniques/{techniqueID}`)
+  .onUpdate(async (techniqueDS, context) => {
+    const technique = techniqueDS.after.data();
+    const techniqueID = context.params.techniqueID;
+    const techniqueTopics = technique.topics;
+    const topicsPromises = techniqueTopics.map((taggedTopic: TaggedTopic) => {
+      if (!taggedTopic.id) return;
+      return db
+        .doc(`topics/${taggedTopic.id}/techniques/${techniqueID}`)
+        .set(technique)
+        .catch((err) =>
+          console.error(
+            'unable to update technique with id ' +
+              techniqueID +
+              ' on topic with id ' +
+              taggedTopic.id,
+            err
+          )
+        );
+    });
+    return await Promise.all(topicsPromises);
   });
 
 export interface Technique {

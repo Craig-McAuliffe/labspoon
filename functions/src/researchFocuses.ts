@@ -6,14 +6,19 @@ import {UserRef} from './users';
 
 const db = admin.firestore();
 
-export const syncCreateToResearchFocusCollection = functions.firestore
-  .document(`groups/{groupID}/researchFocuses/{researchFocusID}`)
-  .onCreate((researchFocusDS) =>
-    db.doc(`researchFocuses/${researchFocusDS.id}`).set(researchFocusDS.data())
-  );
+export const addResearchFocusToGroup = functions.firestore
+  .document(`researchFocuses/{researchFocusID}`)
+  .onCreate((researchFocusDS, context) => {
+    const researchFocus = researchFocusDS.data() as ResearchFocus;
+    const researchFocusID = context.params.researchFocusID;
+    const groupID = researchFocus.group.id;
+    return db
+      .doc(`groups/${groupID}/researchFocuses/${researchFocusID}`)
+      .set(researchFocus);
+  });
 
-export const syncCreateToAuthorResearchFocusCollection = functions.firestore
-  .document(`groups/{groupID}/researchFocuses/{researchFocusID}`)
+export const addResearchFocusToAuthor = functions.firestore
+  .document(`researchFocuses/{researchFocusID}`)
   .onCreate((researchFocusDS) => {
     const researchFocus = researchFocusDS.data();
     const authorID = researchFocus.author.id;
@@ -22,7 +27,33 @@ export const syncCreateToAuthorResearchFocusCollection = functions.firestore
       .set(researchFocus);
   });
 
-export const syncUpdateToGroupResearchFocusCollection = functions.firestore
+export const addResearchFocusToTopics = functions.firestore
+  .document(`researchFocuses/{researchFocusID}`)
+  .onCreate(async (researchFocusDS, context) => {
+    const researchFocus = researchFocusDS.data();
+    const researchFocusID = context.params.researchFocusID;
+    const researchFocusTopics = researchFocus.topics;
+    const topicsPromises = researchFocusTopics.map(
+      (taggedTopic: TaggedTopic) => {
+        if (!taggedTopic.id) return;
+        return db
+          .doc(`topics/${taggedTopic.id}/researchFocuses/${researchFocusID}`)
+          .set(researchFocus)
+          .catch((err) =>
+            console.error(
+              'unable to add research focus with id ' +
+                researchFocusID +
+                ' to topic with id ' +
+                taggedTopic.id,
+              err
+            )
+          );
+      }
+    );
+    return await Promise.all(topicsPromises);
+  });
+
+export const updateResearchFocusOnGroup = functions.firestore
   .document(`researchFocuses/{researchFocusID}`)
   .onUpdate((researchFocusDS) => {
     const researchFocus = researchFocusDS.after.data();
@@ -32,7 +63,7 @@ export const syncUpdateToGroupResearchFocusCollection = functions.firestore
       .set(researchFocus);
   });
 
-export const syncUpdateToAuthorResearchFocusCollection = functions.firestore
+export const updateResearchFocusOnAuthor = functions.firestore
   .document(`researchFocuses/{researchFocusID}`)
   .onUpdate((researchFocusDS) => {
     const researchFocus = researchFocusDS.after.data();
@@ -40,6 +71,32 @@ export const syncUpdateToAuthorResearchFocusCollection = functions.firestore
     return db
       .doc(`users/${authorID}/researchFocuses/${researchFocusDS.after.id}`)
       .set(researchFocus);
+  });
+
+export const updateResearchFocusOnTopics = functions.firestore
+  .document(`researchFocuses/{researchFocusID}`)
+  .onUpdate(async (researchFocusDS, context) => {
+    const researchFocus = researchFocusDS.after.data();
+    const researchFocusID = context.params.researchFocusID;
+    const researchFocusTopics = researchFocus.topics;
+    const topicsPromises = researchFocusTopics.map(
+      (taggedTopic: TaggedTopic) => {
+        if (!taggedTopic.id) return;
+        return db
+          .doc(`topics/${taggedTopic.id}/researchFocuses/${researchFocusID}`)
+          .set(researchFocus)
+          .catch((err) =>
+            console.error(
+              'unable to update researchFocus with id ' +
+                researchFocusID +
+                ' on topic with id ' +
+                taggedTopic.id,
+              err
+            )
+          );
+      }
+    );
+    return await Promise.all(topicsPromises);
   });
 
 export interface ResearchFocus {

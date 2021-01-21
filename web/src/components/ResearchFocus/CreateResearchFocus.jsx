@@ -82,9 +82,7 @@ export default function CreateResearchFocus() {
 
   function onSubmit(res) {
     setSubmitting(true);
-    const researchFocusDBRef = db
-      .collection(`groups/${selectedGroup.id}/researchFocuses`)
-      .doc();
+    const researchFocusDBRef = db.collection(`researchFocuses`).doc();
     const researchFocusID = researchFocusDBRef.id;
 
     if (res.photos.length === 0) {

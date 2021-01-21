@@ -28,12 +28,22 @@ service cloud.firestore {
       allow read;
     }
 
-    match /researchFocuses/{researchFocusID}{
-      allow read;
-    }
+    match /techniques/{techniqueID} {
+        allow read;
+        allow write: if (
+          request.auth != null
+        && exists(/databases/$(database)/documents/groups/$(request.resource.data.group.id)/members/$(request.auth.uid))
+        && request.auth.uid == request.resource.data.author.id
+        );
+      }
 
-    match /techniques/{techniqueID}{
+    match /researchFocuses/{researchFocusID} {
       allow read;
+      allow write: if (
+        request.auth != null
+        && exists(/databases/$(database)/documents/groups/$(request.resource.data.group.id)/members/$(request.auth.uid))
+        && request.auth.uid == request.resource.data.author.id
+      );
     }
 
     match /users/{userID} {
@@ -139,26 +149,6 @@ service cloud.firestore {
       match /videos/{videoID} {
         allow read;
         allow write: if request.auth != null && exists(/databases/$(database)/documents/groups/$(groupID)/members/$(request.auth.uid));
-      }
-
-      match /techniques/{techniqueID} {
-        allow read;
-        allow write: if (
-          request.auth != null
-          && exists(/databases/$(database)/documents/groups/$(groupID)/members/$(request.auth.uid))
-          && request.auth.uid == request.resource.data.author.id
-          && groupID == request.resource.data.group.id
-        );
-      }
-
-      match /researchFocuses/{researchFocusID} {
-        allow read;
-        allow write: if (
-          request.auth != null
-          && exists(/databases/$(database)/documents/groups/$(groupID)/members/$(request.auth.uid))
-          && request.auth.uid == request.resource.data.author.id
-          && groupID == request.resource.data.group.id
-        );
       }
 
       match /openPositions/{openPositionID} {

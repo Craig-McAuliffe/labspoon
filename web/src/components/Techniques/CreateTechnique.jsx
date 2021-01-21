@@ -79,9 +79,7 @@ export default function CreateTechnique() {
 
   function onSubmit(res) {
     setSubmitting(true);
-    const techniqueDBRef = db
-      .collection(`groups/${selectedGroup.id}/techniques`)
-      .doc();
+    const techniqueDBRef = db.collection(`techniques`).doc();
     const techniqueID = techniqueDBRef.id;
 
     if (res.photos.length === 0) {

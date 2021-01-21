@@ -10,7 +10,7 @@ export default async function addArticleToDB(
   selectedTopics,
   selectedGroup,
   userProfile,
-  researchFocusDBRef,
+  articleDBRef,
   setSubmitting,
   history
 ) {
@@ -27,7 +27,7 @@ export default async function addArticleToDB(
   article.title = title;
   article.body = body;
   article.timestamp = new Date();
-  researchFocusDBRef
+  articleDBRef
     .set(article)
     .then(() => {
       setSubmitting(false);

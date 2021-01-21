@@ -106,28 +106,76 @@ async function checkUserIsMemberOfGroup(authorID: string, groupID: string) {
     });
 }
 
-export const syncOpenPosUpdateToUserAndGroup = functions.firestore
-  .document('openPositions/{openPositionID}')
-  .onUpdate(async (change, context) => {
-    const openPosition = change.after.data();
+export const addOpenPosToTopics = functions.firestore
+  .document(`openPositions/{openPositionID}`)
+  .onCreate(async (openPositionDS, context) => {
+    const openPosition = openPositionDS.data();
     const openPositionID = context.params.openPositionID;
-    const authorID = openPosition.author.id;
+    const openPositionTopics = openPosition.topics;
+    const topicsPromises = openPositionTopics.map(
+      (taggedTopic: TaggedTopic) => {
+        if (!taggedTopic.id) return;
+        return db
+          .doc(`topics/${taggedTopic.id}/openPositions/${openPositionID}`)
+          .set(openPosition)
+          .catch((err) =>
+            console.error(
+              'unable to add open position with id ' +
+                openPositionID +
+                ' to topic with id ' +
+                taggedTopic.id,
+              err
+            )
+          );
+      }
+    );
+    return await Promise.all(topicsPromises);
+  });
+
+export const updateOpenPosOnGroup = functions.firestore
+  .document(`openPositions/{openPositionID}`)
+  .onUpdate((openPositionDS) => {
+    const openPosition = openPositionDS.after.data();
     const groupID = openPosition.group.id;
-    const batch = db.batch();
-    batch.set(
-      db.doc(`users/${authorID}/openPositions/${openPositionID}`),
-      openPosition
+    return db
+      .doc(`groups/${groupID}/openPositions/${openPositionDS.after.id}`)
+      .set(openPosition);
+  });
+
+export const updateOpenPosOnUser = functions.firestore
+  .document(`openPositions/{openPositionID}`)
+  .onUpdate((openPositionDS) => {
+    const openPosition = openPositionDS.after.data();
+    const authorID = openPosition.author.id;
+    return db
+      .doc(`users/${authorID}/openPositions/${openPositionDS.after.id}`)
+      .set(openPosition);
+  });
+
+export const updateOpenPosOnTopic = functions.firestore
+  .document(`openPositions/{openPositionID}`)
+  .onUpdate(async (openPositionDS, context) => {
+    const openPosition = openPositionDS.after.data();
+    const openPositionID = context.params.openPositionID;
+    const openPositionTopics = openPosition.topics;
+    const topicsPromises = openPositionTopics.map(
+      (taggedTopic: TaggedTopic) => {
+        if (!taggedTopic.id) return;
+        return db
+          .doc(`topics/${taggedTopic.id}/openPositions/${openPositionID}`)
+          .set(openPosition)
+          .catch((err) =>
+            console.error(
+              'unable to update open position with id ' +
+                openPositionID +
+                ' on topic with id ' +
+                taggedTopic.id,
+              err
+            )
+          );
+      }
     );
-    batch.set(
-      db.doc(`groups/${groupID}/openPositions/${openPositionID}`),
-      openPosition
-    );
-    await batch.commit().catch((err) => {
-      console.error(
-        `could not update open position with id ${openPositionID} on user doc with id ${authorID} and on group with id ${groupID}` +
-          err
-      );
-    });
+    return await topicsPromises;
   });
 
 export interface OpenPosition {
