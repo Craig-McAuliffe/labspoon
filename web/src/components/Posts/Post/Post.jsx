@@ -93,10 +93,8 @@ function PostTextContent({post, dedicatedPage}) {
 
   return (
     <div className="post-text-content">
-      <Link to={`/post/${post.id}`}>
-        <Linkify tagName="p">
-          <p>{post.content.text}</p>
-        </Linkify>
+      <Link to={`/post/${post.id}`} className="post-text-as-link">
+        <Linkify tagName="p">{post.content.text}</Linkify>
       </Link>
     </div>
   );

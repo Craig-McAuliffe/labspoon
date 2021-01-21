@@ -55,13 +55,23 @@
   margin: 10px 0px;
 }
 
-.post-text-content a {
+.post-text-as-link {
   color: #000000;
   text-decoration: none;
 }
 
-.post-text-content a:hover {
+.post-text-as-link:hover {
   text-decoration-color: #000000;
+  text-decoration: none;
+  color: #000000;
+}
+
+.linkified {
+  color: #00507c;
+}
+
+.linkified:hover {
+  color: #3099d3;
 }
 
 .post-header-profile {
