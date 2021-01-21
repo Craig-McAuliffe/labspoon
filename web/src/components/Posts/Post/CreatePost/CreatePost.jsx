@@ -75,15 +75,16 @@ export default function CreatePost({
         <h3>Create Pinned Post</h3>
       </button>
     ) : (
-      <div className="not-creating-post-container">
-        <button onClick={() => setCreatingPost(true)}>
-          <WriteIcon />
-          <p className="not-creating-post-text">Post to your followers...</p>
-        </button>
+      <button
+        onClick={() => setCreatingPost(true)}
+        className="not-creating-post-button"
+      >
+        <WriteIcon />
+        <p className="not-creating-post-text">Post to your followers...</p>
         {postSuccess ? (
           <h4 className="post-success-message">Post Created!</h4>
         ) : null}
-      </div>
+      </button>
     );
 }
 

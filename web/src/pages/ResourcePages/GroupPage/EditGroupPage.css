@@ -1,1 +1,5 @@
-
+@media screen and (max-width: 1197px) {
+  .edit-group-page-margin-top {
+    margin-top: 30px;
+  }
+}

@@ -11,7 +11,7 @@ import FilterableResults, {
 } from '../../components/FilterableResults/FilterableResults';
 import CreatePost from '../../components/Posts/Post/CreatePost/CreatePost';
 import {translateOptionalFields} from '../../helpers/posts';
-import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
+import {LoadingSpinnerPage} from '../../components/LoadingSpinner/LoadingSpinner';
 
 const arrayContainsAnyErrorMessage =
   'Cannot select multiple of more than one resource type. Try deselecting the last option.';
@@ -157,14 +157,7 @@ export default function FollowingFeedPage() {
     return fetchUserFeedData(user.uid, skip, limit, filter, last);
   };
 
-  if (authLoaded === false)
-    return (
-      <div className="content-layout">
-        <div className="feed-container">
-          <LoadingSpinner />
-        </div>
-      </div>
-    );
+  if (authLoaded === false) return <LoadingSpinnerPage />;
   return (
     <FilterableResults fetchResults={fetchResults} limit={10} loadingFilter>
       <FilterManager>

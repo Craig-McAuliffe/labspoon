@@ -130,15 +130,23 @@ export default function EditGroupPage() {
 
 export function EditGroupTabs({tabs, activeTab}) {
   return (
-    <LightTabContainer>
-      {tabs.map((tab) => (
-        <LightTabLink
-          key={tab}
-          name={tabIDToDisplayName[tab]}
-          active={tab === activeTab}
-          link={`${tab}`}
-        />
-      ))}
-    </LightTabContainer>
+    <div
+      className={
+        activeTab === POSTS_TAB || activeTab === PUBLICATIONS_TAB
+          ? 'edit-group-page-margin-top'
+          : ''
+      }
+    >
+      <LightTabContainer>
+        {tabs.map((tab) => (
+          <LightTabLink
+            key={tab}
+            name={tabIDToDisplayName[tab]}
+            active={tab === activeTab}
+            link={`${tab}`}
+          />
+        ))}
+      </LightTabContainer>
+    </div>
   );
 }

@@ -20,6 +20,7 @@ export default async function addArticleToDB(
   const taggedTopicsArray = [];
   await handleTaggedTopicsNoIDs(DBTopics, taggedTopicsArray);
   article.topics = taggedTopicsArray;
+  article.filterTopicIDs = taggedTopicsArray.map((topic) => topic.id);
   article.group = convertGroupToGroupRef(selectedGroup);
   article.photoURLs = photoURLs;
   article.author = userToUserRef(userProfile, userProfile.id);

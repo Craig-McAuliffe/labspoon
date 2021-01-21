@@ -5,6 +5,7 @@ import {RemoveIcon} from '../../assets/GeneralActionIcons';
 import SearchMSFields from './SearchMSFields';
 
 import '../Posts/Post/CreatePost/CreatePost.css';
+import './TagTopics.css';
 
 export default function TagTopics({
   submittingForm,
@@ -116,8 +117,10 @@ function SelectedTopics({selectedTopics, setSelectedTopics}) {
             )
           }
         >
-          {selectedTopic.name}
-          <RemoveIcon />
+          <div>
+            {selectedTopic.name}
+            <RemoveIcon />
+          </div>
         </button>
       ))}
     </div>

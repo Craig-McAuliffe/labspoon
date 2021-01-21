@@ -1,0 +1,64 @@
+.create-post-tagged-topics-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.create-post-topic-section-container {
+  margin: 10px 0px 50px;
+}
+
+.create-post-tagged-topic {
+  padding: 10px 10px;
+  margin: 10px 10px;
+  color: #00507c;
+  font-size: 1.2em;
+  border: 1px solid #00507c;
+}
+
+.create-post-topic-search-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.create-post-tagged-topic svg {
+  margin-left: 10px;
+}
+
+.create-post-tagged-topic:hover path {
+  stroke: #00507c;
+}
+
+.create-post-topic-tag-title {
+  color: #5d5d65;
+  margin-top: 28px;
+  margin-right: 2vw;
+}
+
+.create-post-topic-search-tool-container {
+  min-width: 100%;
+}
+
+.create-post-topic-search-container input {
+  border-bottom: 1px solid #00507c;
+  margin-top: 7px;
+  padding-top: 20px;
+}
+
+.topic-tag-duplicate-topic-warning {
+  text-align: center;
+  color: #da0000;
+}
+
+.create-post-typed-topic-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.create-post-typed-topic-container h4 {
+  color: #5d5d65;
+}
+
+.create-post-typed-topic-container button {
+  color: #00507c;
+}

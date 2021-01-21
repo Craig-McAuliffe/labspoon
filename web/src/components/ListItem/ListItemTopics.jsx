@@ -33,12 +33,10 @@ export default function ListItemTopics({dbTopics, customTopics}) {
   };
 
   return (
-    <div className="post-topics">
+    <div className="post-topics-container">
       <p className="topics-sub-title">Topics: </p>
-      <div className="topic-names-container">
-        {topicLinks(dbTopics)}
-        {topicLinks(customTopics)}
-      </div>
+      {topicLinks(dbTopics)}
+      {topicLinks(customTopics)}
     </div>
   );
 }
