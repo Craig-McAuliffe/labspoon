@@ -213,7 +213,7 @@ export const addNewPublicationToTopics = functions.firestore
         if (!topic.id) return;
         return db
           .doc(`topics/${topic.id}/publications/${publicationID}`)
-          .set(publication)
+          .set(toPublicationRef(publication, publicationID))
           .catch((err) =>
             console.error(
               'failed to add publication with id ' +
@@ -240,7 +240,7 @@ export const addNewPublicationToAuthors = functions.firestore
         .map(async (author) => {
           return db
             .doc(`users/${author.id}/publications/${publicationID}`)
-            .set(publication)
+            .set(toPublicationRef(publication, publicationID))
             .catch((err) =>
               console.error(
                 'failed to add publication with id ' +
@@ -332,29 +332,70 @@ export const updateAuthorsPublication = functions.firestore
   .document('publications/{publicationID}')
   .onUpdate(async (change, _) => {
     const publicationID = change.after.id;
-    const publication = change.after.data() as Publication;
-    const authors = publication.authors;
-    if (!authors) return;
+    const newPublication = change.after.data() as Publication;
+    const oldPublication = change.before.data() as Publication;
+    if (
+      JSON.stringify(toPublicationRef(newPublication, publicationID)) ===
+      JSON.stringify(toPublicationRef(oldPublication, publicationID))
+    )
+      return;
+    const authors = newPublication.authors;
+    if (!authors || authors.length === 0) return;
     const users = authors.filter((author) => Boolean(author.id));
     if (!users || users.length === 0) return;
-    const promises = users.map(async (user) => {
-      db.doc(`users/${user.id}/publications/${publicationID}`)
-        .set(toPublicationRef(publication, publicationID))
+    const promises = users.map(async (user) =>
+      db
+        .doc(`users/${user.id}/publications/${publicationID}`)
+        .set(toPublicationRef(newPublication, publicationID))
         .catch((err) =>
           console.error(
             `Unable to set reference to publication ${publicationID} on user ${user.id} publication collection:`,
             err
           )
+        )
+    );
+    return await Promise.all(promises);
+  });
+
+export const updatePubRefOnTopics = functions.firestore
+  .document('publications/{publicationID}')
+  .onUpdate(async (change, _) => {
+    const publicationID = change.after.id;
+    const newPublication = change.after.data() as Publication;
+    const oldPublication = change.before.data() as Publication;
+    if (
+      JSON.stringify(toPublicationRef(newPublication, publicationID)) ===
+      JSON.stringify(toPublicationRef(oldPublication, publicationID))
+    )
+      return;
+    const topics = newPublication.topics;
+    if (!topics || topics.length === 0) return;
+    const topicsPromises = topics.map(async (topic) => {
+      if (!topic.id) return;
+      return db
+        .doc(`topics/${topic.id}/publications/${publicationID}`)
+        .set(toPublicationRef(newPublication, publicationID))
+        .catch((err) =>
+          console.error(
+            `Unable to set reference to publication ${publicationID} on publication collection of topic with id ${topic.id}:`,
+            err
+          )
         );
     });
-    return Promise.all(promises);
+    return await Promise.all(topicsPromises);
   });
 
 export const updateGroupsPublication = functions.firestore
   .document('publications/{publicationID}')
   .onUpdate(async (change, _) => {
     const publicationID = change.after.id;
-    const publication = change.after.data() as Publication;
+    const newPublication = change.after.data() as Publication;
+    const oldPublication = change.before.data() as Publication;
+    if (
+      JSON.stringify(toPublicationRef(newPublication, publicationID)) ===
+      JSON.stringify(toPublicationRef(oldPublication, publicationID))
+    )
+      return;
     const groupsQS = await db
       .collection(`publications/${publicationID}/groups`)
       .get()
@@ -372,7 +413,7 @@ export const updateGroupsPublication = functions.firestore
     const groupsPromises = groupsToUpdateIDs.map((groupID) =>
       db
         .doc(`groups/${groupID}/publications/${publicationID}`)
-        .set(toPublicationRef(publication, publicationID))
+        .set(toPublicationRef(newPublication, publicationID))
         .catch((err) =>
           console.error(
             'unable to set updated pub ref with id ' +
@@ -590,17 +631,17 @@ async function fulfillOutgoingReferencesOnLabspoon(
     const msPublication = msPublicationDS.data() as MAKPublicationInDB;
     const lsPublicationID = msPublication.processed;
     // This shouldn't happen as we create the MS publication and Labspoon publication in a transaction.
-    if (!lsPublicationID)
-      console.error(
-        `MSPublication with ID ${microsoftID} has not been processed.`
-      );
+    if (!lsPublicationID) {
+      console.error('unprocessed MSPublication found with id ' + microsoftID);
+      return;
+    }
     const lsPublicationRef = db.doc(`publications/${lsPublicationID}`);
     const lsPublicationDS = await lsPublicationRef.get().catch((err) => {
       throw Error(
         `Unable to get publication with id ${lsPublicationID}: ` + err
       );
     });
-    if (!lsPublicationDS)
+    if (!lsPublicationDS || !lsPublicationDS.exists)
       console.error(
         `MSPublication ${microsoftID} has been marked as processed into labspoon publication ${lsPublicationID} but this publication does not exist`
       );
