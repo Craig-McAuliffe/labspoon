@@ -125,10 +125,15 @@ const SignUpForm = ({setLoading}) => {
   const validationSchema = Yup.object({
     email: Yup.string()
       .email('Please enter a valid email address')
-      .required('Email is required'),
+      .required('Email is required')
+      .max(
+        200,
+        'Email address is too long. It must have fewer than 200 characters.'
+      ),
     password: Yup.string()
       .required('Password is required')
-      .min(8, 'Password must be at least 8 characters long.'),
+      .min(8, 'Password must be at least 8 characters long.')
+      .max(30, 'Password is too long. It must have fewer than 30 characters.'),
     confirmPassword: Yup.string()
       .required('Password confirmation is required')
       .label('Confirm password')
@@ -136,7 +141,12 @@ const SignUpForm = ({setLoading}) => {
         // eslint-disable-next-line no-invalid-this
         return this.parent.password === value;
       }),
-    userName: Yup.string().required('Please enter your name'),
+    userName: Yup.string()
+      .required('Please enter your name')
+      .max(
+        150,
+        'Username is too long. It must have fewer than 150 characters.'
+      ),
   });
 
   return (

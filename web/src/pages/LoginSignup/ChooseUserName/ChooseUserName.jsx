@@ -21,7 +21,12 @@ export default function ChooseUserName() {
   };
 
   const validationSchema = Yup.object({
-    userName: Yup.string().required('Please enter your name'),
+    userName: Yup.string()
+      .required('Please enter your name')
+      .max(
+        150,
+        'Too long! Your username must contain fewer than 150 characters.'
+      ),
   });
 
   const submitUserName = async (values) => {

@@ -101,7 +101,12 @@ export default function CreateOpenPosition() {
 
   const validationSchema = Yup.object({
     title: Yup.string().required('You need to provide a title.'),
-    description: Yup.string().required('You need to write a description.'),
+    description: Yup.string()
+      .required('You need to write a description.')
+      .max(
+        7000,
+        'The description is too long. It must have fewer than 7000 characters.'
+      ),
     address: Yup.string(),
     salary: Yup.string(),
     startDate: Yup.string(),

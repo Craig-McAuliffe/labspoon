@@ -151,6 +151,14 @@ service cloud.firestore {
         allow write: if request.auth != null && exists(/databases/$(database)/documents/groups/$(groupID)/members/$(request.auth.uid));
       }
 
+      match /techniques/{techniqueID} {
+        allow read;
+      }
+
+      match /researchFocuses/{researchFocusID} {
+        allow read;
+      }
+
       match /openPositions/{openPositionID} {
         allow read;
       }

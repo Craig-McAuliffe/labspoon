@@ -212,9 +212,8 @@ export function NewFilterMenuWrapper({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabFilter]);
-  if (!siderFilter) return null;
+  if (!getDefaultFilter) return null;
   if (filterableResults.loadingFilter) return <LoadingSpinner />;
-  // if (siderFilter.length === 0) return null;
   return (
     <FilterMenu
       options={siderFilter}

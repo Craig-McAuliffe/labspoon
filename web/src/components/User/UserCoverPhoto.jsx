@@ -11,7 +11,7 @@ export default function UserCoverPhoto({src, alt, spinner}) {
         className={spinner ? 'cover-image-greyed' : 'cover-image'}
         title={alt}
         src={src ? src : getDefaultCoverPhoto()}
-        alt={`cover from source ${src}`}
+        alt={`cover for user page`}
         onError={(img) => (img.target.src = getDefaultCoverPhoto())}
       />
       {spinner && (

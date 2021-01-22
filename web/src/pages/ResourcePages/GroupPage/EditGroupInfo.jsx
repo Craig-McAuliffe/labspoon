@@ -76,9 +76,9 @@ export default function EditingGroupInfo({groupData, children}) {
     institution: groupData.institution ? groupData.institution : '',
     website: groupData.website ? groupData.website : '',
     about: groupData.about ? groupData.about : '',
-    donationLink: groupData.donationLink || '',
   };
-
+  if (groupData.donationLink)
+    initialValues.donationLink = groupData.donationLink;
   const onSubmitEdit = (values) => {
     setSubmitting(true);
     const memberIDsToBeRemoved = [];

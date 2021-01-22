@@ -49,7 +49,12 @@ export default function OpenPositionPostForm({
     startDate: '',
   };
   const validationSchema = Yup.object({
-    title: Yup.string().required('You need to write something!'),
+    title: Yup.string()
+      .required('You need to write something!')
+      .max(
+        1500,
+        'Your post is too long. It must have fewer than 1500 characters.'
+      ),
     position: Yup.string().required(
       'You need to provide a link to the publication'
     ),

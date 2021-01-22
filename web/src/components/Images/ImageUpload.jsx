@@ -351,7 +351,7 @@ export function ImagePreviews({urls, uploading, cover, rounded}) {
         {urls.map((url, i) => (
           <UserCoverPhoto
             src={urls[0]}
-            alt={`photo from source ${url}`}
+            alt="cover for user"
             spinner={uploading}
             key={url + i}
           />
@@ -364,7 +364,7 @@ export function ImagePreviews({urls, uploading, cover, rounded}) {
       <div>
         {urls.map((url, i) => (
           <div key={url + i} className="image-upload-rounded-preview-container">
-            <img src={url} alt={`uploaded avatar from source ${url}`} />
+            <img src={url} alt="avatar" />
           </div>
         ))}
       </div>

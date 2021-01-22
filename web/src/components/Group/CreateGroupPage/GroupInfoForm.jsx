@@ -59,11 +59,16 @@ export default function GroupInfoForm({
   const {user, userProfile} = useContext(AuthContext);
 
   const validationObj = {
-    name: Yup.string().required('Name is required'),
+    name: Yup.string()
+      .required('Name is required')
+      .max(500, 'Must have fewer than 500 characters'),
     location: Yup.string(),
     institution: Yup.string(),
     website: Yup.string().url('Must be a valid url'),
-    about: Yup.string().max(3000, 'Must have fewer than 3000 characters'),
+    about: Yup.string().max(
+      3000,
+      'Too long. Must have fewer than 3000 characters'
+    ),
     donationLink: Yup.string().url('Must be a valid url'),
   };
   if (!editingGroup)

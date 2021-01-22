@@ -57,7 +57,12 @@ export default function PublicationPostForm({
   };
 
   const validationSchema = Yup.object({
-    title: Yup.string().required('You need to write something!'),
+    title: Yup.string()
+      .required('You need to write something!')
+      .max(
+        1500,
+        'Your post is too long. It must have fewer than 1500 characters.'
+      ),
   });
 
   return (

@@ -37,7 +37,6 @@ function FilterMenu({
       />
     );
   });
-  if (options.length === 0) return null;
   if (isMobile) return <MobileFilter filterCollections={filterCollections} />;
 
   return (

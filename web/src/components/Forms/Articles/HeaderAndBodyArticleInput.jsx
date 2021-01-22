@@ -27,11 +27,7 @@ export default function HeaderAndBodyArticleInput({label, ...props}) {
           <Editable renderElement={renderElement} autoFocus spellCheck />
         </Slate>
       </div>
-      {meta.error && meta.touched ? (
-        <InputError error="You must provide a header and a description" />
-      ) : (
-        <></>
-      )}
+      {meta.error && meta.touched ? <InputError error={meta.error} /> : <></>}
     </>
   );
 }
@@ -96,28 +92,72 @@ const withLayout = (editor) => {
   return editor;
 };
 
-export const yupArticleValidation = Yup.array().test(
-  'isArticle',
-  // eslint-disable-next-line no-template-curly-in-string
-  '${path} is not an article',
-  (value) => {
-    if (value.length < 2) return false;
+export const yupArticleValidation = Yup.array()
+  .test(
+    'tooFewSections',
+    // eslint-disable-next-line no-template-curly-in-string
+    'You must provide a title and body section.',
+    (value) => {
+      if (value.length < 2) return false;
+      return true;
+    }
+  )
+  .test(
+    'isEmptyTitle',
+    // eslint-disable-next-line no-template-curly-in-string
+    'You must enter a title',
+    (value) => {
+      // Check title is not empty
+      if (!value[0]) return false;
+      if (value[0].type !== 'title') return false;
+      if (value[0].children.length === 0) return false;
+      if (value[0].children[0].text === undefined) return false;
+      if (value[0].children[0].length === 0) return false;
 
-    // Check title is not empty
-    if (value[0].type !== 'title') return false;
-    if (value[0].children.length !== 1) return false;
-    if (!value[0].children[0].text) return false;
-    if (value[0].children[0].text.length === 0) return false;
+      return true;
+    }
+  )
+  .test(
+    'isEmptyBody',
+    // eslint-disable-next-line no-template-curly-in-string
+    'You must write something!',
+    (value) => {
+      // Check body is not empty
+      if (value[1].type !== 'paragraph') return false;
+      if (value[1].children === undefined) return false;
+      if (value[1].children[0].text === undefined) return false;
+      if (value[1].children[0].text.length === 0) return false;
 
-    // Check body is not empty
-    if (value[1].type !== 'paragraph') return false;
-    if (value[1].children.length !== 1) return false;
-    if (!value[1].children[0].text) return false;
-    if (value[1].children[0].text.length === 0) return false;
-
-    return true;
-  }
-);
+      return true;
+    }
+  )
+  .test(
+    'isTooLong',
+    // eslint-disable-next-line no-template-curly-in-string
+    'Your article is too long. The title and body together must contain fewer than 10,000 characters.',
+    (value) => {
+      if (value[1].children === undefined) return false;
+      if (value[1].children[0].text === undefined) return false;
+      if (
+        value.reduce((accumulator, section) => {
+          if (!section.children[0].text) return accumulator;
+          return accumulator + section.children[0].text.length;
+        }, 0) > 10000
+      )
+        return false;
+      return true;
+    }
+  )
+  .test(
+    'isTooLong',
+    // eslint-disable-next-line no-template-curly-in-string
+    'The title is too long. It must contain fewer than 250 characters.',
+    (value) => {
+      if (value[0].children[0].text === undefined) return false;
+      if (value[0].children[0].text.length > 250) return false;
+      return true;
+    }
+  );
 
 // assumes the article is properly validated
 export function getTitleTextAndBody(article) {

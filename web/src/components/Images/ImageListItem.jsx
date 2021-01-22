@@ -42,7 +42,7 @@ export function ImagesSection({children, images, spinner, customMargin}) {
         ? images.map((image, i) => (
             <ImageListItem
               src={image.src}
-              alt={image.alt}
+              alt={'unknown'}
               spinner={spinner}
               key={image.src + i}
             />
@@ -54,6 +54,6 @@ export function ImagesSection({children, images, spinner, customMargin}) {
 
 export function formatTaggedImages(photoURLs) {
   return photoURLs.map((photoURL) => {
-    return {src: photoURL, alt: `image from source ${photoURL}`};
+    return {src: photoURL, alt: `unknown`};
   });
 }

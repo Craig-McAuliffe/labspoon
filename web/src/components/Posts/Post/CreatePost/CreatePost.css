@@ -236,6 +236,9 @@
   .not-creating-post-button {
     margin-top: 65px;
   }
+  .creating-post-main-text-container {
+    margin-top: 30px;
+  }
 }
 
 @media screen and (max-width: 800px) {

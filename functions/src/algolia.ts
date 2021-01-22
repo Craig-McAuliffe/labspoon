@@ -62,10 +62,9 @@ export const addUserToSearchIndex = functions.firestore
 export const configureGroupSearchIndex = functions.https.onRequest((_, res) =>
   configureSearchIndex(res, GROUPS_INDEX, [
     'name',
-    'location',
-    'institution',
-    'website',
     'about',
+    'institution',
+    'location',
   ])
 );
 

@@ -103,7 +103,7 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "authorIDs",
+          "fieldPath": "filterAuthorIDs",
           "arrayConfig": "CONTAINS"
         },
         {

@@ -28,8 +28,14 @@ export default function EditUserInfo({children}) {
   if (!userProfile && authLoaded) return <GeneralError />;
 
   const validationSchema = Yup.object({
-    institution: Yup.string(),
-    position: Yup.string(),
+    institution: Yup.string().max(
+      300,
+      'Institution name must contain fewer than 300 characters.'
+    ),
+    position: Yup.string().max(
+      150,
+      'Position title must contain fewer than 150 characters.'
+    ),
   });
 
   const initialValues = {

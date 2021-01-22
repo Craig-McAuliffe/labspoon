@@ -112,6 +112,7 @@ function SearchForm({
         value={query}
         onChange={(event) => setQuery(event.target.value)}
         onFocus={onFocus}
+        type="text"
       />
       <button
         type="submit"
