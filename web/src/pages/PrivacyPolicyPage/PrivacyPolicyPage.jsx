@@ -1,4 +1,5 @@
 import React from 'react';
+import {Link} from 'react-router-dom';
 import {PaddedPageContainer} from '../../components/Layout/Content';
 
 import './PrivacyPolicyPage.css';
@@ -30,11 +31,15 @@ export default function PrivacyPolicyPage() {
           interesting, who you might like to connect with, and what adverts will
           actually be interesting for you.
         </p>
-        <p>
+        {/* <p>
           When you&#39;re not logged into Labspoon, we store the information we
           have collected with a unique identifier tied to the browser,
           application, or device you&#39;re using. This helps us to do things
           like maintain preferences across your sessions.
+        </p> */}
+        <p>
+          When you&#39;re not logged into Labspoon, we store no information
+          about you.
         </p>
         <h3>The information you provide us</h3>
         <p>
@@ -47,8 +52,8 @@ export default function PrivacyPolicyPage() {
         <h4>Things you create</h4>
         <p>
           We also collect the content you create, upload, or receive from others
-          when using our services. This includes things like posts and comments
-          you make.
+          when using our services. This includes things like posts you write and
+          group you create.
         </p>
         <h3>Types of information we collect while you use our services</h3>
         <h4>Activity</h4>
@@ -59,7 +64,7 @@ export default function PrivacyPolicyPage() {
         </p>
         <ul>
           <li>
-            Terms you search for Videos, articles, and podcasts you interact
+            Terms you search for. Posts, podcasts, and articles you interact
             with.
           </li>
           <li>Views and interactions with our site&#39;s content and ads.</li>
@@ -103,18 +108,18 @@ export default function PrivacyPolicyPage() {
             such as name or email.
           </li>
         </ul>
-        <h4>Measure our performance</h4>
+        {/* <h4>Measure our performance</h4>
         <p>
           We use data for analytics to understand how our services are used. For
           instance, we analyse data about your visits to our site to check for
           updates in your Following page.
-        </p>
+        </p> */}
         <h4>Communicate with you</h4>
         <p>
           We use information we collect, like your email address, to interact
           with you directly. For instance, we may send you a notification of an
           update from one of the groups you follow, or if you have asked to
-          reset your password
+          reset your password.
         </p>
         <h4>Protect our users and the public</h4>
         <p>
@@ -142,23 +147,19 @@ export default function PrivacyPolicyPage() {
         </p>
         <h4>Ways to Review & Update Your Information</h4>
         <p>
-          My Activity - Review and control data that’s created when you use
-          Labspoon, like searches you’ve done.
+          You can manage your personal information, like your username and
+          email, on the <Link to="/settings">settings page.</Link>
         </p>
         <p>
-          Personal Information - Manage your contact information, like your name
-          and email.
+          You can request to remove your personal information by deleting your
+          account on the <Link to="/settings">settings page.</Link>
         </p>
-        <h3>Export, Remove, & Delete Your Information</h3>
         <p>
-          You can request to remove content from Labspoon based on applicable
-          law.
+          To can request to remove content on Labspoon, according to applicable
+          law, by contacting us. Go to the contact page to do so on the
+          <Link to="/contact"> contact page.</Link>
         </p>
-        <p>To delete your information, you can:</p>
-        <ul>
-          <li>Delete your entire Labspoon account.</li>
-        </ul>
-        <p>
+        {/* <p>
           There are other ways to control the information Labspoon collects
           whether or not you&#39;re signed into a Labspoon account, including:
         </p>
@@ -172,7 +173,7 @@ export default function PrivacyPolicyPage() {
             Device settings: For instance, you can control what permissions
             certain applications have.
           </li>
-        </ul>
+        </ul> */}
         <h3>How we protect your information</h3>
         <p>
           Labspoon is built with strong security features that continuously
@@ -383,6 +384,13 @@ export default function PrivacyPolicyPage() {
         <p>
           We regularly review this Privacy Policy and make sure that we process
           your information in ways that comply with it.
+        </p>
+        <br />
+        <p>
+          By signing up to Labspoon, you indicate your consent to this
+          agreement. If you would like to revoke your consent, please go onto
+          your <Link to="/settings">settings page</Link> and delete your
+          account.
         </p>
       </div>
     </PaddedPageContainer>

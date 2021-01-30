@@ -1,0 +1,30 @@
+.contact-page-title {
+  padding-top: 30px;
+}
+
+.contact-page-submit-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.contact-page-success-back {
+  margin-top: 30px;
+}
+
+.contact-page-error-message-container {
+  margin-top: 20px;
+}
+
+.contact-page-username-label {
+  position: fixed;
+  top: -10000px;
+  left: -10000px;
+}
+
+.contact-page-location-label {
+  display: none;
+}
+
+.contact-page-mouse-movement-detection {
+  height: 100vh;
+}
