@@ -1,6 +1,6 @@
 import {firestore} from 'firebase-admin';
 import * as functions from 'firebase-functions';
-import {admin, environment, ResourceTypes} from './config';
+import {admin, environment} from './config';
 import {GroupRef} from './groups';
 import {
   interpretQuery,
@@ -11,7 +11,7 @@ import {
   MAKAuthor,
 } from './microsoft';
 import {OpenPosition} from './openPositions';
-import {Post, updateFilterCollection} from './posts';
+import {Post, updateRefOnFilterCollection} from './posts';
 import {
   publishAddPublicationRequests,
   allPublicationFields,
@@ -830,23 +830,13 @@ export const updateGroupMemberPostFilter = functions.firestore
 
     const filterUpdatesPromises = groupsIDsToUpdate.map(
       async (groupIDToUpdate) => {
-        const groupPostFeedRef = db.doc(
-          `groups/${groupIDToUpdate}/feeds/postsFeed`
+        const groupUserFilterRef = db.doc(
+          `groups/${groupIDToUpdate}/feeds/postsFeed/filterCollections/user/filterOptions/${userID}`
         );
-        return new Promise((resolve) =>
-          resolve(
-            updateFilterCollection(
-              groupPostFeedRef,
-              {resourceName: 'Author', resourceType: ResourceTypes.USER},
-              {
-                name: newUserName,
-                id: userID,
-              },
-              false,
-              true
-            )
-          )
-        );
+        return updateRefOnFilterCollection(groupUserFilterRef, {
+          name: newUserName,
+          id: userID,
+        });
       }
     );
     return Promise.all(filterUpdatesPromises);
@@ -906,23 +896,13 @@ export const updateGroupMemberPublicationsFilter = functions.firestore
 
     const filterUpdatesPromises = groupsIDsToUpdate.map(
       async (groupIDToUpdate) => {
-        const groupPublicationFeedRef = db.doc(
-          `groups/${groupIDToUpdate}/feeds/publicationsFeed`
+        const groupUserFilterRef = db.doc(
+          `groups/${groupIDToUpdate}/feeds/publicationsFeed/filterCollections/user/filterOptions/${userID}`
         );
-        return new Promise((resolve) =>
-          resolve(
-            updateFilterCollection(
-              groupPublicationFeedRef,
-              {resourceName: 'Author', resourceType: ResourceTypes.USER},
-              {
-                name: newUserName,
-                id: userID,
-              },
-              false,
-              true
-            )
-          )
-        );
+        return updateRefOnFilterCollection(groupUserFilterRef, {
+          name: newUserName,
+          id: userID,
+        });
       }
     );
     return Promise.all(filterUpdatesPromises);

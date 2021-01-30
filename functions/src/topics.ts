@@ -13,6 +13,7 @@ import {
   allPublicationFields,
   publishAddPublicationRequests,
 } from './publications';
+import {addRecentPostsToFollowingFeed, Post} from './posts';
 import {admin} from './config';
 import {firestore} from 'firebase-admin';
 
@@ -358,6 +359,67 @@ export async function removeTopicsFromResource(
   });
   return Promise.all(topicsPromises);
 }
+
+export const addRecentPostsToFeedOnNewTopicFollow = functions.firestore
+  .document(`topics/{followedTopicID}/followedByUsers/{followerID}`)
+  .onCreate(
+    async (_, context): Promise<void[]> => {
+      const followerID = context.params.followerID;
+      const followedTopicID = context.params.followedTopicID;
+      return await addRecentPostsToFollowingFeed(
+        followerID,
+        db.collection(`topics/${followedTopicID}/posts`)
+      );
+    }
+  );
+
+export const addTopicPostToFollowersFeeds = functions.firestore
+  .document(`topics/{topicID}/posts/{postID}`)
+  .onCreate(async (change, context) => {
+    const topicID = context.params.topicID;
+    const postID = context.params.postID;
+    const post = change.data() as Post;
+    const topicFollowersCollectionRef = db.collection(
+      `topics/${topicID}/followedByUsers`
+    );
+    return topicFollowersCollectionRef
+      .get()
+      .then((qs) => {
+        if (qs.empty) return;
+        const topicFollowersIDs: string[] = [];
+        qs.forEach((doc) => {
+          topicFollowersIDs.push(doc.id);
+        });
+        const topicFollowersPromisesArray = topicFollowersIDs.map(
+          async (topicFollowerID) => {
+            const userPostsDocRef = db.doc(
+              `users/${topicFollowerID}/feeds/followingFeed/posts/${postID}`
+            );
+            const batch = db.batch();
+            batch.set(userPostsDocRef, post);
+            batch.set(
+              db.doc(
+                `posts/${postID}/onFollowingFeedsOfUsers/${topicFollowerID}`
+              ),
+              {id: topicFollowerID}
+            );
+            return batch
+              .commit()
+              .catch((err) =>
+                console.log(
+                  'failed to add posts from topic with id ' +
+                    topicID +
+                    ' to following feed of user with id ' +
+                    topicFollowerID,
+                  err
+                )
+              );
+          }
+        );
+        return Promise.all(topicFollowersPromisesArray);
+      })
+      .catch((err) => console.log(err, 'could not fetch followers of topic'));
+  });
 
 interface expressionField {
   expr: string;
