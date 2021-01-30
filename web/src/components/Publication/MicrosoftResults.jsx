@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useContext} from 'react';
 import PrimaryButton from '../Buttons/PrimaryButton';
-import {functions} from 'firebase';
+import {functions} from '../../firebase';
 import Results from '../Results/Results';
 import {SmallPublicationListItem} from './PublicationListItem';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
@@ -9,7 +9,7 @@ import './PublicationListItem.css';
 import {dbPublicationToJSPublication} from '../../helpers/publications';
 import {MicrosoftPublicationSearchCache} from '../../App';
 
-const microsoftPublicationSearchCloudFunction = functions().httpsCallable(
+const microsoftPublicationSearchCloudFunction = functions.httpsCallable(
   'publications-microsoftAcademicKnowledgePublicationSearch'
 );
 

@@ -12,7 +12,6 @@ import {
 } from '../../helpers/resourceTypeDefinitions';
 import NegativeButton from './NegativeButton';
 import {LoadingSpinnerPage} from '../LoadingSpinner/LoadingSpinner';
-import {firestore} from 'firebase';
 import './Buttons.css';
 
 function BookmarkButton({
@@ -55,7 +54,7 @@ function BookmarkButton({
         userID: user.uid,
       });
       batch.update(bookmarkedResourceDoc, {
-        bookmarkedCount: firestore.FieldValue.increment(1),
+        bookmarkedCount: db.FieldValue.increment(1),
       });
       batch
         .commit()
@@ -157,7 +156,7 @@ export async function removeBookmark(
   batch.delete(userBookmarkCollection.doc(bookmarkedResourceID));
   batch.delete(bookmarkedByCollection.doc(userID));
   batch.update(bookmarkedResourceDoc, {
-    bookmarkedCount: firestore.FieldValue.increment(-1),
+    bookmarkedCount: db.FieldValue.increment(-1),
   });
   return batch
     .commit()

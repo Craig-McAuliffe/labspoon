@@ -9,6 +9,7 @@ export const auth = firebase.auth();
 export const googleAuthProvider = new firebase.auth.GoogleAuthProvider();
 export const db = firebase.firestore();
 export const storage = firebase.storage();
+export const functions = firebase.functions();
 if (abbrEnv === 'local') {
   db.settings({
     host: 'localhost:8080',

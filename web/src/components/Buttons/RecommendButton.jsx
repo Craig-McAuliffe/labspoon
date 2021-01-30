@@ -11,7 +11,6 @@ import {
 } from '../../helpers/resourceTypeDefinitions';
 import {SignUpPopoverOverride} from '../Popovers/Popover';
 import {userToUserRef} from '../../helpers/users';
-import {firestore} from 'firebase';
 import './Buttons.css';
 
 const RecommendButton = ({
@@ -56,7 +55,7 @@ const RecommendButton = ({
         userToUserRef(userProfile, user.uid)
       );
       batch.update(recommendedResourceDoc, {
-        recommendedCount: firestore.FieldValue.increment(1),
+        recommendedCount: db.FieldValue.increment(1),
       });
       batch
         .commit()
@@ -158,7 +157,7 @@ export async function removeRecommendation(
   batch.delete(userRecommendationsCollection.doc(recommendedResourceID));
   batch.delete(recommendedByCollection.doc(userID));
   batch.update(recommendedResourceDoc, {
-    recommendedCount: firestore.FieldValue.increment(-1),
+    recommendedCount: db.FieldValue.increment(-1),
   });
   return batch
     .commit()
