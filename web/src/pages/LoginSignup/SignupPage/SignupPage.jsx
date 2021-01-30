@@ -12,6 +12,7 @@ import {createUserDocOnSignUp} from '../../../helpers/users.js';
 import GoogleButton from 'react-google-button';
 import {PaddedPageContainer} from '../../../components/Layout/Content.jsx';
 import GoogleSignIn from '../GoogleSignIn.jsx';
+import {Link} from 'react-router-dom';
 
 import './SignupPage.css';
 
@@ -57,6 +58,12 @@ function SignupPage() {
               }}
             />
           </div>
+          <p className="signup-submit-button-container">
+            <span className="sign-up-privacy-policy-disclaimer">
+              By signing up, you are agreeing to our{' '}
+            </span>
+            <Link to="/privacy-policy">Privacy Policy</Link>
+          </p>
         </div>
       </PaddedPageContainer>
     );

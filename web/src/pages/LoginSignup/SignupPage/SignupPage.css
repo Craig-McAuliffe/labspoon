@@ -28,3 +28,9 @@
   justify-content: flex-end;
   margin-bottom: 10px;
 }
+
+.sign-up-privacy-policy-disclaimer {
+  color: #5d5d65;
+  display: inline-block;
+  margin-right: 5px;
+}

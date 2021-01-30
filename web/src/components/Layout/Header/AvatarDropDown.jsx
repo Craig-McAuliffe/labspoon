@@ -61,11 +61,17 @@ const AvatarDropDown = () => {
               <p className="dropdown-link-item">Settings</p>
             </div>
           </Dropdown.Item>
-          <Dropdown.Item href="/privacyPolicy">
+          <Dropdown.Item href="/privacy-policy">
             <div className="avatar-dropdown-item-container">
               <p className="dropdown-link-item">Privacy Policy</p>
             </div>
           </Dropdown.Item>
+          <Dropdown.Item href="/contact">
+            <div className="avatar-dropdown-item-container">
+              <p className="dropdown-link-item">Contact us</p>
+            </div>
+          </Dropdown.Item>
+
           <div className="log-out-container">
             <button
               onClick={() => {

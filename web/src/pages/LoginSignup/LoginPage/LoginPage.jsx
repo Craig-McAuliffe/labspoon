@@ -12,6 +12,7 @@ import * as Yup from 'yup';
 import GoogleButton from 'react-google-button';
 import GoogleSignIn from '../GoogleSignIn.jsx';
 import {PaddedPageContainer} from '../../../components/Layout/Content.jsx';
+import {Link} from 'react-router-dom';
 
 import './LoginPage.css';
 
@@ -51,6 +52,12 @@ function LoginPage() {
             }}
           />
         </div>
+        <p className="signup-submit-button-container">
+          <span className="sign-up-privacy-policy-disclaimer">
+            By signing up, you are agreeing to our{' '}
+          </span>
+          <Link to="/privacy-policy">Privacy Policy</Link>
+        </p>
       </PaddedPageContainer>
     );
   } else {

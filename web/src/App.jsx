@@ -1,4 +1,10 @@
-import React, {createContext, useState, useEffect, useReducer} from 'react';
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useReducer,
+  useContext,
+} from 'react';
 import {BrowserRouter as Router, useLocation} from 'react-router-dom';
 import Routes from './routes.jsx';
 import {auth, db} from './firebase';
@@ -15,16 +21,76 @@ export default function App() {
   return (
     <FeatureFlagsProvider>
       <AuthProvider>
-        <Router>
-          <AppLayout>
-            <MicrosoftPublicationSearchCacheProvider>
-              <Routes />
-            </MicrosoftPublicationSearchCacheProvider>
-          </AppLayout>
-        </Router>
+        <BotProvider>
+          <Router>
+            <BotDetection>
+              <AppLayout>
+                <MicrosoftPublicationSearchCacheProvider>
+                  <Routes />
+                </MicrosoftPublicationSearchCacheProvider>
+              </AppLayout>
+            </BotDetection>
+          </Router>
+        </BotProvider>
       </AuthProvider>
     </FeatureFlagsProvider>
   );
+}
+
+export const BotDetector = createContext();
+function BotProvider({children}) {
+  const [rapidLocationChanges, setRapidLocationChanges] = useState(0);
+  const [previousLocationTime, setPreviousLocationTime] = useState([]);
+  const [botConfirmed, setBotConfirmed] = useState(false);
+  if (botConfirmed) return <h2>Bot bot bot.</h2>;
+  if (rapidLocationChanges > 20)
+    return (
+      <div>
+        <h4>Recaptcha</h4>You are moving awfully fast. Are you a bot?{' '}
+        <button
+          onClick={() => setBotConfirmed(true)}
+          className="not-a-human-button"
+        >
+          Yes I am a bot
+        </button>{' '}
+        <button
+          onClick={() => setRapidLocationChanges(0)}
+          className="not-a-bot-button"
+        >
+          No, I am not a bot
+        </button>
+        .
+      </div>
+    );
+  return (
+    <BotDetector.Provider
+      value={{
+        setRapidLocationChanges: setRapidLocationChanges,
+        previousLocationTime: previousLocationTime,
+        setPreviousLocationTime: setPreviousLocationTime,
+        setBotConfirmed: setBotConfirmed,
+      }}
+    >
+      {children}
+    </BotDetector.Provider>
+  );
+}
+
+function BotDetection({children}) {
+  const {
+    setRapidLocationChanges,
+    previousLocationTime,
+    setPreviousLocationTime,
+  } = useContext(BotDetector);
+  const locationPathName = useLocation().pathname;
+
+  useEffect(() => {
+    const timeAtLoad = new Date().getTime() / 1000;
+    if (previousLocationTime && timeAtLoad - previousLocationTime < 1)
+      setRapidLocationChanges((current) => current + 1);
+    setPreviousLocationTime(timeAtLoad);
+  }, [locationPathName]);
+  return children;
 }
 
 const AppLayout = ({children}) => {

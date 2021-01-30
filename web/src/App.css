@@ -53,6 +53,21 @@
   margin-bottom: 20px;
 }
 
+.not-a-human-button {
+  color: #287fad;
+}
+
+.not-a-human-button:hover {
+  color: #da0000;
+}
+.not-a-bot-button {
+  color: #287fad;
+}
+
+.not-a-bot-button:hover {
+  color: #00507c;
+}
+
 .success-overlay {
   display: flex;
   justify-content: center;
