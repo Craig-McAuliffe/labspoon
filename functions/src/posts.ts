@@ -48,34 +48,38 @@ export const createPost = functions.https.onCall(async (data, context) => {
       return;
     }
   }
-  const post: Post = {
-    postType: data.postType,
-    author: author,
-    content: content,
-    topics: postTopics,
-    customTopics: data.customTopics,
-    timestamp: new Date(),
-    unixTimeStamp: Math.floor(Date.now() / 1000),
-    filterTopicIDs: postTopics.map(
-      (taggedTopic: TaggedTopic) => taggedTopic.id
-    ),
-    id: postID,
-    bookmarkedCount: 0,
-    recommendedCount: 0,
-  };
-  if (data.publication) {
-    post.publication = toPublicationRef(data.publication, data.publication.id);
-  }
-  if (data.publicationURL) post.publicationURL = data.publicationURL;
-  await Promise.all(matchedTopicsPromises);
-
-  return postDocRef.set(post).catch((err) => {
-    console.error(`could not create post ${postID}` + err);
-    throw new functions.https.HttpsError(
-      'internal',
-      'An error occured while creating the post.'
-    );
-  });
+  return db
+    .runTransaction((transaction) => {
+      const post: Post = {
+        postType: data.postType,
+        author: author,
+        content: content,
+        topics: postTopics,
+        customTopics: data.customTopics,
+        timestamp: new Date(),
+        filterTopicIDs: postTopics.map(
+          (taggedTopic: TaggedTopic) => taggedTopic.id
+        ),
+        id: postID,
+      };
+      if (data.publication) {
+        post.publication = toPublicationRef(
+          data.publication,
+          data.publication.id
+        );
+      }
+      if (data.publicationURL) post.publicationURL = data.publicationURL;
+      return Promise.all(matchedTopicsPromises).then(() => {
+        transaction.set(postDocRef, post);
+      });
+    })
+    .catch((err) => {
+      console.error(`could not create post ${postID}` + err);
+      throw new functions.https.HttpsError(
+        'internal',
+        'An error occured while creating the post.'
+      );
+    });
 });
 
 export const writePostToAuthorPosts = functions.firestore
@@ -255,33 +259,94 @@ export const updatePostOnTopic = functions.firestore
     return Promise.all(topicsUpdatePromise);
   });
 
-export const updatePostOnFollowerFeeds = functions.firestore
-  .document('posts/{postID}')
-  .onUpdate(async (change, context) => {
-    const post = change.after.data();
-    const postID = context.params.postID;
-    const appearsOnFollowerFeedsQS = await db
-      .collection(`posts/${postID}/onFollowingFeedsOfUsers`)
-      .get()
-      .catch((err) =>
-        console.error(
-          'unable to fetch user IDs for those following feeds that have post with id ' +
-            postID,
-          err
-        )
+export const writePostToUserFollowingFeeds = functions.firestore
+  .document(`posts/{postID}`)
+  .onWrite(async (change, context) => {
+    if (
+      context.eventType ===
+      'providers/google.firebase.database/eventTypes/ref.delete'
+    )
+      return null;
+    const post = change.after.data() as Post;
+    const postID = change.after.id;
+    const followers = await db
+      .collection(`users/${post.author.id}/followedByUsers`)
+      .get();
+    if (followers.empty) return null;
+    followers.forEach(async (followerSnapshot) => {
+      const followerID = followerSnapshot.id;
+      const followingFeedRef = db.doc(
+        `users/${followerID}/feeds/followingFeed`
       );
-    if (!appearsOnFollowerFeedsQS || appearsOnFollowerFeedsQS.empty) return;
-    const followersIDs: string[] = [];
-    appearsOnFollowerFeedsQS.forEach((ds) => {
-      followersIDs.push(ds.id);
+      await followingFeedRef.collection('posts').doc(postID).set(post);
+      await updateFiltersByPost(followingFeedRef, post);
     });
-    const followersPromises = followersIDs.map((followerID) =>
-      db
-        .doc(`users/${followerID}/feeds/followingFeed/posts/${postID}`)
-        .set(post)
-    );
-    return Promise.all(followersPromises);
+    return null;
   });
+
+export const addRecentPostsToFeedOnNewUserFollow = functions.firestore
+  .document(`users/{followerID}/followsUsers/{followingID}`)
+  .onCreate(
+    async (_, context): Promise<void[]> => {
+      const followerID = context.params.followerID;
+      const followingID = context.params.followingID;
+
+      try {
+        return addRecentPostsToFollowingFeed(
+          followerID,
+          db.collection(`users/${followingID}/posts`)
+        );
+      } catch (err) {
+        console.error(
+          `Error while adding recent posts to the following feed of user ${followerID} who has just started following user ${followingID}`,
+          err
+        );
+      }
+      return new Promise(() => []);
+    }
+  );
+
+export const addRecentPostsToFeedOnNewGroupFollow = functions.firestore
+  .document(`users/{followerID}/followsGroups/{followingID}`)
+  .onCreate(
+    async (_, context): Promise<void[]> => {
+      const followerID = context.params.followerID;
+      const followingID = context.params.followingID;
+      try {
+        return addRecentPostsToFollowingFeed(
+          followerID,
+          db.collection(`groups/${followingID}/posts`)
+        );
+      } catch (err) {
+        console.error(
+          `Error while adding recent posts to the following feed of user ${followerID} who has just started following group ${followingID}`,
+          err
+        );
+      }
+      return new Promise(() => []);
+    }
+  );
+
+export const addRecentPostsToFeedOnNewTopicFollow = functions.firestore
+  .document(`users/{followerID}/followsTopics/{followingID}`)
+  .onCreate(
+    async (_, context): Promise<void[]> => {
+      const followerID = context.params.followerID;
+      const followingID = context.params.followingID;
+      try {
+        return addRecentPostsToFollowingFeed(
+          followerID,
+          db.collection(`topics/${followingID}/posts`)
+        );
+      } catch (err) {
+        console.error(
+          `Error while adding recent posts to the following feed of user ${followerID} who has just started following topic ${followingID}`,
+          err
+        );
+      }
+      return new Promise(() => []);
+    }
+  );
 
 // When a user starts following a new resource, they will not initially see any
 // of that resource's posts in their following feed as the resource will
@@ -290,10 +355,10 @@ export const updatePostOnFollowerFeeds = functions.firestore
 // empty. To make the new user experience more engaging we add the most recent
 // posts from that resource into the following feed.
 const POSTS_TO_ADD_ON_NEW_FOLLOW = 2;
-export async function addRecentPostsToFollowingFeed(
+async function addRecentPostsToFollowingFeed(
   followerID: string,
   originCollection: firestore.CollectionReference
-): Promise<firestore.WriteResult[][]> {
+): Promise<void[]> {
   const posts = await originCollection
     .orderBy('timestamp', 'desc')
     .limit(POSTS_TO_ADD_ON_NEW_FOLLOW)
@@ -304,19 +369,26 @@ export async function addRecentPostsToFollowingFeed(
       );
     });
   if (posts.empty) new Promise(() => []);
-  const postAddedPromises: Promise<firestore.WriteResult[]>[] = [];
-  posts.forEach(async (postDS) => {
+  const postAddedPromises: Promise<void>[] = [];
+  posts.forEach((postDS) => {
     const post = postDS.data() as Post;
-    const postID = postDS.id;
-    const batch = db.batch();
-    batch.set(
-      db.doc(`users/${followerID}/feeds/followingFeed/posts/${postID}`),
-      post
-    );
-    batch.set(db.doc(`posts/${postID}/onFollowingFeedsOfUsers/${followerID}`), {
-      id: followerID,
-    });
-    postAddedPromises.push(batch.commit());
+    // Not important if we fail to add past posts to the feed.
+    const postAddedPromise = db
+      .doc(`users/${followerID}/feeds/followingFeed/posts/${post.id}`)
+      .set(post)
+      .then(() =>
+        updateFiltersByPost(
+          db.doc(`users/${followerID}/feeds/followingFeed`),
+          post
+        )
+      )
+      .catch((err) => {
+        console.error(
+          `Unable to add post ${post.id} to the following feed of user ${followerID}:`,
+          err
+        );
+      });
+    postAddedPromises.push(postAddedPromise);
   });
   return Promise.all(postAddedPromises);
 }
@@ -358,7 +430,7 @@ export const addPublicationPostToPublication = functions.firestore
       );
   });
 
-export async function updateFiltersWithNewPost(
+export async function updateFiltersByPost(
   feedRef: firestore.DocumentReference<firestore.DocumentData>,
   post: Post
 ) {
@@ -408,89 +480,74 @@ export async function updateFiltersWithNewPost(
       `could not add topics from post with id ${post.id} to following feed filter for ${feedRef}, ${err}`
     )
   );
-  return;
 }
 
 export async function updateFilterCollection(
   feedRef: firestore.DocumentReference<firestore.DocumentData>,
   filterCollection: FilterCollection,
   filterOption: FilterOption,
-  removedResource?: boolean
+  removedResource?: boolean,
+  noRankChange?: boolean
 ) {
   const filterCollectionDocRef = feedRef
     .collection('filterCollections')
     .doc(filterCollection.resourceType);
+  // create the filter collection if it doesn't exist
+  await filterCollectionDocRef.set(filterCollection, {merge: true});
+
   const filterOptionDocRef = filterCollectionDocRef
     .collection('filterOptions')
     .doc(filterOption.id);
-  const fetchedFilterCollectionDoc = await filterCollectionDocRef
-    .get()
-    .catch((err) => console.error('unable to fetch filter collection', err));
-  if (!fetchedFilterCollectionDoc) return;
-  if (!fetchedFilterCollectionDoc.exists)
-    await filterCollectionDocRef.set(filterCollection);
-  const fetchedFilterOptionDoc = await filterOptionDocRef
-    .get()
-    .catch((err) => console.error('unable to fetch filter option', err));
-  if (!fetchedFilterOptionDoc) return;
+  // create the filter option if it doesn't exist
+  await filterOptionDocRef.set(filterOption, {merge: true});
 
   if (removedResource) {
-    if (!fetchedFilterOptionDoc.exists) {
-      console.log('could not find filter option');
-      return;
-    }
-    const filterOptionData = fetchedFilterOptionDoc.data() as FilterOption;
-    const filterOptionRank = filterOptionData.rank;
-    const batch = db.batch();
-    if (!filterOptionRank || filterOptionRank === 1) {
-      batch.delete(filterOptionDocRef);
-    } else {
-      batch.update(filterOptionDocRef, {rank: filterOptionRank - 1});
-    }
-    batch.update(filterCollectionDocRef, {
-      rank: firestore.FieldValue.increment(-1),
+    await filterOptionDocRef.get().then(async (qs) => {
+      if (!qs.exists) {
+        console.log('could not find filter option');
+        return;
+      }
+      const filterOptionData = qs.data() as FilterOption;
+      if (!filterOptionData.rank) return;
+      const filterOptionRank = filterOptionData.rank;
+      if (filterOptionRank === 1) {
+        await filterOptionDocRef
+          .delete()
+          .catch((err) => console.error(err, 'could not delete filter option'));
+      } else {
+        await filterOptionDocRef
+          .update({rank: filterOptionRank - 1})
+          .catch((err) =>
+            console.error(err, 'could not decrease filter option rank')
+          );
+      }
+      await filterCollectionDocRef
+        .update({
+          rank: firestore.FieldValue.increment(-1),
+        })
+        .catch((err) =>
+          console.log(err, 'could not increase filter collection rank')
+        );
     });
-    return batch
-      .commit()
+    return;
+  }
+  if (!noRankChange) {
+    // increment the rank of the filter collection and option
+    await filterCollectionDocRef
+      .update({
+        rank: firestore.FieldValue.increment(1),
+      })
       .catch((err) =>
-        console.log(
-          'unable to decrement or delete filter option and filter collection.'
-        )
+        console.log(err, 'could not increase filter collection rank')
       );
+    await filterOptionDocRef
+      .update({rank: firestore.FieldValue.increment(1)})
+      .catch((err) =>
+        console.log(err, 'could not increase filter option rank')
+      );
+    return;
   }
-
-  if (!fetchedFilterOptionDoc.exists) {
-    const setFilterOption = await filterOptionDocRef
-      .set(filterOption, {merge: true})
-      .then(() => true)
-      .catch((err) => {
-        console.error('unable to set new filter option', err);
-        return false;
-      });
-    if (!setFilterOption) return;
-  }
-  // increment the rank of the filter collection and option
-  const batch = db.batch();
-  batch.update(filterCollectionDocRef, {
-    rank: firestore.FieldValue.increment(1),
-  });
-  batch.update(filterOptionDocRef, {rank: firestore.FieldValue.increment(1)});
-  return batch
-    .commit()
-    .catch((err) =>
-      console.error('could not update rank of collection and doc', err)
-    );
 }
-
-export async function updateRefOnFilterCollection(
-  filterOptionRef: firestore.DocumentReference<firestore.DocumentData>,
-  newFilterOption: FilterOption
-) {
-  return filterOptionRef
-    .set(newFilterOption, {merge: true})
-    .catch((err) => console.error('unable to set new filter option', err));
-}
-
 // This also triggers the user to be added to the topic with the same rank
 export const linkPostTopicsToAuthor = functions.firestore
   .document(`posts/{postID}`)
@@ -558,9 +615,6 @@ export interface Post {
   publication?: PublicationRef;
   // filterable arrays must be array of strings
   filterTopicIDs: string[];
-  bookmarkedCount: number;
-  recommendedCount: number;
-  unixTimeStamp: number;
 }
 
 export interface PostContent {

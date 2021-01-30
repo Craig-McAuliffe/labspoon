@@ -1,8 +1,6 @@
 import * as functions from 'firebase-functions';
 import algoliasearch, {SearchClient} from 'algoliasearch';
 import {config, environment, ResourceTypes} from './config';
-import {toUserRef} from './users';
-import {Group, groupToGroupRef} from './groups';
 
 const algoliaConfig = config.algolia;
 
@@ -22,9 +20,7 @@ if (algoliaConfig) {
 function configureSearchIndex(
   res: functions.Response<any>,
   indexName: string,
-  searchableAttributes: Array<string>,
-  filterableAttributes?: Array<string>,
-  customRanking?: Array<string>
+  searchableAttributes: Array<string>
 ): void | Promise<void> {
   if (!algoliaClient) {
     res.json({error: 'No algolia client available'});
@@ -32,22 +28,19 @@ function configureSearchIndex(
   }
   const index = algoliaClient.initIndex(indexName);
   index
-    .setSettings({
-      searchableAttributes: searchableAttributes,
-      attributesForFaceting: filterableAttributes,
-      customRanking: customRanking,
-    })
+    .setSettings({searchableAttributes: searchableAttributes})
     .then(() => res.json({result: `Configured ${indexName} search index`}))
     .catch((err: Error) => res.json(err));
 }
 
 function addToIndex(
   id: string,
-  data: any,
+  change: functions.firestore.QueryDocumentSnapshot,
   resourceType: string,
   indexName: string
 ): boolean {
   if (!algoliaClient) return true;
+  const data = change.data();
   data.objectID = id;
   data.resourceType = resourceType;
   const index = algoliaClient.initIndex(indexName);
@@ -62,109 +55,43 @@ export const configureUserSearchIndex = functions.https.onRequest(
 
 export const addUserToSearchIndex = functions.firestore
   .document(`users/{userID}`)
-  .onCreate((change, context): boolean => {
-    const user = toUserRef(context.params.userID, change.data());
-    return addToIndex(
-      context.params.userID,
-      user,
-      ResourceTypes.USER,
-      USERS_INDEX
-    );
-  });
-
-export const updateUserToSearchIndex = functions.firestore
-  .document(`users/{userID}`)
-  .onUpdate((change, context): boolean => {
-    const newUserData = change.after.data();
-    const oldUserData = change.before.data();
-    const userID = context.params.userID;
-    if (
-      JSON.stringify(toUserRef(userID, newUserData)) ===
-      JSON.stringify(toUserRef(userID, oldUserData))
-    )
-      return false;
-    return addToIndex(userID, newUserData, ResourceTypes.USER, USERS_INDEX);
-  });
+  .onCreate((change, context): boolean =>
+    addToIndex(context.params.userID, change, ResourceTypes.USER, USERS_INDEX)
+  );
 
 export const configureGroupSearchIndex = functions.https.onRequest((_, res) =>
   configureSearchIndex(res, GROUPS_INDEX, [
-    'unordered(name)',
-    'unordered(about)',
-    'unordered(institution)',
-    'unordered(location)',
+    'name',
+    'about',
+    'institution',
+    'location',
   ])
 );
 
 export const addGroupToSearchIndex = functions.firestore
   .document(`groups/{groupID}`)
-  .onCreate((change, context): boolean => {
-    const group = change.data() as Group;
-    const groupRef = groupToGroupRef(group, context.params.groupID);
-    return addToIndex(
+  .onCreate((change, context): boolean =>
+    addToIndex(
       context.params.groupID,
-      groupRef,
+      change,
       ResourceTypes.GROUP,
       GROUPS_INDEX
-    );
-  });
-
-export const updateGroupToSearchIndex = functions.firestore
-  .document(`groups/{groupID}`)
-  .onUpdate((change, context): boolean => {
-    const newGroupData = change.after.data() as Group;
-    const oldGroupData = change.before.data() as Group;
-    const groupID = context.params.groupID;
-    if (
-      JSON.stringify(groupToGroupRef(newGroupData, groupID)) ===
-      JSON.stringify(groupToGroupRef(oldGroupData, groupID))
     )
-      return false;
-    const groupRef = groupToGroupRef(newGroupData, groupID);
-    return addToIndex(groupID, groupRef, ResourceTypes.GROUP, GROUPS_INDEX);
-  });
+  );
 
 export const configurePostSearchIndex = functions.https.onRequest((_, res) =>
-  configureSearchIndex(
-    res,
-    POSTS_INDEX,
-    ['unordered(content.text)', 'unordered(topics)', 'author.name'],
-    ['postType'],
-    ['desc(recommendedCount)', 'desc(unixTimeStamp)', 'desc(bookmarkedCount)']
-  )
+  configureSearchIndex(res, POSTS_INDEX, ['title', 'content'])
 );
 
 export const addPostToSearchIndex = functions.firestore
   .document(`posts/{postID}`)
-  .onCreate((change, context): boolean => {
-    const post = change.data();
-    post.postType = post.postType.id;
-    return addToIndex(
-      context.params.postID,
-      post,
-      ResourceTypes.POST,
-      POSTS_INDEX
-    );
-  });
-
-export const updatePostToSearchIndex = functions.firestore
-  .document(`posts/{postID}`)
-  .onUpdate((change, context): boolean => {
-    const post = change.after.data();
-    post.postType = post.postType.id;
-    return addToIndex(
-      context.params.postID,
-      post,
-      ResourceTypes.POST,
-      POSTS_INDEX
-    );
-  });
+  .onCreate((change, context): boolean =>
+    addToIndex(context.params.postID, change, ResourceTypes.POST, POSTS_INDEX)
+  );
 
 export const configurePublicationSearchIndex = functions.https.onRequest(
   (_, res) =>
-    configureSearchIndex(res, PUBLICATIONS_INDEX, [
-      'unordered(title)',
-      'unordered(topics)',
-    ])
+    configureSearchIndex(res, PUBLICATIONS_INDEX, ['title', 'content'])
 );
 
 export const addPublicationToSearchIndex = functions.firestore
@@ -172,7 +99,7 @@ export const addPublicationToSearchIndex = functions.firestore
   .onCreate((change, context): boolean =>
     addToIndex(
       context.params.publicationID,
-      change.data(),
+      change,
       ResourceTypes.PUBLICATION,
       PUBLICATIONS_INDEX
     )
@@ -183,7 +110,7 @@ export const updatePublicationToSearchIndex = functions.firestore
   .onUpdate((change, context): boolean =>
     addToIndex(
       context.params.publicationID,
-      change.after.data(),
+      change.after,
       ResourceTypes.PUBLICATION,
       PUBLICATIONS_INDEX
     )
@@ -198,7 +125,7 @@ export const addTopicToSearchIndex = functions.firestore
   .onCreate((change, context): boolean =>
     addToIndex(
       context.params.topicID,
-      change.data(),
+      change,
       ResourceTypes.TOPIC,
       TOPICS_INDEX
     )
