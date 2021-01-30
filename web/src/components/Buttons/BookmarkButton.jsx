@@ -5,11 +5,14 @@ import {
   BookmarkIconUnselected,
   BookmarkIconSelected,
 } from '../../assets/PostActionIcons';
-
 import {SignUpPopoverOverride} from '../Popovers/Popover';
-import {BOOKMARK} from '../../helpers/resourceTypeDefinitions';
+import {
+  BOOKMARK,
+  resourceTypeToCollection,
+} from '../../helpers/resourceTypeDefinitions';
 import NegativeButton from './NegativeButton';
 import {LoadingSpinnerPage} from '../LoadingSpinner/LoadingSpinner';
+import {firestore} from 'firebase';
 import './Buttons.css';
 
 function BookmarkButton({
@@ -35,6 +38,11 @@ function BookmarkButton({
       return;
     }
     const userBookmarkCollection = db.collection(`users/${user.uid}/bookmarks`);
+    const bookmarkedResourceDoc = db.doc(
+      `${resourceTypeToCollection(
+        bookmarkedResourceType
+      )}/${bookmarkedResourceID}`
+    );
     if (isBookmarked === false) {
       const batch = db.batch();
       batch.set(userBookmarkCollection.doc(bookmarkedResourceID), {
@@ -45,6 +53,9 @@ function BookmarkButton({
       });
       batch.set(bookmarkedByCollection.doc(user.uid), {
         userID: user.uid,
+      });
+      batch.update(bookmarkedResourceDoc, {
+        bookmarkedCount: firestore.FieldValue.increment(1),
       });
       batch
         .commit()
@@ -61,6 +72,7 @@ function BookmarkButton({
         userBookmarkCollection,
         bookmarkedResourceID,
         bookmarkedByCollection,
+        bookmarkedResourceDoc,
         user.uid,
         setSubmitting,
         setIsBookmarked
@@ -91,6 +103,13 @@ function BookmarkButton({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookmarkedResourceID, user]);
 
+  if (
+    !bookmarkedResource ||
+    !bookmarkedResourceType ||
+    !bookmarkedResourceID ||
+    !bookmarkedByCollection
+  )
+    return null;
   if (!user)
     return (
       <SignUpPopoverOverride
@@ -129,6 +148,7 @@ export async function removeBookmark(
   userBookmarkCollection,
   bookmarkedResourceID,
   bookmarkedByCollection,
+  bookmarkedResourceDoc,
   userID,
   setSubmitting,
   setIsBookmarked
@@ -136,6 +156,9 @@ export async function removeBookmark(
   const batch = db.batch();
   batch.delete(userBookmarkCollection.doc(bookmarkedResourceID));
   batch.delete(bookmarkedByCollection.doc(userID));
+  batch.update(bookmarkedResourceDoc, {
+    bookmarkedCount: firestore.FieldValue.increment(-1),
+  });
   return batch
     .commit()
     .then(() => {
@@ -152,6 +175,7 @@ export function RemoveBookmarkFromPage({postID, bookmarkedByCollection}) {
   const {user} = useContext(AuthContext);
   const [submitting, setSubmitting] = useState(false);
   const userBookmarkCollection = db.collection(`users/${user.uid}/bookmarks`);
+  const bookmarkedResourceDoc = db.doc(`posts/${postID}`);
   if (!user) return <LoadingSpinnerPage />;
 
   return (
@@ -163,6 +187,7 @@ export function RemoveBookmarkFromPage({postID, bookmarkedByCollection}) {
             userBookmarkCollection,
             postID,
             bookmarkedByCollection,
+            bookmarkedResourceDoc,
             user.uid,
             setSubmitting
           );

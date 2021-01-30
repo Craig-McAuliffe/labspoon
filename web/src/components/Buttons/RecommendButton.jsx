@@ -5,9 +5,13 @@ import {
 } from '../../assets/PostActionIcons';
 import {AuthContext} from '../../App';
 import {db} from '../../firebase';
-import {RECOMMENDATION} from '../../helpers/resourceTypeDefinitions';
+import {
+  RECOMMENDATION,
+  resourceTypeToCollection,
+} from '../../helpers/resourceTypeDefinitions';
 import {SignUpPopoverOverride} from '../Popovers/Popover';
 import {userToUserRef} from '../../helpers/users';
+import {firestore} from 'firebase';
 import './Buttons.css';
 
 const RecommendButton = ({
@@ -34,6 +38,11 @@ const RecommendButton = ({
     const userRecommendationsCollection = db.collection(
       `users/${user.uid}/recommendations`
     );
+    const recommendedResourceDoc = db.doc(
+      `${resourceTypeToCollection(
+        recommendedResourceType
+      )}/${recommendedResourceID}`
+    );
     if (isRecommended === false) {
       const batch = db.batch();
       batch.set(userRecommendationsCollection.doc(recommendedResourceID), {
@@ -46,6 +55,9 @@ const RecommendButton = ({
         recommendedByCollection.doc(user.uid),
         userToUserRef(userProfile, user.uid)
       );
+      batch.update(recommendedResourceDoc, {
+        recommendedCount: firestore.FieldValue.increment(1),
+      });
       batch
         .commit()
         .then(() => {
@@ -54,13 +66,14 @@ const RecommendButton = ({
         })
         .catch((err) => {
           setSubmitting(false);
-          console.log(err);
+          console.error(err);
         });
     } else {
       await removeRecommendation(
         userRecommendationsCollection,
         recommendedResourceID,
         recommendedByCollection,
+        recommendedResourceDoc,
         user.uid,
         setSubmitting,
         setIsRecommended
@@ -87,10 +100,17 @@ const RecommendButton = ({
         }
         setLoading(false);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.error(err));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recommendedResourceID, user]);
 
+  if (
+    !recommendedResource ||
+    !recommendedResourceType ||
+    !recommendedResourceID ||
+    !recommendedByCollection
+  )
+    return null;
   if (!user)
     return (
       <SignUpPopoverOverride
@@ -129,6 +149,7 @@ export async function removeRecommendation(
   userRecommendationsCollection,
   recommendedResourceID,
   recommendedByCollection,
+  recommendedResourceDoc,
   userID,
   setSubmitting,
   setIsRecommended
@@ -136,6 +157,9 @@ export async function removeRecommendation(
   const batch = db.batch();
   batch.delete(userRecommendationsCollection.doc(recommendedResourceID));
   batch.delete(recommendedByCollection.doc(userID));
+  batch.update(recommendedResourceDoc, {
+    recommendedCount: firestore.FieldValue.increment(-1),
+  });
   return batch
     .commit()
     .then(() => {
@@ -143,7 +167,7 @@ export async function removeRecommendation(
       if (setSubmitting) setSubmitting(false);
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       if (setSubmitting) setSubmitting(false);
     });
 }
