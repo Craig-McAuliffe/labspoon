@@ -1,7 +1,11 @@
 import * as functions from 'firebase-functions';
 import {admin, ResourceTypes} from './config';
 import {firestore} from 'firebase-admin';
-import {updateFilterCollection, Post} from './posts';
+import {
+  updateFilterCollection,
+  Post,
+  addRecentPostsToFollowingFeed,
+} from './posts';
 import {Topic, removeTopicsFromResource, addTopicsToResource} from './topics';
 import {Publication} from './publications';
 import {OpenPosition} from './openPositions';
@@ -61,12 +65,12 @@ export const createGroupDocuments = functions.firestore
   });
 
 export const addGroupMembersToPostFilter = functions.firestore
-  .document(`groups/{groupID}/posts/{postID}`)
+  .document('groups/{groupID}/posts/{postID}')
   .onCreate(async (change, context) => {
     const groupID = context.params.groupID;
     const post = change.data() as Post;
     const groupPostsFeedRef = db.doc(`groups/${groupID}/feeds/postsFeed`);
-    updateFilterCollection(
+    return await updateFilterCollection(
       groupPostsFeedRef,
       {resourceName: 'Author', resourceType: ResourceTypes.USER},
       {
@@ -83,12 +87,12 @@ export const addGroupMembersToPostFilter = functions.firestore
   });
 
 export const removeGroupMembersFromPostFilter = functions.firestore
-  .document(`groups/{groupID}/posts/{postID}`)
+  .document('groups/{groupID}/posts/{postID}')
   .onDelete(async (change, context) => {
     const groupID = context.params.groupID;
     const post = change.data() as Post;
     const groupPostsFeedRef = db.doc(`groups/${groupID}/feeds/postsFeed`);
-    updateFilterCollection(
+    return await updateFilterCollection(
       groupPostsFeedRef,
       {resourceName: 'Author', resourceType: ResourceTypes.USER},
       {
@@ -105,7 +109,7 @@ export const removeGroupMembersFromPostFilter = functions.firestore
   });
 
 export const addNewMemberToPublicationFilter = functions.firestore
-  .document(`groups/{groupID}/members/{memberID}`)
+  .document('groups/{groupID}/members/{memberID}')
   .onCreate(async (change, context) => {
     const groupID = context.params.groupID;
     const memberID = context.params.memberID;
@@ -191,7 +195,7 @@ export const addNewMemberToPublicationFilter = functions.firestore
   });
 
 export const addGroupMembersToPublicationFilter = functions.firestore
-  .document(`groups/{groupID}/publications/{publicationID}`)
+  .document('groups/{groupID}/publications/{publicationID}')
   .onCreate(async (change, context) => {
     const groupID = context.params.groupID;
     const publication = change.data() as Publication;
@@ -204,9 +208,9 @@ export const addGroupMembersToPublicationFilter = functions.firestore
       return db
         .doc(`users/${authorID}/groups/${groupID}`)
         .get()
-        .then((userGroupsDS) => {
+        .then(async (userGroupsDS) => {
           if (!userGroupsDS.exists) return;
-          updateFilterCollection(
+          return updateFilterCollection(
             groupPublicationsFeedRef,
             {resourceName: 'Author', resourceType: ResourceTypes.USER},
             {
@@ -223,11 +227,11 @@ export const addGroupMembersToPublicationFilter = functions.firestore
           )
         );
     });
-    await Promise.all(updateFilterPromises);
+    return Promise.all(updateFilterPromises);
   });
 
 export const removeGroupMembersFromPublicationFilter = functions.firestore
-  .document(`groups/{groupID}/publications/{publicationID}`)
+  .document('groups/{groupID}/publications/{publicationID}')
   .onDelete(async (change, context) => {
     const groupID = context.params.groupID;
     const publication = change.data() as Publication;
@@ -236,7 +240,7 @@ export const removeGroupMembersFromPublicationFilter = functions.firestore
     );
     const updateFilterPromises = publication.authors!.map((author) => {
       if (!author.id) return;
-      updateFilterCollection(
+      return updateFilterCollection(
         groupPublicationsFeedRef,
         {resourceName: 'Author', resourceType: ResourceTypes.USER},
         {
@@ -251,7 +255,7 @@ export const removeGroupMembersFromPublicationFilter = functions.firestore
         )
       );
     });
-    await Promise.all(updateFilterPromises);
+    return Promise.all(updateFilterPromises);
   });
 
 export const addGroupToRelatedTopicPage = functions.firestore
@@ -259,7 +263,7 @@ export const addGroupToRelatedTopicPage = functions.firestore
   .onCreate(async (change, context) => {
     const topicID = context.params.topicID;
     const groupID = context.params.groupID;
-    setGroupOnTopic(groupID, topicID);
+    await setGroupOnTopic(groupID, topicID);
   });
 
 export const removeGroupOnRelatedTopicPage = functions.firestore
@@ -287,7 +291,7 @@ export async function setGroupOnTopic(
   rank?: number
 ) {
   const groupInTopicDocRef = db.doc(`topics/${topicID}/groups/${groupID}`);
-  await db
+  return db
     .doc(`groups/${groupID}`)
     .get()
     .then((ds) => {
@@ -295,7 +299,7 @@ export async function setGroupOnTopic(
       const group = ds.data() as Group;
       const groupRef = groupToGroupRef(group, groupID);
       groupRef.rank = rank ? rank : 1;
-      groupInTopicDocRef
+      return groupInTopicDocRef
         .set(groupRef)
         .catch((err) =>
           console.error(
@@ -318,28 +322,17 @@ export async function setGroupOnTopic(
     );
 }
 
-export const updateGroupTopicRankOnTopic = functions.firestore
+export const updateGroupRankOnTopic = functions.firestore
   .document('groups/{groupID}/topics/{topicID}')
   .onUpdate(async (change, context) => {
     const topic = change.after.data() as Topic;
     const topicID = context.params.topicID;
     const groupID = context.params.groupID;
-    db.doc(`topics/${topicID}/groups/${groupID}`)
+    const topicUpdatePromise = await db
+      .doc(`topics/${topicID}/groups/${groupID}`)
       .update({rank: topic.rank})
+      .then(() => true)
       .catch((err) => {
-        db.doc(`topics/${topicID}/groups/${groupID}`)
-          .get()
-          .then((ds) => {
-            if (!ds.exists) setGroupOnTopic(groupID, topicID, topic.rank);
-          })
-          .catch(() =>
-            console.error(
-              'unable to check whether group with id ' +
-                groupID +
-                ' exists on topic with id ' +
-                topicID
-            )
-          );
         console.error(
           'unable to update rank on group with id ' +
             groupID +
@@ -347,7 +340,23 @@ export const updateGroupTopicRankOnTopic = functions.firestore
             topicID,
           err
         );
+        return false;
       });
+    if (topicUpdatePromise) return;
+    return await db
+      .doc(`topics/${topicID}/groups/${groupID}`)
+      .get()
+      .then(async (ds) => {
+        if (!ds.exists) await setGroupOnTopic(groupID, topicID, topic.rank);
+      })
+      .catch(() =>
+        console.error(
+          'unable to check whether group with id ' +
+            groupID +
+            ' exists on topic with id ' +
+            topicID
+        )
+      );
   });
 
 export const updateGroupRefOnTopics = functions.firestore
@@ -723,21 +732,6 @@ export const removeGroupFromUserGroups = functions.firestore
       });
   });
 
-// Adds group types to existing groups. Can be removed when issue #608 is
-// promoted into all environments and this function has been run.
-export const addGroupTypeToExistingGroups = functions.https.onCall(async () => {
-  const groupCollectionRef = await db.collection('groups').get();
-  const updatePromises: Promise<void | firestore.WriteResult>[] = [];
-  groupCollectionRef.forEach((doc) => {
-    const groupRef = doc.ref;
-    const updatePromise = groupRef
-      .update({groupType: 'researchGroup'})
-      .catch((err) => console.error(err));
-    updatePromises.push(updatePromise);
-  });
-  await Promise.all(updatePromises);
-});
-
 export function toGroupRef(groupID: string, group: any) {
   const groupRef: GroupRef = {
     id: groupID,
@@ -912,6 +906,82 @@ export function groupToGroupRef(group: Group, groupID: string) {
   return groupRef;
 }
 
+export const addRecentPostsToFeedOnNewGroupFollow = functions.firestore
+  .document('groups/{followedGroupID}/followedByUsers/{followerID}')
+  .onCreate(
+    async (_, context): Promise<void[]> => {
+      const followerID = context.params.followerID;
+      const followedGroupID = context.params.followedGroupID;
+      return await addRecentPostsToFollowingFeed(
+        followerID,
+        db.collection(`groups/${followedGroupID}/posts`)
+      );
+    }
+  );
+
+export const addGroupPostToFollowersFeeds = functions.firestore
+  .document('groups/{groupID}/posts/{postID}')
+  .onCreate(async (change, context) => {
+    const groupID = context.params.groupID;
+    const postID = context.params.postID;
+    const post = change.data() as Post;
+    const groupFollowersCollectionRef = db.collection(
+      `groups/${groupID}/followedByUsers`
+    );
+    const groupFollowersQS = await groupFollowersCollectionRef
+      .get()
+      .catch((err) =>
+        console.log(
+          err,
+          'could not fetch followers of group with id ' + groupID
+        )
+      );
+    if (!groupFollowersQS || groupFollowersQS.empty) return;
+
+    const groupFollowersIDs: string[] = [];
+    groupFollowersQS.forEach((ds) => {
+      groupFollowersIDs.push(ds.id);
+    });
+
+    const groupFollowersPromisesArray = groupFollowersIDs.map(
+      async (groupFollowerID) => {
+        const userPostsDocRef = db.doc(
+          `users/${groupFollowerID}/feeds/followingFeed/posts/${postID}`
+        );
+        const existingPost = await userPostsDocRef
+          .get()
+          .catch((err) =>
+            console.error(
+              'unable to check if post with id ' +
+                postID +
+                ' already exists on following feed of user with id ' +
+                groupFollowerID,
+              err
+            )
+          );
+        if (existingPost && existingPost.data()) return;
+        const batch = db.batch();
+        batch.set(userPostsDocRef, post);
+        batch.set(
+          db.doc(`posts/${postID}/onFollowingFeedsOfUsers/${groupFollowerID}`),
+          {id: groupFollowerID}
+        );
+        return batch
+          .commit()
+          .catch((err) =>
+            console.log(
+              err,
+              'failed to add post from group with id ' +
+                groupID +
+                ' to user following feed with id ' +
+                groupFollowerID
+            )
+          );
+      }
+    );
+    return Promise.all(groupFollowersPromisesArray);
+  });
+
 interface VerifiedGroup {
   timestamp: Date;
 }
@@ -926,7 +996,7 @@ export interface GroupRef {
   rank?: number;
 }
 
-interface Group {
+export interface Group {
   id: string;
   name: string;
   groupType: string;

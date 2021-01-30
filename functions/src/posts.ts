@@ -422,7 +422,7 @@ export async function updateFilterCollection(
   filterCollection: FilterCollection,
   filterOption: FilterOption,
   removedResource?: boolean
-) {
+): Promise<void> {
   const filterCollectionDocRef = feedRef
     .collection('filterCollections')
     .doc(filterCollection.resourceType);
@@ -466,6 +466,7 @@ export async function updateFilterCollection(
     });
     return batch
       .commit()
+      .then(() => {})
       .catch((err) =>
         console.log(
           'unable to decrement or delete filter option and filter collection.',
@@ -492,6 +493,7 @@ export async function updateFilterCollection(
   batch.update(filterOptionDocRef, {rank: firestore.FieldValue.increment(1)});
   return batch
     .commit()
+    .then(() => {})
     .catch((err) =>
       console.error('could not update rank of collection and doc', err)
     );
