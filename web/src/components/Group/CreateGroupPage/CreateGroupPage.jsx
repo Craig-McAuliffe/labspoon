@@ -23,7 +23,7 @@ export default function CreateGroupPage({
   useEffect(() => {
     if (error) {
       alert(
-        'Something went wrong while creating the group. Please try again. If the problem persists, please email help@labspoon.com'
+        'Something went wrong while creating the group. Please try again. If the problem persists, please contact us through the contact page.'
       );
       setSelectedUsers([userProfile]);
       setError(false);

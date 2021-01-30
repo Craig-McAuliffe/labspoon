@@ -24,7 +24,7 @@ export default function EditingGroupInfo({groupData, children}) {
   useEffect(() => {
     if (error) {
       alert(
-        'Something went wrong while editing the group. Please try again. If the problem persists, please email help@labspoon.com'
+        'Something went wrong while editing the group. Please try again. If the problem persists, please let us know on the contact page.'
       );
       setSelectedUsers(groupMembers);
       setError(false);
