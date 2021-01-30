@@ -21,7 +21,7 @@
     "jshint": "^2.11.2",
     "linkifyjs": "^2.1.9",
     "prop-types": "^15.7.2",
-    "react": "^16.14.0",
+    "react": "^17.0.1",
     "react-bootstrap": "^1.4.3",
     "react-dom": "^16.13.1",
     "react-google-button": "^0.7.1",
