@@ -28,7 +28,7 @@
     "react-infinite-scroll-component": "^5.1.0",
     "react-instantsearch-dom": "^6.8.3",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "3.4.1",
+    "react-scripts": "^3.4.1",
     "react-sizes": "^2.0.0",
     "slate": "^0.59.0",
     "slate-history": "^0.59.0",
