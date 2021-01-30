@@ -59,7 +59,7 @@
     ]
   },
   "devDependencies": {
-    "css-loader": "^4.3.0",
+    "css-loader": "^5.0.1",
     "eslint": "^6.6.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^7.2.0",
