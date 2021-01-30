@@ -15,6 +15,7 @@ import {
 } from './publications';
 import {admin} from './config';
 import {firestore} from 'firebase-admin';
+import {addRecentPostsToFollowingFeed, Post} from './posts';
 
 const db = admin.firestore();
 
@@ -150,6 +151,80 @@ export async function createTopicFromMSField(
       )
     );
 }
+
+export const addRecentPostsToFeedOnNewTopicFollow = functions.firestore
+  .document(`topics/{followedTopicID}/followedByUsers/{followerID}`)
+  .onCreate(
+    async (_, context): Promise<firestore.WriteResult[][]> => {
+      const followerID = context.params.followerID;
+      const followedTopicID = context.params.followedTopicID;
+      try {
+        return addRecentPostsToFollowingFeed(
+          followerID,
+          db.collection(`topics/${followedTopicID}/posts`)
+        );
+      } catch (err) {
+        console.error(
+          `Error while adding recent posts to the following feed 
+        of user ${followerID} who has just started following topic ${followedTopicID}`,
+          err
+        );
+      }
+      return new Promise(() => []);
+    }
+  );
+
+export const addTopicPostToFollowersFeeds = functions.firestore
+  .document(`topics/{topicID}/posts/{postID}`)
+  .onCreate(async (change, context) => {
+    const topicID = context.params.topicID;
+    const postID = context.params.postID;
+    const post = change.data() as Post;
+    const topicFollowersCollectionRef = db.collection(
+      `topics/${topicID}/followedByUsers`
+    );
+
+    const updateFollowersOfTopic = async () => {
+      return topicFollowersCollectionRef
+        .get()
+        .then((qs) => {
+          if (qs.empty) return;
+          const topicFollowersIDs: string[] = [];
+          qs.forEach((doc) => {
+            topicFollowersIDs.push(doc.id);
+          });
+          const topicFollowersPromisesArray = topicFollowersIDs.map(
+            async (topicFollowerID) => {
+              const userPostsDocRef = db.doc(
+                `users/${topicFollowerID}/feeds/followingFeed/posts/${postID}`
+              );
+              const batch = db.batch();
+              batch.set(userPostsDocRef, post);
+              batch.set(
+                db.doc(
+                  `posts/${postID}/onFollowingFeedsOfUsers/${topicFollowerID}`
+                ),
+                {id: topicFollowerID}
+              );
+              return batch
+                .commit()
+                .catch((err) =>
+                  console.log(
+                    'failed to add posts from topic with id ' +
+                      topicID +
+                      ' to following feed of user with id ' +
+                      topicFollowerID,
+                    err
+                  )
+                );
+            }
+          );
+          return Promise.all(topicFollowersPromisesArray);
+        })
+        .catch((err) => console.log(err, 'could not fetch followers of topic'));
+    };
+    return updateFollowersOfTopic();
+  });
 
 export async function handleTopicsNoID(
   taggedTopicsNoIDs: Topic[],

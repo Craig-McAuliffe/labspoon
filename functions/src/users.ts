@@ -1,6 +1,6 @@
 import {firestore} from 'firebase-admin';
 import * as functions from 'firebase-functions';
-import {admin, environment, ResourceTypes} from './config';
+import {admin, environment} from './config';
 import {GroupRef} from './groups';
 import {
   interpretQuery,
@@ -11,7 +11,12 @@ import {
   MAKAuthor,
 } from './microsoft';
 import {OpenPosition} from './openPositions';
-import {Post, updateFilterCollection} from './posts';
+import {
+  Post,
+  updateRefOnFilterCollection,
+  updateFiltersWithNewPost,
+  addRecentPostsToFollowingFeed,
+} from './posts';
 import {
   publishAddPublicationRequests,
   allPublicationFields,
@@ -130,9 +135,7 @@ export const addUserToRelatedTopic = functions.firestore
   .onCreate(async (change, context) => {
     const userID = context.params.userID;
     const topicID = context.params.topicID;
-    setUserOnTopic(topicID, userID).catch((err) =>
-      console.log(err, 'could not add user to topic')
-    );
+    return Promise.resolve(setUserOnTopic(topicID, userID));
   });
 
 export const addOpenPositionTopicsToUser = functions.firestore
@@ -171,15 +174,47 @@ export const addTechniqueTopicsToUser = functions.firestore
     return null;
   });
 
+export const addRecentPostsToFeedOnNewUserFollow = functions.firestore
+  .document(`users/{followedUserID}/followedByUsers/{followerID}`)
+  .onCreate(
+    async (_, context): Promise<firestore.WriteResult[][]> => {
+      const followerID = context.params.followerID;
+      const followedUserID = context.params.followedUserID;
+
+      try {
+        return addRecentPostsToFollowingFeed(
+          followerID,
+          db.collection(`users/${followedUserID}/posts`)
+        );
+      } catch (err) {
+        console.error(
+          `Error while adding recent posts to the following feed of user ${followerID} who has just started following user ${followedUserID}`,
+          err
+        );
+      }
+      return new Promise(() => []);
+    }
+  );
+
 export const updateUserTopicRankOnTopic = functions.firestore
   .document('users/{userID}/topics/{topicID}')
   .onUpdate(async (change, context) => {
     const topicID = context.params.topicID;
     const userID = context.params.userID;
     const topic = change.after.data() as Topic;
-    setUserOnTopic(topicID, userID, topic.rank).catch((err) =>
-      console.log(err, 'could not update user rank on topic')
-    );
+    return db
+      .doc(`topics/${topicID}/users/${userID}`)
+      .update({rank: topic.rank})
+      .catch((err) => {
+        console.error(
+          'unable to update rank of user with id ' +
+            userID +
+            ' on topic with id' +
+            topicID,
+          err
+        );
+        return Promise.resolve(setUserOnTopic(topicID, userID, topic.rank));
+      });
   });
 
 export async function setUserOnTopic(
@@ -188,7 +223,7 @@ export async function setUserOnTopic(
   rank?: number
 ) {
   const userInTopicDocRef = db.doc(`topics/${topicID}/users/${userID}`);
-  await db
+  return db
     .doc(`users/${userID}`)
     .get()
     .then((ds) => {
@@ -196,7 +231,7 @@ export async function setUserOnTopic(
       const user = ds.data() as User;
       const userRef = toUserRef(user.id, user);
       userRef.rank = rank ? rank : 1;
-      userInTopicDocRef
+      return userInTopicDocRef
         .set(userRef)
         .catch((err) =>
           console.log(
@@ -658,6 +693,85 @@ export const updateUserRefOnPost = functions.firestore
     return Promise.all(postsUpdatePromise);
   });
 
+export const addUserPostToFollowersFeeds = functions.firestore
+  .document(`users/{userID/posts/{postID}`)
+  .onCreate(async (change, context) => {
+    const post = change.data() as Post;
+    const postID = context.params.postID;
+    const userID = context.params.userID;
+    const followers = await db
+      .collection(`users/${userID}/followedByUsers`)
+      .get();
+    if (followers.empty) return;
+    const postAddedPromises: Promise<firestore.WriteResult[]>[] = [];
+    followers.forEach(async (followerSnapshot) => {
+      const followerID = followerSnapshot.id;
+      const followingFeedPostRef = db.doc(
+        `users/${followerID}/feeds/followingFeed/posts/${postID}`
+      );
+      const batch = db.batch();
+      batch.set(followingFeedPostRef, post);
+      batch.set(
+        db.doc(`posts/${postID}/onFollowingFeedsOfUsers/${followerID}`),
+        {id: followerID}
+      );
+      postAddedPromises.push(batch.commit());
+    });
+    return Promise.all(postAddedPromises);
+  });
+
+export const updateUserRefOnFollowFeedFilters = functions.firestore
+  .document('users/{userID}')
+  .onUpdate(async (change, context) => {
+    const newUserData = change.after.data() as User;
+    const oldUserData = change.before.data() as User;
+    const userID = context.params.userID;
+    if (newUserData.name === oldUserData.name) return;
+    const folowedByQS = await db
+      .collection(`users/${userID}/followedBy`)
+      .get()
+      .catch((err) =>
+        console.error(
+          'unable to fetch followed by for user with id ' + userID,
+          err
+        )
+      );
+    if (!folowedByQS || folowedByQS.empty) return;
+    const followedByIDs: string[] = [];
+    folowedByQS.forEach((ds) => {
+      const followerID = ds.id;
+      followedByIDs.push(followerID);
+    });
+    const followersUpdatePromise = followedByIDs.map(async (followerID) => {
+      return db
+        .doc(
+          `users/${followerID}/feeds/followingFeed/filterCollections/user/filterOptions/${followerID}`
+        )
+        .update({name: newUserData.name})
+        .catch((err) =>
+          console.error(
+            'unable to update user name on filter of follower with id ' +
+              followerID +
+              ' for user with id ' +
+              userID,
+            err
+          )
+        );
+    });
+    return Promise.all(followersUpdatePromise);
+  });
+
+export const updateFollowFilterOnNewPost = functions.firestore
+  .document('users/{userID}/feeds/followingFeed/posts/{postID}')
+  .onCreate(async (change, context) => {
+    const post = change.data() as Post;
+    const userID = context.params.userID;
+    return updateFiltersWithNewPost(
+      db.doc(`users/${userID}/feeds/followingFeed`),
+      post
+    );
+  });
+
 export const updateUserRefOnPublications = functions.firestore
   .document('users/{userID}')
   .onUpdate(async (change, context) => {
@@ -830,21 +944,15 @@ export const updateGroupMemberPostFilter = functions.firestore
 
     const filterUpdatesPromises = groupsIDsToUpdate.map(
       async (groupIDToUpdate) => {
-        const groupPostFeedRef = db.doc(
-          `groups/${groupIDToUpdate}/feeds/postsFeed`
+        const groupUserFilterRef = db.doc(
+          `groups/${groupIDToUpdate}/feeds/postsFeed/filterCollections/user/filterOptions/${userID}`
         );
         return new Promise((resolve) =>
           resolve(
-            updateFilterCollection(
-              groupPostFeedRef,
-              {resourceName: 'Author', resourceType: ResourceTypes.USER},
-              {
-                name: newUserName,
-                id: userID,
-              },
-              false,
-              true
-            )
+            updateRefOnFilterCollection(groupUserFilterRef, {
+              name: newUserName,
+              id: userID,
+            })
           )
         );
       }
@@ -906,21 +1014,15 @@ export const updateGroupMemberPublicationsFilter = functions.firestore
 
     const filterUpdatesPromises = groupsIDsToUpdate.map(
       async (groupIDToUpdate) => {
-        const groupPublicationFeedRef = db.doc(
-          `groups/${groupIDToUpdate}/feeds/publicationsFeed`
+        const groupUserFilterRef = db.doc(
+          `groups/${groupIDToUpdate}/feeds/publicationsFeed/filterCollections/user/filterOptions/${userID}`
         );
         return new Promise((resolve) =>
           resolve(
-            updateFilterCollection(
-              groupPublicationFeedRef,
-              {resourceName: 'Author', resourceType: ResourceTypes.USER},
-              {
-                name: newUserName,
-                id: userID,
-              },
-              false,
-              true
-            )
+            updateRefOnFilterCollection(groupUserFilterRef, {
+              name: newUserName,
+              id: userID,
+            })
           )
         );
       }
@@ -1164,47 +1266,6 @@ export const removePublicationTopicsToUser = functions.firestore
     return await removeTopicsFromResource(publicationTopics, userID, 'user');
   });
 
-export const addPostsInTopicToFollowingFeeds = functions.firestore
-  .document(`topics/{topicID}/posts/{postID}`)
-  .onCreate(async (change, context) => {
-    const topicID = context.params.topicID;
-    const postID = context.params.postID;
-    const post = change.data() as Post;
-    const topicFollowersCollectionRef = db.collection(
-      `topics/${topicID}/followedByUsers`
-    );
-
-    const updateFollowersOfTopic = async () => {
-      return topicFollowersCollectionRef
-        .get()
-        .then((qs) => {
-          const topicFollowers = [] as UserRef[];
-          qs.forEach((doc) => {
-            topicFollowers.push(doc.data() as UserRef);
-          });
-          const topicFollowersPromisesArray = topicFollowers.map(
-            async (topicFollower) => {
-              const userID = topicFollower.id;
-              const userPostsDocRef = db.doc(
-                `users/${userID}/feeds/followingFeed/posts/${postID}`
-              );
-              return userPostsDocRef
-                .set(post)
-                .catch((err) =>
-                  console.log(
-                    err,
-                    'failed to add posts from topic to user following feed'
-                  )
-                );
-            }
-          );
-          return Promise.all(topicFollowersPromisesArray);
-        })
-        .catch((err) => console.log(err, 'could not fetch followers of topic'));
-    };
-    return updateFollowersOfTopic();
-  });
-
 interface PublicationSuggestion {
   microsoftAcademicIDMatch: string;
   publicationInfo: Publication;
@@ -1216,6 +1277,8 @@ export interface UserRef {
   avatar?: string;
   rank?: number;
   microsoftID?: string;
+  reputation?: number;
+  position?: string;
 }
 
 export function toUserRef(userID: string, user: any) {
@@ -1226,6 +1289,7 @@ export function toUserRef(userID: string, user: any) {
   };
   if (user.rank) userRef.rank = user.rank;
   if (user.microsoftID) userRef.microsoftID = user.microsoftID;
+  if (user.reputation) userRef.reputation = user.reputation;
   return userRef;
 }
 
@@ -1261,12 +1325,14 @@ export interface User {
   checkedCreateOnboardingTip?: boolean;
   microsoftID?: string;
   rank?: number;
+  reputation?: number;
 }
 
 export interface UserFilterRef {
   id: string;
   name: string;
   rank?: number;
+  reputation?: number;
 }
 
 export interface UserPublicationRef {
