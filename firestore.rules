@@ -8,7 +8,7 @@ service cloud.firestore {
         allow read;
         allow create: if request.auth != null && exists(/databases/$(database)/documents/groups/$(groupID)/members/$(request.auth.uid))
         allow update: if request.auth != null && exists(/databases/$(database)/documents/users/$(request.auth.uid)/posts/$(postID))
-        allow delete: if request.auth != null && exists(/databases/$(database)/documents/users/$(request.auth.uid)/posts/$(postID))
+         allow delete: if request.auth != null && exists(/databases/$(database)/documents/groups/$(groupID)/members/$(request.auth.uid))
       }
 
       match /bookmarkedBy/{bookmarkID} {
