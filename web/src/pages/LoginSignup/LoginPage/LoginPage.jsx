@@ -1,6 +1,6 @@
 import React, {useContext, useState} from 'react';
 import firebase from '../../../firebase.js';
-import {Redirect, useHistory, useLocation} from 'react-router';
+import {Link, Redirect, useHistory, useLocation} from 'react-router-dom';
 import {AuthContext} from '../../../App';
 import {Form, Formik} from 'formik';
 import PrimaryButton from '../../../components/Buttons/PrimaryButton';
@@ -12,7 +12,6 @@ import * as Yup from 'yup';
 import GoogleButton from 'react-google-button';
 import GoogleSignIn from '../GoogleSignIn.jsx';
 import {PaddedPageContainer} from '../../../components/Layout/Content.jsx';
-import {Link} from 'react-router-dom';
 
 import './LoginPage.css';
 
