@@ -17,6 +17,7 @@
     "formik": "^2.1.5",
     "immutability-helper": "^3.1.1",
     "instantsearch.css": "^7.4.5",
+    "jquery": "^3.5.1",
     "jshint": "^2.11.2",
     "linkifyjs": "^2.1.9",
     "prop-types": "^15.7.2",
