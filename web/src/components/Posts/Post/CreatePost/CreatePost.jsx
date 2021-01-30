@@ -3,6 +3,7 @@ import {AuthContext} from '../../../../App';
 import DefaultPost from './DefaultPost';
 import PublicationPostForm from './PublicationPostForm';
 import {WriteIcon} from '../../../../assets/GeneralActionIcons';
+import {Redirect} from 'react-router-dom';
 
 import './CreatePost.css';
 
@@ -17,7 +18,7 @@ export default function CreatePost({
   keepExpanded = false,
   redirect = undefined,
 }) {
-  const {user} = useContext(AuthContext);
+  const {user, userProfile} = useContext(AuthContext);
   const [creatingPost, setCreatingPost] = useState(keepExpanded);
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [postSuccess, setPostSuccess] = useState(false);
@@ -46,6 +47,7 @@ export default function CreatePost({
   }
 
   if (!user) return null;
+  if (userProfile && !userProfile.name) return <Redirect to="/userName" />;
   if (creatingPost)
     return (
       <CreatingPostContext.Provider

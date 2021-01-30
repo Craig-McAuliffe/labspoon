@@ -15,9 +15,11 @@ import CreateResearchFocus from '../../components/ResearchFocus/CreateResearchFo
 import './CreatePage.css';
 
 export default function CreatePage() {
-  const {userProfile} = useContext(AuthContext);
+  const {user, userProfile, authLoaded} = useContext(AuthContext);
+  if (!authLoaded) return <LoadingSpinner />;
+  if (!user) return <Redirect to="/signup" />;
+  if (userProfile && !userProfile.name) return <Redirect to="/userName" />;
   const userID = userProfile ? userProfile.id : undefined;
-  if (!userID) return <LoadingSpinner />;
   return (
     <PaddedPageContainer>
       <LightTabContainer>

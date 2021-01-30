@@ -121,7 +121,7 @@ function FilterCollection({
             onClick={() => resetFilterCollection(index)}
             className="filter-collection-reset"
           >
-            Reset
+            Clear
           </button>
         ) : null}
       </div>
