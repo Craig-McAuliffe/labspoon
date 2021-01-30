@@ -25,7 +25,7 @@
     "react-bootstrap": "^1.4.3",
     "react-dom": "^16.13.1",
     "react-google-button": "^0.7.2",
-    "react-infinite-scroll-component": "^5.0.5",
+    "react-infinite-scroll-component": "^5.1.0",
     "react-instantsearch-dom": "^6.8.3",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
