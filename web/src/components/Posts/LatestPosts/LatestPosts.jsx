@@ -1,8 +1,9 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {db} from '../../../firebase';
 import {postsQSToJSPosts} from '../../../helpers/posts';
 import Post from '../Post/Post';
 import LoadingSpinner from '../../LoadingSpinner/LoadingSpinner';
+import {AuthContext} from '../../../App';
 
 import './LatestPosts.css';
 
@@ -11,8 +12,10 @@ import './LatestPosts.css';
 export default function LatestPosts() {
   const [posts, setPosts] = useState();
   const [loading, setLoading] = useState(true);
+  const {authLoaded} = useContext(AuthContext);
 
   useEffect(() => {
+    if (!authLoaded) return;
     db.collection('posts')
       .orderBy('timestamp', 'desc')
       .limit(10)
@@ -22,10 +25,10 @@ export default function LatestPosts() {
         setLoading(false);
       })
       .catch((err) => alert(err));
-  });
+  }, [authLoaded]);
 
+  if (!authLoaded) return null;
   if (!posts) return <></>;
-
   const postsList = posts.map((post) => <Post post={post} key={post.id} />);
   return (
     <div className="suggested-posts-container">
