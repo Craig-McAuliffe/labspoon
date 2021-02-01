@@ -75,16 +75,11 @@ export const createPost = functions.https.onCall(async (data, context) => {
   });
 });
 
-export const writePostToAuthorPosts = functions.firestore
+export const addPostToAuthorPosts = functions.firestore
   .document(`posts/{postID}`)
-  .onWrite(async (change, context) => {
-    if (
-      context.eventType ===
-      'providers/google.firebase.database/eventTypes/ref.delete'
-    )
-      return null;
-    const post = change.after.data() as Post;
-    const postID = change.after.id;
+  .onCreate(async (change, context) => {
+    const post = change.data() as Post;
+    const postID = change.id;
     const authorID = post.author.id;
     await db
       .collection('users')
@@ -95,11 +90,40 @@ export const writePostToAuthorPosts = functions.firestore
     return null;
   });
 
+export const updatePostOnAuthors = functions.firestore
+  .document(`posts/{postID}`)
+  .onUpdate(async (change, context) => {
+    const newPostData = change.after.data() as Post;
+    const oldPostData = change.before.data() as Post;
+    const postID = change.after.id;
+    const authorID = newPostData.author.id;
+    if (
+      JSON.stringify(PostToPostRef(newPostData)) ===
+      JSON.stringify(PostToPostRef(oldPostData))
+    )
+      return;
+
+    await db
+      .collection('users')
+      .doc(authorID)
+      .collection('posts')
+      .doc(postID)
+      .set(newPostData);
+    return null;
+  });
+
 export const updatePostOnGroups = functions.firestore
   .document('posts/{postID}')
   .onUpdate(async (change, context) => {
     const newPostData = change.after.data() as Post;
+    const oldPostData = change.before.data() as Post;
     const postID = context.params.postID;
+    if (
+      JSON.stringify(PostToPostRef(newPostData)) ===
+      JSON.stringify(PostToPostRef(oldPostData))
+    )
+      return;
+
     const groupsQS = await db
       .collection(`posts/${postID}/groups`)
       .get()
@@ -133,7 +157,13 @@ export const updatePostOnPublication = functions.firestore
   .document('posts/{postID}')
   .onUpdate(async (change, context) => {
     const newPostData = change.after.data() as Post;
+    const oldPostData = change.before.data() as Post;
     const postID = context.params.postID;
+    if (
+      JSON.stringify(PostToPostRef(newPostData)) ===
+      JSON.stringify(PostToPostRef(oldPostData))
+    )
+      return;
     const publication = newPostData.publication;
     if (!publication || !publication.id) return;
     return db
@@ -154,7 +184,13 @@ export const updatePostOnBookmarks = functions.firestore
   .document('posts/{postID}')
   .onUpdate(async (change, context) => {
     const newPostData = change.after.data() as Post;
+    const oldPostData = change.before.data() as Post;
     const postID = context.params.postID;
+    if (
+      JSON.stringify(PostToPostRef(newPostData)) ===
+      JSON.stringify(PostToPostRef(oldPostData))
+    )
+      return;
     const bookmarkersQS = await db
       .collection(`posts/${postID}/bookmarkedBy`)
       .get()
@@ -193,7 +229,13 @@ export const updatePostOnRecommenders = functions.firestore
   .document('posts/{postID}')
   .onUpdate(async (change, context) => {
     const newPostData = change.after.data() as Post;
+    const oldPostData = change.before.data() as Post;
     const postID = context.params.postID;
+    if (
+      JSON.stringify(PostToPostRef(newPostData)) ===
+      JSON.stringify(PostToPostRef(oldPostData))
+    )
+      return;
     const recommendersQS = await db
       .collection(`posts/${postID}/recommendedBy`)
       .get()
@@ -232,7 +274,13 @@ export const updatePostOnTopic = functions.firestore
   .document('posts/{postID}')
   .onUpdate(async (change, context) => {
     const newPostData = change.after.data() as Post;
+    const oldPostData = change.before.data() as Post;
     const postID = context.params.postID;
+    if (
+      JSON.stringify(PostToPostRef(newPostData)) ===
+      JSON.stringify(PostToPostRef(oldPostData))
+    )
+      return;
     const topics = newPostData.topics;
     if (!topics || topics.length === 0) return;
     const topicsUpdatePromise = topics.map(async (topic) =>
@@ -255,8 +303,14 @@ export const updatePostOnTopic = functions.firestore
 export const updatePostOnFollowerFeeds = functions.firestore
   .document('posts/{postID}')
   .onUpdate(async (change, context) => {
-    const post = change.after.data();
+    const newPostData = change.after.data() as Post;
+    const oldPostData = change.before.data() as Post;
     const postID = context.params.postID;
+    if (
+      JSON.stringify(PostToPostRef(newPostData)) ===
+      JSON.stringify(PostToPostRef(oldPostData))
+    )
+      return;
     const appearsOnFollowerFeedsQS = await db
       .collection(`posts/${postID}/onFollowingFeedsOfUsers`)
       .get()
@@ -275,7 +329,7 @@ export const updatePostOnFollowerFeeds = functions.firestore
     const followersPromises = followersIDs.map((followerID) =>
       db
         .doc(`users/${followerID}/feeds/followingFeed/posts/${postID}`)
-        .set(post)
+        .set(newPostData)
     );
     return Promise.all(followersPromises);
   });
@@ -576,6 +630,27 @@ export interface Post {
   bookmarkedCount?: number;
   recommendedCount?: number;
   unixTimeStamp: number;
+}
+
+export interface PostRef {
+  postType: PostType;
+  author: UserRef;
+  content: PostContent;
+  topics: TaggedTopic[];
+  customTopics?: string[];
+  timestamp: Date;
+  id: string;
+  publicationURL?: string[];
+  publication?: PublicationRef;
+  // filterable arrays must be array of strings
+  filterTopicIDs: string[];
+  unixTimeStamp: number;
+}
+
+export function PostToPostRef(post: Post): PostRef {
+  delete post.bookmarkedCount;
+  delete post.recommendedCount;
+  return post;
 }
 
 export interface PostContent {

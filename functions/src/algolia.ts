@@ -3,6 +3,7 @@ import algoliasearch, {SearchClient} from 'algoliasearch';
 import {config, environment, ResourceTypes} from './config';
 import {toUserRef} from './users';
 import {Group, groupToGroupRef} from './groups';
+import {Post, PostToPostRef} from './posts';
 
 const algoliaConfig = config.algolia;
 
@@ -128,7 +129,7 @@ export const configurePostSearchIndex = functions.https.onRequest((_, res) =>
     res,
     POSTS_INDEX,
     ['unordered(content.text)', 'unordered(topics)', 'author.name'],
-    ['postType'],
+    ['postType.id'],
     ['desc(recommendedCount)', 'desc(unixTimeStamp)', 'desc(bookmarkedCount)']
   )
 );
@@ -149,11 +150,16 @@ export const addPostToSearchIndex = functions.firestore
 export const updatePostToSearchIndex = functions.firestore
   .document(`posts/{postID}`)
   .onUpdate((change, context): boolean => {
-    const post = change.after.data();
-    post.postType = post.postType.id;
+    const newPostData = change.after.data() as Post;
+    const oldPostData = change.before.data() as Post;
+    if (
+      JSON.stringify(PostToPostRef(newPostData)) ===
+      JSON.stringify(PostToPostRef(oldPostData))
+    )
+      return false;
     return addToIndex(
       context.params.postID,
-      post,
+      newPostData,
       ResourceTypes.POST,
       POSTS_INDEX
     );

@@ -14,7 +14,6 @@ import {OpenPosition} from './openPositions';
 import {
   Post,
   updateRefOnFilterCollection,
-  updateFiltersByPost,
   addRecentPostsToFollowingFeed,
 } from './posts';
 
@@ -1302,17 +1301,6 @@ export const updateUserRefOnFollowFeedFilters = functions.firestore
         );
     });
     return Promise.all(followersUpdatePromise);
-  });
-
-export const updateFollowFilterOnNewPost = functions.firestore
-  .document('users/{userID}/feeds/followingFeed/posts/{postID}')
-  .onCreate(async (change, context) => {
-    const post = change.data() as Post;
-    const userID = context.params.userID;
-    return updateFiltersByPost(
-      db.doc(`users/${userID}/feeds/followingFeed`),
-      post
-    );
   });
 
 interface PublicationSuggestion {
