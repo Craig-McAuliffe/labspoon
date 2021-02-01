@@ -217,5 +217,14 @@ service cloud.firestore {
     match /verifiedGroups/{groupID} {
       allow read;
     }
+
+    match /contactForms/{contactFormType} {
+      allow write;
+      allow read;
+      
+    match /submittedForms/{submittedFormID} {
+      allow write: if request.resource.data.keys().hasAny(['isHuman']);
+      }
+    }
   }
 }
