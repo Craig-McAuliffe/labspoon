@@ -20,19 +20,19 @@ if (algoliaConfig) {
   algoliaClient = algoliasearch(algoliaID, algoliaAdminKey);
 }
 
-function configureSearchIndex(
+async function configureSearchIndex(
   res: functions.Response<any>,
   indexName: string,
   searchableAttributes: Array<string>,
   filterableAttributes?: Array<string>,
   customRanking?: Array<string>
-): void | Promise<void> {
+): Promise<void> {
   if (!algoliaClient) {
     res.json({error: 'No algolia client available'});
     return;
   }
   const index = algoliaClient.initIndex(indexName);
-  index
+  await index
     .setSettings({
       searchableAttributes: searchableAttributes,
       attributesForFaceting: filterableAttributes,
