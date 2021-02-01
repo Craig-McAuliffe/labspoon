@@ -1,6 +1,7 @@
 import React, {useState, useContext, useEffect} from 'react';
 import {AuthContext} from '../../App';
 import {db} from '../../firebase';
+import firebase from 'firebase';
 import {
   BookmarkIconUnselected,
   BookmarkIconSelected,
@@ -54,7 +55,7 @@ function BookmarkButton({
         userID: user.uid,
       });
       batch.update(bookmarkedResourceDoc, {
-        bookmarkedCount: db.FieldValue.increment(1),
+        bookmarkedCount: firebase.firestore.FieldValue.increment(1),
       });
       batch
         .commit()
@@ -156,7 +157,7 @@ export async function removeBookmark(
   batch.delete(userBookmarkCollection.doc(bookmarkedResourceID));
   batch.delete(bookmarkedByCollection.doc(userID));
   batch.update(bookmarkedResourceDoc, {
-    bookmarkedCount: db.FieldValue.increment(-1),
+    bookmarkedCount: firebase.firestore.FieldValue.increment(-1),
   });
   return batch
     .commit()

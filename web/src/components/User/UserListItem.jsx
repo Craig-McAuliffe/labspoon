@@ -126,7 +126,7 @@ export function UserSmallResultItem({user, selectUser}) {
         <h4>{user.institution}</h4>
       </div>
       <div className="Follow">
-        <PrimaryButton onClick={select} small>
+        <PrimaryButton onClick={select} smallVersion>
           Select
         </PrimaryButton>
       </div>

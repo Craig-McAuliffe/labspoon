@@ -397,7 +397,7 @@ function VerificationRequest() {
   const [open, setOpen] = useState(false);
 
   let content = (
-    <PrimaryButton onClick={() => setOpen(true)} light small>
+    <PrimaryButton onClick={() => setOpen(true)} light smallVersion>
       Request Verification
     </PrimaryButton>
   );

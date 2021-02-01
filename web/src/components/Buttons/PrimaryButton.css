@@ -1,9 +1,9 @@
 .primary-button,
-.primary-button-small,
+.primary-button-smallVersion,
 .primary-button-inactive,
 .primary-button-spinner,
 .negative-button,
-.negative-button-small {
+.negative-button-smallVersion {
   border: none;
   border-radius: 4%;
   text-decoration: none;
@@ -14,7 +14,7 @@
 }
 
 .primary-button,
-.primary-button-small,
+.primary-button-smallVersion,
 .primary-button-inactive,
 .primary-button-spinner {
   background: #00507c;
@@ -22,7 +22,7 @@
 }
 
 .negative-button,
-.negative-button-small {
+.negative-button-smallVersion {
   background: #dcdce0;
   color: #000000;
 }
@@ -37,8 +37,8 @@
   padding: 10px 10px;
 }
 
-.primary-button-small,
-.negative-button-small {
+.primary-button-smallVersion,
+.negative-button-smallVersion {
   padding: 10px 10px;
 }
 
@@ -46,15 +46,15 @@
 .primary-button:focus,
 .primary-button-inactive:hover,
 .primary-button-inactive:focus,
-.primary-button-small:hover,
-.primary-button-small:focus {
+.primary-button-smallVersion:hover,
+.primary-button-smallVersion:focus {
   background: #023b5a;
 }
 
 .negative-button:hover,
 .negative-button:focus,
-.negative-button-small:hover,
-.negative-button-small:focus {
+.negative-button-smallVersion:hover,
+.negative-button-smallVersion:focus {
   background: #99999f;
 }
 
@@ -66,7 +66,7 @@
   margin-bottom: 0px;
 }
 
-.primary-button-text-small {
+.primary-button-text-smallVersion {
   margin-bottom: 0px;
 }
 
@@ -89,18 +89,18 @@
   cursor: pointer;
 }
 
-.primary-button-small-light {
+.primary-button-smallVersion-light {
   border: none;
   text-decoration: none;
   cursor: pointer;
   text-align: center;
 }
 
-.primary-button-small-light h4 {
+.primary-button-smallVersion-light h4 {
   color: #00507c;
 }
 
-.primary-button-small-light h4:hover {
+.primary-button-smallVersion-light h4:hover {
   color: #001f30;
 }
 
@@ -108,7 +108,7 @@
   .primary-button,
   .primary-button-inactive,
   .negative-button,
-  .negative-button-small,
+  .negative-button-smallVersion,
   .primary-button-clicked {
     padding: 10px 10px;
     border-radius: 3%;
@@ -125,7 +125,7 @@
   .FollowButton:hover h2,
   .primary-button-clicked,
   .negative-button,
-  .negative-button-small {
+  .negative-button-smallVersion {
     padding: 8px 8px;
     border-radius: 2%;
   }

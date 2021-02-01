@@ -5,7 +5,7 @@ import './PrimaryButton.css';
 export default function PrimaryButton({
   submit,
   onClick,
-  small,
+  smallVersion,
   children,
   formID,
   disabled,
@@ -13,8 +13,8 @@ export default function PrimaryButton({
   ...props
 }) {
   let className = 'primary-button';
-  if (small) {
-    className = className + '-small';
+  if (smallVersion) {
+    className = className + '-smallVersion';
     if (light) className = className + '-light';
   } else {
     if (disabled) className = className + '-inactive';
@@ -29,8 +29,8 @@ export default function PrimaryButton({
       disabled={disabled}
       {...props}
     >
-      {small ? (
-        <h4 className="primary-button-text-small">{children}</h4>
+      {smallVersion ? (
+        <h4 className="primary-button-text-smallVersion">{children}</h4>
       ) : (
         <h2 className="primary-button-text">{children}</h2>
       )}

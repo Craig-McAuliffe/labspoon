@@ -5,6 +5,7 @@ import {
 } from '../../assets/PostActionIcons';
 import {AuthContext} from '../../App';
 import {db} from '../../firebase';
+import firebase from 'firebase';
 import {
   RECOMMENDATION,
   resourceTypeToCollection,
@@ -55,7 +56,7 @@ const RecommendButton = ({
         userToUserRef(userProfile, user.uid)
       );
       batch.update(recommendedResourceDoc, {
-        recommendedCount: db.FieldValue.increment(1),
+        recommendedCount: firebase.firestore.FieldValue.increment(1),
       });
       batch
         .commit()
@@ -157,7 +158,7 @@ export async function removeRecommendation(
   batch.delete(userRecommendationsCollection.doc(recommendedResourceID));
   batch.delete(recommendedByCollection.doc(userID));
   batch.update(recommendedResourceDoc, {
-    recommendedCount: db.FieldValue.increment(-1),
+    recommendedCount: firebase.firestore.FieldValue.increment(-1),
   });
   return batch
     .commit()
