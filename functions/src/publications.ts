@@ -648,8 +648,8 @@ async function fulfillOutgoingReferencesOnLabspoon(
     const lsPublication = lsPublicationDS.data() as Publication;
     const batch = db.batch();
     batch.set(
-      referencingPublicationRef.collection('references').doc(lsPublicationID!),
-      toPublicationRef(lsPublication, lsPublicationID!)
+      referencingPublicationRef.collection('references').doc(lsPublicationID),
+      toPublicationRef(lsPublication, lsPublicationID)
     );
     batch.update(referencingPublicationRef, {
       referencedPublicationMicrosoftIDs: adminNS.firestore.FieldValue.arrayRemove(

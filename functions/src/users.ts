@@ -1256,7 +1256,9 @@ export const addUserPostToFollowersFeeds = functions.firestore
               err
             )
           )
-          .then(() => {})
+          .then(() => {
+            return;
+          })
       );
     });
     return Promise.all(postAddedPromises);

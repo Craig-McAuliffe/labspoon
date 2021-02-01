@@ -70,7 +70,7 @@ export const addGroupMembersToPostFilter = functions.firestore
     const groupID = context.params.groupID;
     const post = change.data() as Post;
     const groupPostsFeedRef = db.doc(`groups/${groupID}/feeds/postsFeed`);
-    return await updateFilterCollection(
+    return updateFilterCollection(
       groupPostsFeedRef,
       {resourceName: 'Author', resourceType: ResourceTypes.USER},
       {
@@ -92,7 +92,7 @@ export const removeGroupMembersFromPostFilter = functions.firestore
     const groupID = context.params.groupID;
     const post = change.data() as Post;
     const groupPostsFeedRef = db.doc(`groups/${groupID}/feeds/postsFeed`);
-    return await updateFilterCollection(
+    return updateFilterCollection(
       groupPostsFeedRef,
       {resourceName: 'Author', resourceType: ResourceTypes.USER},
       {
@@ -343,11 +343,11 @@ export const updateGroupRankOnTopic = functions.firestore
         return false;
       });
     if (topicUpdatePromise) return;
-    return await db
+    return db
       .doc(`topics/${topicID}/groups/${groupID}`)
       .get()
       .then(async (ds) => {
-        if (!ds.exists) await setGroupOnTopic(groupID, topicID, topic.rank);
+        if (!ds.exists) return setGroupOnTopic(groupID, topicID, topic.rank);
       })
       .catch(() =>
         console.error(

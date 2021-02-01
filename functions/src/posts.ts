@@ -35,7 +35,7 @@ export const createPost = functions.https.onCall(async (data, context) => {
 
   if (data.publication) {
     const publicationDS = await getPublicationByMicrosoftPublicationID(
-      data.publication.microsoftID!,
+      data.publication.microsoftID,
       true
     );
     data.publication.id = publicationDS.id;
@@ -370,7 +370,9 @@ export async function addRecentPostsToFollowingFeed(
     });
     const postAddedPromise = batch
       .commit()
-      .then(() => {})
+      .then(() => {
+        return;
+      })
       .catch((err) =>
         console.error(
           `Unable to add post ${postID} to the following feed of user ${followerID}:`,
@@ -509,18 +511,20 @@ export async function updateFilterCollection(
     }
     const filterOptionData = fetchedFilterOptionDoc.data() as FilterOption;
     const filterOptionRank = filterOptionData.rank;
-    const batch = db.batch();
+    const batchDB = db.batch();
     if (!filterOptionRank || filterOptionRank === 1) {
-      batch.delete(filterOptionDocRef);
+      batchDB.delete(filterOptionDocRef);
     } else {
-      batch.update(filterOptionDocRef, {rank: filterOptionRank - 1});
+      batchDB.update(filterOptionDocRef, {rank: filterOptionRank - 1});
     }
-    batch.update(filterCollectionDocRef, {
+    batchDB.update(filterCollectionDocRef, {
       rank: firestore.FieldValue.increment(-1),
     });
-    return batch
+    return batchDB
       .commit()
-      .then(() => {})
+      .then(() => {
+        return;
+      })
       .catch((err) =>
         console.log(
           'unable to decrement or delete filter option and filter collection.',
@@ -547,7 +551,9 @@ export async function updateFilterCollection(
   batch.update(filterOptionDocRef, {rank: firestore.FieldValue.increment(1)});
   return batch
     .commit()
-    .then(() => {})
+    .then(() => {
+      return;
+    })
     .catch((err) =>
       console.error('could not update rank of collection and doc', err)
     );
