@@ -39,7 +39,8 @@ function configureSearchIndex(
       customRanking: customRanking,
     })
     .then(() => res.json({result: `Configured ${indexName} search index`}))
-    .catch((err: Error) => res.json(err));
+    .catch((err: Error) => res.json(err))
+    .finally(() => res.end());
 }
 
 function addToIndex(
