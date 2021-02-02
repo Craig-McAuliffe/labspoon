@@ -37,14 +37,22 @@
 }
 
 /* labspoon classes */
-.dropdown-menu .dropdown-link-item {
+.dropdown-menu .dropdown-link-item,
+.dropdown-menu .dropdown-link-item-less-emphasis {
   width: 295px;
   max-width: 295px;
   height: 28px;
   overflow-x: hidden;
-  color: #00507c;
   margin-left: 6px;
   margin-bottom: 0px;
+}
+
+.dropdown-menu .dropdown-link-item {
+  color: #00507c;
+}
+
+.dropdown-menu .dropdown-link-item-less-emphasis {
+  color: #5d5d65;
 }
 
 .DropDownHeaderSmall {

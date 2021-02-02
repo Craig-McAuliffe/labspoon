@@ -63,12 +63,12 @@ const AvatarDropDown = () => {
           </Dropdown.Item>
           <Dropdown.Item href="/privacy-policy">
             <div className="avatar-dropdown-item-container">
-              <p className="dropdown-link-item">Privacy Policy</p>
+              <p className="dropdown-link-item-less-emphasis">Privacy Policy</p>
             </div>
           </Dropdown.Item>
           <Dropdown.Item href="/contact">
             <div className="avatar-dropdown-item-container">
-              <p className="dropdown-link-item">Contact us</p>
+              <p className="dropdown-link-item-less-emphasis">Contact us</p>
             </div>
           </Dropdown.Item>
 
