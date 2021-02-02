@@ -1047,7 +1047,7 @@ export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall
 const SUGGESTED_PUBLICATIONS_INTERPRETATIONS_COUNT =
   environment === 'local' ? 1 : 4;
 const SUGGESTED_PUBLICATIONS_EXECUTION_PAGE_SIZE =
-  environment === 'local' ? 4 : 25;
+  environment === 'local' ? 4 : 8;
 const FRONT_END_SCROLL_LIMIT = 12;
 
 // for a given name, return potential matching publications so the user can select theirs
