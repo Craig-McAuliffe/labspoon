@@ -51,6 +51,11 @@ deploy_dev:
     - npm install
     - npm run build
     - cd ..
+    - n 10
+    - cd functions
+    - npm install
+    - npm functions build
+    - cd ..
     - firebase use --token $FIREBASE_TOKEN dev
     - firebase deploy -m "pipeline $CI_PIPELINE_ID build $CI_BUILD_ID" --non-interactive --token $FIREBASE_TOKEN --only hosting
 
@@ -74,8 +79,11 @@ deploy_test:
     - npm install
     - npm run build
     - cd ..
-    - npm --prefix functions install
-    - npm run --prefix functions build
+    - n 10
+    - cd functions
+    - npm install
+    - npm run build
+    - cd ..
     - firebase use --token $FIREBASE_TOKEN test
     - firebase deploy -m "pipeline $CI_PIPELINE_ID build $CI_BUILD_ID" --non-interactive --token $FIREBASE_TOKEN --only hosting
 
@@ -104,6 +112,7 @@ deploy_prod:
     - npm install
     - npm run build
     - cd ..
+    - n 10
     - cd functions
     - npm install
     - npm run build
