@@ -55,7 +55,7 @@ export const createPost = functions.https.onCall(async (data, context) => {
     topics: postTopics,
     customTopics: data.customTopics,
     timestamp: new Date(),
-    unixTimeStamp: new Date().getTime() / 1000,
+    unixTimeStamp: Math.floor(new Date().getTime() / 1000),
     filterTopicIDs: postTopics.map(
       (taggedTopic: TaggedTopic) => taggedTopic.id
     ),
