@@ -1045,14 +1045,16 @@ export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall
 // emulators with too many add publication requests, so we use a smaller number
 // of interpretations and smaller page size for each of those interpretations.
 const SUGGESTED_PUBLICATIONS_INTERPRETATIONS_COUNT =
-  environment === 'local' ? 1 : 10;
+  environment === 'local' ? 1 : 4;
 const SUGGESTED_PUBLICATIONS_EXECUTION_PAGE_SIZE =
-  environment === 'local' ? 10 : 100;
+  environment === 'local' ? 4 : 25;
+const FRONT_END_SCROLL_LIMIT = 12;
 
 // for a given name, return potential matching publications so the user can select theirs
 export const getSuggestedPublicationsForAuthorName = functions.https.onCall(
   async (data) => {
     const name = data.name;
+    let offset: number = data.offset ? data.offset : 0;
     if (name === undefined)
       throw new functions.https.HttpsError(
         'invalid-argument',
@@ -1074,74 +1076,100 @@ export const getSuggestedPublicationsForAuthorName = functions.https.onCall(
         console.error(err);
         throw new functions.https.HttpsError('internal', 'An error occurred.');
       });
-    const executePromises = expressions.map(async (expression) => {
-      return executeExpression({
-        expr: expression,
-        count: SUGGESTED_PUBLICATIONS_EXECUTION_PAGE_SIZE,
-        attributes: allPublicationFields,
-      })
-        .then(async (resp) => {
-          const makPublications: MAKPublication[] = resp.data.entities;
-          await publishAddPublicationRequests(makPublications);
-          return resp;
-        })
-        .then((resp) => {
-          const evaluateExpression = resp.data.expr;
-          const normalisedAuthorNameRegex = /AA\.AuN=='(?<name>[a-z ]*)'/;
-          const authorMatches = normalisedAuthorNameRegex.exec(
-            evaluateExpression
-          );
-          if (!authorMatches) {
-            console.warn(
-              'Could not extract a normalised author name from the evaluate expression:',
-              evaluateExpression
-            );
-            return undefined;
-          }
-          // get the first capturing group in the regex match
-          const normalisedAuthorName = authorMatches[1];
-          const makPublications: MAKPublication[] = resp.data.entities;
-          const publications: PublicationSuggestion[] = [];
-          makPublications.forEach((entity: MAKPublication) => {
-            const publication = makPublicationToPublication(entity);
-            const authors = publication.authors!;
-            const matchingAuthor = authors.find(
-              (author) => author.normalisedName === normalisedAuthorName
-            )!;
-            if (!matchingAuthor.microsoftID) return;
-            const publicationSuggestion: PublicationSuggestion = {
-              microsoftAcademicIDMatch: matchingAuthor.microsoftID,
-              publicationInfo: publication,
-            };
-            publications.push(publicationSuggestion);
-          });
-          // want to return a maximum of two papers per author
-          const seenAuthorIDs = new Map();
-          return publications.filter((publicationSuggestion) => {
-            const matchingAuthorID =
-              publicationSuggestion.microsoftAcademicIDMatch;
-            if (seenAuthorIDs.get(matchingAuthorID) === 2) return false;
-            if (seenAuthorIDs.get(matchingAuthorID) === 1)
-              seenAuthorIDs.set(matchingAuthorID, 2);
-            if (!seenAuthorIDs.has(matchingAuthorID))
-              seenAuthorIDs.set(matchingAuthorID, 1);
-            return true;
-          });
-        })
-        .catch((err) => {
-          console.error(err);
-          throw new functions.https.HttpsError(
-            'internal',
-            'An error occurred.'
-          );
-        });
-    });
-    const publicationsByInterpretation = await Promise.all(executePromises);
+    const publicationsByInterpretation = await Promise.all(
+      msExecutePromises(offset, expressions)
+    );
     const suggestedPublications = flatten(publicationsByInterpretation);
     // filter out null values
-    return suggestedPublications.filter(Boolean);
+    let filteredResults = suggestedPublications.filter(Boolean);
+    if (filteredResults.length < FRONT_END_SCROLL_LIMIT) {
+      offset = offset + filteredResults.length;
+      const morePublicationsByInterpretation = await Promise.all(
+        msExecutePromises(offset, expressions)
+      );
+      const moreSuggestedPublications = flatten(
+        morePublicationsByInterpretation
+      );
+      const moreUniqueSuggestions = moreSuggestedPublications.filter(
+        (publication) =>
+          !filteredResults.some(
+            (previousPub) =>
+              previousPub.publicationInfo.microsoftID ===
+              publication.publicationInfo.microsoftID
+          )
+      );
+      if (moreUniqueSuggestions && moreUniqueSuggestions.length > 0)
+        filteredResults = [
+          ...filteredResults,
+          ...moreSuggestedPublications.filter(Boolean),
+        ];
+    }
+    return {
+      publications: filteredResults,
+      offset: offset,
+    };
   }
 );
+
+const msExecutePromises = (offset: number, expressions: Array<string>) =>
+  expressions.map(async (expression) => {
+    const evaluateExpression = expression;
+    const normalisedAuthorNameRegex = /AA\.AuN=='(?<name>[a-z ]*)'/;
+    const authorMatches = normalisedAuthorNameRegex.exec(evaluateExpression);
+    if (!authorMatches) {
+      console.warn(
+        'No normalised author name within evaluate expression ',
+        evaluateExpression
+      );
+      return [];
+    }
+    // get the first capturing group in the regex match
+    const normalisedAuthorName = authorMatches[1];
+    return executeExpression({
+      expr: expression,
+      count: SUGGESTED_PUBLICATIONS_EXECUTION_PAGE_SIZE,
+      attributes: allPublicationFields,
+      offset: offset,
+    })
+      .then(async (resp) => {
+        const makPublications: MAKPublication[] = resp.data.entities;
+        await publishAddPublicationRequests(makPublications);
+        return resp;
+      })
+      .then((resp) => {
+        const makPublications: MAKPublication[] = resp.data.entities;
+        const publicationsWithAuthor: PublicationSuggestion[] = [];
+        makPublications.forEach((entity: MAKPublication) => {
+          const publication = makPublicationToPublication(entity);
+          const authors = publication.authors!;
+          const matchingAuthor = authors.find(
+            (author) => author.normalisedName === normalisedAuthorName
+          )!;
+          if (!matchingAuthor || !matchingAuthor.microsoftID) return;
+          const publicationSuggestion: PublicationSuggestion = {
+            microsoftAcademicAuthorID: matchingAuthor.microsoftID,
+            publicationInfo: publication,
+          };
+          publicationsWithAuthor.push(publicationSuggestion);
+        });
+        // want to return a maximum of two papers per author
+        const seenAuthorIDs = new Map();
+        return publicationsWithAuthor.filter((publicationSuggestion) => {
+          const matchingAuthorID =
+            publicationSuggestion.microsoftAcademicAuthorID;
+          if (seenAuthorIDs.get(matchingAuthorID) === 2) return false;
+          if (seenAuthorIDs.get(matchingAuthorID) === 1)
+            seenAuthorIDs.set(matchingAuthorID, 2);
+          if (!seenAuthorIDs.has(matchingAuthorID))
+            seenAuthorIDs.set(matchingAuthorID, 1);
+          return true;
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+        throw new functions.https.HttpsError('internal', 'An error occurred.');
+      });
+  });
 
 const flatten = function (arr: Array<any>, result: Array<any> = []) {
   for (let i = 0, length = arr.length; i < length; i++) {
@@ -1306,7 +1334,7 @@ export const updateUserRefOnFollowFeedFilters = functions.firestore
   });
 
 interface PublicationSuggestion {
-  microsoftAcademicIDMatch: string;
+  microsoftAcademicAuthorID: string;
   publicationInfo: Publication;
 }
 // Rank relates to how often the user posts in this topic

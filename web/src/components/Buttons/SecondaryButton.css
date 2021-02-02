@@ -5,12 +5,36 @@
   cursor: pointer;
   box-sizing: border-box;
   margin: 1px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.secondary-button-inactive {
+.secondary-button {
+  margin: 0px;
+}
+
+.secondary-button-disabled {
   color: #99999f;
   padding: 8px 16px;
   border: 2px solid #99999f;
+}
+
+.secondary-button-disabled h3 {
+  color: #99999f;
+}
+
+.secondary-button-disabled h3 span {
+  color: #99999f;
+}
+
+.secondary-button-disabled path {
+  fill: #99999f;
+  stroke: #99999f;
+}
+
+.secondary-button-disabled svg {
+  stroke: #99999f;
 }
 
 .secondary-button:hover {
@@ -34,7 +58,7 @@
   color: #5d5d65;
 }
 
-.secondary-button-inactive-light {
+.secondary-button-disabled-light {
   color: #99999f;
   padding: 8px 16px;
 }

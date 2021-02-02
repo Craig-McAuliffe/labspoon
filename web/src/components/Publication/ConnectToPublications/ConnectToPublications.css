@@ -50,6 +50,11 @@
   fill: #00507c;
 }
 
+.secondary-button-disabled .connect-to-pubs-search-icon-container path {
+  fill: #99999f;
+  stroke: #99999f;
+}
+
 .connect-to-pubs-search-label {
   display: block;
 }

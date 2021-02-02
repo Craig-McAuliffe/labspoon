@@ -24,6 +24,37 @@ export default function LinkAuthorIDForm({submitBehaviour, cancel}) {
   const [name, setName] = useState('');
   const [suggestedPublications, setSuggestedPublications] = useState([]);
   const [loadingState, setLoadingState] = useState();
+  const [hasMore, setHasMore] = useState();
+  const [parentSearchOffset, setParentSearchOffset] = useState(0);
+
+  const fetchSuggestedPublications = (firstTime) => {
+    if (loadingState === LOADING) return;
+    if (firstTime) {
+      setSuggestedPublications([]);
+      setHasMore(undefined);
+      setParentSearchOffset(0);
+    }
+    setLoadingState(LOADING);
+    getSuggestedPublicationsForAuthorName({
+      name: name,
+      offset: parentSearchOffset,
+    })
+      .then((fetchedSuggestedPublications) => {
+        setLoadingState(LOADED);
+        setSuggestedPublications((currentPublications) => [
+          ...currentPublications,
+          ...fetchedSuggestedPublications.data.publications,
+        ]);
+        setHasMore(
+          !(fetchedSuggestedPublications.data.publications.length === 0)
+        );
+        setParentSearchOffset(fetchedSuggestedPublications.data.offset);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoadingState(ERROR);
+      });
+  };
 
   const searchProgress = () => {
     if (loadingState === LOADING) return <LoadingSpinner />;
@@ -40,17 +71,7 @@ export default function LinkAuthorIDForm({submitBehaviour, cancel}) {
         onSubmit={(e) => {
           e.preventDefault();
           setLoadingState(LOADING);
-          getSuggestedPublicationsForAuthorName({
-            name: name,
-          })
-            .then((fetchedSuggestedPublications) => {
-              setLoadingState(LOADED);
-              setSuggestedPublications(fetchedSuggestedPublications.data);
-            })
-            .catch((err) => {
-              console.log(err);
-              setLoadingState(ERROR);
-            });
+          fetchSuggestedPublications(true);
         }}
       >
         <h4>Search for your publications:</h4>
@@ -63,7 +84,7 @@ export default function LinkAuthorIDForm({submitBehaviour, cancel}) {
           placeholder="Your name as it appears on publications"
         />
         <div className="connect-to-pubs-search-container">
-          <SecondaryButton type="submit">
+          <SecondaryButton type="submit" inactive={loadingState === LOADING}>
             <div className="connect-to-pubs-search-icon-container">
               <SearchIconGrey />
             </div>
@@ -74,20 +95,28 @@ export default function LinkAuthorIDForm({submitBehaviour, cancel}) {
           <SecondaryButton
             className="search-cancel-button"
             type="button"
-            onClick={cancel}
+            onClick={() => {
+              if (loadingState === LOADING) return;
+              cancel();
+            }}
+            inactive={loadingState === LOADING}
           >
             Cancel
           </SecondaryButton>
         )}
       </form>
-      {searchProgress()}
       {suggestedPublications.length > 0 ? (
         <SuggestedPublications
           suggestedPublications={suggestedPublications}
           submitBehaviour={submitBehaviour}
           setLoadingState={setLoadingState}
+          fetchMore={fetchSuggestedPublications}
+          hasMore={hasMore}
+          searchProgress={searchProgress}
         />
-      ) : null}
+      ) : (
+        searchProgress()
+      )}
     </div>
   );
 }
@@ -96,6 +125,9 @@ function SuggestedPublications({
   suggestedPublications,
   submitBehaviour,
   setLoadingState,
+  fetchMore,
+  hasMore,
+  searchProgress,
 }) {
   const [
     selectedPublicationsAuthorID,
@@ -117,6 +149,12 @@ function SuggestedPublications({
             selectedPublicationsAuthorID={selectedPublicationsAuthorID}
             setSelectedPublicationsAuthorID={setSelectedPublicationsAuthorID}
           />
+          {hasMore && (
+            <SecondaryButton onClick={() => fetchMore()}>
+              Fetch More
+            </SecondaryButton>
+          )}
+          {searchProgress()}
         </div>
       )}
       <div className="onboarding-suggested-publications-submit-container">
@@ -166,7 +204,7 @@ function SuggestedPublications({
                   err.message.includes('linked to a labspoon user')
                 ) {
                   alert(
-                    'Someone has already linked to that author. If this is you, please contact help@labspoon.com.'
+                    'Someone has already linked to that author. If this is you, please let us know through the contact page.'
                   );
                   return;
                 }
@@ -176,7 +214,7 @@ function SuggestedPublications({
                 return;
               });
           }}
-          inactive={selectedPublicationsAuthorID || submitting ? false : true}
+          disabled={selectedPublicationsAuthorID || submitting ? false : true}
         >
           Link Papers to Profile
         </PrimaryButton>
@@ -206,20 +244,20 @@ function SuggestedPublicationItems({
           <button
             className={
               selectedPublicationsAuthorID ===
-              suggestedPublication.microsoftAcademicIDMatch
+              suggestedPublication.microsoftAcademicAuthorID
                 ? 'onboarding-publication-selector-button-selected'
                 : 'onboarding-publication-selector-button'
             }
             type="button"
             onClick={() => {
               if (
-                suggestedPublication.microsoftAcademicIDMatch ===
+                suggestedPublication.microsoftAcademicAuthorID ===
                 selectedPublicationsAuthorID
               )
                 setSelectedPublicationsAuthorID(undefined);
               else
                 setSelectedPublicationsAuthorID(
-                  suggestedPublication.microsoftAcademicIDMatch
+                  suggestedPublication.microsoftAcademicAuthorID
                 );
             }}
           />
@@ -235,16 +273,21 @@ function SuggestedPublicationAuthors({authors}) {
       if (i === authors.length - 1)
         return (
           <p
-            key={author.id}
+            key={author.microsoftID + '-' + i}
             className="onboarding-suggested-publication-authors"
           >
             ...and {i + 1} more.
           </p>
         );
-      return <></>;
+      return (
+        <React.Fragment key={author.microsoftID + '-' + i}></React.Fragment>
+      );
     }
     return (
-      <p key={author.id} className="onboarding-suggested-publication-authors">
+      <p
+        key={author.microsoftID + '-' + i}
+        className="onboarding-suggested-publication-authors"
+      >
         {author.name}
         {i === authors.length - 1 ? null : ','}
       </p>

@@ -148,7 +148,6 @@ function fetchFeedData(userID, filterOptions) {
           return Promise.all(publicationPromises);
         })
         .catch((err) => console.error(err));
-      console.log('publicationsPromise', publicationsPromise);
       return [publicationsPromise, undefined];
     default:
       results = [];

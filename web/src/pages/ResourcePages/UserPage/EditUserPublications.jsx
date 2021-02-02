@@ -7,19 +7,20 @@ import {LoadingSpinnerPage} from '../../../components/LoadingSpinner/LoadingSpin
 
 import './UserPage.css';
 import './EditUserPage.css';
+import {Link} from 'react-router-dom';
 
 export default function EditUserPublications({children}) {
   const [linkingAuthor, setLinkingAuthor] = useState(false);
   const {userProfile} = useContext(AuthContext);
   if (!userProfile) return <LoadingSpinnerPage />;
-  if (userProfile.microsoftAcademicAuthorID)
+  if (userProfile.microsoftID)
     return (
       <PaddedPageContainer>
         {children}
         <h3>You have already linked publications to your user profile</h3>
         <p>
-          If you have incorrectly linked your account, please email{' '}
-          <a href={'mailto:help@labspoon.com'}>help@labspoon.com</a>
+          If you have incorrectly linked your account, please let us know
+          through the <Link to="/contact">contact page.</Link>
         </p>
         <p className="link-to-pubs-already-linked-note">
           <b>Note:</b> We are constantly indexing more publications, so if any
