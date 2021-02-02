@@ -113,9 +113,10 @@ export default function LinkAuthorIDForm({submitBehaviour, cancel}) {
           fetchMore={fetchSuggestedPublications}
           hasMore={hasMore}
           searchProgress={searchProgress}
+          loadingState={loadingState}
         />
       ) : (
-        searchProgress()
+        <div>{searchProgress()}</div>
       )}
     </div>
   );
@@ -128,6 +129,7 @@ function SuggestedPublications({
   fetchMore,
   hasMore,
   searchProgress,
+  loadingState,
 }) {
   const [
     selectedPublicationsAuthorID,
@@ -143,19 +145,26 @@ function SuggestedPublications({
           <h4>This will take a few seconds.</h4>
         </>
       ) : (
-        <div className="onboarding-suggested-publications-container">
-          <SuggestedPublicationItems
-            suggestedPublications={suggestedPublications}
-            selectedPublicationsAuthorID={selectedPublicationsAuthorID}
-            setSelectedPublicationsAuthorID={setSelectedPublicationsAuthorID}
-          />
-          {hasMore && (
-            <SecondaryButton onClick={() => fetchMore()}>
-              Fetch More
-            </SecondaryButton>
-          )}
-          {searchProgress()}
-        </div>
+        <>
+          <div className="onboarding-suggested-publications-container">
+            <SuggestedPublicationItems
+              suggestedPublications={suggestedPublications}
+              selectedPublicationsAuthorID={selectedPublicationsAuthorID}
+              setSelectedPublicationsAuthorID={setSelectedPublicationsAuthorID}
+            />
+          </div>
+          <div className="link-pub-author-fetch-more-container">
+            {hasMore && (
+              <SecondaryButton
+                onClick={() => fetchMore()}
+                inactive={loadingState === LOADING}
+              >
+                Fetch More
+              </SecondaryButton>
+            )}
+          </div>
+          <div style={{'margin-top': '20px'}}>{searchProgress()}</div>
+        </>
       )}
       <div className="onboarding-suggested-publications-submit-container">
         <PrimaryButton

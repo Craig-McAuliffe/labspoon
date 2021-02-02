@@ -113,3 +113,11 @@
   line-height: 0px;
   margin-bottom: 0px;
 }
+
+.link-pub-author-fetch-more-container {
+  display: flex;
+}
+
+.link-pub-author-fetch-more-container button {
+  flex-grow: 1;
+}
