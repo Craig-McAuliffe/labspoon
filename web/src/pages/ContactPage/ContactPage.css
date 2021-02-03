@@ -28,3 +28,8 @@
 .contact-page-mouse-movement-detection {
   height: 100vh;
 }
+
+.contact-page-nav-container {
+  display: flex;
+  align-items: start;
+}

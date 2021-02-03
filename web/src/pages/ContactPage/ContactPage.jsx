@@ -51,7 +51,7 @@ function ContactPageNavigation() {
 
 export function ContactPageNavigationLinks() {
   return (
-    <div>
+    <div className="contact-page-nav-container">
       <Link to="/contact/help">
         <SecondaryButton>Help</SecondaryButton>
       </Link>
