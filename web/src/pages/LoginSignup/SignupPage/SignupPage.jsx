@@ -187,10 +187,10 @@ function ReferrerAlert({referrer}) {
     case 'groupInvite':
       return (
         <div className="referrer-alert">
-          <h3>
-            You need to sign up to join the group. Don&rsquo;t worry it
-            doesn&rsquo;t take long!
-          </h3>
+          <h4>
+            To automatically join the group, please sign up with the email
+            address that received the invite.
+          </h4>
         </div>
       );
     default:

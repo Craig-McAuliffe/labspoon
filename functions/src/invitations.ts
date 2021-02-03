@@ -12,7 +12,7 @@ export enum InvitationType {
 
 export interface Invitation {
   email: string;
-  type: InvitationType;
+  resourceType: InvitationType;
   resourceID: string;
   invitingUserID: string;
 }
@@ -60,7 +60,7 @@ export const fulfillInvitationsOnEmailSignUp = functions.firestore
     invitationsQS.forEach((doc) => {
       const invitation = doc.data() as Invitation;
       const invitationDocRef = doc.ref;
-      switch (invitation.type) {
+      switch (invitation.resourceType) {
         case InvitationType.GROUP:
           fulfillInvitationPromises.push(
             fulfillGroupInvitation(userRef, invitationDocRef, invitation)
