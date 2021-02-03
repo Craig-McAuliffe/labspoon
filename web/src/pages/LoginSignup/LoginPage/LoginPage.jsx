@@ -51,12 +51,12 @@ function LoginPage() {
             }}
           />
         </div>
-        <p className="signup-submit-button-container">
+        <div className="signup-submit-button-container">
           <span className="sign-up-privacy-policy-disclaimer">
             By signing up, you are agreeing to our{' '}
+            <Link to="/privacy-policy">Privacy Policy</Link>
           </span>
-          <Link to="/privacy-policy">Privacy Policy</Link>
-        </p>
+        </div>
       </PaddedPageContainer>
     );
   } else {

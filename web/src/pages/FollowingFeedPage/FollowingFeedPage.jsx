@@ -12,6 +12,7 @@ import FilterableResults, {
 import CreatePost from '../../components/Posts/Post/CreatePost/CreatePost';
 import {translateOptionalFields} from '../../helpers/posts';
 import {LoadingSpinnerPage} from '../../components/LoadingSpinner/LoadingSpinner';
+import {UnpaddedPageContainer} from '../../components/Layout/Content';
 
 const arrayContainsAnyErrorMessage =
   'Cannot select multiple of more than one resource type. Try deselecting the last option.';
@@ -164,12 +165,10 @@ export default function FollowingFeedPage() {
         <NewFilterMenuWrapper getDefaultFilter={getDefaultFilter} />
         <ResourceTabs />
       </FilterManager>
-      <div className="content-layout">
-        <div className="feed-container">
-          <CreatePost />
-          <NewResultsWrapper />
-        </div>
-      </div>
+      <UnpaddedPageContainer>
+        <CreatePost />
+        <NewResultsWrapper />
+      </UnpaddedPageContainer>
     </FilterableResults>
   );
 }

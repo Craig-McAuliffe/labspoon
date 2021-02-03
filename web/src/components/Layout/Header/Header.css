@@ -5,7 +5,6 @@
   align-items: center;
   background: #eaf1f5;
   height: 100%;
-  width: 100%;
   width: calc(100% - 14px);
 }
 
@@ -66,6 +65,7 @@
 @media screen and (max-width: 1197px) {
   .header-container {
     grid-template-columns: 60px 1fr 350px;
+    width: 100%;
   }
 
   .header-home-text {

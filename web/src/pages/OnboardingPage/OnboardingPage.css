@@ -102,3 +102,8 @@
 .onboarding-topic-search-container svg {
   margin-right: 10px;
 }
+
+.onboarding-next-back-container {
+  display: flex;
+  justify-content: flex-end;
+}

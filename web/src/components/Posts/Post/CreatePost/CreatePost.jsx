@@ -3,7 +3,7 @@ import {AuthContext} from '../../../../App';
 import DefaultPost from './DefaultPost';
 import PublicationPostForm from './PublicationPostForm';
 import {WriteIcon} from '../../../../assets/GeneralActionIcons';
-import {Redirect} from 'react-router-dom';
+import {Redirect, useLocation} from 'react-router-dom';
 
 import './CreatePost.css';
 
@@ -25,6 +25,7 @@ export default function CreatePost({
   const [taggedResourceType, setTaggedResourceType] = useState(DEFAULT_POST);
   const [submittingPost, setSubmittingPost] = useState(false);
 
+  const locationPathname = useLocation().pathname;
   const setCreatingPostIfNotExpanded = (newValue) => {
     if (!keepExpanded) setCreatingPost(newValue);
   };
@@ -60,11 +61,13 @@ export default function CreatePost({
           cancelPost: keepExpanded ? undefined : cancelPost,
         }}
       >
-        <PostTypeSpecificForm
-          setCreatingPost={setCreatingPostIfNotExpanded}
-          postType={taggedResourceType}
-          setPostType={setTaggedResourceType}
-        />
+        <div className={locationPathname ? 'create-post-margin-top' : ''}>
+          <PostTypeSpecificForm
+            setCreatingPost={setCreatingPostIfNotExpanded}
+            postType={taggedResourceType}
+            setPostType={setTaggedResourceType}
+          />
+        </div>
       </CreatingPostContext.Provider>
     );
   else

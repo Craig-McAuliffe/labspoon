@@ -89,7 +89,7 @@ export default function OnboardingPage() {
         >
           Skip
         </button>
-        <div>
+        <div className="onboarding-next-back-container">
           {onboardingStage !== FOLLOW ? (
             <button
               className="onboarding-back-button"
@@ -257,7 +257,7 @@ function OnboardingGroup({user}) {
     <div className="onboarding-page-container">
       <h3>Group pages are a great place to share updates from the lab.</h3>
       <h4 className="onboarding-page-instructions">{`Follow groups on Labspoon.`}</h4>
-      <div onboarding-group-search>
+      <div>
         <FormDatabaseSearch
           setDisplayedItems={setDisplayedGroups}
           inputRef={groupSearchRef}
