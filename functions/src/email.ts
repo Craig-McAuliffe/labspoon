@@ -135,9 +135,8 @@ async function sendUserNotificationEmail(
       template: 'update_email',
       'h:X-Mailgun-Variables': JSON.stringify(templateData),
     },
-    (err: Error, body: any) => {
+    (err: Error) => {
       if (err) console.error('Error raised whilst sending email:', err);
-      console.log(body);
     }
   );
   db.doc(`users/${userID}`)
@@ -203,7 +202,7 @@ export async function sendGroupInvitationEmail(
       'the env url has not been defined. For local, add a url to the env of .runtimeconfig found within the functions directory, by following instructions in README.md. For the cloud, add a value for config env.'
     );
     throw new Error(
-      'Unable to send email invite. Sorry about that. Please try again later.'
+      'Unable to send email invite. Env url has not been defined.'
     );
     return;
   }
@@ -238,35 +237,43 @@ export async function sendGroupInvitationEmail(
     await batch.commit();
     return;
   }
-
-  try {
-    await axios({
-      method: 'get',
-      url: invitingUserRef.avatar,
-    });
-  } catch (err) {
-    if (err.response.status === 403) {
-      invitingUserRef.avatar = getDefaultUserAvatar(config.env.storagebucket)
-    } else {
-      throw err;
+  if (invitingUserRef.avatar) {
+    try {
+      await axios({
+        method: 'get',
+        url: invitingUserRef.avatar,
+      });
+    } catch (err) {
+      if (err && err.response.status === 403) {
+        invitingUserRef.avatar = getDefaultUserAvatar(config.env.storagebucket);
+      } else {
+        await groupRef.collection('invitations').doc(invitationID).delete();
+        throw err;
+      }
     }
+  } else {
+    invitingUserRef.avatar = getDefaultUserAvatar(config.env.storagebucket);
   }
-
   const groupDS = await groupRef.get();
   if (!groupDS.exists) throw new Error(`No group found with ID ${groupID}`);
   const group = groupDS.data() as GroupRef;
 
-  try {
-    await axios({
-      method: 'get',
-      url: group.avatar,
-    });
-  } catch (err) {
-    if (err.response.status === 403) {
-      group.avatar = getDefaultGroupAvatar(config.env.storagebucket)
-    } else {
-      throw err;
+  if (group.avatar) {
+    try {
+      await axios({
+        method: 'get',
+        url: group.avatar,
+      });
+    } catch (err) {
+      if (err.response.status === 403) {
+        group.avatar = getDefaultGroupAvatar(config.env.storagebucket);
+      } else {
+        await groupRef.collection('invitations').doc(invitationID).delete();
+        throw err;
+      }
     }
+  } else {
+    group.avatar = getDefaultGroupAvatar(config.env.storagebucket);
   }
 
   const templateData = {
@@ -278,7 +285,6 @@ export async function sendGroupInvitationEmail(
   const subject = `${invitingUser!.name} is inviting you to join ${
     group.name
   } on Labspoon!`;
-
   mailgun.messages().send(
     {
       from: 'Labspoon <invites-noreply@mail.labspoon.com>',
@@ -287,8 +293,11 @@ export async function sendGroupInvitationEmail(
       template: 'group-invitation-email',
       'h:X-Mailgun-Variables': JSON.stringify(templateData),
     },
-    (err: Error) => {
-      if (err) console.error('Error raised whilst sending email:', err);
+    async (err: Error) => {
+      if (err) {
+        console.error('Error raised whilst sending email:', err);
+        await groupRef.collection('invitations').doc(invitationID).delete();
+      }
     }
   );
   return;

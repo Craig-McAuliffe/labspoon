@@ -86,6 +86,10 @@ export default function GroupInfoForm({
   }, [userProfile, setSelectedUsers]);
 
   const addSelectedUsers = (chosenUser) => {
+    if (selectedUsers.length > 14) {
+      alert('You can only add 15 members at a time.');
+      return;
+    }
     if (
       chosenUser.id &&
       (selectedUsers.some(
@@ -225,7 +229,7 @@ function SelectedMembers({selectedUsers, setSelectedUsers}) {
       return curatedSelectedMembers;
     });
   };
-  const userListItems = selectedUsers.map((user) => {
+  const userListItems = selectedUsers.map((user, i) => {
     if (user.id) {
       return (
         <UserListItem user={user} key={user.id}>
@@ -236,7 +240,7 @@ function SelectedMembers({selectedUsers, setSelectedUsers}) {
       );
     }
     return (
-      <UserListItemEmailOnly user={user} key={user.email}>
+      <UserListItemEmailOnly user={user} key={user.email + i}>
         <NegativeButton onClick={() => removeSelectedUser(user)}>
           Remove
         </NegativeButton>

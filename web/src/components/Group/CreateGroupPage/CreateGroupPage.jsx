@@ -63,14 +63,23 @@ export default function CreateGroupPage({
             resourceID: groupID,
             invitingUserID: userID,
           };
-          batch.set(groupDocRef.collection('invitations').doc(), invitation);
+          const groupInvitationRef = groupDocRef
+            .collection('invitations')
+            .doc();
+          batch.set(groupInvitationRef, invitation);
+          batch.set(
+            db.doc(
+              `invitations/group/newMemberInvites/${groupInvitationRef.id}`
+            ),
+            invitation
+          );
           return;
         }
         const memberRef = {
           id: member.id,
           name: member.name,
-          avatar: member.avatar,
         };
+        if (member.avatar) memberRef.avatar = member.avatar;
         batch.set(groupDocRef.collection('members').doc(member.id), memberRef);
       });
       batch

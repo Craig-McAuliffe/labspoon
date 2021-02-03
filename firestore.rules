@@ -226,5 +226,9 @@ service cloud.firestore {
       allow write: if request.resource.data.keys().hasAny(['isHuman']);
       }
     }
+
+    match /invitations/group/newMemberInvites/{invitationID} {
+        allow read, write: if request.auth != null && existsAfter(/databases/$(database)/documents/groups/$(request.resource.data.resourceID)/members/$(request.resource.data.invitingUserID));
+      }
   }
 }

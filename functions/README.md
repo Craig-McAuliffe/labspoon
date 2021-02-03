@@ -7,7 +7,8 @@ The current structure of the config is as follows (see the relevant section for 
 ```
 {
     "env": {
-        "name": ...
+        "name": ...,
+        "storagebucket":labspoon-dev-266bc.appspot.com
     },
     "microsoftacademicknowledgeapi": {
         "subscriptionkey": ...
@@ -21,10 +22,13 @@ The current structure of the config is as follows (see the relevant section for 
 ```
 
 ## env
+
 Describes the labspoon environment that the functions are running in. Should be set to "dev" for local development.
 
 ## algolia
+
 Contains keys for the Algolia admin API, for writing new data to the search indexes. These keys are retrieved from the Algolia dashboard.
 
 ## microsoftacademicknowledgeapi
+
 Contains the access token for the Microsoft Academic Knowledge API, which can be requested and retrieved through the Microsoft Research API portal https://msr-apis.portal.azure-api.net/products.

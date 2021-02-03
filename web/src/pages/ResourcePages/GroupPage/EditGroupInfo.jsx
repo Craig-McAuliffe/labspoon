@@ -69,7 +69,6 @@ export default function EditingGroupInfo({groupData, children}) {
   useEffect(() => {
     setSelectedUsers(groupMembers);
   }, [groupMembers]);
-
   const initialValues = {
     name: groupData.name ? groupData.name : '',
     location: groupData.location ? groupData.location : '',
@@ -110,20 +109,37 @@ export default function EditingGroupInfo({groupData, children}) {
       batch.update(groupDocRef, values);
       selectedUsers.forEach((newMember) => {
         if (!newMember.id) {
+          if (
+            groupMembers.some(
+              (groupMember) => groupMember.email === newMember.email
+            )
+          )
+            return;
           const invitation = {
             email: newMember.email,
             resourceType: 'group',
             resourceID: groupID,
             invitingUserID: userID,
           };
-          batch.set(groupDocRef.collection('invitations').doc(), invitation);
+          const groupInvitationRef = groupDocRef
+            .collection('invitations')
+            .doc();
+          batch.set(groupInvitationRef, invitation);
+          batch.set(
+            db.doc(
+              `invitations/group/newMemberInvites/${groupInvitationRef.id}`
+            ),
+            invitation
+          );
           return;
         }
+        if (groupMembers.some((groupMember) => groupMember.id === newMember.id))
+          return;
         const memberRef = {
           id: newMember.id,
           name: newMember.name,
-          avatar: newMember.avatar ? newMember.avatar : '',
         };
+        if (newMember.avatar) memberRef.avatar = newMember.avatar;
         batch.set(
           groupDocRef.collection('members').doc(newMember.id),
           memberRef
@@ -155,7 +171,7 @@ export default function EditingGroupInfo({groupData, children}) {
     };
 
     if (avatar.length > 0) {
-      editGroupAvatarStorageInForm(
+      return editGroupAvatarStorageInForm(
         avatar,
         groupID,
         setSubmitting,
