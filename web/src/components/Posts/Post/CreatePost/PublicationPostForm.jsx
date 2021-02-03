@@ -113,7 +113,7 @@ function SelectPublication({
               setQuery(undefined);
               setPublication(undefined);
             }}
-            small
+            smallVersion
           >
             Deselect
           </NegativeButton>

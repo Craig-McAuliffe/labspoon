@@ -193,7 +193,7 @@ export function RemoveBookmarkFromPage({postID, bookmarkedByCollection}) {
           );
           window.location.reload();
         }}
-        small={true}
+        smallVersion={true}
       >
         Remove Bookmark
       </NegativeButton>
