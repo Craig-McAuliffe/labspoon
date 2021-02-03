@@ -26,7 +26,7 @@ export const addInvitationFromGroup = functions.firestore
     return;
   });
 
-export const removeInvitationFromGroup = functions.firestore
+export const removeInviteOnGroupInviteRemoval = functions.firestore
   .document('groups/{groupID}/invitations/{invitationID}')
   .onDelete(async (change) => {
     await db.doc(`invitations/group/newMemberInvites/${change.id}`).delete();
@@ -52,7 +52,7 @@ export const fulfillInvitationsOnEmailSignUp = functions.firestore
     const userRef = toUserRef(userID, change.data());
 
     const invitationsQS = await db
-      .collection('invitations')
+      .collection('invitations/group/newMemberInvites')
       .where('email', '==', email)
       .get();
     if (invitationsQS.empty) return;
@@ -81,7 +81,6 @@ async function fulfillGroupInvitation(
   const userID = userRef.id;
   const batch = db.batch();
   batch.set(db.doc(`groups/${groupID}/members/${userID}`), userRef);
-  batch.delete(invitationDocRef);
   batch.delete(db.doc(`groups/${groupID}/invitations/${invitationDocRef.id}`));
   await batch.commit();
 }
