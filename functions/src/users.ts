@@ -695,10 +695,10 @@ export const updateUserRefOnPublications = functions.firestore
     const newUserData = change.after.data() as UserPublicationRef;
     const oldUserData = change.before.data() as UserPublicationRef;
     const userID = context.params.userID;
-    if (newUserData.name === oldUserData.name || !newUserData.microsoftID)
+    if (newUserData.name === oldUserData.name || !newUserData.microsoftID || !oldUserData.microsoftID)
       return;
-    const oldPublicationUser = toUserPublicationRef(oldUserData, userID);
-    const newPublicationUser = toUserPublicationRef(newUserData, userID);
+    const oldPublicationUser = toUserPublicationRef(oldUserData.name, oldUserData.microsoftID, userID);
+    const newPublicationUser = toUserPublicationRef(newUserData.name, newUserData.microsoftID, userID);
     const publicationsQS = await db
       .collection(`users/${userID}/publications`)
       .get()
@@ -1360,11 +1360,11 @@ export function toUserRef(userID: string, user: any) {
   return userRef;
 }
 
-export function toUserPublicationRef(user: UserPublicationRef, userID: string) {
+export function toUserPublicationRef(userName:string, microsoftID:string, userID: string) {
   const publicationUserRef: UserPublicationRef = {
     id: userID,
-    name: user.name,
-    microsoftID: user.microsoftID,
+    name: userName,
+    microsoftID: microsoftID,
   };
   return publicationUserRef;
 }

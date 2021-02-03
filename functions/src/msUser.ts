@@ -1,9 +1,9 @@
 import {firestore} from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import {admin} from './config';
-import {MAKAuthor} from './microsoft';
+import {MAKAuthor, User} from './microsoft';
 import {Publication} from './publications';
-import {toUserPublicationRef, UserPublicationRef} from './users';
+import {toUserPublicationRef} from './users';
 
 const db = admin.firestore();
 
@@ -28,7 +28,7 @@ export const addMSUserPubsToNewLinkedUser = functions.firestore
             );
             return;
           }
-          return ds.data() as UserPublicationRef;
+          return ds.data() as User;
         })
         .catch((err) =>
           console.error(
@@ -37,6 +37,8 @@ export const addMSUserPubsToNewLinkedUser = functions.firestore
           )
         );
       if (!correspondingUser) return;
+      // this should never happen as it is batched with processed field
+      if (!correspondingUser.microsoftID) return;
       const msPublicationsQS = await db
         .collection(`MSUsers/${msUserID}/publications`)
         .get()
@@ -71,7 +73,7 @@ export const addMSUserPubsToNewLinkedUser = functions.firestore
           console.error(
             'publication with id ' +
               correspondingPublicationID +
-              ' does not exists despite being processed field of mspublication with id ' +
+              ' might not exist despite being processed field of mspublication with id ' +
               msPublicationDS.id
           );
           return;
@@ -100,7 +102,11 @@ export const addMSUserPubsToNewLinkedUser = functions.firestore
           });
           batch.update(correspondingPublicationRef, {
             authors: firestore.FieldValue.arrayUnion(
-              toUserPublicationRef(correspondingUser, correspondingUserID)
+              toUserPublicationRef(
+                correspondingUser.name,
+                correspondingUser.microsoftID!,
+                correspondingUserID
+              )
             ),
           });
         }

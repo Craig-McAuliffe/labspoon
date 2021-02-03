@@ -1,7 +1,6 @@
 import * as functions from 'firebase-functions';
 import {PubSub} from '@google-cloud/pubsub';
 import {admin} from './config';
-import * as adminNS from 'firebase-admin';
 import {
   interpretQuery,
   executeExpression,
@@ -12,7 +11,8 @@ import {
   Source,
 } from './microsoft';
 import {Topic, handleTopicsNoID, TaggedTopic} from './topics';
-import {toUserPublicationRef, UserPublicationRef} from './users';
+import {toUserPublicationRef, User, UserPublicationRef} from './users';
+import * as adminNS from 'firebase-admin';
 const pubSubClient = new PubSub();
 const db = admin.firestore();
 
@@ -191,8 +191,18 @@ async function resolveUserIDs(
     if (userQS.empty) {
       return user;
     }
-    // if there is labspoon user, add the id to the user object
-    return toUserPublicationRef(user, userQS.docs[0].id);
+    const labspoonUser: User[] = [];
+    userQS.forEach((ds) => {
+      if (!ds.exists) return;
+      labspoonUser.push(ds.data() as User);
+    });
+    if (!labspoonUser[0]) return user;
+    // if there is labspoon user, return the user pub ref
+    return toUserPublicationRef(
+      labspoonUser[0].name,
+      user.microsoftID,
+      userQS.docs[0].id
+    );
   });
   return await Promise.all(setUserPromises);
 }
