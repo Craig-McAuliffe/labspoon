@@ -472,49 +472,6 @@ export async function getPublicationByMicrosoftPublicationID(
   return publicationsQS.docs[0];
 }
 
-export const addSourcesToExistingPublications = functions.https.onRequest(
-  async (_, res) => {
-    const msPublicationsQS = await db.collection('MSPublications').get();
-    if (msPublicationsQS.empty) {
-      res.status(200).send();
-      return;
-    }
-
-    const promises: Promise<any>[] = [];
-    msPublicationsQS.forEach((ds) => {
-      if (!ds.exists) return;
-      const msPublication = ds.data() as MAKPublicationInDB;
-
-      const publicationID = msPublication.processed;
-      // This should not happen as publications are created in a transaction.
-      if (!publicationID) return;
-
-      let sources: Source[] = [];
-      if (msPublication.S) {
-        sources = msPublication.S.map((s) => makSourceToSource(s));
-      }
-
-      const writePromise = db
-        .collection('publications')
-        .doc(publicationID)
-        .update({
-          sources: sources,
-        })
-        .catch((err) => {
-          console.error(
-            `An error occurred adding sources to the publication with ID ${publicationID}`,
-            err
-          );
-          throw new functions.https.HttpsError('internal', 'An error occured.');
-        });
-      promises.push(writePromise);
-    });
-
-    await Promise.all(promises);
-    res.status(200).send();
-  }
-);
-
 // Adds referenced microsoft publication IDs to existing publications that do
 // not have this field populated. This function is idempotent, but should only
 // be run once after the updates to the add publication function are made that
