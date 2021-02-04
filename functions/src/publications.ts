@@ -7,7 +7,6 @@ import {
   makPublicationToPublication,
   MAKPublication,
   MAKPublicationInDB,
-  makSourceToSource,
   Source,
 } from './microsoft';
 import {Topic, handleTopicsNoID, TaggedTopic} from './topics';

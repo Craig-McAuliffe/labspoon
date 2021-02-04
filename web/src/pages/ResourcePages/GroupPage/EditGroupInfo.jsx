@@ -69,6 +69,7 @@ export default function EditingGroupInfo({groupData, children}) {
   useEffect(() => {
     setSelectedUsers(groupMembers);
   }, [groupMembers]);
+
   const initialValues = {
     name: groupData.name ? groupData.name : '',
     location: groupData.location ? groupData.location : '',
@@ -200,6 +201,7 @@ export default function EditingGroupInfo({groupData, children}) {
         cancelForm={() => history.push(`/group/${groupID}`)}
         groupType={groupData.groupType}
         submitting={submitting}
+        avatar={avatar}
       />
     </PaddedPageContainer>
   );

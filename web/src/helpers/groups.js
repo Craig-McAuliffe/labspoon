@@ -82,7 +82,6 @@ export function editGroupAvatarStorageInForm(
     '-extent',
     '200x200',
   ];
-
   return avatarStorageRef
     .put(avatarFile, {
       contentType: avatarFile.type,
@@ -102,7 +101,7 @@ export function editGroupAvatarStorageInForm(
         avatarStorageRef
           .getDownloadURL()
           .then(async (url) => {
-            resizeImage({
+            await resizeImage({
               filePath: avatarStoragePath,
               resizeOptions: resizeOptions,
             })
@@ -113,7 +112,7 @@ export function editGroupAvatarStorageInForm(
                   err
                 );
               })
-              .then(() => writeToDB(avatarID, url));
+              .then(async () => await writeToDB(avatarID, url));
           })
           .catch((err) => {
             console.error(

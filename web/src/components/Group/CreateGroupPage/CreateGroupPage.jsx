@@ -4,9 +4,9 @@ import {useHistory} from 'react-router-dom';
 import {db} from '../../../firebase';
 import {AuthContext} from '../../../App';
 import {LoadingSpinnerPage} from '../../LoadingSpinner/LoadingSpinner';
+import {editGroupAvatarStorageInForm} from '../../../helpers/groups';
 
 import './CreateGroupPage.css';
-import {editGroupAvatarStorageInForm} from '../../../helpers/groups';
 
 export default function CreateGroupPage({
   onboardingCancelOrSubmitAction,
@@ -101,7 +101,7 @@ export default function CreateGroupPage({
     };
 
     if (avatar.length > 0) {
-      editGroupAvatarStorageInForm(
+      return editGroupAvatarStorageInForm(
         avatar,
         groupID,
         setSubmitting,
@@ -123,6 +123,7 @@ export default function CreateGroupPage({
       cancelForm={onboardingCancelOrSubmitAction}
       submitText="Create Group"
       submitting={submitting}
+      avatar={avatar}
     />
   );
 }

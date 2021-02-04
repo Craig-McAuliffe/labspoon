@@ -55,6 +55,7 @@ export default function GroupInfoForm({
   editingGroup,
   groupType,
   submitting,
+  avatar,
 }) {
   const {user, userProfile} = useContext(AuthContext);
 
@@ -107,10 +108,6 @@ export default function GroupInfoForm({
       return;
     } else setSelectedUsers([...selectedUsers, chosenUser]);
   };
-
-  const onAvatarSelect = (selectedAvatar) => {
-    setAvatar(selectedAvatar);
-  };
   return (
     <PaddedContent>
       <Formik
@@ -126,8 +123,9 @@ export default function GroupInfoForm({
               )}
               <EditAvatar
                 existingAvatar={existingAvatar}
-                onAvatarSelect={onAvatarSelect}
+                setAvatar={(selectedPhotos) => setAvatar(selectedPhotos)}
                 submitting={submitting}
+                avatar={avatar}
               />
               <div className="create-group-meta-info">
                 <h3>Basic Info</h3>
@@ -174,15 +172,17 @@ export default function GroupInfoForm({
   );
 }
 
-function EditAvatar({existingAvatar, onAvatarSelect, submitting}) {
+function EditAvatar({existingAvatar, setAvatar, submitting, avatar}) {
   return (
     <div className="edit-group-avatar-section">
       <h3>Group Picture </h3>
       <div>
         <ImageUploadInForm
-          onSelect={onAvatarSelect}
+          setSelectedImages={setAvatar}
           existingAvatar={existingAvatar}
           submitting={submitting}
+          selectedImages={avatar}
+          isAvatar={true}
         />
       </div>
     </div>

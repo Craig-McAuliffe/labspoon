@@ -9,14 +9,16 @@ import SuccessMessage from '../Forms/SuccessMessage';
 import ErrorMessage from '../Forms/ErrorMessage';
 import UserCoverPhoto from '../User/UserCoverPhoto';
 import './ImageUpload.css';
-import GroupAvatar from '../Avatar/GroupAvatar';
 import {AddProfilePhoto} from '../../assets/CreateGroupIcons';
 
 const NOT_STARTED = 0;
 const UPLOADING = 1;
 const FINISHED = 2;
+const NONIMAGE = 'nonImage';
+const TOOBIG = 'tooBig';
 
 const resizeImage = firebase.functions().httpsCallable('images-resizeImage');
+
 export default function ImageUpload({
   storageDir,
   updateDB,
@@ -185,48 +187,41 @@ function onSuccessfulStorageUpload(
 
 export function ImageUploadInForm({
   existingAvatar,
-  onSelect,
+  setSelectedImages,
   multiple,
   submitting,
+  selectedImages,
+  isAvatar,
 }) {
-  const [files, setFiles] = useState([]);
   const [imageURLs, setImageURLs] = useState([]);
   const selectFileInputRef = useRef();
   const [displayValidationMessage, setDisplayValidationMessage] = useState(
     false
   );
   const onChange = (e) => {
-    setFiles(Array.from(e.target.files));
+    setSelectedImages(Array.from(e.target.files));
   };
 
   useEffect(() => {
-    onSelect(files);
-  }, [onSelect, files]);
-
-  useEffect(() => {
-    setImageURLs(files.map((file) => URL.createObjectURL(file)));
+    setImageURLs(selectedImages.map((file) => URL.createObjectURL(file)));
 
     return () => {
       imageURLs.map((url) => URL.revokeObjectURL(url));
       setImageURLs([]);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [files, setImageURLs]);
+  }, [selectedImages, setImageURLs]);
 
   if (imageURLs.length > 0)
     return (
       <ImagesSelected
         imageURLs={imageURLs}
-        cancel={cancel}
+        cancel={() => setSelectedImages([])}
         uploading={submitting ? UPLOADING : false}
-        isAvatar={true}
+        isAvatar={isAvatar}
         cancelText="Remove"
       />
     );
-
-  function cancel() {
-    setFiles([]);
-  }
 
   return (
     <div>
@@ -244,10 +239,13 @@ export function ImageUploadInForm({
         className="image-upload-avatar-button"
         onClick={() => selectFileInputRef.current.click()}
         type="button"
+        label="upload images"
       >
         {existingAvatar ? (
           <div className="image-upload-avatar-container">
-            <GroupAvatar src={existingAvatar} />
+            <div className="image-upload-rounded-preview-container">
+              <img src={existingAvatar} alt="avatar" />
+            </div>
             <AddButton />
             <h3>Upload New Photo</h3>
           </div>
@@ -257,7 +255,8 @@ export function ImageUploadInForm({
           </div>
         )}
       </button>
-      {displayValidationMessage && <UploadValidationMessage />}
+      {displayValidationMessage === NONIMAGE && <UploadTypeValidationMessage />}
+      {displayValidationMessage === TOOBIG && <UploadSizeValidationMessage />}
     </div>
   );
 }
@@ -339,7 +338,8 @@ export function SelectImages({onChange, multipleImages}) {
           />
         </label>
       </div>
-      {displayValidationMessage && <UploadValidationMessage />}
+      {displayValidationMessage === NONIMAGE && <UploadTypeValidationMessage />}
+      {displayValidationMessage === TOOBIG && <UploadSizeValidationMessage />}
     </>
   );
 }
@@ -400,18 +400,27 @@ function UploadErrorMessage({count}) {
   );
 }
 
-function UploadValidationMessage() {
+function UploadTypeValidationMessage() {
   return <ErrorMessage>You can only upload images here.</ErrorMessage>;
+}
+
+function UploadSizeValidationMessage() {
+  return <ErrorMessage>Images must be less than 15MB</ErrorMessage>;
 }
 
 function validatedOnChange(e, onChange, setDisplayValidationMessage) {
   setDisplayValidationMessage(false);
   const files = Array.from(e.target.files);
-  const anyNonImages = files.filter(
+  const nonOrInvalidImages = files.filter(
     (file) => file.type.split('/')[0] !== 'image'
   );
-  if (anyNonImages.length !== 0) {
-    setDisplayValidationMessage(true);
+  if (nonOrInvalidImages.length !== 0) {
+    setDisplayValidationMessage(NONIMAGE);
+    return;
+  }
+  const tooBigImages = files.filter((file) => file.size >= 15000000);
+  if (tooBigImages.length !== 0) {
+    setDisplayValidationMessage(TOOBIG);
     return;
   }
   return onChange(e);
