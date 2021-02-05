@@ -107,10 +107,6 @@
           "arrayConfig": "CONTAINS"
         },
         {
-          "fieldPath": "referencedPublicationMicrosoftIDs",
-          "arrayConfig": "CONTAINS"
-        },
-        {
           "fieldPath": "date",
           "order": "DESCENDING"
         }
