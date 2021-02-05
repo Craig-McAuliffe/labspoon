@@ -107,7 +107,6 @@ export default function EditingGroupInfo({groupData, children}) {
       if (avatarID) values.avatarCloudID = avatarID;
       const batch = db.batch();
       const groupDocRef = db.doc(`groups/${groupID}`);
-      delete values.avatar;
       batch.update(groupDocRef, values);
       selectedUsers.forEach((newMember) => {
         if (!newMember.id) {
