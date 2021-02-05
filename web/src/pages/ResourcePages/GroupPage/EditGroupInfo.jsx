@@ -101,7 +101,10 @@ export default function EditingGroupInfo({groupData, children}) {
         memberIDsToBeRemoved.push(existingGroupMember.id);
     });
 
-    const writeToDB = () => {
+    const writeToDB = async (avatarID, downloadURL) => {
+      delete values.avatar;
+      if (downloadURL) values.avatar = downloadURL;
+      if (avatarID) values.avatarCloudID = avatarID;
       const batch = db.batch();
       const groupDocRef = db.doc(`groups/${groupID}`);
       delete values.avatar;
@@ -156,7 +159,7 @@ export default function EditingGroupInfo({groupData, children}) {
             .doc(invitationToRemove.invitationID)
         );
       });
-      batch
+      await batch
         .commit()
         .catch((err) => {
           console.error('edit group batch failed', err);

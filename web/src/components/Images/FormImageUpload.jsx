@@ -32,7 +32,11 @@ export default function FormImageUpload({
   if (!imageFiles || imageFiles.length === 0) {
     if (isAvatar)
       return (
-        <SelectAvatar onChange={onChange} existingAvatar={existingAvatar} />
+        <SelectAvatar
+          onChange={onChange}
+          existingAvatar={existingAvatar}
+          noGif={true}
+        />
       );
     return (
       <SelectImages

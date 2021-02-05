@@ -42,8 +42,10 @@ export default function CreateGroupPage({
     const groupDocRef = db.collection('groups').doc();
     const groupID = groupDocRef.id;
 
-    const writeToDB = () => {
+    const writeToDB = async (avatarID, downloadURL) => {
       delete values.avatar;
+      if (downloadURL) values.avatar = downloadURL;
+      if (avatarID) values.avatarCloudID = avatarID;
       const batch = db.batch();
       batch.set(groupDocRef, values);
       const userRef = {
@@ -79,7 +81,7 @@ export default function CreateGroupPage({
         if (member.avatar) memberRef.avatar = member.avatar;
         batch.set(groupDocRef.collection('members').doc(member.id), memberRef);
       });
-      batch
+      await batch
         .commit()
         .catch((err) => {
           setSubmitting(false);

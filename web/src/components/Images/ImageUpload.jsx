@@ -16,6 +16,7 @@ const UPLOADING = 1;
 const FINISHED = 2;
 const NONIMAGE = 'nonImage';
 const TOOBIG = 'tooBig';
+const GIF = 'gif';
 
 const resizeImage = firebase.functions().httpsCallable('images-resizeImage');
 
@@ -24,8 +25,10 @@ export default function ImageUpload({
   updateDB,
   refresh,
   multipleImages,
-  cover,
+  isCover,
   resizeOptions,
+  noGif,
+  isAvatar,
 }) {
   const [files, setFiles] = useState([]);
   const [imageURLs, setImageURLs] = useState([]);
@@ -112,14 +115,16 @@ export default function ImageUpload({
       displaySuccessMessage={displaySuccessMessage}
       displayErrorMessage={displayErrorMessage}
       unsuccessfulUploadCount={unsuccessfulUploadCount}
+      noGif={noGif}
     />
   ) : (
     <ImagesSelected
       imageURLs={imageURLs}
       uploading={uploading}
-      cover={cover}
+      isCover={isCover}
       cancel={cancel}
       uploadImages={uploadImages}
+      isAvatar={isAvatar}
     />
   );
 }
@@ -191,10 +196,15 @@ function NoImagesSelected({
   displaySuccessMessage,
   displayErrorMessage,
   unsuccessfulUploadCount,
+  noGif,
 }) {
   return (
     <div className="image-upload-section">
-      <SelectImages onChange={onChange} multipleImages={multipleImages} />
+      <SelectImages
+        onChange={onChange}
+        multipleImages={multipleImages}
+        noGif={noGif}
+      />
       <div className="after-upload-message-container">
         {displaySuccessMessage ? <UploadSuccessMessage /> : <></>}
         {displayErrorMessage ? (
@@ -210,7 +220,7 @@ function NoImagesSelected({
 function ImagesSelected({
   imageURLs,
   uploading,
-  cover,
+  isCover,
   cancel,
   uploadImages,
   isAvatar,
@@ -221,8 +231,8 @@ function ImagesSelected({
       <ImagePreviews
         urls={imageURLs}
         uploading={uploading === UPLOADING}
-        cover={cover}
-        rounded={isAvatar}
+        isCover={isCover}
+        isAvatar={isAvatar}
       />
       <div className="confirm-cancel-upload-container">
         <NegativeButton onClick={cancel} disabled={uploading === UPLOADING}>
@@ -242,7 +252,7 @@ function ImagesSelected({
 }
 const MAX_IMAGE_PREVIEWS = 3;
 
-export function SelectImages({onChange, multipleImages}) {
+export function SelectImages({onChange, multipleImages, noGif}) {
   const [displayValidationMessage, setDisplayValidationMessage] = useState(
     false
   );
@@ -255,20 +265,28 @@ export function SelectImages({onChange, multipleImages}) {
           <input
             type="file"
             onChange={(e) =>
-              validatedOnChange(e, onChange, setDisplayValidationMessage)
+              validatedOnChange(e, onChange, setDisplayValidationMessage, noGif)
             }
             multiple={multipleImages}
             name="uploaded-image"
           />
         </label>
       </div>
-      {displayValidationMessage === NONIMAGE && <UploadTypeValidationMessage />}
-      {displayValidationMessage === TOOBIG && <UploadSizeValidationMessage />}
+      <ErrorMessageType displayValidationMessage={displayValidationMessage} />
     </>
   );
 }
 
-export function SelectAvatar({existingAvatar, onChange}) {
+function ErrorMessageType({displayValidationMessage}) {
+  if (displayValidationMessage === NONIMAGE)
+    return <UploadTypeValidationMessage />;
+  if (displayValidationMessage === GIF) return <NoGifValidationMessage />;
+  if (displayValidationMessage === TOOBIG)
+    return <UploadSizeValidationMessage />;
+  return null;
+}
+
+export function SelectAvatar({existingAvatar, onChange, noGif}) {
   const [displayValidationMessage, setDisplayValidationMessage] = useState(
     false
   );
@@ -278,7 +296,7 @@ export function SelectAvatar({existingAvatar, onChange}) {
       <input
         type="file"
         onChange={(e) =>
-          validatedOnChange(e, onChange, setDisplayValidationMessage)
+          validatedOnChange(e, onChange, setDisplayValidationMessage, noGif)
         }
         name="uploaded-image"
         multiple={false}
@@ -305,14 +323,13 @@ export function SelectAvatar({existingAvatar, onChange}) {
           </div>
         )}
       </button>
-      {displayValidationMessage === NONIMAGE && <UploadTypeValidationMessage />}
-      {displayValidationMessage === TOOBIG && <UploadSizeValidationMessage />}
+      <ErrorMessageType displayValidationMessage={displayValidationMessage} />
     </div>
   );
 }
 
-export function ImagePreviews({urls, uploading, cover, rounded}) {
-  if (cover)
+export function ImagePreviews({urls, uploading, isCover, isAvatar}) {
+  if (isCover)
     return (
       <div className="image-upload-cover-preview-container">
         {urls.map((url, i) => (
@@ -326,7 +343,7 @@ export function ImagePreviews({urls, uploading, cover, rounded}) {
       </div>
     );
 
-  if (rounded)
+  if (isAvatar)
     return (
       <div>
         {urls.map((url, i) => (
@@ -375,7 +392,11 @@ function UploadSizeValidationMessage() {
   return <ErrorMessage>Images must be less than 15MB</ErrorMessage>;
 }
 
-function validatedOnChange(e, onChange, setDisplayValidationMessage) {
+function NoGifValidationMessage() {
+  return <ErrorMessage>Avatars cannot be GIFs</ErrorMessage>;
+}
+
+function validatedOnChange(e, onChange, setDisplayValidationMessage, noGif) {
   setDisplayValidationMessage(false);
   const files = Array.from(e.target.files);
   const nonOrInvalidImages = files.filter(
@@ -390,5 +411,14 @@ function validatedOnChange(e, onChange, setDisplayValidationMessage) {
     setDisplayValidationMessage(TOOBIG);
     return;
   }
+
+  if (noGif) {
+    const gifImages = files.filter((file) => file.type.split('/')[1] === 'gif');
+    if (gifImages.length !== 0) {
+      setDisplayValidationMessage(GIF);
+      return;
+    }
+  }
+
   return onChange(e);
 }

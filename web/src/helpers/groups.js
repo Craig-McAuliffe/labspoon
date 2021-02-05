@@ -2,6 +2,8 @@ import {firebaseConfig} from '../config';
 import firebase, {db, storage} from '../firebase';
 import {v4 as uuid} from 'uuid';
 
+const resizeImage = firebase.functions().httpsCallable('images-resizeImage');
+
 // Retrieves paginated group references from passed group reference collection
 // for use in results pages. Returns a promise that returns an array of results
 // when resolved. If there are no results, or the collection does not exist, an
@@ -72,6 +74,14 @@ export function editGroupAvatarStorageInForm(
   const avatarID = uuid();
   const avatarStoragePath = `groups/${groupID}/avatar/${avatarID}`;
   const avatarStorageRef = storage.ref(avatarStoragePath);
+  const resizeOptions = [
+    '-thumbnail',
+    '200x200^',
+    '-gravity',
+    'center',
+    '-extent',
+    '200x200',
+  ];
   return avatarStorageRef
     .put(avatarFile, {
       contentType: avatarFile.type,
@@ -88,13 +98,20 @@ export function editGroupAvatarStorageInForm(
         setError(true);
       },
       async () => {
-        return Promise.resolve(
-          avatarStorageRef
-            .getDownloadURL()
-            .then(async (url) =>
-              writeToDB(avatarID + '_thumbnail', url + '_thumbnail')
-            )
-        );
+        let resizeIsSuccessful = true;
+        const downloadURL = await avatarStorageRef.getDownloadURL();
+        await resizeImage({
+          filePath: avatarStoragePath,
+          resizeOptions: resizeOptions,
+        })
+          .catch((err) => {
+            setError(true);
+            console.error('an error occurred while resizing the image', err);
+            resizeIsSuccessful = false;
+          })
+          .then(async () => {
+            if (resizeIsSuccessful) await writeToDB(avatarID, downloadURL);
+          });
       }
     );
 }

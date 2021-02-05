@@ -41,6 +41,8 @@ export function EditUserProfilePicture({userID}) {
           '-extent',
           '200x200',
         ]}
+        noGif={true}
+        isAvatar={true}
       />
     </div>
   );
@@ -65,7 +67,7 @@ export function EditUserCoverPicture({userID}) {
       </p>
       <ImageUpload
         storageDir={`users/${userID}/coverPhoto`}
-        cover={true}
+        isCover={true}
         updateDB={addCoverPhotoToUserDoc}
         resizeOptions={[
           '-thumbnail',
@@ -75,6 +77,7 @@ export function EditUserCoverPicture({userID}) {
           '-extent',
           '1070x200',
         ]}
+        noGif={true}
       />
     </div>
   );
