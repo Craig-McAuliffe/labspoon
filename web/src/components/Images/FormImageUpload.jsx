@@ -49,7 +49,7 @@ export default function FormImageUpload({
 
   return (
     <>
-      <ImagePreviews urls={urls} rounded={isAvatar} />
+      <ImagePreviews urls={urls} isAvatar={isAvatar} />
       <div className="form-image-cancel-container">
         <NegativeButton onClick={() => helpers.setValue([])}>
           Remove
