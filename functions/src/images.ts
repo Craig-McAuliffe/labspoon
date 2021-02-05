@@ -41,7 +41,7 @@ export const resizeImage = functions.https.onCall(async (data, context) => {
   try {
     fs.unlinkSync(tmp);
   } catch {
-    throw Error('error when freeing up local memory during image resize');
+    console.error('error when freeing up local memory during image resize');
   }
 
   return uploadPromise;
