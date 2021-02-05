@@ -8,8 +8,9 @@ import {formatTaggedImages, ImagesSection} from './ImageListItem';
 import SuccessMessage from '../Forms/SuccessMessage';
 import ErrorMessage from '../Forms/ErrorMessage';
 import UserCoverPhoto from '../User/UserCoverPhoto';
-import './ImageUpload.css';
 import {AddProfilePhoto} from '../../assets/CreateGroupIcons';
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
+import './ImageUpload.css';
 
 const NOT_STARTED = 0;
 const UPLOADING = 1;
@@ -33,10 +34,8 @@ export default function ImageUpload({
   const [files, setFiles] = useState([]);
   const [imageURLs, setImageURLs] = useState([]);
   const [uploading, setUploading] = useState(NOT_STARTED);
-  const [uploadingCount, setUploadingCount] = useState(0);
   const [displaySuccessMessage, setDisplaySuccessMessage] = useState(false);
   const [displayErrorMessage, setDisplayErrorMessage] = useState(false);
-  const [unsuccessfulUploadCount, setUnsuccessfulUploadCount] = useState(0);
 
   function onChange(e) {
     setFiles(Array.from(e.target.files));
@@ -47,16 +46,21 @@ export default function ImageUpload({
       setDisplaySuccessMessage(false);
       setDisplayErrorMessage(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [files, setDisplayErrorMessage, setDisplaySuccessMessage]);
 
+  useEffect(() => {
     setImageURLs(files.map((file) => URL.createObjectURL(file)));
-    if (setUploading) setUploading(NOT_STARTED);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [files, setImageURLs]);
 
+  useEffect(() => {
     return () => {
       imageURLs.map((url) => URL.revokeObjectURL(url));
       setImageURLs([]);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [files, setDisplayErrorMessage, setDisplaySuccessMessage]);
+  }, [setImageURLs]);
 
   useEffect(() => {
     if (uploading === FINISHED) {
@@ -66,47 +70,53 @@ export default function ImageUpload({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uploading, setImageURLs, setFiles]);
 
-  useEffect(() => {
-    if (uploadingCount === 0 && uploading === UPLOADING) setUploading(FINISHED);
-  }, [uploadingCount, uploading, setUploading]);
-
-  function uploadImages() {
+  async function uploadImages() {
     setUploading(UPLOADING);
-    setUnsuccessfulUploadCount(0);
-    setUploadingCount(files.length);
-
+    let uploadingCount = files.length;
+    let unsuccessfulUploadCount = 0;
+    const uploadPromisesArray = [];
     files.forEach(async (file) => {
-      setUploadingCount((count) => count - 1);
+      uploadingCount = uploadingCount - 1;
       const photoID = uuid();
       const filePath = storageDir + '/' + photoID;
       const photoStorageRef = storage.ref(filePath);
-      photoStorageRef.put(file, {contentType: file.type}).on(
-        firebase.storage.TaskEvent.STATE_CHANGED,
-        () => {},
-        (err) => {
-          console.error(err);
-          setUnsuccessfulUploadCount((count) => count + 1);
-        },
-        () => {
-          onSuccessfulStorageUpload(
-            photoStorageRef,
-            photoID,
-            resizeOptions,
-            filePath,
-            setUnsuccessfulUploadCount,
-            updateDB
+      uploadPromisesArray.push(
+        new Promise((resolve, reject) => {
+          photoStorageRef.put(file, {contentType: file.type}).on(
+            firebase.storage.TaskEvent.STATE_CHANGED,
+            () => {},
+            (err) => {
+              console.error(err);
+              unsuccessfulUploadCount = unsuccessfulUploadCount + 1;
+              reject(err);
+            },
+            async () => {
+              await onSuccessfulStorageUpload(
+                photoStorageRef,
+                photoID,
+                resizeOptions,
+                filePath,
+                unsuccessfulUploadCount,
+                updateDB
+              );
+              resolve('succeeded');
+              if (uploadingCount === 0) {
+                if (unsuccessfulUploadCount === 0)
+                  setDisplaySuccessMessage(true);
+                else setDisplayErrorMessage(true);
+              }
+            }
           );
-        }
+        })
       );
-      if (uploadingCount === 0) {
-        if (unsuccessfulUploadCount === 0) setDisplaySuccessMessage(true);
-        else setDisplayErrorMessage(true);
-      }
     });
+    await Promise.all(uploadPromisesArray);
+    setUploading(FINISHED);
   }
 
   function cancel() {
     setFiles([]);
+    setImageURLs([]);
   }
   return imageURLs.length === 0 ? (
     <NoImagesSelected
@@ -114,7 +124,6 @@ export default function ImageUpload({
       multipleImages={multipleImages}
       displaySuccessMessage={displaySuccessMessage}
       displayErrorMessage={displayErrorMessage}
-      unsuccessfulUploadCount={unsuccessfulUploadCount}
       noGif={noGif}
     />
   ) : (
@@ -129,73 +138,67 @@ export default function ImageUpload({
   );
 }
 
-function onSuccessfulStorageUpload(
+async function onSuccessfulStorageUpload(
   photoStorageRef,
   photoID,
   resizeOptions,
   filePath,
-  setUnsuccessfulUploadCount,
+  unsuccessfulUploadCount,
   updateDB
 ) {
-  photoStorageRef
+  const downloadURL = await photoStorageRef
     .getDownloadURL()
-    .then(async (url) => {
-      if (resizeOptions) {
-        await resizeImage({
-          filePath: filePath,
-          resizeOptions: resizeOptions,
-        })
-          .catch((err) => {
-            console.error(
-              'an error occurred while calling the resize functions',
-              err
-            );
-            setUnsuccessfulUploadCount((count) => count + 1);
-            deleteUploadedFileOnError();
-          })
-          .then(async () => {
-            if (updateDB)
-              await updateDB(url, photoID).catch((err) => {
-                console.error(err);
-                setUnsuccessfulUploadCount((count) => count + 1);
-              });
-          });
-      } else if (updateDB) {
-        await updateDB(url, photoID).catch((err) => {
-          console.error(err);
-          setUnsuccessfulUploadCount((count) => count + 1);
-        });
-      }
-    })
-    .catch((err) => {
+    .catch(async (err) => {
       console.error(
-        'failed to get download url for ' +
+        'unable to get download url for ' +
           photoStorageRef +
           ', therefore cannot update db',
         err
       );
-      deleteUploadedFileOnError();
-      setUnsuccessfulUploadCount((count) => count + 1);
+      await deleteUploadedFileOnError();
+      unsuccessfulUploadCount = unsuccessfulUploadCount + 1;
     });
 
-  const deleteUploadedFileOnError = () => {
-    photoStorageRef
-      .delete()
-      .catch((err) =>
-        console.error(
-          'could not delete cloud file for ref' + photoStorageRef,
-          err
-        )
+  if (!downloadURL) return;
+
+  if (resizeOptions) {
+    let successfulResize = true;
+    await resizeImage({
+      filePath: filePath,
+      resizeOptions: resizeOptions,
+    }).catch(async (err) => {
+      console.error(
+        'an error occurred while calling the resize functions',
+        err
       );
-  };
+      unsuccessfulUploadCount = unsuccessfulUploadCount + 1;
+      await deleteUploadedFileOnError();
+      successfulResize = false;
+    });
+    if (!successfulResize) return;
+  }
+  if (updateDB)
+    await updateDB(downloadURL, photoID).catch((err) => {
+      console.error(err);
+      unsuccessfulUploadCount = unsuccessfulUploadCount + 1;
+    });
 }
+
+const deleteUploadedFileOnError = () =>
+  photoStorageRef
+    .delete()
+    .catch((err) =>
+      console.error(
+        'could not delete cloud file for ref' + photoStorageRef,
+        err
+      )
+    );
 
 function NoImagesSelected({
   onChange,
   multipleImages,
   displaySuccessMessage,
   displayErrorMessage,
-  unsuccessfulUploadCount,
   noGif,
 }) {
   return (
@@ -207,11 +210,7 @@ function NoImagesSelected({
       />
       <div className="after-upload-message-container">
         {displaySuccessMessage ? <UploadSuccessMessage /> : <></>}
-        {displayErrorMessage ? (
-          <UploadErrorMessage count={unsuccessfulUploadCount} />
-        ) : (
-          <></>
-        )}
+        {displayErrorMessage ? <UploadErrorMessage /> : <></>}
       </div>
     </div>
   );
@@ -348,7 +347,16 @@ export function ImagePreviews({urls, uploading, isCover, isAvatar}) {
       <div>
         {urls.map((url, i) => (
           <div key={url + i} className="image-upload-rounded-preview-container">
-            <img src={url} alt="avatar" />
+            <img
+              src={url}
+              alt="avatar"
+              className={uploading ? 'avatar-preview-loading' : ''}
+            />
+            {uploading && (
+              <div className="avatar-image-spinner-container">
+                <LoadingSpinner />
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -372,13 +380,7 @@ function UploadSuccessMessage() {
   return <SuccessMessage>Photos successfully uploaded.</SuccessMessage>;
 }
 
-function UploadErrorMessage({count}) {
-  if (count)
-    return (
-      <ErrorMessage>
-        Something went wrong uploading {count} of your images.
-      </ErrorMessage>
-    );
+function UploadErrorMessage() {
   return (
     <ErrorMessage>Something went wrong. Please try again later.</ErrorMessage>
   );
