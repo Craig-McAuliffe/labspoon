@@ -19,7 +19,7 @@ import TagTopics from '../Topics/TagTopics';
 import CreateResourceFormActions from '../Forms/CreateResourceFormActions';
 import {db} from '../../firebase';
 import {uploadImagesAndGetURLs} from '../../helpers/images';
-import FormImageUpload from '../Forms/FormImageUpload';
+import FormImageUpload from '../Images/FormImageUpload';
 import addArticleToDB from '../../helpers/articles';
 
 export default function CreateTechnique() {
@@ -135,7 +135,7 @@ export default function CreateTechnique() {
           selectedTopics={selectedTopics}
           setSelectedTopics={setSelectedTopics}
         />
-        <FormImageUpload name="photos" />
+        <FormImageUpload name="photos" multiple={true} />
         <CreateResourceFormActions
           submitting={submitting}
           submitText="Create"

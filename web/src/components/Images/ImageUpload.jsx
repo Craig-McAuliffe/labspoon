@@ -185,82 +185,6 @@ function onSuccessfulStorageUpload(
   };
 }
 
-export function ImageUploadInForm({
-  existingAvatar,
-  setSelectedImages,
-  multiple,
-  submitting,
-  selectedImages,
-  isAvatar,
-}) {
-  const [imageURLs, setImageURLs] = useState([]);
-  const selectFileInputRef = useRef();
-  const [displayValidationMessage, setDisplayValidationMessage] = useState(
-    false
-  );
-  const onChange = (e) => {
-    setSelectedImages(Array.from(e.target.files));
-  };
-
-  useEffect(() => {
-    setImageURLs(selectedImages.map((file) => URL.createObjectURL(file)));
-
-    return () => {
-      imageURLs.map((url) => URL.revokeObjectURL(url));
-      setImageURLs([]);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedImages, setImageURLs]);
-
-  if (imageURLs.length > 0)
-    return (
-      <ImagesSelected
-        imageURLs={imageURLs}
-        cancel={() => setSelectedImages([])}
-        uploading={submitting ? UPLOADING : false}
-        isAvatar={isAvatar}
-        cancelText="Remove"
-      />
-    );
-
-  return (
-    <div>
-      <input
-        type="file"
-        onChange={(e) =>
-          validatedOnChange(e, onChange, setDisplayValidationMessage)
-        }
-        name="uploaded-image"
-        multiple={multiple}
-        ref={selectFileInputRef}
-        style={{display: 'none'}}
-      />
-      <button
-        className="image-upload-avatar-button"
-        onClick={() => selectFileInputRef.current.click()}
-        type="button"
-        label="upload images"
-      >
-        {existingAvatar ? (
-          <div className="image-upload-avatar-container">
-            <div className="image-upload-rounded-preview-container">
-              <img src={existingAvatar} alt="avatar" />
-            </div>
-            <AddButton />
-            <h3>Upload New Photo</h3>
-          </div>
-        ) : (
-          <div className="image-upload-no-avatar-container">
-            <AddProfilePhoto />
-          </div>
-        )}
-      </button>
-      {displayValidationMessage === NONIMAGE && <UploadTypeValidationMessage />}
-      {displayValidationMessage === TOOBIG && <UploadSizeValidationMessage />}
-    </div>
-  );
-}
-
 function NoImagesSelected({
   onChange,
   multipleImages,
@@ -341,6 +265,49 @@ export function SelectImages({onChange, multipleImages}) {
       {displayValidationMessage === NONIMAGE && <UploadTypeValidationMessage />}
       {displayValidationMessage === TOOBIG && <UploadSizeValidationMessage />}
     </>
+  );
+}
+
+export function SelectAvatar({existingAvatar, onChange}) {
+  const [displayValidationMessage, setDisplayValidationMessage] = useState(
+    false
+  );
+  const selectFileInputRef = useRef();
+  return (
+    <div>
+      <input
+        type="file"
+        onChange={(e) =>
+          validatedOnChange(e, onChange, setDisplayValidationMessage)
+        }
+        name="uploaded-image"
+        multiple={false}
+        ref={selectFileInputRef}
+        style={{display: 'none'}}
+      />
+      <button
+        className="image-upload-avatar-button"
+        onClick={() => selectFileInputRef.current.click()}
+        type="button"
+        label="upload images"
+      >
+        {existingAvatar ? (
+          <div className="image-upload-avatar-container">
+            <div className="image-upload-rounded-preview-container">
+              <img src={existingAvatar} alt="avatar" />
+            </div>
+            <AddButton />
+            <h3>Upload New Photo</h3>
+          </div>
+        ) : (
+          <div className="image-upload-no-avatar-container">
+            <AddProfilePhoto />
+          </div>
+        )}
+      </button>
+      {displayValidationMessage === NONIMAGE && <UploadTypeValidationMessage />}
+      {displayValidationMessage === TOOBIG && <UploadSizeValidationMessage />}
+    </div>
   );
 }
 

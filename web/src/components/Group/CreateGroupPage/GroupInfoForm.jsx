@@ -31,7 +31,7 @@ import {PaddedContent} from '../../../components/Layout/Content';
 import Select, {LabelledDropdownContainer} from '../../Forms/Select/Select';
 import {DropdownOption} from '../../Dropdown';
 import InputError from '../../../components/Forms/InputError';
-import {ImageUploadInForm} from '../../Images/ImageUpload';
+import FormImageUpload from '../../Images/FormImageUpload';
 
 import './CreateGroupPage.css';
 import './GroupInfoForm.css';
@@ -126,6 +126,7 @@ export default function GroupInfoForm({
                 setAvatar={(selectedPhotos) => setAvatar(selectedPhotos)}
                 submitting={submitting}
                 avatar={avatar}
+                name="avatar"
               />
               <div className="create-group-meta-info">
                 <h3>Basic Info</h3>
@@ -172,17 +173,16 @@ export default function GroupInfoForm({
   );
 }
 
-function EditAvatar({existingAvatar, setAvatar, submitting, avatar}) {
+function EditAvatar({existingAvatar, submitting}) {
   return (
     <div className="edit-group-avatar-section">
       <h3>Group Picture </h3>
       <div>
-        <ImageUploadInForm
-          setSelectedImages={setAvatar}
+        <FormImageUpload
           existingAvatar={existingAvatar}
           submitting={submitting}
-          selectedImages={avatar}
           isAvatar={true}
+          name="avatar"
         />
       </div>
     </div>

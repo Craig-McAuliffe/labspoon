@@ -19,7 +19,7 @@ import HeaderAndBodyArticleInput, {
 import TagTopics from '../Topics/TagTopics';
 import CreateResourceFormActions from '../Forms/CreateResourceFormActions';
 import {uploadImagesAndGetURLs} from '../../helpers/images';
-import FormImageUpload from '../Forms/FormImageUpload';
+import FormImageUpload from '../Images/FormImageUpload';
 import addArticleToDB from '../../helpers/articles';
 
 import './CreateResearchFocus.css';
@@ -137,7 +137,7 @@ export default function CreateResearchFocus() {
           selectedTopics={selectedTopics}
           setSelectedTopics={setSelectedTopics}
         />
-        <FormImageUpload name="photos" />
+        <FormImageUpload name="photos" multiple={true} />
         <CreateResourceFormActions
           submitting={submitting}
           submitText="Create"

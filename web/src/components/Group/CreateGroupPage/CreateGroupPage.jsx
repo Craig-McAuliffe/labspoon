@@ -15,7 +15,6 @@ export default function CreateGroupPage({
   const history = useHistory();
   const {user, userProfile} = useContext(AuthContext);
   const [selectedUsers, setSelectedUsers] = useState([]);
-  const [avatar, setAvatar] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(false);
   const userID = user.uid;
@@ -43,11 +42,9 @@ export default function CreateGroupPage({
     const groupDocRef = db.collection('groups').doc();
     const groupID = groupDocRef.id;
 
-    const writeToDB = (avatarID, downloadURL) => {
+    const writeToDB = () => {
+      delete values.avatar;
       const batch = db.batch();
-
-      if (downloadURL) values.avatar = downloadURL;
-      if (avatarID) values.avatarCloudID = avatarID;
       batch.set(groupDocRef, values);
       const userRef = {
         id: userProfile.id,
@@ -100,9 +97,9 @@ export default function CreateGroupPage({
         });
     };
 
-    if (avatar.length > 0) {
+    if (values.avatar && values.avatar.length > 0) {
       return editGroupAvatarStorageInForm(
-        avatar,
+        values.avatar,
         groupID,
         setSubmitting,
         setError,
@@ -117,13 +114,10 @@ export default function CreateGroupPage({
     <GroupInfoForm
       initialValues={initialValues}
       onSubmit={onSubmit}
-      setAvatar={setAvatar}
       selectedUsers={selectedUsers}
       setSelectedUsers={setSelectedUsers}
       cancelForm={onboardingCancelOrSubmitAction}
       submitText="Create Group"
-      submitting={submitting}
-      avatar={avatar}
     />
   );
 }

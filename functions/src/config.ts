@@ -2,9 +2,7 @@ import * as functions from 'firebase-functions';
 import * as adminNS from 'firebase-admin';
 
 export const config = functions.config();
-export const admin = adminNS.initializeApp({
-  storageBucket: config.env.storagebucket,
-});
+export const admin = adminNS.initializeApp();
 
 export const environment = config.env.name;
 export const url = config.env.url;

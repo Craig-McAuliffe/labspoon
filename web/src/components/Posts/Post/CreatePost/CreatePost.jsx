@@ -61,7 +61,9 @@ export default function CreatePost({
           cancelPost: keepExpanded ? undefined : cancelPost,
         }}
       >
-        <div className={locationPathname ? 'create-post-margin-top' : ''}>
+        <div
+          className={locationPathname === '/' ? 'create-post-margin-top' : ''}
+        >
           <PostTypeSpecificForm
             setCreatingPost={setCreatingPostIfNotExpanded}
             postType={taggedResourceType}

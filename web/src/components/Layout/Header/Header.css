@@ -65,7 +65,6 @@
 @media screen and (max-width: 1197px) {
   .header-container {
     grid-template-columns: 60px 1fr 350px;
-    width: 100%;
   }
 
   .header-home-text {
@@ -106,6 +105,9 @@
   }
   .header-right-section {
     width: 100px;
+  }
+  .header-container {
+    width: 100%;
   }
 }
 

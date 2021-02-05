@@ -1,10 +1,16 @@
 import React, {useState, useEffect} from 'react';
 import {useField} from 'formik';
-import {ImagePreviews, SelectImages} from '../Images/ImageUpload';
+import {ImagePreviews, SelectImages, SelectAvatar} from './ImageUpload';
 import NegativeButton from '../Buttons/NegativeButton';
 
 import './FormImageUpload.css';
-export default function FormImageUpload({...props}) {
+
+export default function FormImageUpload({
+  isAvatar,
+  multiple,
+  existingAvatar,
+  ...props
+}) {
   const [field, , helpers] = useField(props);
   const [urls, setURLs] = useState([]);
   const imageFiles = field.value;
@@ -24,12 +30,22 @@ export default function FormImageUpload({...props}) {
   }
 
   if (!imageFiles || imageFiles.length === 0) {
-    return <SelectImages onChange={onChange} multipleImages={true} />;
+    if (isAvatar)
+      return (
+        <SelectAvatar onChange={onChange} existingAvatar={existingAvatar} />
+      );
+    return (
+      <SelectImages
+        onChange={onChange}
+        multipleImages={multiple}
+        existingAvatar={existingAvatar}
+      />
+    );
   }
 
   return (
     <>
-      <ImagePreviews urls={urls} />
+      <ImagePreviews urls={urls} rounded={isAvatar} />
       <div className="form-image-cancel-container">
         <NegativeButton onClick={() => helpers.setValue([])}>
           Remove

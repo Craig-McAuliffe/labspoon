@@ -14,7 +14,6 @@ export default function EditingGroupInfo({groupData, children}) {
   const [groupMembers, setGroupMembers] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [verified, setVerified] = useState(undefined);
-  const [avatar, setAvatar] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(false);
   const {user} = useContext(AuthContext);
@@ -102,11 +101,10 @@ export default function EditingGroupInfo({groupData, children}) {
         memberIDsToBeRemoved.push(existingGroupMember.id);
     });
 
-    const writeToDB = (avatarID, downloadURL) => {
+    const writeToDB = () => {
       const batch = db.batch();
       const groupDocRef = db.doc(`groups/${groupID}`);
-      if (downloadURL) values.avatar = downloadURL;
-      if (avatarID) values.avatarCloudID = avatarID;
+      delete values.avatar;
       batch.update(groupDocRef, values);
       selectedUsers.forEach((newMember) => {
         if (!newMember.id) {
@@ -171,9 +169,9 @@ export default function EditingGroupInfo({groupData, children}) {
         });
     };
 
-    if (avatar.length > 0) {
+    if (values.avatar && values.avatar.length > 0) {
       return editGroupAvatarStorageInForm(
-        avatar,
+        values.avatar,
         groupID,
         setSubmitting,
         setError,
@@ -193,7 +191,6 @@ export default function EditingGroupInfo({groupData, children}) {
         onSubmit={onSubmitEdit}
         selectedUsers={selectedUsers}
         setSelectedUsers={setSelectedUsers}
-        setAvatar={setAvatar}
         existingAvatar={groupData.avatar}
         submitText="Save Changes"
         verified={verified}
@@ -201,7 +198,6 @@ export default function EditingGroupInfo({groupData, children}) {
         cancelForm={() => history.push(`/group/${groupID}`)}
         groupType={groupData.groupType}
         submitting={submitting}
-        avatar={avatar}
       />
     </PaddedPageContainer>
   );
