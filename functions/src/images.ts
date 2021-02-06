@@ -6,6 +6,7 @@ import * as os from 'os';
 import * as fs from 'fs';
 
 const storage = admin.storage();
+const db = admin.firestore();
 
 // Generates a thumbnail for a large image using the image magick library. Takes a cloud storage file path, and saves the output image as destinationFileName in the same directory as the input image. options is an array of image magick convert options.
 export const resizeImage = functions.https.onCall(async (data, context) => {
@@ -66,7 +67,11 @@ export const resizeImageOnTrigger = functions.storage
       return;
     }
 
-    console.log(`filePath userID is ${filePath.split('/')[1]}`);
+    const splitFilePath = filePath.split('/');
+    const resourceCollectionName = splitFilePath[0];
+    const resourceID = splitFilePath[1];
+    const imageType = splitFilePath[2];
+
     let resizeOptions;
     if (filePath.includes('users')) {
       if (filePath.includes('avatar'))
@@ -102,47 +107,55 @@ export const resizeImageOnTrigger = functions.storage
       );
       return;
     }
-    const filePathSplitArray = filePath.split('_');
-    if (filePathSplitArray.length < 2) {
+    const storageIDSplit = filePath.split('_');
+    if (storageIDSplit.length < 2) {
       console.error(
         `file name does not have correct naming convention, _fullSize, for path ${filePath}`
       );
       return;
     }
-    const newFilePath = filePathSplitArray[0];
-    console.log(newFilePath);
-    // const tmpfileName = `thumbnail`;
-    // const tmp = path.join(os.tmpdir(), tmpfileName);
-    // const file = storage.bucket().file(filePath);
-    // await file.download({destination: tmp});
-    // const [metadata] = await file.getMetadata();
-    // // convert to thumbnail
-    // resizeOptions.unshift(tmp);
-    // resizeOptions.push(tmp);
-    // await spawn('convert', resizeOptions);
-    // // upload thumbnail
-    // const uploadPromise = await storage
-    //   .bucket()
-    //   .upload(tmp, {
-    //     destination: filePath,
-    //     metadata: {
-    //       contentType: metadata.contentType,
-    //       cacheControl: 'no-cache public',
-    //     },
-    //   })
-    //   .catch((err) => {
-    //     console.error(err);
-    //     throw new functions.https.HttpsError(
-    //       'internal',
-    //       'An error occurred while resizing the image.'
-    //     );
-    //   });
-    // // free up disk space
-    // try {
-    //   fs.unlinkSync(tmp);
-    // } catch {
-    //   console.error('error when freeing up local memory during image resize');
-    // }
-
-    // return uploadPromise;
+    const newFilePath = storageIDSplit[0];
+    const newFileID = storageIDSplit[0].split('/')[3];
+    if (!resourceCollectionName || !resourceID || !imageType || !newFileID) {
+      console.log('file path unsuccessfully deconstructed while resizing');
+      return;
+    }
+    const tmpfileName = `thumbnail`;
+    const tmp = path.join(os.tmpdir(), tmpfileName);
+    const file = storage.bucket().file(filePath);
+    await file.download({destination: tmp});
+    const [metadata] = await file.getMetadata();
+    // convert to thumbnail
+    resizeOptions.unshift(tmp);
+    resizeOptions.push(tmp);
+    await spawn('convert', resizeOptions);
+    // upload thumbnail
+    const uploadPromise = await storage
+      .bucket()
+      .upload(tmp, {
+        destination: filePath,
+        metadata: {
+          contentType: metadata.contentType,
+          cacheControl: 'no-cache public',
+        },
+      })
+      .catch((err) => {
+        console.error(err);
+        throw new functions.https.HttpsError(
+          'internal',
+          'An error occurred while resizing the image.'
+        );
+      })
+      .then(() => true);
+    // free up disk space
+    try {
+      fs.unlinkSync(tmp);
+    } catch {
+      console.error('error when freeing up local memory during image resize');
+    }
+    const resizeSuccess = await Promise.resolve(uploadPromise);
+    if (!resizeSuccess) return;
+    return db
+      .doc(`${resourceCollectionName}/${resourceID}`)
+      .update({[imageType]: newFilePath, [imageType + 'CloudID']: newFileID});
   });

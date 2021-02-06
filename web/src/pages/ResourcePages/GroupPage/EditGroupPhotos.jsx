@@ -61,17 +61,22 @@ export default function EditGroupPhotos({children}) {
   function refresh() {
     setPhotos([]);
     setLast(undefined);
+    setGroupAvatar(undefined);
   }
 
   return (
     <PaddedPageContainer>
       {children}
-      <ImageUpload
-        storageDir={`groups/${groupID}/avatar`}
-        existingAvatar={groupAvatar}
-        isAvatar={true}
-        shouldResize={true}
-      />
+      <div>
+        <h3 className="edit-group-photos-sub-title">Group Profile Picture</h3>
+        <ImageUpload
+          storageDir={`groups/${groupID}/avatar`}
+          existingAvatar={groupAvatar}
+          isAvatar={true}
+          shouldResize={true}
+          refresh={refresh}
+        />
+      </div>
       <GroupImageUpload groupID={groupID} refresh={refresh} />
       <Results results={photos} hasMore={hasMore} fetchMore={fetchMore} />
       {loading ? <LoadingSpinner /> : <></>}
@@ -87,11 +92,14 @@ function GroupImageUpload({groupID, refresh}) {
     });
   }
   return (
-    <ImageUpload
-      storageDir={`groups/${groupID}/photos`}
-      updateDB={updateDB}
-      refresh={refresh}
-      multipleImages={true}
-    />
+    <div className="edit-group-photos-more-pictures-section">
+      <h3 className="edit-group-photos-sub-title">More Pictures</h3>
+      <ImageUpload
+        storageDir={`groups/${groupID}/photos`}
+        updateDB={updateDB}
+        refresh={refresh}
+        multipleImages={true}
+      />
+    </div>
   );
 }

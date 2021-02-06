@@ -79,7 +79,7 @@ export default function ImageUpload({
     const uploadPromisesArray = [];
     files.forEach(async (file) => {
       uploadingCount = uploadingCount - 1;
-      const photoID = uuid() + shouldResize ? '_fullSize' : '';
+      const photoID = uuid() + (shouldResize ? '_fullSize' : '');
       const filePath = storageDir + '/' + photoID;
       const photoStorageRef = storage.ref(filePath);
       uploadPromisesArray.push(
@@ -208,16 +208,13 @@ function NoImagesSelected({
   existingAvatar,
 }) {
   let imageSelectionUI;
-  if (isAvatar)
+  if (isAvatar && existingAvatar)
     imageSelectionUI = (
-      <div>
-        <h3>Group Main Picture</h3>
-        <SelectAvatar
-          existingAvatar={existingAvatar}
-          noGif={true}
-          onChange={onChange}
-        />
-      </div>
+      <SelectAvatar
+        existingAvatar={existingAvatar}
+        noGif={true}
+        onChange={onChange}
+      />
     );
   else
     imageSelectionUI = (
