@@ -31,8 +31,8 @@ export function ImagesSection({children, images, spinner, customMargin}) {
 
   const customMarginStyle = customMargin
     ? {
-        'margin-top': customMargin,
-        'margin-bottom': customMargin,
+        marginTop: customMargin,
+        marginBottom: customMargin,
       }
     : null;
 

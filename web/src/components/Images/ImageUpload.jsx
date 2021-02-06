@@ -11,6 +11,7 @@ import UserCoverPhoto from '../User/UserCoverPhoto';
 import {AddProfilePhoto} from '../../assets/CreateGroupIcons';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import './ImageUpload.css';
+import {getDefaultAvatar} from '../../helpers/groups';
 
 const NOT_STARTED = 0;
 const UPLOADING = 1;
@@ -19,15 +20,12 @@ const NONIMAGE = 'nonImage';
 const TOOBIG = 'tooBig';
 const GIF = 'gif';
 
-const resizeImage = firebase.functions().httpsCallable('images-resizeImage');
-
 export default function ImageUpload({
   storageDir,
   updateDB,
   refresh,
   multipleImages,
   isCover,
-  resizeOptions,
   noGif,
   isAvatar,
   existingAvatar,
@@ -96,17 +94,15 @@ export default function ImageUpload({
               await onSuccessfulStorageUpload(
                 photoStorageRef,
                 photoID,
-                resizeOptions,
-                filePath,
                 unsuccessfulUploadCount,
                 updateDB
               );
-              resolve('succeeded');
               if (uploadingCount === 0) {
                 if (unsuccessfulUploadCount === 0)
                   setDisplaySuccessMessage(true);
                 else setDisplayErrorMessage(true);
               }
+              resolve('succeeded');
             }
           );
         })
@@ -145,12 +141,10 @@ export default function ImageUpload({
 async function onSuccessfulStorageUpload(
   photoStorageRef,
   photoID,
-  resizeOptions,
-  filePath,
   unsuccessfulUploadCount,
   updateDB
 ) {
-  const downloadURL = await photoStorageRef
+  photoStorageRef
     .getDownloadURL()
     .catch(async (err) => {
       console.error(
@@ -159,32 +153,15 @@ async function onSuccessfulStorageUpload(
           ', therefore cannot update db',
         err
       );
-      await deleteUploadedFileOnError();
       unsuccessfulUploadCount = unsuccessfulUploadCount + 1;
-    });
-
-  if (!downloadURL) return;
-
-  if (resizeOptions) {
-    let successfulResize = true;
-    await resizeImage({
-      filePath: filePath,
-      resizeOptions: resizeOptions,
-    }).catch(async (err) => {
-      console.error(
-        'an error occurred while calling the resize functions',
-        err
-      );
-      unsuccessfulUploadCount = unsuccessfulUploadCount + 1;
-      await deleteUploadedFileOnError();
-      successfulResize = false;
-    });
-    if (!successfulResize) return;
-  }
-  if (updateDB)
-    await updateDB(downloadURL, photoID).catch((err) => {
-      console.error(err);
-      unsuccessfulUploadCount = unsuccessfulUploadCount + 1;
+      return deleteUploadedFileOnError();
+    })
+    .then((downloadURL) => {
+      if (!updateDB) return;
+      return updateDB(downloadURL, photoID).catch((err) => {
+        console.error(err);
+        unsuccessfulUploadCount = unsuccessfulUploadCount + 1;
+      });
     });
 }
 
@@ -331,7 +308,11 @@ export function SelectAvatar({existingAvatar, onChange}) {
         {existingAvatar ? (
           <div className="image-upload-avatar-container">
             <div className="image-upload-rounded-preview-container">
-              <img src={existingAvatar} alt="avatar" />
+              <img
+                src={existingAvatar}
+                alt="avatar"
+                onError={(img) => (img.target.src = getDefaultAvatar())}
+              />
             </div>
             <AddButton />
             <h3>Upload New Photo</h3>
@@ -397,7 +378,11 @@ export function ImagePreviews({urls, uploading, isCover, isAvatar}) {
 }
 
 function UploadSuccessMessage() {
-  return <SuccessMessage>Photos successfully uploaded.</SuccessMessage>;
+  return (
+    <SuccessMessage>
+      Success! It can take few seconds for the changes to appear.
+    </SuccessMessage>
+  );
 }
 
 function UploadErrorMessage() {

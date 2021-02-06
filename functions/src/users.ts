@@ -28,6 +28,61 @@ import {addTopicsToResource, removeTopicsFromResource, Topic} from './topics';
 
 const db = admin.firestore();
 
+const storage = admin.storage();
+
+export const removeOldUserAvatarAndCoverPhoto = functions.firestore
+  .document(`users/{userID}`)
+  .onUpdate(async (change, context) => {
+    const userID = context.params.userID;
+    const oldUserData = change.before.data() as User;
+    const newUserData = change.after.data() as User;
+    const oldCoverPhotoCloudID = oldUserData.coverPhotoCloudID;
+    const oldAvatarCloudID = oldUserData.avatarCloudID;
+    const newCoverPhotoCloudID = newUserData.coverPhotoCloudID;
+    const newAvatarCloudID = newUserData.avatarCloudID;
+
+    const updatePromises = [];
+    if (oldCoverPhotoCloudID && oldCoverPhotoCloudID !== newCoverPhotoCloudID) {
+      const oldCoverPhotoPath = `users/${userID}/coverPhoto/${oldCoverPhotoCloudID}`;
+      updatePromises.push(
+        storage
+          .bucket()
+          .file(`${oldCoverPhotoPath}_fullSize`)
+          .delete()
+          .catch((err) =>
+            console.error(
+              'unable to delete old cover photo with id ' +
+                oldCoverPhotoCloudID +
+                ' for user with id ' +
+                userID,
+              err
+            )
+          )
+      );
+    }
+
+    if (oldAvatarCloudID && oldAvatarCloudID !== newAvatarCloudID) {
+      const oldAvatarPath = `users/${userID}/avatar/${oldAvatarCloudID}`;
+      updatePromises.push(
+        storage
+          .bucket()
+          .file(`${oldAvatarPath}_fullSize`)
+          .delete()
+          .catch((err) =>
+            console.error(
+              'unable to delete old avatar with id ' +
+                oldAvatarCloudID +
+                ' for user with id ' +
+                userID,
+              err
+            )
+          )
+      );
+    }
+
+    return Promise.all(updatePromises);
+  });
+
 export const instantiateFollowingFeedForNewUser = functions.firestore
   .document('users/{userID}')
   .onCreate(async (change) => {

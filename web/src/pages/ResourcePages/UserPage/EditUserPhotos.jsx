@@ -33,16 +33,8 @@ export function EditUserProfilePicture({userID}) {
       <ImageUpload
         storageDir={`users/${userID}/avatar`}
         updateDB={addAvatarToUserDoc}
-        resizeOptions={[
-          '-thumbnail',
-          '200x200^',
-          '-gravity',
-          'center',
-          '-extent',
-          '200x200',
-        ]}
-        noGif={true}
         isAvatar={true}
+        shouldResize={true}
       />
     </div>
   );
@@ -69,15 +61,8 @@ export function EditUserCoverPicture({userID}) {
         storageDir={`users/${userID}/coverPhoto`}
         isCover={true}
         updateDB={addCoverPhotoToUserDoc}
-        resizeOptions={[
-          '-thumbnail',
-          '1070x200^',
-          '-gravity',
-          'center',
-          '-extent',
-          '1070x200',
-        ]}
         noGif={true}
+        shouldResize={true}
       />
     </div>
   );

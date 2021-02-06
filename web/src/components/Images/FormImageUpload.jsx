@@ -34,13 +34,7 @@ export default function FormImageUpload({
       return (
         <SelectAvatar onChange={onChange} existingAvatar={existingAvatar} />
       );
-    return (
-      <SelectImages
-        onChange={onChange}
-        multipleImages={multiple}
-        existingAvatar={existingAvatar}
-      />
-    );
+    return <SelectImages onChange={onChange} multipleImages={multiple} />;
   }
 
   return (

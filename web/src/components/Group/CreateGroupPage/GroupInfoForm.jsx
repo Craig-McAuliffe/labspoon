@@ -57,7 +57,7 @@ export default function GroupInfoForm({
   submitting,
   avatar,
 }) {
-  const {user, userProfile} = useContext(AuthContext);
+  const {userProfile} = useContext(AuthContext);
 
   const validationObj = {
     name: Yup.string()
@@ -86,28 +86,6 @@ export default function GroupInfoForm({
     ]);
   }, [userProfile, setSelectedUsers]);
 
-  const addSelectedUsers = (chosenUser) => {
-    if (selectedUsers.length > 14) {
-      alert('You can only add 15 members at a time.');
-      return;
-    }
-    if (
-      chosenUser.id &&
-      (selectedUsers.some(
-        (selectedUser) => selectedUser.id === chosenUser.id
-      ) ||
-        chosenUser.id === user.uid)
-    ) {
-      return;
-    } else if (
-      chosenUser.email &&
-      selectedUsers.some(
-        (selectedUser) => selectedUser.email === chosenUser.email
-      )
-    ) {
-      return;
-    } else setSelectedUsers([...selectedUsers, chosenUser]);
-  };
   return (
     <PaddedContent>
       <Formik
@@ -128,38 +106,21 @@ export default function GroupInfoForm({
                 avatar={avatar}
                 name="avatar"
               />
-              <div className="create-group-meta-info">
-                <h3>Basic Info</h3>
-                <FormTextInput label="Name" name="name" sideLabel />
-                <FormTextInput label="Location" name="location" sideLabel />
-                <FormTextInput
-                  label="Institution"
-                  name="institution"
-                  sideLabel
-                />
-                <FormTextInput label="Website" name="website" sideLabel />
-              </div>
-              <div className="create-group-group-photos"></div>
-              <FormTextArea
-                height="200px"
-                label="About"
-                name="about"
-                bigLabel
-              />
-              {
-                // If the group is being created, the group type is specified by the user in the form. Otherwise it should be passed to this component.
-              }
-              {(props.values.groupType === CHARITY ||
-                groupType === CHARITY) && (
-                <VerificationFormOrDonationLinkField verified={verified} />
-              )}
+              <EditInfo {...props} verified={verified} groupType={groupType} />
             </Form>
           </>
         )}
       </Formik>
       <SelectUsers
         selectedUsers={selectedUsers}
-        addSelectedUsers={addSelectedUsers}
+        addSelectedUsers={(chosenUser) =>
+          addSelectedUsers(
+            chosenUser,
+            selectedUsers,
+            setSelectedUsers,
+            userProfile.id
+          )
+        }
         setSelectedUsers={setSelectedUsers}
       />
 
@@ -173,6 +134,49 @@ export default function GroupInfoForm({
   );
 }
 
+export function addSelectedUsers(
+  chosenUser,
+  selectedUsers,
+  setSelectedUsers,
+  userID
+) {
+  if (selectedUsers.length > 14) {
+    alert('You can only add 15 members at a time.');
+    return;
+  }
+  if (
+    chosenUser.id &&
+    (selectedUsers.some((selectedUser) => selectedUser.id === chosenUser.id) ||
+      chosenUser.id === userID)
+  ) {
+    return;
+  } else if (
+    chosenUser.email &&
+    selectedUsers.some(
+      (selectedUser) => selectedUser.email === chosenUser.email
+    )
+  ) {
+    return;
+  } else setSelectedUsers([...selectedUsers, chosenUser]);
+}
+
+export function EditInfo({verified, groupType, ...props}) {
+  return (
+    <>
+      <div className="create-group-meta-info">
+        <h3>Basic Info</h3>
+        <FormTextInput label="Name" name="name" sideLabel />
+        <FormTextInput label="Location" name="location" sideLabel />
+        <FormTextInput label="Institution" name="institution" sideLabel />
+        <FormTextInput label="Website" name="website" sideLabel />
+      </div>
+      <FormTextArea height="200px" label="About" name="about" bigLabel />
+      {(props.values.groupType === CHARITY || groupType === CHARITY) && (
+        <VerificationFormOrDonationLinkField verified={verified} />
+      )}
+    </>
+  );
+}
 function EditAvatar({existingAvatar, submitting}) {
   return (
     <div className="edit-group-avatar-section">
@@ -189,7 +193,11 @@ function EditAvatar({existingAvatar, submitting}) {
   );
 }
 
-function SelectUsers({selectedUsers, addSelectedUsers, setSelectedUsers}) {
+export function SelectUsers({
+  selectedUsers,
+  addSelectedUsers,
+  setSelectedUsers,
+}) {
   const [selectingUser, setSelectingUser] = useState(false);
   return (
     <div className="create-group-add-members-container">

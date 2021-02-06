@@ -15,6 +15,35 @@ import {toUserFilterRef, UserRef} from './users';
 
 const db: firestore.Firestore = admin.firestore();
 
+const storage = admin.storage();
+
+export const removeOldGroupAvatar = functions.firestore
+  .document(`groups/{groupID}`)
+  .onUpdate(async (change, context) => {
+    const oldGroupData = change.before.data() as Group;
+    const newGroupData = change.after.data() as Group;
+    const groupID = context.params.groupID;
+    const oldAvatarCloudID = oldGroupData.avatarCloudID;
+    const newAvatarCloudID = newGroupData.avatarCloudID;
+    if (oldAvatarCloudID && oldAvatarCloudID !== newAvatarCloudID) {
+      const oldAvatarPath = `groups/${groupID}/avatar/${oldAvatarCloudID}`;
+      return storage
+        .bucket()
+        .file(`${oldAvatarPath}_fullSize`)
+        .delete()
+        .catch((err) =>
+          console.error(
+            'unable to delete old avatar with id ' +
+              oldAvatarCloudID +
+              ' for group with id ' +
+              groupID,
+            err
+          )
+        );
+    }
+    return null;
+  });
+
 export const createGroupDocuments = functions.firestore
   .document(`groups/{groupID}`)
   .onCreate(async (change, context) => {

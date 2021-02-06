@@ -11,15 +11,17 @@ import EditGroupVideos from './EditGroupVideos';
 import EditGroupTechniques from './EditGroupTechniques';
 import EditGroupResearchFocuses from './EditGroupResearchFocuses';
 import EditGroupOpenPositions from './EditGroupOpenPositions';
-
-import './EditGroupPage.css';
 import LightTabLink, {
   LightTabContainer,
 } from '../../../components/Navigation/LightTab';
 import ReturnToPublicViewButton from '../../../components/Buttons/ReturnToPublicViewButton';
+import EditGroupMembers from './EditGroupMembers';
+
+import './EditGroupPage.css';
 
 const INFO_TAB = 'info';
 const POSTS_TAB = 'posts';
+const MEMBERS_TAB = 'members';
 const PUBLICATIONS_TAB = 'publications';
 const PHOTOS_TAB = 'photos';
 const VIDEOS_TAB = 'videos';
@@ -29,6 +31,7 @@ const OPENPOSITIONS_TAB = 'openPositions';
 
 const tabIDToDisplayName = {
   [INFO_TAB]: 'Info',
+  [MEMBERS_TAB]: 'Members',
   [POSTS_TAB]: 'Posts',
   [PUBLICATIONS_TAB]: 'Publications',
   [PHOTOS_TAB]: 'Photos',
@@ -46,6 +49,7 @@ export default function EditGroupPage() {
   const [notFound, setNotFound] = useState(false);
   const tabs = [
     INFO_TAB,
+    MEMBERS_TAB,
     POSTS_TAB,
     PUBLICATIONS_TAB,
     PHOTOS_TAB,
@@ -78,6 +82,12 @@ export default function EditGroupPage() {
           <EditGroupTabs tabs={tabs} activeTab={INFO_TAB} />
           <ReturnToPublicViewButton url={groupURL} />
         </EditGroupInfo>
+      </Route>
+      <Route path={`${path}/${MEMBERS_TAB}`}>
+        <EditGroupMembers groupData={group}>
+          <EditGroupTabs tabs={tabs} activeTab={INFO_TAB} />
+          <ReturnToPublicViewButton url={groupURL} />
+        </EditGroupMembers>
       </Route>
       <Route path={`${path}/${POSTS_TAB}`}>
         <EditGroupPosts groupID={groupID} group={group}>

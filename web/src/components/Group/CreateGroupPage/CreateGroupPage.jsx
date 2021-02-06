@@ -42,10 +42,8 @@ export default function CreateGroupPage({
     const groupDocRef = db.collection('groups').doc();
     const groupID = groupDocRef.id;
 
-    const writeToDB = async (avatarID, downloadURL) => {
+    const writeToDB = async () => {
       delete values.avatar;
-      if (downloadURL) values.avatar = downloadURL;
-      if (avatarID) values.avatarCloudID = avatarID;
       const batch = db.batch();
       batch.set(groupDocRef, values);
       const userRef = {
