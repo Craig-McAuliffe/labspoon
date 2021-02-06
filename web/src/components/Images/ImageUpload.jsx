@@ -30,6 +30,8 @@ export default function ImageUpload({
   resizeOptions,
   noGif,
   isAvatar,
+  existingAvatar,
+  shouldResize,
 }) {
   const [files, setFiles] = useState([]);
   const [imageURLs, setImageURLs] = useState([]);
@@ -77,7 +79,7 @@ export default function ImageUpload({
     const uploadPromisesArray = [];
     files.forEach(async (file) => {
       uploadingCount = uploadingCount - 1;
-      const photoID = uuid();
+      const photoID = uuid() + shouldResize ? '_fullSize' : '';
       const filePath = storageDir + '/' + photoID;
       const photoStorageRef = storage.ref(filePath);
       uploadPromisesArray.push(
@@ -125,6 +127,8 @@ export default function ImageUpload({
       displaySuccessMessage={displaySuccessMessage}
       displayErrorMessage={displayErrorMessage}
       noGif={noGif}
+      isAvatar={isAvatar}
+      existingAvatar={existingAvatar}
     />
   ) : (
     <ImagesSelected
@@ -200,14 +204,33 @@ function NoImagesSelected({
   displaySuccessMessage,
   displayErrorMessage,
   noGif,
+  isAvatar,
+  existingAvatar,
 }) {
-  return (
-    <div className="image-upload-section">
+  let imageSelectionUI;
+  if (isAvatar)
+    imageSelectionUI = (
+      <div>
+        <h3>Group Main Picture</h3>
+        <SelectAvatar
+          existingAvatar={existingAvatar}
+          noGif={true}
+          onChange={onChange}
+        />
+      </div>
+    );
+  else
+    imageSelectionUI = (
       <SelectImages
         onChange={onChange}
         multipleImages={multipleImages}
         noGif={noGif}
       />
+    );
+
+  return (
+    <div className="image-upload-section">
+      {imageSelectionUI}
       <div className="after-upload-message-container">
         {displaySuccessMessage ? <UploadSuccessMessage /> : <></>}
         {displayErrorMessage ? <UploadErrorMessage /> : <></>}
@@ -285,7 +308,7 @@ function ErrorMessageType({displayValidationMessage}) {
   return null;
 }
 
-export function SelectAvatar({existingAvatar, onChange, noGif}) {
+export function SelectAvatar({existingAvatar, onChange}) {
   const [displayValidationMessage, setDisplayValidationMessage] = useState(
     false
   );
@@ -295,7 +318,7 @@ export function SelectAvatar({existingAvatar, onChange, noGif}) {
       <input
         type="file"
         onChange={(e) =>
-          validatedOnChange(e, onChange, setDisplayValidationMessage, noGif)
+          validatedOnChange(e, onChange, setDisplayValidationMessage, true)
         }
         name="uploaded-image"
         multiple={false}

@@ -12,14 +12,15 @@ import './EditGroupPhotos.css';
 export default function EditGroupPhotos({children}) {
   const limit = 9;
   const [photos, setPhotos] = useState([]);
+  const [groupAvatar, setGroupAvatar] = useState();
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
   const [last, setLast] = useState();
   const groupID = useParams().groupID;
 
-  function fetchMore() {
+  async function fetchMore() {
     setLoading(true);
-    getPaginatedImagesFromCollectionRef(
+    await getPaginatedImagesFromCollectionRef(
       db.collection(`groups/${groupID}/photos`),
       limit + 1,
       last
@@ -36,6 +37,21 @@ export default function EditGroupPhotos({children}) {
       .catch((err) => console.error(err));
   }
 
+  useEffect(async () => {
+    if (!groupID) return;
+    const groupDS = await db
+      .doc(`groups/${groupID}`)
+      .get()
+      .catch((err) =>
+        console.error(
+          'unable to fetch group doc for group with id ' + groupID,
+          err
+        )
+      );
+    if (!groupDS || !groupDS.exists) return;
+    if (groupDS.data().avatar) setGroupAvatar(groupDS.data().avatar);
+  }, [groupID]);
+
   useEffect(() => {
     if (last !== undefined) return;
     fetchMore();
@@ -50,6 +66,12 @@ export default function EditGroupPhotos({children}) {
   return (
     <PaddedPageContainer>
       {children}
+      <ImageUpload
+        storageDir={`groups/${groupID}/avatar`}
+        existingAvatar={groupAvatar}
+        isAvatar={true}
+        shouldResize={true}
+      />
       <GroupImageUpload groupID={groupID} refresh={refresh} />
       <Results results={photos} hasMore={hasMore} fetchMore={fetchMore} />
       {loading ? <LoadingSpinner /> : <></>}
