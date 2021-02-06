@@ -1,5 +1,4 @@
 import React, {useContext} from 'react';
-import {db} from '../../../firebase';
 import {useParams} from 'react-router-dom';
 import {PaddedPageContainer} from '../../../components/Layout/Content';
 import ImageUpload from '../../../components/Images/ImageUpload';
@@ -22,17 +21,12 @@ export default function EditUserPhotos({children}) {
 }
 
 export function EditUserProfilePicture({userID}) {
-  const addAvatarToUserDoc = async (url, photoID) => {
-    return addToUserDoc(url, 'avatar', userID, photoID, 'avatarCloudID');
-  };
-
   return (
     <div className="edit-user-photos-section">
       <h2>Profile Picture</h2>
       <p className="resize-images-note">Cropped to a 200x200 pixel square.</p>
       <ImageUpload
         storageDir={`users/${userID}/avatar`}
-        updateDB={addAvatarToUserDoc}
         isAvatar={true}
         shouldResize={true}
       />
@@ -41,16 +35,6 @@ export function EditUserProfilePicture({userID}) {
 }
 
 export function EditUserCoverPicture({userID}) {
-  const addCoverPhotoToUserDoc = async (url, photoID) => {
-    return addToUserDoc(
-      url,
-      'coverPhoto',
-      userID,
-      photoID,
-      'coverPhotoCloudID'
-    );
-  };
-
   return (
     <div className="edit-user-photos-section">
       <h2>Cover Picture</h2>
@@ -60,16 +44,9 @@ export function EditUserCoverPicture({userID}) {
       <ImageUpload
         storageDir={`users/${userID}/coverPhoto`}
         isCover={true}
-        updateDB={addCoverPhotoToUserDoc}
         noGif={true}
         shouldResize={true}
       />
     </div>
   );
-}
-
-async function addToUserDoc(url, urlField, userID, photoID, photoIDField) {
-  return db
-    .doc(`users/${userID}`)
-    .update({[urlField]: url, [photoIDField]: photoID});
 }
