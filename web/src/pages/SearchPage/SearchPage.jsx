@@ -12,18 +12,11 @@ import {
   connectStateResults,
 } from 'react-instantsearch-dom';
 import {abbrEnv} from '../../config';
-
 import {searchClient} from '../../algolia';
 import {createURL} from '../../helpers/search';
-
 import {GenericListItem} from '../../components/Results/Results';
-import {MicrosoftAcademicKnowledgeAPIPublicationResults} from '../../components/Publication/MicrosoftResults';
-
-import {dbPublicationToJSPublication} from '../../helpers/publications';
-
 import 'instantsearch.css/themes/algolia.css';
 import {useContext} from 'react';
-import SecondaryButton from '../../components/Buttons/SecondaryButton';
 import SearchBar from '../../components/SearchBar';
 
 import './SearchPage.css';
@@ -47,7 +40,6 @@ const urlToTabsMap = new Map([
 
 const tabsToURLMap = new Map([
   [OVERVIEW, 'overview'],
-  [PUBLICATIONS, 'publications'],
   [POSTS, 'posts'],
   [USERS, 'users'],
   [GROUPS, 'groups'],
@@ -85,29 +77,20 @@ export default function SearchPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 
-  const tabs = [OVERVIEW, PUBLICATIONS, POSTS, USERS, GROUPS, TOPICS].map(
-    (tabName) => (
-      <button
-        onClick={() => updateTab(tabName)}
-        key={tabName}
-        className={tabName === tab ? 'feed-tab-active' : 'feed-tab-inactive'}
-      >
-        <h3>{tabName}</h3>
-      </button>
-    )
-  );
+  const tabs = [OVERVIEW, POSTS, USERS, GROUPS, TOPICS].map((tabName) => (
+    <button
+      onClick={() => updateTab(tabName)}
+      key={tabName}
+      className={tabName === tab ? 'feed-tab-active' : 'feed-tab-inactive'}
+    >
+      <h3>{tabName}</h3>
+    </button>
+  ));
 
   let results;
   switch (tab) {
     case OVERVIEW:
       results = <OverviewResults setTab={updateTab} />;
-      break;
-    case PUBLICATIONS:
-      results = (
-        <MicrosoftAcademicKnowledgeAPIPublicationResults
-          query={searchState.query}
-        />
-      );
       break;
     case POSTS:
       results = <PostsResults />;
@@ -178,8 +161,20 @@ const IndexResults = connectStateResults(
 );
 
 const AllResults = connectStateResults(({allSearchResults, children}) => {
-  const {setActiveTab} = useContext(SearchPageActiveTabContext);
-  if (!allSearchResults) return null;
+  const noResultsDisplay = (
+    <>
+      <Index indexName={`${abbrEnv}_POSTS`} />
+      <Index indexName={`${abbrEnv}_USERS`} />
+      <Index indexName={`${abbrEnv}_GROUPS`} />
+      <Index indexName={`${abbrEnv}_TOPICS`} />
+      <div className="search-page-no-results-message">
+        {`Hmm, looks like there's nothing on Labspoon that matches your search.`}
+      </div>
+      <TryAnotherSearch />
+      <LatestPosts />
+    </>
+  );
+  if (!allSearchResults) return noResultsDisplay;
   if (
     Object.values(allSearchResults).some(
       (individualIndexResults) => individualIndexResults.nbHits > 0
@@ -188,39 +183,7 @@ const AllResults = connectStateResults(({allSearchResults, children}) => {
     return children;
   }
   // These indexes trigger the AllResults to re-render and check other indexes
-  return (
-    <>
-      <Index indexName={`${abbrEnv}_PUBLICATIONS`} />
-      <Index indexName={`${abbrEnv}_POSTS`} />
-      <Index indexName={`${abbrEnv}_USERS`} />
-      <Index indexName={`${abbrEnv}_GROUPS`} />
-      <Index indexName={`${abbrEnv}_TOPICS`} />
-      <div className="search-page-no-results-message">
-        {`Hmm, looks like there's nothing on Labspoon that matches your search.`}
-      </div>
-      <div className="search-page-overview-deep-search-container">
-        <div>
-          <h2 className="search-page-overview-deep-search-title">
-            We can run a deep search for{' '}
-            <button onClick={() => setActiveTab(PUBLICATIONS)}>
-              publications outside of Labspoon.
-            </button>
-          </h2>
-        </div>
-        <div className="search-page-publication-tab-button-container">
-          <h3 className="search-page-publication-search-suggestion">
-            Just go to the publications tab
-          </h3>
-          <SecondaryButton onClick={() => setActiveTab(PUBLICATIONS)}>
-            {' '}
-            Publications
-          </SecondaryButton>
-        </div>
-      </div>
-      <TryAnotherSearch />
-      <LatestPosts />
-    </>
-  );
+  return noResultsDisplay;
 });
 
 // Adds a 'see more' button to the end of a hits component. Used for switching to tabs from the federated overview search.
@@ -266,14 +229,6 @@ function OverviewResultsSection({
   );
 }
 
-const PublicationHitsComponent = () => (
-  <Hits
-    hitComponent={({hit}) => (
-      <GenericListItem result={dbPublicationToJSPublication(hit)} />
-    )}
-  />
-);
-
 const PostHitsComponent = () => (
   <Hits
     hitComponent={({hit}) => {
@@ -308,14 +263,6 @@ const TopicHitsComponent = () => (
 const OverviewResults = ({setTab}) => (
   <>
     <AllResults>
-      <OverviewResultsSection
-        setTab={setTab}
-        indexSuffix={'_PUBLICATIONS'}
-        tabName={PUBLICATIONS}
-        resourceType={'Publications'}
-      >
-        <PublicationHitsComponent />
-      </OverviewResultsSection>
       <OverviewResultsSection
         setTab={setTab}
         indexSuffix={'_POSTS'}
@@ -400,9 +347,7 @@ const TryAnotherSearch = () => {
   return (
     <div className="search-page-try-another-search">
       <SearchBar bigSearchPrompt>
-        <p className="search-page-search-prompt-label">
-          Or you can try another search
-        </p>
+        <p className="search-page-search-prompt-label">Try another search</p>
       </SearchBar>
     </div>
   );
