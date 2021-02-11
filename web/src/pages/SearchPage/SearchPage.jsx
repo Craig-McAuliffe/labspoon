@@ -23,7 +23,6 @@ import './SearchPage.css';
 import LatestPosts from '../../components/Posts/LatestPosts/LatestPosts';
 
 const OVERVIEW = 'Overview';
-const PUBLICATIONS = 'Publications';
 const POSTS = 'Posts';
 const USERS = 'Users';
 const GROUPS = 'Groups';
@@ -31,7 +30,6 @@ const TOPICS = 'Topics';
 
 const urlToTabsMap = new Map([
   ['overview', OVERVIEW],
-  ['publications', PUBLICATIONS],
   ['posts', POSTS],
   ['users', USERS],
   ['groups', GROUPS],
@@ -338,8 +336,6 @@ const TopicsResults = () => {
 const urlToSearchState = (location) => qs.parse(location.search.slice(1));
 
 const tabToIndex = (tab) => {
-  if (tab === OVERVIEW) return `${abbrEnv}_PUBLICATIONS`;
-
   return `${abbrEnv}_${tab.toUpperCase()}`;
 };
 
