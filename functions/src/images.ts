@@ -8,8 +8,9 @@ import * as fs from 'fs';
 const storage = admin.storage();
 const db = admin.firestore();
 
-export const resizeImageOnTrigger = functions.storage
-  .object()
+export const resizeImageOnTrigger = functions
+  .runWith({timeoutSeconds: 60, memory: '1GB'})
+  .storage.object()
   .onFinalize(async (object, context) => {
     const filePath = object.name;
     if (!filePath) {
@@ -18,7 +19,6 @@ export const resizeImageOnTrigger = functions.storage
     }
     const fileName = path.basename(filePath);
     if (!fileName.endsWith('_fullSize')) {
-      console.log('no resize');
       return;
     }
     const contentType = object.contentType;
