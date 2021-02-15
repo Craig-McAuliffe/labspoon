@@ -21,12 +21,24 @@
 .feed-tab-active {
   border: 1px solid #99999f;
   margin: 0px 10px 10px;
+  padding: 10px;
   color: #99999f;
   flex-shrink: 0;
-  flex: 0 0 auto;
-  padding-top: 6px;
   flex-grow: 1;
   max-width: 220px;
+  display: flex;
+  justify-content: center;
+  justify-items: center;
+}
+
+.feed-tab-inactive:hover,
+.feed-tab-active:hover {
+  text-decoration: none;
+}
+
+.feed-tab-inactive h3,
+.feed-tab-active h3 {
+  margin: 0px;
 }
 
 .feed-tab-active {

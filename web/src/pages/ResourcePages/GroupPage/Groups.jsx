@@ -13,14 +13,28 @@ export default function Groups() {
       <AuthRoute path={`${path}/create`}>
         <CreateGroupPage />
       </AuthRoute>
-      <AuthRoute path={`${path}/:groupID/edit`}>
-        <EditGroupPage />
-      </AuthRoute>
       <Route path={`${path}/:groupID`}>
-        <GroupPage />
+        <GroupPages />
       </Route>
       <Route path={`${path}`}>
         <NotFoundPage />
+      </Route>
+    </Switch>
+  );
+}
+
+function GroupPages() {
+  const {path} = useRouteMatch();
+  return (
+    <Switch>
+      <AuthRoute path={`${path}/edit`}>
+        <EditGroupPage />
+      </AuthRoute>
+      <Route path={`${path}/:routedTabID`}>
+        <GroupPage />
+      </Route>
+      <Route path={`${path}`}>
+        <GroupPage />
       </Route>
     </Switch>
   );

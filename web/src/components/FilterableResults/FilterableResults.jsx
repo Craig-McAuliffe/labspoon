@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext, createContext} from 'react';
-import {useLocation} from 'react-router-dom';
+import {Link, useLocation} from 'react-router-dom';
 import SearchBar from '../SearchBar';
 import update from 'immutability-helper';
 import FilterMenu from '../Filter/Filter';
@@ -108,12 +108,14 @@ export default function FilterableResults({children, fetchResults, limit}) {
       });
   }
 
-  // when the filters or results fetch function are updated we want to
+  // when the filters, results, or tabs fetch function are updated we want to
   // repopulate the feed
   useEffect(() => {
     setLast(undefined);
     setSkip(0);
+    setResults([]);
   }, [filter, fetchResultsFunction]);
+
   return (
     <FilterableResultsContext.Provider
       value={{
@@ -132,7 +134,7 @@ export default function FilterableResults({children, fetchResults, limit}) {
     </FilterableResultsContext.Provider>
   );
 }
-
+// combine tab filtering with sider filtering
 export function FilterManager({children}) {
   const filterableResults = useContext(FilterableResultsContext);
   const [displayedTabFilter, setDisplayedTabFilter] = useState([]);
@@ -200,7 +202,7 @@ export function NewFilterMenuWrapper({
     if (getDefaultFilter) {
       if (dependentOnTab) {
         filterManager.setSiderFilterLoading(true);
-        if (filterManager.displayedTabFilter) {
+        if (tabFilter) {
           Promise.resolve(getDefaultFilter(tabFilter))
             .then((defaultFilter) => {
               setSiderFilter(defaultFilter);
@@ -238,7 +240,12 @@ export function NewFilterMenuWrapper({
   );
 }
 
-export function ResourceTabs({tabs, affectsFilter}) {
+export function ResourceTabs({
+  tabs,
+  affectsFilter,
+  routedTabBasePathname,
+  useRoutedTabs,
+}) {
   const filterManager = useContext(FilterManagerContext);
   const setTabFilter = filterManager.setDisplayedTabFilter;
   const tabFilter = filterManager.displayedTabFilter;
@@ -253,10 +260,12 @@ export function ResourceTabs({tabs, affectsFilter}) {
       setTabsFilterLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  if (!tabFilter) return null;
+  }, [tabs]);
+
   return (
     <Tabs
+      routedTabBasePathname={routedTabBasePathname}
+      useRoutedTabs={useRoutedTabs}
       tabFilter={tabFilter[0]}
       setTabFilter={(id) => {
         const reset = resetFilterCollection(tabFilter, 0);
@@ -337,7 +346,13 @@ function updateFilterOption(
   return updatedFilterOptions;
 }
 
-export function Tabs({tabFilter, setTabFilter, affectsFilter}) {
+export function Tabs({
+  tabFilter,
+  setTabFilter,
+  affectsFilter,
+  routedTabBasePathname,
+  useRoutedTabs,
+}) {
   const filterManager = useContext(FilterManagerContext);
   const selectedTabID = getActiveTabIDFromTypeFilterCollection(tabFilter);
 
@@ -346,28 +361,46 @@ export function Tabs({tabFilter, setTabFilter, affectsFilter}) {
     if (selectedTabID === 'default') setTabFilter(tabFilter.options[0].data.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabFilter]);
-
   if (!tabFilter) return <div></div>;
-  const tabs = tabFilter.options.map((option) => (
-    <button
-      onClick={() => {
-        // If the filter changes on tab change, we should not fetch results
-        // until the new filter is loaded
-        if (affectsFilter) {
-          filterManager.setSiderFilterLoading(true);
+  const tabs = tabFilter.options.map((option) => {
+    return useRoutedTabs && option.data.id !== selectedTabID ? (
+      <Link
+        to={
+          routedTabBasePathname
+            ? `${routedTabBasePathname}/${option.data.id}`
+            : `${option.data.id}`
         }
-        setTabFilter(option.data.id);
-      }}
-      key={option.data.id}
-      className={
-        option.data.id === selectedTabID
-          ? 'feed-tab-active'
-          : 'feed-tab-inactive'
-      }
-    >
-      <h3>{option.data.name}</h3>
-    </button>
-  ));
+        key={option.data.id}
+        className={
+          option.data.id === selectedTabID
+            ? 'feed-tab-active'
+            : 'feed-tab-inactive'
+        }
+      >
+        <h3>{option.data.name}</h3>
+      </Link>
+    ) : (
+      <button
+        onClick={() => {
+          if (option.data.id === selectedTabID) return;
+          // If the filter changes on tab change, we should not fetch results
+          // until the new filter is loaded
+          if (affectsFilter) {
+            filterManager.setSiderFilterLoading(true);
+          }
+          setTabFilter(option.data.id);
+        }}
+        key={option.data.id}
+        className={
+          option.data.id === selectedTabID
+            ? 'feed-tab-active'
+            : 'feed-tab-inactive'
+        }
+      >
+        <h3>{option.data.name}</h3>
+      </button>
+    );
+  });
 
   return (
     <div className="feed-tabs-container">

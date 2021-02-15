@@ -14,6 +14,8 @@ export default function ResourcesFeed({
   limit,
   tabs,
   tabsLoading,
+  routedTabBasePathname,
+  useRoutedTabs,
 }) {
   return (
     <FilterableResults fetchResults={fetchResults} limit={limit}>
@@ -21,8 +23,18 @@ export default function ResourcesFeed({
         <NewFilterMenuWrapper />
         <UnpaddedPageContainer>
           {children}
-          {tabsLoading ? <LoadingSpinner /> : <ResourceTabs tabs={tabs} />}
-          <NewResultsWrapper />
+          {tabsLoading ? (
+            <LoadingSpinner />
+          ) : (
+            <>
+              <ResourceTabs
+                tabs={tabs}
+                routedTabBasePathname={routedTabBasePathname}
+                useRoutedTabs={useRoutedTabs}
+              />
+              <NewResultsWrapper />
+            </>
+          )}
         </UnpaddedPageContainer>
       </FilterManager>
     </FilterableResults>

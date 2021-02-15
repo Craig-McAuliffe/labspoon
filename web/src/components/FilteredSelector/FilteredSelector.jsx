@@ -38,29 +38,6 @@ export default function FilteredSelector({
   const fetchItemsWithSelectedItems = (skip, limit, filter, last) =>
     fetchItems(selectedItems, skip, limit, filter, last);
 
-  const tabs = [
-    {
-      collectionName: 'Add or Remove',
-      options: [
-        {
-          enabled: false,
-          data: {
-            id: ADD,
-            name: 'Add',
-          },
-        },
-        {
-          enabled: false,
-          data: {
-            id: REMOVE,
-            name: 'Remove',
-          },
-        },
-      ],
-      mutable: false,
-    },
-  ];
-
   const resetSelection = () => {
     setSelectedItems([]);
   };
@@ -96,6 +73,29 @@ export default function FilteredSelector({
     </FilterableResults>
   );
 }
+
+const tabs = [
+  {
+    collectionName: 'Add or Remove',
+    options: [
+      {
+        enabled: false,
+        data: {
+          id: ADD,
+          name: 'Add',
+        },
+      },
+      {
+        enabled: false,
+        data: {
+          id: REMOVE,
+          name: 'Remove',
+        },
+      },
+    ],
+    mutable: false,
+  },
+];
 
 function SuccessMessage() {
   return (

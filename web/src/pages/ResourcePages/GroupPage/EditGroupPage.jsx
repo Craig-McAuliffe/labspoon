@@ -85,7 +85,7 @@ export default function EditGroupPage() {
       </Route>
       <Route path={`${path}/${MEMBERS_TAB}`}>
         <EditGroupMembers groupData={group}>
-          <EditGroupTabs tabs={tabs} activeTab={INFO_TAB} />
+          <EditGroupTabs tabs={tabs} activeTab={MEMBERS_TAB} />
           <ReturnToPublicViewButton url={groupURL} />
         </EditGroupMembers>
       </Route>
