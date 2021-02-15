@@ -146,6 +146,16 @@ function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip) {
 }
 
 const checkIfTabsAreUsed = async (setUsedTabs, usedTabs, groupID) => {
+  if (!usedTabs.some((usedTab) => usedTab === TECHNIQUES))
+    await db
+      .collection(`groups/${groupID}/techniques`)
+      .limit(1)
+      .get()
+      .then((qs) => {
+        if (qs.empty) return;
+        setUsedTabs((alreadyAddedTabs) => [...alreadyAddedTabs, TECHNIQUES]);
+      })
+      .catch((err) => console.error(err));
   if (!usedTabs.some((usedTab) => usedTab === OPENPOSITIONS))
     await db
       .collection(`groups/${groupID}/openPositions`)
@@ -274,6 +284,9 @@ export default function GroupPage() {
     usedTabs.forEach((usedTab) => {
       let tabName;
       switch (usedTab) {
+        case TECHNIQUES:
+          tabName = 'Techniques';
+          break;
         case OPENPOSITIONS:
           tabName = 'Open Positions';
           break;
