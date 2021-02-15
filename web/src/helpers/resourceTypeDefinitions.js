@@ -4,6 +4,9 @@ export const OPENPOSITIONS = 'openPositions';
 export const RESEARCHFOCUSES = 'researchFocuses';
 export const TECHNIQUES = 'techniques';
 export const POSTS = 'posts';
+export const IMAGES = 'images';
+export const PUBLICATIONS = 'publications';
+export const TOPICS = 'topics';
 
 export const OPENPOSITION = 'openPosition';
 export const RESEARCHFOCUS = 'researchFocus';

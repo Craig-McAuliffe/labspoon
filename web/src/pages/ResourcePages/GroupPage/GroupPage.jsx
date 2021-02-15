@@ -33,6 +33,9 @@ import {
   RESEARCHFOCUS,
   TECHNIQUE,
   TECHNIQUES,
+  PUBLICATIONS,
+  POSTS,
+  TOPICS,
 } from '../../../helpers/resourceTypeDefinitions';
 import ResourcesFeed from '../ResourcesFeeds';
 import {PaddedContent} from '../../../components/Layout/Content';
@@ -142,16 +145,60 @@ function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip) {
   return [results, null];
 }
 
+const checkIfTabsAreUsed = async (setUsedTabs, usedTabs, groupID) => {
+  if (!usedTabs.some((usedTab) => usedTab === OPENPOSITIONS))
+    await db
+      .collection(`groups/${groupID}/openPositions`)
+      .limit(1)
+      .get()
+      .then((qs) => {
+        if (qs.empty) return;
+        setUsedTabs((alreadyAddedTabs) => [...alreadyAddedTabs, OPENPOSITIONS]);
+      })
+      .catch((err) => console.error(err));
+  if (!usedTabs.some((usedTab) => usedTab === PHOTOS))
+    await db
+      .collection(`groups/${groupID}/photos`)
+      .limit(1)
+      .get()
+      .then((qs) => {
+        if (qs.empty) return;
+        setUsedTabs((alreadyAddedTabs) => [...alreadyAddedTabs, PHOTOS]);
+      })
+      .catch((err) => console.error(err));
+  if (!usedTabs.some((usedTab) => usedTab === VIDEOS))
+    await db
+      .collection(`groups/${groupID}/videos`)
+      .limit(1)
+      .get()
+      .then((qs) => {
+        if (qs.empty) return;
+        setUsedTabs((alreadyAddedTabs) => [...alreadyAddedTabs, VIDEOS]);
+      })
+      .catch((err) => console.error(err));
+  if (!usedTabs.some((usedTab) => usedTab === TOPICS))
+    await db
+      .collection(`groups/${groupID}/topics`)
+      .limit(1)
+      .get()
+      .then((qs) => {
+        if (qs.empty) return;
+        setUsedTabs((alreadyAddedTabs) => [...alreadyAddedTabs, TOPICS]);
+      })
+      .catch((err) => console.error(err));
+};
+
 export default function GroupPage() {
   const featureFlags = useContext(FeatureFlags);
   const [groupID, setGroupID] = useState(undefined);
   const [groupData, setGroupData] = useState(undefined);
   const [verified, setVerified] = useState(false);
   const [userIsMember, setUserIsMember] = useState(false);
+  const [tabsLoading, setTabsLoading] = useState(true);
+  const [usedTabs, setUsedTabs] = useState([]);
   const history = useHistory();
   const {user} = useContext(AuthContext);
   const route = useRouteMatch();
-
   const groupIDParam = useParams().groupID;
   if (groupID !== groupIDParam) {
     setGroupID(groupIDParam);
@@ -165,15 +212,19 @@ export default function GroupPage() {
         }
         setGroupData(groupData);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.error(err));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupID, route]);
 
-  useEffect(() => {
-    db.doc(`verifiedGroups/${groupID}`)
+  useEffect(async () => {
+    await db
+      .doc(`verifiedGroups/${groupID}`)
       .get()
       .then((ds) => setVerified(ds.exists))
       .catch((err) => console.error(err));
+
+    await checkIfTabsAreUsed(setUsedTabs, usedTabs, groupID);
+    setTabsLoading(false);
   }, [groupID]);
 
   const groupDescriptionRef = useRef();
@@ -181,89 +232,75 @@ export default function GroupPage() {
   const fetchFeedData = (skip, limit, filterOptions, last) =>
     fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip);
 
-  const relationshipFilter = [
-    {
-      collectionName: 'Relationship Types',
-      options: [
-        {
-          enabled: false,
-          data: {
-            id: 'posts',
-            name: 'Posts',
+  const getTabs = () => {
+    const tabOptions = [
+      {
+        collectionName: 'Relationship Types',
+        options: [
+          {
+            enabled: false,
+            data: {
+              id: POSTS,
+              name: 'Posts',
+            },
           },
-        },
-        {
-          enabled: false,
-          data: {
-            id: 'publications',
-            name: 'Publications',
+          {
+            enabled: false,
+            data: {
+              id: PUBLICATIONS,
+              name: 'Publications',
+            },
           },
-        },
-        {
-          enabled: false,
-          data: {
-            id: 'members',
-            name: 'Members',
+          {
+            enabled: false,
+            data: {
+              id: 'members',
+              name: 'Members',
+            },
           },
-        },
-        {
-          enabled: false,
-          data: {
-            id: OPENPOSITIONS,
-            name: 'Open Positions',
-          },
-        },
-        {
-          enabled: false,
-          data: {
-            id: RESEARCHFOCUSES,
-            name: 'Research Focuses',
-          },
-        },
-        {
-          enabled: false,
-          data: {
-            id: PHOTOS,
-            name: 'Photos',
-          },
-        },
-        {
-          enabled: false,
-          data: {
-            id: VIDEOS,
-            name: 'Videos',
-          },
-        },
-        {
-          enabled: false,
-          data: {
-            id: 'topics',
-            name: 'Topics',
-          },
-        },
-      ],
 
-      mutable: false,
-    },
-  ];
+          {
+            enabled: false,
+            data: {
+              id: RESEARCHFOCUSES,
+              name: 'Research Focuses',
+            },
+          },
+        ],
 
-  if (featureFlags.has('overview')) {
-    relationshipFilter[0].options.push({
-      enabled: false,
-      data: {
-        id: 'overview',
-        name: 'Overview',
+        mutable: false,
       },
-    });
-  }
+    ];
+    usedTabs.forEach((usedTab) => {
+      let tabName;
+      switch (usedTab) {
+        case OPENPOSITIONS:
+          tabName = 'Open Positions';
+          break;
+        case PHOTOS:
+          tabName = 'Photos';
+          break;
+        case VIDEOS:
+          tabName = 'Videos';
+          break;
+        case TOPICS:
+          tabName = 'Topics';
+          break;
+        default:
+          tabName = null;
+      }
+      if (!tabName) return;
 
-  relationshipFilter[0].options.push({
-    enabled: false,
-    data: {
-      id: TECHNIQUES,
-      name: 'Techniques',
-    },
-  });
+      tabOptions[0].options.push({
+        enabled: false,
+        data: {
+          id: usedTab,
+          name: tabName,
+        },
+      });
+    });
+    return tabOptions;
+  };
 
   if (user) {
     db.collection(`groups/${groupID}/members`)
@@ -274,7 +311,7 @@ export default function GroupPage() {
           setUserIsMember(true);
         } else setUserIsMember(false);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.error(err));
   }
 
   return (
@@ -287,7 +324,8 @@ export default function GroupPage() {
       <ResourcesFeed
         fetchResults={fetchFeedData}
         limit={9}
-        tabs={relationshipFilter}
+        tabs={getTabs()}
+        tabsLoading={tabsLoading}
       >
         <PaddedContent>
           <GroupDetails
