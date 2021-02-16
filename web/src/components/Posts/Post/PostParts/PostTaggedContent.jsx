@@ -1,6 +1,11 @@
 import React from 'react';
 
-import {PUBLICATION, USER} from '../../../../helpers/resourceTypeDefinitions';
+import {
+  OPENPOSITION,
+  PUBLICATION,
+  USER,
+} from '../../../../helpers/resourceTypeDefinitions';
+import {ReducedOpenPositionListItem} from '../../../OpenPosition/OpenPositionListItem';
 import PublicationListItem from '../../../Publication/PublicationListItem';
 import FollowUserButton from '../../../User/FollowUserButton/FollowUserButton';
 import UserListItem from '../../../User/UserListItem';
@@ -18,9 +23,12 @@ export default function PostOptionalTags({taggedContent}) {
               <FollowUserButton targetUser={taggedItem.content} />
             </UserListItem>
           );
-
         case PUBLICATION:
           return <PublicationListItem publication={taggedItem.content} />;
+        case OPENPOSITION:
+          return (
+            <ReducedOpenPositionListItem openPosition={taggedItem.content} />
+          );
         default:
           return null;
       }

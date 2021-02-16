@@ -18,35 +18,42 @@ import {
 } from '../../../components/Images/ImageListItem';
 import {TechniqueIcon} from '../../../assets/ResourceTypeIcons';
 import {TECHNIQUE} from '../../../helpers/resourceTypeDefinitions';
+import NotFoundPage from '../../NotFoundPage/NotFoundPage';
 
 export default function TechniquePage() {
   const [technique, setTechnique] = useState();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [notFound, setNotFound] = useState(false);
   const techniqueID = useParams().techniqueID;
   const history = useHistory();
 
   useEffect(() => {
     setLoading(true);
+    if (!techniqueID) {
+      setNotFound(true);
+      return;
+    }
     db.doc(`techniques/${techniqueID}`)
       .get()
       .then((ds) => {
+        setLoading(false);
         if (!ds.exists) {
-          history.push('/notfound');
+          setNotFound(true);
         }
         const techniqueFromDB = ds.data();
         techniqueFromDB.resourceType = TECHNIQUE;
         setTechnique(techniqueFromDB);
       })
       .catch((err) => {
+        setLoading(false);
         console.error('Unable to retrieve technique:', err);
         setError(true);
-      })
-      .finally(() => setLoading(false));
+      });
   }, [techniqueID, history]);
 
   if (error) return <GeneralError />;
-
+  if (notFound) return <NotFoundPage />;
   if (loading) return <LoadingSpinnerPage />;
   return (
     <PaddedPageContainer>

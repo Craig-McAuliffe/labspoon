@@ -9,31 +9,41 @@ import {LoadingSpinnerPage} from '../../../components/LoadingSpinner/LoadingSpin
 import {db} from '../../../firebase';
 
 import './OpenPositionPage.css';
+import NotFoundPage from '../../NotFoundPage/NotFoundPage';
 
 export default function OpenPositionPage() {
   const [openPosition, setOpenPosition] = useState();
   const [pageError, setPageError] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
   const openPositionID = useParams().openPositionID;
   const history = useHistory();
 
   useEffect(() => {
+    setLoading(true);
+    if (!openPositionID) {
+      setNotFound(true);
+      return;
+    }
     db.doc(`openPositions/${openPositionID}`)
       .get()
       .then((ds) => {
+        setLoading(false);
         if (!ds.exists) {
-          history.push('/notfound');
+          setNotFound(true);
         }
         setOpenPosition(ds.data());
       })
       .catch((err) => {
+        setLoading(false);
         console.error('unable to retrieve open position from db' + err);
         setPageError(true);
       });
   }, [openPositionID, history]);
 
   if (pageError) return <GeneralError />;
-
-  if (!openPosition) return <LoadingSpinnerPage />;
+  if (notFound) return <NotFoundPage />;
+  if (!openPosition || loading) return <LoadingSpinnerPage />;
   return (
     <PaddedPageContainer>
       <div className="open-position-headline-section">

@@ -9,7 +9,7 @@ import {CreatingPostContext} from './CreatePost';
 import {Link} from 'react-router-dom';
 
 import './CreatePost.css';
-import {SmallOpenPositionListItem} from '../../../OpenPosition/OpenPositionListItem';
+import {ReducedOpenPositionListItem} from '../../../OpenPosition/OpenPositionListItem';
 import NegativeButton from '../../../Buttons/NegativeButton';
 import FormDatabaseSearch from '../../../Forms/FormDatabaseSearch';
 import InputError from '../../../Forms/InputError';
@@ -64,6 +64,7 @@ export default function OpenPositionPostForm({
         )
       );
     if (!dbOpenPosition) setGeneralError(true);
+    dbOpenPosition.id = taggedOpenPosition.id;
     res.openPosition = dbOpenPosition;
     createPost(res)
       .then(() => {
@@ -125,7 +126,10 @@ function SelectOpenPosition({
   if (taggedOpenPosition) {
     return (
       <div className="tagged-resource-section">
-        <SmallOpenPositionListItem openPosition={taggedOpenPosition} />
+        <ReducedOpenPositionListItem
+          openPosition={taggedOpenPosition}
+          noLink={true}
+        />
         <div className="create-post-deselect-resource-container">
           <NegativeButton
             onClick={() => {
@@ -199,7 +203,8 @@ function OpenPositionsSearchResults({openPositions, setTaggedOpenPosition}) {
           </SecondaryButton>
           {/* <button className='resource-result-selector'>Select</button> */}
         </div>
-        <SmallOpenPositionListItem
+        <ReducedOpenPositionListItem
+          noLink={true}
           openPosition={openPosition}
           decreasedEmphasis={true}
         />

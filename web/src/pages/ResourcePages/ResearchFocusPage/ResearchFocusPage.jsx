@@ -18,35 +18,42 @@ import {
 } from '../../../components/Images/ImageListItem';
 import {ResearchFocusIcon} from '../../../assets/ResourceTypeIcons';
 import {RESEARCHFOCUS} from '../../../helpers/resourceTypeDefinitions';
+import NotFoundPage from '../../NotFoundPage/NotFoundPage';
 
 export default function ResearchFocusPage() {
   const [researchFocus, setResearchFocus] = useState();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [notFound, setNotFound] = useState(false);
   const researchFocusID = useParams().researchFocusID;
   const history = useHistory();
 
   useEffect(() => {
     setLoading(true);
+    if (!researchFocusID) {
+      setNotFound(true);
+      return;
+    }
     db.doc(`researchFocuses/${researchFocusID}`)
       .get()
       .then((ds) => {
+        setLoading(false);
         if (!ds.exists) {
-          history.push('/notfound');
+          setNotFound(true);
         }
         const researchFocusFromDB = ds.data();
         researchFocusFromDB.resourceType = RESEARCHFOCUS;
         setResearchFocus(researchFocusFromDB);
       })
       .catch((err) => {
+        setLoading(false);
         console.error('Unable to retrieve technique:', err);
         setError(true);
-      })
-      .finally(() => setLoading(false));
+      });
   }, [researchFocusID, history]);
 
   if (error) return <GeneralError />;
-
+  if (notFound) return <NotFoundPage />;
   if (loading) return <LoadingSpinnerPage />;
 
   return (

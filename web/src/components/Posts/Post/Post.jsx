@@ -11,12 +11,17 @@ import UserAvatar from '../../Avatar/UserAvatar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import './Post.css';
-import {PUBLICATION} from '../../../helpers/resourceTypeDefinitions';
+import {
+  OPENPOSITION,
+  PUBLICATION,
+} from '../../../helpers/resourceTypeDefinitions';
 
 export default function Post({post, dedicatedPage, bookmarkedVariation}) {
   const taggedContent = [];
   if (post.publication)
     taggedContent.push({type: PUBLICATION, content: post.publication});
+  if (post.openPosition)
+    taggedContent.push({type: OPENPOSITION, content: post.openPosition});
 
   if (post.generated)
     return (

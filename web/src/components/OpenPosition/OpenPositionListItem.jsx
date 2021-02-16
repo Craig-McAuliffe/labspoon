@@ -45,14 +45,27 @@ export default function OpenPositionListItem({openPosition}) {
   );
 }
 
-export function SmallOpenPositionListItem({openPosition, decreasedEmphasis}) {
+export function ReducedOpenPositionListItem({
+  openPosition,
+  decreasedEmphasis,
+  noLink,
+}) {
   const content = openPosition.content;
   if (!openPosition) return null;
-  return (
-    <ListItemContainer>
+  const titleDisplay = noLink ? (
+    <h3 style={decreasedEmphasis ? {color: '#5d5d65'} : null}>
+      {content.title}
+    </h3>
+  ) : (
+    <Link to={`/openPosition/${openPosition.id}`}>
       <h3 style={decreasedEmphasis ? {color: '#5d5d65'} : null}>
         {content.title}
       </h3>
+    </Link>
+  );
+  return (
+    <ListItemContainer>
+      {titleDisplay}
       {openPosition.topics.length > 0 ||
       openPosition.customTopics.length > 0 ? (
         <ListItemTopics
