@@ -134,14 +134,13 @@ function SelectPublication({
           className="search-input"
         />
       </div>
-      <div className="create-publication-post-search-or-link-container">
+      <div className="create-post-alt-tagging-method-container">
         <button className="create-publication-search-publications-button"></button>
-        <p>Can&rsquo;t find the publication you&rsquo;re looking for?</p>
+        <p>Can&#39;t find the publication you&#39;re looking for?</p>
         <button
           onClick={() => {
             setUsePublicationURL(true);
           }}
-          small
         >
           <h4>Add Link Instead</h4>
         </button>
@@ -165,13 +164,12 @@ function PublicationURL({
         onChange={(event) => setPublicationURL(event.target.value)}
         className="search-input"
       />
-      <div className="create-publication-post-search-or-link-container">
+      <div className="create-post-alt-tagging-method-container">
         <p>Search for a publication instead?</p>
         <button
           onClick={() => {
             setUsePublicationURL(false);
           }}
-          small
         >
           <h4>Find on Labspoon</h4>
         </button>

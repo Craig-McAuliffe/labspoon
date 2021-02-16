@@ -6,6 +6,7 @@ import {WriteIcon} from '../../../../assets/GeneralActionIcons';
 import {Redirect, useLocation} from 'react-router-dom';
 
 import './CreatePost.css';
+import OpenPositionPostForm from './OpenPositionPostForm';
 
 export const DEFAULT_POST = 'Default';
 export const PUBLICATION_POST = 'Publication';
@@ -108,6 +109,14 @@ function PostTypeSpecificForm({setCreatingPost, postType, setPostType}) {
     case PUBLICATION_POST:
       return (
         <PublicationPostForm
+          setCreatingPost={setCreatingPost}
+          setPostType={setPostType}
+          postType={postType}
+        />
+      );
+    case OPEN_POSITION_POST:
+      return (
+        <OpenPositionPostForm
           setCreatingPost={setCreatingPost}
           setPostType={setPostType}
           postType={postType}

@@ -44,3 +44,27 @@ export default function OpenPositionListItem({openPosition}) {
     </ListItemContainer>
   );
 }
+
+export function SmallOpenPositionListItem({openPosition}) {
+  const content = openPosition.content;
+  if (!openPosition) return null;
+  return (
+    <ListItemContainer>
+      <h3>{content.title}</h3>
+      {openPosition.topics.length > 0 ||
+      openPosition.customTopics.length > 0 ? (
+        <ListItemTopics
+          dbTopics={openPosition.topics}
+          customTopics={openPosition.customTopics}
+        />
+      ) : null}
+      <h4 className="resource-list-item-subtitle">Description of Role</h4>
+      <div
+        className="article-list-item-small-description"
+        resourceID={openPosition.id}
+      >
+        <p>{content.description}</p>
+      </div>
+    </ListItemContainer>
+  );
+}

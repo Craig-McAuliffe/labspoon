@@ -20,6 +20,7 @@ export default function FormDatabaseSearch({
   hideSearchIcon,
   displayedItems,
   clearListOnNoResults,
+  hasCustomContainer,
 }) {
   const resourceResults = ({searchResults}) => {
     if (
@@ -40,7 +41,7 @@ export default function FormDatabaseSearch({
   const CustomStateResourceResults = connectStateResults(resourceResults);
   return (
     <div
-      className="form-database-search-container"
+      className={hasCustomContainer ? '' : 'form-database-search-container'}
       ref={inputRef ? inputRef : null}
     >
       {hideSearchIcon ? null : <SearchIconGrey />}

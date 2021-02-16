@@ -28,9 +28,10 @@
   padding: 0px 0px 10px 10px;
 }
 
-.creating-post-tags {
+.tagged-resource-search-container {
   padding-left: 10px;
   margin-top: 40px;
+  color: #5d5d65;
 }
 
 .create-post-actions {
@@ -79,19 +80,25 @@
   text-align: center;
 }
 
-.create-publication-post-search-or-link-container {
+.create-post-tag-a-container {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.create-post-alt-tagging-method-container {
   display: flex;
   justify-content: flex-end;
   margin-top: -30px;
 }
 
-.create-publication-post-search-or-link-container p {
+.create-post-alt-tagging-method-container p {
   color: #5d5d65;
   display: inline-block;
   margin-top: 20px;
 }
 
-.create-publication-post-search-or-link-container button {
+.create-post-alt-tagging-method-container button {
   color: #00507c;
 }
 
@@ -130,15 +137,12 @@
 }
 
 .create-post-post-resource-type-dropdown-section {
-  display: grid;
-  grid-template-columns: minmax(90px, 1fr) 1fr minmax(170px, 2fr);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
   align-items: center;
-  margin-top: 20px;
+  margin: 20px 0px;
   max-width: 100%;
-}
-
-.create-post-post-resource-type-dropdown-section svg {
-  height: 60%;
 }
 
 .create-post-post-resource-type-dropdown-tag {
@@ -147,10 +151,14 @@
   align-items: center;
 }
 
-.create-post-post-resource-type-dropdown-tag span {
-  color: #5d5d65;
+.create-post-post-resource-type-dropdown-section svg {
+  height: 25px;
+}
+
+.create-post-tag-a {
   display: inline-block;
-  margin-left: 8px;
+  color: #5d5d65;
+  margin: 0px 8px;
 }
 
 .create-post-post-resource-suggested-tags-container {
@@ -160,6 +168,11 @@
 
 .create-post-post-resource-type-suggestion {
   color: #00507c;
+  margin: 0px 10px;
+}
+
+.create-post-post-resource-type-suggestion h4 {
+  margin: 0px;
 }
 
 .create-post-post-resource-type-suggestion:hover,
@@ -167,19 +180,23 @@
   color: #3099d3;
 }
 
-.create-post-resource-dropdown-toggle-triangle path {
-  fill: #00507c;
-}
-
 .create-post-post-resource-dropdown-toggle-container {
   display: flex;
 }
 
 .create-post-post-resource-dropdown-toggle {
-  border-bottom: 1px solid #00507c;
+  /* border: 1px solid #00507c; */
+  width: 200px;
   color: #5d5d65;
   text-align: start;
-  flex-grow: 1;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.create-post-post-resource-dropdown-toggle path {
+  fill: #00507c;
 }
 
 .create-post-resource-tag-dropdown-option-name {
@@ -189,15 +206,24 @@
 }
 
 .create-post-post-resource-type-dropdown-section-active {
-  display: grid;
-  grid-template-columns: minmax(50px, 1fr) 1fr;
-  align-items: center;
   margin-top: 20px;
 }
 
 .create-post-post-tagged-resource-type-button {
   display: flex;
   align-items: center;
+  border: 1px solid #00507c;
+  padding: 5px;
+}
+
+.create-post-post-tagged-resource-type-button:hover {
+  border: 2px solid #00507c;
+  padding: 4px;
+}
+
+.create-post-post-tagged-resource-type-button h4 {
+  margin: 0px 10px;
+  color: #00507c;
 }
 
 .create-post-post-tagged-resource-type-button svg {
@@ -207,15 +233,10 @@
 .create-post-post-tagged-resource-type-button path,
 .create-post-post-tagged-resource-type-button circle,
 .create-post-post-tagged-resource-type-button ellipse {
-  stroke: #99999f;
-  fill: #ffffff;
 }
 
-.create-post-post-tagged-resource-type-button:hover h4,
-.create-post-post-tagged-resource-type-button:focus h4 {
-  border-bottom: 2px solid #00507c;
-  margin: 0px 5px 0px 10px;
-  color: #00507c;
+.create-post-remove-tagged-resource-icon-container {
+  margin: 0px 5px;
 }
 
 .create-post-post-tagged-resource-type-button:hover
@@ -239,6 +260,19 @@
   margin-top: 0px;
 }
 
+.type-of-tagged-resource-dropdown-container {
+  display: grid;
+  grid-template-columns: minmax(250px, 1fr) 1fr;
+}
+
+.resource-search-input-container {
+  border: 1px solid #99999f;
+  line-height: 40px;
+  width: 100%;
+  padding-left: 10px;
+  margin: 0px 0px 40px;
+}
+
 @media screen and (max-width: 1197px) {
   .not-creating-post-button {
     margin-top: 65px;
@@ -259,13 +293,5 @@
 @media screen and (max-width: 800px) {
   .not-creating-post-button {
     margin-bottom: 30px;
-  }
-  .create-post-post-resource-type-dropdown-section {
-    display: flex;
-    flex-wrap: wrap;
-  }
-  .create-post-post-resource-type-dropdown-section-active {
-    display: flex;
-    flex-wrap: wrap;
   }
 }

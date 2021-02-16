@@ -17,3 +17,7 @@
   color: #99999f;
   margin-top: 10px;
 }
+
+.article-list-item-small-description {
+  height: 100px;
+}
