@@ -125,7 +125,7 @@ function SelectPublication({
   // if the user clicks enter
   return (
     <>
-      <div className="creating-post-tags">
+      <div className="publication-post-search-section">
         <TextInput
           value={query}
           label={'Search Publications:'}
@@ -156,7 +156,7 @@ function PublicationURL({
   setUsePublicationURL,
 }) {
   return (
-    <div className="creating-post-tags">
+    <div className="publication-post-search-section">
       <TextInput
         value={publicationURL}
         label={'Publication URL:'}
