@@ -135,7 +135,7 @@ export default function CreateTechnique() {
           selectedTopics={selectedTopics}
           setSelectedTopics={setSelectedTopics}
         />
-        <FormImageUpload name="photos" multiple={true} />
+        <FormImageUpload name="photos" multiple={true} maxImages={9} />
         <CreateResourceFormActions
           submitting={submitting}
           submitText="Create"

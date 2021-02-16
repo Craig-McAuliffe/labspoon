@@ -19,6 +19,7 @@ const FINISHED = 2;
 const NONIMAGE = 'nonImage';
 const TOOBIG = 'tooBig';
 const GIF = 'gif';
+const TOOMANY = 'maxImages';
 
 export default function ImageUpload({
   storageDir,
@@ -30,6 +31,7 @@ export default function ImageUpload({
   isAvatar,
   existingAvatar,
   shouldResize,
+  maxImages,
 }) {
   const [files, setFiles] = useState([]);
   const [imageURLs, setImageURLs] = useState([]);
@@ -125,6 +127,7 @@ export default function ImageUpload({
       noGif={noGif}
       isAvatar={isAvatar}
       existingAvatar={existingAvatar}
+      maxImages={maxImages}
     />
   ) : (
     <ImagesSelected
@@ -183,6 +186,7 @@ function NoImagesSelected({
   noGif,
   isAvatar,
   existingAvatar,
+  maxImages,
 }) {
   let imageSelectionUI;
   if (isAvatar && existingAvatar)
@@ -199,6 +203,7 @@ function NoImagesSelected({
         onChange={onChange}
         multipleImages={multipleImages}
         noGif={noGif}
+        maxImages={maxImages}
       />
     );
 
@@ -248,7 +253,7 @@ function ImagesSelected({
 }
 const MAX_IMAGE_PREVIEWS = 3;
 
-export function SelectImages({onChange, multipleImages, noGif}) {
+export function SelectImages({onChange, multipleImages, noGif, maxImages}) {
   const [displayValidationMessage, setDisplayValidationMessage] = useState(
     false
   );
@@ -261,24 +266,35 @@ export function SelectImages({onChange, multipleImages, noGif}) {
           <input
             type="file"
             onChange={(e) =>
-              validatedOnChange(e, onChange, setDisplayValidationMessage, noGif)
+              validatedOnChange(
+                e,
+                onChange,
+                setDisplayValidationMessage,
+                noGif,
+                maxImages
+              )
             }
             multiple={multipleImages}
             name="uploaded-image"
           />
         </label>
       </div>
-      <ErrorMessageType displayValidationMessage={displayValidationMessage} />
+      <ErrorMessageType
+        displayValidationMessage={displayValidationMessage}
+        maxImages={maxImages}
+      />
     </>
   );
 }
 
-function ErrorMessageType({displayValidationMessage}) {
+function ErrorMessageType({displayValidationMessage, maxImages}) {
   if (displayValidationMessage === NONIMAGE)
     return <UploadTypeValidationMessage />;
   if (displayValidationMessage === GIF) return <NoGifValidationMessage />;
   if (displayValidationMessage === TOOBIG)
     return <UploadSizeValidationMessage />;
+  if (displayValidationMessage === TOOMANY)
+    return <TooManyValidationMessage maxImages={maxImages} />;
   return null;
 }
 
@@ -403,7 +419,17 @@ function NoGifValidationMessage() {
   return <ErrorMessage>Avatars cannot be GIFs</ErrorMessage>;
 }
 
-function validatedOnChange(e, onChange, setDisplayValidationMessage, noGif) {
+function TooManyValidationMessage({maxImages}) {
+  return <ErrorMessage>You can only add {maxImages} images.</ErrorMessage>;
+}
+
+function validatedOnChange(
+  e,
+  onChange,
+  setDisplayValidationMessage,
+  noGif,
+  maxImages
+) {
   setDisplayValidationMessage(false);
   const files = Array.from(e.target.files);
   const nonOrInvalidImages = files.filter(
@@ -425,6 +451,10 @@ function validatedOnChange(e, onChange, setDisplayValidationMessage, noGif) {
       setDisplayValidationMessage(GIF);
       return;
     }
+  }
+  if (maxImages && files.length > maxImages) {
+    setDisplayValidationMessage(TOOMANY);
+    return;
   }
 
   return onChange(e);

@@ -99,6 +99,7 @@ function GroupImageUpload({groupID, refresh}) {
         updateDB={updateDB}
         refresh={refresh}
         multipleImages={true}
+        maxImages={12}
       />
     </div>
   );

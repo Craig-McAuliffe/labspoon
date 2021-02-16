@@ -9,6 +9,7 @@ export default function FormImageUpload({
   isAvatar,
   multiple,
   existingAvatar,
+  maxImages,
   ...props
 }) {
   const [field, , helpers] = useField(props);
@@ -34,7 +35,13 @@ export default function FormImageUpload({
       return (
         <SelectAvatar onChange={onChange} existingAvatar={existingAvatar} />
       );
-    return <SelectImages onChange={onChange} multipleImages={multiple} />;
+    return (
+      <SelectImages
+        onChange={onChange}
+        multipleImages={multiple}
+        maxImages={maxImages}
+      />
+    );
   }
 
   return (
