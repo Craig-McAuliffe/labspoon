@@ -53,6 +53,7 @@ export const createOpenPosition = functions.https.onCall(
       group: data.group,
       customTopics: data.customTopics,
       timestamp: new Date(),
+      unixTimeStamp: Math.floor(new Date().getTime() / 1000),
       filterTopicIDs: openPositionTopics.map(
         (taggedTopic: TaggedTopic) => taggedTopic.id
       ),
@@ -184,6 +185,7 @@ export interface OpenPosition {
   topics?: TaggedTopic[];
   customTopics?: string[];
   timestamp: Date;
+  unixTimeStamp: number;
   group: GroupRef;
   id?: string;
   // filterable arrays must be array of strings

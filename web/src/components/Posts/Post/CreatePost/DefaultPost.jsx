@@ -50,6 +50,7 @@ export default function DefaultPost({setCreatingPost, postType, setPostType}) {
       onSubmit={submitChanges}
       initialValues={initialValues}
       validationSchema={validationSchema}
+      formID="create-default-post-form"
     >
       <div className="creating-post-main-text-container">
         <CreatePostTextArea name="title" />

@@ -13,6 +13,7 @@ import {
   convertTaggedTopicToTopic,
   handleTopicsNoID,
 } from './topics';
+import {OpenPosition} from './openPositions';
 
 const db = admin.firestore();
 
@@ -65,6 +66,7 @@ export const createPost = functions.https.onCall(async (data, context) => {
     post.publication = toPublicationRef(data.publication, data.publication.id);
   }
   if (data.publicationURL) post.publicationURL = data.publicationURL;
+  if (data.openPosition) post.openPosition = data.openPosition;
   await Promise.all(matchedTopicsPromises);
   return postDocRef.set(post).catch((err) => {
     console.error(`could not create post ${postID}` + err);
@@ -631,6 +633,7 @@ export interface Post {
   id: string;
   publicationURL?: string[];
   publication?: PublicationRef;
+  openPosition?: OpenPosition;
   // filterable arrays must be array of strings
   filterTopicIDs: string[];
   bookmarkedCount?: number;

@@ -45,12 +45,14 @@ export default function OpenPositionListItem({openPosition}) {
   );
 }
 
-export function SmallOpenPositionListItem({openPosition}) {
+export function SmallOpenPositionListItem({openPosition, decreasedEmphasis}) {
   const content = openPosition.content;
   if (!openPosition) return null;
   return (
     <ListItemContainer>
-      <h3>{content.title}</h3>
+      <h3 style={decreasedEmphasis ? {color: '#5d5d65'} : null}>
+        {content.title}
+      </h3>
       {openPosition.topics.length > 0 ||
       openPosition.customTopics.length > 0 ? (
         <ListItemTopics
@@ -59,10 +61,7 @@ export function SmallOpenPositionListItem({openPosition}) {
         />
       ) : null}
       <h4 className="resource-list-item-subtitle">Description of Role</h4>
-      <div
-        className="article-list-item-small-description"
-        resourceID={openPosition.id}
-      >
+      <div className="article-list-item-small-description">
         <p>{content.description}</p>
       </div>
     </ListItemContainer>

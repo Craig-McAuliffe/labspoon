@@ -4,6 +4,7 @@ import {config, environment, ResourceTypes} from './config';
 import {toUserRef} from './users';
 import {Group, groupToGroupRef} from './groups';
 import {Post, PostToPostRef} from './posts';
+import {OpenPosition} from './openPositions';
 
 const algoliaConfig = config.algolia;
 
@@ -12,6 +13,7 @@ const GROUPS_INDEX = environment + '_GROUPS';
 const POSTS_INDEX = environment + '_POSTS';
 const PUBLICATIONS_INDEX = environment + '_PUBLICATIONS';
 const TOPICS_INDEX = environment + '_TOPICS';
+const OPENPOSITIONS_INDEX = environment + '_OPENPOSITIONS';
 
 let algoliaClient: SearchClient;
 if (algoliaConfig) {
@@ -129,7 +131,7 @@ export const configurePostSearchIndex = functions.https.onRequest((_, res) =>
   configureSearchIndex(
     res,
     POSTS_INDEX,
-    ['unordered(content.text)', 'unordered(topics)', 'author.name'],
+    ['unordered(content.text)', 'unordered(topics.name)', 'author.name'],
     ['postType.id'],
     ['desc(recommendedCount)', 'desc(unixTimeStamp)', 'desc(bookmarkedCount)']
   )
@@ -166,11 +168,52 @@ export const updatePostToSearchIndex = functions.firestore
     );
   });
 
+export const configureOpenPositionSearchIndex = functions.https.onRequest(
+  (_, res) =>
+    configureSearchIndex(
+      res,
+      OPENPOSITIONS_INDEX,
+      [
+        'unordered(content.title)',
+        'unordered(content.description)',
+        'topics.name',
+      ],
+      undefined,
+      ['desc(unixTimeStamp)']
+    )
+);
+
+export const addOpenPositionToSearchIndex = functions.firestore
+  .document(`openPositions/{openPositionID}`)
+  .onCreate((change, context): boolean => {
+    const openPosition = change.data();
+    openPosition.id = context.params.openPositionID;
+    return addToIndex(
+      context.params.openPositionID,
+      openPosition,
+      ResourceTypes.OPEN_POSITION,
+      OPENPOSITIONS_INDEX
+    );
+  });
+
+export const updateOpenPositionToSearchIndex = functions.firestore
+  .document('openPositions/{openPositionID}')
+  .onUpdate((change, context): boolean => {
+    const newOpenPositionData = change.after.data() as OpenPosition;
+    newOpenPositionData.id = context.params.openPositionID;
+    return addToIndex(
+      context.params.openPositionID,
+      newOpenPositionData,
+      ResourceTypes.OPEN_POSITION,
+      OPENPOSITIONS_INDEX
+    );
+  });
+
 export const configurePublicationSearchIndex = functions.https.onRequest(
   (_, res) =>
     configureSearchIndex(res, PUBLICATIONS_INDEX, [
       'unordered(title)',
-      'unordered(topics)',
+      'unordered(topics.name)',
     ])
 );
 

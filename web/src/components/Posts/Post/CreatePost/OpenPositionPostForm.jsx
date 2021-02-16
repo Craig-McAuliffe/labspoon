@@ -1,6 +1,6 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import * as Yup from 'yup';
-import firebase from '../../../../firebase';
+import firebase, {db} from '../../../../firebase';
 import {CreatePostTextArea} from '../../../Forms/FormTextInput';
 import PostForm from './PostForm';
 import TypeOfTaggedResourceDropDown from './TypeOfTaggedResourceDropDown';
@@ -13,6 +13,8 @@ import {SmallOpenPositionListItem} from '../../../OpenPosition/OpenPositionListI
 import NegativeButton from '../../../Buttons/NegativeButton';
 import FormDatabaseSearch from '../../../Forms/FormDatabaseSearch';
 import InputError from '../../../Forms/InputError';
+import SecondaryButton from '../../../Buttons/SecondaryButton';
+import {TagResourceIcon} from '../../../../assets/ResourceTypeIcons';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
@@ -26,8 +28,22 @@ export default function OpenPositionPostForm({
   );
   const [taggedOpenPosition, setTaggedOpenPosition] = useState();
   const [noTaggedOpenPosError, setNoTaggedOpenPosError] = useState(false);
+  const [generalError, setGeneralError] = useState(false);
 
-  const submitChanges = (res) => {
+  useEffect(() => {
+    if (taggedOpenPosition && noTaggedOpenPosError)
+      setNoTaggedOpenPosError(false);
+  }, [taggedOpenPosition]);
+
+  useEffect(() => {
+    if (!generalError) return;
+    alert(
+      'Something went wrong while creating your post. Sorry about that. Please try again and contact support if the problem persists.'
+    );
+    setGeneralError(false);
+  }, [generalError]);
+
+  const submitChanges = async (res) => {
     setSubmittingPost(true);
     if (!taggedOpenPosition) {
       setNoTaggedOpenPosError(true);
@@ -38,12 +54,22 @@ export default function OpenPositionPostForm({
     const taggedTopics = handlePostTopics(selectedTopics);
     res.customTopics = taggedTopics.customTopics;
     res.topics = taggedTopics.DBTopics;
-    res.openPosition = taggedOpenPosition;
+    const dbOpenPosition = await db
+      .doc(`openPositions/${taggedOpenPosition.id}`)
+      .get()
+      .then((ds) => ds.data())
+      .catch((err) =>
+        console.error(
+          `unable to fetch open position with id ${taggedOpenPosition.id} ${err}`
+        )
+      );
+    if (!dbOpenPosition) setGeneralError(true);
+    res.openPosition = dbOpenPosition;
     createPost(res)
       .then(() => {
         setCreatingPost(false);
-        setPostSuccess(true);
         setSubmittingPost(false);
+        setPostSuccess(true);
       })
       .catch((err) => {
         console.log(err);
@@ -70,6 +96,14 @@ export default function OpenPositionPostForm({
       onSubmit={submitChanges}
       initialValues={initialValues}
       validationSchema={validationSchema}
+      formID="create-openPosition-post-form"
+      algoliaFormSearch={
+        <SelectOpenPosition
+          setTaggedOpenPosition={setTaggedOpenPosition}
+          taggedOpenPosition={taggedOpenPosition}
+          noTaggedOpenPosError={noTaggedOpenPosError}
+        />
+      }
     >
       <div className="creating-post-main-text-container">
         <CreatePostTextArea name="title" />
@@ -77,11 +111,6 @@ export default function OpenPositionPostForm({
       <TypeOfTaggedResourceDropDown
         setTaggedResourceType={setPostType}
         taggedResourceType={postType}
-      />
-      <SelectOpenPosition
-        setTaggedOpenPosition={setTaggedOpenPosition}
-        taggedOpenPosition={taggedOpenPosition}
-        noTaggedOpenPosError={noTaggedOpenPosError}
       />
     </PostForm>
   );
@@ -95,12 +124,11 @@ function SelectOpenPosition({
   const [displayedOpenPositions, setDisplayedOpenPositions] = useState([]);
   if (taggedOpenPosition) {
     return (
-      <div>
+      <div className="tagged-resource-section">
         <SmallOpenPositionListItem openPosition={taggedOpenPosition} />
-        <div>
+        <div className="create-post-deselect-resource-container">
           <NegativeButton
             onClick={() => {
-              setQuery(undefined);
               setTaggedOpenPosition(undefined);
             }}
             smallVersion
@@ -115,12 +143,12 @@ function SelectOpenPosition({
   // if the user clicks enter
   return (
     <>
-      <div className="tagged-resource-search-container">
+      <div className="tagged-resource-section">
         <h4>Search Open Positions</h4>
         <div className="resource-search-input-container">
           <FormDatabaseSearch
             setDisplayedItems={setDisplayedOpenPositions}
-            indexName="_OPEN_POSITIONS"
+            indexName="_OPENPOSITIONS"
             placeholderText=""
             displayedItems={displayedOpenPositions}
             clearListOnNoResults={true}
@@ -138,6 +166,44 @@ function SelectOpenPosition({
       {noTaggedOpenPosError && (
         <InputError error="You need to tag an open position" />
       )}
+      {displayedOpenPositions && displayedOpenPositions.length > 0 && (
+        <OpenPositionsSearchResults
+          openPositions={displayedOpenPositions}
+          setTaggedOpenPosition={setTaggedOpenPosition}
+        />
+      )}
     </>
   );
+}
+
+function OpenPositionsSearchResults({openPositions, setTaggedOpenPosition}) {
+  const selectOpenPosition = (openPosition) => {
+    setTaggedOpenPosition(openPosition);
+  };
+  return openPositions.map((openPosition, i) => {
+    if (!openPosition.id) return null;
+    return (
+      <div
+        key={openPosition.content.title + i}
+        className="resource-result-with-selector-container"
+      >
+        <div className="resource-result-selector-container">
+          <SecondaryButton
+            className="resource-result-selector"
+            onClick={() => selectOpenPosition(openPosition)}
+          >
+            <div className="select-tagged-resource-icon">
+              <TagResourceIcon />
+            </div>
+            Select
+          </SecondaryButton>
+          {/* <button className='resource-result-selector'>Select</button> */}
+        </div>
+        <SmallOpenPositionListItem
+          openPosition={openPosition}
+          decreasedEmphasis={true}
+        />
+      </div>
+    );
+  });
 }

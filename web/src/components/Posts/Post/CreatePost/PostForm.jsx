@@ -13,6 +13,8 @@ export default function PostForm({
   validationSchema,
   postType,
   setPostType,
+  formID,
+  algoliaFormSearch,
 }) {
   const {
     setSubmittingPost,
@@ -40,14 +42,19 @@ export default function PostForm({
           validationSchema={validationSchema}
           onSubmit={createPost}
         >
-          <Form id="create-post-form">{children}</Form>
+          <Form id={formID}>{children}</Form>
         </Formik>
+        {algoliaFormSearch}
         <TagTopics
           submittingForm={submittingPost}
           setSelectedTopics={setSelectedTopics}
           selectedTopics={selectedTopics}
         />
-        <CreatePostActions postType={postType} setPostType={setPostType} />
+        <CreatePostActions
+          postType={postType}
+          setPostType={setPostType}
+          formID={formID}
+        />
       </div>
     </div>
   );

@@ -3,6 +3,7 @@
   line-height: 40px;
   width: 100%;
   padding-left: 10px;
+  min-width: 200px;
 }
 
 .form-text-input-container {
@@ -44,6 +45,10 @@
 
 @media screen and (max-width: 800px) {
   .form-text-input-container-side-label {
-    display: block;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .form-text-input-container-side-label h4 {
+    margin-right: 10px;
   }
 }

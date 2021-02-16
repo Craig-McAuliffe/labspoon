@@ -4,7 +4,7 @@ import PrimaryButton from '../../../Buttons/PrimaryButton';
 import {CreatingPostContext} from './CreatePost';
 import './CreatePost';
 
-export default function CreatePostActions() {
+export default function CreatePostActions({formID}) {
   const {cancelPost} = useContext(CreatingPostContext);
   return (
     <div className="create-post-actions">
@@ -12,7 +12,7 @@ export default function CreatePostActions() {
         {cancelPost ? <CancelButton cancelAction={cancelPost} /> : <></>}
       </div>
       <div className="create-post-actions-positive">
-        <PrimaryButton submit={true} formID="create-post-form">
+        <PrimaryButton submit={true} formID={formID}>
           Post
         </PrimaryButton>
       </div>

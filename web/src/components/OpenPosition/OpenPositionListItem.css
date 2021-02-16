@@ -19,5 +19,11 @@
 }
 
 .article-list-item-small-description {
-  height: 100px;
+  height: 50px;
+  overflow-y: hidden;
+}
+
+.resource-result-selector-container {
+  display: flex;
+  justify-content: flex-end;
 }

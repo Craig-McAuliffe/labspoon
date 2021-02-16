@@ -70,6 +70,7 @@ export default function PublicationPostForm({
       onSubmit={submitChanges}
       initialValues={initialValues}
       validationSchema={validationSchema}
+      formID="create-publication-post-form"
     >
       <div className="creating-post-main-text-container">
         <CreatePostTextArea name="title" />
@@ -131,7 +132,6 @@ function SelectPublication({
           label={'Search Publications:'}
           sideLabel={true}
           onChange={(event) => setQuery(event.target.value)}
-          className="search-input"
         />
       </div>
       <div className="create-post-alt-tagging-method-container">
@@ -162,7 +162,6 @@ function PublicationURL({
         label={'Publication URL:'}
         sideLabel={true}
         onChange={(event) => setPublicationURL(event.target.value)}
-        className="search-input"
       />
       <div className="create-post-alt-tagging-method-container">
         <p>Search for a publication instead?</p>

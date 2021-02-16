@@ -13,6 +13,7 @@ export enum ResourceTypes {
   POST = 'post',
   PUBLICATION = 'publication',
   TOPIC = 'topic',
+  OPEN_POSITION = 'openPosition',
   // meta type for all types of post
   POST_TYPE = 'postType',
 }

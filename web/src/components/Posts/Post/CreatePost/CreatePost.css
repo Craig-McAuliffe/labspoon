@@ -30,11 +30,14 @@
 
 .publication-post-search-section {
   margin-top: 40px;
+  color: #5d5d65;
 }
 
-.tagged-resource-search-container {
-  padding-left: 10px;
+.tagged-resource-section {
   margin-top: 40px;
+}
+
+.tagged-resource-section h4 {
   color: #5d5d65;
 }
 
@@ -277,6 +280,28 @@
   margin: 0px 0px 40px;
 }
 
+.create-post-deselect-resource-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.resource-result-with-selector-container {
+  margin: 40px 0px;
+  position: relative;
+}
+
+.resource-result-selector-container {
+  position: absolute;
+  right: 0px;
+  background: rgba(255, 255, 255, 0.8);
+  margin: 10px;
+  padding: 8px 8px 20px 20px;
+}
+
+.select-tagged-resource-icon {
+  margin: 0px 5px;
+  display: inline-block;
+}
 @media screen and (max-width: 1197px) {
   .not-creating-post-button {
     margin-top: 65px;
