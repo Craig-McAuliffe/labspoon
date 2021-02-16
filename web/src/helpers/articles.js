@@ -28,6 +28,7 @@ export default async function addArticleToDB(
   article.title = title;
   article.body = body;
   article.timestamp = new Date();
+  article.unixTimeStamp = Math.floor(new Date().getTime() / 1000);
   articleDBRef
     .set(article)
     .then(() => {
