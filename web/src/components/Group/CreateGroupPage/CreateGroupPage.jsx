@@ -7,7 +7,9 @@ import {LoadingSpinnerPage} from '../../LoadingSpinner/LoadingSpinner';
 import {editGroupAvatarStorageInForm} from '../../../helpers/groups';
 
 import './CreateGroupPage.css';
+import {PaddedPageContainer} from '../../Layout/Content';
 
+const MAXGROUPS = 12;
 export default function CreateGroupPage({
   onboardingCancelOrSubmitAction,
   confirmGroupCreation,
@@ -17,6 +19,8 @@ export default function CreateGroupPage({
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(false);
+  const [numberOfExistingGroups, setNumberOfExistingGroups] = useState();
+  const [loading, setLoading] = useState(true);
   const userID = user.uid;
 
   useEffect(() => {
@@ -28,6 +32,22 @@ export default function CreateGroupPage({
       setError(false);
     }
   }, [error, setError, setSelectedUsers, userProfile]);
+
+  useEffect(async () => {
+    if (numberOfExistingGroups || !userID) return;
+    await db
+      .collection(`users/${userID}/groups`)
+      .get()
+      .then((qs) => {
+        if (qs.empty) {
+          setNumberOfExistingGroups(0);
+          return;
+        }
+        setNumberOfExistingGroups(qs.size);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
+  }, [userID]);
 
   const initialValues = {
     name: '',
@@ -109,7 +129,17 @@ export default function CreateGroupPage({
       return writeToDB();
     }
   }
-  if (submitting) return <LoadingSpinnerPage />;
+  if (submitting || loading) return <LoadingSpinnerPage />;
+  if (numberOfExistingGroups && numberOfExistingGroups >= MAXGROUPS)
+    return (
+      <PaddedPageContainer>
+        <h2>You can be a member of {MAXGROUPS} groups maximum.</h2>
+        <p>
+          If you would like to create a new group, please leave one of which you
+          are currently a member.
+        </p>
+      </PaddedPageContainer>
+    );
   return (
     <GroupInfoForm
       initialValues={initialValues}
