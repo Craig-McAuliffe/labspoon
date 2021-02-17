@@ -630,6 +630,46 @@ export const updateGroupRefOnResearchFocuses = functions.firestore
     return Promise.all(researchFocusesUpdatePromise);
   });
 
+export const updateGroupRefOnPosts = functions.firestore
+  .document('groups/{groupID}')
+  .onUpdate(async (change, context) => {
+    const newGroupData = change.after.data() as Group;
+    const oldGroupData = change.before.data() as Group;
+    const groupID = context.params.groupID;
+    if (
+      JSON.stringify(groupToGroupRef(newGroupData, groupID)) ===
+      JSON.stringify(groupToGroupRef(oldGroupData, groupID))
+    )
+      return;
+    const postsQS = await db
+      .collection(`groups/${groupID}/posts`)
+      .get()
+      .catch((err) =>
+        console.error('unable to fetch posts of group with id ' + groupID, err)
+      );
+    if (!postsQS || postsQS.empty) return;
+    const postsIDs: string[] = [];
+    postsQS.forEach((ds) => {
+      const postID = ds.id;
+      postsIDs.push(postID);
+    });
+    const postsUpdatePromise = postsIDs.map(async (postID) => {
+      return db
+        .doc(`posts/${postID}/groups/${groupID}`)
+        .set(groupToGroupRef(newGroupData, groupID))
+        .catch((err) =>
+          console.error(
+            'unable to update group ref on post with id ' +
+              postID +
+              ' for group with id ' +
+              groupID,
+            err
+          )
+        );
+    });
+    return Promise.all(postsUpdatePromise);
+  });
+
 export const updateGroupRefOnPublications = functions.firestore
   .document('groups/{groupID}')
   .onUpdate(async (change, context) => {

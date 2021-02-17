@@ -71,6 +71,7 @@ export function createUserDocOnSignUp(
       .set({
         id: result.user.uid,
         name: result.user.displayName,
+        nameChangeTimeStamp: firebase.firestore.FieldValue.serverTimestamp(),
       })
       .then(() => {
         setLoading(false);

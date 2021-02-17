@@ -1,8 +1,8 @@
 import React, {useContext, useState} from 'react';
 import {PaddedPageContainer} from '../../../components/Layout/Content';
-import {auth, db} from '../../../firebase.js';
-import * as Yup from 'yup';
+import firebase, {auth, db} from '../../../firebase';
 import {Form, Formik} from 'formik';
+import * as Yup from 'yup';
 import FormTextInput from '../../../components/Forms/FormTextInput';
 import PrimaryButton from '../../../components/Buttons/PrimaryButton.jsx';
 import {AuthContext} from '../../../App.jsx';
@@ -37,7 +37,10 @@ export default function ChooseUserName() {
       );
     await db
       .doc(`users/${userProfile.id}`)
-      .update({name: values.userName})
+      .update({
+        name: values.userName,
+        nameChangeTimeStamp: firebase.firestore.FieldValue.serverTimestamp(),
+      })
       .then(async () => {
         await updateUserDetails({uid: userProfile.id});
         await auth.currentUser
@@ -49,9 +52,14 @@ export default function ChooseUserName() {
       })
       .catch((err) => {
         console.error(err);
-        alert(
-          'Something went wrong trying to create your user name. Please refresh the page and try again.'
-        );
+        if (err.message.includes('PERMISSION_DENIED'))
+          alert(
+            'You can only change your username every 100 days. Please contact support if something has gone wrong when setting up your username.'
+          );
+        else
+          alert(
+            'Something went wrong trying to create your user name. Please refresh the page and try again.'
+          );
       });
   };
 
