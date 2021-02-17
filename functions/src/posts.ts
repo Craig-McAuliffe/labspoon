@@ -66,7 +66,8 @@ export const createPost = functions.https.onCall(async (data, context) => {
     post.publication = toPublicationRef(data.publication, data.publication.id);
   }
   if (data.publicationURL) post.publicationURL = data.publicationURL;
-  if (data.openPosition) post.openPosition = data.openPosition;
+  if (data.openPosition && data.openPosition.id)
+    post.openPosition = data.openPosition;
   await Promise.all(matchedTopicsPromises);
   return postDocRef.set(post).catch((err) => {
     console.error(`could not create post ${postID}` + err);
@@ -175,6 +176,33 @@ export const updatePostOnPublication = functions.firestore
         console.error(
           'unable to update post on publication with id ' +
             publication.id +
+            ' for post with id ' +
+            postID,
+          err
+        )
+      );
+  });
+
+export const updatePostOnOpenPosition = functions.firestore
+  .document('posts/{postID}')
+  .onUpdate(async (change, context) => {
+    const newPostData = change.after.data() as Post;
+    const oldPostData = change.before.data() as Post;
+    const postID = context.params.postID;
+    if (
+      JSON.stringify(PostToPostRef(newPostData)) ===
+      JSON.stringify(PostToPostRef(oldPostData))
+    )
+      return;
+    const openPosition = newPostData.openPosition;
+    if (!openPosition) return;
+    return db
+      .doc(`openPositions/${openPosition.id}/posts/${postID}`)
+      .set(newPostData)
+      .catch((err) =>
+        console.error(
+          'unable to update post on open position with id ' +
+            openPosition.id +
             ' for post with id ' +
             postID,
           err
@@ -418,6 +446,27 @@ export const addPublicationPostToPublication = functions.firestore
             postID +
             ' on publication with id ' +
             publication.id,
+          err
+        )
+      );
+  });
+
+export const addPostToOpenPosition = functions.firestore
+  .document(`posts/{postID}`)
+  .onCreate(async (change) => {
+    const postID = change.id;
+    const post = change.data() as Post;
+    const openPosition = post.openPosition;
+    if (!openPosition) return;
+    return db
+      .doc(`openPositions/${openPosition.id}/posts/${postID}`)
+      .set(post)
+      .catch((err) =>
+        console.error(
+          'unable to set post with id ' +
+            postID +
+            ' on open position with id ' +
+            openPosition.id,
           err
         )
       );

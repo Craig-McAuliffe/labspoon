@@ -649,7 +649,7 @@ export const updateUserRefOnTopicsYouFollow = functions.firestore
     return Promise.all(followsUpdatePromise);
   });
 
-export const updateUserRefOnPost = functions.firestore
+export const updateUserRefOnPosts = functions.firestore
   .document('users/{userID}')
   .onUpdate(async (change, context) => {
     const newUserData = change.after.data() as User;
