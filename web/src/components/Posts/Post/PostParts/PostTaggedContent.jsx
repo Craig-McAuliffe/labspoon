@@ -19,15 +19,23 @@ export default function PostOptionalTags({taggedContent}) {
       switch (taggedItem.type) {
         case USER:
           return (
-            <UserListItem user={taggedItem.content}>
+            <UserListItem user={taggedItem.content} key={(taggedItem.id, i)}>
               <FollowUserButton targetUser={taggedItem.content} />
             </UserListItem>
           );
         case PUBLICATION:
-          return <PublicationListItem publication={taggedItem.content} />;
+          return (
+            <PublicationListItem
+              publication={taggedItem.content}
+              key={(taggedItem.id, i)}
+            />
+          );
         case OPENPOSITION:
           return (
-            <ReducedOpenPositionListItem openPosition={taggedItem.content} />
+            <ReducedOpenPositionListItem
+              openPosition={taggedItem.content}
+              key={(taggedItem.id, i)}
+            />
           );
         default:
           return null;
