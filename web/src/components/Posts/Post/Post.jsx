@@ -20,6 +20,8 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
   const taggedContent = [];
   if (post.publication)
     taggedContent.push({type: PUBLICATION, content: post.publication});
+  if (post.publicationURL)
+    taggedContent.push({type: 'publicationURL', content: post.publicationURL});
   if (post.openPosition)
     taggedContent.push({type: OPENPOSITION, content: post.openPosition});
 
