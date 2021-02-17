@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 import firebase from '../../../../firebase';
 import {CreatePostTextArea, TextInput} from '../../../Forms/FormTextInput';
 import PostForm from './PostForm';
-import {CreatingPostContext} from './CreatePost';
+import {CreatingPostContext, sortThrownCreatePostErrors} from './CreatePost';
 import {FormPublicationResults} from '../../../Publication/MicrosoftResults';
 import {handlePostTopics} from '../../../Topics/TagTopics';
 import TypeOfTaggedResourceDropDown from './TypeOfTaggedResourceDropDown';
@@ -44,10 +44,7 @@ export default function PublicationPostForm({
         setSubmittingPost(false);
       })
       .catch((err) => {
-        console.log(err);
-        alert(
-          'Oh dear, something went wrong trying to create your post. Please try again later.'
-        );
+        sortThrownCreatePostErrors(err);
         setSubmittingPost(false);
       });
   };

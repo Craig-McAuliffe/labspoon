@@ -132,3 +132,18 @@ function PostTypeSpecificForm({setCreatingPost, postType, setPostType}) {
       );
   }
 }
+
+export function sortThrownCreatePostErrors(err) {
+  console.error(err);
+  switch (err.code) {
+    case 'unavailable':
+      alert(
+        'You are posting too fast. Please wait at least 10 seconds between posts.'
+      );
+      break;
+    default:
+      alert(
+        'Oh dear, something went wrong trying to create your post. Please try again later.'
+      );
+  }
+}

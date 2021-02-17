@@ -5,7 +5,7 @@ import {CreatePostTextArea} from '../../../Forms/FormTextInput';
 import PostForm from './PostForm';
 import TypeOfTaggedResourceDropDown from './TypeOfTaggedResourceDropDown';
 import {handlePostTopics} from '../../../Topics/TagTopics';
-import {CreatingPostContext} from './CreatePost';
+import {CreatingPostContext, sortThrownCreatePostErrors} from './CreatePost';
 import {Link} from 'react-router-dom';
 
 import './CreatePost.css';
@@ -73,10 +73,7 @@ export default function OpenPositionPostForm({
         setPostSuccess(true);
       })
       .catch((err) => {
-        console.log(err);
-        alert(
-          'Oh dear, something went wrong trying to create your post. Please try again later.'
-        );
+        sortThrownCreatePostErrors(err);
         setSubmittingPost(false);
       });
   };

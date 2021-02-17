@@ -7,7 +7,7 @@ import {
   getPublicationByMicrosoftPublicationID,
 } from './publications';
 
-import {UserRef, checkAuthAndGetUserFromContext} from './users';
+import {UserRef, checkAuthAndGetUserFromContext, User} from './users';
 import {
   TaggedTopic,
   convertTaggedTopicToTopic,
@@ -62,6 +62,26 @@ export const createPost = functions.https.onCall(async (data, context) => {
     ),
     id: postID,
   };
+  const lastPostTime = await db
+    .doc(`users/${author.id}`)
+    .get()
+    .then((ds) => {
+      if (!ds.exists) return;
+      const userDoc = ds.data() as User;
+      return userDoc.lastPostTimeStamp;
+    })
+    .catch((err) =>
+      console.error(
+        `unable to check last post time for user with id ${author.id} ${err}`
+      )
+    );
+  if (lastPostTime) {
+    if (post.unixTimeStamp - lastPostTime < 10)
+      throw new functions.https.HttpsError(
+        'unavailable',
+        'Must wait at least 10 seconds between creating posts.'
+      );
+  }
   if (data.publication) {
     post.publication = toPublicationRef(data.publication, data.publication.id);
   }
@@ -69,13 +89,27 @@ export const createPost = functions.https.onCall(async (data, context) => {
   if (data.openPosition && data.openPosition.id)
     post.openPosition = data.openPosition;
   await Promise.all(matchedTopicsPromises);
-  return postDocRef.set(post).catch((err) => {
-    console.error(`could not create post ${postID}` + err);
-    throw new functions.https.HttpsError(
-      'internal',
-      'An error occured while creating the post.'
-    );
-  });
+  return postDocRef
+    .set(post)
+    .then(() =>
+      db
+        .doc(`users/${post.author.id}`)
+        .update({lastPostTimeStamp: post.unixTimeStamp})
+        .catch((err) =>
+          console.error(
+            'unable to add recent post time stamp to user with id' +
+              post.author.id +
+              err
+          )
+        )
+    )
+    .catch((err) => {
+      console.error(`could not create post ${postID}` + err);
+      throw new functions.https.HttpsError(
+        'internal',
+        'An error occured while creating the post.'
+      );
+    });
 });
 
 export const addPostToAuthorPosts = functions.firestore

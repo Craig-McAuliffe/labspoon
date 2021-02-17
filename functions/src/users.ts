@@ -1409,6 +1409,7 @@ export interface User {
   microsoftID?: string;
   rank?: number;
   reputation?: number;
+  lastPostTimeStamp?: number;
 }
 
 export interface UserFilterRef {

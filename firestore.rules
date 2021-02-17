@@ -1,9 +1,20 @@
 rules_version = '2';
+// function checkForPreviousPost(authID) {
+//     return get(/databases/$(database)/documents/users/$(authID)).data.lastPostTimeStamp == null
+//   }
+// function checkPostingFrequency(authID, postTimeStamp) {
+//     return postTimeStamp - get(/databases/$(database)/documents/users/$(authID)).data.lastPostTimeStamp >duration.value(100, 's')
+//   }
+
 service cloud.firestore {
   match /databases/{database}/documents {
+    function noIDUpdate(request) {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['id'])
+    }
     match /posts/{postID} {
       allow read;
-      allow update: if request.auth != null && request.resource.data.keys().hasAny(['recommendedCount', 'bookmarkedCount'])
+      // only relevant when create post from client
+      // allow create: if request.auth != null && request.auth.uid == request.resource.data.author.id && request.resource.data.timestamp == request.time && (checkForPreviousPost(request.auth.uid) || checkPostingFrequency(request.auth.uid, request.time));
 
       match /groups/{groupID} {
         allow read;
@@ -47,7 +58,7 @@ service cloud.firestore {
 
     match /users/{userID} {
       allow read;
-      allow update: if request.auth != null && request.auth.uid == userID && (request.resource.data.name==resource.data.name || resource.data.name == null || (request.resource.data.nameChangeTimeStamp == request.time && request.time-resource.data.nameChangeTimeStamp>duration.value(100, 'd')))
+      allow update: if request.auth != null && request.auth.uid == userID && noIDUpdate(request) && (request.resource.data.name==resource.data.name || resource.data.name == null || (request.resource.data.nameChangeTimeStamp == request.time && request.time-resource.data.nameChangeTimeStamp>duration.value(100, 'd')))
       allow create: if request.auth != null;
 
       match /recommendations/{recommendationID} {
