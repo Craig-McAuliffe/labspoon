@@ -137,9 +137,14 @@ export function sortThrownCreatePostErrors(err) {
   console.error(err);
   switch (err.code) {
     case 'unavailable':
-      alert(
-        'You are posting too fast. Please wait at least 10 seconds between posts.'
-      );
+      if (err.message.includes('limit'))
+        alert(
+          'You have reached the daily post limit. This will be reset sometime in the next 24 hours.'
+        );
+      else
+        alert(
+          'You are posting too fast. Please wait at least 10 seconds between posts.'
+        );
       break;
     default:
       alert(

@@ -6,8 +6,12 @@ import {
   toPublicationRef,
   getPublicationByMicrosoftPublicationID,
 } from './publications';
-
-import {UserRef, checkAuthAndGetUserFromContext, User} from './users';
+import {
+  UserRef,
+  checkAuthAndGetUserFromContext,
+  User,
+  UserActivityRef,
+} from './users';
 import {
   TaggedTopic,
   convertTaggedTopicToTopic,
@@ -21,8 +25,12 @@ db.settings({
   ignoreUndefinedProperties: true,
 });
 
+const DAILY_POSTS_LIMIT = 60;
+
 export const createPost = functions.https.onCall(async (data, context) => {
   const author = await checkAuthAndGetUserFromContext(context);
+  await authorSpamCheck(author.id);
+
   const postDocRef = db.collection('posts').doc();
   const postID = postDocRef.id;
 
@@ -111,6 +119,48 @@ export const createPost = functions.https.onCall(async (data, context) => {
       );
     });
 });
+
+async function authorSpamCheck(authorID: string) {
+  const activityData = await db
+    .doc(`activity/postActivity/creators/${authorID}`)
+    .get()
+    .then((ds) => {
+      if (!ds.exists) return;
+      return ds.data() as UserActivityRef;
+    })
+    .catch((err) =>
+      console.error('unable to check new post for spam author', err)
+    );
+  if (!activityData) return;
+  if (activityData.rank >= DAILY_POSTS_LIMIT)
+    throw new functions.https.HttpsError(
+      'unavailable',
+      'Daily post limit reached.'
+    );
+}
+
+export const addPostActivity = functions.firestore
+  .document(`posts/{postID}`)
+  .onCreate(async (change) => {
+    const post = change.data() as Post;
+    const authorID = post.author.id;
+    const authorActivityRef = db.doc(
+      `activity/postActivity/creators/${authorID}`
+    );
+    const authorActivity = await authorActivityRef
+      .get()
+      .catch((err) =>
+        console.error(
+          `unable to update activity for user with id ${authorID} ${err}`
+        )
+      );
+    if (authorActivity && authorActivity.exists) {
+      return Promise.resolve(
+        authorActivityRef.update({rank: firestore.FieldValue.increment(1)})
+      );
+    }
+    return Promise.resolve(authorActivityRef.set({id: authorID, rank: 1}));
+  });
 
 export const addPostToAuthorPosts = functions.firestore
   .document(`posts/{postID}`)

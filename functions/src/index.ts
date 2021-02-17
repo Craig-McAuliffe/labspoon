@@ -12,3 +12,4 @@ exports.researchFocuses = require('./researchFocuses');
 exports.images = require('./images');
 exports.msUser = require('./msUser');
 exports.feeds = require('./feeds');
+exports.activity = require('./activity');

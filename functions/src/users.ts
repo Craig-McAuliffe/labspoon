@@ -1418,6 +1418,11 @@ export interface UserFilterRef {
   rank?: number;
 }
 
+export interface UserActivityRef {
+  id: string;
+  rank: number;
+}
+
 export interface UserPublicationRef {
   id?: string;
   name: string;
