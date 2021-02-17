@@ -21,6 +21,7 @@ import {db} from '../../firebase';
 import {uploadImagesAndGetURLs} from '../../helpers/images';
 import FormImageUpload from '../Images/FormImageUpload';
 import addArticleToDB from '../../helpers/articles';
+import {TECHNIQUES} from '../../helpers/resourceTypeDefinitions';
 
 export default function CreateTechnique() {
   const preSelectedGroupID = useParams().groupID;
@@ -91,7 +92,9 @@ export default function CreateTechnique() {
         userProfile,
         techniqueDBRef,
         setSubmitting,
-        history
+        history,
+        TECHNIQUES,
+        'techniquesCount'
       );
       return;
     }
@@ -107,7 +110,9 @@ export default function CreateTechnique() {
         userProfile,
         techniqueDBRef,
         setSubmitting,
-        history
+        history,
+        TECHNIQUES,
+        'techniquesCount'
       )
     );
   }

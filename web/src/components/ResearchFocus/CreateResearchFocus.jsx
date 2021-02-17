@@ -21,6 +21,7 @@ import CreateResourceFormActions from '../Forms/CreateResourceFormActions';
 import {uploadImagesAndGetURLs} from '../../helpers/images';
 import FormImageUpload from '../Images/FormImageUpload';
 import addArticleToDB from '../../helpers/articles';
+import {RESEARCHFOCUSES} from '../../helpers/resourceTypeDefinitions';
 
 import './CreateResearchFocus.css';
 
@@ -94,7 +95,9 @@ export default function CreateResearchFocus() {
         userProfile,
         researchFocusDBRef,
         setSubmitting,
-        history
+        history,
+        RESEARCHFOCUSES,
+        'researchFocusesCount'
       );
       return;
     }
@@ -110,7 +113,9 @@ export default function CreateResearchFocus() {
         userProfile,
         researchFocusDBRef,
         setSubmitting,
-        history
+        history,
+        RESEARCHFOCUSES,
+        'researchFocusesCount'
       )
     );
   }
