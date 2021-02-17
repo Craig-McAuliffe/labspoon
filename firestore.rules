@@ -15,6 +15,7 @@ service cloud.firestore {
       allow read;
       // only relevant when create post from client
       // allow create: if request.auth != null && request.auth.uid == request.resource.data.author.id && request.resource.data.timestamp == request.time && (checkForPreviousPost(request.auth.uid) || checkPostingFrequency(request.auth.uid, request.time));
+      allow update: if request.auth != null && (request.auth.uid == request.resource.data.author.id || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['recommendedCount', 'bookmarkedCount']));
 
       match /groups/{groupID} {
         allow read;
