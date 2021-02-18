@@ -5,9 +5,10 @@ import Results from '../Results/Results';
 import {SmallPublicationListItem} from './PublicationListItem';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 
-import './PublicationListItem.css';
 import {dbPublicationToJSPublication} from '../../helpers/publications';
 import {MicrosoftPublicationSearchCache} from '../../App';
+import './PublicationListItem.css';
+import './MicrosoftResults.css';
 
 const microsoftPublicationSearchCloudFunction = functions.httpsCallable(
   'publications-microsoftAcademicKnowledgePublicationSearch'
@@ -237,7 +238,16 @@ export function FormPublicationResults({query, setPublication}) {
     fetchPageByOffset(offset);
   }
 
-  if (loading) return <LoadingSpinner />;
+  if (loading)
+    return (
+      <div className="publication-search-loading-spinner-container">
+        <LoadingSpinner />
+        <p className="publication-search-loading-advice">
+          If the search takes too long, try looking for the author name and
+          scrolling through.
+        </p>
+      </div>
+    );
   if (error)
     return (
       <h4>

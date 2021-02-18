@@ -310,6 +310,7 @@
   margin: 0px 5px;
   display: inline-block;
 }
+
 @media screen and (max-width: 1197px) {
   .not-creating-post-button {
     margin-top: 65px;
