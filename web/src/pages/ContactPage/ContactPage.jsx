@@ -18,8 +18,12 @@ import ErrorMessage from '../../components/Forms/ErrorMessage';
 import {LoadingSpinnerPage} from '../../components/LoadingSpinner/LoadingSpinner';
 import {BotDetector} from '../../App';
 import firebase from 'firebase';
+import useScript from '../../helpers/useScript';
+import {reCaptchaSiteKey} from '../../config';
+import reCaptcha from '../../helpers/activity';
 
 import './ContactPage.css';
+import useDomRemover from '../../helpers/useDomRemover';
 
 export default function ContactPage() {
   const {path} = useRouteMatch();
@@ -87,6 +91,12 @@ export function GenericContactPage({contactFormType, mainLabel, children}) {
   useEffect(() => {
     setTimeAtPageLoad(new Date().getTime() / 1000);
   }, [user]);
+
+  useScript(
+    `https://www.google.com/recaptcha/api.js?render=${reCaptchaSiteKey}`
+  );
+
+  useDomRemover('.grecaptcha-badge');
 
   // prevent too many writes
   useEffect(async () => {
@@ -175,60 +185,85 @@ export function GenericContactPage({contactFormType, mainLabel, children}) {
   });
 
   const onSubmit = async (values, manuallyApproved) => {
+    setSubmitting(true);
+
+    const submitContactForm = async () => {
+      const formDBRef = db
+        .collection(`contactForms/${contactFormType}/submittedForms`)
+        .doc();
+      if (user) values.userID = user.uid;
+      const batch = db.batch();
+      if (doesCollectionExist === false) {
+        batch.set(db.doc(`contactForms/${contactFormType}`), {
+          formType: contactFormType,
+          numberOfMessages: 1,
+        });
+      } else {
+        batch.update(db.doc(`contactForms/${contactFormType}`), {
+          numberOfMessages: firebase.firestore.FieldValue.increment(1),
+        });
+      }
+      batch.set(formDBRef, values);
+      await batch
+        .commit()
+        .catch((err) => {
+          console.error('unable to submit contact form', err);
+          setSubmitting(false);
+          setError(true);
+        })
+        .then(() => {
+          setSuccess(true);
+          setSubmitting(false);
+        });
+    };
+
     if (currentNumberOfMessages > 150) {
       setSubmitting(false);
       setError(true);
       return;
     }
+
     values.isHuman = true;
-    if (manuallyApproved !== true) {
-      // bot trap
-      if (
-        honey ||
-        !humanMouseMovement ||
-        new Date().getTime() / 1000 - timeAtPageLoad < 3
-      ) {
-        setRecaptchaRequired(true);
-        setCachedSubmitData(values);
-        return;
-      }
+
+    if (manuallyApproved) return submitContactForm();
+
+    // bot trap
+    if (
+      honey ||
+      !humanMouseMovement ||
+      new Date().getTime() / 1000 - timeAtPageLoad < 3
+    ) {
+      setSubmitting(false);
+      setRecaptchaRequired(true);
+      setCachedSubmitData(values);
+      return;
     }
-    setSubmitting(true);
-    const formDBRef = db
-      .collection(`contactForms/${contactFormType}/submittedForms`)
-      .doc();
-    if (user) values.userID = user.uid;
-    const batch = db.batch();
-    if (doesCollectionExist === false) {
-      batch.set(db.doc(`contactForms/${contactFormType}`), {
-        formType: contactFormType,
-        numberOfMessages: 1,
-      });
-    } else {
-      batch.update(db.doc(`contactForms/${contactFormType}`), {
-        numberOfMessages: firebase.firestore.FieldValue.increment(1),
-      });
-    }
-    batch.set(formDBRef, values);
-    await batch
-      .commit()
-      .catch((err) => {
-        console.error('unable to submit contact form', err);
-        setSubmitting(false);
-        setError(true);
-      })
-      .then(() => {
-        setSuccess(true);
-        setSubmitting(false);
-      });
+
+    const reCaptchaFailFunction = () => {
+      setCachedSubmitData(values);
+      setRecaptchaRequired(true);
+    };
+    const reCaptchaErrorFunction = () => {
+      setCachedSubmitData(values);
+      setSubmitting(false);
+      setError(true);
+    };
+    return reCaptcha(
+      0.2,
+      submitContactForm,
+      reCaptchaFailFunction,
+      reCaptchaErrorFunction
+    );
   };
 
   if (recaptchaRequired)
     return (
       <ContactFormRecaptcha
         setBotConfirmed={setBotConfirmed}
-        cachedSubmitData={cachedSubmitData}
-        onSubmit={onSubmit}
+        successFunction={() => {
+          setRecaptchaRequired(false);
+          onSubmit(cachedSubmitData, true);
+        }}
       />
     );
   if (submitting) return <LoadingSpinnerPage />;
@@ -251,7 +286,7 @@ export function GenericContactPage({contactFormType, mainLabel, children}) {
           <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}
-            onSubmit={onSubmit}
+            onSubmit={(values) => onSubmit(values, false)}
           >
             <Form>
               <label className="contact-page-username-label">
@@ -287,7 +322,7 @@ export function GenericContactPage({contactFormType, mainLabel, children}) {
               )}
               <FormTextInput label="Please Write: I am hum4n" name="isHuman" />
               <div className="contact-page-submit-container">
-                <PrimaryButton type="submit">Send Suggestion</PrimaryButton>
+                <PrimaryButton type="submit">Submit</PrimaryButton>
               </div>
             </Form>
           </Formik>
@@ -308,10 +343,10 @@ function ContactFormSuccess({typeSpecificMessage}) {
   );
 }
 
-function ContactFormRecaptcha({setBotConfirmed, cachedSubmitData, onSubmit}) {
+function ContactFormRecaptcha({setBotConfirmed, successFunction}) {
   return (
     <PaddedPageContainer>
-      <h4>Recaptcha</h4>Are sensors indicate that you might be a bot. Bots are
+      <h4>Recaptcha</h4>Our sensors indicate that you might be a bot. Bots are
       not allowed to contact us. Are you a bot?
       <div>
         <button
@@ -320,10 +355,7 @@ function ContactFormRecaptcha({setBotConfirmed, cachedSubmitData, onSubmit}) {
         >
           Yes I am a bot
         </button>{' '}
-        <button
-          onClick={() => onSubmit(cachedSubmitData, true)}
-          className="not-a-bot-button"
-        >
+        <button onClick={() => successFunction()} className="not-a-bot-button">
           No, I am not a bot
         </button>
       </div>

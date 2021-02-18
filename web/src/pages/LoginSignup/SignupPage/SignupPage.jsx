@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useState} from 'react';
 import qs from 'qs';
 import firebase from '../../../firebase.js';
 import {Link, Redirect, useHistory, useLocation} from 'react-router-dom';
@@ -12,10 +12,11 @@ import {createUserDocOnSignUp} from '../../../helpers/users.js';
 import GoogleButton from 'react-google-button';
 import {PaddedPageContainer} from '../../../components/Layout/Content.jsx';
 import GoogleSignIn from '../GoogleSignIn.jsx';
-import {reCaptchaSiteKey, functionsHttpsUrl} from '../../../config';
-import axios from 'axios';
-import './SignupPage.css';
+import {reCaptchaSiteKey} from '../../../config';
 import useScript from '../../../helpers/useScript';
+import useDomRemover from '../../../helpers/useDomRemover.js';
+import './SignupPage.css';
+import reCaptcha from '../../../helpers/activity.js';
 
 /**
  * Sign up page using the Firebase authentication handler
@@ -38,13 +39,7 @@ function SignupPage() {
     `https://www.google.com/recaptcha/api.js?render=${reCaptchaSiteKey}`
   );
 
-  useEffect(
-    () => () => {
-      const recaptchaBadge = document.querySelector('.grecaptcha-badge');
-      if (recaptchaBadge) recaptchaBadge.remove();
-    },
-    [location]
-  );
+  useDomRemover('.grecaptcha-badge');
 
   if (loading) return <LoadingSpinnerPage />;
   if (!userProfile) {
@@ -149,34 +144,21 @@ const SignUpForm = ({
           }
         });
     };
-
-    return window.grecaptcha.ready(async () =>
-      window.grecaptcha
-        .execute(reCaptchaSiteKey, {action: 'sign_up'})
-        .then(async (token) =>
-          axios
-            .get(`${functionsHttpsUrl}activity-recaptchaVerify?token=${token}`)
-            .then((res) => {
-              const score = res.data.score;
-              if (score && score > 0.2) {
-                authenticateThenUpdateDB();
-                return;
-              }
-            })
-            .catch((err) => {
-              setSavedInitialValues(values);
-              alert(
-                'Our security system thinks you might be a bot. Please try again'
-              );
-              console.error('recaptcha function call failed', err);
-              setLoading(false);
-            })
-        )
-        .catch((err) => {
-          console.error('unable to execute recaptcha', err);
-          defaultAlert();
-          setLoading(false);
-        })
+    const reCaptchaFailFunction = () => {
+      setSavedInitialValues(values);
+      alert('Our security system thinks you might be a bot. Please try again');
+      setLoading(false);
+    };
+    const reCaptchaErrorFunction = () => {
+      setSavedInitialValues(values);
+      defaultAlert();
+      setLoading(false);
+    };
+    return reCaptcha(
+      0.2,
+      authenticateThenUpdateDB,
+      reCaptchaFailFunction,
+      reCaptchaErrorFunction
     );
   };
 
