@@ -147,6 +147,7 @@ const IndexResults = connectStateResults(
     if (searchResults && searchResults.nbHits !== 0) {
       return children;
     }
+    if (activeTab === 'Overview') return null;
     return (
       <>
         <div className="search-page-no-results-message">
@@ -159,7 +160,15 @@ const IndexResults = connectStateResults(
 );
 
 const AllResults = connectStateResults(({allSearchResults, children}) => {
-  const noResultsDisplay = (
+  const hasResults =
+    allSearchResults &&
+    Object.values(allSearchResults).some(
+      (individualIndexResults) => individualIndexResults.nbHits > 0
+    );
+  return hasResults ? (
+    children
+  ) : (
+    // These indexes trigger the AllResults to re-render and check other indexes
     <>
       <Index indexName={`${abbrEnv}_POSTS`} />
       <Index indexName={`${abbrEnv}_USERS`} />
@@ -172,16 +181,6 @@ const AllResults = connectStateResults(({allSearchResults, children}) => {
       <LatestPosts />
     </>
   );
-  if (!allSearchResults) return noResultsDisplay;
-  if (
-    Object.values(allSearchResults).some(
-      (individualIndexResults) => individualIndexResults.nbHits > 0
-    )
-  ) {
-    return children;
-  }
-  // These indexes trigger the AllResults to re-render and check other indexes
-  return noResultsDisplay;
 });
 
 // Adds a 'see more' button to the end of a hits component. Used for switching to tabs from the federated overview search.
@@ -220,43 +219,12 @@ function OverviewResultsSection({
         onClick={() => setTab(tabName)}
         resourceType={resourceType}
       >
-        <Configure hitsPerPage={3} />
+        <Configure hitsPerPage={4} />
         {children}
       </SeeMoreWrapper>
     </Index>
   );
 }
-
-const PostHitsComponent = () => (
-  <Hits
-    hitComponent={({hit}) => {
-      hit.id = hit.objectID;
-      return <GenericListItem result={hit} />;
-    }}
-  />
-);
-
-const GroupHitsComponent = () => (
-  <Hits
-    hitComponent={({hit}) => {
-      hit.id = hit.objectID;
-      return <GenericListItem result={hit} />;
-    }}
-  />
-);
-
-const UserHitsComponent = () => (
-  <Hits hitComponent={({hit}) => <GenericListItem result={hit} />} />
-);
-
-const TopicHitsComponent = () => (
-  <Hits
-    hitComponent={({hit}) => {
-      hit.id = hit.objectID;
-      return <GenericListItem result={hit} />;
-    }}
-  />
-);
 
 const OverviewResults = ({setTab}) => (
   <>
@@ -267,7 +235,7 @@ const OverviewResults = ({setTab}) => (
         tabName={POSTS}
         resourceType={'Posts'}
       >
-        <PostHitsComponent />
+        <PostsResults />
       </OverviewResultsSection>
       <OverviewResultsSection
         setTab={setTab}
@@ -275,7 +243,7 @@ const OverviewResults = ({setTab}) => (
         tabName={USERS}
         resourceType={'Users'}
       >
-        <UserHitsComponent />
+        <UsersResults />
       </OverviewResultsSection>
       <OverviewResultsSection
         setTab={setTab}
@@ -283,7 +251,7 @@ const OverviewResults = ({setTab}) => (
         tabName={GROUPS}
         resourceType={'Groups'}
       >
-        <GroupHitsComponent />
+        <GroupsResults />
       </OverviewResultsSection>
       <OverviewResultsSection
         setTab={setTab}
@@ -291,7 +259,7 @@ const OverviewResults = ({setTab}) => (
         tabName={TOPICS}
         resourceType={'Topics'}
       >
-        <TopicHitsComponent />
+        <TopicsResults />
       </OverviewResultsSection>
     </AllResults>
   </>
@@ -328,7 +296,12 @@ const PostsResults = () => (
 const TopicsResults = () => {
   return (
     <IndexResults>
-      <TopicHitsComponent />
+      <Hits
+        hitComponent={({hit}) => {
+          hit.id = hit.objectID;
+          return <GenericListItem result={hit} />;
+        }}
+      />
     </IndexResults>
   );
 };
@@ -336,6 +309,7 @@ const TopicsResults = () => {
 const urlToSearchState = (location) => qs.parse(location.search.slice(1));
 
 const tabToIndex = (tab) => {
+  if (tab === 'Overview') return `${abbrEnv}_POSTS`;
   return `${abbrEnv}_${tab.toUpperCase()}`;
 };
 
