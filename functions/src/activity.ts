@@ -1,7 +1,7 @@
 import Axios from 'axios';
 import {firestore} from 'firebase-admin';
 import * as functions from 'firebase-functions';
-import {admin, config} from './config';
+import {admin, config, domain} from './config';
 
 const db = admin.firestore();
 
@@ -44,7 +44,7 @@ async function deleteQueryBatch(query: firestore.DocumentData, resolve: any) {
 
 export const recaptchaVerify = functions.https.onRequest(
   async (req: any, res: any) => {
-    res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.set('Access-Control-Allow-Origin', domain);
     const recaptchaSecretKey = config.recaptcha.secret_key;
     const token = req.query.token;
     const response = await Axios.get(

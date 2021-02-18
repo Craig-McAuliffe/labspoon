@@ -117,6 +117,10 @@ const SignUpForm = ({
   const submitChanges = async (values) => {
     setLoading(true);
 
+    const defaultAlert = () =>
+      alert(
+        'Something went wrong. Please try refreshing the page and signing up again.'
+      );
     const authenticateThenUpdateDB = () => {
       firebase
         .auth()
@@ -141,9 +145,7 @@ const SignUpForm = ({
               `There is already a Labspoon account linked to that address.`
             );
           } else {
-            alert(
-              'Something went wrong. Please try refreshing the page and signing up again.'
-            );
+            defaultAlert();
           }
         });
     };
@@ -172,6 +174,7 @@ const SignUpForm = ({
         )
         .catch((err) => {
           console.error('unable to execute recaptcha', err);
+          defaultAlert();
           setLoading(false);
         })
     );
