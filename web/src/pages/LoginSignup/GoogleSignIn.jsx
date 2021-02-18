@@ -23,7 +23,7 @@ export default function GoogleSignIn({
           .get()
           .then((ds) => {
             if (ds.exists) return;
-            createUserDocOnSignUp(result, setLoading, '', updateUserDetails);
+            createUserDocOnSignUp(result, undefined, '', updateUserDetails);
             setGoogleSignInFlow(false);
           })
           .catch((err) => {
@@ -46,7 +46,6 @@ export default function GoogleSignIn({
           );
         setGoogleSignInFlow(false);
       });
-    setLoading(false);
     return () => {
       isMounted = false;
     };

@@ -74,11 +74,10 @@ export function createUserDocOnSignUp(
         nameChangeTimeStamp: firebase.firestore.FieldValue.serverTimestamp(),
       })
       .then(() => {
-        setLoading(false);
         updateUserDetails(result.user);
+        if (setLoading) setLoading(false);
       })
       .catch((err) => {
-        setLoading(false);
         console.log(err);
         firebase
           .auth()
@@ -94,6 +93,7 @@ export function createUserDocOnSignUp(
               'Something went wrong. Please contact our support team at help@labspoon.com from the email address that you are trying to sign up with. We apologise for the inconvenience.'
             );
           });
+        if (setLoading) setLoading(false);
       });
 
   result.user
