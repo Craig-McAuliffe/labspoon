@@ -1,6 +1,7 @@
+import Axios from 'axios';
 import {firestore} from 'firebase-admin';
 import * as functions from 'firebase-functions';
-import {admin} from './config';
+import {admin, config} from './config';
 
 const db = admin.firestore();
 
@@ -40,3 +41,23 @@ async function deleteQueryBatch(query: firestore.DocumentData, resolve: any) {
     deleteQueryBatch(query, resolve);
   });
 }
+
+export const recaptchaVerify = functions.https.onRequest(
+  async (req: any, res: any) => {
+    res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+    const recaptchaSecretKey = config.recaptcha.secret_key;
+    const token = req.query.token;
+    const response = await Axios.get(
+      `https://recaptcha.google.com/recaptcha/api/siteverify?secret=${recaptchaSecretKey}&response=${token}`
+    );
+    const data = response.data;
+    if (data.success) {
+      // Send the score back
+      return res.status(200).send({score: data.score});
+    }
+    throw new functions.https.HttpsError(
+      'permission-denied',
+      'Sign up attempt failed recaptcha.'
+    );
+  }
+);

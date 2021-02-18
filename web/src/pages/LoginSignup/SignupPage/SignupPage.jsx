@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import qs from 'qs';
 import firebase from '../../../firebase.js';
 import {Link, Redirect, useHistory, useLocation} from 'react-router-dom';
@@ -12,8 +12,10 @@ import {createUserDocOnSignUp} from '../../../helpers/users.js';
 import GoogleButton from 'react-google-button';
 import {PaddedPageContainer} from '../../../components/Layout/Content.jsx';
 import GoogleSignIn from '../GoogleSignIn.jsx';
-
+import {reCaptchaSiteKey, functionsHttpsUrl} from '../../../config';
+import axios from 'axios';
 import './SignupPage.css';
+import useScript from '../../../helpers/useScript';
 
 /**
  * Sign up page using the Firebase authentication handler
@@ -30,6 +32,19 @@ function SignupPage() {
   const searchParams = qs.parse(search.slice(1));
   const referrer = searchParams.referrer;
   const [googleSignInFlow, setGoogleSignInFlow] = useState(false);
+  const [savedInitialValues, setSavedInitialValues] = useState();
+
+  useScript(
+    `https://www.google.com/recaptcha/api.js?render=${reCaptchaSiteKey}`
+  );
+
+  useEffect(
+    () => () => {
+      const recaptchaBadge = document.querySelector('.grecaptcha-badge');
+      if (recaptchaBadge) recaptchaBadge.remove();
+    },
+    [location]
+  );
 
   if (loading) return <LoadingSpinnerPage />;
   if (!userProfile) {
@@ -49,7 +64,11 @@ function SignupPage() {
           <button onClick={() => history.push('/login')}>Login here</button>
         </p>
         <div className="sign-up-form">
-          <SignUpForm setLoading={setLoading} />
+          <SignUpForm
+            setLoading={setLoading}
+            setSavedInitialValues={setSavedInitialValues}
+            savedInitialValues={savedInitialValues}
+          />
           <div className="signup-submit-button-container">
             <GoogleButton
               onClick={() => {
@@ -88,45 +107,84 @@ function SignupPage() {
   }
 }
 
-const SignUpForm = ({setLoading}) => {
+const SignUpForm = ({
+  setLoading,
+  setSavedInitialValues,
+  savedInitialValues,
+}) => {
   const {updateUserDetails} = useContext(AuthContext);
 
-  const submitChanges = (values) => {
+  const submitChanges = async (values) => {
     setLoading(true);
-    firebase
-      .auth()
-      .createUserWithEmailAndPassword(values.email, values.password)
-      .then((result) => {
-        createUserDocOnSignUp(
-          result,
-          setLoading,
-          values.userName,
-          updateUserDetails
-        );
-      })
-      .catch((error) => {
-        setLoading(false);
-        console.log(error);
-        if (
-          error.message.includes(
-            'The email address is already in use by another account.'
-          )
-        ) {
-          alert(`There is already a Labspoon account linked to that address.`);
-        } else {
-          alert(
-            'Something went wrong. Please try refreshing the page and signing up again.'
+
+    const authenticateThenUpdateDB = () => {
+      firebase
+        .auth()
+        .createUserWithEmailAndPassword(values.email, values.password)
+        .then((result) => {
+          createUserDocOnSignUp(
+            result,
+            setLoading,
+            values.userName,
+            updateUserDetails
           );
-        }
-      });
+        })
+        .catch((error) => {
+          console.log(error);
+          setLoading(false);
+          if (
+            error.message.includes(
+              'The email address is already in use by another account.'
+            )
+          ) {
+            alert(
+              `There is already a Labspoon account linked to that address.`
+            );
+          } else {
+            alert(
+              'Something went wrong. Please try refreshing the page and signing up again.'
+            );
+          }
+        });
+    };
+
+    return window.grecaptcha.ready(async () =>
+      window.grecaptcha
+        .execute(reCaptchaSiteKey, {action: 'sign_up'})
+        .then(async (token) =>
+          axios
+            .get(`${functionsHttpsUrl}activity-recaptchaVerify?token=${token}`)
+            .then((res) => {
+              const score = res.data.score;
+              if (score && score > 0.2) {
+                authenticateThenUpdateDB();
+                return;
+              }
+            })
+            .catch((err) => {
+              setSavedInitialValues(values);
+              alert(
+                'Our security system thinks you might be a bot. Please try again'
+              );
+              console.error('recaptcha function call failed', err);
+              setLoading(false);
+            })
+        )
+        .catch((err) => {
+          console.error('unable to execute recaptcha', err);
+          setLoading(false);
+        })
+    );
   };
 
-  const initialValues = {
-    email: '',
-    password: '',
-    confirmPassword: '',
-    userName: '',
-  };
+  const initialValues = savedInitialValues
+    ? savedInitialValues
+    : {
+        email: '',
+        password: '',
+        confirmPassword: '',
+        userName: '',
+      };
 
   const validationSchema = Yup.object({
     email: Yup.string()

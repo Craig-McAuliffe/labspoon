@@ -13,3 +13,7 @@ export const projectURL = process.env.REACT_APP_FIREBASE_PROJECT_URL;
 
 export const env = process.env.REACT_APP_ENV;
 export const abbrEnv = env;
+
+export const reCaptchaSiteKey = process.env.REACT_APP_RECAPTCHA_SITE_KEY;
+export const functionsHttpsUrl =
+  process.env.REACT_APP_FIREBASE_FUNCTIONS_HTTPS_URL;

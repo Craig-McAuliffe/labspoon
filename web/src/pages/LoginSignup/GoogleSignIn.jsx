@@ -32,7 +32,8 @@ export default function GoogleSignIn({
               'We could not verify if you email address is already linked to an account. Please email help@labspoon.com from the google email address with which you are trying to sign up.'
             );
             setGoogleSignInFlow(false);
-          });
+          })
+          .finally(() => setLoading(false));
       })
       .catch((err) => {
         console.log(err.code, err.message, err.email);
