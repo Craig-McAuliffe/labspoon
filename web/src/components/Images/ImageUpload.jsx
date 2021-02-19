@@ -21,6 +21,7 @@ const TOOBIG = 'tooBig';
 const GIF = 'gif';
 const TOOMANY = 'maxImages';
 
+// Check images resize function before defining filepath for this component
 export default function ImageUpload({
   storageDir,
   updateDB,

@@ -37,8 +37,8 @@ async function deleteQueryBatch(query: firestore.DocumentData, resolve: any) {
 
   // Recurse on the next process tick, to avoid
   // exploding the stack.
-  process.nextTick(() => {
-    deleteQueryBatch(query, resolve);
+  process.nextTick(async () => {
+    await deleteQueryBatch(query, resolve);
   });
 }
 

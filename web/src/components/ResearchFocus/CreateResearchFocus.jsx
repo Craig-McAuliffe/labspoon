@@ -89,7 +89,6 @@ export default function CreateResearchFocus() {
     if (res.photos.length === 0) {
       addArticleToDB(
         res.researchFocus,
-        [],
         selectedTopics,
         selectedGroup,
         userProfile,
@@ -104,10 +103,9 @@ export default function CreateResearchFocus() {
     uploadImagesAndGetURLs(
       Array.from(res.photos),
       `groups/${selectedGroup.id}/researchFocuses/${researchFocusID}`
-    ).then((photoURLs) =>
+    ).then(() =>
       addArticleToDB(
         res.researchFocus,
-        photoURLs,
         selectedTopics,
         selectedGroup,
         userProfile,

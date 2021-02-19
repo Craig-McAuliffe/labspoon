@@ -17,3 +17,14 @@ export enum ResourceTypes {
   // meta type for all types of post
   POST_TYPE = 'postType',
 }
+
+export enum ResourceTypesCollections {
+  USERS = 'users',
+  GROUP = 'groups',
+  POST = 'posts',
+  PUBLICATION = 'publications',
+  TOPIC = 'topics',
+  OPEN_POSITION = 'openPositions',
+  RESEARCH_FOCUSES = 'researchFocuses',
+  TECHNIQUES = 'techniques',
+}

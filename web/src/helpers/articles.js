@@ -9,7 +9,6 @@ import {userToUserRef} from './users';
 const MAX_ARTICLE_TYPE_PER_GROUP = 20;
 export default async function addArticleToDB(
   articleText,
-  photoURLs,
   selectedTopics,
   selectedGroup,
   userProfile,
@@ -52,7 +51,7 @@ export default async function addArticleToDB(
   article.topics = taggedTopicsArray;
   article.filterTopicIDs = taggedTopicsArray.map((topic) => topic.id);
   article.group = convertGroupToGroupRef(selectedGroup);
-  article.photoURLs = photoURLs;
+  article.photoURLs = [];
   article.author = userToUserRef(userProfile, userProfile.id);
   const [title, body] = getTitleTextAndBody(articleText);
   article.title = title;

@@ -86,7 +86,6 @@ export default function CreateTechnique() {
     if (res.photos.length === 0) {
       addArticleToDB(
         res.technique,
-        [],
         selectedTopics,
         selectedGroup,
         userProfile,
@@ -101,10 +100,9 @@ export default function CreateTechnique() {
     uploadImagesAndGetURLs(
       Array.from(res.photos),
       `groups/${selectedGroup.id}/techniques/${techniqueID}`
-    ).then((photoURLs) =>
+    ).then(() =>
       addArticleToDB(
         res.technique,
-        photoURLs,
         selectedTopics,
         selectedGroup,
         userProfile,

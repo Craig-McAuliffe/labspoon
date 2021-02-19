@@ -26,7 +26,7 @@ export function getPaginatedImagesFromCollectionRef(
 
 export async function uploadImagesAndGetURLs(images, storageDir) {
   const promises = images.map(async (image) => {
-    const imageStorageRef = storage.ref(`${storageDir}/${uuid()}`);
+    const imageStorageRef = storage.ref(`${storageDir}/${uuid()}__fullSize`);
     await imageStorageRef
       .put(image, {contentType: image.type})
       .catch((err) => console.error(err));
