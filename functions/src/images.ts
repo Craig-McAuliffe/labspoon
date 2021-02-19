@@ -27,10 +27,8 @@ export const resizeImageOnTrigger = functions
       console.error('storage trigger file is not an image.');
       return;
     }
-    console.log('fileName', fileName);
     const storageFileNameSplit = filePath.split('_');
     if (storageFileNameSplit.length !== 2) {
-      console.log('storageFileNameSplit.length' + storageFileNameSplit.length);
       console.error(
         `file name does not have correct naming convention, _fullSize, for path ${filePath}`
       );
@@ -43,26 +41,22 @@ export const resizeImageOnTrigger = functions
       );
       return;
     }
-    console.log(resizeOptions, 'resizeOptions');
     const filePathNoFullSizeTag = filePath.split('_')[0];
     const splitFilePathNoFullSizeTag: Array<string> = filePathNoFullSizeTag.split(
       '/'
     );
     const newFileName = fileName.split('_')[0];
-    console.log('newFileName' + newFileName);
-    console.log(`old file id ${fileName}`);
     if (splitFilePathNoFullSizeTag.length < 4) {
       console.error(
         `unable to resize image with filePath ${filePath} as the filePath is too short`
       );
       return;
     }
-
+    console.log('filePathNoFullSizeTag' + filePathNoFullSizeTag);
     const firestoreDocumentDetails:
       | PhotoRefDetails
       | undefined = getFirestorePathandUpdateType(
       filePathNoFullSizeTag,
-      newFileName,
       splitFilePathNoFullSizeTag
     );
     if (
@@ -212,16 +206,14 @@ function getResizeOptions(filePath: string) {
 
 function getFirestorePathandUpdateType(
   filePathNoFullSizeTag: string,
-  newFileName: string,
   splitFilePathNoFullSizeTag: Array<string>
 ) {
   const processFilePathForDocUpdate = (): string | undefined => {
     if (splitFilePathNoFullSizeTag.length !== 4) return undefined;
     const collectionAndDocArray = splitFilePathNoFullSizeTag.slice(0, 2);
-    collectionAndDocArray.push(newFileName);
     return collectionAndDocArray.join('/');
   };
-  if (filePathNoFullSizeTag.length % 2 === 0) {
+  if (splitFilePathNoFullSizeTag.length % 2 === 0) {
     if (filePathNoFullSizeTag.includes('avatar'))
       return {
         updateType: 'updateField',
@@ -232,7 +224,7 @@ function getFirestorePathandUpdateType(
       return {
         updateType: 'updateField',
         firestoreDocPath: processFilePathForDocUpdate(),
-        fieldName: 'cover',
+        fieldName: 'coverPhoto',
       };
     return {updateType: 'newDoc', firestoreDocPath: filePathNoFullSizeTag};
   }
@@ -243,9 +235,10 @@ function getFirestorePathandUpdateType(
     return;
   const splitPathCopy = [...splitFilePathNoFullSizeTag];
   splitPathCopy.pop();
+  const primaryResourceDoc = `${splitPathCopy[2]}/${splitPathCopy[3]}`;
   return {
     updateType: 'updateArray',
-    firestoreDocPath: splitPathCopy.join('/'),
+    firestoreDocPath: primaryResourceDoc,
     fieldName: 'photoURLs',
   };
 }

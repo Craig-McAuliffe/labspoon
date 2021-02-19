@@ -2,6 +2,7 @@ import {getTitleTextAndBody} from '../components/Forms/Articles/HeaderAndBodyArt
 import {handlePostTopics} from '../components/Topics/TagTopics';
 import {db} from '../firebase';
 import {convertGroupToGroupRef} from './groups';
+import {uploadImagesAndGetURLs} from './images';
 import {RESEARCHFOCUSES, TECHNIQUES} from './resourceTypeDefinitions';
 import {handleTaggedTopicsNoIDs} from './topics';
 import {userToUserRef} from './users';
@@ -16,7 +17,9 @@ export default async function addArticleToDB(
   setSubmitting,
   history,
   resourceTypePlural,
-  countFieldName
+  countFieldName,
+  hasImages,
+  resourceDBPath
 ) {
   const fullGroupDoc = await db
     .doc(`groups/${selectedGroup.id}`)
@@ -61,6 +64,10 @@ export default async function addArticleToDB(
   articleDBRef
     .set(article)
     .then(async () => {
+      if (hasImages) {
+        console.log('hasImages');
+        await uploadImagesAndGetURLs(Array.from(res.photos), resourceDBPath);
+      }
       await db
         .doc(`groups/${selectedGroup.id}`)
         .update({

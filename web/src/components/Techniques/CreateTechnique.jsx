@@ -18,7 +18,6 @@ import HeaderAndBodyArticleInput, {
 import TagTopics from '../Topics/TagTopics';
 import CreateResourceFormActions from '../Forms/CreateResourceFormActions';
 import {db} from '../../firebase';
-import {uploadImagesAndGetURLs} from '../../helpers/images';
 import FormImageUpload from '../Images/FormImageUpload';
 import addArticleToDB from '../../helpers/articles';
 import {TECHNIQUES} from '../../helpers/resourceTypeDefinitions';
@@ -83,36 +82,20 @@ export default function CreateTechnique() {
     const techniqueDBRef = db.collection(`techniques`).doc();
     const techniqueID = techniqueDBRef.id;
 
-    if (res.photos.length === 0) {
-      addArticleToDB(
-        res.technique,
-        selectedTopics,
-        selectedGroup,
-        userProfile,
-        techniqueDBRef,
-        setSubmitting,
-        history,
-        TECHNIQUES,
-        'techniquesCount'
-      );
-      return;
-    }
-    uploadImagesAndGetURLs(
-      Array.from(res.photos),
+    addArticleToDB(
+      res.technique,
+      selectedTopics,
+      selectedGroup,
+      userProfile,
+      techniqueDBRef,
+      setSubmitting,
+      history,
+      TECHNIQUES,
+      'techniquesCount',
+      res.photos.length === 0,
       `groups/${selectedGroup.id}/techniques/${techniqueID}`
-    ).then(() =>
-      addArticleToDB(
-        res.technique,
-        selectedTopics,
-        selectedGroup,
-        userProfile,
-        techniqueDBRef,
-        setSubmitting,
-        history,
-        TECHNIQUES,
-        'techniquesCount'
-      )
     );
+    return;
   }
 
   return (

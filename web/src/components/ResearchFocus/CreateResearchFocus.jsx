@@ -18,7 +18,6 @@ import HeaderAndBodyArticleInput, {
 } from '../Forms/Articles/HeaderAndBodyArticleInput';
 import TagTopics from '../Topics/TagTopics';
 import CreateResourceFormActions from '../Forms/CreateResourceFormActions';
-import {uploadImagesAndGetURLs} from '../../helpers/images';
 import FormImageUpload from '../Images/FormImageUpload';
 import addArticleToDB from '../../helpers/articles';
 import {RESEARCHFOCUSES} from '../../helpers/resourceTypeDefinitions';
@@ -86,36 +85,20 @@ export default function CreateResearchFocus() {
     const researchFocusDBRef = db.collection(`researchFocuses`).doc();
     const researchFocusID = researchFocusDBRef.id;
 
-    if (res.photos.length === 0) {
-      addArticleToDB(
-        res.researchFocus,
-        selectedTopics,
-        selectedGroup,
-        userProfile,
-        researchFocusDBRef,
-        setSubmitting,
-        history,
-        RESEARCHFOCUSES,
-        'researchFocusesCount'
-      );
-      return;
-    }
-    uploadImagesAndGetURLs(
-      Array.from(res.photos),
+    addArticleToDB(
+      res.researchFocus,
+      selectedTopics,
+      selectedGroup,
+      userProfile,
+      researchFocusDBRef,
+      setSubmitting,
+      history,
+      RESEARCHFOCUSES,
+      'researchFocusesCount',
+      res.photos.length === 0,
       `groups/${selectedGroup.id}/researchFocuses/${researchFocusID}`
-    ).then(() =>
-      addArticleToDB(
-        res.researchFocus,
-        selectedTopics,
-        selectedGroup,
-        userProfile,
-        researchFocusDBRef,
-        setSubmitting,
-        history,
-        RESEARCHFOCUSES,
-        'researchFocusesCount'
-      )
     );
+    return;
   }
   return (
     <Formik
