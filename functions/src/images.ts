@@ -27,9 +27,10 @@ export const resizeImageOnTrigger = functions
       console.error('storage trigger file is not an image.');
       return;
     }
-
-    const storageIDSplit = filePath.split('_');
-    if (storageIDSplit.length !== 2) {
+    console.log('fileName', fileName);
+    const storageFileNameSplit = filePath.split('_');
+    if (storageFileNameSplit.length !== 2) {
+      console.log('storageFileNameSplit.length' + storageFileNameSplit.length);
       console.error(
         `file name does not have correct naming convention, _fullSize, for path ${filePath}`
       );
@@ -42,22 +43,14 @@ export const resizeImageOnTrigger = functions
       );
       return;
     }
-    if (filePath.split('_').length !== 2) {
-      console.log('resize failed as naming convention _ is incorrect.');
-      return;
-    }
-
+    console.log(resizeOptions, 'resizeOptions');
     const filePathNoFullSizeTag = filePath.split('_')[0];
     const splitFilePathNoFullSizeTag: Array<string> = filePathNoFullSizeTag.split(
       '/'
     );
-    const oldFileID = filePath.split('/')[
-      splitFilePathNoFullSizeTag.length - 1
-    ];
-    const newFileID =
-      splitFilePathNoFullSizeTag[splitFilePathNoFullSizeTag.length - 1];
-    console.log('newFileID' + newFileID);
-    console.log(`old file id ${oldFileID}`);
+    const newFileName = fileName.split('_')[0];
+    console.log('newFileName' + newFileName);
+    console.log(`old file id ${fileName}`);
     if (splitFilePathNoFullSizeTag.length < 4) {
       console.error(
         `unable to resize image with filePath ${filePath} as the filePath is too short`
@@ -69,7 +62,7 @@ export const resizeImageOnTrigger = functions
       | PhotoRefDetails
       | undefined = getFirestorePathandUpdateType(
       filePathNoFullSizeTag,
-      newFileID,
+      newFileName,
       splitFilePathNoFullSizeTag
     );
     if (
@@ -79,7 +72,7 @@ export const resizeImageOnTrigger = functions
       console.error(`unable to properly deconstruct the pathname ${filePath}`);
       return;
     }
-
+    console.log(firestoreDocumentDetails);
     const tmpfileName = `thumbnail`;
     const tmp = path.join(os.tmpdir(), tmpfileName);
     const file = storage.bucket().file(filePath);
@@ -127,11 +120,11 @@ export const resizeImageOnTrigger = functions
             .doc(firestoreDocumentDetails.firestoreDocPath)
             .update({
               [firestoreDocumentDetails.fieldName!]: resizePublicURL,
-              [`${firestoreDocumentDetails.fieldName!}CloudID`]: newFileID,
+              [`${firestoreDocumentDetails.fieldName!}CloudID`]: newFileName,
             })
             .catch((err) =>
               console.error(
-                `unable to update ${firestoreDocumentDetails.fieldName} at ${firestoreDocumentDetails.firestoreDocPath} for photo with id ${newFileID} ${err}`
+                `unable to update ${firestoreDocumentDetails.fieldName} at ${firestoreDocumentDetails.firestoreDocPath} for photo with id ${newFileName} ${err}`
               )
             )
         );
@@ -146,7 +139,7 @@ export const resizeImageOnTrigger = functions
             })
             .catch((err) =>
               console.error(
-                `unable to add photo with id ${newFileID} to ${firestoreDocumentDetails.firestoreDocPath} ${err}`
+                `unable to add photo with id ${newFileName} to ${firestoreDocumentDetails.firestoreDocPath} ${err}`
               )
             )
         );
@@ -157,7 +150,7 @@ export const resizeImageOnTrigger = functions
             .set({src: resizePublicURL, timestamp: new Date()})
             .catch((err) =>
               console.error(
-                `unable to add photo with id ${newFileID} to ${firestoreDocumentDetails.firestoreDocPath} ${err}`
+                `unable to add photo with id ${newFileName} to ${firestoreDocumentDetails.firestoreDocPath} ${err}`
               )
             )
         );
@@ -219,13 +212,13 @@ function getResizeOptions(filePath: string) {
 
 function getFirestorePathandUpdateType(
   filePathNoFullSizeTag: string,
-  newFileID: string,
+  newFileName: string,
   splitFilePathNoFullSizeTag: Array<string>
 ) {
   const processFilePathForDocUpdate = (): string | undefined => {
     if (splitFilePathNoFullSizeTag.length !== 4) return undefined;
     const collectionAndDocArray = splitFilePathNoFullSizeTag.slice(0, 2);
-    collectionAndDocArray.push(newFileID);
+    collectionAndDocArray.push(newFileName);
     return collectionAndDocArray.join('/');
   };
   if (filePathNoFullSizeTag.length % 2 === 0) {
