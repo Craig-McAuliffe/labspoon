@@ -16,6 +16,7 @@ export default function reCaptcha(
           .get(`${functionsHttpsUrl}activity-recaptchaVerify?token=${token}`)
           .then((res) => {
             const score = res.data.score;
+            console.log(score);
             if (score && score > threshold) {
               if (successFunction) successFunction();
               return;

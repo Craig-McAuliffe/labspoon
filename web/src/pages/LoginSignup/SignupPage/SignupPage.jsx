@@ -155,7 +155,7 @@ const SignUpForm = ({
       setLoading(false);
     };
     return reCaptcha(
-      0.2,
+      0.4,
       'sign_up',
       authenticateThenUpdateDB,
       reCaptchaFailFunction,

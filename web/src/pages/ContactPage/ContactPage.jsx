@@ -248,7 +248,7 @@ export function GenericContactPage({contactFormType, mainLabel, children}) {
       setError(true);
     };
     return reCaptcha(
-      0.2,
+      0.5,
       'submit_contact_form',
       submitContactForm,
       reCaptchaFailFunction,

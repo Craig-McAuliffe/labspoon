@@ -77,7 +77,7 @@ export default function SearchPage() {
     const searchURLParams = createURL(searchState);
     const changeTab = () =>
       history.push(`/search/${tabPath}/${searchURLParams}`);
-    reCaptcha(0.2, 'navigate_search_tabs', changeTab(), () => setIsBot(true));
+    reCaptcha(0.5, 'navigate_search_tabs', changeTab(), () => setIsBot(true));
   }
 
   useEffect(() => {
