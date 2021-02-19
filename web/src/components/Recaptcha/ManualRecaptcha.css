@@ -1,0 +1,14 @@
+.manual-recaptcha-not-a-human-button {
+  color: #287fad;
+}
+
+.manual-recaptcha-not-a-human-button:hover {
+  color: #da0000;
+}
+.manual-recaptcha-not-a-bot-button {
+  color: #287fad;
+}
+
+.manual-recaptcha-not-a-bot-button:hover {
+  color: #00507c;
+}

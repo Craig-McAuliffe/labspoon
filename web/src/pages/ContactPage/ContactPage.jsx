@@ -16,14 +16,14 @@ import {db} from '../../firebase';
 import SuccessMessage from '../../components/Forms/SuccessMessage';
 import ErrorMessage from '../../components/Forms/ErrorMessage';
 import {LoadingSpinnerPage} from '../../components/LoadingSpinner/LoadingSpinner';
-import {BotDetector} from '../../App';
 import firebase from 'firebase';
 import useScript from '../../helpers/useScript';
 import {reCaptchaSiteKey} from '../../config';
 import reCaptcha from '../../helpers/activity';
+import useDomRemover from '../../helpers/useDomRemover';
+import ManualRecaptcha from '../../components/Recaptcha/ManualRecaptcha';
 
 import './ContactPage.css';
-import useDomRemover from '../../helpers/useDomRemover';
 
 export default function ContactPage() {
   const {path} = useRouteMatch();
@@ -81,7 +81,6 @@ export function GenericContactPage({contactFormType, mainLabel, children}) {
   const [currentNumberOfMessages, setCurrentNumberOfMessages] = useState();
   const [doesCollectionExist, setDoesCollectionExist] = useState();
   const [cachedSubmitData, setCachedSubmitData] = useState();
-  const {setBotConfirmed} = useContext(BotDetector);
   const {user} = useContext(AuthContext);
 
   let typeSpecificMessage;
@@ -250,6 +249,7 @@ export function GenericContactPage({contactFormType, mainLabel, children}) {
     };
     return reCaptcha(
       0.2,
+      'submit_contact_form',
       submitContactForm,
       reCaptchaFailFunction,
       reCaptchaErrorFunction
@@ -258,8 +258,7 @@ export function GenericContactPage({contactFormType, mainLabel, children}) {
 
   if (recaptchaRequired)
     return (
-      <ContactFormRecaptcha
-        setBotConfirmed={setBotConfirmed}
+      <ManualRecaptcha
         successFunction={() => {
           setRecaptchaRequired(false);
           onSubmit(cachedSubmitData, true);
@@ -339,26 +338,6 @@ function ContactFormSuccess({typeSpecificMessage}) {
       <Link to="/">
         <h3 className="contact-page-success-back">Back to the home page</h3>
       </Link>
-    </PaddedPageContainer>
-  );
-}
-
-function ContactFormRecaptcha({setBotConfirmed, successFunction}) {
-  return (
-    <PaddedPageContainer>
-      <h4>Recaptcha</h4>Our sensors indicate that you might be a bot. Bots are
-      not allowed to contact us. Are you a bot?
-      <div>
-        <button
-          onClick={() => setBotConfirmed(true)}
-          className="not-a-human-button"
-        >
-          Yes I am a bot
-        </button>{' '}
-        <button onClick={() => successFunction()} className="not-a-bot-button">
-          No, I am not a bot
-        </button>
-      </div>
     </PaddedPageContainer>
   );
 }

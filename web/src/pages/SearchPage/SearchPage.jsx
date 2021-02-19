@@ -18,9 +18,14 @@ import {GenericListItem} from '../../components/Results/Results';
 import 'instantsearch.css/themes/algolia.css';
 import {useContext} from 'react';
 import SearchBar from '../../components/SearchBar';
+import LatestPosts from '../../components/Posts/LatestPosts/LatestPosts';
+import reCaptcha from '../../helpers/activity';
+import useScript from '../../helpers/useScript';
+import useDomRemover from '../../helpers/useDomRemover';
+import {reCaptchaSiteKey} from '../../config';
+import ManualRecaptcha from '../../components/Recaptcha/ManualRecaptcha';
 
 import './SearchPage.css';
-import LatestPosts from '../../components/Posts/LatestPosts/LatestPosts';
 
 const OVERVIEW = 'Overview';
 const POSTS = 'Posts';
@@ -50,7 +55,13 @@ export default function SearchPage() {
   const location = useLocation();
   const [tab, setTab] = useState(OVERVIEW);
   const [searchState, setSearchState] = useState(urlToSearchState(location));
+  const [isBot, setIsBot] = useState(false);
   const history = useHistory();
+
+  useScript(
+    `https://www.google.com/recaptcha/api.js?render=${reCaptchaSiteKey}`
+  );
+  useDomRemover('.grecaptcha-badge');
 
   useEffect(() => {
     const tabPath = location.pathname.slice(1).split('/')[1];
@@ -64,7 +75,9 @@ export default function SearchPage() {
   function updateTab(tab) {
     const tabPath = tabsToURLMap.get(tab);
     const searchURLParams = createURL(searchState);
-    history.push(`/search/${tabPath}/${searchURLParams}`);
+    const changeTab = () =>
+      history.push(`/search/${tabPath}/${searchURLParams}`);
+    reCaptcha(0.2, 'navigate_search_tabs', changeTab(), () => setIsBot(true));
   }
 
   useEffect(() => {
@@ -105,7 +118,7 @@ export default function SearchPage() {
     default:
       break;
   }
-
+  if (isBot) return <ManualRecaptcha successFunction={() => setIsBot(false)} />;
   return (
     <SearchPageActiveTabContext.Provider
       value={{

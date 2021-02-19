@@ -3,31 +3,32 @@ import axios from 'axios';
 
 export default function reCaptcha(
   threshold,
+  action,
   successFunction,
   failureFunction,
   errorFunction
 ) {
   return window.grecaptcha.ready(async () =>
     window.grecaptcha
-      .execute(reCaptchaSiteKey, {action: 'sign_up'})
+      .execute(reCaptchaSiteKey, {action: action})
       .then(async (token) =>
         axios
           .get(`${functionsHttpsUrl}activity-recaptchaVerify?token=${token}`)
           .then((res) => {
             const score = res.data.score;
             if (score && score > threshold) {
-              successFunction();
+              if (successFunction) successFunction();
               return;
             }
-            failureFunction();
+            if (failureFunction) failureFunction();
           })
           .catch((err) => {
             console.error('recaptcha function call failed', err);
-            errorFunction();
+            if (errorFunction) errorFunction();
           })
       )
       .catch((err) => {
-        errorFunction();
+        if (errorFunction) errorFunction();
         console.error('unable to execute recaptcha', err);
       })
   );
