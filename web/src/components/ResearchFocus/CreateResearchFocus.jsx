@@ -10,7 +10,9 @@ import {
   SelectedGroup,
   SelectGroupLabel,
 } from '../Forms/Groups/SelectGroup';
-import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
+import LoadingSpinner, {
+  LoadingSpinnerPage,
+} from '../LoadingSpinner/LoadingSpinner';
 import {getUserGroups} from '../../helpers/users';
 import HeaderAndBodyArticleInput, {
   initialValue,
@@ -21,6 +23,7 @@ import CreateResourceFormActions from '../Forms/CreateResourceFormActions';
 import FormImageUpload from '../Images/FormImageUpload';
 import addArticleToDB from '../../helpers/articles';
 import {RESEARCHFOCUSES} from '../../helpers/resourceTypeDefinitions';
+import {uploadImagesAndGetURLs} from '../../helpers/images';
 
 import './CreateResearchFocus.css';
 
@@ -31,9 +34,14 @@ export default function CreateResearchFocus() {
   const [loadingMemberOfGroups, setLoadingMemberOfGroups] = useState(false);
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [submitting, setSubmitting] = useState(false);
-  const {userProfile} = useContext(AuthContext);
+  const [savedInitialValues, setSavedInitialValues] = useState({
+    researchFocus: initialValue,
+    photos: [],
+  });
+  const {userProfile, authLoaded, user} = useContext(AuthContext);
   const history = useHistory();
-  const userID = userProfile.id;
+  if (!authLoaded) return <LoadingSpinnerPage />;
+  const userID = user.uid;
 
   useEffect(() => {
     setLoadingMemberOfGroups(true);
@@ -84,28 +92,59 @@ export default function CreateResearchFocus() {
     setSubmitting(true);
     const researchFocusDBRef = db.collection(`researchFocuses`).doc();
     const researchFocusID = researchFocusDBRef.id;
-
-    addArticleToDB(
-      res.researchFocus,
-      selectedTopics,
-      selectedGroup,
-      userProfile,
-      researchFocusDBRef,
-      setSubmitting,
-      history,
-      RESEARCHFOCUSES,
-      'researchFocusesCount',
-      res.photos.length === 0,
+    const failFunction = () =>
+      setSavedInitialValues({
+        researchFocus: res.researchFocus,
+        photos: res.photos,
+      });
+    if (res.photos.length === 0) {
+      addArticleToDB(
+        res.researchFocus,
+        [],
+        selectedTopics,
+        selectedGroup,
+        userProfile,
+        researchFocusDBRef,
+        setSubmitting,
+        history,
+        RESEARCHFOCUSES,
+        'researchFocusesCount',
+        failFunction
+      );
+      return;
+    }
+    uploadImagesAndGetURLs(
+      Array.from(res.photos),
       `groups/${selectedGroup.id}/researchFocuses/${researchFocusID}`
-    );
+    ).then((fullSizePhotoURLs) => {
+      if (!fullSizePhotoURLs) {
+        alert('Something went wrong, please try again');
+        failFunction();
+        setSubmitting(false);
+        return;
+      }
+      const resizedPhotoURLs = fullSizePhotoURLs.map((fullSizeURL) =>
+        fullSizeURL.replace('_fullSize', '')
+      );
+      addArticleToDB(
+        res.researchFocus,
+        resizedPhotoURLs,
+        selectedTopics,
+        selectedGroup,
+        userProfile,
+        researchFocusDBRef,
+        setSubmitting,
+        history,
+        RESEARCHFOCUSES,
+        'researchFocusesCount',
+        failFunction
+      );
+    });
     return;
   }
   return (
     <Formik
-      initialValues={{
-        researchFocus: initialValue,
-        photos: [],
-      }}
+      initialValues={savedInitialValues}
       validationSchema={Yup.object({
         researchFocus: yupArticleValidation,
       })}

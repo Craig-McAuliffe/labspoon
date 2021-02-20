@@ -9,7 +9,9 @@ import {
   SelectedGroup,
   SelectGroupLabel,
 } from '../Forms/Groups/SelectGroup';
-import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
+import LoadingSpinner, {
+  LoadingSpinnerPage,
+} from '../LoadingSpinner/LoadingSpinner';
 import {getUserGroups} from '../../helpers/users';
 import HeaderAndBodyArticleInput, {
   initialValue,
@@ -21,6 +23,7 @@ import {db} from '../../firebase';
 import FormImageUpload from '../Images/FormImageUpload';
 import addArticleToDB from '../../helpers/articles';
 import {TECHNIQUES} from '../../helpers/resourceTypeDefinitions';
+import {uploadImagesAndGetURLs} from '../../helpers/images';
 
 export default function CreateTechnique() {
   const preSelectedGroupID = useParams().groupID;
@@ -29,9 +32,14 @@ export default function CreateTechnique() {
   const [loadingMemberOfGroups, setLoadingMemberOfGroups] = useState(false);
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [submitting, setSubmitting] = useState(false);
-  const {userProfile} = useContext(AuthContext);
+  const [savedInitialValues, setSavedInitialValues] = useState({
+    technique: initialValue,
+    photos: [],
+  });
+  const {userProfile, authLoaded, user} = useContext(AuthContext);
   const history = useHistory();
-  const userID = userProfile.id;
+  if (!authLoaded) return <LoadingSpinnerPage />;
+  const userID = user.uid;
 
   useEffect(() => {
     setLoadingMemberOfGroups(true);
@@ -81,29 +89,56 @@ export default function CreateTechnique() {
     setSubmitting(true);
     const techniqueDBRef = db.collection(`techniques`).doc();
     const techniqueID = techniqueDBRef.id;
-
-    addArticleToDB(
-      res.technique,
-      selectedTopics,
-      selectedGroup,
-      userProfile,
-      techniqueDBRef,
-      setSubmitting,
-      history,
-      TECHNIQUES,
-      'techniquesCount',
-      res.photos.length === 0,
-      `groups/${selectedGroup.id}/techniques/${techniqueID}`
-    );
+    const failFunction = () =>
+      setSavedInitialValues({technique: res.technique, photos: res.photos});
+    if (res.photos.length === 0) {
+      addArticleToDB(
+        res.technique,
+        [],
+        selectedTopics,
+        selectedGroup,
+        userProfile,
+        techniqueDBRef,
+        setSubmitting,
+        history,
+        TECHNIQUES,
+        'techniquesCount',
+        failFunction
+      );
+      return;
+    }
+    uploadImagesAndGetURLs(
+      Array.from(res.photos),
+      `groups/${selectedGroup.id}/techniques/${techniqueID}_fullSize`
+    ).then((fullSizePhotoURLs) => {
+      if (!fullSizePhotoURLs) {
+        alert('Something went wrong, please try again');
+        failFunction();
+        setSubmitting(false);
+        return;
+      }
+      const resizedPhotoURLs = fullSizePhotoURLs.map((fullSizeURL) =>
+        fullSizeURL.replace('_fullSize', '')
+      );
+      addArticleToDB(
+        res.technique,
+        resizedPhotoURLs,
+        selectedTopics,
+        selectedGroup,
+        userProfile,
+        techniqueDBRef,
+        setSubmitting,
+        history,
+        TECHNIQUES,
+        'techniquesCount',
+        failFunction
+      );
+    });
     return;
   }
-
   return (
     <Formik
-      initialValues={{
-        technique: initialValue,
-        photos: [],
-      }}
+      initialValues={savedInitialValues}
       validationSchema={Yup.object({
         technique: yupArticleValidation,
       })}

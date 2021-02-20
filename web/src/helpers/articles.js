@@ -2,7 +2,6 @@ import {getTitleTextAndBody} from '../components/Forms/Articles/HeaderAndBodyArt
 import {handlePostTopics} from '../components/Topics/TagTopics';
 import {db} from '../firebase';
 import {convertGroupToGroupRef} from './groups';
-import {uploadImagesAndGetURLs} from './images';
 import {RESEARCHFOCUSES, TECHNIQUES} from './resourceTypeDefinitions';
 import {handleTaggedTopicsNoIDs} from './topics';
 import {userToUserRef} from './users';
@@ -10,6 +9,7 @@ import {userToUserRef} from './users';
 const MAX_ARTICLE_TYPE_PER_GROUP = 20;
 export default async function addArticleToDB(
   articleText,
+  photoURLs,
   selectedTopics,
   selectedGroup,
   userProfile,
@@ -18,8 +18,7 @@ export default async function addArticleToDB(
   history,
   resourceTypePlural,
   countFieldName,
-  hasImages,
-  resourceDBPath
+  failFunction
 ) {
   const fullGroupDoc = await db
     .doc(`groups/${selectedGroup.id}`)
@@ -30,9 +29,8 @@ export default async function addArticleToDB(
       )
     );
   if (!fullGroupDoc || !fullGroupDoc.exists) {
-    alert(
-      'Something went wrong trying to create the research focus. Sorry about that. Please try again later.'
-    );
+    alert('Something went wrong. Sorry about that. Please try again.');
+    failFunction();
     setSubmitting(false);
     return;
   }
@@ -43,6 +41,7 @@ export default async function addArticleToDB(
         resourceTypePlural
       )} for this group. You must delete at least one in order to make another.`
     );
+    failFunction();
     setSubmitting(false);
     return;
   }
@@ -54,7 +53,7 @@ export default async function addArticleToDB(
   article.topics = taggedTopicsArray;
   article.filterTopicIDs = taggedTopicsArray.map((topic) => topic.id);
   article.group = convertGroupToGroupRef(selectedGroup);
-  article.photoURLs = [];
+  article.photoURLs = photoURLs;
   article.author = userToUserRef(userProfile, userProfile.id);
   const [title, body] = getTitleTextAndBody(articleText);
   article.title = title;
@@ -64,10 +63,6 @@ export default async function addArticleToDB(
   articleDBRef
     .set(article)
     .then(async () => {
-      if (hasImages) {
-        console.log('hasImages');
-        await uploadImagesAndGetURLs(Array.from(res.photos), resourceDBPath);
-      }
       await db
         .doc(`groups/${selectedGroup.id}`)
         .update({
@@ -75,17 +70,15 @@ export default async function addArticleToDB(
         })
         .catch((err) =>
           console.error(
-            `unable to add article count to group with id ${selectedGroup.id}`
+            `unable to add article count to group with id ${selectedGroup.id} ${err}`
           )
         );
-      setSubmitting(false);
       history.push(`/group/${selectedGroup.id}`);
     })
     .catch((err) => {
       console.error(err);
-      alert(
-        'Something went wrong trying to create the research focus. Sorry about that. Please try again later.'
-      );
+      failFunction();
+      alert('Something went wrong Sorry about that. Please try again later.');
       setSubmitting(false);
     });
 }

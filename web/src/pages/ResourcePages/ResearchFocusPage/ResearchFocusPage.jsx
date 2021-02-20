@@ -37,13 +37,13 @@ export default function ResearchFocusPage() {
     db.doc(`researchFocuses/${researchFocusID}`)
       .get()
       .then((ds) => {
-        setLoading(false);
         if (!ds.exists) {
           setNotFound(true);
         }
         const researchFocusFromDB = ds.data();
         researchFocusFromDB.resourceType = RESEARCHFOCUS;
         setResearchFocus(researchFocusFromDB);
+        setLoading(false);
       })
       .catch((err) => {
         setLoading(false);

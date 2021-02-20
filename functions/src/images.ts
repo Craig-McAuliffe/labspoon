@@ -60,7 +60,7 @@ export const resizeImageOnTrigger = functions
       splitFilePathNoFullSizeTag
     );
     if (
-      !firestoreDocumentDetails ||
+      firestoreDocumentDetails &&
       !firestoreDocumentDetails.firestoreDocPath
     ) {
       console.error(`unable to properly deconstruct the pathname ${filePath}`);
@@ -107,6 +107,8 @@ export const resizeImageOnTrigger = functions
     }
     const resizePublicURL = await Promise.resolve(uploadPromise);
     if (!resizePublicURL) return;
+    if (!firestoreDocumentDetails || !firestoreDocumentDetails.firestoreDocPath)
+      return;
     switch (firestoreDocumentDetails.updateType) {
       case 'updateField':
         return Promise.resolve(
@@ -228,19 +230,20 @@ function getFirestorePathandUpdateType(
       };
     return {updateType: 'newDoc', firestoreDocPath: filePathNoFullSizeTag};
   }
-  if (
-    !filePathNoFullSizeTag.includes(ResourceTypesCollections.TECHNIQUES) &&
-    !filePathNoFullSizeTag.includes(ResourceTypesCollections.RESEARCH_FOCUSES)
-  )
-    return;
-  const splitPathCopy = [...splitFilePathNoFullSizeTag];
-  splitPathCopy.pop();
-  const primaryResourceDoc = `${splitPathCopy[2]}/${splitPathCopy[3]}`;
-  return {
-    updateType: 'updateArray',
-    firestoreDocPath: primaryResourceDoc,
-    fieldName: 'photoURLs',
-  };
+  return;
+  // if (
+  //   !filePathNoFullSizeTag.includes(ResourceTypesCollections.TECHNIQUES) &&
+  //   !filePathNoFullSizeTag.includes(ResourceTypesCollections.RESEARCH_FOCUSES)
+  // )
+  //   return;
+  // const splitPathCopy = [...splitFilePathNoFullSizeTag];
+  // splitPathCopy.pop();
+  // const primaryResourceDoc = `${splitPathCopy[2]}/${splitPathCopy[3]}`;
+  // return {
+  //   updateType: 'updateArray',
+  //   firestoreDocPath: primaryResourceDoc,
+  //   fieldName: 'photoURLs',
+  // };
 }
 
 interface PhotoRefDetails {

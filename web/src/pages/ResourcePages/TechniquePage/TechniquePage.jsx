@@ -37,13 +37,13 @@ export default function TechniquePage() {
     db.doc(`techniques/${techniqueID}`)
       .get()
       .then((ds) => {
-        setLoading(false);
         if (!ds.exists) {
           setNotFound(true);
         }
         const techniqueFromDB = ds.data();
         techniqueFromDB.resourceType = TECHNIQUE;
         setTechnique(techniqueFromDB);
+        setLoading(false);
       })
       .catch((err) => {
         setLoading(false);
