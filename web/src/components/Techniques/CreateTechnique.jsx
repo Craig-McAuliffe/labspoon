@@ -109,7 +109,7 @@ export default function CreateTechnique() {
     }
     uploadImagesAndGetURLs(
       Array.from(res.photos),
-      `groups/${selectedGroup.id}/techniques/${techniqueID}_fullSize`
+      `groups/${selectedGroup.id}/techniques/${techniqueID}`
     ).then((fullSizePhotoURLs) => {
       if (!fullSizePhotoURLs) {
         alert('Something went wrong, please try again');
