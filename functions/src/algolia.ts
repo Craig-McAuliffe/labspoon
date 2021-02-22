@@ -209,14 +209,6 @@ export const updateOpenPositionToSearchIndex = functions.firestore
     );
   });
 
-export const configurePublicationSearchIndex = functions.https.onRequest(
-  (_, res) =>
-    configureSearchIndex(res, PUBLICATIONS_INDEX, [
-      'unordered(title)',
-      'unordered(topics.name)',
-    ])
-);
-
 export const configureTopicSearchIndex = functions.https.onRequest((_, res) =>
   configureSearchIndex(res, TOPICS_INDEX, ['name'])
 );
