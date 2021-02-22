@@ -100,7 +100,6 @@ function GroupImageUpload({groupID, refresh}) {
       <h3 className="edit-group-photos-sub-title">More Pictures</h3>
       <ImageUpload
         storageDir={`groups/${groupID}/photos`}
-        updateDB={updateDB}
         refresh={refresh}
         multipleImages={true}
         maxImages={12}
