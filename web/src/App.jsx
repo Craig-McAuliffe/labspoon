@@ -5,12 +5,11 @@ import React, {
   useReducer,
   useContext,
 } from 'react';
-import {BrowserRouter as Router, Link, useLocation} from 'react-router-dom';
+import {BrowserRouter as Router, useLocation} from 'react-router-dom';
 import Routes from './routes.jsx';
 import {auth, db} from './firebase';
 import Header from './components/Layout/Header/Header';
 import {getDefaultAvatar, getDefaultCoverPhoto} from './helpers/users.js';
-import OnboardingTipButton from './components/Buttons/OnboardingTipButton.jsx';
 
 import './App.css';
 
@@ -24,7 +23,6 @@ export default function App() {
       <AuthProvider>
         <BotProvider>
           <Router>
-            <EssentialCookies />
             <BotDetection>
               <AppLayout>
                 <MicrosoftPublicationSearchCacheProvider>
@@ -203,40 +201,5 @@ function MicrosoftPublicationSearchCacheProvider({children}) {
     >
       {children}
     </MicrosoftPublicationSearchCache.Provider>
-  );
-}
-
-function EssentialCookies() {
-  const {userProfile, authLoaded, user} = useContext(AuthContext);
-  const [openCookiesBanner, setOpenCookiesBanner] = useState();
-  const [hasChecked, setHasChecked] = useState(false);
-  if (!authLoaded) return null;
-  let hasAcknowledgedBanner;
-  if (authLoaded && !user)
-    hasAcknowledgedBanner = !localStorage.getItem(
-      'essentialCookiesAcknowledged'
-    );
-  if (authLoaded && userProfile)
-    hasAcknowledgedBanner = !userProfile.dismissedCookiesBanner;
-  if (openCookiesBanner !== hasAcknowledgedBanner && !hasChecked)
-    setOpenCookiesBanner(hasAcknowledgedBanner);
-
-  const dismissCookiesBanner = () => {
-    if (!user) localStorage.setItem('essentialCookiesAcknowledged', 'true');
-    else db.doc(`users/${user.uid}`).update({dismissedCookiesBanner: true});
-    setHasChecked(true);
-    setOpenCookiesBanner(false);
-  };
-  if (!openCookiesBanner) return null;
-  return (
-    <div className="essential-cookies-banner">
-      <div className="essential-cookies-text-container">
-        <h3>
-          We only use essential cookies on our site. For more information,{' '}
-          <Link to="/cookies-policy">click here</Link>.
-        </h3>
-        <OnboardingTipButton onClick={dismissCookiesBanner} />
-      </div>
-    </div>
   );
 }

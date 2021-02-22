@@ -20,12 +20,6 @@ export default function CookiesPolicyPage() {
           These cookies are required to keep our users logged in between
           sessions.
         </p>
-        <h4>Preferences Cookies</h4>
-        <p>
-          For non-signed up users, we use cookies to remember if they have
-          already dismissed popups, so that we do not keep showing them the same
-          message.
-        </p>
       </div>
     </PaddedPageContainer>
   );
