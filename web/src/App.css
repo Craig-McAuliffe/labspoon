@@ -110,6 +110,27 @@
   color: #3f3f45;
 }
 
+.essential-cookies-banner {
+  position: fixed;
+  bottom: 0px;
+  min-height: 80px;
+  background: #185e9c;
+  min-width: 100%;
+  color: #ffffff;
+  padding: 10px 40px 10px 10px;
+  z-index: 1;
+}
+
+.essential-cookies-banner a {
+  color: #ffffff;
+}
+
+.essential-cookies-text-container {
+  display: grid;
+  grid-template-columns: 1fr 100px;
+  align-items: center;
+}
+
 @media screen and (max-width: 1550px) {
   .main-layout {
     grid-template-columns: 350px 1fr 350px;

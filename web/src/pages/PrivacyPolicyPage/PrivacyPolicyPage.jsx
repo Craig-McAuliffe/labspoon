@@ -25,21 +25,15 @@ export default function PrivacyPolicyPage() {
         </p>
         <h2>We want you to understand the type of information we collect</h2>
         <p>
-          We collect information to optimise your experience with Labspoon,
-          ranging from simple things like remembering your preferences when you
-          log in, to more complex things like which research areas will you find
-          interesting, who you might like to connect with, and what adverts will
-          actually be interesting for you.
+          We collect information to optimise your experience with Labspoon, like
+          which research areas will you find interesting and who you might like
+          to connect with.
         </p>
-        {/* <p>
+        <p>
           When you&#39;re not logged into Labspoon, we store the information we
           have collected with a unique identifier tied to the browser,
           application, or device you&#39;re using. This helps us to do things
-          like maintain preferences across your sessions.
-        </p> */}
-        <p>
-          When you&#39;re not logged into Labspoon, we store no information
-          about you.
+          like keep you logged on between sessions.
         </p>
         <h3>The information you provide us</h3>
         <p>
@@ -221,10 +215,9 @@ export default function PrivacyPolicyPage() {
           We share personal information with our affiliates and other trusted
           businesses or persons to process it for us, based on our instructions
           and in compliance with our Privacy Policy and any other appropriate
-          confidentiality and security measures. This includes tracking
-          essential cookies that we place on your computer as you browse our
-          site in order to protect our users and ourselves from malicious
-          activity.
+          confidentiality and security measures. This includes essential cookies
+          that we place on your computer as you browse our site in order to
+          protect our users and ourselves from malicious activity.
         </p>
         <h4>For legal reasons</h4>
         <p>

@@ -33,6 +33,8 @@ import ResearchFocusPage from './pages/ResourcePages/ResearchFocusPage/ResearchF
 import Users from './pages/ResourcePages/UserPage/Users';
 import ChooseUserName from './pages/LoginSignup/ChooseUserName/ChooseUserName';
 import ContactPage from './pages/ContactPage/ContactPage';
+import PoliciesPage from './pages/PoliciesPage/PoliciesPage';
+import CookiesPolicyPage from './pages/Info/CookiesPolicyPage';
 
 /**
  * Top level routing structure for the app.
@@ -109,8 +111,14 @@ export default function Routes({user, setUser}) {
       <Route path="/articles">
         <Articles />
       </Route>
+      <Route path="/policies">
+        <PoliciesPage />
+      </Route>
       <Route path="/privacy-policy">
         <PrivacyPolicyPage />
+      </Route>
+      <Route path="/cookies-policy">
+        <CookiesPolicyPage />
       </Route>
       <Route path="/contact">
         <ContactPage />

@@ -61,9 +61,9 @@ const AvatarDropDown = () => {
               <p className="dropdown-link-item">Settings</p>
             </div>
           </Dropdown.Item>
-          <Dropdown.Item href="/privacy-policy">
+          <Dropdown.Item href="/policies">
             <div className="avatar-dropdown-item-container">
-              <p className="dropdown-link-item-less-emphasis">Privacy Policy</p>
+              <p className="dropdown-link-item-less-emphasis">Policies</p>
             </div>
           </Dropdown.Item>
           <Dropdown.Item href="/contact">
