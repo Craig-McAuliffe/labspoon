@@ -114,7 +114,7 @@ service cloud.firestore {
     match /groups/{groupID} {
       allow read;
       allow create: if request.auth != null && request.resource.data.keys().hasAny(['groupType']);
-      allow update: if request.auth != null && existsAfter(/databases/$(database)/documents/groups/$(groupID)/members/$(request.auth.uid));
+      allow update: if request.auth != null && existsAfter(/databases/$(database)/documents/groups/$(groupID)/members/$(request.auth.uid)) && noIDUpdate(request);
 
       match /followedByUsers/{userID} {
         allow read;
