@@ -129,7 +129,7 @@
 }
 
 .image-upload-avatar-button:hover img {
-  opacity: 50%;
+  opacity: 0.5;
 }
 
 .image-upload-avatar-button:hover h3 {

@@ -141,7 +141,7 @@
 }
 
 .create-post-loading-greyed-out {
-  opacity: 50%;
+  opacity: 0.5;
 }
 
 .create-post-loading-spinner {

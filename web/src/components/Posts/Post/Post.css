@@ -113,7 +113,7 @@
 }
 
 .post-selector-button-active:hover {
-  opacity: 50%;
+  opacity: 0.5;
 }
 
 .post-selector-button-active:focus {

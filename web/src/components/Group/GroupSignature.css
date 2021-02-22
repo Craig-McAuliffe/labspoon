@@ -9,7 +9,7 @@
 }
 
 .group-signature-link:hover img {
-  opacity: 50%;
+  opacity: 0.5;
 }
 
 .group-signature-text-container {
