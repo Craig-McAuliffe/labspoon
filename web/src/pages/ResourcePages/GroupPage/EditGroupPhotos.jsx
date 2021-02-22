@@ -95,12 +95,6 @@ function GroupAvatarUpload({groupID, groupAvatar, refresh}) {
 }
 
 function GroupImageUpload({groupID, refresh}) {
-  function updateDB(url, id) {
-    return db.doc(`groups/${groupID}/photos/${id}`).set({
-      src: url,
-      timestamp: new Date(),
-    });
-  }
   return (
     <div className="edit-group-photos-more-pictures-section">
       <h3 className="edit-group-photos-sub-title">More Pictures</h3>

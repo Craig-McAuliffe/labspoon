@@ -3,8 +3,7 @@ const spawn = require('child-process-promise').spawn;
 import * as path from 'path';
 import * as os from 'os';
 import * as fs from 'fs';
-import {admin, ResourceTypesCollections} from './config';
-import * as adminNS from 'firebase-admin';
+import {admin} from './config';
 
 const storage = admin.storage();
 const db = admin.firestore();
@@ -121,21 +120,6 @@ export const resizeImageOnTrigger = functions
             .catch((err) =>
               console.error(
                 `unable to update ${firestoreDocumentDetails.fieldName} at ${firestoreDocumentDetails.firestoreDocPath} for photo with id ${newFileName} ${err}`
-              )
-            )
-        );
-      case 'updateArray':
-        return Promise.resolve(
-          db
-            .doc(firestoreDocumentDetails.firestoreDocPath)
-            .update({
-              [firestoreDocumentDetails.fieldName!]: adminNS.firestore.FieldValue.arrayUnion(
-                resizePublicURL
-              ),
-            })
-            .catch((err) =>
-              console.error(
-                `unable to add photo with id ${newFileName} to ${firestoreDocumentDetails.firestoreDocPath} ${err}`
               )
             )
         );
