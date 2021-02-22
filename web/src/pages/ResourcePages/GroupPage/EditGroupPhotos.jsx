@@ -67,7 +67,8 @@ export default function EditGroupPhotos({children}) {
           `unable to check number of photos for group with id ${groupID} while editing photos ${err}`
         )
       );
-    if (!groupPhotosCount || !groupPhotosCount.exists) return;
+    if (!groupPhotosCount || !groupPhotosCount.exists)
+      return setPageLoading(false);
     if (groupPhotosCount.data().photoCount >= MAX_PHOTOS_PER_GROUP)
       setTooManyPhotos(true);
     else setTooManyPhotos(false);
