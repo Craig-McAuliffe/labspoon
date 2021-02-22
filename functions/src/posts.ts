@@ -10,7 +10,7 @@ import {
   UserRef,
   checkAuthAndGetUserFromContext,
   User,
-  UserActivityRef,
+  UserStatsRef,
 } from './users';
 import {
   TaggedTopic,
@@ -70,26 +70,7 @@ export const createPost = functions.https.onCall(async (data, context) => {
     ),
     id: postID,
   };
-  const lastPostTime = await db
-    .doc(`users/${author.id}`)
-    .get()
-    .then((ds) => {
-      if (!ds.exists) return;
-      const userDoc = ds.data() as User;
-      return userDoc.lastPostTimeStamp;
-    })
-    .catch((err) =>
-      console.error(
-        `unable to check last post time for user with id ${author.id} ${err}`
-      )
-    );
-  if (lastPostTime) {
-    if (post.unixTimeStamp - lastPostTime < 10)
-      throw new functions.https.HttpsError(
-        'unavailable',
-        'Must wait at least 10 seconds between creating posts.'
-      );
-  }
+  await authorLastPostTimeCheck(author.id, post.unixTimeStamp);
   if (data.publication) {
     post.publication = toPublicationRef(data.publication, data.publication.id);
   }
@@ -101,8 +82,8 @@ export const createPost = functions.https.onCall(async (data, context) => {
     .set(post)
     .then(() =>
       db
-        .doc(`users/${post.author.id}`)
-        .update({lastPostTimeStamp: post.unixTimeStamp})
+        .doc(`usersStats/${post.author.id}`)
+        .set({lastPostTimeStamp: post.unixTimeStamp})
         .catch((err) =>
           console.error(
             'unable to add recent post time stamp to user with id' +
@@ -120,19 +101,45 @@ export const createPost = functions.https.onCall(async (data, context) => {
     });
 });
 
+async function authorLastPostTimeCheck(
+  authorID: string,
+  postUnixTimeStamp: number
+) {
+  const lastPostTime = await db
+    .doc(`usersStats/${authorID}`)
+    .get()
+    .then((ds) => {
+      if (!ds.exists) return;
+      const userDoc = ds.data() as User;
+      return userDoc.lastPostTimeStamp;
+    })
+    .catch((err) =>
+      console.error(
+        `unable to check last post time for user with id ${authorID} ${err}`
+      )
+    );
+  if (lastPostTime) {
+    if (postUnixTimeStamp - lastPostTime < 10)
+      throw new functions.https.HttpsError(
+        'unavailable',
+        'Must wait at least 10 seconds between creating posts.'
+      );
+  }
+}
+
 async function authorSpamCheck(authorID: string) {
   const activityData = await db
     .doc(`activity/postActivity/creators/${authorID}`)
     .get()
     .then((ds) => {
       if (!ds.exists) return;
-      return ds.data() as UserActivityRef;
+      return ds.data() as UserStatsRef;
     })
     .catch((err) =>
       console.error('unable to check new post for spam author', err)
     );
   if (!activityData) return;
-  if (activityData.rank >= DAILY_POSTS_LIMIT)
+  if (activityData.dailyPostCount >= DAILY_POSTS_LIMIT)
     throw new functions.https.HttpsError(
       'unavailable',
       'Daily post limit reached.'
@@ -147,19 +154,12 @@ export const addPostActivity = functions.firestore
     const authorActivityRef = db.doc(
       `activity/postActivity/creators/${authorID}`
     );
-    const authorActivity = await authorActivityRef
-      .get()
-      .catch((err) =>
-        console.error(
-          `unable to update activity for user with id ${authorID} ${err}`
-        )
-      );
-    if (authorActivity && authorActivity.exists) {
-      return Promise.resolve(
-        authorActivityRef.update({rank: firestore.FieldValue.increment(1)})
-      );
-    }
-    return Promise.resolve(authorActivityRef.set({id: authorID, rank: 1}));
+    return Promise.resolve(
+      authorActivityRef.set(
+        {dailyPostCount: firestore.FieldValue.increment(1)},
+        {merge: true}
+      )
+    );
   });
 
 export const addPostToAuthorPosts = functions.firestore

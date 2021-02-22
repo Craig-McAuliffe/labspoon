@@ -322,6 +322,15 @@ export async function setGroupOnTopic(
     );
 }
 
+export const incrementPhotosCountOnGroupDoc = functions.firestore
+  .document('groups/{groupID}/photos/{photoID}')
+  .onCreate((change, context) => {
+    const groupID = context.params.groupID;
+    return db
+      .doc(`groupsStats/${groupID}`)
+      .set({photoCount: firestore.FieldValue.increment(1)}, {merge: true});
+  });
+
 export const updateGroupRankOnTopic = functions.firestore
   .document('groups/{groupID}/topics/{topicID}')
   .onUpdate(async (change, context) => {

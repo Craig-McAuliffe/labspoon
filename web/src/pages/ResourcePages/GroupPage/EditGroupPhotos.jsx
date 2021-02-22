@@ -3,18 +3,23 @@ import {useParams} from 'react-router-dom';
 import {db} from '../../../firebase';
 import {getPaginatedImagesFromCollectionRef} from '../../../helpers/images';
 import {PaddedPageContainer} from '../../../components/Layout/Content';
-import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
+import LoadingSpinner, {
+  LoadingSpinnerPage,
+} from '../../../components/LoadingSpinner/LoadingSpinner';
 import Results from '../../../components/Results/Results';
 import ImageUpload from '../../../components/Images/ImageUpload';
 
 import './EditGroupPhotos.css';
 
+const MAX_PHOTOS_PER_GROUP = 1000;
 export default function EditGroupPhotos({children}) {
   const limit = 9;
   const [photos, setPhotos] = useState([]);
   const [groupAvatar, setGroupAvatar] = useState();
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
+  const [tooManyPhotos, setTooManyPhotos] = useState();
   const [last, setLast] = useState();
   const groupID = useParams().groupID;
 
@@ -52,6 +57,23 @@ export default function EditGroupPhotos({children}) {
     if (groupDS.data().avatar) setGroupAvatar(groupDS.data().avatar);
   }, [groupID]);
 
+  useEffect(async () => {
+    if (!groupID) return;
+    const groupPhotosCount = await db
+      .doc(`groupsStats/${groupID}`)
+      .get()
+      .catch((err) =>
+        console.error(
+          `unable to check number of photos for group with id ${groupID} while editing photos ${err}`
+        )
+      );
+    if (!groupPhotosCount || !groupPhotosCount.exists) return;
+    if (groupPhotosCount.data().photoCount >= MAX_PHOTOS_PER_GROUP)
+      setTooManyPhotos(true);
+    else setTooManyPhotos(false);
+    return setPageLoading(false);
+  }, [groupID]);
+
   useEffect(() => {
     if (last !== undefined) return;
     fetchMore();
@@ -63,7 +85,7 @@ export default function EditGroupPhotos({children}) {
     setLast(undefined);
     setGroupAvatar(undefined);
   }
-
+  if (pageLoading) return <LoadingSpinnerPage />;
   return (
     <PaddedPageContainer>
       {children}
@@ -72,7 +94,11 @@ export default function EditGroupPhotos({children}) {
         groupAvatar={groupAvatar}
         refresh={refresh}
       />
-      <GroupImageUpload groupID={groupID} refresh={refresh} />
+      <GroupImageUpload
+        groupID={groupID}
+        refresh={refresh}
+        tooManyPhotos={tooManyPhotos}
+      />
       <Results results={photos} hasMore={hasMore} fetchMore={fetchMore} />
       {loading ? <LoadingSpinner /> : <></>}
     </PaddedPageContainer>
@@ -94,7 +120,19 @@ function GroupAvatarUpload({groupID, groupAvatar, refresh}) {
   );
 }
 
-function GroupImageUpload({groupID, refresh}) {
+function GroupImageUpload({groupID, refresh, tooManyPhotos}) {
+  if (tooManyPhotos)
+    return (
+      <div className="edit-group-photos-more-pictures-section">
+        <h3>Max photos reached. 1000.</h3>
+        <p>
+          You have uploaded the maximum number of photos allowed for a group.
+          Please delete some if you would like to add new ones. If this is a
+          significant problem for you, please send us a message through the
+          contact form.
+        </p>
+      </div>
+    );
   return (
     <div className="edit-group-photos-more-pictures-section">
       <h3 className="edit-group-photos-sub-title">More Pictures</h3>

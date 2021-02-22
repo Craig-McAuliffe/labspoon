@@ -1,6 +1,6 @@
 import {getTitleTextAndBody} from '../components/Forms/Articles/HeaderAndBodyArticleInput';
 import {handlePostTopics} from '../components/Topics/TagTopics';
-import {db} from '../firebase';
+import {db, firebaseFirestoreOptions} from '../firebase';
 import {convertGroupToGroupRef} from './groups';
 import {RESEARCHFOCUSES, TECHNIQUES} from './resourceTypeDefinitions';
 import {handleTaggedTopicsNoIDs} from './topics';
@@ -21,7 +21,7 @@ export default async function addArticleToDB(
   failFunction
 ) {
   const fullGroupDoc = await db
-    .doc(`groups/${selectedGroup.id}`)
+    .doc(`groupsStats/${selectedGroup.id}`)
     .get()
     .catch((err) =>
       console.error(
@@ -64,10 +64,13 @@ export default async function addArticleToDB(
     .set(article)
     .then(async () => {
       await db
-        .doc(`groups/${selectedGroup.id}`)
-        .update({
-          [countFieldName]: articleCount ? articleCount + 1 : 1,
-        })
+        .doc(`groupsStats/${selectedGroup.id}`)
+        .set(
+          {
+            [countFieldName]: firebaseFirestoreOptions.FieldValue.increment(1),
+          },
+          {merge: true}
+        )
         .catch((err) =>
           console.error(
             `unable to add article count to group with id ${selectedGroup.id} ${err}`

@@ -1418,9 +1418,8 @@ export interface UserFilterRef {
   rank?: number;
 }
 
-export interface UserActivityRef {
-  id: string;
-  rank: number;
+export interface UserStatsRef {
+  dailyPostCount: number;
 }
 
 export interface UserPublicationRef {
