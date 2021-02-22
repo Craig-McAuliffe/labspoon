@@ -221,7 +221,10 @@ export default function PrivacyPolicyPage() {
           We share personal information with our affiliates and other trusted
           businesses or persons to process it for us, based on our instructions
           and in compliance with our Privacy Policy and any other appropriate
-          confidentiality and security measures.
+          confidentiality and security measures. This includes tracking
+          essential cookies that we place on your computer as you browse our
+          site in order to protect our users and ourselves from malicious
+          activity.
         </p>
         <h4>For legal reasons</h4>
         <p>
