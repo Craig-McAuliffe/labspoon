@@ -51,7 +51,6 @@ export const resizeImageOnTrigger = functions
       );
       return;
     }
-    console.log('filePathNoFullSizeTag' + filePathNoFullSizeTag);
     const firestoreDocumentDetails:
       | PhotoRefDetails
       | undefined = getFirestorePathandUpdateType(
@@ -65,7 +64,6 @@ export const resizeImageOnTrigger = functions
       console.error(`unable to properly deconstruct the pathname ${filePath}`);
       return;
     }
-    console.log(firestoreDocumentDetails);
     const tmpfileName = `thumbnail`;
     const tmp = path.join(os.tmpdir(), tmpfileName);
     const file = storage.bucket().file(filePath);
