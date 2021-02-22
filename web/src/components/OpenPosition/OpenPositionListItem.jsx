@@ -17,6 +17,12 @@ export default function OpenPositionListItem({openPosition}) {
       <Link to={`/openPosition/${openPosition.id}`}>
         <h3>{content.title}</h3>
       </Link>
+      {content.position && content.position.length > 0 && (
+        <h4 className="resource-list-item-inline-subtitle">
+          Position
+          <span>{content.position}</span>
+        </h4>
+      )}
       {content.salary.length > 0 ? (
         <h4 className="resource-list-item-inline-subtitle">
           Salary

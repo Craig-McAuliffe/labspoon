@@ -390,7 +390,7 @@ function GroupTypeSelect({...props}) {
   if (meta.error) error = <InputError error={meta.error} />;
   return (
     <LabelledDropdownContainer label="Group Type">
-      <Select {...props}>
+      <Select required={true} {...props}>
         <DropdownOption value={RESEARCH_GROUP} text="Research Group" />
         <DropdownOption value={CHARITY} text="Charity" />
       </Select>

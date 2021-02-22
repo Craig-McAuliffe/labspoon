@@ -78,7 +78,9 @@ function DropdownToggle({
         customToggle({setOpen})
       ) : (
         <button
-          className="dropdown-default-toggle"
+          className={`dropdown${
+            customToggleTextOnly ? '-custom' : '-default'
+          }-toggle`}
           style={{width: customToggleWidth}}
           type="button"
           onClick={() => setOpen(true)}

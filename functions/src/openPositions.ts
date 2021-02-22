@@ -32,6 +32,7 @@ export const createOpenPosition = functions.https.onCall(
     const openPositionID = openPositionRef.id;
     const content: OpenPositionContent = {
       title: data.title,
+      position: data.position,
       address: data.address,
       salary: data.salary,
       startDate: data.startDate,
@@ -194,6 +195,7 @@ export interface OpenPosition {
 
 interface OpenPositionContent {
   title: string;
+  position: string;
   address: string;
   salary: string;
   startDate: string;

@@ -3,12 +3,14 @@ import React, {cloneElement} from 'react';
 import Dropdown from '../../Dropdown';
 import InputError from '../InputError';
 
+import './Select.css';
 // currently only supports text options
-export default function Select({children, ...props}) {
+export default function Select({required, children, ...props}) {
   const [field, meta, helpers] = useField(props);
 
   let error;
-  if (meta.touched && meta.error) error = <InputError error={meta.error} />;
+  if (meta.touched && meta.error && required)
+    error = <InputError error={meta.error} />;
 
   const optionsText = new Map();
   const selectChildren = React.Children.map(children, (child) => {
@@ -33,9 +35,9 @@ export default function Select({children, ...props}) {
 
 export function LabelledDropdownContainer({label, children}) {
   return (
-    <div className="dropdown-positioning">
-      <h4 className="open-position-dropdown-label">{label}</h4>
-      <div className="open-position-dropdown-container">{children}</div>
+    <div className="select-dropdown-positioning">
+      <h4 className="select-dropdown-label">{label}</h4>
+      <div className="select-dropdown-container">{children}</div>
     </div>
   );
 }

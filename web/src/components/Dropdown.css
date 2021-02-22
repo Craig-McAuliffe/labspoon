@@ -2,22 +2,31 @@
   min-width: 100%;
 }
 
-.dropdown-default-toggle {
+.dropdown-default-toggle,
+.dropdown-custom-toggle {
   display: flex;
   min-width: 200px;
   width: 25%;
   height: 40px;
   border: 1px solid #99999f;
-  color: #00507c;
   align-items: center;
   justify-content: space-between;
 }
 
-.dropdown-default-toggle span {
+.dropdown-custom-toggle {
+  color: #00507c;
+}
+.dropdown-default-toggle {
+  color: #5d5d65;
+}
+
+.dropdown-default-toggle span,
+.dropdown-custom-toggle span {
   display: inline-block;
 }
 
-.dropdown-default-toggle path {
+.dropdown-default-toggle path,
+.dropdown-custom-toggle path {
   fill: #00507c;
 }
 

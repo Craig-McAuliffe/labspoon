@@ -1,0 +1,17 @@
+.select-dropdown-container {
+  width: 25%;
+  min-width: 200px;
+  margin-bottom: 50px;
+}
+
+.select-dropdown path {
+  fill: #00507c;
+}
+
+.select-dropdown-positioning {
+  position: relative;
+}
+
+.select-dropdown-label {
+  margin-bottom: 0.5rem;
+}

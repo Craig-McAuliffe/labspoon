@@ -11,7 +11,6 @@ const algoliaConfig = config.algolia;
 const USERS_INDEX = environment + '_USERS';
 const GROUPS_INDEX = environment + '_GROUPS';
 const POSTS_INDEX = environment + '_POSTS';
-const PUBLICATIONS_INDEX = environment + '_PUBLICATIONS';
 const TOPICS_INDEX = environment + '_TOPICS';
 const OPENPOSITIONS_INDEX = environment + '_OPENPOSITIONS';
 

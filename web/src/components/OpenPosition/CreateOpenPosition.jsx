@@ -6,7 +6,7 @@ import FormTextInput, {FormTextArea} from '../Forms/FormTextInput';
 import FormDateInput from '../Forms/FormDateInput';
 import TagTopics, {handlePostTopics} from '../Topics/TagTopics';
 import CreateResourceFormActions from '../Forms/CreateResourceFormActions';
-import Dropdown, {DropdownOption} from '../Dropdown';
+import {DropdownOption} from '../Dropdown';
 import {AuthContext} from '../../App';
 import {WebsiteIcon, EmailIcon} from '../../assets/PostOptionalTagsIcons';
 import TabbedContainer from '../TabbedContainer/TabbedContainer';
@@ -23,6 +23,7 @@ import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import {getUserGroups} from '../../helpers/users';
 
 import './CreateOpenPosition.css';
+import Select, {LabelledDropdownContainer} from '../Forms/Select/Select';
 
 const POSITIONS = ['Masters', 'Phd', 'Post Doc'];
 
@@ -32,7 +33,6 @@ const createOpenPosition = firebase
 
 export default function CreateOpenPosition() {
   const preSelectedGroupID = useParams().groupID;
-  const [selectedPosition, setSelectedPosition] = useState('');
   const [selectedGroup, setSelectedGroup] = useState(undefined);
   const [memberOfGroups, setMemberOfGroups] = useState([]);
   const [loadingMemberOfGroups, setLoadingMemberOfGroups] = useState(false);
@@ -41,8 +41,8 @@ export default function CreateOpenPosition() {
   const [pageError, setPageError] = useState(false);
   const [loading, setLoading] = useState(true);
   const history = useHistory();
-  const {userProfile} = useContext(AuthContext);
-  const userID = userProfile.id;
+  const {user, authLoaded} = useContext(AuthContext);
+  const userID = user.uid;
 
   const onSubmit = (res) => {
     setSubmitting(true);
@@ -97,6 +97,7 @@ export default function CreateOpenPosition() {
     applyEmail: '',
     applyLink: '',
     description: '',
+    position: '',
   };
 
   const validationSchema = Yup.object({
@@ -130,11 +131,12 @@ export default function CreateOpenPosition() {
         }
       )
       .url('Must be a valid url'),
+    position: Yup.mixed().oneOf(POSITIONS),
   });
 
   if (pageError) return <GeneralError />;
 
-  if (loadingMemberOfGroups) return <LoadingSpinner />;
+  if (loadingMemberOfGroups || !authLoaded) return <LoadingSpinner />;
 
   if (selectedGroup === undefined)
     return (
@@ -159,63 +161,52 @@ export default function CreateOpenPosition() {
       validationSchema={validationSchema}
       onSubmit={onSubmit}
     >
-      <Form>
-        {submitting && (
-          <div className="article-submitting-overlay">
-            <LoadingSpinner />
-          </div>
-        )}
-        <SelectedGroup
-          groups={memberOfGroups}
-          selectedGroup={selectedGroup}
-          setSelectedGroup={setSelectedGroup}
-        />
-        <FormTextInput name="title" label="Title" />
-        <SelectPosition
-          selectedPosition={selectedPosition}
-          setSelectedPosition={setSelectedPosition}
-        />
-        <FormTextArea height="100px" name="address" label="Address" />
-        <FormTextInput name="salary" label="Salary" />
-        <FormDateInput sideLabel={true} name="startDate" label="Start Date" />
-        <FormTextArea height="300px" name="description" label="Description" />
-        <TagTopics
-          submittingForm={submitting}
-          selectedTopics={selectedTopics}
-          setSelectedTopics={setSelectedTopics}
-        />
-        <h4>How to Apply</h4>
-        <HowToApply />
-        <CreateResourceFormActions submitted={submitting} submitText="Create" />
-      </Form>
+      {(props) => (
+        <Form>
+          {submitting && (
+            <div className="article-submitting-overlay">
+              <LoadingSpinner />
+            </div>
+          )}
+          <SelectedGroup
+            groups={memberOfGroups}
+            selectedGroup={selectedGroup}
+            setSelectedGroup={setSelectedGroup}
+          />
+          <FormTextInput name="title" label="Title" />
+          <SelectPosition name="position" {...props} />
+          <FormTextArea height="100px" name="address" label="Address" />
+          <FormTextInput name="salary" label="Salary" />
+          <FormDateInput sideLabel={true} name="startDate" label="Start Date" />
+          <FormTextArea height="300px" name="description" label="Description" />
+          <TagTopics
+            submittingForm={submitting}
+            selectedTopics={selectedTopics}
+            setSelectedTopics={setSelectedTopics}
+          />
+          <h4>How to Apply</h4>
+          <HowToApply />
+          <CreateResourceFormActions
+            submitted={submitting}
+            submitText="Create"
+          />
+        </Form>
+      )}
     </Formik>
   );
 }
 
-function SelectPosition({selectedPosition, setSelectedPosition}) {
+function SelectPosition({...props}) {
   return (
-    <div className="dropdown-positioning">
-      <h4 className="open-position-dropdown-label">Position</h4>
-      <div className="open-position-dropdown-container">
-        <Dropdown
-          customToggleTextOnly={selectedPosition}
-          containerTopPosition="40px"
-        >
-          {getPositionTypes(setSelectedPosition)}
-        </Dropdown>
-      </div>
-    </div>
+    <LabelledDropdownContainer label="Position">
+      <Select {...props}>{getPositionTypes()}</Select>
+    </LabelledDropdownContainer>
   );
 }
 
-function getPositionTypes(setSelectedPosition) {
+function getPositionTypes() {
   return POSITIONS.map((position) => (
-    <DropdownOption
-      key={position}
-      onSelect={() => {
-        setSelectedPosition(position);
-      }}
-    >
+    <DropdownOption key={position} value={position} text={position}>
       <h4 className="create-open-position-types-dropdown-option">{position}</h4>
     </DropdownOption>
   ));
