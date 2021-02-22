@@ -177,7 +177,7 @@ export const configureOpenPositionSearchIndex = functions.https.onRequest(
         'unordered(content.description)',
         'topics.name',
       ],
-      undefined,
+      ['content.position'],
       ['desc(unixTimeStamp)']
     )
 );
