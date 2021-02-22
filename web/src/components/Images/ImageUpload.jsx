@@ -237,9 +237,11 @@ function ImagesSelected({
         isAvatar={isAvatar}
       />
       <div className="confirm-cancel-upload-container">
-        <NegativeButton onClick={cancel} disabled={uploading === UPLOADING}>
-          {cancelText ? cancelText : 'Cancel'}
-        </NegativeButton>
+        {uploading !== UPLOADING && (
+          <NegativeButton onClick={cancel}>
+            {cancelText ? cancelText : 'Cancel'}
+          </NegativeButton>
+        )}
         {uploadImages && (
           <PrimaryButton
             onClick={uploadImages}
