@@ -184,24 +184,14 @@ function getResizeOptions(filePath: string) {
         '-extent',
         '200x200',
       ];
-    if (filePath.includes(ResourceTypesCollections.RESEARCH_FOCUSES))
-      return [
-        '-thumbnail',
-        '400x400^',
-        '-gravity',
-        'center',
-        '-extent',
-        '400x400',
-      ];
-    if (filePath.includes(ResourceTypesCollections.TECHNIQUES))
-      return [
-        '-thumbnail',
-        '400x400^',
-        '-gravity',
-        'center',
-        '-extent',
-        '400x400',
-      ];
+    return [
+      '-thumbnail',
+      '400x400^',
+      '-gravity',
+      'center',
+      '-extent',
+      '400x400',
+    ];
   }
   return;
 }
@@ -231,19 +221,6 @@ function getFirestorePathandUpdateType(
     return {updateType: 'newDoc', firestoreDocPath: filePathNoFullSizeTag};
   }
   return;
-  // if (
-  //   !filePathNoFullSizeTag.includes(ResourceTypesCollections.TECHNIQUES) &&
-  //   !filePathNoFullSizeTag.includes(ResourceTypesCollections.RESEARCH_FOCUSES)
-  // )
-  //   return;
-  // const splitPathCopy = [...splitFilePathNoFullSizeTag];
-  // splitPathCopy.pop();
-  // const primaryResourceDoc = `${splitPathCopy[2]}/${splitPathCopy[3]}`;
-  // return {
-  //   updateType: 'updateArray',
-  //   firestoreDocPath: primaryResourceDoc,
-  //   fieldName: 'photoURLs',
-  // };
 }
 
 interface PhotoRefDetails {

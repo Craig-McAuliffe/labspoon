@@ -110,6 +110,7 @@ function GroupImageUpload({groupID, refresh}) {
         refresh={refresh}
         multipleImages={true}
         maxImages={12}
+        shouldResize={true}
       />
     </div>
   );
