@@ -4,10 +4,10 @@ import LinkAuthorIDForm from '../../../components/Publication/ConnectToPublicati
 import {PaddedPageContainer} from '../../../components/Layout/Content';
 import {AuthContext} from '../../../App';
 import {LoadingSpinnerPage} from '../../../components/LoadingSpinner/LoadingSpinner';
+import {Link} from 'react-router-dom';
 
 import './UserPage.css';
 import './EditUserPage.css';
-import {Link} from 'react-router-dom';
 
 export default function EditUserPublications({children}) {
   const [linkingAuthor, setLinkingAuthor] = useState(false);

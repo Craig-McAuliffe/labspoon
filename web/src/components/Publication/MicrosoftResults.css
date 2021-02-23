@@ -6,3 +6,7 @@
 .publication-search-loading-spinner-container {
   text-align: center;
 }
+
+.publication-search-no-more-results {
+  color: #5d5d65;
+}

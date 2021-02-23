@@ -163,7 +163,7 @@ export function MicrosoftAcademicKnowledgeAPIPublicationResults({query}) {
 }
 
 // Publication results for use in forms, such as the create publication post form.
-export function FormPublicationResults({query, setPublication}) {
+export function PublicationSearchAfterDelayAndResults({query, setPublication}) {
   const limit = 10;
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -176,25 +176,31 @@ export function FormPublicationResults({query, setPublication}) {
   );
   useEffect(
     () => {
-      setResults([]);
-      microsoftPublicationSearchByQuery(
-        query,
-        limit,
-        setOffset,
-        setResults,
-        setLoading,
-        setExpression,
-        setHasMore,
-        interpretCache,
-        interpretDispatch,
-        setError
-      );
-      if (error) setError(false);
+      query && query.length > 0 ? setLoading(true) : setLoading(false);
+      const pubSearchAfterDelay = setTimeout(() => {
+        setResults([]);
+        if (error) setError(false);
+        if (query && query.length > 0)
+          microsoftPublicationSearchByQuery(
+            query,
+            limit,
+            setOffset,
+            setResults,
+            setLoading,
+            setExpression,
+            setHasMore,
+            interpretCache,
+            interpretDispatch,
+            setError
+          );
+      }, 1400);
+      return () => clearTimeout(pubSearchAfterDelay);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [query]
   );
   const fetchPageByOffset = (searchOffset) => {
+    setLoading(true);
     setResults([]);
     microsoftPublicationSearchByExpression(
       query,
@@ -211,6 +217,24 @@ export function FormPublicationResults({query, setPublication}) {
       setError
     );
   };
+
+  if (loading)
+    return (
+      <div className="publication-search-loading-spinner-container">
+        <LoadingSpinner />
+        <p className="publication-search-loading-advice">
+          If the search takes too long, try looking for the author name and
+          scrolling through.
+        </p>
+      </div>
+    );
+  if (error)
+    return (
+      <h4>
+        Something went wrong. Try a variation of your search or look for one of
+        the authors instead.
+      </h4>
+    );
 
   if (query === undefined) {
     if (loading) setLoading(false);
@@ -238,23 +262,6 @@ export function FormPublicationResults({query, setPublication}) {
     fetchPageByOffset(offset);
   }
 
-  if (loading)
-    return (
-      <div className="publication-search-loading-spinner-container">
-        <LoadingSpinner />
-        <p className="publication-search-loading-advice">
-          If the search takes too long, try looking for the author name and
-          scrolling through.
-        </p>
-      </div>
-    );
-  if (error)
-    return (
-      <h4>
-        Something went wrong. Try a variation of your search or look for one of
-        the authors instead.
-      </h4>
-    );
   if (results.length === 0)
     return (
       <h4>
@@ -294,7 +301,9 @@ export function FormPublicationResults({query, setPublication}) {
           Next Page
         </button>
       ) : (
-        <></>
+        <span className="publication-search-no-more-results">
+          No more results
+        </span>
       )}
     </>
   );
@@ -314,7 +323,6 @@ function microsoftPublicationSearchByExpression(
   interpretDispatch,
   setError
 ) {
-  setLoading(true);
   return getMicrosoftAcademicKnowledgeAPIPublications(
     {
       query: query,
@@ -358,44 +366,34 @@ function microsoftPublicationSearchByQuery(
   setError
 ) {
   if (!query) {
-    setResults([]);
     return;
   }
-
   setLoading(true);
   const params = {
     query: query,
     limit: limit,
     offset: 0,
   };
-  const paramsString = paramsToString(params);
-  const getPublications = () =>
-    getMicrosoftAcademicKnowledgeAPIPublications(
-      params,
-      interpretCache,
-      interpretDispatch
-    )
-      .then((res) => {
-        updateStateForResults(
-          res.data.results,
-          res.data.expression,
-          0,
-          limit,
-          setHasMore,
-          setResults,
-          setExpression,
-          setOffset
-        );
-      })
-      .catch((err) => {
-        console.error(err);
-        if (setError) setError(true);
-      })
-      .finally(() => setLoading(false));
-  if (interpretCache.has(paramsString)) {
-    getPublications();
-    return;
-  }
-  const apiCallTimeout = setTimeout(getPublications, 1400);
-  return () => clearTimeout(apiCallTimeout);
+  getMicrosoftAcademicKnowledgeAPIPublications(
+    params,
+    interpretCache,
+    interpretDispatch
+  )
+    .then((res) => {
+      updateStateForResults(
+        res.data.results,
+        res.data.expression,
+        0,
+        limit,
+        setHasMore,
+        setResults,
+        setExpression,
+        setOffset
+      );
+    })
+    .catch((err) => {
+      console.error(err);
+      if (setError) setError(true);
+    })
+    .finally(() => setLoading(false));
 }

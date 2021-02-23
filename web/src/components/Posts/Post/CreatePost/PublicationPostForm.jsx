@@ -5,7 +5,7 @@ import firebase from '../../../../firebase';
 import {CreatePostTextArea, TextInput} from '../../../Forms/FormTextInput';
 import PostForm from './PostForm';
 import {CreatingPostContext, sortThrownCreatePostErrors} from './CreatePost';
-import {FormPublicationResults} from '../../../Publication/MicrosoftResults';
+import {PublicationSearchAfterDelayAndResults} from '../../../Publication/MicrosoftResults';
 import {handlePostTopics} from '../../../Topics/TagTopics';
 import TypeOfTaggedResourceDropDown from './TypeOfTaggedResourceDropDown';
 import {SmallPublicationListItem} from '../../../Publication/PublicationListItem';
@@ -142,7 +142,10 @@ function SelectPublication({
           <h4>Add Link Instead</h4>
         </button>
       </div>
-      <FormPublicationResults query={query} setPublication={setPublication} />
+      <PublicationSearchAfterDelayAndResults
+        query={query}
+        setPublication={setPublication}
+      />
     </>
   );
 }

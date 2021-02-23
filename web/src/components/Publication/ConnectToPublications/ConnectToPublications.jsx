@@ -26,7 +26,6 @@ export default function LinkAuthorIDForm({submitBehaviour, cancel}) {
   const [loadingState, setLoadingState] = useState();
   const [hasMore, setHasMore] = useState();
   const [parentSearchOffset, setParentSearchOffset] = useState(0);
-
   const fetchSuggestedPublications = (firstTime) => {
     if (loadingState === LOADING) return;
     if (firstTime) {
