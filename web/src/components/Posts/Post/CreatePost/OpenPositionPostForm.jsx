@@ -161,7 +161,7 @@ function SelectOpenPosition({
       <div className="create-post-alt-tagging-method-container">
         <h4>
           Haven&#39;t made one yet?{' '}
-          <Link to="/create">Create an Open Position now</Link>
+          <Link to="/create/openPosition">Create an Open Position now</Link>
         </h4>
       </div>
       {noTaggedOpenPosError && (
