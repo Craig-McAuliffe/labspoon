@@ -6,7 +6,7 @@ export const admin = adminNS.initializeApp();
 
 export const environment = config.env.name;
 export const url = config.env.url;
-export const domain = config.domain;
+export const domain = config.domain.url;
 export enum ResourceTypes {
   USER = 'user',
   GROUP = 'group',
