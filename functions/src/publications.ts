@@ -553,7 +553,7 @@ export const triggerFulfillReferencesOnLabspoon = functions.https.onRequest(
         .send('An error occurred whilst fulfilling references: ' + err)
     );
     res.status(200).send(lastDate);
-    return;
+    return res.end();
   }
 );
 
@@ -699,7 +699,7 @@ export const addMicrosoftPublicationByID = functions.https.onRequest(
     const publications = executeResponse.data.entities;
     await publishAddPublicationRequests(publications);
     res.status(200).send();
-    return;
+    return res.end();
   }
 );
 
