@@ -155,7 +155,7 @@ function FeaturesCarousel() {
   return (
     <div className="about-page-carousel-section">
       {nextSlideIcon()}
-      <Carousel activeIndex={index} onSelect={handleSelect}>
+      <Carousel activeIndex={index} onSelect={handleSelect} interval={null}>
         <Carousel.Item interval={300} pause="hover" slide controls>
           <div className="about-page-carousel-item">
             <img
