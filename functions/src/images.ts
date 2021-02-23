@@ -80,7 +80,6 @@ export const resizeImageOnTrigger = functions
         destination: filePathNoFullSizeTag,
         metadata: {
           contentType: metadata.contentType,
-          cacheControl: 'no-cache public',
         },
       })
       .catch((err) => {
@@ -149,11 +148,11 @@ function getResizeOptions(filePath: string) {
     if (filePath.includes('cover'))
       return [
         '-thumbnail',
-        '1070x200^',
+        '1605x300^',
         '-gravity',
         'center',
         '-extent',
-        '1070x200',
+        '1605x300',
       ];
   }
   if (filePath.includes('groups')) {
