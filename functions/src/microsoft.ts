@@ -193,6 +193,7 @@ export const getPublicationsByAuthorIDExpression = functions.https.onCall(
     return fetchedPubs.map((makPub) => makPublicationToPublication(makPub));
   }
 );
+
 export const msExecuteAuthorExpressions = (
   offset: number,
   expressionsAndNames: Array<ExpressionAndName>
