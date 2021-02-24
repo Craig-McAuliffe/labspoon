@@ -1,7 +1,6 @@
 import React, {useState, useEffect, useContext} from 'react';
 import PrimaryButton from '../Buttons/PrimaryButton';
 import {functions} from '../../firebase';
-import Results from '../Results/Results';
 import {SmallPublicationListItem} from './PublicationListItem';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 
@@ -33,23 +32,6 @@ async function getMicrosoftAcademicKnowledgeAPIPublications(
   return resp;
 }
 
-function updateStateForCachedResults(
-  newResults,
-  expression,
-  setHasMore,
-  setResults,
-  setExpression,
-  setOffset,
-  setMissedCache
-) {
-  setHasMore(true);
-  const mappedNewResults = newResults.map(dbPublicationToJSPublication);
-  setResults(mappedNewResults);
-  setExpression(expression);
-  setOffset(newResults.length);
-  setMissedCache(true);
-}
-
 function updateStateForResults(
   newResults,
   expression,
@@ -67,99 +49,6 @@ function updateStateForResults(
   setResults((results) => results.concat(mappedNewResults));
   setExpression(expression);
   setOffset(offset + limit);
-}
-
-// Fully fledged search results for use on the search page.
-export function MicrosoftAcademicKnowledgeAPIPublicationResults({query}) {
-  const limit = 10;
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [expression, setExpression] = useState();
-  const [offset, setOffset] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-  const [error, setError] = useState(false);
-  const [missedCache, setMissedCache] = useState(false);
-  const {interpretCache, interpretDispatch} = useContext(
-    MicrosoftPublicationSearchCache
-  );
-
-  useEffect(() => {
-    const paramsString = paramsToString({
-      query: query,
-      expression: expression,
-      limit: limit,
-      offset: offset,
-    });
-    if (interpretCache.has(paramsString)) {
-      setMissedCache(false);
-      const cachedValues = interpretCache.get(paramsString);
-
-      updateStateForCachedResults(
-        cachedValues.data.results,
-        cachedValues.data.expression,
-        setHasMore,
-        setResults,
-        setExpression,
-        setOffset,
-        setMissedCache
-      );
-      return;
-    }
-    setMissedCache(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, expression, limit, offset]);
-
-  useEffect(() => {
-    if (!missedCache || offset !== 0) return;
-    // Clear the old results as they will no longer be relevant to the new search
-    setResults([]);
-    microsoftPublicationSearchByQuery(
-      query,
-      limit,
-      setOffset,
-      setResults,
-      setLoading,
-      setExpression,
-      setHasMore,
-      interpretCache,
-      interpretDispatch,
-      setError
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, missedCache]);
-  function fetchMore() {
-    if (!missedCache) {
-      setMissedCache(true);
-      return;
-    }
-    return microsoftPublicationSearchByExpression(
-      query,
-      expression,
-      limit,
-      offset,
-      setOffset,
-      setResults,
-      setLoading,
-      setExpression,
-      setHasMore,
-      interpretCache,
-      interpretDispatch,
-      setError
-    );
-  }
-  if (error)
-    return (
-      <h4>
-        Something went wrong. Try a variation of your search or look for one of
-        the authors instead.
-      </h4>
-    );
-  return (
-    <>
-      <Results results={results} hasMore={hasMore} fetchMore={fetchMore} />
-      {loading ? <LoadingSpinner /> : null}
-    </>
-  );
 }
 
 // Publication results for use in forms, such as the create publication post form.
