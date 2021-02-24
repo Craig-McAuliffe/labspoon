@@ -38,6 +38,8 @@ export default function Results({results, hasMore, fetchMore, activeTabID}) {
   const [resourceTypes, setResourceTypes] = useState(new Set());
   const [resultComponents, setResultComponents] = useState([]);
   const currentLocation = useLocation().pathname;
+  const filterableResults = useContext(FilterableResultsContext);
+  const loading = filterableResults.loadingResults;
 
   useEffect(() => {
     const currentResourceTypes = new Set();
@@ -76,10 +78,10 @@ export default function Results({results, hasMore, fetchMore, activeTabID}) {
       dataLength={resultComponents.length}
       hasMore={hasMore}
       next={fetchMore}
-      loader={<p>Loading...</p>}
       endMessage={endMessage}
       style={{minWidth: '100%'}}
     >
+      {loading && <LoadingSpinner />}
       {content}
     </InfiniteScroll>
   );
@@ -254,6 +256,7 @@ export function SelectableResults({selectedItems, setSelectedItems}) {
       />
     );
   });
+  const endMessage = <p className="end-result">No more results</p>;
 
   return (
     <>
@@ -262,6 +265,7 @@ export function SelectableResults({selectedItems, setSelectedItems}) {
         hasMore={hasMore}
         next={fetchMore}
         style={{minWidth: '100%'}}
+        endMessage={endMessage}
       >
         {items}
       </InfiniteScroll>

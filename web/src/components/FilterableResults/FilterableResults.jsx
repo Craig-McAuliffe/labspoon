@@ -411,6 +411,8 @@ export function Tabs({
 
 function Results({results, hasMore, fetchMore, activeTabID}) {
   const currentLocation = useLocation().pathname;
+  const filterableResults = useContext(FilterableResultsContext);
+  const loading = filterableResults.loadingResults;
   if (Array.isArray(results) && results.length > 0) {
     return (
       <ResultsList
@@ -421,6 +423,7 @@ function Results({results, hasMore, fetchMore, activeTabID}) {
       />
     );
   } else {
+    if (loading) return null;
     return currentLocation === '/' ? (
       <>
         <SearchBar bigSearchPrompt={true} />

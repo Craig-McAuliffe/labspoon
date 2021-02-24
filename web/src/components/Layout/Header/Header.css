@@ -5,7 +5,6 @@
   align-items: center;
   background: #eaf1f5;
   height: 100%;
-  width: calc(100% - 14px);
 }
 
 .header-logo {
@@ -105,9 +104,6 @@
   }
   .header-right-section {
     width: 100px;
-  }
-  .header-container {
-    width: 100%;
   }
 }
 
