@@ -1,27 +1,14 @@
 import {firestore} from 'firebase-admin';
 import * as functions from 'firebase-functions';
-import {admin, environment} from './config';
+import {admin} from './config';
 import {GroupRef} from './groups';
-import {
-  interpretQuery,
-  executeExpression,
-  MAKPublication,
-  makPublicationToPublication,
-  interpretationResult,
-  MAKAuthor,
-} from './microsoft';
+import {MAKAuthor} from './microsoft';
 import {OpenPosition} from './openPositions';
 import {
   Post,
   updateRefOnFilterCollection,
   addRecentPostsToFollowingFeed,
 } from './posts';
-
-import {
-  publishAddPublicationRequests,
-  allPublicationFields,
-  Publication,
-} from './publications';
 import {ResearchFocus} from './researchFocuses';
 import {Technique} from './techniques';
 import {addTopicsToResource, removeTopicsFromResource, Topic} from './topics';
@@ -1053,148 +1040,6 @@ export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall
   }
 );
 
-// If we are running the functions locally, we don't want to brick the
-// emulators with too many add publication requests, so we use a smaller number
-// of interpretations and smaller page size for each of those interpretations.
-const SUGGESTED_PUBLICATIONS_INTERPRETATIONS_COUNT =
-  environment === 'local' ? 1 : 4;
-const SUGGESTED_PUBLICATIONS_EXECUTION_PAGE_SIZE =
-  environment === 'local' ? 4 : 8;
-const FRONT_END_SCROLL_LIMIT = 12;
-
-// for a given name, return potential matching publications so the user can select theirs
-export const getSuggestedPublicationsForAuthorName = functions.https.onCall(
-  async (data) => {
-    const name = data.name;
-    let offset: number = data.offset ? data.offset : 0;
-    if (name === undefined)
-      throw new functions.https.HttpsError(
-        'invalid-argument',
-        'A name must be provided'
-      );
-    // retrieve expressions for retrieving results related to the search query
-    const expressions: Array<string> = await interpretQuery({
-      query: name as string,
-      complete: 1,
-      count: SUGGESTED_PUBLICATIONS_INTERPRETATIONS_COUNT,
-    })
-      .then((resp) =>
-        resp.data.interpretations.map(
-          // TODO: filter out non-author rules
-          (result: interpretationResult) => result.rules[0].output.value
-        )
-      )
-      .catch((err) => {
-        console.error(err);
-        throw new functions.https.HttpsError('internal', 'An error occurred.');
-      });
-    const publicationsByInterpretation = await Promise.all(
-      msExecutePromises(offset, expressions)
-    );
-    const suggestedPublications = flatten(publicationsByInterpretation);
-    // filter out null values
-    let filteredResults = suggestedPublications.filter(Boolean);
-    if (filteredResults.length < FRONT_END_SCROLL_LIMIT) {
-      offset = offset + filteredResults.length;
-      const morePublicationsByInterpretation = await Promise.all(
-        msExecutePromises(offset, expressions)
-      );
-      const moreSuggestedPublications = flatten(
-        morePublicationsByInterpretation
-      );
-      const moreUniqueSuggestions = moreSuggestedPublications.filter(
-        (publication) =>
-          !filteredResults.some(
-            (previousPub) =>
-              previousPub.publicationInfo.microsoftID ===
-              publication.publicationInfo.microsoftID
-          )
-      );
-      if (moreUniqueSuggestions && moreUniqueSuggestions.length > 0)
-        filteredResults = [
-          ...filteredResults,
-          ...moreSuggestedPublications.filter(Boolean),
-        ];
-    }
-    return {
-      publications: filteredResults,
-      offset: offset,
-    };
-  }
-);
-
-const msExecutePromises = (offset: number, expressions: Array<string>) =>
-  expressions.map(async (expression) => {
-    const evaluateExpression = expression;
-    const normalisedAuthorNameRegex = /AA\.AuN=='(?<name>[a-z ]*)'/;
-    const authorMatches = normalisedAuthorNameRegex.exec(evaluateExpression);
-    if (!authorMatches) {
-      console.warn(
-        'No normalised author name within evaluate expression ',
-        evaluateExpression
-      );
-      return [];
-    }
-    // get the first capturing group in the regex match
-    const normalisedAuthorName = authorMatches[1];
-    return executeExpression({
-      expr: expression,
-      count: SUGGESTED_PUBLICATIONS_EXECUTION_PAGE_SIZE,
-      attributes: allPublicationFields,
-      offset: offset,
-    })
-      .then(async (resp) => {
-        const makPublications: MAKPublication[] = resp.data.entities;
-        await publishAddPublicationRequests(makPublications);
-        return resp;
-      })
-      .then((resp) => {
-        const makPublications: MAKPublication[] = resp.data.entities;
-        const publicationsWithAuthor: PublicationSuggestion[] = [];
-        makPublications.forEach((entity: MAKPublication) => {
-          const publication = makPublicationToPublication(entity);
-          const authors = publication.authors!;
-          const matchingAuthor = authors.find(
-            (author) => author.normalisedName === normalisedAuthorName
-          )!;
-          if (!matchingAuthor || !matchingAuthor.microsoftID) return;
-          const publicationSuggestion: PublicationSuggestion = {
-            microsoftAcademicAuthorID: matchingAuthor.microsoftID,
-            publicationInfo: publication,
-          };
-          publicationsWithAuthor.push(publicationSuggestion);
-        });
-        // want to return a maximum of two papers per author
-        const seenAuthorIDs = new Map();
-        return publicationsWithAuthor.filter((publicationSuggestion) => {
-          const matchingAuthorID =
-            publicationSuggestion.microsoftAcademicAuthorID;
-          if (seenAuthorIDs.get(matchingAuthorID) === 2) return false;
-          if (seenAuthorIDs.get(matchingAuthorID) === 1)
-            seenAuthorIDs.set(matchingAuthorID, 2);
-          if (!seenAuthorIDs.has(matchingAuthorID))
-            seenAuthorIDs.set(matchingAuthorID, 1);
-          return true;
-        });
-      })
-      .catch((err) => {
-        console.error(err);
-        throw new functions.https.HttpsError('internal', 'An error occurred.');
-      });
-  });
-
-const flatten = function (arr: Array<any>, result: Array<any> = []) {
-  for (let i = 0, length = arr.length; i < length; i++) {
-    const value = arr[i];
-    if (Array.isArray(value)) {
-      flatten(value, result);
-    } else {
-      result.push(value);
-    }
-  }
-  return result;
-};
-
 export const addPublicationTopicsToUser = functions.firestore
   .document(`users/{userID}/publications/{publicationID}`)
   .onCreate(async (change, context) => {
@@ -1345,10 +1190,6 @@ export const updateUserRefOnFollowFeedFilters = functions.firestore
     return Promise.all(followersUpdatePromise);
   });
 
-interface PublicationSuggestion {
-  microsoftAcademicAuthorID: string;
-  publicationInfo: Publication;
-}
 // Rank relates to how often the user posts in this topic
 export interface UserRef {
   id: string;
@@ -1427,4 +1268,9 @@ export interface UserPublicationRef {
   name: string;
   microsoftID: string;
   normalisedName?: string;
+}
+
+export interface ExpressionAndName {
+  name: string;
+  expression: string;
 }

@@ -11,7 +11,10 @@ import './ConnectToPublications.css';
 
 const getSuggestedPublicationsForAuthorName = firebase
   .functions()
-  .httpsCallable('users-getSuggestedPublicationsForAuthorName');
+  .httpsCallable('microsoft-getSuggestedPublicationsForAuthorName');
+const interpretAuthorPubSearch = firebase
+  .functions()
+  .httpsCallable('microsoft-interpretAuthorPubSearch');
 const setMicrosoftAcademicIDByPublicationMatches = firebase
   .functions()
   .httpsCallable('users-setMicrosoftAcademicIDByPublicationMatches');
@@ -26,33 +29,67 @@ export default function LinkAuthorIDForm({submitBehaviour, cancel}) {
   const [loadingState, setLoadingState] = useState();
   const [hasMore, setHasMore] = useState();
   const [parentSearchOffset, setParentSearchOffset] = useState(0);
-  const fetchSuggestedPublications = (firstTime) => {
+  const [fetchedExpressionsAndNames, setFetchedExpressionsAndNames] = useState(
+    []
+  );
+  const fetchSuggestedPublications = async (firstTime) => {
     if (loadingState === LOADING) return;
+    setLoadingState(LOADING);
+    const fetchSuggestedPublicationsWithExpressionsAndNames = (
+      expressionsAndNamesToEvaluate
+    ) => {
+      getSuggestedPublicationsForAuthorName({
+        expressionsAndNames: expressionsAndNamesToEvaluate,
+        offset: parentSearchOffset,
+      })
+        .then((fetchedSuggestedPublications) => {
+          setLoadingState(LOADED);
+          setSuggestedPublications((currentPublications) => [
+            ...currentPublications,
+            ...fetchedSuggestedPublications.data.publications,
+          ]);
+          setHasMore(
+            !(fetchedSuggestedPublications.data.publications.length === 0)
+          );
+          setParentSearchOffset(fetchedSuggestedPublications.data.offset);
+        })
+        .catch((err) => {
+          console.error(err);
+          setLoadingState(ERROR);
+        });
+    };
+
     if (firstTime) {
       setSuggestedPublications([]);
       setHasMore(undefined);
       setParentSearchOffset(0);
-    }
-    setLoadingState(LOADING);
-    getSuggestedPublicationsForAuthorName({
-      name: name,
-      offset: parentSearchOffset,
-    })
-      .then((fetchedSuggestedPublications) => {
-        setLoadingState(LOADED);
-        setSuggestedPublications((currentPublications) => [
-          ...currentPublications,
-          ...fetchedSuggestedPublications.data.publications,
-        ]);
-        setHasMore(
-          !(fetchedSuggestedPublications.data.publications.length === 0)
-        );
-        setParentSearchOffset(fetchedSuggestedPublications.data.offset);
-      })
-      .catch((err) => {
-        console.error(err);
+      const interpretAuthorPubSearchResponse = await interpretAuthorPubSearch({
+        name: name,
+      }).catch((err) => {
+        console.error(`unable to interpret name ${name} ${err}`);
         setLoadingState(ERROR);
+        return;
       });
+      if (
+        !interpretAuthorPubSearchResponse ||
+        !interpretAuthorPubSearchResponse.data
+      ) {
+        setLoadingState(LOADED);
+        return;
+      }
+      const expressionsAndNames = interpretAuthorPubSearchResponse.data;
+      setFetchedExpressionsAndNames(expressionsAndNames);
+      if (!expressionsAndNames || expressionsAndNames.length === 0) {
+        setLoadingState(LOADED);
+        return;
+      }
+      return fetchSuggestedPublicationsWithExpressionsAndNames(
+        expressionsAndNames
+      );
+    }
+    fetchSuggestedPublicationsWithExpressionsAndNames(
+      fetchedExpressionsAndNames
+    );
   };
 
   const searchProgress = () => {
@@ -162,7 +199,7 @@ function SuggestedPublications({
               </SecondaryButton>
             )}
           </div>
-          <div style={{'margin-top': '20px'}}>{searchProgress()}</div>
+          <div style={{marginTop: '20px'}}>{searchProgress()}</div>
         </>
       )}
       <div className="onboarding-suggested-publications-submit-container">

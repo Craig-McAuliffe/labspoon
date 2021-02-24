@@ -49,3 +49,112 @@
 .resize-images-note {
   color: #99999f;
 }
+
+.edit-user-pubs-fetch-more-button-container {
+  display: flex;
+  justify-content: center;
+  margin: 40px 0px;
+}
+
+.edit-user-pubs-fetching {
+  color: #5d5d65;
+}
+
+@keyframes fadeIn1 {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeIn2 {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeIn3 {
+  from {
+    opacity: 0;
+  }
+}
+@-o-keyframes fadeIn1 {
+  from {
+    opacity: 0;
+  }
+}
+
+@-o-keyframes fadeIn2 {
+  from {
+    opacity: 0;
+  }
+}
+
+@-o-keyframes fadeIn3 {
+  from {
+    opacity: 0;
+  }
+}
+@-moz-keyframes fadeIn1 {
+  from {
+    opacity: 0;
+  }
+}
+
+@-moz-keyframes fadeIn2 {
+  from {
+    opacity: 0;
+  }
+}
+
+@-moz-keyframes fadeIn3 {
+  from {
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes fadeIn1 {
+  from {
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes fadeIn2 {
+  from {
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes fadeIn3 {
+  from {
+    opacity: 0;
+  }
+}
+
+.edit-user-pubs-fetching-dots,
+.edit-user-pubs-fetching-dots::before,
+.edit-user-pubs-fetching-dots::after {
+  background: #5d5d65;
+  height: 4px;
+  width: 4px;
+  display: inline-block;
+}
+
+.edit-user-pubs-fetching-dots {
+  animation: fadeIn1 1s infinite alternate;
+  position: relative;
+  margin-left: 5px;
+}
+
+.edit-user-pubs-fetching-dots::before {
+  content: '';
+  animation: fadeIn2 1s infinite alternate;
+  position: absolute;
+  left: 8px;
+}
+
+.edit-user-pubs-fetching-dots::after {
+  content: '';
+  animation: fadeIn3 1s infinite alternate;
+  position: absolute;
+  left: 16px;
+}
