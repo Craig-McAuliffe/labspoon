@@ -43,7 +43,7 @@
 
 .link-to-pubs-already-linked-note {
   color: #5d5d65;
-  margin-top: 40px;
+  margin-top: 60px;
 }
 
 .resize-images-note {
@@ -157,4 +157,8 @@
   animation: fadeIn3 1s infinite alternate;
   position: absolute;
   left: 16px;
+}
+
+.edit-user-pubs-already-linked-title {
+  color: #5d5d65;
 }

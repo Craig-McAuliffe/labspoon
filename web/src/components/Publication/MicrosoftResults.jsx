@@ -397,23 +397,3 @@ function microsoftPublicationSearchByQuery(
     })
     .finally(() => setLoading(false));
 }
-
-export function SearchPublicationsByAuthorID(authorID, setLoading) {
-  const expression = `Composite(AA.AuId==${authorID})`;
-  const limit = 20;
-
-  microsoftPublicationSearchByExpression(
-    query,
-    expression,
-    limit,
-    searchOffset,
-    setOffset,
-    setResults,
-    setLoading,
-    setExpression,
-    setHasMore,
-    interpretCache,
-    interpretDispatch,
-    setError
-  );
-}
