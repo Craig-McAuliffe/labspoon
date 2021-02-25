@@ -15,6 +15,12 @@ import Popover from 'react-bootstrap/Popover';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 import {dbPublicationToJSPublication} from '../../../helpers/publications';
+import {
+  fetchRecentPublications,
+  FetchMorePubsForAuthorButtonAndResults,
+} from './EditUserPublications';
+
+import './SkeletonUserPage.css';
 
 const PUBLICATIONS_TAB = 'publications';
 
@@ -80,9 +86,10 @@ export default function SkeletonUserPage() {
       <FilterableResults fetchResults={fetchResults} limit={10}>
         <div className="feed-container">
           <FilterManager>
-            <ResourceTabs tabs={tabs} />
             <NewFilterMenuWrapper />
+            <ResourceTabs tabs={tabs} />
           </FilterManager>
+          <FetchPublicationsForSkeletonProfile authorID={userID} />
           <NewResultsWrapper />
         </div>
       </FilterableResults>
@@ -153,4 +160,50 @@ function fetchFeedData(userID, filterOptions) {
       results = [];
   }
   return results;
+}
+
+function FetchPublicationsForSkeletonProfile({authorID}) {
+  const [fetchedPubs, setFetchedPubs] = useState([]);
+  return (
+    <>
+      <h4 className="skeleton-profile-missing-pubs-title">
+        Is this profile missing publications?
+      </h4>
+      <FetchMorePubsForAuthorButtonAndResults
+        authorID={authorID}
+        fetchedPubs={fetchedPubs}
+        setFetchedPubs={setFetchedPubs}
+        CustomSearchButton={SkeletonProfileFetchMorePubsCustomButton}
+      />
+    </>
+  );
+}
+
+function SkeletonProfileFetchMorePubsCustomButton({
+  authorID,
+  setFetchingMorePubs,
+  setError,
+  error,
+  setFetchedPubs,
+  pubSearchOffset,
+  setPubSearchOffset,
+}) {
+  return (
+    <button
+      className="skeleton-profile-missing-pubs-action"
+      onClick={() =>
+        fetchRecentPublications(
+          authorID,
+          setFetchingMorePubs,
+          setError,
+          error,
+          setFetchedPubs,
+          pubSearchOffset,
+          setPubSearchOffset
+        )
+      }
+    >
+      Fetch more
+    </button>
+  );
 }

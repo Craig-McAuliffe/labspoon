@@ -18,10 +18,6 @@ const getPublicationsByAuthorIDExpression = firebase
 
 export default function EditUserPublications({children}) {
   const [linkingAuthor, setLinkingAuthor] = useState(false);
-  const [fetchingMorePubs, setFetchingMorePubs] = useState(false);
-  const [fetchedPubs, setFetchedPubs] = useState([]);
-  const [error, setError] = useState(false);
-  const [pubSearchOffset, setPubSearchOffset] = useState(0);
   const {userProfile, user, authLoaded} = useContext(AuthContext);
   if (!authLoaded) return <LoadingSpinnerPage />;
   if (user && !userProfile) return null;
@@ -30,56 +26,7 @@ export default function EditUserPublications({children}) {
       <PaddedPageContainer>
         {children}
 
-        {fetchedPubs.length > 0 ? (
-          <>
-            {' '}
-            <h3>Here are the new publication we have fetched:</h3>
-            {fetchedPubs.map((fetchedPub) => (
-              <SmallPublicationListItem
-                publication={fetchedPub}
-                key={fetchedPub.microsoftID}
-              />
-            ))}
-          </>
-        ) : (
-          <>
-            <h3 className="edit-user-pubs-already-linked-title">
-              Your publications are linked.
-            </h3>
-            <p>
-              Are we missing some publications on your profile? Try fetching
-              them:
-            </p>
-          </>
-        )}
-        <div className="edit-user-pubs-fetch-more-button-container">
-          {fetchingMorePubs ? (
-            <div className="edit-user-pubs-fetching">
-              Fetching<div className="edit-user-pubs-fetching-dots"></div>
-            </div>
-          ) : (
-            <SecondaryButton
-              onClick={() =>
-                fetchRecentPublications(
-                  userProfile.microsoftID,
-                  setFetchingMorePubs,
-                  setError,
-                  error,
-                  setFetchedPubs,
-                  pubSearchOffset,
-                  setPubSearchOffset
-                )
-              }
-            >
-              Fetch {fetchedPubs.length > 0 ? 'More' : 'Recent'} Publications
-            </SecondaryButton>
-          )}
-        </div>
-        {error && (
-          <ErrorMessage noBorder={true}>
-            Something went wrong. Please try again.
-          </ErrorMessage>
-        )}
+        <FetchPublicationsForAuthor authorID={userProfile.microsoftID} />
         <p className="link-to-pubs-already-linked-note">
           If you have incorrectly linked your account, please let us know
           through the <Link to="/contact">contact page.</Link>
@@ -116,7 +63,107 @@ function LinkUserToPublications({setLinkingAuthor}) {
   );
 }
 
-async function fetchRecentPublications(
+function FetchPublicationsForAuthor({authorID}) {
+  const [fetchedPubs, setFetchedPubs] = useState([]);
+
+  return (
+    <div>
+      {fetchedPubs.length > 0 ? (
+        <h3>Here are the new publications we have fetched:</h3>
+      ) : (
+        <>
+          <h3 className="edit-user-pubs-already-linked-title">
+            Your publications are linked.
+          </h3>
+          <p>
+            Are we missing some publications on your profile? Try fetching them:
+          </p>
+        </>
+      )}
+      <FetchMorePubsForAuthorButtonAndResults
+        fetchedPubs={fetchedPubs}
+        setFetchedPubs={setFetchedPubs}
+        authorID={authorID}
+      />
+    </div>
+  );
+}
+
+export function FetchMorePubsForAuthorButtonAndResults({
+  fetchedPubs,
+  setFetchedPubs,
+  CustomSearchButton,
+  authorID,
+}) {
+  const [error, setError] = useState(false);
+  const [pubSearchOffset, setPubSearchOffset] = useState(0);
+  const [fetchingMorePubs, setFetchingMorePubs] = useState(false);
+
+  const pubResultsList = fetchedPubs.map((fetchedPub) => (
+    <SmallPublicationListItem
+      publication={fetchedPub}
+      key={fetchedPub.microsoftID}
+    />
+  ));
+
+  let fetchingOrFetchButton;
+
+  if (fetchingMorePubs)
+    fetchingOrFetchButton = (
+      <div className="edit-user-pubs-fetch-more-button-container">
+        <div className="edit-user-pubs-fetching">
+          Fetching<div className="edit-user-pubs-fetching-dots"></div>
+        </div>
+      </div>
+    );
+  else
+    fetchingOrFetchButton =
+      CustomSearchButton && fetchedPubs.length === 0 ? (
+        <CustomSearchButton
+          authorID={authorID}
+          setFetchingMorePubs={setFetchingMorePubs}
+          setError={setError}
+          error={error}
+          setFetchedPubs={setFetchedPubs}
+          pubSearchOffset={pubSearchOffset}
+          setPubSearchOffset={setPubSearchOffset}
+        />
+      ) : (
+        <div className="edit-user-pubs-fetch-more-button-container">
+          <SecondaryButton
+            onClick={() =>
+              fetchRecentPublications(
+                authorID,
+                setFetchingMorePubs,
+                setError,
+                error,
+                setFetchedPubs,
+                pubSearchOffset,
+                setPubSearchOffset
+              )
+            }
+          >
+            Fetch {fetchedPubs.length > 0 ? 'More' : 'Recent'} Publications
+          </SecondaryButton>
+        </div>
+      );
+
+  return (
+    <>
+      {pubResultsList}
+
+      {fetchingOrFetchButton}
+
+      {error && (
+        <ErrorMessage noBorder={true}>
+          Something went wrong. Please try again.
+        </ErrorMessage>
+      )}
+    </>
+  );
+}
+
+export async function fetchRecentPublications(
   authorID,
   setFetchingMorePubs,
   setError,
