@@ -4,8 +4,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   box-sizing: border-box;
-
   font-size: 16px;
+  overflow-y: scroll;
 }
 
 h1,
