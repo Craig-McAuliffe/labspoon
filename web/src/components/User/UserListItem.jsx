@@ -10,6 +10,7 @@ export default function UserListItem({
   user,
   children,
   LinkOverride = undefined,
+  noBorder,
 }) {
   const {userProfile} = useContext(AuthContext);
   const userID = userProfile ? userProfile.id : undefined;
@@ -53,7 +54,7 @@ export default function UserListItem({
   );
 
   return (
-    <div className="user-listItem-container">
+    <div className={`user-listItem-container${noBorder ? '-no-border' : ''}`}>
       {details}
       <div className="user-listItem-institution">
         <h3>{user.institution}</h3>

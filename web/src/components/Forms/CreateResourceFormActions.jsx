@@ -10,9 +10,14 @@ export default function CreateResourceFormActions({
   cancelForm,
   formID,
   customAction,
+  noBorder,
 }) {
   return (
-    <div className="create-group-submit-cancel-container">
+    <div
+      className={`create-resource-submit-cancel-container${
+        noBorder ? '-no-border' : ''
+      }`}
+    >
       <div>
         {cancelForm ? <CancelButton cancelAction={cancelForm} /> : null}
       </div>

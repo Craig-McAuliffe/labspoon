@@ -21,6 +21,7 @@ import {
 } from './EditUserPublications';
 
 import './SkeletonUserPage.css';
+import TertiaryButton from '../../../components/Buttons/TertiaryButton';
 
 const PUBLICATIONS_TAB = 'publications';
 
@@ -166,9 +167,11 @@ function FetchPublicationsForSkeletonProfile({authorID}) {
   const [fetchedPubs, setFetchedPubs] = useState([]);
   return (
     <>
-      <h4 className="skeleton-profile-missing-pubs-title">
-        Is this profile missing publications?
-      </h4>
+      {fetchedPubs.length === 0 && (
+        <h4 className="skeleton-profile-missing-pubs-title">
+          Is this profile missing publications?
+        </h4>
+      )}
       <FetchMorePubsForAuthorButtonAndResults
         authorID={authorID}
         fetchedPubs={fetchedPubs}
@@ -189,21 +192,22 @@ function SkeletonProfileFetchMorePubsCustomButton({
   setPubSearchOffset,
 }) {
   return (
-    <button
-      className="skeleton-profile-missing-pubs-action"
-      onClick={() =>
-        fetchRecentPublications(
-          authorID,
-          setFetchingMorePubs,
-          setError,
-          error,
-          setFetchedPubs,
-          pubSearchOffset,
-          setPubSearchOffset
-        )
-      }
-    >
-      Fetch more
-    </button>
+    <div className="skeleton-profile-missing-pubs-action">
+      <TertiaryButton
+        onClick={() =>
+          fetchRecentPublications(
+            authorID,
+            setFetchingMorePubs,
+            setError,
+            error,
+            setFetchedPubs,
+            pubSearchOffset,
+            setPubSearchOffset
+          )
+        }
+      >
+        Fetch more
+      </TertiaryButton>
+    </div>
   );
 }

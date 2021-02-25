@@ -1,0 +1,50 @@
+.create-custom-publication-container {
+  margin: 20px 0px;
+}
+
+.create-custom-publication-text {
+  color: #5d5d65;
+}
+
+.create-custom-publication-icon-container {
+  display: flex;
+  align-items: center;
+  height: 50px;
+}
+
+.create-custom-publication-icon-container h3 {
+  margin-left: 10px;
+  color: #5d5d65;
+}
+
+.create-custom-publication-icon-container svg {
+  height: 100%;
+}
+
+.create-custom-pub-form-container {
+  padding: 5px;
+  margin: 20px 0px;
+  padding-top: 20px;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.6);
+}
+
+.create-custom-publication-button-container {
+  display: flex;
+  justify-content: center;
+}
+
+.create-custom-remove-icon-container {
+  padding: 0px;
+  margin-right: 10px;
+}
+
+.create-custom-publication-remove-icons-container {
+  display: flex;
+  justify-content: space-between;
+  height: 50px;
+  align-items: flex-start;
+}
+
+.create-custom-publication-selected-authors-title {
+  color: #5d5d65;
+}

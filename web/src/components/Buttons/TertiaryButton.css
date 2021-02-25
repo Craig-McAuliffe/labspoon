@@ -1,0 +1,9 @@
+.tertiary-button {
+  padding: 0px;
+  color: #00507c;
+}
+
+.tertiary-button:hover {
+  text-decoration: underline;
+  color: #00507c;
+}

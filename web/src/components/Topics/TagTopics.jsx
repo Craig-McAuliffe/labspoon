@@ -11,6 +11,7 @@ export default function TagTopics({
   submittingForm,
   selectedTopics,
   setSelectedTopics,
+  noCustomTopics,
 }) {
   const [displayedTopics, setDisplayedTopics] = useState([]);
   const [duplicateTopic, setDuplicateTopic] = useState(false);
@@ -52,12 +53,14 @@ export default function TagTopics({
           setDuplicateTopic={setDuplicateTopic}
           displayedTopics={displayedTopics}
         />
-        <TypedTopic
-          typedTopic={typedTopic}
-          setSelectedTopics={setSelectedTopics}
-          setDuplicateTopic={setDuplicateTopic}
-          displayedTopics={displayedTopics}
-        />
+        {!noCustomTopics && (
+          <TypedTopic
+            typedTopic={typedTopic}
+            setSelectedTopics={setSelectedTopics}
+            setDuplicateTopic={setDuplicateTopic}
+            displayedTopics={displayedTopics}
+          />
+        )}
       </div>
     </div>
   );

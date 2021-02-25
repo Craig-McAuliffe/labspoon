@@ -17,6 +17,10 @@
   align-items: center;
 }
 
+.form-text-input-container-no-label {
+  margin-bottom: 10px;
+}
+
 .create-post-main-text {
   height: 100px;
   min-width: 100%;

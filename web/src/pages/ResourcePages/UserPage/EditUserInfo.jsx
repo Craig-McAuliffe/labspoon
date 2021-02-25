@@ -72,7 +72,7 @@ export default function EditUserInfo({children}) {
         </Form>
       </Formik>
 
-      <div className="create-group-submit-cancel-container">
+      <div className="create-resource-submit-cancel-container">
         <div className="create-group-cancel">
           <CancelButton cancelAction={() => history.push(`/user/${userID}`)} />
         </div>

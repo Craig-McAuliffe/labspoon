@@ -36,17 +36,16 @@ export function TextInput({
   placeholder,
   ...props
 }) {
+  let containerClassName = 'form-text-input-container';
+  if (sideLabel) containerClassName = containerClassName + '-side-label';
+  if (!label) containerClassName = containerClassName + '-no-label';
   return (
-    <div
-      className={
-        sideLabel
-          ? 'form-text-input-container-side-label'
-          : 'form-text-input-container'
-      }
-    >
-      <label htmlFor={props.name} className="form-input-label">
-        <h4>{label}</h4>
-      </label>
+    <div className={containerClassName}>
+      {label && (
+        <label htmlFor={props.name} className="form-input-label">
+          <h4>{label}</h4>
+        </label>
+      )}
       <input
         className="form-text-input"
         type={passwordInput ? 'password' : 'text'}

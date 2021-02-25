@@ -6,7 +6,6 @@ import {db} from '../../../firebase';
 
 import {PaddedPageContainer} from '../../../components/Layout/Content';
 import FormTextInput from '../../../components/Forms/FormTextInput';
-import PrimaryButton from '../../../components/Buttons/PrimaryButton';
 import SuccessMessage from '../../../components/Forms/SuccessMessage';
 import ErrorMessage from '../../../components/Forms/ErrorMessage';
 import Results from '../../../components/Results/Results';
@@ -15,6 +14,7 @@ import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 import {getPaginatedVideosFromCollectionRef} from '../../../helpers/videos';
 
 import './EditGroupVideos.css';
+import CreateResourceFormActions from '../../../components/Forms/CreateResourceFormActions';
 
 export default function EditGroupVideos({children}) {
   const limit = 9;
@@ -114,9 +114,11 @@ function VideoUploadForm({refresh}) {
             label="Paste the Youtube URL here, it looks like this: https://www.youtube.com/watch?v=ns2gDDiD5ag"
             name="url"
           />
-          <PrimaryButton submit disabled={uploading}>
-            Upload
-          </PrimaryButton>
+          <CreateResourceFormActions
+            submitText="Upload"
+            submitting={uploading}
+            noBorder={true}
+          />
         </Form>
       </Formik>
     </div>

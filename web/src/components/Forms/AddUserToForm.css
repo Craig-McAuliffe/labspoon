@@ -1,0 +1,24 @@
+.create-group-invite-email-info {
+  color: #99999f;
+  margin-top: 5px;
+}
+
+.create-group-member-search {
+  margin-bottom: 20px;
+}
+
+.add-user-to-form-instant-search-searchbox-container {
+  border: 1px solid #99999f;
+}
+
+.add-user-to-form-instant-search-searchbox-container .ais-SearchBox-input {
+  height: 42px;
+}
+
+.find-and-add-users-to-form-container {
+  margin-bottom: 40px;
+}
+
+.find-and-add-users-to-form-title {
+  margin-bottom: 10px;
+}

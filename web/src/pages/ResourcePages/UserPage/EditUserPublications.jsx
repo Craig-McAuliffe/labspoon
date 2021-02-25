@@ -8,6 +8,8 @@ import {Link} from 'react-router-dom';
 import {SmallPublicationListItem} from '../../../components/Publication/PublicationListItem';
 import firebase from '../../../firebase';
 import ErrorMessage from '../../../components/Forms/ErrorMessage';
+import CreateCustomPublication from '../../../components/Publication/CreateCustomPublication';
+import {Alert} from 'react-bootstrap';
 
 import './UserPage.css';
 import './EditUserPage.css';
@@ -27,10 +29,13 @@ export default function EditUserPublications({children}) {
         {children}
 
         <FetchPublicationsForAuthor authorID={userProfile.microsoftID} />
-        <p className="link-to-pubs-already-linked-note">
-          If you have incorrectly linked your account, please let us know
-          through the <Link to="/contact">contact page.</Link>
-        </p>
+        <CreateCustomPublication />
+        <div className="link-to-pubs-already-linked-note">
+          <Alert variant="warning">
+            If you have incorrectly linked your account, please let us know
+            through the <Link to="/contact">contact page.</Link>
+          </Alert>
+        </div>
       </PaddedPageContainer>
     );
 

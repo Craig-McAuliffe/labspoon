@@ -1,7 +1,11 @@
-.user-listItem-container {
+.user-listItem-container,
+.user-listItem-container-no-border {
   display: grid;
   grid-template-columns: 3fr 2.5fr 1fr;
   align-items: center;
+}
+
+.user-listItem-container {
   border-bottom: 1px solid #dcdce0;
 }
 

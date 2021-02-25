@@ -5,11 +5,5 @@
 
 .skeleton-profile-missing-pubs-action {
   display: inline-block;
-  padding: 0px;
-  color: #00507c;
   margin-left: 10px;
-}
-
-.skeleton-profile-missing-pubs-action:hover {
-  color: #185e9c;
 }

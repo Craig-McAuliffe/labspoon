@@ -1,37 +1,19 @@
 import React, {useState, useContext, useEffect} from 'react';
 import {Formik, Form, useField} from 'formik';
 import * as Yup from 'yup';
-import {
-  InstantSearch,
-  SearchBox,
-  Hits,
-  Configure,
-  connectStateResults,
-} from 'react-instantsearch-dom';
-
-import {searchClient} from '../../../algolia';
-import {abbrEnv} from '../../../config';
-
 import {AuthContext} from '../../../App';
 import FormTextInput, {FormTextArea} from '../../Forms/FormTextInput';
 import PrimaryButton from '../../Buttons/PrimaryButton';
-import CancelButton from '../../Buttons/CancelButton';
 import NegativeButton from '../../Buttons/NegativeButton';
 import {AddMemberIcon} from '../../../assets/CreateGroupIcons';
-import UserListItem, {
-  UserListItemEmailOnly,
-  UserSmallResultItem,
-} from '../../User/UserListItem';
-import {useLocation} from 'react-router-dom';
+import UserListItem, {UserListItemEmailOnly} from '../../User/UserListItem';
 import CreateResourceFormActions from '../../Forms/CreateResourceFormActions';
-import TabbedContainer from '../../TabbedContainer/TabbedContainer';
-import {EmailIcon} from '../../../assets/PostOptionalTagsIcons';
-import {SearchIconGrey} from '../../../assets/HeaderIcons';
 import {PaddedContent} from '../../../components/Layout/Content';
 import Select, {LabelledDropdownContainer} from '../../Forms/Select/Select';
 import {DropdownOption} from '../../Dropdown';
 import InputError from '../../../components/Forms/InputError';
 import FormImageUpload from '../../Images/FormImageUpload';
+import AddMemberContainer from '../../Forms/AddUserToForm';
 
 import './CreateGroupPage.css';
 import './GroupInfoForm.css';
@@ -267,120 +249,6 @@ function AddMemberButton({setSelecting}) {
     >
       <AddMemberIcon />
     </button>
-  );
-}
-
-function AddMemberContainer({addSelectedUsers, setSelecting}) {
-  const tabDetails = [
-    {
-      name: 'Search on Labspoon',
-      icon: <SearchIconGrey />,
-      contents: (
-        <AddMemberSearch
-          addSelectedUsers={addSelectedUsers}
-          setSelecting={setSelecting}
-        />
-      ),
-    },
-    {
-      name: 'Invite By Email',
-      icon: <EmailIcon />,
-      contents: (
-        <AddMemberByEmail
-          addSelectedUsers={addSelectedUsers}
-          setSelecting={setSelecting}
-        />
-      ),
-    },
-  ];
-
-  return <TabbedContainer tabDetails={tabDetails} />;
-}
-
-const NoQueryNoResults = connectStateResults(({searchState, children}) => {
-  if (!searchState.query) return <></>;
-  return children;
-});
-
-function AddMemberByEmail({addSelectedUsers, setSelecting}) {
-  const validationSchema = Yup.object({
-    email: Yup.string().email().required('Email required'),
-  });
-  function onSubmit(res) {
-    addSelectedUsers({
-      email: res.email,
-    });
-    setSelecting(false);
-  }
-  const pathname = useLocation().pathname;
-
-  return (
-    <>
-      <Formik
-        validationSchema={validationSchema}
-        onSubmit={onSubmit}
-        initialValues={{
-          email: '',
-        }}
-      >
-        <Form id="email-form">
-          <FormTextInput label="Email" name="email" sideLabel />
-        </Form>
-      </Formik>
-      <div className="create-group-submit-cancel-container">
-        <div className="create-group-cancel">
-          <CancelButton cancelAction={() => setSelecting(false)} />
-        </div>
-        <div className="create-group-submit">
-          <PrimaryButton submit formID="email-form">
-            Add
-          </PrimaryButton>
-        </div>
-      </div>
-      <p className="create-group-invite-email-info">
-        The invite will only be sent once you have{' '}
-        {pathname.includes('create')
-          ? 'created your group'
-          : 'saved your changes'}
-      </p>
-    </>
-  );
-}
-
-function AddMemberSearch({addSelectedUsers, setSelecting}) {
-  const selectUserAndStopSelecting = (user) => {
-    addSelectedUsers(user);
-    setSelecting(false);
-  };
-  // TODO: when a user has been selected their entry in the search results should be greyed out
-  return (
-    <>
-      <div className="create-group-member-search">
-        <InstantSearch
-          searchClient={searchClient}
-          indexName={abbrEnv + '_USERS'}
-        >
-          <div className="instant-search-searchbox-container">
-            <SearchBox />
-          </div>
-          <NoQueryNoResults>
-            <Hits
-              hitComponent={({hit}) => {
-                return (
-                  <UserSmallResultItem
-                    user={hit}
-                    selectUser={selectUserAndStopSelecting}
-                    key={hit.id + 'user'}
-                  />
-                );
-              }}
-            />
-          </NoQueryNoResults>
-          <Configure hitsPerPage={10} />
-        </InstantSearch>
-      </div>
-      <CancelButton cancelAction={() => setSelecting(false)} />
-    </>
   );
 }
 
