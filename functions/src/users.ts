@@ -1270,6 +1270,12 @@ export interface UserPublicationRef {
   normalisedName?: string;
 }
 
+export interface UserCustomPublicationRef {
+  id: string;
+  name: string;
+  microsoftID?: string;
+}
+
 export interface ExpressionAndName {
   name: string;
   expression: string;

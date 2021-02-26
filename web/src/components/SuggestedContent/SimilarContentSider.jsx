@@ -13,16 +13,27 @@ const getSuggestedPublications = firebase
   .functions()
   .httpsCallable('publications-suggestedPublications');
 
+const mapSuggestedSiderSizesToProps = ({width}) => ({
+  // When the whole site has similar content, we will only switch to this view at 800
+  // isMobile: width && width <= 800,
+  isMobile: width && width <= 1197,
+});
+
+// Tracks window width and sends boolean prop to
+// SimilarContentSider if below 800px
+export default withSizes(mapSuggestedSiderSizesToProps)(SimilarContentSider);
+
 function SimilarContentSider({resourceType, resourceID, isMobile, footerOnly}) {
   const [suggestedContent, setSuggestedContent] = useState();
   const [loading, setLoading] = useState(true);
   const pathname = useLocation().pathname;
-
   useEffect(() => {
     if (!resourceID) return;
     switch (resourceType) {
       case PUBLICATION:
-        getSuggestedPublications(resourceID)
+        getSuggestedPublications({
+          publicationID: resourceID,
+        })
           .then((resp) => {
             setLoading(false);
             setSuggestedContent(resp.data);
@@ -37,13 +48,13 @@ function SimilarContentSider({resourceType, resourceID, isMobile, footerOnly}) {
     }
   }, [resourceType, resourceID]);
 
-  if (!suggestedContent || suggestedContent.length === 0) return null;
   if (isMobile)
     return (
       <MobileRelatedContentFooter
         resourceType={resourceType}
         resourceID={resourceID}
         pathname={pathname}
+        loading={loading}
       />
     );
   // This prevents the sider appearing when accessed through fullscreen similar content
@@ -53,47 +64,50 @@ function SimilarContentSider({resourceType, resourceID, isMobile, footerOnly}) {
     <SiderContent
       suggestedContent={suggestedContent}
       resourceType={resourceType}
-      resourceID={resourceID}
       loading={loading}
     />
   );
 }
 
-const mapSuggestedSiderSizesToProps = ({width}) => ({
-  // When the whole site has similar content, we will only switch to this view at 800
-  // isMobile: width && width <= 800,
-  isMobile: width && width <= 1197,
-});
-
-// Tracks window width and sends boolean prop to
-// SimilarContentSider if below 800px
-export default withSizes(mapSuggestedSiderSizesToProps)(SimilarContentSider);
-
-function SiderContent({suggestedContent, resourceID, resourceType, loading}) {
+function SiderContent({suggestedContent, resourceType, loading}) {
+  let similarSiderContent = (
+    <GenericSuggestedResourceType
+      suggestedContent={suggestedContent}
+      resourceType={resourceType}
+    />
+  );
+  if (!suggestedContent || suggestedContent.length === 0)
+    similarSiderContent = null;
+  if (loading) similarSiderContent = <LoadingSpinner />;
   return (
     <div className="suggested-content-sider-container">
       <h3 className="suggested-content-sider-title">
         Similar {resourceType ? resourceType + 's' : 'content'}
       </h3>
-      {loading ? (
-        <LoadingSpinner />
-      ) : (
-        <GenericSuggestedResourceType
-          suggestedContent={suggestedContent}
-          resourceType={suggestedContent}
-        />
-      )}
+      {similarSiderContent}
     </div>
   );
 }
 
 // This is displayed at the bottom of the screen for small devices
 // The resource page should route the similar link to the FullScreenSimilarContent component
-function MobileRelatedContentFooter({resourceID, resourceType, pathname}) {
+function MobileRelatedContentFooter({
+  resourceID,
+  resourceType,
+  pathname,
+  loading,
+}) {
   return (
     <div className="mobile-suggested-content-footer">
-      <Link to={`/${resourceType}/${resourceID}`}>
-        <div className="mobile-footer-button-container">
+      <SimilarContentLinkWrapper
+        targetPath={`/${resourceType}/${resourceID}`}
+        loading={loading}
+      >
+        <div
+          className={`mobile-footer-button-container${
+            loading ? '-loading' : ''
+          }`}
+        >
           <MainItemIcon />
           <h3
             className={
@@ -105,9 +119,16 @@ function MobileRelatedContentFooter({resourceID, resourceType, pathname}) {
             Item
           </h3>
         </div>
-      </Link>
-      <Link to={`/${resourceType}/${resourceID}/similar`}>
-        <div className="mobile-footer-button-container">
+      </SimilarContentLinkWrapper>
+      <SimilarContentLinkWrapper
+        targetPath={`/${resourceType}/${resourceID}/similar`}
+        loading={loading}
+      >
+        <div
+          className={`mobile-footer-button-container${
+            loading ? '-loading' : ''
+          }`}
+        >
           <SimilarContentIcon />
           <h3
             className={
@@ -119,9 +140,14 @@ function MobileRelatedContentFooter({resourceID, resourceType, pathname}) {
             Similar
           </h3>
         </div>
-      </Link>
+      </SimilarContentLinkWrapper>
     </div>
   );
+}
+
+function SimilarContentLinkWrapper({loading, targetPath, children}) {
+  if (loading) return children;
+  return <Link to={targetPath}>{children}</Link>;
 }
 
 export const GenericSuggestedResourceType = ({

@@ -59,11 +59,19 @@
   color: #ffffff;
 }
 
-.mobile-footer-button-container svg {
+.mobile-footer-button-container-loading {
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.mobile-footer-button-container svg,
+.mobile-footer-button-container-loading svg {
   height: 20px;
 }
 
-.mobile-footer-button-container h3 {
+.mobile-footer-button-container h3,
+.mobile-footer-button-container-loading h3 {
   margin-bottom: 0px;
   margin-left: 5px;
 }
@@ -94,4 +102,9 @@
 .mobile-suggested-content-footer a:hover rect {
   fill: rgba(255, 255, 255, 0.6);
   stroke: rgba(255, 255, 255, 0.6);
+}
+
+.mobile-footer-button-container-loading rect {
+  fill: rgba(255, 255, 255, 0.2);
+  stroke: rgba(255, 255, 255, 0.2);
 }

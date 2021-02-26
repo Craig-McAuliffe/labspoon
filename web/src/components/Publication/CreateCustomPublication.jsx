@@ -6,9 +6,6 @@ import {FindAndAddUsersToForm} from '../Forms/AddUserToForm';
 import * as Yup from 'yup';
 
 import './CreateCustomPublication.css';
-import HeaderAndBodyArticleInput, {
-  yupArticleValidation,
-} from '../Forms/Articles/HeaderAndBodyArticleInput';
 import {PublicationIcon} from '../../assets/ResourceTypeIcons';
 import CreateResourceFormActions from '../Forms/CreateResourceFormActions';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
@@ -19,8 +16,9 @@ import {db} from '../../firebase';
 import SuccessMessage from '../Forms/SuccessMessage';
 import ErrorMessage from '../Forms/ErrorMessage';
 import {AuthContext} from '../../App';
-import {userToUserRef} from '../../helpers/users';
+import {userToCustomPubUserRef} from '../../helpers/users';
 import TagTopics from '../Topics/TagTopics';
+import {handleTaggedTopicsNoIDs} from '../../helpers/topics';
 
 export default function CreateCustomPublication() {
   const [isAdding, setIsAdding] = useState(false);
@@ -64,34 +62,19 @@ function CreateCustomPublicationForm({setIsAdding, setSuccess}) {
   const {userProfile} = useContext(AuthContext);
   const [authors, setAuthors] = useState([userProfile]);
   const [savedFormData, setSavedFormData] = useState();
-  const descriptionInitialValue = [
-    {
-      type: 'title',
-      children: [{text: 'Title of the publication'}],
-    },
-    {
-      type: 'paragraph',
-      children: [
-        {
-          text:
-            'Brief description. Please do not copy and paste anything from the publication itself unless you own the copyright to the article.',
-        },
-      ],
-    },
-  ];
 
   const initialValues = savedFormData
     ? savedFormData
     : {
         url: '',
-        titleAndDescription: descriptionInitialValue,
+        title: '',
       };
 
   const validationSchema = Yup.object({
     url: Yup.string()
       .url()
       .required('Please add a url link to the publication'),
-    titleAndDescription: yupArticleValidation,
+    title: Yup.string().required('Please add the title of the publication'),
   });
 
   const removeAuthor = (author) => {
@@ -137,8 +120,8 @@ function CreateCustomPublicationForm({setIsAdding, setSuccess}) {
         }}
       >
         <Form id="create-custom-publication-form">
-          <FormTextInput name="url" label="Url for the publication" />
-          <HeaderAndBodyArticleInput name="titleAndDescription" />
+          <FormTextInput name="url" label="Url of the publication" />
+          <FormTextInput name="title" label="Title of the publication" />
         </Form>
       </Formik>
 
@@ -205,11 +188,18 @@ async function createCustomPublication(
   setSavedFormData
 ) {
   setSubmitting(true);
-  const authorRefs = authors.map((author) => userToUserRef(author, author.id));
+  const authorRefs = authors.map((author) =>
+    userToCustomPubUserRef(author, author.id, author.microsoftID)
+  );
   res.authors = authorRefs;
   res.isCustomPublication = true;
-  res.topics = selectedTopics;
-  res.processed;
+  res.timeStamp = new Date().toDateString();
+  const taggedTopicsArray = [];
+  await handleTaggedTopicsNoIDs(selectedTopics, taggedTopicsArray);
+  res.topics = taggedTopicsArray;
+  res.filterTopicIDs = taggedTopicsArray.map((topic) => topic.id);
+  res.filterAuthorIDs = authors.map((author) => author.id);
+
   const customPublicationRef = db.collection(`publications`).doc();
   return customPublicationRef
     .set(res)
@@ -222,7 +212,7 @@ async function createCustomPublication(
       console.error(`unable to create custom publication ${err}`);
       setSavedFormData({
         url: res.url,
-        titleAndDescription: res.titleAndDescription,
+        title: res.title,
       });
       setSubmitting(false);
       setError(true);

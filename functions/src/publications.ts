@@ -10,7 +10,12 @@ import {
   Source,
 } from './microsoft';
 import {Topic, handleTopicsNoID, TaggedTopic} from './topics';
-import {toUserPublicationRef, User, UserPublicationRef} from './users';
+import {
+  toUserPublicationRef,
+  User,
+  UserPublicationRef,
+  UserCustomPublicationRef,
+} from './users';
 import * as adminNS from 'firebase-admin';
 const pubSubClient = new PubSub();
 const db = admin.firestore();
@@ -215,14 +220,21 @@ async function resolveTopicIDs(topicsNoIDs: Topic[]) {
 export const addNewPublicationToTopics = functions.firestore
   .document(`publications/{publicationID}`)
   .onCreate((publicationDS, context) => {
-    const publication = publicationDS.data() as Publication;
+    const publication = publicationDS.data();
     const publicationID = context.params.publicationID;
-    if (publication.topics) {
-      const writePublicationPromises = publication.topics.map(async (topic) => {
+    if (!publication.topics) return;
+    const specificPublicationRef = publication.isCustomPublication
+      ? customPublicationToCustomPublicationRef(
+          publication as CustomPublication,
+          publicationID
+        )
+      : publicationToPublicationRef(publication as Publication, publicationID);
+    const writePublicationPromises = publication.topics.map(
+      async (topic: TaggedTopic) => {
         if (!topic.id) return;
         return db
           .doc(`topics/${topic.id}/publications/${publicationID}`)
-          .set(toPublicationRef(publication, publicationID))
+          .set(specificPublicationRef)
           .catch((err) =>
             console.error(
               'failed to add publication with id ' +
@@ -232,43 +244,50 @@ export const addNewPublicationToTopics = functions.firestore
               err
             )
           );
-      });
-      return Promise.all(writePublicationPromises);
-    }
-    return;
+      }
+    );
+    return Promise.all(writePublicationPromises);
   });
 
 export const addNewPublicationToAuthors = functions.firestore
   .document(`publications/{publicationID}`)
   .onCreate((publicationDS, context) => {
-    const publication = publicationDS.data() as Publication;
+    const publication = publicationDS.data();
     const publicationID = context.params.publicationID;
-    if (publication.authors) {
-      const writePublicationPromises = publication.authors
-        .filter((author) => author.id)
-        .map(async (author) => {
-          return db
-            .doc(`users/${author.id}/publications/${publicationID}`)
-            .set(toPublicationRef(publication, publicationID))
-            .catch((err) =>
-              console.error(
-                'failed to add publication with id ' +
-                  publicationID +
-                  ' to author with id ' +
-                  author.id,
-                err
-              )
-            );
-        });
-      return Promise.all(writePublicationPromises);
-    }
-    return;
+    if (!publication.authors) return;
+    const specificPublicationRef = publication.isCustomPublication
+      ? customPublicationToCustomPublicationRef(
+          publication as CustomPublication,
+          publicationID
+        )
+      : publicationToPublicationRef(publication as Publication, publicationID);
+    const writePublicationPromises = publication.authors
+      .filter(
+        (author: UserPublicationRef | UserCustomPublicationRef) => author.id
+      )
+      .map(async (author: UserPublicationRef | UserCustomPublicationRef) => {
+        return db
+          .doc(`users/${author.id}/publications/${publicationID}`)
+          .set(specificPublicationRef)
+          .catch((err) =>
+            console.error(
+              'failed to add publication with id ' +
+                publicationID +
+                ' to author with id ' +
+                author.id,
+              err
+            )
+          );
+      });
+    return Promise.all(writePublicationPromises);
   });
 
 export const outgoingReferencesNewPub = functions.firestore
   .document(`publications/{publicationID}`)
   .onCreate((publicationDS, context) => {
     const publicationID = context.params.publicationID;
+    const publication = publicationDS.data();
+    if (publication.isCustomPublication) return;
     return fulfillOutgoingReferencesOnLabspoon(publicationID);
   });
 
@@ -276,6 +295,7 @@ export const incomingReferencesNewPub = functions.firestore
   .document(`publications/{publicationID}`)
   .onCreate((publicationDS, context) => {
     const publication = publicationDS.data() as Publication;
+    if (publication.isCustomPublication) return;
     const publicationID = context.params.publicationID;
     const microsoftPublicationID = publication.microsoftID!;
     if (!microsoftPublicationID) return;
@@ -341,27 +361,67 @@ export const updateAuthorsPublication = functions.firestore
   .document('publications/{publicationID}')
   .onUpdate(async (change, _) => {
     const publicationID = change.after.id;
-    const newPublication = change.after.data() as Publication;
-    const oldPublication = change.before.data() as Publication;
+    const newPublication = change.after.data();
+    const oldPublication = change.before.data();
+
     if (
-      JSON.stringify(toPublicationRef(newPublication, publicationID)) ===
-      JSON.stringify(toPublicationRef(oldPublication, publicationID))
-    )
-      return;
-    const authors = newPublication.authors;
-    if (!authors || authors.length === 0) return;
-    const users = authors.filter((author) => Boolean(author.id));
-    if (!users || users.length === 0) return;
-    const promises = users.map(async (user) =>
-      db
-        .doc(`users/${user.id}/publications/${publicationID}`)
-        .set(toPublicationRef(newPublication, publicationID))
-        .catch((err) =>
-          console.error(
-            `Unable to set reference to publication ${publicationID} on user ${user.id} publication collection:`,
-            err
+      !oldPublication.isCustomPublication &&
+      JSON.stringify(
+        publicationToPublicationRef(
+          newPublication as Publication,
+          publicationID
+        )
+      ) ===
+        JSON.stringify(
+          publicationToPublicationRef(
+            oldPublication as Publication,
+            publicationID
           )
         )
+    )
+      return;
+    if (
+      oldPublication.isCustomPublication &&
+      JSON.stringify(
+        customPublicationToCustomPublicationRef(
+          newPublication as CustomPublication,
+          publicationID
+        )
+      ) ===
+        JSON.stringify(
+          customPublicationToCustomPublicationRef(
+            oldPublication as CustomPublication,
+            publicationID
+          )
+        )
+    )
+      return;
+    const specificPublicationRef = newPublication.isCustomPublication
+      ? customPublicationToCustomPublicationRef(
+          newPublication as CustomPublication,
+          publicationID
+        )
+      : publicationToPublicationRef(
+          newPublication as Publication,
+          publicationID
+        );
+    const authors = newPublication.authors;
+    if (!authors || authors.length === 0) return;
+    const users = oldPublication.isCustomPublication
+      ? authors
+      : authors.filter((author: UserPublicationRef) => Boolean(author.id));
+    if (!users || users.length === 0) return;
+    const promises = users.map(
+      async (user: UserPublicationRef | UserCustomPublicationRef) =>
+        db
+          .doc(`users/${user.id}/publications/${publicationID}`)
+          .set(specificPublicationRef)
+          .catch((err) =>
+            console.error(
+              `Unable to set reference to publication ${publicationID} on user ${user.id} publication collection:`,
+              err
+            )
+          )
     );
     return await Promise.all(promises);
   });
@@ -370,20 +430,56 @@ export const updatePubRefOnTopics = functions.firestore
   .document('publications/{publicationID}')
   .onUpdate(async (change, _) => {
     const publicationID = change.after.id;
-    const newPublication = change.after.data() as Publication;
-    const oldPublication = change.before.data() as Publication;
+    const newPublication = change.after.data();
+    const oldPublication = change.before.data();
     if (
-      JSON.stringify(toPublicationRef(newPublication, publicationID)) ===
-      JSON.stringify(toPublicationRef(oldPublication, publicationID))
+      !oldPublication.isCustomPublication &&
+      JSON.stringify(
+        publicationToPublicationRef(
+          newPublication as Publication,
+          publicationID
+        )
+      ) ===
+        JSON.stringify(
+          publicationToPublicationRef(
+            oldPublication as Publication,
+            publicationID
+          )
+        )
     )
       return;
+    if (
+      oldPublication.isCustomPublication &&
+      JSON.stringify(
+        customPublicationToCustomPublicationRef(
+          newPublication as CustomPublication,
+          publicationID
+        )
+      ) ===
+        JSON.stringify(
+          customPublicationToCustomPublicationRef(
+            oldPublication as CustomPublication,
+            publicationID
+          )
+        )
+    )
+      return;
+    const specificPublicationRef = newPublication.isCustomPublication
+      ? customPublicationToCustomPublicationRef(
+          newPublication as CustomPublication,
+          publicationID
+        )
+      : publicationToPublicationRef(
+          newPublication as Publication,
+          publicationID
+        );
     const topics = newPublication.topics;
     if (!topics || topics.length === 0) return;
-    const topicsPromises = topics.map(async (topic) => {
+    const topicsPromises = topics.map(async (topic: TaggedTopic) => {
       if (!topic.id) return;
       return db
         .doc(`topics/${topic.id}/publications/${publicationID}`)
-        .set(toPublicationRef(newPublication, publicationID))
+        .set(specificPublicationRef)
         .catch((err) =>
           console.error(
             `Unable to set reference to publication ${publicationID} on publication collection of topic with id ${topic.id}:`,
@@ -398,13 +494,49 @@ export const updateGroupsPublication = functions.firestore
   .document('publications/{publicationID}')
   .onUpdate(async (change, _) => {
     const publicationID = change.after.id;
-    const newPublication = change.after.data() as Publication;
-    const oldPublication = change.before.data() as Publication;
+    const newPublication = change.after.data();
+    const oldPublication = change.before.data();
     if (
-      JSON.stringify(toPublicationRef(newPublication, publicationID)) ===
-      JSON.stringify(toPublicationRef(oldPublication, publicationID))
+      !oldPublication.isCustomPublication &&
+      JSON.stringify(
+        publicationToPublicationRef(
+          newPublication as Publication,
+          publicationID
+        )
+      ) ===
+        JSON.stringify(
+          publicationToPublicationRef(
+            oldPublication as Publication,
+            publicationID
+          )
+        )
     )
       return;
+    if (
+      oldPublication.isCustomPublication &&
+      JSON.stringify(
+        customPublicationToCustomPublicationRef(
+          newPublication as CustomPublication,
+          publicationID
+        )
+      ) ===
+        JSON.stringify(
+          customPublicationToCustomPublicationRef(
+            oldPublication as CustomPublication,
+            publicationID
+          )
+        )
+    )
+      return;
+    const specificPublicationRef = newPublication.isCustomPublication
+      ? customPublicationToCustomPublicationRef(
+          newPublication as CustomPublication,
+          publicationID
+        )
+      : publicationToPublicationRef(
+          newPublication as Publication,
+          publicationID
+        );
     const groupsQS = await db
       .collection(`publications/${publicationID}/groups`)
       .get()
@@ -422,7 +554,7 @@ export const updateGroupsPublication = functions.firestore
     const groupsPromises = groupsToUpdateIDs.map((groupID) =>
       db
         .doc(`groups/${groupID}/publications/${publicationID}`)
-        .set(toPublicationRef(newPublication, publicationID))
+        .set(specificPublicationRef)
         .catch((err) =>
           console.error(
             'unable to set updated pub ref with id ' +
@@ -615,7 +747,7 @@ async function fulfillOutgoingReferencesOnLabspoon(
     const batch = db.batch();
     batch.set(
       referencingPublicationRef.collection('references').doc(lsPublicationID),
-      toPublicationRef(lsPublication, lsPublicationID)
+      publicationToPublicationRef(lsPublication, lsPublicationID)
     );
     batch.update(referencingPublicationRef, {
       referencedPublicationMicrosoftIDs: adminNS.firestore.FieldValue.arrayRemove(
@@ -665,7 +797,7 @@ async function fulfillIncomingReferencesOnLabspoon(
     const batch = db.batch();
     batch.set(
       referencingPublicationRef.collection('references').doc(publicationID),
-      toPublicationRef(publication, publicationID)
+      publicationToPublicationRef(publication, publicationID)
     );
     batch.update(referencingPublicationRef, {
       referencedPublicationMicrosoftIDs: adminNS.firestore.FieldValue.arrayRemove(
@@ -762,82 +894,126 @@ export const retrieveReferencesFromMicrosoft = functions.https.onCall(
 );
 
 // Returns suggested publications for display on the publications page.
-export const suggestedPublications = functions.https.onCall(
-  async (publicationID) => {
-    const publicationDS = await db
-      .collection('publications')
-      .doc(publicationID)
-      .get()
-      .catch((err) => {
-        console.error(
-          `Unable to retrieve publication with ID ${publicationID}:`,
-          err
-        );
-        throw new functions.https.HttpsError('internal', 'An error occured.');
-      });
-    if (!publicationDS.exists)
-      throw new functions.https.HttpsError(
-        'not-found',
-        'No matching publication found'
+export const suggestedPublications = functions.https.onCall(async (data) => {
+  const publicationID = data.publicationID;
+  const publicationDS = await db
+    .collection('publications')
+    .doc(publicationID)
+    .get()
+    .catch((err) => {
+      console.error(
+        `Unable to retrieve publication with ID ${publicationID}:`,
+        err
       );
+      throw new functions.https.HttpsError('internal', 'An error occured.');
+    });
+  if (!publicationDS.exists)
+    throw new functions.https.HttpsError(
+      'not-found',
+      'No matching publication found'
+    );
 
-    const publication = publicationDS.data() as Publication;
-    const topics = publication.topics;
-    if (!topics || topics.length === 0) return;
-    const suggestedPublicationPromises = topics.map(async (topic) => {
+  const publication = publicationDS.data();
+  if (!publication) return;
+  if (!publication.topics || publication.topics.length === 0) return;
+  // limit the number of topics we fetch
+  let topics: TaggedTopic[] = publication.topics.slice(0, 6);
+  if (!topics || topics.length === 0) return;
+  let suggestedPublicationsDeduplicated = await extractSuggestionFromTopics(
+    topics,
+    publicationID
+  );
+  if (suggestedPublicationsDeduplicated.length === 0) {
+    topics = publication.topics.slice(6, 12);
+    suggestedPublicationsDeduplicated = await extractSuggestionFromTopics(
+      topics,
+      publicationID
+    );
+  }
+  // randomly select 10 items from the array
+  const suggestions: any = [];
+  for (let i = 0; i < 10; i++) {
+    const index = Math.floor(
+      Math.random() * suggestedPublicationsDeduplicated.length
+    );
+    const removed = suggestedPublicationsDeduplicated.splice(index, 1);
+    // Since we are only removing one element
+    suggestions.push(removed[0]);
+  }
+  const filteredForNulls = suggestions.filter(Boolean);
+  return filteredForNulls;
+});
+
+async function extractSuggestionFromTopics(
+  topics: TaggedTopic[],
+  publicationID: string
+) {
+  const suggestedPublicationPromises = topics.map(
+    async (topic: TaggedTopic) => {
       const topicID = topic.id;
-      const suggestedPublicationsForTopicQS = await db
+      if (!topicID) return;
+      return db
         .collection(`topics/${topicID}/publications`)
         .orderBy('date')
         .limit(11)
-        .get();
-      if (suggestedPublicationsForTopicQS.empty) return [];
-      const suggestedPublicationsFromTopic = suggestedPublicationsForTopicQS.docs.map(
-        (suggestedPublicationsForTopicDS) => {
-          return toPublicationRef(
-            suggestedPublicationsForTopicDS.data() as Publication,
-            suggestedPublicationsForTopicDS.id
+        .get()
+        .then((suggestedPublicationsForTopicQS) => {
+          if (suggestedPublicationsForTopicQS.empty) return [];
+
+          const suggestedPublicationsFromTopic: any = [];
+          suggestedPublicationsForTopicQS.docs.forEach(
+            (suggestedPublicationsForTopicDS) => {
+              const suggestedPublication = suggestedPublicationsForTopicDS.data();
+              if (suggestedPublicationsForTopicDS.id === publicationID) return;
+              if (suggestedPublication.isCustomPublication)
+                return suggestedPublicationsFromTopic.push(
+                  customPublicationToCustomPublicationRef(
+                    suggestedPublication as CustomPublication,
+                    suggestedPublicationsForTopicDS.id
+                  )
+                );
+
+              return suggestedPublicationsFromTopic.push(
+                publicationToPublicationRef(
+                  suggestedPublication as Publication,
+                  suggestedPublicationsForTopicDS.id
+                )
+              );
+            }
           );
-        }
-      );
-      return suggestedPublicationsFromTopic;
-    });
-    const suggestedPublicationsArrayOfArrays = await Promise.all(
-      suggestedPublicationPromises
-    );
-    // flatten the array of arrays
-    const suggestedPublicationsNotUnique: PublicationRef[] = ([] as PublicationRef[]).concat.apply(
-      [],
-      suggestedPublicationsArrayOfArrays
-    );
-
-    // deduplicate the publications in the array
-    const seenIDs = new Set();
-    seenIDs.add(publicationID);
-    const suggestedPublicationsDeduplicated: PublicationRef[] = [];
-    suggestedPublicationsNotUnique.forEach((publicationNotUnique) => {
-      if (seenIDs.has(publicationNotUnique.id)) return;
-      suggestedPublicationsDeduplicated.push(publicationNotUnique);
-      seenIDs.add(publicationNotUnique.id);
-    });
-
-    // randomly select 10 items from the array
-    const suggestions: PublicationRef[] = [];
-    for (let i = 0; i < 10; i++) {
-      const index = Math.floor(
-        Math.random() * suggestedPublicationsDeduplicated.length
-      );
-      const removed = suggestedPublicationsDeduplicated.splice(index, 1);
-      // Since we are only removing one element
-      suggestions.push(removed[0]);
+          return suggestedPublicationsFromTopic;
+        });
     }
+  );
+  const suggestedPublicationsArrayOfArrays: any[] = await Promise.all(
+    suggestedPublicationPromises
+  );
+  // flatten the array of arrays
+  const suggestedPublicationsNotUnique: any[] = suggestedPublicationsArrayOfArrays.reduce(
+    (
+      accumulator: CustomPublicationRef | PublicationRef,
+      current: CustomPublicationRef | PublicationRef
+    ) => {
+      if (!Array.isArray(accumulator)) return [];
+      if (!Array.isArray(current)) return [...accumulator, current];
+      return [...accumulator, ...current];
+    }
+  );
+  // deduplicate the publications in the array
+  const seenIDs = new Set();
+  const suggestedPublicationsDeduplicated:
+    | PublicationRef[]
+    | CustomPublicationRef[] = [];
+  suggestedPublicationsNotUnique.forEach((publicationNotUnique) => {
+    if (!publicationNotUnique.id) return;
+    if (seenIDs.has(publicationNotUnique.id)) return;
+    suggestedPublicationsDeduplicated.push(publicationNotUnique);
+    seenIDs.add(publicationNotUnique.id);
+  });
+  return suggestedPublicationsDeduplicated;
+}
 
-    const filteredForNulls = suggestions.filter(Boolean);
-    return filteredForNulls;
-  }
-);
-
-export function toPublicationRef(
+export function publicationToPublicationRef(
   input: Publication,
   publicationID?: string
 ): PublicationRef {
@@ -856,17 +1032,47 @@ export function toPublicationRef(
   return publicationRef;
 }
 
+export function customPublicationToCustomPublicationRef(
+  input: CustomPublication,
+  publicationID?: string
+): CustomPublicationRef {
+  const customPublicationRef: CustomPublicationRef = {
+    date: input.date,
+    title: input.title!,
+    authors: input.authors!,
+    topics: input.topics!,
+    filterAuthorIDs: input.filterAuthorIDs,
+    url: input.url,
+  };
+  if (input.filterTopicIDs)
+    customPublicationRef.filterTopicIDs = input.filterTopicIDs;
+  if (publicationID) customPublicationRef.id = publicationID;
+  return customPublicationRef;
+}
+
 export interface PublicationRef {
-  // This field is required so we can find references to a publication in
-  // a collection group.
   id?: string;
   date: string;
   title: string;
   authors: Array<UserPublicationRef>;
   topics: Topic[];
   microsoftID?: string;
+  // This field is required so we can find references to a publication in
+  // a collection group.
   filterTopicIDs?: string[];
   filterAuthorIDs?: string[];
+}
+
+export interface CustomPublicationRef {
+  id?: string;
+  date: string;
+  title: string;
+  authors: Array<UserCustomPublicationRef>;
+  topics: Topic[];
+  microsoftID?: string;
+  filterTopicIDs?: string[];
+  filterAuthorIDs?: string[];
+  url: string;
 }
 
 export interface Publication {
@@ -879,4 +1085,16 @@ export interface Publication {
   referencedPublicationMicrosoftIDs: string[];
   filterTopicIDs?: string[];
   filterAuthorIDs?: string[];
+  isCustomPublication?: false;
+}
+
+export interface CustomPublication {
+  date: string;
+  title: string;
+  url: string;
+  authors: UserCustomPublicationRef[];
+  filterAuthorIDs: string[];
+  topics?: Topic[];
+  filterTopicIDs?: string[];
+  isCustomPublication: boolean;
 }

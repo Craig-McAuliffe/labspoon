@@ -3,8 +3,12 @@ import {admin, ResourceTypes} from './config';
 import {firestore} from 'firebase-admin';
 import {
   PublicationRef,
-  toPublicationRef,
+  publicationToPublicationRef,
   getPublicationByMicrosoftPublicationID,
+  customPublicationToCustomPublicationRef,
+  CustomPublicationRef,
+  CustomPublication,
+  Publication,
 } from './publications';
 import {
   UserRef,
@@ -72,7 +76,16 @@ export const createPost = functions.https.onCall(async (data, context) => {
   };
   await authorLastPostTimeCheck(author.id, post.unixTimeStamp);
   if (data.publication) {
-    post.publication = toPublicationRef(data.publication, data.publication.id);
+    if (data.publication.isCustomPublication)
+      post.publication = customPublicationToCustomPublicationRef(
+        data.publication as CustomPublication,
+        data.publication.id
+      );
+    else
+      post.publication = publicationToPublicationRef(
+        data.publication as Publication,
+        data.publication.id
+      );
   }
   if (data.publicationURL) post.publicationURL = data.publicationURL;
   if (data.openPosition && data.openPosition.id)
@@ -765,7 +778,7 @@ export interface Post {
   timestamp: Date;
   id: string;
   publicationURL?: string[];
-  publication?: PublicationRef;
+  publication?: PublicationRef | CustomPublicationRef;
   openPosition?: OpenPosition;
   // filterable arrays must be array of strings
   filterTopicIDs: string[];
@@ -783,7 +796,7 @@ export interface PostRef {
   timestamp: Date;
   id: string;
   publicationURL?: string[];
-  publication?: PublicationRef;
+  publication?: PublicationRef | CustomPublicationRef;
   // filterable arrays must be array of strings
   filterTopicIDs: string[];
   unixTimeStamp: number;

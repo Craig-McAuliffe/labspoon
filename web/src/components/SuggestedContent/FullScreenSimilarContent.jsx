@@ -23,7 +23,7 @@ export default function FullScreenSimilarContent({resourceType, resourceID}) {
     if (!resourceID) return;
     switch (resourceType) {
       case PUBLICATION:
-        getSuggestedPublications(resourceID).then((resp) => {
+        getSuggestedPublications({publicationID: resourceID}).then((resp) => {
           setLoading(false);
           setSuggestedContent(resp.data);
         });

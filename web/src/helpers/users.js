@@ -114,3 +114,12 @@ export function userToUserRef(user, userID) {
   if (user.rank) userRef.rank = user.rank;
   return userRef;
 }
+
+export function userToCustomPubUserRef(user, userID, microsoftID) {
+  const customPubUserRef = {
+    id: userID,
+    name: user.name,
+  };
+  if (microsoftID) customPubUserRef.microsoftID = microsoftID;
+  return customPubUserRef;
+}
