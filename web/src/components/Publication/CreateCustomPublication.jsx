@@ -193,7 +193,7 @@ async function createCustomPublication(
   );
   res.authors = authorRefs;
   res.isCustomPublication = true;
-  res.date = new Date().toDateString();
+  res.date = new Date().toISOString();
   const taggedTopicsArray = [];
   await handleTaggedTopicsNoIDs(selectedTopics, taggedTopicsArray);
   res.topics = taggedTopicsArray;
