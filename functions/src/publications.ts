@@ -685,7 +685,7 @@ export const triggerFulfillReferencesOnLabspoon = functions.https.onRequest(
         .send('An error occurred whilst fulfilling references: ' + err)
     );
     res.status(200).send(lastDate);
-    return res.end();
+    res.end();
   }
 );
 
@@ -831,7 +831,7 @@ export const addMicrosoftPublicationByID = functions.https.onRequest(
     const publications = executeResponse.data.entities;
     await publishAddPublicationRequests(publications);
     res.status(200).send();
-    return res.end();
+    res.end();
   }
 );
 
@@ -1038,9 +1038,9 @@ export function customPublicationToCustomPublicationRef(
 ): CustomPublicationRef {
   const customPublicationRef: CustomPublicationRef = {
     date: input.date,
-    title: input.title!,
-    authors: input.authors!,
-    topics: input.topics!,
+    title: input.title,
+    authors: input.authors,
+    topics: input.topics,
     filterAuthorIDs: input.filterAuthorIDs,
     sources: input.sources,
   };
@@ -1094,7 +1094,7 @@ export interface CustomPublication {
   sources: Source[];
   authors: UserCustomPublicationRef[];
   filterAuthorIDs: string[];
-  topics?: Topic[];
+  topics: Topic[];
   filterTopicIDs?: string[];
   isCustomPublication: boolean;
 }

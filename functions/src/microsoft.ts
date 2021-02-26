@@ -121,7 +121,7 @@ export const getSuggestedPublicationsForAuthorName = functions.https.onCall(
     );
     const suggestedPublications = flatten(publicationsByInterpretation);
     // filter out null values
-    let filteredNullResults = suggestedPublications.filter(Boolean);
+    const filteredNullResults = suggestedPublications.filter(Boolean);
     const filteredDuplicateResults: Array<PublicationSuggestion> = [];
     const filterDuplicateSuggestedPublications = (
       newSuggestedPublication: PublicationSuggestion
