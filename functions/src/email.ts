@@ -227,7 +227,9 @@ export async function sendGroupInvitationEmail(
     const authUserID = authUser.uid;
     const authUserDS = await db.doc(`users/${authUserID}`).get();
     if (!authUserDS.exists)
-      throw new Error(`No user found in DB for auth User ID ${authUserID}`);
+      throw new Error(
+        `No user found in DB for auth User ID ${authUserID} despite being authenticated`
+      );
     const batch = db.batch();
     batch.set(
       groupRef.collection('members').doc(authUserID),
