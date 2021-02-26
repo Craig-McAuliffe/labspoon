@@ -40,6 +40,7 @@
 .publication-list-item-content-authors {
   margin: 0px 5px 5px;
   display: flex;
+  flex-wrap: wrap;
 }
 
 .publication-list-item-content-author {

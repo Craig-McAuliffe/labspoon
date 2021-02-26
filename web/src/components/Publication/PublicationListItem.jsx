@@ -16,7 +16,7 @@ export default function PublicationListItem({
   bookmarkedVariation,
 }) {
   const featureFlags = useContext(FeatureFlags);
-  const publicationURL = getPublicationURL(publication);
+  const publicationPathName = getPublicationPathName(publication);
   return (
     <div
       className={
@@ -28,7 +28,7 @@ export default function PublicationListItem({
       <PublicationListItemHeader publication={publication} />
       <div className="publication-list-item-content">
         <PublicationListItemTitle
-          url={publicationURL}
+          pathName={publicationPathName}
           title={publication.title}
         />
         <PublicationListItemAuthors authors={publication.authors} />
@@ -48,11 +48,11 @@ export default function PublicationListItem({
 }
 
 export function SmallPublicationListItem({publication, children}) {
-  const publicationURL = getPublicationURL(publication);
+  const publicationPathName = getPublicationPathName(publication);
   return (
     <div className="publication-list-item-container">
       <PublicationListItemTitle
-        url={publicationURL}
+        pathName={publicationPathName}
         title={publication.title}
       />
       <PublicationListItemAuthors authors={publication.authors} />
@@ -61,7 +61,7 @@ export function SmallPublicationListItem({publication, children}) {
   );
 }
 
-function getPublicationURL(publication) {
+function getPublicationPathName(publication) {
   if (publication.id) {
     return `/publication/${publication.id}`;
   } else if (publication.microsoftID) {
@@ -94,10 +94,10 @@ function PublicationListItemHeader({publication}) {
   );
 }
 
-function PublicationListItemTitle({url, title}) {
+function PublicationListItemTitle({pathName, title}) {
   const titleHeader = <h3 className="publication-list-item-title">{title}</h3>;
-  if (!url) return titleHeader;
-  return <Link to={url}>{titleHeader}</Link>;
+  if (!pathName) return titleHeader;
+  return <Link to={pathName}>{titleHeader}</Link>;
 }
 
 // the max number of authors to display at a time

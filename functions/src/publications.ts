@@ -1042,7 +1042,7 @@ export function customPublicationToCustomPublicationRef(
     authors: input.authors!,
     topics: input.topics!,
     filterAuthorIDs: input.filterAuthorIDs,
-    url: input.url,
+    sources: input.sources,
   };
   if (input.filterTopicIDs)
     customPublicationRef.filterTopicIDs = input.filterTopicIDs;
@@ -1072,7 +1072,7 @@ export interface CustomPublicationRef {
   microsoftID?: string;
   filterTopicIDs?: string[];
   filterAuthorIDs?: string[];
-  url: string;
+  sources: Source[];
 }
 
 export interface Publication {
@@ -1091,7 +1091,7 @@ export interface Publication {
 export interface CustomPublication {
   date: string;
   title: string;
-  url: string;
+  sources: Source[];
   authors: UserCustomPublicationRef[];
   filterAuthorIDs: string[];
   topics?: Topic[];

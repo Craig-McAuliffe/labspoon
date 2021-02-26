@@ -193,13 +193,19 @@ async function createCustomPublication(
   );
   res.authors = authorRefs;
   res.isCustomPublication = true;
-  res.timeStamp = new Date().toDateString();
+  res.date = new Date().toDateString();
   const taggedTopicsArray = [];
   await handleTaggedTopicsNoIDs(selectedTopics, taggedTopicsArray);
   res.topics = taggedTopicsArray;
   res.filterTopicIDs = taggedTopicsArray.map((topic) => topic.id);
   res.filterAuthorIDs = authors.map((author) => author.id);
-
+  res.sources = [
+    {
+      type: 'html',
+      url: res.url,
+    },
+  ];
+  delete res.url;
   const customPublicationRef = db.collection(`publications`).doc();
   return customPublicationRef
     .set(res)

@@ -259,13 +259,13 @@ function PublicationSources({sources}) {
   const linkTypeCustomText = (sourceType) => {
     switch (sourceType) {
       case 'doc' || 'pdf' || 'ppt' || 'xls' || 'ps':
-        return 'Download';
+        return `Download ${sourceType}`;
       case 'html':
-        return 'Go to';
+        return 'Full text link';
       case 'text':
-        return 'View';
+        return `View ${sourceType}`;
       default:
-        return 'View';
+        return `View ${sourceType}`;
     }
   };
   const [showMore, setShowMore] = useState(false);
@@ -277,7 +277,7 @@ function PublicationSources({sources}) {
       rel="noopener noreferrer"
       className="publication-page-source-link"
     >
-      {linkTypeCustomText(source.type)} {source.type}&nbsp;
+      {linkTypeCustomText(source.type)}
       {includeURL ? (
         <span className="publication-page-extra-option-url">{source.url}</span>
       ) : null}
