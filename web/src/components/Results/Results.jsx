@@ -236,7 +236,6 @@ export function SelectableResults({selectedItems, setSelectedItems}) {
   const results = filterableResults.results;
   const hasMore = filterableResults.hasMore;
   const fetchMore = filterableResults.fetchMore;
-  const loading = filterableResults.loadingResults;
 
   if (filterableResults.resultsError)
     return <h1>{filterableResults.resultsError}</h1>;
@@ -269,7 +268,6 @@ export function SelectableResults({selectedItems, setSelectedItems}) {
       >
         {items}
       </InfiniteScroll>
-      {loading ? <LoadingSpinner /> : <></>}
     </>
   );
 }
