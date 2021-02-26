@@ -38,7 +38,12 @@ export const addMSUserPubsToNewLinkedUser = functions.firestore
         );
       if (!correspondingUser) return;
       // this should never happen as it is batched with processed field
-      if (!correspondingUser.microsoftID) return;
+      if (!correspondingUser.microsoftID) {
+        console.error(
+          `MSUser with ID ${msUserID} is linked to user with id ${correspondingUserID} yet the user has no microsoftID`
+        );
+        return;
+      }
       const msPublicationsQS = await db
         .collection(`MSUsers/${msUserID}/publications`)
         .get()

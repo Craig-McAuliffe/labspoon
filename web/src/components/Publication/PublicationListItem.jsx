@@ -105,12 +105,23 @@ const AUTHORS_DISPLAY_LIMIT = 3;
 
 function PublicationListItemAuthors({authors}) {
   if (!authors) return <></>;
+  // MS Publications have duplication
+  const seenMicrosoftIDs = new Set();
+  const uniqueAuthors = [];
+  authors.forEach((possiblyDuplicateAuthor) => {
+    if (!possiblyDuplicateAuthor.microsoftID) return;
+    if (seenMicrosoftIDs.has(possiblyDuplicateAuthor.microsoftID)) return;
+    uniqueAuthors.push(possiblyDuplicateAuthor);
+    seenMicrosoftIDs.add(possiblyDuplicateAuthor.microsoftID);
+  });
   let authorsList;
-  if (authors.length <= AUTHORS_DISPLAY_LIMIT) {
-    authorsList = authorsToAuthorList(authors);
+  if (uniqueAuthors.length <= AUTHORS_DISPLAY_LIMIT) {
+    authorsList = authorsToAuthorList(uniqueAuthors);
   } else {
-    authorsList = authorsToAuthorList(authors.slice(0, AUTHORS_DISPLAY_LIMIT));
-    const remainingCount = authors.length - AUTHORS_DISPLAY_LIMIT;
+    authorsList = authorsToAuthorList(
+      uniqueAuthors.slice(0, AUTHORS_DISPLAY_LIMIT)
+    );
+    const remainingCount = uniqueAuthors.length - AUTHORS_DISPLAY_LIMIT;
     authorsList.push(
       <h4 key="authors spill over">
         and {remainingCount} other{remainingCount > 1 ? 's' : ''}

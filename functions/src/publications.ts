@@ -407,9 +407,9 @@ export const updateAuthorsPublication = functions.firestore
         );
     const authors = newPublication.authors;
     if (!authors || authors.length === 0) return;
-    const users = oldPublication.isCustomPublication
-      ? authors
-      : authors.filter((author: UserPublicationRef) => Boolean(author.id));
+    const users = authors.filter((author: UserPublicationRef) =>
+      Boolean(author.id)
+    );
     if (!users || users.length === 0) return;
     const promises = users.map(
       async (user: UserPublicationRef | UserCustomPublicationRef) =>

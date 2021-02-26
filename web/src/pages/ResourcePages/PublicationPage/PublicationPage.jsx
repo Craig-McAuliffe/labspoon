@@ -322,7 +322,17 @@ function PublicationSources({sources}) {
 
 function PublicationAuthors({publicationAuthors}) {
   if (!publicationAuthors) return <></>;
-  return publicationAuthors.map((author) => {
+  // MS Publications have duplication
+  const seenMicrosoftIDs = new Set();
+  const uniqueAuthors = [];
+  publicationAuthors.forEach((possiblyDuplicateAuthor) => {
+    if (!possiblyDuplicateAuthor.microsoftID) return;
+    if (seenMicrosoftIDs.has(possiblyDuplicateAuthor.microsoftID)) return;
+    uniqueAuthors.push(possiblyDuplicateAuthor);
+    seenMicrosoftIDs.add(possiblyDuplicateAuthor.microsoftID);
+  });
+
+  return uniqueAuthors.map((author) => {
     const authorLink = getLinkForAuthor(
       author.id,
       author.microsoftID,
