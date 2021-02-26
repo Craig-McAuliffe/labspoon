@@ -5,7 +5,7 @@
   color: #ffffff;
   border-radius: 2%;
   width: 400px;
-  right: 104px;
+  right: 90px;
   top: 80px;
   display: block;
 }
@@ -49,7 +49,7 @@
 @media screen and (max-width: 850px) {
   .onboarding-tip-popup-container {
     width: 300px;
-    right: 84px;
+    right: 70px;
   }
   .onboarding-tip-popup-container::before {
     right: 36px;
