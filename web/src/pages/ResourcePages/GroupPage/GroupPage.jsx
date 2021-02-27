@@ -82,7 +82,12 @@ function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip) {
     case 'topics':
       const topicsCollection = db.collection(`groups/${groupID}/topics`);
       return [
-        getPaginatedTopicsFromCollectionRef(topicsCollection, limit, last),
+        getPaginatedTopicsFromCollectionRef(
+          topicsCollection,
+          limit,
+          last,
+          true
+        ),
         null,
       ];
     case PHOTOS:

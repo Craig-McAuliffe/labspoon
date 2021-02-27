@@ -8,11 +8,25 @@ import {db} from '../firebase';
 export function getPaginatedTopicsFromCollectionRef(
   topicCollection,
   limit,
-  last
+  last,
+  hasRank
 ) {
-  if (typeof last !== 'undefined') {
-    topicCollection = topicCollection.startAt(last.id);
+  if (hasRank) {
+    topicCollection = topicCollection
+      .orderBy('rank', 'desc')
+      .orderBy('name', 'asc');
+    last
+      ? (topicCollection = topicCollection.startAfter(last.rank, last.name))
+      : (topicCollection = topicCollection.startAt(1));
+  } else {
+    topicCollection = topicCollection.orderBy('name');
+    if (typeof last !== 'undefined') {
+      last
+        ? (topicCollection = topicCollection.startAfter(last.name, last.id))
+        : (topicCollection = topicCollection.startAt(1));
+    }
   }
+
   return topicCollection
     .limit(limit)
     .get()
