@@ -1088,6 +1088,21 @@ export interface Publication {
   isCustomPublication?: false;
 }
 
+export interface AlgoliaPublication {
+  date?: string;
+  title?: string;
+  authors?: UserPublicationRef[];
+  microsoftID?: string;
+  topics?: Topic[];
+  sources: Source[];
+  referencedPublicationMicrosoftIDs: string[];
+  filterTopicIDs?: string[];
+  filterAuthorIDs?: string[];
+  isCustomPublication?: false;
+  objectID: string;
+  resourceType: string;
+}
+
 export interface CustomPublication {
   date: string;
   title: string;
