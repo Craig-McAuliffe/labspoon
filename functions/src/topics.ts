@@ -360,6 +360,28 @@ export async function removeTopicsFromResource(
   return Promise.all(topicsPromises);
 }
 
+export const recordDuplicateTopic = functions.firestore
+  .document(`topics/{topicID}`)
+  .onCreate(async (doc, context) => {
+    const topicID = context.params.topicID;
+    const topicData = doc.data();
+    const microsoftTopicID = topicData.microsoftID;
+    const correspondingMSField = await db
+      .doc(`MSFields/${microsoftTopicID}`)
+      .get()
+      .catch((err) =>
+        console.error(
+          `unable to check if topic with id ${topicID} is a duplicate ${err}`
+        )
+      );
+    if (!correspondingMSField || !correspondingMSField.exists) return;
+    const correspondingMSFieldData = correspondingMSField.data()! as MAKField;
+    const processedID = correspondingMSFieldData.processed;
+    if (processedID !== topicID)
+      return db.doc(`duplicateTopics/${topicID}`).set(topicData);
+    return;
+  });
+
 export const addRecentPostsToFeedOnNewTopicFollow = functions.firestore
   .document(`topics/{followedTopicID}/followedByUsers/{followerID}`)
   .onCreate(
