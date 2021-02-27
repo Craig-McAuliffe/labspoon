@@ -1,14 +1,11 @@
 import * as functions from 'firebase-functions';
 import algoliasearch, {SearchClient} from 'algoliasearch';
-import {config, environment, ResourceTypes, admin} from './config';
+import {config, environment, ResourceTypes} from './config';
 import {toUserRef} from './users';
 import {Group, groupToGroupRef} from './groups';
 import {Post, PostToPostRef} from './posts';
 import {OpenPosition} from './openPositions';
-import {firestore} from 'firebase-admin';
-import {Publication, AlgoliaPublication} from './publications';
 
-const db = admin.firestore();
 const algoliaConfig = config.algolia;
 
 const USERS_INDEX = environment + '_USERS';
@@ -257,77 +254,3 @@ export const updatePublicationToSearchIndex = functions.firestore
       PUBLICATIONS_INDEX
     )
   );
-
-const PUBLICATION_ALGOLIA_BATCH_SIZE = 50;
-export const addExistingPublicationsToAlgolia = functions
-  .runWith({
-    timeoutSeconds: 120,
-    memory: '2GB',
-  })
-  .https.onRequest(async (_, res) => {
-    if (!algoliaClient)
-      throw new functions.https.HttpsError(
-        'internal',
-        'Algolia is not configured for this env.'
-      );
-
-    await new Promise((resolve, reject) =>
-      addCollectionToAlgolia(fetchPublicationsForAlgoliaQuery(), resolve).catch(
-        reject
-      )
-    );
-    res.status(200).send('Publications successfully added');
-    res.end();
-  });
-
-async function addCollectionToAlgolia(
-  query: firestore.DocumentData,
-  resolve: any
-) {
-  const snapshot = await query.get().catch(() => {
-    throw new functions.https.HttpsError(
-      'internal',
-      'Unable to fetch publications'
-    );
-  });
-
-  const publicationsToBeAdded: Publication[] = [];
-  let lastDoc: firestore.DocumentSnapshot;
-  await snapshot.docs.forEach((doc: firestore.DocumentSnapshot) => {
-    if (!doc.exists) return;
-    const publicationData = doc.data() as AlgoliaPublication;
-    if (!publicationData) return;
-    publicationData.objectID = doc.id;
-    publicationData.resourceType = ResourceTypes.PUBLICATION;
-    publicationsToBeAdded.push(publicationData);
-    lastDoc = doc;
-  });
-
-  const index = algoliaClient.initIndex(PUBLICATIONS_INDEX);
-
-  await index.saveObjects(publicationsToBeAdded);
-  const batchSize = snapshot.size;
-
-  if (batchSize < PUBLICATION_ALGOLIA_BATCH_SIZE) {
-    // Indicates that there are no more publications
-    resolve();
-    return;
-  }
-  // Recurse on the next process tick, to avoid
-  // exploding the stack.
-  process.nextTick(async () => {
-    await addCollectionToAlgolia(
-      fetchPublicationsForAlgoliaQuery(lastDoc),
-      resolve
-    );
-  });
-}
-
-const fetchPublicationsForAlgoliaQuery = (
-  last?: firestore.DocumentSnapshot
-) => {
-  const collectionRef = db.collection('publications');
-  if (last)
-    return collectionRef.limit(PUBLICATION_ALGOLIA_BATCH_SIZE).startAfter(last);
-  return collectionRef.limit(PUBLICATION_ALGOLIA_BATCH_SIZE);
-};
