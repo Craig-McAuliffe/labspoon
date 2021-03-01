@@ -324,9 +324,16 @@ function PublicationAuthors({publicationAuthors}) {
   if (!publicationAuthors) return <></>;
   // MS Publications have duplication
   const seenMicrosoftIDs = new Set();
+  const seenLabspoonUserIDs = new Set();
   const uniqueAuthors = [];
   publicationAuthors.forEach((possiblyDuplicateAuthor) => {
-    if (!possiblyDuplicateAuthor.microsoftID) return;
+    if (!!possiblyDuplicateAuthor.microsoftID && !!possiblyDuplicateAuthor.id)
+      return;
+    if (!possiblyDuplicateAuthor.microsoftID) {
+      if (seenLabspoonUserIDs.has(possiblyDuplicateAuthor.id)) return;
+      uniqueAuthors.push(possiblyDuplicateAuthor);
+      seenLabspoonUserIDs.add(possiblyDuplicateAuthor.id);
+    }
     if (seenMicrosoftIDs.has(possiblyDuplicateAuthor.microsoftID)) return;
     uniqueAuthors.push(possiblyDuplicateAuthor);
     seenMicrosoftIDs.add(possiblyDuplicateAuthor.microsoftID);

@@ -15,6 +15,7 @@ export default function PostForm({
   setPostType,
   formID,
   algoliaFormSearch,
+  outsideFormComponents,
 }) {
   const {
     setSubmittingPost,
@@ -45,10 +46,12 @@ export default function PostForm({
           <Form id={formID}>{children}</Form>
         </Formik>
         {algoliaFormSearch}
+        {outsideFormComponents}
         <TagTopics
           submittingForm={submittingPost}
           setSelectedTopics={setSelectedTopics}
           selectedTopics={selectedTopics}
+          noCustomTopics={true}
         />
         <CreatePostActions
           postType={postType}

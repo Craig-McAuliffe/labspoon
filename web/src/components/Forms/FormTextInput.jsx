@@ -34,6 +34,7 @@ export function TextInput({
   passwordInput,
   sideLabel,
   placeholder,
+  disabled,
   ...props
 }) {
   let containerClassName = 'form-text-input-container';
@@ -42,16 +43,20 @@ export function TextInput({
   return (
     <div className={containerClassName}>
       {label && (
-        <label htmlFor={props.name} className="form-input-label">
+        <label
+          htmlFor={props.name}
+          className={`form-input-label${disabled ? '-disabled' : ''}`}
+        >
           <h4>{label}</h4>
         </label>
       )}
       <input
-        className="form-text-input"
+        className={`form-text-input${disabled ? '-disabled' : ''}`}
         type={passwordInput ? 'password' : 'text'}
         {...field}
         {...props}
         placeholder={placeholder}
+        disabled={disabled}
       />
       {error}
     </div>

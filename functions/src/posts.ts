@@ -46,7 +46,7 @@ export const createPost = functions.https.onCall(async (data, context) => {
   const matchedTopicsPromises = await handleTopicsNoID(data.topics, postTopics);
   await Promise.all(matchedTopicsPromises);
 
-  if (data.publication) {
+  if (data.publication && !data.publication.id) {
     const publicationDS = await getPublicationByMicrosoftPublicationID(
       data.publication.microsoftID,
       true
@@ -87,7 +87,6 @@ export const createPost = functions.https.onCall(async (data, context) => {
         data.publication.id
       );
   }
-  if (data.publicationURL) post.publicationURL = data.publicationURL;
   if (data.openPosition && data.openPosition.id)
     post.openPosition = data.openPosition;
   await Promise.all(matchedTopicsPromises);

@@ -1,4 +1,5 @@
-.form-text-input {
+.form-text-input,
+.form-text-input-disabled {
   border: 1px solid #99999f;
   line-height: 40px;
   width: 100%;
@@ -6,6 +7,13 @@
   min-width: 200px;
 }
 
+.form-text-input-disabled {
+  background: #dcdce0;
+}
+
+.form-input-label-disabled {
+  color: #99999f;
+}
 .form-text-input-container {
   margin: 40px 0px;
 }

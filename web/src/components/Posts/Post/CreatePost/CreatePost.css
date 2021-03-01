@@ -38,7 +38,10 @@
 
 .publication-post-search-section {
   margin-top: 40px;
-  color: #5d5d65;
+}
+
+.publication-post-quick-create-section {
+  margin-top: 20px;
 }
 
 .tagged-resource-section {
@@ -104,13 +107,14 @@
 .create-post-alt-tagging-method-container {
   display: flex;
   justify-content: flex-end;
-  margin-top: -30px;
+  margin-top: -20px;
 }
 
 .create-post-alt-tagging-method-container p {
   color: #5d5d65;
   display: inline-block;
-  margin-top: 20px;
+  padding: 0px;
+  margin: 0px;
 }
 
 .create-post-alt-tagging-method-container button {
@@ -309,6 +313,30 @@
 .select-tagged-resource-icon {
   margin: 0px 5px;
   display: inline-block;
+}
+
+.create-post-quick-create-pub-container {
+  padding: 5px;
+  margin: 20px 0px;
+  padding-top: 20px;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.6);
+}
+
+.create-pub-post-quick-create-toggle {
+  display: flex;
+  align-items: center;
+}
+
+.create-pub-post-quick-create-toggle:hover h4 {
+  text-decoration: underline;
+}
+
+.create-pub-post-quick-create-toggle path {
+  fill: #00507c;
+}
+
+.create-pub-post-quick-create-toggle h4 {
+  margin-right: 5px;
 }
 
 @media screen and (max-width: 1197px) {

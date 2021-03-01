@@ -112,7 +112,7 @@ function CreateCustomPublicationForm({setIsAdding, setSuccess}) {
             authors,
             setSubmitting,
             setSuccess,
-            setError,
+            () => setError(true),
             selectedTopics,
             setIsAdding,
             setSavedFormData
@@ -129,7 +129,7 @@ function CreateCustomPublicationForm({setIsAdding, setSuccess}) {
         onUserSelect={(user) =>
           setAuthors((existingAuthors) => [...existingAuthors, user])
         }
-        searchBarLabel="Add authors"
+        searchBarLabel="Add authors on Labspoon"
       />
       <SelectedAuthors
         authors={authors}
@@ -154,10 +154,11 @@ function CreateCustomPublicationForm({setIsAdding, setSuccess}) {
   );
 }
 
-function SelectedAuthors({authors, removeAuthor, exceptionID}) {
+export function SelectedAuthors({authors, removeAuthor, exceptionID}) {
   const isException = (author) => {
     author.id === exceptionID;
   };
+  if (!authors || authors.length === 0) return null;
   const authorList = authors.map((author) => (
     <UserListItem user={author} key={author.id} noBorder={true}>
       {isException(author) ? null : (
@@ -177,7 +178,7 @@ function SelectedAuthors({authors, removeAuthor, exceptionID}) {
   );
 }
 
-async function createCustomPublication(
+export async function createCustomPublication(
   res,
   authors,
   setSubmitting,
@@ -187,7 +188,7 @@ async function createCustomPublication(
   setIsAdding,
   setSavedFormData
 ) {
-  setSubmitting(true);
+  if (setSubmitting) setSubmitting(true);
   const authorRefs = authors.map((author) =>
     userToCustomPubUserRef(author, author.id, author.microsoftID)
   );
@@ -210,17 +211,20 @@ async function createCustomPublication(
   return customPublicationRef
     .set(res)
     .then(() => {
-      setSubmitting(false);
-      setSuccess(true);
-      setIsAdding(false);
+      if (setSubmitting) setSubmitting(false);
+      if (setSuccess) setSuccess(true);
+      if (setIsAdding) setIsAdding(false);
+      return {id: customPublicationRef.id, createdCustomPublication: res};
     })
     .catch((err) => {
       console.error(`unable to create custom publication ${err}`);
-      setSavedFormData({
-        url: res.url,
-        title: res.title,
-      });
-      setSubmitting(false);
-      setError(true);
+      if (setSavedFormData)
+        setSavedFormData({
+          url: res.url,
+          title: res.title,
+        });
+      setError();
+      if (setSubmitting) setSubmitting(false);
+      return false;
     });
 }
