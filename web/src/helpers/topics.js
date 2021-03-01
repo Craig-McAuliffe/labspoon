@@ -15,15 +15,12 @@ export function getPaginatedTopicsFromCollectionRef(
     topicCollection = topicCollection
       .orderBy('rank', 'desc')
       .orderBy('name', 'asc');
-    last
-      ? (topicCollection = topicCollection.startAfter(last.rank, last.name))
-      : (topicCollection = topicCollection.startAt(1));
+    if (last)
+      topicCollection = topicCollection.startAfter(last.rank, last.name);
   } else {
     topicCollection = topicCollection.orderBy('name');
     if (typeof last !== 'undefined') {
-      last
-        ? (topicCollection = topicCollection.startAfter(last.name, last.id))
-        : (topicCollection = topicCollection.startAt(1));
+      if (last) topicCollection = topicCollection.startAfter(last.name);
     }
   }
 
