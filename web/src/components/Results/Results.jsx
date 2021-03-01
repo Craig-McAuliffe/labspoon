@@ -227,7 +227,11 @@ function MixedResultsPage({results}) {
   );
 }
 
-export function SelectableResults({selectedItems, setSelectedItems}) {
+export function SelectableResults({
+  selectedItems,
+  setSelectedItems,
+  customEndMessage,
+}) {
   // This should not really depend on the FilterableResultsContext directly.
   // When we want to use it in other places too, we should wrap it with
   // a component that retrives the FilterableResultsContext, similarly to what
@@ -236,6 +240,7 @@ export function SelectableResults({selectedItems, setSelectedItems}) {
   const results = filterableResults.results;
   const hasMore = filterableResults.hasMore;
   const fetchMore = filterableResults.fetchMore;
+  const loading = filterableResults.loadingResults;
 
   if (filterableResults.resultsError)
     return <h1>{filterableResults.resultsError}</h1>;
@@ -255,8 +260,12 @@ export function SelectableResults({selectedItems, setSelectedItems}) {
       />
     );
   });
-  const endMessage = <p className="end-result">No more results</p>;
-
+  const endMessage = (
+    <p className="end-result">
+      {customEndMessage ? customEndMessage : 'No more results'}
+    </p>
+  );
+  if (loading) return <LoadingSpinner />;
   return (
     <>
       <InfiniteScroll

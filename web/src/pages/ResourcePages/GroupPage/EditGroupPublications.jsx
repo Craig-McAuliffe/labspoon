@@ -20,7 +20,7 @@ const GROUP_MEMBERS = 'Group Members';
 
 export default function EditGroupPublications({children, groupID, groupData}) {
   const [errorCount, setErrorCount] = useState(0);
-  function fetchItems(selectedItems, skip, limit, filter, last) {
+  function fetchItems(skip, limit, filter, last) {
     if (!filter) return [[], null];
 
     const userID = getEnabledUserID(filter);
@@ -77,6 +77,7 @@ export default function EditGroupPublications({children, groupID, groupData}) {
       getDefaultFilter={getDefaultFilter}
       addSelected={addSelected}
       removeSelected={removeSelected}
+      customEndMessage="This group member does not have any publications. Try another."
     >
       {children}
     </FilteredSelector>

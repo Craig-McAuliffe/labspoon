@@ -10,27 +10,20 @@ import {
   getEnabledIDsFromFilter,
   usersToFilterOptions,
 } from '../../../helpers/filters';
-
 import {db} from '../../../firebase';
-
-import './GroupPage.css';
 import {convertGroupToGroupRef} from '../../../helpers/groups';
 
+import './GroupPage.css';
+
 export default function EditGroupPosts({children, groupID, group}) {
-  function fetchItems(selected, skip, limit, filter, last) {
+  function fetchItems(skip, limit, filter, last) {
     const activeTab = filter ? getActiveTabID(filter) : null;
     switch (activeTab) {
       case ADD:
         return [fetchPostsByFilteredMember(limit, filter, last, groupID), null];
       case REMOVE:
         return [
-          fetchPostsOnGroupByFilteredMember(
-            limit,
-            filter,
-            last,
-            groupID,
-            selected
-          ),
+          fetchPostsOnGroupByFilteredMember(limit, filter, last, groupID),
           null,
         ];
       default:
@@ -99,6 +92,7 @@ export default function EditGroupPosts({children, groupID, group}) {
       getDefaultFilter={getDefaultFilter}
       addSelected={addPostsToGroup}
       removeSelected={removePostsFromGroup}
+      customEndMessage="This group member does not have any posts. Try another."
     >
       {children}
     </FilteredSelector>
@@ -136,8 +130,7 @@ export const fetchPostsOnGroupByFilteredMember = (
   limit,
   filter,
   last,
-  groupID,
-  selectedPosts
+  groupID
 ) => {
   const enabledFilterIDs = filter ? getEnabledIDsFromFilter(filter) : undefined;
   if (enabledFilterIDs === undefined) return [];
@@ -155,15 +148,6 @@ export const fetchPostsOnGroupByFilteredMember = (
     last
   )
     .then((postsList) => {
-      postsList.forEach((fetchedPost) => {
-        fetchedPost.hasSelector = 'active-remove';
-        // Allows user to switch sider filter and still keep selection
-        fetchedPost.hasBeenSelected = selectedPosts.some(
-          (selectedPost) => selectedPost.id === fetchedPost.id
-        )
-          ? true
-          : false;
-      });
       return postsList;
     })
     .catch((err) => console.log('Could not get group posts', err));

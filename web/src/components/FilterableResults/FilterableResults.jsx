@@ -44,10 +44,13 @@ export default function FilterableResults({children, fetchResults, limit}) {
   const [fetchResultsFunction, setFetchResultsFunction] = useState(
     () => fetchResults
   );
-  if (fetchResultsFunction !== fetchResults) {
-    setFetchResultsFunction(() => fetchResults);
-    setSkip(0);
-  }
+
+  useEffect(() => {
+    if (fetchResultsFunction !== fetchResults) {
+      setFetchResultsFunction(() => fetchResults);
+      setSkip(0);
+    }
+  }, [fetchResults]);
 
   useEffect(() => {
     // wait until the filter is loaded to avoid an unnecessary reload of the results

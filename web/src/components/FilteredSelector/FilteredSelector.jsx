@@ -21,10 +21,11 @@ export default function FilteredSelector({
   children,
   addSelected,
   removeSelected,
+  customEndMessage,
 }) {
   const [selectedItems, setSelectedItems] = useState([]);
   const [success, setSuccess] = useState(false);
-
+  const [fetchResults, setFetchResults] = useState(() => []);
   // Deselect posts when successfully adding posts
   useEffect(() => {
     if (success) {
@@ -35,15 +36,18 @@ export default function FilteredSelector({
     }
   }, [success]);
 
-  const fetchItemsWithSelectedItems = (skip, limit, filter, last) =>
-    fetchItems(selectedItems, skip, limit, filter, last);
+  useEffect(() => {
+    const fetchingResultsFunction = (skip, limit, filter, last) =>
+      fetchItems(skip, limit, filter, last);
+    setFetchResults(() => fetchingResultsFunction);
+  }, []);
 
   const resetSelection = () => {
     setSelectedItems([]);
   };
 
   return (
-    <FilterableResults fetchResults={fetchItemsWithSelectedItems} limit={10}>
+    <FilterableResults fetchResults={fetchResults} limit={10}>
       <ResetOnTabSwitch
         resetSelection={resetSelection}
         setSuccess={setSuccess}
@@ -67,6 +71,7 @@ export default function FilteredSelector({
           <SelectableResults
             selectedItems={selectedItems}
             setSelectedItems={setSelectedItems}
+            customEndMessage={customEndMessage}
           />
         </UnpaddedPageContainer>
       </FilterManager>
