@@ -5,6 +5,7 @@ import {toUserRef} from './users';
 import {Group, groupToGroupRef} from './groups';
 import {Post, PostToPostRef} from './posts';
 import {OpenPosition, openPosToOpenPosListItem} from './openPositions';
+import {Publication, publicationToPublicationRef} from './publications';
 
 const algoliaConfig = config.algolia;
 
@@ -245,22 +246,35 @@ export const configurePublicationSearchIndex = functions.https.onRequest(
 
 export const addPublicationToSearchIndex = functions.firestore
   .document(`publications/{publicationID}`)
-  .onCreate((change, context): boolean =>
-    addToIndex(
+  .onCreate((change, context): boolean => {
+    const publication = change.data() as Publication;
+    return addToIndex(
       context.params.publicationID,
-      change.data(),
+      publicationToPublicationRef(publication),
       ResourceTypes.PUBLICATION,
       PUBLICATIONS_INDEX
-    )
-  );
+    );
+  });
 
 export const updatePublicationToSearchIndex = functions.firestore
   .document(`publications/{publicationID}`)
-  .onUpdate((change, context): boolean =>
-    addToIndex(
+  .onUpdate((change, context): boolean => {
+    const newPublicationData = change.after.data() as Publication;
+    const oldPublicationData = change.before.data() as Publication;
+    const publicationID = context.params.publicationID;
+    if (
+      JSON.stringify(
+        publicationToPublicationRef(newPublicationData, publicationID)
+      ) ===
+      JSON.stringify(
+        publicationToPublicationRef(oldPublicationData, publicationID)
+      )
+    )
+      return false;
+    return addToIndex(
       context.params.publicationID,
-      change.after.data(),
+      publicationToPublicationRef(newPublicationData, publicationID),
       ResourceTypes.PUBLICATION,
       PUBLICATIONS_INDEX
-    )
-  );
+    );
+  });
