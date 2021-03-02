@@ -4,9 +4,9 @@ import DefaultPost from './DefaultPost';
 import PublicationPostForm from './PublicationPostForm';
 import {WriteIcon} from '../../../../assets/GeneralActionIcons';
 import {Redirect, useLocation} from 'react-router-dom';
+import OpenPositionPostForm from './OpenPositionPostForm';
 
 import './CreatePost.css';
-import OpenPositionPostForm from './OpenPositionPostForm';
 
 export const DEFAULT_POST = 'Default';
 export const PUBLICATION_POST = 'Publication';
@@ -151,4 +151,20 @@ export function sortThrownCreatePostErrors(err) {
         'Oh dear, something went wrong trying to create your post. Please try again later.'
       );
   }
+}
+
+export function getTweetPostURL(text, topics) {
+  const commaSeparatedTopics = topics
+    .map((topic) => topic.name)
+    .join(',')
+    .replace(/\s/g, '')
+    .replace('-', '');
+  return `https://twitter.com/intent/tweet?text=${text}&hashtags=${commaSeparatedTopics}&via=Labspoon`;
+}
+
+export function validateTweetPostLength(textLength, topics) {
+  const commaSeparatedTopics = topics.map((topic) => topic.name).join(',');
+  const topicsLength = commaSeparatedTopics.replace(',', ' #').length;
+  if (topicsLength + textLength > 280 - ' via @Labspoon '.length) return false;
+  return true;
 }

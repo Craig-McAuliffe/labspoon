@@ -359,6 +359,12 @@
   margin-right: 5px;
 }
 
+.create-post-twitter-toggle-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 15px;
+}
+
 @media screen and (max-width: 1197px) {
   .not-creating-post-button {
     margin-top: 65px;

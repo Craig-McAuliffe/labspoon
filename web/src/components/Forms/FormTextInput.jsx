@@ -1,6 +1,7 @@
-import React from 'react';
+import React, {useContext, useEffect} from 'react';
 import {useField} from 'formik';
 import InputError from './InputError';
+import {CreatePostTitleContext} from '../Posts/Post/CreatePost/PostForm';
 
 import './FormTextInput.css';
 
@@ -65,6 +66,10 @@ export function TextInput({
 
 export function CreatePostTextArea({...props}) {
   const [field, meta] = useField(props);
+  const {setTitleLength} = useContext(CreatePostTitleContext);
+
+  useEffect(() => setTitleLength(field.value.length), [field.value.length]);
+
   return (
     <>
       <textarea
