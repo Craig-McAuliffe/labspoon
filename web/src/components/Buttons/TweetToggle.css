@@ -1,6 +1,26 @@
 .tweet-toggle-container {
   display: flex;
   align-items: center;
+  position: relative;
+}
+
+.tweet-toggle-info-hidden {
+  display: none;
+}
+
+.tweet-toggle-info-visible {
+  width: 40vw;
+  min-width: 140px;
+  max-width: 500px;
+  display: block;
+  position: absolute;
+  padding: 10px;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
+  top: 25px;
+  right: 70px;
+  background: #ffffff;
+  color: #5d5d65;
+  border-radius: 10px;
 }
 
 .twitter-toggle-logo {
