@@ -4,7 +4,7 @@ import {config, environment, ResourceTypes} from './config';
 import {toUserRef} from './users';
 import {Group, groupToGroupRef} from './groups';
 import {Post, PostToPostRef} from './posts';
-import {OpenPosition} from './openPositions';
+import {OpenPosition, openPosToOpenPosListItem} from './openPositions';
 
 const algoliaConfig = config.algolia;
 
@@ -186,11 +186,11 @@ export const configureOpenPositionSearchIndex = functions.https.onRequest(
 export const addOpenPositionToSearchIndex = functions.firestore
   .document(`openPositions/{openPositionID}`)
   .onCreate((change, context): boolean => {
-    const openPosition = change.data();
-    openPosition.id = context.params.openPositionID;
+    const openPosition = change.data() as OpenPosition;
+    const openPositionID = context.params.openPositionID;
     return addToIndex(
-      context.params.openPositionID,
-      openPosition,
+      openPositionID,
+      openPosToOpenPosListItem(openPosition, openPositionID),
       ResourceTypes.OPEN_POSITION,
       OPENPOSITIONS_INDEX
     );
@@ -200,10 +200,20 @@ export const updateOpenPositionToSearchIndex = functions.firestore
   .document('openPositions/{openPositionID}')
   .onUpdate((change, context): boolean => {
     const newOpenPositionData = change.after.data() as OpenPosition;
-    newOpenPositionData.id = context.params.openPositionID;
+    const oldOpenPositionData = change.before.data() as OpenPosition;
+    const openPositionID = context.params.openPositionID;
+    if (
+      JSON.stringify(
+        openPosToOpenPosListItem(newOpenPositionData, openPositionID)
+      ) ===
+      JSON.stringify(
+        openPosToOpenPosListItem(oldOpenPositionData, openPositionID)
+      )
+    )
+      return false;
     return addToIndex(
       context.params.openPositionID,
-      newOpenPositionData,
+      openPosToOpenPosListItem(newOpenPositionData, openPositionID),
       ResourceTypes.OPEN_POSITION,
       OPENPOSITIONS_INDEX
     );

@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import {admin} from './config';
-import {GroupRef} from './groups';
+import {GroupRef, groupRefToGroupSignature, GroupSignature} from './groups';
 
 import {TaggedTopic, handleTopicsNoID} from './topics';
 import {UserRef, checkAuthAndGetUserFromContext} from './users';
@@ -52,7 +52,6 @@ export const createOpenPosition = functions.https.onCall(
       content: content,
       topics: openPositionTopics,
       group: data.group,
-      customTopics: data.customTopics,
       timestamp: new Date(),
       unixTimeStamp: Math.floor(new Date().getTime() / 1000),
       filterTopicIDs: openPositionTopics.map(
@@ -67,8 +66,14 @@ export const createOpenPosition = functions.https.onCall(
     );
     const batch = db.batch();
     batch.set(openPositionRef, processedOpenPosition);
-    batch.set(authorOpenPositionsRef, processedOpenPosition);
-    batch.set(groupOpenPositionsRef, processedOpenPosition);
+    batch.set(
+      authorOpenPositionsRef,
+      openPosToOpenPosListItem(processedOpenPosition, openPositionID)
+    );
+    batch.set(
+      groupOpenPositionsRef,
+      openPosToOpenPosListItem(processedOpenPosition, openPositionID)
+    );
     await batch.commit().catch((err) => {
       console.error(
         `could not create open position with id ${openPositionID}` + err
@@ -111,15 +116,16 @@ async function checkUserIsMemberOfGroup(authorID: string, groupID: string) {
 export const addOpenPosToTopics = functions.firestore
   .document(`openPositions/{openPositionID}`)
   .onCreate(async (openPositionDS, context) => {
-    const openPosition = openPositionDS.data();
+    const openPosition = openPositionDS.data() as OpenPosition;
     const openPositionID = context.params.openPositionID;
     const openPositionTopics = openPosition.topics;
+    if (!openPositionTopics || openPositionTopics.length === 0) return;
     const topicsPromises = openPositionTopics.map(
       (taggedTopic: TaggedTopic) => {
-        if (!taggedTopic.id) return;
+        if (!taggedTopic.id) return Promise.resolve();
         return db
           .doc(`topics/${taggedTopic.id}/openPositions/${openPositionID}`)
-          .set(openPosition)
+          .set(openPosToOpenPosListItem(openPosition, openPositionID))
           .catch((err) =>
             console.error(
               'unable to add open position with id ' +
@@ -136,36 +142,71 @@ export const addOpenPosToTopics = functions.firestore
 
 export const updateOpenPosOnGroup = functions.firestore
   .document(`openPositions/{openPositionID}`)
-  .onUpdate((openPositionDS) => {
-    const openPosition = openPositionDS.after.data();
-    const groupID = openPosition.group.id;
+  .onUpdate((openPositionDS, context) => {
+    const newOpenPositionData = openPositionDS.after.data() as OpenPosition;
+    const oldOpenPositionData = openPositionDS.before.data() as OpenPosition;
+    const groupID = oldOpenPositionData.group.id;
+    const openPositionID = context.params.openPositionID;
+    if (
+      JSON.stringify(
+        openPosToOpenPosListItem(newOpenPositionData, openPositionID)
+      ) ===
+      JSON.stringify(
+        openPosToOpenPosListItem(oldOpenPositionData, openPositionID)
+      )
+    )
+      return false;
+
     return db
       .doc(`groups/${groupID}/openPositions/${openPositionDS.after.id}`)
-      .set(openPosition);
+      .set(openPosToOpenPosListItem(newOpenPositionData, openPositionID));
   });
 
 export const updateOpenPosOnUser = functions.firestore
   .document(`openPositions/{openPositionID}`)
-  .onUpdate((openPositionDS) => {
-    const openPosition = openPositionDS.after.data();
-    const authorID = openPosition.author.id;
+  .onUpdate((openPositionDS, context) => {
+    const newOpenPositionData = openPositionDS.after.data() as OpenPosition;
+    const oldOpenPositionData = openPositionDS.before.data() as OpenPosition;
+    const openPositionID = context.params.openPositionID;
+    if (
+      JSON.stringify(
+        openPosToOpenPosListItem(newOpenPositionData, openPositionID)
+      ) ===
+      JSON.stringify(
+        openPosToOpenPosListItem(oldOpenPositionData, openPositionID)
+      )
+    )
+      return false;
+
+    const authorID = oldOpenPositionData.author.id;
     return db
       .doc(`users/${authorID}/openPositions/${openPositionDS.after.id}`)
-      .set(openPosition);
+      .set(openPosToOpenPosListItem(newOpenPositionData, openPositionID));
   });
 
 export const updateOpenPosOnTopic = functions.firestore
   .document(`openPositions/{openPositionID}`)
   .onUpdate(async (openPositionDS, context) => {
-    const openPosition = openPositionDS.after.data();
+    const newOpenPositionData = openPositionDS.after.data() as OpenPosition;
+    const oldOpenPositionData = openPositionDS.before.data() as OpenPosition;
     const openPositionID = context.params.openPositionID;
-    const openPositionTopics = openPosition.topics;
+    if (
+      JSON.stringify(
+        openPosToOpenPosListItem(newOpenPositionData, openPositionID)
+      ) ===
+      JSON.stringify(
+        openPosToOpenPosListItem(oldOpenPositionData, openPositionID)
+      )
+    )
+      return false;
+    const openPositionTopics = newOpenPositionData.topics;
+    if (!openPositionTopics || openPositionTopics.length === 0) return false;
     const topicsPromises = openPositionTopics.map(
       (taggedTopic: TaggedTopic) => {
         if (!taggedTopic.id) return;
         return db
           .doc(`topics/${taggedTopic.id}/openPositions/${openPositionID}`)
-          .set(openPosition)
+          .set(openPosToOpenPosListItem(newOpenPositionData, openPositionID))
           .catch((err) =>
             console.error(
               'unable to update open position with id ' +
@@ -177,14 +218,41 @@ export const updateOpenPosOnTopic = functions.firestore
           );
       }
     );
-    return await topicsPromises;
+    return Promise.all(topicsPromises);
   });
+
+export function openPosToOpenPosListItem(
+  openPosition: OpenPosition,
+  openPositionID: string
+): OpenPositionListItem {
+  const OpenPosContentToOpenPosListItemContent = (
+    content: OpenPositionContent
+  ) => {
+    return {
+      title: content.title,
+      position: content.position,
+      salary: content.salary,
+      startDate: content.startDate,
+      description: content.description,
+    };
+  };
+  const openPositionListItem: OpenPositionListItem = {
+    content: OpenPosContentToOpenPosListItemContent(openPosition.content),
+    author: openPosition.author,
+    topics: openPosition.topics,
+    timestamp: openPosition.timestamp,
+    unixTimeStamp: openPosition.unixTimeStamp,
+    group: groupRefToGroupSignature(openPosition.group),
+    id: openPositionID,
+    filterTopicIDs: openPosition.filterTopicIDs,
+  };
+  return openPositionListItem;
+}
 
 export interface OpenPosition {
   content: OpenPositionContent;
   author: UserRef;
   topics?: TaggedTopic[];
-  customTopics?: string[];
   timestamp: Date;
   unixTimeStamp: number;
   group: GroupRef;
@@ -201,5 +269,24 @@ interface OpenPositionContent {
   startDate: string;
   applyEmail: string;
   applyLink: string;
+  description: string;
+}
+
+export interface OpenPositionListItem {
+  content: OpenPositionListItemContent;
+  author: UserRef;
+  topics?: TaggedTopic[];
+  timestamp: Date;
+  unixTimeStamp: number;
+  group: GroupSignature;
+  id?: string;
+  filterTopicIDs: string[];
+}
+
+interface OpenPositionListItemContent {
+  title: string;
+  position: string;
+  salary: string;
+  startDate: string;
   description: string;
 }

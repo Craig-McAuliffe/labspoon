@@ -1032,6 +1032,15 @@ export const addGroupPostToFollowersFeeds = functions.firestore
     return Promise.all(groupFollowersPromisesArray);
   });
 
+export function groupRefToGroupSignature(groupRef: GroupRef) {
+  const groupSignature: GroupSignature = {
+    id: groupRef.id,
+    name: groupRef.name,
+  };
+  if (groupRef.avatar) groupSignature.avatar = groupRef.avatar;
+  if (groupRef.institution) groupSignature.avatar = groupRef.institution;
+  return groupSignature;
+}
 interface VerifiedGroup {
   timestamp: Date;
 }
@@ -1058,4 +1067,11 @@ export interface Group {
   donationLink?: string;
   institution?: string;
   rank?: number;
+}
+
+export interface GroupSignature {
+  id: string;
+  name: string;
+  avatar?: string;
+  institution?: string;
 }
