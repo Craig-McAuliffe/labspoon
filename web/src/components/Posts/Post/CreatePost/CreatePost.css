@@ -107,7 +107,6 @@
 .create-post-alt-tagging-method-container {
   display: flex;
   justify-content: flex-end;
-  margin-top: -20px;
 }
 
 .create-post-alt-tagging-method-container p {
@@ -290,7 +289,7 @@
   line-height: 40px;
   width: 100%;
   padding-left: 10px;
-  margin: 0px 0px 40px;
+  margin: 0px 0px 10px;
 }
 
 .resource-search-input-container-disabled input,

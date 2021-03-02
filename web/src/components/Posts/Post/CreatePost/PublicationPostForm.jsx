@@ -29,6 +29,7 @@ import FormDatabaseSearch from '../../../Forms/FormDatabaseSearch';
 import SecondaryButton from '../../../Buttons/SecondaryButton';
 import './CreatePost.css';
 import {algoliaPublicationToDBPublicationListItem} from '../../../../helpers/publications';
+import {Alert} from 'react-bootstrap';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
@@ -52,11 +53,15 @@ export default function PublicationPostForm({
     url: '',
   });
   const [customPublicationErrors, setCustomPublicationErrors] = useState();
+  const [
+    customPubSuccessfullyCreated,
+    setCustomPubSuccessfullyCreated,
+  ] = useState(false);
 
   const submitChanges = async (res) => {
-    setCustomPublicationErrors();
-    setPubSubmissionError(false);
-
+    if (customPublicationErrors) setCustomPublicationErrors();
+    if (pubSubmissionError) setPubSubmissionError(false);
+    if (customPublication) setCustomPubSuccessfullyCreated(false);
     const submitCustomPublication = async () => {
       if (!isQuickCreatingPub) return false;
       const pubValidationErrors = await validateCustomPublication(
@@ -104,6 +109,12 @@ export default function PublicationPostForm({
         setSubmittingPost(false);
       })
       .catch((err) => {
+        setIsQuickCreatingPub(false);
+        setCustomPublication({
+          title: '',
+          url: '',
+        });
+        setCustomPubSuccessfullyCreated(true);
         sortThrownCreatePostErrors(err);
         setSubmittingPost(false);
       });
@@ -156,6 +167,7 @@ export default function PublicationPostForm({
           setPublication={setPublication}
           isQuickCreatingPub={isQuickCreatingPub}
           setIsQuickCreatingPub={setIsQuickCreatingPub}
+          customPubSuccessfullyCreated={customPubSuccessfullyCreated}
         />
       </PostForm>
     </>
@@ -167,6 +179,7 @@ function SelectPublication({
   setPublication,
   setIsQuickCreatingPub,
   isQuickCreatingPub,
+  customPubSuccessfullyCreated,
 }) {
   const [displayedPublications, setDisplayedPublications] = useState([]);
   if (publication) {
@@ -206,6 +219,14 @@ function SelectPublication({
           hideSearchIcon={true}
         />
       </div>
+      <div className="create-pub-post-alert-container">
+        {customPubSuccessfullyCreated && (
+          <Alert variant="primary">
+            Your publication was successfully created. Only the post failed. You
+            should be able to find that publication by searching.
+          </Alert>
+        )}
+      </div>
       {!isQuickCreatingPub &&
         displayedPublications &&
         displayedPublications.length > 0 && (
@@ -214,7 +235,6 @@ function SelectPublication({
             setTaggedPublication={setPublication}
           />
         )}
-
       <div className="create-post-alt-tagging-method-container">
         <button className="create-publication-search-publications-button"></button>
         <p>
