@@ -4,7 +4,7 @@ import firebase from '../../firebase';
 import * as Yup from 'yup';
 import FormTextInput, {FormTextArea} from '../Forms/FormTextInput';
 import FormDateInput from '../Forms/FormDateInput';
-import TagTopics, {handlePostTopics} from '../Topics/TagTopics';
+import TagTopics from '../Topics/TagTopics';
 import CreateResourceFormActions from '../Forms/CreateResourceFormActions';
 import {DropdownOption} from '../Dropdown';
 import {AuthContext} from '../../App';
@@ -46,9 +46,7 @@ export default function CreateOpenPosition() {
 
   const onSubmit = (res) => {
     setSubmitting(true);
-    const {customTopics, DBTopics} = handlePostTopics(selectedTopics);
-    res.customTopics = customTopics;
-    res.topics = DBTopics;
+    res.topics = selectedTopics;
     res.group = convertGroupToGroupRef(selectedGroup);
     createOpenPosition(res)
       .then(() => {
@@ -183,6 +181,7 @@ export default function CreateOpenPosition() {
             submittingForm={submitting}
             selectedTopics={selectedTopics}
             setSelectedTopics={setSelectedTopics}
+            noCustomTopics={true}
           />
           <h4>How to Apply</h4>
           <HowToApply />

@@ -47,6 +47,15 @@ export const createPost = functions.https.onCall(async (data, context) => {
   await Promise.all(matchedTopicsPromises);
 
   if (data.publication && !data.publication.id) {
+    if (data.isCustomPublication) {
+      console.error(
+        'post was created with a tagged custom publication but it does not have an ID. The id is therefore irretrievable'
+      );
+      throw new functions.https.HttpsError(
+        'internal',
+        'An error occured while creating the post. Tagged custom publication lacks an ID'
+      );
+    }
     const publicationDS = await getPublicationByMicrosoftPublicationID(
       data.publication.microsoftID,
       true

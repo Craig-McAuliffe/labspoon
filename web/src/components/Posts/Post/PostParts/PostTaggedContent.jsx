@@ -5,7 +5,6 @@ import {
   PUBLICATION,
   USER,
 } from '../../../../helpers/resourceTypeDefinitions';
-import {ListItemContainer} from '../../../ListItem/ListItemCommonComponents';
 import {ReducedOpenPositionListItem} from '../../../OpenPosition/OpenPositionListItem';
 import PublicationListItem from '../../../Publication/PublicationListItem';
 import FollowUserButton from '../../../User/FollowUserButton/FollowUserButton';
@@ -29,13 +28,7 @@ export default function PostOptionalTags({taggedContent}) {
             <PublicationListItem
               publication={taggedItem.content}
               key={(taggedItem.id, i)}
-            />
-          );
-        case 'publicationURL':
-          return (
-            <TaggedPublicationURL
-              url={taggedItem.content}
-              key={(taggedItem.content, i)}
+              onPost={true}
             />
           );
         case OPENPOSITION:
@@ -51,15 +44,4 @@ export default function PostOptionalTags({taggedContent}) {
     });
     return <div className="tagged-content-container">{taggedContentItems}</div>;
   }
-}
-
-function TaggedPublicationURL({url}) {
-  return (
-    <ListItemContainer>
-      <h3 className="post-tagged-publicationURL">Publication Link:</h3>
-      <a href={url}>
-        <h4>{url}</h4>
-      </a>
-    </ListItemContainer>
-  );
 }

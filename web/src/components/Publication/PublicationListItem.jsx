@@ -14,6 +14,8 @@ export default function PublicationListItem({
   removeBorder,
   mixedResults,
   bookmarkedVariation,
+  noLink,
+  onPost,
 }) {
   const featureFlags = useContext(FeatureFlags);
   const publicationPathName = getPublicationPathName(publication);
@@ -30,9 +32,10 @@ export default function PublicationListItem({
         <PublicationListItemTitle
           pathName={publicationPathName}
           title={publication.title}
+          noLink={noLink}
         />
         <PublicationListItemAuthors authors={publication.authors} />
-        {mixedResults ? null : (
+        {mixedResults || onPost ? null : (
           <div className="publication-list-item-topics-container">
             <ListItemTopics dbTopics={publication.topics} />
           </div>
@@ -94,9 +97,9 @@ function PublicationListItemHeader({publication}) {
   );
 }
 
-function PublicationListItemTitle({pathName, title}) {
+function PublicationListItemTitle({pathName, title, noLink}) {
   const titleHeader = <h3 className="publication-list-item-title">{title}</h3>;
-  if (!pathName) return titleHeader;
+  if (!pathName || noLink) return titleHeader;
   return <Link to={pathName}>{titleHeader}</Link>;
 }
 

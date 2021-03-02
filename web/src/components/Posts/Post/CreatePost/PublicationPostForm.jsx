@@ -5,23 +5,30 @@ import firebase from '../../../../firebase';
 import {CreatePostTextArea, TextInput} from '../../../Forms/FormTextInput';
 import PostForm from './PostForm';
 import {CreatingPostContext, sortThrownCreatePostErrors} from './CreatePost';
-import {PublicationSearchAfterDelayAndResults} from '../../../Publication/MicrosoftResults';
 import TypeOfTaggedResourceDropDown from './TypeOfTaggedResourceDropDown';
-import {SmallPublicationListItem} from '../../../Publication/PublicationListItem';
+import PublicationListItem, {
+  SmallPublicationListItem,
+} from '../../../Publication/PublicationListItem';
 import {FindAndAddUsersToForm} from '../../../Forms/AddUserToForm';
 import {
   SelectedAuthors,
   createCustomPublication,
 } from '../../../Publication/CreateCustomPublication';
 import {AuthContext} from '../../../../App';
-import {PublicationIcon} from '../../../../assets/ResourceTypeIcons';
+import {
+  PublicationIcon,
+  TagResourceIcon,
+} from '../../../../assets/ResourceTypeIcons';
 import {
   DropDownTriangle,
   InvertedDropDownTriangle,
 } from '../../../../assets/GeneralActionIcons';
-import './CreatePost.css';
 import InputError from '../../../Forms/InputError';
 import ErrorMessage from '../../../Forms/ErrorMessage';
+import FormDatabaseSearch from '../../../Forms/FormDatabaseSearch';
+import SecondaryButton from '../../../Buttons/SecondaryButton';
+import './CreatePost.css';
+import {algoliaPublicationToDBPublicationListItem} from '../../../../helpers/publications';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
@@ -86,7 +93,8 @@ export default function PublicationPostForm({
         customPublicationSubmissionResult.createdCustomPublication;
       customPublicationWithID.id = customPublicationSubmissionResult.id;
       res.publication = customPublicationWithID;
-    } else res.publication = publication;
+    } else
+      res.publication = algoliaPublicationToDBPublicationListItem(publication);
     res.postType = {id: 'publicationPost', name: 'Publication'};
     res.topics = selectedTopics;
     createPost(res)
@@ -160,7 +168,7 @@ function SelectPublication({
   setIsQuickCreatingPub,
   isQuickCreatingPub,
 }) {
-  const [query, setQuery] = useState();
+  const [displayedPublications, setDisplayedPublications] = useState([]);
   if (publication) {
     return (
       <div className="create-publication-post-list-item-container">
@@ -168,7 +176,6 @@ function SelectPublication({
         <div className="create-publication-post-list-item-select-container">
           <NegativeButton
             onClick={() => {
-              setQuery(undefined);
               setPublication(undefined);
             }}
             smallVersion
@@ -182,20 +189,32 @@ function SelectPublication({
   // The "search" button is just there to prevent search/url switch
   // if the user clicks enter
   return (
-    <>
-      <div className="publication-post-search-section">
-        <TextInput
-          value={query}
-          label={'Search Publications:'}
-          sideLabel={true}
-          onChange={(event) => setQuery(event.target.value)}
-          disabled={isQuickCreatingPub}
+    <div className="publication-post-search-section">
+      <h4>Search Publications</h4>
+      <div
+        className={`resource-search-input-container${
+          isQuickCreatingPub ? '-disabled' : ''
+        }`}
+      >
+        <FormDatabaseSearch
+          setDisplayedItems={setDisplayedPublications}
+          indexName="_PUBLICATIONS"
+          placeholderText=""
+          displayedItems={displayedPublications}
+          clearListOnNoResults={true}
+          hasCustomContainer={true}
+          hideSearchIcon={true}
         />
       </div>
-      <PublicationSearchAfterDelayAndResults
-        query={query}
-        setPublication={setPublication}
-      />
+      {!isQuickCreatingPub &&
+        displayedPublications &&
+        displayedPublications.length > 0 && (
+          <PublicationSearchResults
+            publications={displayedPublications}
+            setTaggedPublication={setPublication}
+          />
+        )}
+
       <div className="create-post-alt-tagging-method-container">
         <button className="create-publication-search-publications-button"></button>
         <p>
@@ -223,7 +242,7 @@ function SelectPublication({
           )}
         </button>
       </div>
-    </>
+    </div>
   );
 }
 
@@ -329,4 +348,33 @@ function handlePubUrlError(customPublicationErrors) {
   )
     return <InputError error={customPublicationErrors[0]} />;
   return <InputError error={customPublicationErrors[1]} />;
+}
+
+function PublicationSearchResults({publications, setTaggedPublication}) {
+  const selectPublication = (publication) => {
+    setTaggedPublication(publication);
+  };
+  return publications.map((publication) => {
+    if (!publication.objectID) return null;
+    publication.id = publication.objectID;
+    return (
+      <div
+        key={publication.id}
+        className="resource-result-with-selector-container"
+      >
+        <div className="resource-result-selector-container-pubs">
+          <SecondaryButton
+            className="resource-result-selector"
+            onClick={() => selectPublication(publication)}
+          >
+            <div className="select-tagged-resource-icon">
+              <TagResourceIcon />
+            </div>
+            Select
+          </SecondaryButton>
+        </div>
+        <PublicationListItem noLink={true} publication={publication} />
+      </div>
+    );
+  });
 }

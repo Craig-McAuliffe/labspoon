@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
 import * as Yup from 'yup';
-import firebase, {db} from '../../../../firebase';
+import firebase from '../../../../firebase';
 import {CreatePostTextArea} from '../../../Forms/FormTextInput';
 import PostForm from './PostForm';
 import TypeOfTaggedResourceDropDown from './TypeOfTaggedResourceDropDown';
@@ -15,6 +15,7 @@ import FormDatabaseSearch from '../../../Forms/FormDatabaseSearch';
 import InputError from '../../../Forms/InputError';
 import SecondaryButton from '../../../Buttons/SecondaryButton';
 import {TagResourceIcon} from '../../../../assets/ResourceTypeIcons';
+import {algoliaOpenPosToDBOpenPosListItem} from '../../../../helpers/openPositions';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
@@ -54,16 +55,9 @@ export default function OpenPositionPostForm({
     const taggedTopics = handlePostTopics(selectedTopics);
     res.customTopics = taggedTopics.customTopics;
     res.topics = taggedTopics.DBTopics;
-    const dbOpenPosition = await db
-      .doc(`openPositions/${taggedOpenPosition.id}`)
-      .get()
-      .then((ds) => ds.data())
-      .catch((err) =>
-        console.error(
-          `unable to fetch open position with id ${taggedOpenPosition.id} ${err}`
-        )
-      );
-    if (!dbOpenPosition) setGeneralError(true);
+    const dbOpenPosition = algoliaOpenPosToDBOpenPosListItem(
+      taggedOpenPosition
+    );
     dbOpenPosition.id = taggedOpenPosition.id;
     res.openPosition = dbOpenPosition;
     createPost(res)
@@ -181,11 +175,12 @@ function OpenPositionsSearchResults({openPositions, setTaggedOpenPosition}) {
   const selectOpenPosition = (openPosition) => {
     setTaggedOpenPosition(openPosition);
   };
-  return openPositions.map((openPosition, i) => {
-    if (!openPosition.id) return null;
+  return openPositions.map((openPosition) => {
+    if (!openPosition.objectID) return null;
+    openPosition.id = openPosition.objectID;
     return (
       <div
-        key={openPosition.content.title + i}
+        key={openPosition.id}
         className="resource-result-with-selector-container"
       >
         <div className="resource-result-selector-container">
@@ -198,7 +193,6 @@ function OpenPositionsSearchResults({openPositions, setTaggedOpenPosition}) {
             </div>
             Select
           </SecondaryButton>
-          {/* <button className='resource-result-selector'>Select</button> */}
         </div>
         <ReducedOpenPositionListItem
           noLink={true}

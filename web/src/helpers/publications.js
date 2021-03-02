@@ -59,3 +59,20 @@ export function getLinkForAuthor(id, microsoftID, nameStr) {
     return nameStr;
   }
 }
+
+export function algoliaPublicationToDBPublicationListItem(algoliaPublication) {
+  const publicationListItem = {
+    id: algoliaPublication.id,
+    date: algoliaPublication.date,
+    title: algoliaPublication.title,
+    authors: algoliaPublication.authors,
+    topics: algoliaPublication.topics,
+  };
+  if (algoliaPublication.microsoftID)
+    publicationListItem.microsoftID = algoliaPublication.microsoftID;
+  if (algoliaPublication.filterTopicIDs)
+    publicationListItem.filterTopicIDs = algoliaPublication.filterTopicIDs;
+  if (algoliaPublication.filterAuthorIDs)
+    publicationListItem.filterAuthorIDs = algoliaPublication.filterAuthorIDs;
+  return publicationListItem;
+}

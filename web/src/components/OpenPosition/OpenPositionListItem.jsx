@@ -36,7 +36,7 @@ export default function OpenPositionListItem({openPosition}) {
         </h4>
       ) : null}
       {openPosition.topics.length > 0 ||
-      openPosition.customTopics.length > 0 ? (
+      (openPosition.customTopics && openPosition.customTopics.length > 0) ? (
         <ListItemTopics
           dbTopics={openPosition.topics}
           customTopics={openPosition.customTopics}
@@ -72,13 +72,6 @@ export function ReducedOpenPositionListItem({
   return (
     <ListItemContainer>
       {titleDisplay}
-      {openPosition.topics.length > 0 ||
-      openPosition.customTopics.length > 0 ? (
-        <ListItemTopics
-          dbTopics={openPosition.topics}
-          customTopics={openPosition.customTopics}
-        />
-      ) : null}
       <h4 className="resource-list-item-subtitle">Description of Role</h4>
       <div className="article-list-item-small-description">
         <p>{content.description}</p>

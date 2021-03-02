@@ -19,3 +19,19 @@ export function getPaginatedOpenPositionsFromCollectionRef(
       return openPositions;
     });
 }
+
+export function algoliaOpenPosToDBOpenPosListItem(algoliaOpenPos) {
+  const dbOpenPositionListItem = {
+    content: {
+      title: algoliaOpenPos.content.position,
+      position: algoliaOpenPos.content.position,
+      salary: algoliaOpenPos.content.salary,
+      startDate: algoliaOpenPos.content.startDate,
+      description: algoliaOpenPos.content.description,
+    },
+    topics: algoliaOpenPos.topics,
+    group: algoliaOpenPos.group,
+    id: algoliaOpenPos.id,
+  };
+  return dbOpenPositionListItem;
+}
