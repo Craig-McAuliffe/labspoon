@@ -74,7 +74,9 @@ function CreateCustomPublicationForm({setIsAdding, setSuccess}) {
     url: Yup.string()
       .url()
       .required('Please add a url link to the publication'),
-    title: Yup.string().required('Please add the title of the publication'),
+    title: Yup.string()
+      .required('Please add the title of the publication')
+      .max(1000, 'The maximum title length is 1000 characters.'),
   });
 
   const removeAuthor = (author) => {
