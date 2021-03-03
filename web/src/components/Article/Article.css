@@ -12,11 +12,15 @@
 .article-list-item-header-section,
 .article-header-section {
   margin-bottom: 20px;
+  position: relative;
 }
 
-.article-list-item-header-section svg,
-.article-header-section svg {
+.article-list-item-resource-type-svg-container svg {
   height: 20px;
+}
+
+.article-list-item-resource-type-svg-container {
+  display: inline-block;
 }
 
 .article-list-item-header-section h4,

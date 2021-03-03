@@ -75,7 +75,7 @@ function DropdownToggle({
   return (
     <div className="dropdown-toggle-container">
       {customToggle ? (
-        customToggle({setOpen})
+        customToggle(setOpen)
       ) : (
         <button
           className={`dropdown${

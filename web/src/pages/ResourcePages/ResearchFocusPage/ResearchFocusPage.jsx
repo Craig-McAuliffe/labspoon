@@ -60,9 +60,11 @@ export default function ResearchFocusPage() {
     <PaddedPageContainer>
       <ArticleHeaderAndType
         title={researchFocus.title}
-        resourceType={researchFocus.resourceType}
+        resourceType={RESEARCHFOCUS}
         icon={<ResearchFocusIcon />}
         dedicatedPage={true}
+        authorID={researchFocus.author.id}
+        resourceID={researchFocusID}
       />
       <ListItemTopics
         dbTopics={researchFocus.topics}

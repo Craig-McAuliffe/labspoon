@@ -1,6 +1,8 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {Link} from 'react-router-dom';
+import {AuthContext} from '../../App';
 import {RESEARCHFOCUS, TECHNIQUE} from '../../helpers/resourceTypeDefinitions';
+import {ListItemOptionsDropdown} from '../ListItem/ListItemCommonComponents';
 
 import './Article.css';
 
@@ -19,7 +21,10 @@ export function ArticleHeaderAndType({
   icon,
   resourceID,
   dedicatedPage,
+  authorID,
 }) {
+  const {userProfile} = useContext(AuthContext);
+  const userID = userProfile ? userProfile.id : undefined;
   let url;
   let resourceTypeName;
   switch (resourceType) {
@@ -53,17 +58,27 @@ export function ArticleHeaderAndType({
   };
 
   return (
-    <div
-      className={`article${dedicatedPage ? '' : '-list-item'}-header-section`}
-    >
-      {resourceID ? (
-        <Link to={url}>{sizedHeaders().articleTitle}</Link>
-      ) : (
-        sizedHeaders().articleTitle
+    <>
+      {userID && userID === authorID && (
+        <ListItemOptionsDropdown
+          resourceType={resourceType}
+          resourceID={resourceID}
+        />
       )}
-      {icon}
-      {resourceTypeName ? sizedHeaders().articleResourceType : null}
-    </div>
+      <div
+        className={`article${dedicatedPage ? '' : '-list-item'}-header-section`}
+      >
+        {resourceID ? (
+          <Link to={url}>{sizedHeaders().articleTitle}</Link>
+        ) : (
+          sizedHeaders().articleTitle
+        )}
+        <div className="article-list-item-resource-type-svg-container">
+          {icon}
+        </div>
+        {resourceTypeName ? sizedHeaders().articleResourceType : null}
+      </div>
+    </>
   );
 }
 

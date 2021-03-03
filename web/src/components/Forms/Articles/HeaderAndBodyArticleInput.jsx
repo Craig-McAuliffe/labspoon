@@ -163,3 +163,11 @@ export const yupArticleValidation = Yup.array()
 export function getTitleTextAndBody(article) {
   return [article[0].children[0].text, article.slice(1)];
 }
+
+export function mergeTitleAndBody(title, body) {
+  const mergedTitleAndBody = [
+    {type: 'title', children: [{text: title}]},
+    ...body,
+  ];
+  return mergedTitleAndBody;
+}

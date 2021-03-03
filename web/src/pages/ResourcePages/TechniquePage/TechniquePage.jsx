@@ -59,9 +59,11 @@ export default function TechniquePage() {
     <PaddedPageContainer>
       <ArticleHeaderAndType
         title={technique.title}
-        resourceType={technique.resourceType}
+        resourceType={TECHNIQUE}
         icon={<TechniqueIcon />}
         dedicatedPage={true}
+        resourceID={techniqueID}
+        authorID={technique.author.id}
       />
       <ListItemTopics
         dbTopics={technique.topics}

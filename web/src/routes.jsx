@@ -27,14 +27,14 @@ import OpenPositionPage from './pages/ResourcePages/OpenPositionPage/OpenPositio
 import CreatePage from './pages/ResourcePages/CreatePage';
 import Articles from './pages/Articles/Articles';
 import Groups from './pages/ResourcePages/GroupPage/Groups';
-import TechniquePage from './pages/ResourcePages/TechniquePage/TechniquePage';
+import Techniques from './pages/ResourcePages/TechniquePage/Techniques';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage/PrivacyPolicyPage';
-import ResearchFocusPage from './pages/ResourcePages/ResearchFocusPage/ResearchFocusPage';
 import Users from './pages/ResourcePages/UserPage/Users';
 import ChooseUserName from './pages/LoginSignup/ChooseUserName/ChooseUserName';
 import ContactPage from './pages/ContactPage/ContactPage';
 import PoliciesPage from './pages/PoliciesPage/PoliciesPage';
 import CookiesPolicyPage from './pages/Info/CookiesPolicyPage';
+import ResearchFocuses from './pages/ResourcePages/ResearchFocusPage/ResearchFocuses';
 
 /**
  * Top level routing structure for the app.
@@ -99,7 +99,7 @@ export default function Routes({user, setUser}) {
       <Route path="/topic/:topicID">
         <TopicPage />
       </Route>
-      <Route exact path="/openPosition/:openPositionID">
+      <Route path="/openPosition/:openPositionID">
         <OpenPositionPage />
       </Route>
       <Route path="/magField/:magFieldID">
@@ -126,11 +126,11 @@ export default function Routes({user, setUser}) {
       <Route exact path="/about">
         <AboutPage />
       </Route>
-      <Route exact path="/technique/:techniqueID">
-        <TechniquePage />
+      <Route path="/technique/:techniqueID">
+        <Techniques />
       </Route>
-      <Route exact path="/researchFocus/:researchFocusID">
-        <ResearchFocusPage />
+      <Route path="/researchFocus/:researchFocusID">
+        <ResearchFocuses />
       </Route>
       <Route path="/notfound">
         <NotFoundPage />

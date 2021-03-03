@@ -8,6 +8,7 @@ import {
 import {RichTextBody, ArticleHeaderAndType} from '../Article/Article';
 import ListItemTopics from '../ListItem/ListItemTopics';
 import GroupSignature from '../Group/GroupSignature';
+import {TECHNIQUE} from '../../helpers/resourceTypeDefinitions';
 
 export default function TechniqueListItem({technique}) {
   const title = technique.title;
@@ -16,9 +17,10 @@ export default function TechniqueListItem({technique}) {
     <ListItemContainer>
       <ArticleHeaderAndType
         title={title}
-        resourceType={technique.resourceType}
+        resourceType={TECHNIQUE}
         icon={<TechniqueIcon />}
         resourceID={technique.id}
+        authorID={technique.author.id}
       />
       <ImagesSection
         images={formatTaggedImages(technique.photoURLs)}

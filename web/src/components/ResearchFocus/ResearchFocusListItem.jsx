@@ -8,6 +8,7 @@ import {
 import {RichTextBody, ArticleHeaderAndType} from '../Article/Article';
 import ListItemTopics from '../ListItem/ListItemTopics';
 import GroupSignature from '../Group/GroupSignature';
+import {RESEARCHFOCUS} from '../../helpers/resourceTypeDefinitions';
 
 import './ResearchFocusListItem.css';
 
@@ -18,9 +19,10 @@ export default function ResearchFocusListItem({researchFocus}) {
     <ListItemContainer>
       <ArticleHeaderAndType
         title={title}
-        resourceType={researchFocus.resourceType}
+        resourceType={RESEARCHFOCUS}
         icon={<ResearchFocusIcon />}
         resourceID={researchFocus.id}
+        authorID={researchFocus.author.id}
       />
       <ImagesSection
         images={formatTaggedImages(researchFocus.photoURLs)}

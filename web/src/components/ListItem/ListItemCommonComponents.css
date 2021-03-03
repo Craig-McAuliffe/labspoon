@@ -8,3 +8,29 @@
 .list-item-expandable-container {
   overflow-y: hidden;
 }
+
+.list-options-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.list-options-container svg {
+  width: 30px;
+  height: 5px;
+}
+
+.list-item-dropdown-option-container {
+  margin: 0px 10px;
+}
+
+.list-item-options-dropdown-text {
+  margin: 0px 10px;
+}
+
+.list-item-dropdown-toggle {
+  width: 80px;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0px;
+  margin-bottom: 10px;
+}

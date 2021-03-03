@@ -37,10 +37,11 @@ export default function FilteredSelector({
   }, [success]);
 
   useEffect(() => {
+    if (!success) return;
     const fetchingResultsFunction = (skip, limit, filter, last) =>
       fetchItems(skip, limit, filter, last);
     setFetchResults(() => fetchingResultsFunction);
-  }, []);
+  }, [success]);
 
   const resetSelection = () => {
     setSelectedItems([]);
