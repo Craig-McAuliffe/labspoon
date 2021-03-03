@@ -157,6 +157,16 @@ export const yupArticleValidation = Yup.array()
       if (value[0].children[0].text.length > 250) return false;
       return true;
     }
+  )
+  .test(
+    'isTooLong',
+    // eslint-disable-next-line no-template-curly-in-string
+    'Too many paragraphs.',
+    (value) => {
+      if (value === undefined) return false;
+      if (value.length > 30) return false;
+      return true;
+    }
   );
 
 // assumes the article is properly validated
