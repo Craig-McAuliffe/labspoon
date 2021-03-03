@@ -132,7 +132,11 @@ export const addPostTopicsToRecentUserTopics = functions.firestore
     const authorID = context.params.userID;
     const topics = post.topics;
     if (!topics || topics.length === 0) return;
-    addRecentResourceTopicsToUserDoc(authorID, topics, 'recentPostTopics');
+    return addRecentResourceTopicsToUserDoc(
+      authorID,
+      topics,
+      'recentPostTopics'
+    );
   });
 
 export const addPublicationTopicsToRecentUserTopics = functions.firestore
@@ -142,7 +146,7 @@ export const addPublicationTopicsToRecentUserTopics = functions.firestore
     const authorID = context.params.userID;
     const topics = publication.topics;
     if (!topics || topics.length === 0) return;
-    addRecentResourceTopicsToUserDoc(
+    return addRecentResourceTopicsToUserDoc(
       authorID,
       topics,
       'recentPublicationTopics'
