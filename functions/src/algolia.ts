@@ -1,9 +1,9 @@
 import * as functions from 'firebase-functions';
 import algoliasearch, {SearchClient} from 'algoliasearch';
 import {config, environment, ResourceTypes} from './config';
-import {toUserRef} from './users';
-import {Group, groupToGroupRef} from './groups';
-import {Post, PostToPostRef} from './posts';
+import {toUserAlgoliaFilterRef, User} from './users';
+import {Group, groupToAlgoliaGroupRef} from './groups';
+import {Post, postToPostRef} from './posts';
 import {OpenPosition, openPosToOpenPosListItem} from './openPositions';
 import {Publication, publicationToPublicationRef} from './publications';
 
@@ -62,16 +62,24 @@ function addToIndex(
 
 export const configureUserSearchIndex = functions.https.onRequest(
   (req, res): void | Promise<void> =>
-    configureSearchIndex(res, USERS_INDEX, ['name', 'institution'])
+    configureSearchIndex(res, USERS_INDEX, [
+      'name',
+      'institution',
+      'recentPostTopics.name',
+      'recentPublicationTopics.name',
+    ])
 );
 
 export const addUserToSearchIndex = functions.firestore
   .document(`users/{userID}`)
   .onCreate((change, context): boolean => {
-    const user = toUserRef(context.params.userID, change.data());
+    const userRef = toUserAlgoliaFilterRef(
+      change.data() as User,
+      context.params.userID
+    );
     return addToIndex(
       context.params.userID,
-      user,
+      userRef,
       ResourceTypes.USER,
       USERS_INDEX
     );
@@ -80,15 +88,20 @@ export const addUserToSearchIndex = functions.firestore
 export const updateUserToSearchIndex = functions.firestore
   .document(`users/{userID}`)
   .onUpdate((change, context): boolean => {
-    const newUserData = change.after.data();
-    const oldUserData = change.before.data();
+    const newUserData = change.after.data() as User;
+    const oldUserData = change.before.data() as User;
     const userID = context.params.userID;
     if (
-      JSON.stringify(toUserRef(userID, newUserData)) ===
-      JSON.stringify(toUserRef(userID, oldUserData))
+      JSON.stringify(toUserAlgoliaFilterRef(newUserData, userID)) ===
+      JSON.stringify(toUserAlgoliaFilterRef(oldUserData, userID))
     )
       return false;
-    return addToIndex(userID, newUserData, ResourceTypes.USER, USERS_INDEX);
+    return addToIndex(
+      userID,
+      toUserAlgoliaFilterRef(newUserData, userID),
+      ResourceTypes.USER,
+      USERS_INDEX
+    );
   });
 
 export const configureGroupSearchIndex = functions.https.onRequest((_, res) =>
@@ -97,6 +110,9 @@ export const configureGroupSearchIndex = functions.https.onRequest((_, res) =>
     'unordered(about)',
     'unordered(institution)',
     'unordered(location)',
+    'recentPostTopics.name',
+    'recentArticleTopics.name',
+    'recentPublicationTopics.name',
   ])
 );
 
@@ -104,7 +120,7 @@ export const addGroupToSearchIndex = functions.firestore
   .document(`groups/{groupID}`)
   .onCreate((change, context): boolean => {
     const group = change.data() as Group;
-    const groupRef = groupToGroupRef(group, context.params.groupID);
+    const groupRef = groupToAlgoliaGroupRef(group, context.params.groupID);
     return addToIndex(
       context.params.groupID,
       groupRef,
@@ -120,11 +136,11 @@ export const updateGroupToSearchIndex = functions.firestore
     const oldGroupData = change.before.data() as Group;
     const groupID = context.params.groupID;
     if (
-      JSON.stringify(groupToGroupRef(newGroupData, groupID)) ===
-      JSON.stringify(groupToGroupRef(oldGroupData, groupID))
+      JSON.stringify(groupToAlgoliaGroupRef(newGroupData, groupID)) ===
+      JSON.stringify(groupToAlgoliaGroupRef(oldGroupData, groupID))
     )
       return false;
-    const groupRef = groupToGroupRef(newGroupData, groupID);
+    const groupRef = groupToAlgoliaGroupRef(newGroupData, groupID);
     return addToIndex(groupID, groupRef, ResourceTypes.GROUP, GROUPS_INDEX);
   });
 
@@ -141,11 +157,10 @@ export const configurePostSearchIndex = functions.https.onRequest((_, res) =>
 export const addPostToSearchIndex = functions.firestore
   .document(`posts/{postID}`)
   .onCreate((change, context): boolean => {
-    const post = change.data();
-    post.postType = post.postType.id;
+    const post = change.data() as Post;
     return addToIndex(
       context.params.postID,
-      post,
+      postToPostRef(post),
       ResourceTypes.POST,
       POSTS_INDEX
     );
@@ -157,13 +172,13 @@ export const updatePostToSearchIndex = functions.firestore
     const newPostData = change.after.data() as Post;
     const oldPostData = change.before.data() as Post;
     if (
-      JSON.stringify(PostToPostRef(newPostData)) ===
-      JSON.stringify(PostToPostRef(oldPostData))
+      JSON.stringify(postToPostRef(newPostData)) ===
+      JSON.stringify(postToPostRef(oldPostData))
     )
       return false;
     return addToIndex(
       context.params.postID,
-      newPostData,
+      postToPostRef(newPostData),
       ResourceTypes.POST,
       POSTS_INDEX
     );

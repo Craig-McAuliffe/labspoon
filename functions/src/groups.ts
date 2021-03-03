@@ -5,13 +5,19 @@ import {
   updateFilterCollection,
   Post,
   addRecentPostsToFollowingFeed,
+  PostRef,
 } from './posts';
-import {Topic, removeTopicsFromResource, addTopicsToResource} from './topics';
-import {Publication} from './publications';
+import {
+  Topic,
+  removeTopicsFromResource,
+  addTopicsToResource,
+  TaggedTopic,
+} from './topics';
+import {Publication, PublicationRef} from './publications';
 import {OpenPosition} from './openPositions';
 import {ResearchFocus} from './researchFocuses';
 import {Technique} from './techniques';
-import {toUserFilterRef, UserRef} from './users';
+import {MAX_RECENT_TOPICS, toUserFilterRef, UserRef} from './users';
 
 const db: firestore.Firestore = admin.firestore();
 
@@ -943,19 +949,6 @@ export const removePublicationTopicsToGroup = functions.firestore
     return await removeTopicsFromResource(publicationTopics, groupID, 'group');
   });
 
-export function groupToGroupRef(group: Group, groupID: string) {
-  const groupRef = {
-    id: groupID,
-    name: group.name,
-    about: group.about,
-    institution: group.institution,
-  } as GroupRef;
-
-  if (group.avatar) groupRef.avatar = group.avatar;
-  if (group.rank) groupRef.rank = group.rank;
-  return groupRef;
-}
-
 export const addRecentPostsToFeedOnNewGroupFollow = functions.firestore
   .document('groups/{followedGroupID}/followedByUsers/{followerID}')
   .onCreate(
@@ -1032,6 +1025,140 @@ export const addGroupPostToFollowersFeeds = functions.firestore
     return Promise.all(groupFollowersPromisesArray);
   });
 
+export const addPostTopicsToRecentGroupTopics = functions.firestore
+  .document('groups/{groupID}/posts/{postID}')
+  .onCreate(async (change, context) => {
+    const post = change.data() as PostRef;
+    const groupID = context.params.groupID;
+    const topics = post.topics;
+    if (!topics || topics.length === 0) return;
+    return addRecentResourceTopicsToGroupDoc(
+      groupID,
+      topics,
+      'recentPostTopics'
+    );
+  });
+
+export const addPublicationTopicsToRecentGroupTopics = functions.firestore
+  .document('groups/{groupID}/publications/{publicationID}')
+  .onCreate(async (change, context) => {
+    const publication = change.data() as PublicationRef;
+    const groupID = context.params.groupID;
+    const topics = publication.topics;
+    if (!topics || topics.length === 0) return;
+    return addRecentResourceTopicsToGroupDoc(
+      groupID,
+      topics,
+      'recentPublicationTopics'
+    );
+  });
+
+export const addResearchFocusTopicsToRecentGroupTopics = functions.firestore
+  .document('groups/{groupID}/researchFocuses/{researchFocusID}')
+  .onCreate(async (change, context) => {
+    const post = change.data() as Post;
+    const groupID = context.params.groupID;
+    const topics = post.topics;
+    if (!topics || topics.length === 0) return;
+    return addRecentResourceTopicsToGroupDoc(
+      groupID,
+      topics,
+      'recentArticleTopics'
+    );
+  });
+
+export const addTechniqueTopicsToRecentGroupTopics = functions.firestore
+  .document('groups/{groupID}/techniques/{techniqueID}')
+  .onCreate(async (change, context) => {
+    const post = change.data() as Post;
+    const groupID = context.params.groupID;
+    const topics = post.topics;
+    if (!topics || topics.length === 0) return;
+    return addRecentResourceTopicsToGroupDoc(
+      groupID,
+      topics,
+      'recentArticleTopics'
+    );
+  });
+
+export const addOpenPosTopicsToRecentGroupTopics = functions.firestore
+  .document('groups/{groupID}/openPositions/{openPositionID}')
+  .onCreate(async (change, context) => {
+    const post = change.data() as Post;
+    const groupID = context.params.groupID;
+    const topics = post.topics;
+    if (!topics || topics.length === 0) return;
+    return addRecentResourceTopicsToGroupDoc(
+      groupID,
+      topics,
+      'recentArticleTopics'
+    );
+  });
+
+async function addRecentResourceTopicsToGroupDoc(
+  groupID: string,
+  newTopics: TaggedTopic[],
+  targetField:
+    | 'recentArticleTopics'
+    | 'recentPublicationTopics'
+    | 'recentPostTopics'
+) {
+  const groupRef = db.doc(`groups/${groupID}`);
+  const groupDocData = await groupRef
+    .get()
+    .then((ds) => ds.data() as Group)
+    .catch((err) =>
+      console.error(`unable to get group doc for group ${groupID} ${err}`)
+    );
+  if (!groupDocData) return;
+  const currentRecentTopics = groupDocData[targetField] as TaggedTopic[];
+  let newRecentTopics;
+  if (!currentRecentTopics) newRecentTopics = newTopics;
+  else {
+    newRecentTopics = currentRecentTopics;
+    newTopics.forEach((topic) => newRecentTopics.unshift(topic));
+  }
+  if (newRecentTopics.length > MAX_RECENT_TOPICS)
+    newRecentTopics.splice(MAX_RECENT_TOPICS);
+  return groupRef.set(
+    {
+      [targetField]: newRecentTopics,
+    },
+    {merge: true}
+  );
+}
+
+export function groupToGroupRef(group: Group, groupID: string) {
+  const groupRef = {
+    id: groupID,
+    name: group.name,
+    about: group.about,
+    institution: group.institution,
+  } as GroupRef;
+
+  if (group.avatar) groupRef.avatar = group.avatar;
+  if (group.rank) groupRef.rank = group.rank;
+  return groupRef;
+}
+
+export function groupToAlgoliaGroupRef(group: Group, groupID: string) {
+  const groupAlgoliaRef = {
+    id: groupID,
+    name: group.name,
+    about: group.about,
+    institution: group.institution,
+  } as AlgoliaGroupRef;
+
+  if (group.avatar) groupAlgoliaRef.avatar = group.avatar;
+  if (group.recentPostTopics)
+    groupAlgoliaRef.recentPostTopics = group.recentPostTopics;
+  if (group.recentPublicationTopics)
+    groupAlgoliaRef.recentPublicationTopics = group.recentPublicationTopics;
+  if (group.recentArticleTopics)
+    groupAlgoliaRef.recentArticleTopics = group.recentArticleTopics;
+  return groupAlgoliaRef;
+}
+
 export function groupRefToGroupSignature(groupRef: GroupRef) {
   const groupSignature: GroupSignature = {
     id: groupRef.id,
@@ -1055,6 +1182,17 @@ export interface GroupRef {
   rank?: number;
 }
 
+export interface AlgoliaGroupRef {
+  id: string;
+  name: string;
+  avatar?: string;
+  about?: string;
+  institution?: string;
+  recentPostTopics?: TaggedTopic[];
+  recentPublicationTopics?: TaggedTopic[];
+  recentArticleTopics?: TaggedTopic[];
+}
+
 export interface Group {
   id: string;
   name: string;
@@ -1067,6 +1205,9 @@ export interface Group {
   donationLink?: string;
   institution?: string;
   rank?: number;
+  recentPostTopics?: TaggedTopic[];
+  recentPublicationTopics?: TaggedTopic[];
+  recentArticleTopics?: TaggedTopic[];
 }
 
 export interface GroupSignature {

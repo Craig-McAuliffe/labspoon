@@ -28,22 +28,24 @@ export default async function addArticleToDB(
         `unable to fetch article count for group with id ${selectedGroup.id} ${err}`
       )
     );
-  if (!fullGroupDoc || !fullGroupDoc.exists) {
+  if (!fullGroupDoc) {
     alert('Something went wrong. Sorry about that. Please try again.');
     failFunction();
     setSubmitting(false);
     return;
   }
-  const articleCount = fullGroupDoc.data()[countFieldName];
-  if (articleCount && articleCount >= MAX_ARTICLE_TYPE_PER_GROUP) {
-    alert(
-      `You have reached the maximum number of ${resourceTypeToWord(
-        resourceTypePlural
-      )} for this group. You must delete at least one in order to make another.`
-    );
-    failFunction();
-    setSubmitting(false);
-    return;
+  if (fullGroupDoc.exists) {
+    const articleCount = fullGroupDoc.data()[countFieldName];
+    if (articleCount && articleCount >= MAX_ARTICLE_TYPE_PER_GROUP) {
+      alert(
+        `You have reached the maximum number of ${resourceTypeToWord(
+          resourceTypePlural
+        )} for this group. You must delete at least one in order to make another.`
+      );
+      failFunction();
+      setSubmitting(false);
+      return;
+    }
   }
   const article = {};
   const {customTopics, DBTopics} = handlePostTopics(selectedTopics);

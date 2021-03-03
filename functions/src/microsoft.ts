@@ -4,8 +4,8 @@ import axios, {AxiosPromise} from 'axios';
 import {Topic} from './topics';
 import {
   allPublicationFields,
-  Publication,
   publishAddPublicationRequests,
+  PublicationNoTopicIDs,
 } from './publications';
 import {UserPublicationRef, ExpressionAndName} from './users';
 import {flatten} from './helpers';
@@ -162,38 +162,6 @@ export const getSuggestedPublicationsForAuthorName = functions.https.onCall(
   }
 );
 
-export const getPublicationsByAuthorIDExpression = functions.https.onCall(
-  async (data) => {
-    const expression: string = data.expression;
-    const count: number = data.count;
-    const offset: number = data.offset;
-    if (!expression || !count)
-      throw new functions.https.HttpsError(
-        'invalid-argument',
-        'An expression and count are required in the request'
-      );
-    const fetchedPubs = await executeExpression({
-      expr: expression,
-      count: count,
-      attributes: allPublicationFields,
-      offset: offset,
-    })
-      .then(async (resp) => {
-        const makPublications: MAKPublication[] = resp.data.entities;
-        await publishAddPublicationRequests(makPublications);
-        return makPublications;
-      })
-      .catch((err) => {
-        console.error(`unable to execute expression ${expression} ${err}`);
-        throw new functions.https.HttpsError(
-          'internal',
-          'Microsoft evaluate failed for given expression'
-        );
-      });
-    return fetchedPubs.map((makPub) => makPublicationToPublication(makPub));
-  }
-);
-
 export const msExecuteAuthorExpressions = (
   offset: number,
   expressionsAndNames: Array<ExpressionAndName>
@@ -251,6 +219,38 @@ export const msExecuteAuthorExpressions = (
       });
   });
 
+export const getPublicationsByAuthorIDExpression = functions.https.onCall(
+  async (data) => {
+    const expression: string = data.expression;
+    const count: number = data.count;
+    const offset: number = data.offset;
+    if (!expression || !count)
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        'An expression and count are required in the request'
+      );
+    const fetchedPubs = await executeExpression({
+      expr: expression,
+      count: count,
+      attributes: allPublicationFields,
+      offset: offset,
+    })
+      .then(async (resp) => {
+        const makPublications: MAKPublication[] = resp.data.entities;
+        await publishAddPublicationRequests(makPublications);
+        return makPublications;
+      })
+      .catch((err) => {
+        console.error(`unable to execute expression ${expression} ${err}`);
+        throw new functions.https.HttpsError(
+          'internal',
+          'Microsoft evaluate failed for given expression'
+        );
+      });
+    return fetchedPubs.map((makPub) => makPublicationToPublication(makPub));
+  }
+);
+
 interface executeParams {
   expr: string;
   count: number;
@@ -272,8 +272,8 @@ export function executeExpression(params: executeParams): AxiosPromise {
 
 export function makPublicationToPublication(
   makPublication: MAKPublication
-): Publication {
-  const publication = {} as Publication;
+): PublicationNoTopicIDs {
+  const publication = {} as PublicationNoTopicIDs;
   if (makPublication.D) publication.date = makPublication.D;
   if (makPublication.DN) publication.title = makPublication.DN;
   if (makPublication.AA)
@@ -438,5 +438,5 @@ export function TopicToMAKField(
 
 interface PublicationSuggestion {
   microsoftAcademicAuthorID: string;
-  publicationInfo: Publication;
+  publicationInfo: PublicationNoTopicIDs;
 }

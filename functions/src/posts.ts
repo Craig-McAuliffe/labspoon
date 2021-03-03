@@ -98,7 +98,6 @@ export const createPost = functions.https.onCall(async (data, context) => {
   }
   if (data.openPosition && data.openPosition.id)
     post.openPosition = data.openPosition;
-  await Promise.all(matchedTopicsPromises);
   return postDocRef
     .set(post)
     .then(() =>
@@ -194,7 +193,7 @@ export const addPostToAuthorPosts = functions.firestore
       .doc(authorID)
       .collection('posts')
       .doc(postID)
-      .set(post);
+      .set(postToPostRef(post));
     return null;
   });
 
@@ -206,8 +205,8 @@ export const updatePostOnAuthors = functions.firestore
     const postID = change.after.id;
     const authorID = newPostData.author.id;
     if (
-      JSON.stringify(PostToPostRef(newPostData)) ===
-      JSON.stringify(PostToPostRef(oldPostData))
+      JSON.stringify(postToPostRef(newPostData)) ===
+      JSON.stringify(postToPostRef(oldPostData))
     )
       return;
 
@@ -227,8 +226,8 @@ export const updatePostOnGroups = functions.firestore
     const oldPostData = change.before.data() as Post;
     const postID = context.params.postID;
     if (
-      JSON.stringify(PostToPostRef(newPostData)) ===
-      JSON.stringify(PostToPostRef(oldPostData))
+      JSON.stringify(postToPostRef(newPostData)) ===
+      JSON.stringify(postToPostRef(oldPostData))
     )
       return;
 
@@ -268,8 +267,8 @@ export const updatePostOnPublication = functions.firestore
     const oldPostData = change.before.data() as Post;
     const postID = context.params.postID;
     if (
-      JSON.stringify(PostToPostRef(newPostData)) ===
-      JSON.stringify(PostToPostRef(oldPostData))
+      JSON.stringify(postToPostRef(newPostData)) ===
+      JSON.stringify(postToPostRef(oldPostData))
     )
       return;
     const publication = newPostData.publication;
@@ -295,8 +294,8 @@ export const updatePostOnOpenPosition = functions.firestore
     const oldPostData = change.before.data() as Post;
     const postID = context.params.postID;
     if (
-      JSON.stringify(PostToPostRef(newPostData)) ===
-      JSON.stringify(PostToPostRef(oldPostData))
+      JSON.stringify(postToPostRef(newPostData)) ===
+      JSON.stringify(postToPostRef(oldPostData))
     )
       return;
     const openPosition = newPostData.openPosition;
@@ -322,8 +321,8 @@ export const updatePostOnBookmarks = functions.firestore
     const oldPostData = change.before.data() as Post;
     const postID = context.params.postID;
     if (
-      JSON.stringify(PostToPostRef(newPostData)) ===
-      JSON.stringify(PostToPostRef(oldPostData))
+      JSON.stringify(postToPostRef(newPostData)) ===
+      JSON.stringify(postToPostRef(oldPostData))
     )
       return;
     const bookmarkersQS = await db
@@ -367,8 +366,8 @@ export const updatePostOnRecommenders = functions.firestore
     const oldPostData = change.before.data() as Post;
     const postID = context.params.postID;
     if (
-      JSON.stringify(PostToPostRef(newPostData)) ===
-      JSON.stringify(PostToPostRef(oldPostData))
+      JSON.stringify(postToPostRef(newPostData)) ===
+      JSON.stringify(postToPostRef(oldPostData))
     )
       return;
     const recommendersQS = await db
@@ -412,8 +411,8 @@ export const updatePostOnTopic = functions.firestore
     const oldPostData = change.before.data() as Post;
     const postID = context.params.postID;
     if (
-      JSON.stringify(PostToPostRef(newPostData)) ===
-      JSON.stringify(PostToPostRef(oldPostData))
+      JSON.stringify(postToPostRef(newPostData)) ===
+      JSON.stringify(postToPostRef(oldPostData))
     )
       return;
     const topics = newPostData.topics;
@@ -442,8 +441,8 @@ export const updatePostOnFollowerFeeds = functions.firestore
     const oldPostData = change.before.data() as Post;
     const postID = context.params.postID;
     if (
-      JSON.stringify(PostToPostRef(newPostData)) ===
-      JSON.stringify(PostToPostRef(oldPostData))
+      JSON.stringify(postToPostRef(newPostData)) ===
+      JSON.stringify(postToPostRef(oldPostData))
     )
       return;
     const appearsOnFollowerFeedsQS = await db
@@ -522,13 +521,13 @@ export async function addRecentPostsToFollowingFeed(
 export const addPostToTopic = functions.firestore
   .document(`posts/{postID}`)
   .onCreate(async (change, context) => {
-    const post = change.data();
+    const post = change.data() as Post;
     const postID = context.params.postID;
     const postTopics = post.topics;
     const topicsToTopicsPromisesArray = postTopics.map(
       (postTopic: TaggedTopic) => {
         db.doc(`topics/${postTopic.id}/posts/${postID}`)
-          .set(post)
+          .set(postToPostRef(post))
           .catch((err) => console.log(err, 'could not add post to topic'));
       }
     );
@@ -544,7 +543,7 @@ export const addPublicationPostToPublication = functions.firestore
     if (!publication) return;
     return db
       .doc(`publications/${publication.id}/posts/${postID}`)
-      .set(post)
+      .set(postToPostRef(post))
       .catch((err) =>
         console.error(
           'unable to set post with id ' +
@@ -565,7 +564,7 @@ export const addPostToOpenPosition = functions.firestore
     if (!openPosition) return;
     return db
       .doc(`openPositions/${openPosition.id}/posts/${postID}`)
-      .set(post)
+      .set(postToPostRef(post))
       .catch((err) =>
         console.error(
           'unable to set post with id ' +
@@ -810,10 +809,20 @@ export interface PostRef {
   unixTimeStamp: number;
 }
 
-export function PostToPostRef(post: Post): PostRef {
-  delete post.bookmarkedCount;
-  delete post.recommendedCount;
-  return post;
+export function postToPostRef(post: Post): PostRef {
+  const postRef: PostRef = {
+    postType: post.postType,
+    author: post.author,
+    content: post.content,
+    topics: post.topics,
+    timestamp: post.timestamp,
+    filterTopicIDs: post.filterTopicIDs,
+    unixTimeStamp: post.unixTimeStamp,
+    id: post.id,
+  };
+  if (post.customTopics) postRef.customTopics = post.customTopics;
+  if (post.publication) postRef.publication = post.publication;
+  return postRef;
 }
 
 export interface PostContent {

@@ -8,10 +8,17 @@ import {
   Post,
   updateRefOnFilterCollection,
   addRecentPostsToFollowingFeed,
+  PostRef,
 } from './posts';
+import {PublicationRef} from './publications';
 import {ResearchFocus} from './researchFocuses';
 import {Technique} from './techniques';
-import {addTopicsToResource, removeTopicsFromResource, Topic} from './topics';
+import {
+  addTopicsToResource,
+  removeTopicsFromResource,
+  TaggedTopic,
+  Topic,
+} from './topics';
 
 const db = admin.firestore();
 
@@ -116,6 +123,61 @@ export const setUserIsFollowedBySelfOnCreation = functions.firestore
     if (user.avatar) userRef.avatar = user.avatar;
     await db.doc(`users/${userID}/followedByUsers/${userID}`).set(userRef);
   });
+
+export const MAX_RECENT_TOPICS = 20;
+export const addPostTopicsToRecentUserTopics = functions.firestore
+  .document('users/{userID}/posts/{postID}')
+  .onCreate(async (change, context) => {
+    const post = change.data() as PostRef;
+    const authorID = context.params.userID;
+    const topics = post.topics;
+    if (!topics || topics.length === 0) return;
+    addRecentResourceTopicsToUserDoc(authorID, topics, 'recentPostTopics');
+  });
+
+export const addPublicationTopicsToRecentUserTopics = functions.firestore
+  .document('users/{userID}/publications/{publicationID}')
+  .onCreate(async (change, context) => {
+    const publication = change.data() as PublicationRef;
+    const authorID = context.params.userID;
+    const topics = publication.topics;
+    if (!topics || topics.length === 0) return;
+    addRecentResourceTopicsToUserDoc(
+      authorID,
+      topics,
+      'recentPublicationTopics'
+    );
+  });
+
+async function addRecentResourceTopicsToUserDoc(
+  authorID: string,
+  newTopics: TaggedTopic[],
+  targetField: 'recentPublicationTopics' | 'recentPostTopics'
+) {
+  const authorRef = db.doc(`users/${authorID}`);
+  const userDocData = await authorRef
+    .get()
+    .then((ds) => ds.data() as User)
+    .catch((err) =>
+      console.error(`unable to get user doc for userId ${authorID} ${err}`)
+    );
+  if (!userDocData) return;
+  const currentRecentTopics = userDocData[targetField] as TaggedTopic[];
+  let newRecentTopics;
+  if (!currentRecentTopics) newRecentTopics = newTopics;
+  else {
+    newRecentTopics = currentRecentTopics;
+    newTopics.forEach((topic) => newRecentTopics.unshift(topic));
+  }
+  if (newRecentTopics.length > MAX_RECENT_TOPICS)
+    newRecentTopics.splice(MAX_RECENT_TOPICS);
+  return authorRef.set(
+    {
+      [targetField]: newRecentTopics,
+    },
+    {merge: true}
+  );
+}
 
 export const addUserToRelatedTopic = functions.firestore
   .document('users/{userID}/topics/{topicID}')
@@ -1201,6 +1263,17 @@ export interface UserRef {
   position?: string;
 }
 
+export interface UserAlgoliaRef {
+  id: string;
+  name: string;
+  avatar?: string;
+  microsoftID?: string;
+  reputation?: number;
+  position?: string;
+  recentPublicationTopics?: Topic[];
+  recentPostTopics?: Topic[];
+}
+
 export function toUserRef(userID: string, user: any) {
   const userRef: UserRef = {
     id: userID,
@@ -1211,6 +1284,21 @@ export function toUserRef(userID: string, user: any) {
   if (user.microsoftID) userRef.microsoftID = user.microsoftID;
   if (user.reputation) userRef.reputation = user.reputation;
   return userRef;
+}
+
+export function toUserAlgoliaFilterRef(user: User, userID: string) {
+  const userAlgoliaRef: UserAlgoliaRef = {
+    id: userID,
+    name: user.name,
+  };
+  if (user.microsoftID) userAlgoliaRef.microsoftID = user.microsoftID;
+  if (user.reputation) userAlgoliaRef.reputation = user.reputation;
+  if (user.avatar) userAlgoliaRef.avatar = user.avatar;
+  if (user.recentPublicationTopics)
+    userAlgoliaRef.recentPublicationTopics = user.recentPublicationTopics;
+  if (user.recentPostTopics)
+    userAlgoliaRef.recentPostTopics = user.recentPostTopics;
+  return userAlgoliaRef;
 }
 
 export function toUserPublicationRef(
@@ -1251,6 +1339,8 @@ export interface User {
   rank?: number;
   reputation?: number;
   lastPostTimeStamp?: number;
+  recentPublicationTopics?: Topic[];
+  recentPostTopics?: Topic[];
 }
 
 export interface UserFilterRef {

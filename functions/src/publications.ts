@@ -1055,7 +1055,7 @@ export interface PublicationRef {
   date: string;
   title: string;
   authors: Array<UserPublicationRef>;
-  topics: Topic[];
+  topics: TaggedTopic[];
   microsoftID?: string;
   // This field is required so we can find references to a publication in
   // a collection group.
@@ -1080,6 +1080,19 @@ export interface Publication {
   title?: string;
   authors?: UserPublicationRef[];
   microsoftID?: string;
+  topics?: TaggedTopic[];
+  sources: Source[];
+  referencedPublicationMicrosoftIDs: string[];
+  filterTopicIDs?: string[];
+  filterAuthorIDs?: string[];
+  isCustomPublication?: false;
+}
+
+export interface PublicationNoTopicIDs {
+  date?: string;
+  title?: string;
+  authors?: UserPublicationRef[];
+  microsoftID?: string;
   topics?: Topic[];
   sources: Source[];
   referencedPublicationMicrosoftIDs: string[];
@@ -1093,7 +1106,7 @@ export interface AlgoliaPublication {
   title?: string;
   authors?: UserPublicationRef[];
   microsoftID?: string;
-  topics?: Topic[];
+  topics?: TaggedTopic[];
   sources: Source[];
   referencedPublicationMicrosoftIDs: string[];
   filterTopicIDs?: string[];
@@ -1109,7 +1122,7 @@ export interface CustomPublication {
   sources: Source[];
   authors: UserCustomPublicationRef[];
   filterAuthorIDs: string[];
-  topics: Topic[];
+  topics: TaggedTopic[];
   filterTopicIDs?: string[];
   isCustomPublication: boolean;
 }
