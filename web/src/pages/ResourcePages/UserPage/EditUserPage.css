@@ -1,10 +1,17 @@
 .link-user-to-publications-button-container {
-  text-align: center;
+  justify-content: center;
+  display: flex;
 }
 
 .edit-user-profile-submit-image-button-container {
   display: flex;
   justify-content: space-between;
+}
+
+.link-user-to-publications-sync-text {
+  color: #5d5d65;
+  text-align: center;
+  margin-top: 10px;
 }
 
 .edit-user-profile-upload-image-container {

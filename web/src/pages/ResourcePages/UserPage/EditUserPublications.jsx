@@ -45,11 +45,16 @@ export default function EditUserPublications({children}) {
       {linkingAuthor ? (
         <LinkUserToPublications setLinkingAuthor={setLinkingAuthor} />
       ) : (
-        <div className="link-user-to-publications-button-container">
-          <SecondaryButton onClick={() => setLinkingAuthor(true)}>
-            Connect publications to profile
-          </SecondaryButton>
-        </div>
+        <>
+          <div className="link-user-to-publications-button-container">
+            <SecondaryButton onClick={() => setLinkingAuthor(true)}>
+              Connect publications to profile
+            </SecondaryButton>
+          </div>
+          <p className="link-user-to-publications-sync-text">
+            This will sync your Labspoon profile to Microsoft Academic
+          </p>
+        </>
       )}
     </PaddedPageContainer>
   );
