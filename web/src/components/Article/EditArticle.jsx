@@ -14,6 +14,7 @@ import CreateResourceFormActions from '../Forms/CreateResourceFormActions';
 import ErrorMessage from '../Forms/ErrorMessage';
 import NotFoundPage from '../../pages/NotFoundPage/NotFoundPage';
 import {AuthContext} from '../../App';
+import {PaddedPageContainer} from '../Layout/Content';
 
 export default function EditArticle({
   articleCollectionName,
@@ -95,7 +96,7 @@ export default function EditArticle({
   };
 
   return (
-    <div>
+    <PaddedPageContainer>
       {uploadError && (
         <ErrorMessage noBorder={true}>
           Something went wrong. Please try again.
@@ -116,6 +117,6 @@ export default function EditArticle({
           />
         </Form>
       </Formik>
-    </div>
+    </PaddedPageContainer>
   );
 }
