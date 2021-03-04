@@ -26,6 +26,7 @@ export default function FilteredSelector({
   const [selectedItems, setSelectedItems] = useState([]);
   const [success, setSuccess] = useState(false);
   const [fetchResults, setFetchResults] = useState(() => []);
+  const [shouldFetchResults, setShouldFetchResults] = useState(true);
   // Deselect posts when successfully adding posts
   useEffect(() => {
     if (success) {
@@ -37,11 +38,18 @@ export default function FilteredSelector({
   }, [success]);
 
   useEffect(() => {
-    if (!success) return;
+    if (success) {
+      setShouldFetchResults(true);
+    }
+  }, [success]);
+
+  useEffect(() => {
+    if (!shouldFetchResults) return;
+    setShouldFetchResults(false);
     const fetchingResultsFunction = (skip, limit, filter, last) =>
       fetchItems(skip, limit, filter, last);
     setFetchResults(() => fetchingResultsFunction);
-  }, [success]);
+  }, [shouldFetchResults]);
 
   const resetSelection = () => {
     setSelectedItems([]);
