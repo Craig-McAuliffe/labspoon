@@ -7,13 +7,14 @@ import {Redirect, useLocation} from 'react-router-dom';
 import OpenPositionPostForm from './OpenPositionPostForm';
 
 import './CreatePost.css';
+import {getTweetTextFromRichText} from '../../../Article/Article';
 
 export const DEFAULT_POST = 'Default';
 export const PUBLICATION_POST = 'Publication';
 export const OPEN_POSITION_POST = 'Open Position';
 
 export const CreatingPostContext = createContext();
-
+export const MAX_POST_CHARACTERS = 800;
 export default function CreatePost({
   pinnedPost,
   keepExpanded = false,
@@ -39,6 +40,7 @@ export default function CreatePost({
 
   useEffect(() => {
     setSavedTitleText();
+    setTaggedResourceType(DEFAULT_POST);
     setTimeout(() => setPostSuccess(false), 3000);
   }, [postSuccess]);
 
@@ -162,7 +164,9 @@ export function getTweetPostURL(text, topics) {
     .map((topic) => topic.name)
     .join(',')
     .replace(/\s/g, '')
-    .replace('-', '');
+    .replace('-', '')
+    .replace('(', '')
+    .replace(')', '');
   return `https://twitter.com/intent/tweet?text=${text}&hashtags=${commaSeparatedTopics}&via=Labspoon`;
 }
 
@@ -171,4 +175,11 @@ export function validateTweetPostLength(textLength, topics) {
   const topicsLength = commaSeparatedTopics.replace(',', ' #').length;
   if (topicsLength + textLength > 280 - ' via @Labspoon '.length) return false;
   return true;
+}
+
+export function openTwitterWithPopulatedTweet(richText, topics) {
+  window.open(
+    getTweetPostURL(getTweetTextFromRichText(richText), topics),
+    '_blank'
+  );
 }

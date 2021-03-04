@@ -96,3 +96,11 @@ export function RichTextBody({body}) {
     </div>
   );
 }
+
+export function getTweetTextFromRichText(text) {
+  if (!text) return null;
+  return text.reduce((accumulator, current, index) => {
+    if (index === 0) return current.children[0].text;
+    return accumulator + '%0a' + current.children[0].text;
+  }, '');
+}

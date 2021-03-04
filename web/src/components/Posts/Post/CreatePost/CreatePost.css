@@ -34,6 +34,8 @@
 .creating-post-main-text-container {
   border-left: 2px solid #00507c;
   padding: 0px 0px 10px 10px;
+  max-width: 100%;
+  word-break: break-all;
 }
 
 .publication-post-search-section {
@@ -365,6 +367,10 @@
   margin-top: 15px;
 }
 
+.character-length-warning-container {
+  display: flex;
+  justify-content: flex-end;
+}
 @media screen and (max-width: 1197px) {
   .not-creating-post-button {
     margin-top: 65px;

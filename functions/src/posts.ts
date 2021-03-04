@@ -22,6 +22,7 @@ import {
   handleTopicsNoID,
 } from './topics';
 import {OpenPosition} from './openPositions';
+import {ArticleBodyChild} from './researchFocuses';
 
 const db = admin.firestore();
 
@@ -827,7 +828,7 @@ export function postToPostRef(post: Post): PostRef {
 }
 
 export interface PostContent {
-  text: string;
+  text: ArticleBodyChild[];
 }
 
 export interface PostType {

@@ -4,7 +4,7 @@ import TagTopics from '../../../Topics/TagTopics';
 import CreatePostActions from './CreatePostActions';
 import {
   CreatingPostContext,
-  getTweetPostURL,
+  MAX_POST_CHARACTERS,
   validateTweetPostLength,
 } from './CreatePost';
 import './CreatePost';
@@ -36,9 +36,7 @@ export default function PostForm({
   const createPost = (res) => {
     if (submittingPost) return;
     setSubmittingPost(true);
-    if (isTweeting)
-      window.open(getTweetPostURL(res.title, selectedTopics), '_blank');
-    onSubmit(res);
+    onSubmit(res, isTweeting);
   };
 
   useEffect(() => {
@@ -61,7 +59,7 @@ export default function PostForm({
         >
           <Form id={formID}>
             <CreatePostTitleContext.Provider
-              value={{setTitleLength: setTitleLength}}
+              value={{setTitleLength: setTitleLength, titleLength: titleLength}}
             >
               {children}
             </CreatePostTitleContext.Provider>
@@ -69,6 +67,7 @@ export default function PostForm({
         </Formik>
         {algoliaFormSearch}
         {outsideFormComponents}
+
         <TagTopics
           submittingForm={submittingPost}
           setSelectedTopics={setSelectedTopics}
@@ -90,6 +89,18 @@ export default function PostForm({
           hasTweetOption={true}
         />
       </div>
+    </div>
+  );
+}
+
+export function CreatePostCharacterCount({count}) {
+  let color;
+  color = '#99999F';
+  if (count >= (MAX_POST_CHARACTERS / 3) * 2) color = '#FF8A00';
+  if (count > MAX_POST_CHARACTERS) color = '#DA0000';
+  return (
+    <div style={{color: color}} className="character-length-warning-container">
+      {count} characters. Max {MAX_POST_CHARACTERS}
     </div>
   );
 }

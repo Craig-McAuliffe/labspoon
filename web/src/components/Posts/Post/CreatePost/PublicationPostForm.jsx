@@ -4,7 +4,11 @@ import * as Yup from 'yup';
 import firebase from '../../../../firebase';
 import {CreatePostTextArea, TextInput} from '../../../Forms/FormTextInput';
 import PostForm from './PostForm';
-import {CreatingPostContext, sortThrownCreatePostErrors} from './CreatePost';
+import {
+  CreatingPostContext,
+  sortThrownCreatePostErrors,
+  openTwitterWithPopulatedTweet,
+} from './CreatePost';
 import TypeOfTaggedResourceDropDown from './TypeOfTaggedResourceDropDown';
 import PublicationListItem, {
   SmallPublicationListItem,
@@ -32,6 +36,7 @@ import {algoliaPublicationToDBPublicationListItem} from '../../../../helpers/pub
 import {Alert} from 'react-bootstrap';
 import {FilterableResultsContext} from '../../../FilterableResults/FilterableResults';
 import {POST} from '../../../../helpers/resourceTypeDefinitions';
+import {postValidationSchema} from './DefaultPost';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
@@ -64,7 +69,7 @@ export default function PublicationPostForm({
   ] = useState(false);
   const {setResults} = useContext(FilterableResultsContext);
 
-  const submitChanges = async (res) => {
+  const submitChanges = async (res, isTweeting) => {
     if (customPublicationErrors) setCustomPublicationErrors();
     if (pubSubmissionError) setPubSubmissionError(false);
     if (customPublication) setCustomPubSuccessfullyCreated(false);
@@ -111,6 +116,8 @@ export default function PublicationPostForm({
     res.topics = selectedTopics;
     createPost(res)
       .then((response) => {
+        if (isTweeting)
+          openTwitterWithPopulatedTweet(res.title, selectedTopics);
         setCreatingPost(false);
         setPostSuccess(true);
         setSubmittingPost(false);
@@ -136,22 +143,12 @@ export default function PublicationPostForm({
     title: savedTitleText ? savedTitleText : '',
   };
 
-  const postTitleValidation = Yup.string()
-    .required('You need to write something!')
-    .max(
-      1500,
-      'Your post is too long. It must have fewer than 1500 characters.'
-    );
-  const validationSchema = Yup.object({
-    title: postTitleValidation,
-  });
-
   return (
     <>
       <PostForm
         onSubmit={submitChanges}
         initialValues={initialValues}
-        validationSchema={validationSchema}
+        validationSchema={postValidationSchema}
         formID="create-publication-post-form"
         outsideFormComponents={
           isQuickCreatingPub && (

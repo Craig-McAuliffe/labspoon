@@ -1,10 +1,14 @@
 import React, {useContext, useEffect} from 'react';
 import {useField} from 'formik';
 import InputError from './InputError';
-import {CreatePostTitleContext} from '../Posts/Post/CreatePost/PostForm';
+import {
+  CreatePostCharacterCount,
+  CreatePostTitleContext,
+} from '../Posts/Post/CreatePost/PostForm';
 import {CreatingPostContext} from '../Posts/Post/CreatePost/CreatePost';
 
 import './FormTextInput.css';
+import HeaderAndBodyArticleInput from './Articles/HeaderAndBodyArticleInput';
 
 export default function FormTextInput({
   label,
@@ -66,23 +70,27 @@ export function TextInput({
 }
 
 export function CreatePostTextArea({...props}) {
-  const [field, meta] = useField(props);
-  const {setTitleLength} = useContext(CreatePostTitleContext);
-  const {setSavedTitleText, savedTitleText} = useContext(CreatingPostContext);
-
-  useEffect(() => setTitleLength(field.value.length), [field.value.length]);
-  useEffect(() => setSavedTitleText(field.value), [field.value]);
+  const [field] = useField(props);
+  const {setTitleLength, titleLength} = useContext(CreatePostTitleContext);
+  const {setSavedTitleText} = useContext(CreatingPostContext);
+  useEffect(() => {
+    const titleLength = field.value.reduce((accumulator, current) => {
+      // + 1 is for the paragraph break character itself
+      return accumulator + current.children[0].text.length + 1;
+    }, 0);
+    setTitleLength(titleLength);
+    setSavedTitleText(field.value);
+  }, [field.value]);
 
   return (
     <>
-      <textarea
+      <HeaderAndBodyArticleInput
+        noTitle={true}
         className="create-post-main-text"
-        autoFocus
-        placeholder={savedTitleText ? null : "...What's happening?"}
-        {...field}
         {...props}
+        customPlaceholderText="...What's happening?"
       />
-      {meta.touched && meta.error ? <InputError error={meta.error} /> : null}
+      <CreatePostCharacterCount count={titleLength} />
     </>
   );
 }

@@ -1,11 +1,14 @@
 import React, {useContext, useEffect, useState} from 'react';
-import * as Yup from 'yup';
 import firebase from '../../../../firebase';
 import {CreatePostTextArea} from '../../../Forms/FormTextInput';
 import PostForm from './PostForm';
 import TypeOfTaggedResourceDropDown from './TypeOfTaggedResourceDropDown';
 import {handlePostTopics} from '../../../Topics/TagTopics';
-import {CreatingPostContext, sortThrownCreatePostErrors} from './CreatePost';
+import {
+  CreatingPostContext,
+  sortThrownCreatePostErrors,
+  openTwitterWithPopulatedTweet,
+} from './CreatePost';
 import {Link} from 'react-router-dom';
 
 import './CreatePost.css';
@@ -18,6 +21,7 @@ import {TagResourceIcon} from '../../../../assets/ResourceTypeIcons';
 import {algoliaOpenPosToDBOpenPosListItem} from '../../../../helpers/openPositions';
 import {FilterableResultsContext} from '../../../FilterableResults/FilterableResults';
 import {POST} from '../../../../helpers/resourceTypeDefinitions';
+import {postValidationSchema} from './DefaultPost';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
@@ -50,7 +54,7 @@ export default function OpenPositionPostForm({
     setGeneralError(false);
   }, [generalError]);
 
-  const submitChanges = async (res) => {
+  const submitChanges = async (res, isTweeting) => {
     setSubmittingPost(true);
     if (!taggedOpenPosition) {
       setNoTaggedOpenPosError(true);
@@ -68,6 +72,8 @@ export default function OpenPositionPostForm({
     res.openPosition = dbOpenPosition;
     createPost(res)
       .then((response) => {
+        if (isTweeting)
+          openTwitterWithPopulatedTweet(res.title, selectedTopics);
         setCreatingPost(false);
         setSubmittingPost(false);
         setPostSuccess(true);
@@ -86,19 +92,11 @@ export default function OpenPositionPostForm({
     title: savedTitleText ? savedTitleText : '',
   };
 
-  const validationSchema = Yup.object({
-    title: Yup.string()
-      .required('You need to write something!')
-      .max(
-        1500,
-        'Your post is too long. It must have fewer than 1500 characters.'
-      ),
-  });
   return (
     <PostForm
       onSubmit={submitChanges}
       initialValues={initialValues}
-      validationSchema={validationSchema}
+      validationSchema={postValidationSchema}
       formID="create-openPosition-post-form"
       algoliaFormSearch={
         <SelectOpenPosition

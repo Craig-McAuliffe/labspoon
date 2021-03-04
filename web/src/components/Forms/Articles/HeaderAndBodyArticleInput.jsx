@@ -7,11 +7,20 @@ import {withHistory} from 'slate-history';
 import InputError from '../InputError';
 
 import './HeaderAndBodyArticleInput.css';
+import {MAX_POST_CHARACTERS} from '../../Posts/Post/CreatePost/CreatePost';
 
-export default function HeaderAndBodyArticleInput({label, ...props}) {
+export default function HeaderAndBodyArticleInput({
+  label,
+  noTitle,
+  customPlaceholderText,
+  ...props
+}) {
   const [field, meta, helpers] = useField(props);
   const editor = useMemo(
-    () => withLayout(withHistory(withReact(createEditor()))),
+    () =>
+      noTitle
+        ? withLayoutNoTitle(withHistory(withReact(createEditor())))
+        : withLayout(withHistory(withReact(createEditor()))),
     []
   );
   const renderElement = useCallback((props) => <Element {...props} />, []);
@@ -22,9 +31,14 @@ export default function HeaderAndBodyArticleInput({label, ...props}) {
 
   return (
     <>
-      <div className="editor-container">
+      <div className={`editor-container${noTitle ? '-no-title' : ''}`}>
         <Slate editor={editor} {...field} {...props}>
-          <Editable renderElement={renderElement} autoFocus spellCheck />
+          <Editable
+            renderElement={renderElement}
+            autoFocus
+            spellCheck
+            placeholder={customPlaceholderText}
+          />
         </Slate>
       </div>
       {meta.error && meta.touched ? <InputError error={meta.error} /> : <></>}
@@ -39,7 +53,7 @@ const Element = ({attributes, children, element}) => {
     case 'paragraph':
       return <p {...attributes}>{children}</p>;
     default:
-      return null;
+      return <p {...attributes}>{children}</p>;
   }
 };
 
@@ -53,6 +67,17 @@ export const initialValue = [
     children: [
       {
         text: 'Body goes here',
+      },
+    ],
+  },
+];
+
+export const initialValueNoTitle = [
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text: '',
       },
     ],
   },
@@ -91,6 +116,80 @@ const withLayout = (editor) => {
 
   return editor;
 };
+
+const withLayoutNoTitle = (editor) => {
+  const {normalizeNode} = editor;
+
+  editor.normalizeNode = ([node, path]) => {
+    if (path.length === 0) {
+      if (editor.children.length < 1) {
+        const paragraph = {
+          type: 'paragraph',
+          children: [{text: ''}],
+        };
+
+        Transforms.insertNodes(editor, paragraph, {at: path.concat(0)});
+      }
+      for (const [child, childPath] of Node.children(editor, path)) {
+        const type = 'paragraph';
+
+        if (SlateElement.isElement(child) && child.type !== type) {
+          const newProperties = {type};
+          Transforms.setNodes(editor, newProperties, {at: childPath});
+        }
+      }
+    }
+
+    return normalizeNode([node, path]);
+  };
+
+  return editor;
+};
+
+export const yupPostValidation = Yup.array()
+  .test(
+    'isEmptyBody',
+    // eslint-disable-next-line no-template-curly-in-string
+    'You must write something!',
+    (value) => {
+      // Check body is not empty
+      if (!value) return false;
+      if (!value[0]) return false;
+      if (value[0].type !== 'paragraph') return false;
+      if (value[0].children === undefined) return false;
+      if (value[0].children[0].text === undefined) return false;
+      if (value[0].children[0].text.length === 0) return false;
+
+      return true;
+    }
+  )
+  .test(
+    'isTooLong',
+    // eslint-disable-next-line no-template-curly-in-string
+    'Your post is too long. It must have fewer than 1500 characters.',
+    (value) => {
+      if (value[0].children === undefined) return false;
+      if (value[0].children[0].text === undefined) return false;
+      if (
+        value.reduce((accumulator, section) => {
+          if (!section.children[0].text) return accumulator;
+          return accumulator + section.children[0].text.length;
+        }, 0) > MAX_POST_CHARACTERS
+      )
+        return false;
+      return true;
+    }
+  )
+  .test(
+    'isTooLong',
+    // eslint-disable-next-line no-template-curly-in-string
+    'Too many paragraphs. Max 15.',
+    (value) => {
+      if (value === undefined) return false;
+      if (value.length > 15) return false;
+      return true;
+    }
+  );
 
 export const yupArticleValidation = Yup.array()
   .test(

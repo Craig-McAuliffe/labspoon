@@ -15,6 +15,7 @@ import {
   OPENPOSITION,
   PUBLICATION,
 } from '../../../helpers/resourceTypeDefinitions';
+import {RichTextBody} from '../../Article/Article';
 
 export default function Post({post, dedicatedPage, bookmarkedVariation}) {
   const taggedContent = [];
@@ -92,14 +93,27 @@ function PostTextContent({post, dedicatedPage}) {
   if (dedicatedPage)
     return (
       <div className="post-text-content">
-        <Linkify tagName="p">{post.content.text}</Linkify>
+        <Linkify tagName="p">
+          {' '}
+          {Array.isArray(post.content.text) ? (
+            <RichTextBody body={post.content.text} />
+          ) : (
+            post.content.text
+          )}
+        </Linkify>
       </div>
     );
 
   return (
     <div className="post-text-content">
       <Link to={`/post/${post.id}`} className="post-text-as-link">
-        <Linkify tagName="p">{post.content.text}</Linkify>
+        <Linkify tagName="p">
+          {Array.isArray(post.content.text) ? (
+            <RichTextBody body={post.content.text} />
+          ) : (
+            post.content.text
+          )}
+        </Linkify>
       </Link>
     </div>
   );
@@ -109,7 +123,14 @@ export function PinnedPost({post}) {
   if (post === undefined) return <></>;
   return (
     <div className="pinned-post">
-      <h3>{post.title}</h3>
+      <h3>
+        {' '}
+        {Array.isArray(post.content.text) ? (
+          <RichTextBody body={post.content.text} />
+        ) : (
+          post.content.text
+        )}
+      </h3>
       <div>
         {post.topics
           .map((postTopic) => (
