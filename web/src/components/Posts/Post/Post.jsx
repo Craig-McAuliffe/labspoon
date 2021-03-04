@@ -18,11 +18,9 @@ import {
 
 export default function Post({post, dedicatedPage, bookmarkedVariation}) {
   const taggedContent = [];
-  if (post.publication)
+  if (post[PUBLICATION])
     taggedContent.push({type: PUBLICATION, content: post.publication});
-  if (post.publicationURL)
-    taggedContent.push({type: 'publicationURL', content: post.publicationURL});
-  if (post.openPosition)
+  if (post[OPENPOSITION])
     taggedContent.push({type: OPENPOSITION, content: post.openPosition});
 
   if (post.generated)

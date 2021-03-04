@@ -785,7 +785,6 @@ export interface Post {
   customTopics?: string[];
   timestamp: Date;
   id: string;
-  publicationURL?: string[];
   publication?: PublicationRef | CustomPublicationRef;
   openPosition?: OpenPosition;
   // filterable arrays must be array of strings
@@ -803,8 +802,8 @@ export interface PostRef {
   customTopics?: string[];
   timestamp: Date;
   id: string;
-  publicationURL?: string[];
   publication?: PublicationRef | CustomPublicationRef;
+  openPosition?: OpenPosition;
   // filterable arrays must be array of strings
   filterTopicIDs: string[];
   unixTimeStamp: number;
@@ -823,6 +822,7 @@ export function postToPostRef(post: Post): PostRef {
   };
   if (post.customTopics) postRef.customTopics = post.customTopics;
   if (post.publication) postRef.publication = post.publication;
+  if (post.openPosition) postRef.openPosition = post.openPosition;
   return postRef;
 }
 

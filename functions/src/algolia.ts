@@ -148,7 +148,13 @@ export const configurePostSearchIndex = functions.https.onRequest((_, res) =>
   configureSearchIndex(
     res,
     POSTS_INDEX,
-    ['unordered(content.text)', 'unordered(topics.name)', 'author.name'],
+    [
+      'unordered(content.text)',
+      'unordered(topics.name)',
+      'author.name',
+      'publication.title',
+      'openPosition.content.title',
+    ],
     ['postType.id'],
     ['desc(recommendedCount)', 'desc(unixTimeStamp)', 'desc(bookmarkedCount)']
   )

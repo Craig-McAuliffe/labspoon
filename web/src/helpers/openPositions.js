@@ -23,7 +23,7 @@ export function getPaginatedOpenPositionsFromCollectionRef(
 export function algoliaOpenPosToDBOpenPosListItem(algoliaOpenPos) {
   const dbOpenPositionListItem = {
     content: {
-      title: algoliaOpenPos.content.position,
+      title: algoliaOpenPos.content.title,
       position: algoliaOpenPos.content.position,
       salary: algoliaOpenPos.content.salary,
       startDate: algoliaOpenPos.content.startDate,
