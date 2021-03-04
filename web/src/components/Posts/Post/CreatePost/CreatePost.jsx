@@ -25,6 +25,7 @@ export default function CreatePost({
   const [postSuccess, setPostSuccess] = useState(false);
   const [taggedResourceType, setTaggedResourceType] = useState(DEFAULT_POST);
   const [submittingPost, setSubmittingPost] = useState(false);
+  const [savedTitleText, setSavedTitleText] = useState();
 
   const locationPathname = useLocation().pathname;
   const setCreatingPostIfNotExpanded = (newValue) => {
@@ -60,6 +61,8 @@ export default function CreatePost({
           submittingPost: submittingPost,
           setSubmittingPost: setSubmittingPost,
           cancelPost: keepExpanded ? undefined : cancelPost,
+          savedTitleText: savedTitleText,
+          setSavedTitleText: setSavedTitleText,
         }}
       >
         <div

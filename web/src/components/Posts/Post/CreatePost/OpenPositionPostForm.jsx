@@ -24,9 +24,12 @@ export default function OpenPositionPostForm({
   postType,
   setPostType,
 }) {
-  const {selectedTopics, setPostSuccess, setSubmittingPost} = useContext(
-    CreatingPostContext
-  );
+  const {
+    selectedTopics,
+    setPostSuccess,
+    setSubmittingPost,
+    savedTitleText,
+  } = useContext(CreatingPostContext);
   const [taggedOpenPosition, setTaggedOpenPosition] = useState();
   const [noTaggedOpenPosError, setNoTaggedOpenPosError] = useState(false);
   const [generalError, setGeneralError] = useState(false);
@@ -72,7 +75,7 @@ export default function OpenPositionPostForm({
       });
   };
   const initialValues = {
-    title: '',
+    title: savedTitleText ? savedTitleText : '',
   };
 
   const validationSchema = Yup.object({

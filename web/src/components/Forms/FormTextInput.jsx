@@ -2,6 +2,7 @@ import React, {useContext, useEffect} from 'react';
 import {useField} from 'formik';
 import InputError from './InputError';
 import {CreatePostTitleContext} from '../Posts/Post/CreatePost/PostForm';
+import {CreatingPostContext} from '../Posts/Post/CreatePost/CreatePost';
 
 import './FormTextInput.css';
 
@@ -67,15 +68,17 @@ export function TextInput({
 export function CreatePostTextArea({...props}) {
   const [field, meta] = useField(props);
   const {setTitleLength} = useContext(CreatePostTitleContext);
+  const {setSavedTitleText, savedTitleText} = useContext(CreatingPostContext);
 
   useEffect(() => setTitleLength(field.value.length), [field.value.length]);
+  useEffect(() => setSavedTitleText(field.value), [field.value]);
 
   return (
     <>
       <textarea
         className="create-post-main-text"
         autoFocus
-        placeholder="...What's happening?"
+        placeholder={savedTitleText ? null : "...What's happening?"}
         {...field}
         {...props}
       />

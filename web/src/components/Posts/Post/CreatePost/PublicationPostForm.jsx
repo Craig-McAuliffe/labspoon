@@ -39,9 +39,12 @@ export default function PublicationPostForm({
   setPostType,
 }) {
   const {userProfile} = useContext(AuthContext);
-  const {selectedTopics, setSubmittingPost, setPostSuccess} = useContext(
-    CreatingPostContext
-  );
+  const {
+    selectedTopics,
+    setSubmittingPost,
+    setPostSuccess,
+    savedTitleText,
+  } = useContext(CreatingPostContext);
   const [publication, setPublication] = useState();
   const [isQuickCreatingPub, setIsQuickCreatingPub] = useState(false);
   const [customPublicationAuthors, setCustomPublicationAuthors] = useState([
@@ -121,7 +124,7 @@ export default function PublicationPostForm({
   };
 
   const initialValues = {
-    title: '',
+    title: savedTitleText ? savedTitleText : '',
   };
 
   const postTitleValidation = Yup.string()

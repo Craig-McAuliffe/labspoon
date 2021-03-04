@@ -11,9 +11,12 @@ import './CreatePost.css';
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
 export default function DefaultPost({setCreatingPost, postType, setPostType}) {
-  const {selectedTopics, setPostSuccess, setSubmittingPost} = useContext(
-    CreatingPostContext
-  );
+  const {
+    selectedTopics,
+    setPostSuccess,
+    setSubmittingPost,
+    savedTitleText,
+  } = useContext(CreatingPostContext);
 
   const submitChanges = (res) => {
     res.postType = {id: 'defaultPost', name: 'Default'};
@@ -32,7 +35,7 @@ export default function DefaultPost({setCreatingPost, postType, setPostType}) {
       });
   };
   const initialValues = {
-    title: '',
+    title: savedTitleText ? savedTitleText : '',
   };
   const validationSchema = Yup.object({
     title: Yup.string()
