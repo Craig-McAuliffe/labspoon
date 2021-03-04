@@ -39,10 +39,6 @@ export const createPost = functions.https.onCall(async (data, context) => {
   const postDocRef = db.collection('posts').doc();
   const postID = postDocRef.id;
 
-  const content: PostContent = {
-    text: data.title,
-  };
-
   const postTopics: TaggedTopic[] = [];
   const matchedTopicsPromises = await handleTopicsNoID(data.topics, postTopics);
   await Promise.all(matchedTopicsPromises);
@@ -74,7 +70,7 @@ export const createPost = functions.https.onCall(async (data, context) => {
   const post: Post = {
     postType: data.postType,
     author: author,
-    content: content,
+    text: data.title,
     topics: postTopics,
     customTopics: data.customTopics,
     timestamp: new Date(),
@@ -781,7 +777,7 @@ interface FilterCollection {
 export interface Post {
   postType: PostType;
   author: UserRef;
-  content: PostContent;
+  text: ArticleBodyChild;
   topics: TaggedTopic[];
   customTopics?: string[];
   timestamp: Date;
@@ -798,7 +794,7 @@ export interface Post {
 export interface PostRef {
   postType: PostType;
   author: UserRef;
-  content: PostContent;
+  text: ArticleBodyChild;
   topics: TaggedTopic[];
   customTopics?: string[];
   timestamp: Date;
@@ -814,7 +810,7 @@ export function postToPostRef(post: Post): PostRef {
   const postRef: PostRef = {
     postType: post.postType,
     author: post.author,
-    content: post.content,
+    text: post.text,
     topics: post.topics,
     timestamp: post.timestamp,
     filterTopicIDs: post.filterTopicIDs,
@@ -827,11 +823,59 @@ export function postToPostRef(post: Post): PostRef {
   return postRef;
 }
 
-export interface PostContent {
-  text: ArticleBodyChild[];
-}
-
 export interface PostType {
   id: string;
   name: string;
 }
+
+export const makeExistingPostsRichText = functions
+  .runWith({
+    timeoutSeconds: 10,
+    memory: '2GB',
+  })
+  .https.onRequest(async (req, resp) => {
+    const collectionRef = db.collection('posts');
+    const query = collectionRef.limit(50);
+
+    await new Promise((resolve, reject) => {
+      convertPostBath(query, resolve).catch(reject);
+    });
+    resp.json({result: `reformatted posts to rich text`});
+    resp.end();
+  });
+
+async function convertPostBath(query: firestore.DocumentData, resolve: any) {
+  const snapshot = await query.get();
+  const batchSize = snapshot.size;
+  // Delete documents in a batch
+  const batch = db.batch();
+  let lastDoc: firestore.DocumentSnapshot;
+  snapshot.docs.forEach((doc: firestore.DocumentSnapshot) => {
+    if (!doc.exists) return;
+    const reformattedPost: any = doc.data();
+    if (!reformattedPost.content) return;
+    batch.update(doc.ref, {
+      text: [
+        {children: [{text: reformattedPost.content.text}], type: 'paragraph'},
+      ],
+    });
+    lastDoc = doc;
+  });
+
+  await batch.commit();
+  if (batchSize < 20) {
+    resolve();
+    return;
+  }
+  // Recurse on the next process tick, to avoid
+  // exploding the stack.
+  process.nextTick(async () => {
+    await convertPostBath(fetchPostsForReformatting(lastDoc), resolve);
+  });
+}
+
+const fetchPostsForReformatting = (last?: firestore.DocumentSnapshot) => {
+  const collectionRef = db.collection('posts');
+  if (last) return collectionRef.limit(20).startAfter(last);
+  return collectionRef.limit(20);
+};

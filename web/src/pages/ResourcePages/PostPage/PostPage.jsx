@@ -3,10 +3,9 @@ import {db} from '../../../firebase';
 import Post from '../../../components/Posts/Post/Post';
 import {Redirect, useParams, useRouteMatch} from 'react-router-dom';
 import {UnpaddedPageContainer} from '../../../components/Layout/Content';
+import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 
 import './PostPage.css';
-import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
-import {translateOptionalField} from '../../../helpers/posts';
 
 export default function PostPage() {
   const postID = useParams().postID;
@@ -24,9 +23,8 @@ export default function PostPage() {
           setNotFound(true);
           return;
         }
-        let post = postData.data();
+        const post = postData.data();
         post.id = postData.id;
-        post = translateOptionalField(post);
         setPost(post);
         setLoading(false);
       })

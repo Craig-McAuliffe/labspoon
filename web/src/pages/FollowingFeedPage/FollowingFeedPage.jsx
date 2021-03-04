@@ -10,7 +10,6 @@ import FilterableResults, {
   FilterManager,
 } from '../../components/FilterableResults/FilterableResults';
 import CreatePost from '../../components/Posts/Post/CreatePost/CreatePost';
-import {translateOptionalFields} from '../../helpers/posts';
 import {LoadingSpinnerPage} from '../../components/LoadingSpinner/LoadingSpinner';
 import {UnpaddedPageContainer} from '../../components/Layout/Content';
 
@@ -81,7 +80,7 @@ function filterFeedData(collection, skip, limit, filter, last) {
     last,
     limit
   );
-  return [sortedAndPaginatedResults.then(translateOptionalFields), undefined];
+  return [sortedAndPaginatedResults, undefined];
 }
 
 function sortAndPaginateFeedData(results, last, limit) {

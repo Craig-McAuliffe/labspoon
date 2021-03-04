@@ -94,11 +94,10 @@ function PostTextContent({post, dedicatedPage}) {
     return (
       <div className="post-text-content">
         <Linkify tagName="p">
-          {' '}
-          {Array.isArray(post.content.text) ? (
-            <RichTextBody body={post.content.text} />
+          {Array.isArray(post.text) ? (
+            <RichTextBody body={post.text} />
           ) : (
-            post.content.text
+            post.text
           )}
         </Linkify>
       </div>
@@ -108,10 +107,10 @@ function PostTextContent({post, dedicatedPage}) {
     <div className="post-text-content">
       <Link to={`/post/${post.id}`} className="post-text-as-link">
         <Linkify tagName="p">
-          {Array.isArray(post.content.text) ? (
-            <RichTextBody body={post.content.text} />
+          {Array.isArray(post.text) ? (
+            <RichTextBody body={post.text} />
           ) : (
-            post.content.text
+            post.text
           )}
         </Linkify>
       </Link>
@@ -124,11 +123,10 @@ export function PinnedPost({post}) {
   return (
     <div className="pinned-post">
       <h3>
-        {' '}
-        {Array.isArray(post.content.text) ? (
-          <RichTextBody body={post.content.text} />
+        {Array.isArray(post.text) ? (
+          <RichTextBody body={post.text} />
         ) : (
-          post.content.text
+          post.text
         )}
       </h3>
       <div>

@@ -4,10 +4,7 @@ import {FeatureFlags, AuthContext} from '../../../App';
 import {db} from '../../../firebase';
 
 import {getActiveTabID} from '../../../helpers/filters';
-import {
-  getPaginatedPostsFromCollectionRef,
-  translateOptionalFields,
-} from '../../../helpers/posts';
+import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
 import {getPaginatedTopicsFromCollectionRef} from '../../../helpers/topics';
 import {getPaginatedPublicationsFromCollectionRef} from '../../../helpers/publications';
 import {getPaginatedGroupReferencesFromCollectionRef} from '../../../helpers/groups';
@@ -198,9 +195,7 @@ function userPageFeedDataFromDB(skip, limit, filterOptions, userID, last) {
         .collection(`users/${userID}/posts`)
         .orderBy('timestamp', 'desc');
       return [
-        getPaginatedPostsFromCollectionRef(postsCollection, limit, last).then(
-          translateOptionalFields
-        ),
+        getPaginatedPostsFromCollectionRef(postsCollection, limit, last),
         null,
       ];
     case 'publications':

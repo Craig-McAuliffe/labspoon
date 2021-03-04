@@ -4,10 +4,7 @@ import {FeatureFlags} from '../../App';
 import {db} from '../../firebase';
 
 import {getActiveTabID} from '../../helpers/filters';
-import {
-  getPaginatedPostsFromCollectionRef,
-  translateOptionalFields,
-} from '../../helpers/posts';
+import {getPaginatedPostsFromCollectionRef} from '../../helpers/posts';
 import {getPaginatedPublicationsFromCollectionRef} from '../../helpers/publications';
 import {getPaginatedUserReferencesFromCollectionRef} from '../../helpers/users';
 import {getPaginatedGroupReferencesFromCollectionRef} from '../../helpers/groups';
@@ -46,9 +43,7 @@ function topicPageFeedDataFromDB(skip, limit, filterOptions, topicID, last) {
         .collection(`topics/${topicID}/posts`)
         .orderBy('timestamp', 'desc');
       return [
-        getPaginatedPostsFromCollectionRef(postsCollection, limit, last).then(
-          translateOptionalFields
-        ),
+        getPaginatedPostsFromCollectionRef(postsCollection, limit, last),
         null,
       ];
     case 'publications':
