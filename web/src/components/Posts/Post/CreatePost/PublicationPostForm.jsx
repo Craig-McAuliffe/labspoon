@@ -30,6 +30,8 @@ import SecondaryButton from '../../../Buttons/SecondaryButton';
 import './CreatePost.css';
 import {algoliaPublicationToDBPublicationListItem} from '../../../../helpers/publications';
 import {Alert} from 'react-bootstrap';
+import {FilterableResultsContext} from '../../../FilterableResults/FilterableResults';
+import {POST} from '../../../../helpers/resourceTypeDefinitions';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
@@ -60,6 +62,7 @@ export default function PublicationPostForm({
     customPubSuccessfullyCreated,
     setCustomPubSuccessfullyCreated,
   ] = useState(false);
+  const {setResults} = useContext(FilterableResultsContext);
 
   const submitChanges = async (res) => {
     if (customPublicationErrors) setCustomPublicationErrors();
@@ -82,6 +85,7 @@ export default function PublicationPostForm({
         undefined,
         () => {
           setPubSubmissionError(true);
+          setSubmittingPost(false);
         },
         selectedTopics,
         undefined,
@@ -106,10 +110,15 @@ export default function PublicationPostForm({
     res.postType = {id: 'publicationPost', name: 'Publication'};
     res.topics = selectedTopics;
     createPost(res)
-      .then(() => {
+      .then((response) => {
         setCreatingPost(false);
         setPostSuccess(true);
         setSubmittingPost(false);
+        if (setResults) {
+          const newPost = response.data;
+          newPost.resourceType = POST;
+          setResults((currentResults) => [newPost, ...currentResults]);
+        }
       })
       .catch((err) => {
         setIsQuickCreatingPub(false);
@@ -171,6 +180,7 @@ export default function PublicationPostForm({
           isQuickCreatingPub={isQuickCreatingPub}
           setIsQuickCreatingPub={setIsQuickCreatingPub}
           customPubSuccessfullyCreated={customPubSuccessfullyCreated}
+          userIsLinkedToMicrosoft={userProfile.microsoftID}
         />
       </PostForm>
     </>
@@ -183,6 +193,7 @@ function SelectPublication({
   setIsQuickCreatingPub,
   isQuickCreatingPub,
   customPubSuccessfullyCreated,
+  userIsLinkedToMicrosoft,
 }) {
   const [displayedPublications, setDisplayedPublications] = useState([]);
   if (publication) {
@@ -238,33 +249,35 @@ function SelectPublication({
             setTaggedPublication={setPublication}
           />
         )}
-      <div className="create-post-alt-tagging-method-container">
-        <button className="create-publication-search-publications-button"></button>
-        <p>
-          {isQuickCreatingPub
-            ? ''
-            : "Can't find the publication you're looking for?"}
-        </p>
-        <button
-          onClick={() => {
-            setIsQuickCreatingPub(!isQuickCreatingPub);
-          }}
-          className="create-pub-post-quick-create-toggle"
-          type="button"
-        >
-          {isQuickCreatingPub ? (
-            <>
-              <h4>Switch Back</h4>
-              <InvertedDropDownTriangle />
-            </>
-          ) : (
-            <>
-              <h4>Quick Add</h4>
-              <DropDownTriangle />
-            </>
-          )}
-        </button>
-      </div>
+      {userIsLinkedToMicrosoft && (
+        <div className="create-post-alt-tagging-method-container">
+          <button className="create-publication-search-publications-button"></button>
+          <p>
+            {isQuickCreatingPub
+              ? ''
+              : "Can't find the publication you're looking for?"}
+          </p>
+          <button
+            onClick={() => {
+              setIsQuickCreatingPub(!isQuickCreatingPub);
+            }}
+            className="create-pub-post-quick-create-toggle"
+            type="button"
+          >
+            {isQuickCreatingPub ? (
+              <>
+                <h4>Switch Back</h4>
+                <InvertedDropDownTriangle />
+              </>
+            ) : (
+              <>
+                <h4>Quick Add</h4>
+                <DropDownTriangle />
+              </>
+            )}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

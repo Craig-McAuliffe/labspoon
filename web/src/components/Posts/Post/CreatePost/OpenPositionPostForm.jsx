@@ -16,6 +16,8 @@ import InputError from '../../../Forms/InputError';
 import SecondaryButton from '../../../Buttons/SecondaryButton';
 import {TagResourceIcon} from '../../../../assets/ResourceTypeIcons';
 import {algoliaOpenPosToDBOpenPosListItem} from '../../../../helpers/openPositions';
+import {FilterableResultsContext} from '../../../FilterableResults/FilterableResults';
+import {POST} from '../../../../helpers/resourceTypeDefinitions';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
@@ -33,6 +35,7 @@ export default function OpenPositionPostForm({
   const [taggedOpenPosition, setTaggedOpenPosition] = useState();
   const [noTaggedOpenPosError, setNoTaggedOpenPosError] = useState(false);
   const [generalError, setGeneralError] = useState(false);
+  const {setResults} = useContext(FilterableResultsContext);
 
   useEffect(() => {
     if (taggedOpenPosition && noTaggedOpenPosError)
@@ -64,10 +67,15 @@ export default function OpenPositionPostForm({
     dbOpenPosition.id = taggedOpenPosition.id;
     res.openPosition = dbOpenPosition;
     createPost(res)
-      .then(() => {
+      .then((response) => {
         setCreatingPost(false);
         setSubmittingPost(false);
         setPostSuccess(true);
+        if (setResults) {
+          const newPost = response.data;
+          newPost.resourceType = POST;
+          setResults((currentResults) => [newPost, ...currentResults]);
+        }
       })
       .catch((err) => {
         sortThrownCreatePostErrors(err);

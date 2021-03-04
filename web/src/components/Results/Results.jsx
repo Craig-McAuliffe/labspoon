@@ -21,6 +21,7 @@ import ResearchFocusListItem from '../ResearchFocus/ResearchFocusListItem';
 import TechniqueListItem from '../Techniques/TechniqueListItem';
 import {
   OPENPOSITION,
+  POST,
   RESEARCHFOCUS,
   TECHNIQUE,
 } from '../../helpers/resourceTypeDefinitions';
@@ -94,11 +95,11 @@ Results.propTypes = {
 
 export function GenericListItem({result, onBookmarkPage}) {
   switch (result.resourceType) {
-    case 'post':
+    case POST:
       return (
         <Post
           post={result}
-          key={result.id + 'post'}
+          key={result.id + POST}
           bookmarkedVariation={onBookmarkPage}
         />
       );

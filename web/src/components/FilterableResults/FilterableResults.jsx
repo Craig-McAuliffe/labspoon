@@ -131,6 +131,7 @@ export default function FilterableResults({children, fetchResults, limit}) {
         fetchMore,
         loadingResults,
         resultsError,
+        setResults,
       }}
     >
       {children}

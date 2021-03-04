@@ -38,6 +38,7 @@ export default function CreatePost({
   };
 
   useEffect(() => {
+    setSavedTitleText();
     setTimeout(() => setPostSuccess(false), 3000);
   }, [postSuccess]);
 

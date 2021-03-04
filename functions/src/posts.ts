@@ -98,7 +98,7 @@ export const createPost = functions.https.onCall(async (data, context) => {
   }
   if (data.openPosition && data.openPosition.id)
     post.openPosition = data.openPosition;
-  return postDocRef
+  await postDocRef
     .set(post)
     .then(() =>
       db
@@ -119,6 +119,7 @@ export const createPost = functions.https.onCall(async (data, context) => {
         'An error occured while creating the post.'
       );
     });
+  return post;
 });
 
 async function authorLastPostTimeCheck(

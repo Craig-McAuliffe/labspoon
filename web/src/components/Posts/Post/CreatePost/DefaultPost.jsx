@@ -6,6 +6,9 @@ import {CreatePostTextArea} from '../../../Forms/FormTextInput';
 import {CreatingPostContext, sortThrownCreatePostErrors} from './CreatePost';
 import {handlePostTopics} from '../../../Topics/TagTopics';
 import TypeOfTaggedResourceDropDown from './TypeOfTaggedResourceDropDown';
+import {FilterableResultsContext} from '../../../FilterableResults/FilterableResults';
+import {POST} from '../../../../helpers/resourceTypeDefinitions';
+
 import './CreatePost.css';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
@@ -17,6 +20,7 @@ export default function DefaultPost({setCreatingPost, postType, setPostType}) {
     setSubmittingPost,
     savedTitleText,
   } = useContext(CreatingPostContext);
+  const {setResults} = useContext(FilterableResultsContext);
 
   const submitChanges = (res) => {
     res.postType = {id: 'defaultPost', name: 'Default'};
@@ -24,10 +28,15 @@ export default function DefaultPost({setCreatingPost, postType, setPostType}) {
     res.customTopics = taggedTopics.customTopics;
     res.topics = taggedTopics.DBTopics;
     createPost(res)
-      .then(() => {
+      .then((response) => {
         setCreatingPost(false);
         setPostSuccess(true);
         setSubmittingPost(false);
+        if (setResults) {
+          const newPost = response.data;
+          newPost.resourceType = POST;
+          setResults((currentResults) => [newPost, ...currentResults]);
+        }
       })
       .catch((err) => {
         sortThrownCreatePostErrors(err);
