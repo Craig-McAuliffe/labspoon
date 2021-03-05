@@ -3,11 +3,11 @@ import {getActiveTabID} from '../../helpers/filters';
 import PrimaryButton from '../Buttons/PrimaryButton';
 import FilterableResults, {
   FilterableResultsContext,
+  FilteredSelectorManager,
   FilterManager,
   NewFilterMenuWrapper,
   ResourceTabs,
 } from '../FilterableResults/FilterableResults';
-import {SelectableResults} from '../Results/Results';
 import {UnpaddedPageContainer} from '../Layout/Content';
 
 import './FilteredSelector.css';
@@ -77,7 +77,7 @@ export default function FilteredSelector({
             }
           />
           {success ? <SuccessMessage /> : <></>}
-          <SelectableResults
+          <FilteredSelectorManager
             selectedItems={selectedItems}
             setSelectedItems={setSelectedItems}
             customEndMessage={customEndMessage}

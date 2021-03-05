@@ -7,6 +7,8 @@ export const POSTS = 'posts';
 export const IMAGES = 'images';
 export const PUBLICATIONS = 'publications';
 export const TOPICS = 'topics';
+export const USERS = 'users';
+export const GROUPS = 'groups';
 
 export const OPENPOSITION = 'openPosition';
 export const RESEARCHFOCUS = 'researchFocus';
@@ -25,6 +27,12 @@ export function resourceTypeToCollection(resourceType) {
   switch (resourceType) {
     case POST:
       return POSTS;
+    case TOPIC:
+      return TOPICS;
+    case USER:
+      return USERS;
+    case GROUP:
+      return GROUPS;
     default:
       return undefined;
   }

@@ -5,15 +5,19 @@ import {FOLLOW, SignUpPopoverOverride} from '../Popovers/Popover';
 import './Buttons.css';
 import './FollowButton.css';
 
-const FollowButton = ({following, setFollowing}) => {
+const FollowButton = ({following, setFollowing, actionAndTriggerPopUp}) => {
   const {user} = useContext(AuthContext);
   const followAction = () => {
+    if (actionAndTriggerPopUp) actionAndTriggerPopUp();
     if (!user) return;
     setFollowing();
   };
 
   const buttonContent = (
-    <FollowButtonContent followAction={followAction} following={following} />
+    <FollowButtonContent
+      actionAndTriggerPopUp={followAction}
+      following={following}
+    />
   );
 
   if (user) return buttonContent;
@@ -29,7 +33,7 @@ const FollowButton = ({following, setFollowing}) => {
   );
 };
 
-function FollowButtonContent({followAction, following}) {
+function FollowButtonContent({actionAndTriggerPopUp, following}) {
   return (
     <div className="button-position">
       <button
@@ -40,7 +44,7 @@ function FollowButtonContent({followAction, following}) {
             ? 'primary-button-clicked'
             : 'primary-button'
         }
-        onClick={followAction}
+        onClick={actionAndTriggerPopUp}
       >
         {following === undefined ? (
           <LoadingSpinner />

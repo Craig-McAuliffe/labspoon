@@ -1,8 +1,10 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {AuthContext, FeatureFlags} from '../../../App';
 import {db} from '../../../firebase';
-
+import {USER} from '../../../helpers/resourceTypeDefinitions';
 import FollowButton from '../../Buttons/FollowButton';
+import FollowOptionsPopover from '../../Popovers/FollowOptionsPopover';
+import Popover from '../../Popovers/Popover';
 
 export default function FollowUserButton({targetUser}) {
   const [following, setFollowing] = useState();
@@ -60,10 +62,20 @@ export default function FollowUserButton({targetUser}) {
     }
   }
 
+  const getFollowOptionsPopover = () => (
+    <FollowOptionsPopover targetResourceData={targetUser} resourceType={USER} />
+  );
+
   return (
-    <FollowButton
-      following={following}
-      setFollowing={setFollowingAndUpdateDB}
-    />
+    <Popover
+      getPopUpComponent={getFollowOptionsPopover}
+      shouldNotOpen={following}
+    >
+      <FollowButton
+        following={following}
+        setFollowing={setFollowingAndUpdateDB}
+        actionAndTriggerPopUp={() => {}}
+      />
+    </Popover>
   );
 }

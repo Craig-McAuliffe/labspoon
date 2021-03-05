@@ -9,13 +9,19 @@ export default function TopicListItem({
   children,
   noLink,
   LinkOverride = undefined,
+  nameOnly,
+  isSmallVersion,
+  noDivider,
 }) {
   if (!topic) {
     return null;
   }
   const displayType = () => {
     if (dedicatedPage) return <h2>{topic.name}</h2>;
-    if (noLink) return <h3>{topic.name}</h3>;
+    if (noLink) {
+      if (isSmallVersion) return <h4>{topic.name}</h4>;
+      return <h3>{topic.name}</h3>;
+    }
     if (LinkOverride)
       return (
         <LinkOverride>
@@ -30,9 +36,11 @@ export default function TopicListItem({
       );
   };
   return (
-    <div className="topic-list-item-container">
+    <div
+      className={`topic-list-item-container${noDivider ? '-no-divider' : ''}`}
+    >
       {displayType()}
-      {children}
+      {!nameOnly && children}
     </div>
   );
 }

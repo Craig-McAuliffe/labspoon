@@ -26,8 +26,8 @@ export function SignUpPopoverOverride({children, text, actionTaken}) {
       switch (actionTaken) {
         case FOLLOW:
           return cloneElement(child, {
-            followAction: () => {
-              child.props.followAction();
+            actionAndTriggerPopUp: () => {
+              child.props.actionAndTriggerPopUp();
               setOpen(true);
             },
           });
@@ -74,6 +74,40 @@ export function SignUpPopoverOverride({children, text, actionTaken}) {
             {text}
           </Link>
         </div>
+      </div>
+    );
+  return popOverChild;
+}
+
+export default function Popover({getPopUpComponent, shouldNotOpen, children}) {
+  const [open, setOpen] = useState(false);
+  const popOverRef = useRef();
+
+  useEffect(() => {
+    const handleDocumentClick = (e) => {
+      if (popOverRef.current) {
+        if (!popOverRef.current.contains(e.target)) setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleDocumentClick);
+  });
+  const popOverChild = React.Children.map(children, (child) => {
+    if (React.isValidElement(child)) {
+      return cloneElement(child, {
+        actionAndTriggerPopUp: () => {
+          if (child.props.actionAndTriggerPopUp)
+            child.props.actionAndTriggerPopUp();
+          if (!shouldNotOpen) setOpen(true);
+        },
+      });
+    }
+    return child;
+  });
+  if (open)
+    return (
+      <div className="pop-up-relative-container">
+        {popOverChild}
+        <div ref={popOverRef}>{getPopUpComponent()}</div>
       </div>
     );
   return popOverChild;

@@ -3,7 +3,7 @@ import {Link, useLocation} from 'react-router-dom';
 import SearchBar from '../SearchBar';
 import update from 'immutability-helper';
 import FilterMenu from '../Filter/Filter';
-import ResultsList from '../Results/Results';
+import ResultsList, {SelectableResults} from '../Results/Results';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 
 import './FilterableResults.css';
@@ -459,4 +459,27 @@ export function getActiveTabIDFromTypeFilterCollection(filterCollection) {
     return enabledTypes[0].data.id;
   }
   return 'default';
+}
+
+export function FilteredSelectorManager({
+  selectedItems,
+  setSelectedItems,
+  customEndMessage,
+}) {
+  const filterableResults = useContext(FilterableResultsContext);
+  const results = filterableResults.results;
+  const hasMore = filterableResults.hasMore;
+  const fetchMore = filterableResults.fetchMore;
+  const loading = filterableResults.loadingResults;
+  return (
+    <SelectableResults
+      selectedItems={selectedItems}
+      setSelectedItems={setSelectedItems}
+      customEndMessage={customEndMessage}
+      results={results}
+      hasMore={hasMore}
+      fetchMore={fetchMore}
+      loading={loading}
+    />
+  );
 }

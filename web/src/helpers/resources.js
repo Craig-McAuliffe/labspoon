@@ -2,10 +2,15 @@ export function getPaginatedResourcesFromCollectionRef(
   resourceRef,
   limit,
   last,
-  resourceType
+  resourceType,
+  rankByName
 ) {
-  resourceRef = resourceRef.orderBy('timestamp', 'desc');
-  if (last) resourceRef = resourceRef.startAt(last.timestamp);
+  if (rankByName) resourceRef = resourceRef.orderBy('name', 'asc');
+  else resourceRef = resourceRef.orderBy('timestamp', 'desc');
+  if (last) {
+    if (rankByName) resourceRef = resourceRef.startAt(last.name);
+    else resourceRef = resourceRef.startAt(last.timestamp);
+  }
   return resourceRef
     .limit(limit)
     .get()

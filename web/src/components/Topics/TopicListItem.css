@@ -1,7 +1,16 @@
-.topic-list-item-container {
+.topic-list-item-container,
+.topic-list-item-container-no-divider {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 20px 0px;
+}
+
+.topic-list-item-container {
   border-bottom: 1px solid #dcdce0;
+}
+
+.topic-list-item-container h4,
+.topic-list-item-container h3 {
+  margin-bottom: 0px;
 }

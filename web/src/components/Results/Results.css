@@ -22,3 +22,15 @@
   text-align: center;
   margin-top: 40px;
 }
+
+.resource-with-selector-container {
+  display: grid;
+  grid-template-columns: 1fr 100px;
+  align-items: center;
+}
+
+.resource-with-selector-container-small-checkbox {
+  display: grid;
+  grid-template-columns: 1fr 20px;
+  align-items: center;
+}

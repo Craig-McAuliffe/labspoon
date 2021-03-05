@@ -1,0 +1,79 @@
+.follow-options-topics-container {
+  padding: 20px 10px;
+  border-top: 1px solid #dcdce0;
+  color: #5d5d65;
+}
+.follow-options-post-types-container {
+  padding: 10px 10px 20px;
+}
+.follow-options-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0px;
+  color: #00507c;
+}
+
+.follow-options-title {
+  color: #5d5d65;
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
+.follow-options-toggle:hover {
+  text-decoration: underline;
+}
+
+.follow-options-toggle-container-expanded,
+.follow-options-toggle-container-minimised {
+  position: absolute;
+  width: 30vw;
+  min-width: 140px;
+  max-width: 400px;
+  padding: 10px 0px 0px;
+  border: 1px solid #00507c;
+  box-shadow: 0px 0px 4px rgba(48, 153, 211, 0.8);
+  top: 40px;
+  right: 0px;
+  background: #ffffff;
+  border-radius: 10px;
+
+  overflow-y: hidden;
+}
+
+.follow-options-toggle-container-expanded {
+  max-height: 700px;
+  height: 50vh;
+  overflow-y: auto;
+}
+
+.follow-options-toggle-container-minimised {
+  padding: 10px;
+}
+
+.follow-options-expanded-section {
+}
+
+.follow-options-option-container {
+  display: grid;
+  grid-template-columns: 1fr 20px;
+  margin: 5px 0px;
+}
+
+.follow-options-topics-note {
+  color: #5d5d65;
+}
+
+.follow-options-actions-container {
+  position: sticky;
+  bottom: 0px;
+  height: 45px;
+  display: flex;
+  justify-content: space-between;
+  background: #ffffff;
+  border-top: 1px solid #dcdce0;
+  align-items: center;
+  box-shadow: 0px -10px 6px rgba(255, 255, 255, 0.9);
+  padding: 5px 5px;
+}

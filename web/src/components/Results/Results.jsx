@@ -27,6 +27,7 @@ import {
 } from '../../helpers/resourceTypeDefinitions';
 
 import './Results.css';
+import SelectCheckBox, {setItemSelectedState} from '../Buttons/SelectCheckBox';
 
 /**
  * Displays an infinitely scrolling list of posts.
@@ -93,7 +94,14 @@ Results.propTypes = {
   fetchMore: PropTypes.func.isRequired,
 };
 
-export function GenericListItem({result, onBookmarkPage}) {
+export function GenericListItem({
+  result,
+  onBookmarkPage,
+  noLink,
+  nameOnly,
+  useSmallListItem,
+  noDivider,
+}) {
   switch (result.resourceType) {
     case POST:
       return (
@@ -129,7 +137,14 @@ export function GenericListItem({result, onBookmarkPage}) {
       );
     case 'topic':
       return (
-        <TopicListItem key={result.id + 'topic'} topic={result}>
+        <TopicListItem
+          key={result.id + 'topic'}
+          topic={result}
+          noLink={noLink}
+          nameOnly={nameOnly}
+          isSmallVersion={useSmallListItem}
+          noDivider={noDivider}
+        >
           <FollowTopicButton targetTopic={result} />
         </TopicListItem>
       );
@@ -232,20 +247,17 @@ export function SelectableResults({
   selectedItems,
   setSelectedItems,
   customEndMessage,
+  results,
+  hasMore,
+  fetchMore,
+  loading,
+  error,
+  useSmallListItems,
+  useSmallCheckBox,
+  noDivider,
+  scrollableTarget,
 }) {
-  // This should not really depend on the FilterableResultsContext directly.
-  // When we want to use it in other places too, we should wrap it with
-  // a component that retrives the FilterableResultsContext, similarly to what
-  // we do with NewResultsWrapper.
-  const filterableResults = useContext(FilterableResultsContext);
-  const results = filterableResults.results;
-  const hasMore = filterableResults.hasMore;
-  const fetchMore = filterableResults.fetchMore;
-  const loading = filterableResults.loadingResults;
-
-  if (filterableResults.resultsError)
-    return <h1>{filterableResults.resultsError}</h1>;
-
+  if (error) return <h1>{error}</h1>;
   const selectedIDs = new Set(selectedItems.map((item) => item.id));
 
   const items = results.map((result) => {
@@ -258,6 +270,9 @@ export function SelectableResults({
         setSelected={() =>
           setItemSelectedState(result, !selected, setSelectedItems)
         }
+        useSmallListItem={useSmallListItems}
+        useSmallCheckBox={useSmallCheckBox}
+        noDivider={noDivider}
       />
     );
   });
@@ -275,6 +290,7 @@ export function SelectableResults({
         next={fetchMore}
         style={{minWidth: '100%'}}
         endMessage={endMessage}
+        scrollableTarget={scrollableTarget}
       >
         {items}
       </InfiniteScroll>
@@ -282,40 +298,33 @@ export function SelectableResults({
   );
 }
 
-function setItemSelectedState(result, willAdd, setSelectedItems) {
-  if (willAdd) {
-    setSelectedItems((items) => [...items, result]);
-    return;
-  }
-  setSelectedItems((items) => items.filter((item) => item.id !== result.id));
-}
-
-function SelectableGenericListItem({result, selected, setSelected}) {
+function SelectableGenericListItem({
+  result,
+  selected,
+  setSelected,
+  useSmallCheckBox,
+  useSmallListItem,
+  noDivider,
+}) {
   return (
-    <div className="post-with-selector-container">
-      <GenericListItem result={result} />
-      <Select
-        selected={selected}
-        toggle={() => setSelected(result)}
-        alreadyPresent={result._alreadyPresent}
+    <div
+      className={`resource-with-selector-container${
+        useSmallCheckBox ? '-small-checkbox' : ''
+      }`}
+    >
+      <GenericListItem
+        result={result}
+        noLink={true}
+        nameOnly={true}
+        useSmallListItem={useSmallListItem}
+        noDivider={noDivider}
       />
-    </div>
-  );
-}
-
-function Select({toggle, selected, alreadyPresent}) {
-  if (alreadyPresent)
-    return (
-      <div className="post-selector-container">
-        <p className="post-selector-inactive-text">Already added</p>
-      </div>
-    );
-  const buttonClassName =
-    'post-selector-button-' + (selected ? 'active' : 'inactive');
-  return (
-    <div className="post-selector-container">
-      <button className={buttonClassName} onClick={toggle} />
-      <p className="post-selector-active-text">Select</p>
+      <SelectCheckBox
+        selected={selected}
+        selectAction={() => setSelected(result)}
+        alreadyPresent={result._alreadyPresent}
+        isSmallVersion={useSmallCheckBox}
+      />
     </div>
   );
 }
