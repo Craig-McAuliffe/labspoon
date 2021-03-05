@@ -1,3 +1,5 @@
+import firebase from '../firebase';
+
 export function getPaginatedResourcesFromCollectionRef(
   resourceRef,
   limit,
@@ -5,10 +7,13 @@ export function getPaginatedResourcesFromCollectionRef(
   resourceType,
   rankByName
 ) {
-  if (rankByName) resourceRef = resourceRef.orderBy('name', 'asc');
+  if (rankByName)
+    resourceRef = resourceRef
+      .orderBy('name', 'asc')
+      .orderBy(firebase.firestore.FieldPath.documentId());
   else resourceRef = resourceRef.orderBy('timestamp', 'desc');
   if (last) {
-    if (rankByName) resourceRef = resourceRef.startAt(last.name);
+    if (rankByName) resourceRef = resourceRef.startAt(last.name, last.id);
     else resourceRef = resourceRef.startAt(last.timestamp);
   }
   return resourceRef

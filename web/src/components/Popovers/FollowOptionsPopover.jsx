@@ -57,7 +57,6 @@ export default function FollowOptionsPopover({
   );
   return (
     <div
-      id={INFINITE_SCROLL_TARGET_ID}
       className={`follow-options-toggle-container${
         expanded ? '-expanded' : '-minimised'
       }`}
@@ -130,7 +129,10 @@ function ResourceFollowTopicsOptions({
     },
   ];
   return (
-    <div className="follow-options-topics-container">
+    <div
+      className="follow-options-topics-container"
+      id={INFINITE_SCROLL_TARGET_ID}
+    >
       <h4 className="follow-options-topics-note">I&#39;m interested in...</h4>
       <PaginatedResourceFetch
         isSelectable={true}
@@ -140,7 +142,7 @@ function ResourceFollowTopicsOptions({
         limit={LIMIT}
         resourceType={TOPIC}
         isSmallVersion={true}
-        customEndMessage={`No topics associated with this ${resourceType}`}
+        customEndMessage={`No more topics associated with this ${resourceType}`}
         initialResults={initialResults}
         useSmallListItems={true}
         useSmallCheckBox={true}

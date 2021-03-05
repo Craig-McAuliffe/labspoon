@@ -281,7 +281,6 @@ export function SelectableResults({
       {customEndMessage ? customEndMessage : 'No more results'}
     </p>
   );
-  if (loading) return <LoadingSpinner />;
   return (
     <>
       <InfiniteScroll
@@ -292,6 +291,7 @@ export function SelectableResults({
         endMessage={endMessage}
         scrollableTarget={scrollableTarget}
       >
+        {loading && <LoadingSpinner />}
         {items}
       </InfiniteScroll>
     </>
