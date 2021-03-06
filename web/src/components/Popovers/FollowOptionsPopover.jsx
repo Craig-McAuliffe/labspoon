@@ -82,6 +82,7 @@ export default function FollowOptionsPopover({
     const capitaliseFirstLetter = (targetString) =>
       targetString[0].toUpperCase() + targetString.slice(1);
 
+    const batch = db.batch();
     batch.update(
       db.doc(
         `${resourceTypeToCollection(resourceType)}/${
