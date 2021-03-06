@@ -1,4 +1,5 @@
-import React, {useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
+import {AuthContext} from '../../App';
 import {db} from '../../firebase';
 import {
   OPENPOSITIONS,
@@ -12,7 +13,28 @@ import SelectCheckBox, {setItemSelectedState} from '../Buttons/SelectCheckBox';
 import PaginatedResourceFetch from '../PaginatedResourceFetch/PaginatedResourceFetch';
 
 import './FollowOptionsPopover.css';
+
 const INFINITE_SCROLL_TARGET_ID = 'scrollableFollowOptions';
+const postTypesOptions = [
+  {id: 'all', name: 'All posts'},
+  {id: 'general', name: 'General posts'},
+  {id: PUBLICATIONS, name: 'Publication posts'},
+  {id: OPENPOSITIONS, name: 'Open position posts'},
+];
+
+const initialTopicResults = [
+  {
+    name: 'All topics',
+    id: 'allTopics',
+    resourceType: TOPIC,
+  },
+  {
+    name: 'Content without topics',
+    id: 'noTopics',
+    resourceType: TOPIC,
+  },
+];
+
 export default function FollowOptionsPopover({
   targetResourceData,
   resourceType,
@@ -20,10 +42,75 @@ export default function FollowOptionsPopover({
   const [expanded, setExpanded] = useState(false);
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [selectedPostTypes, setSelectedPostTypes] = useState(['all']);
-  const [submittingOptions, setSubmittingOptions] = useState(false);
-  const saveFollowOptions = () => {
-    setSubmittingOptions(true);
-    setSubmittingOptions(false);
+  const [isSubmittingOptions, setIsSubmittingOptions] = useState(false);
+  const [topicResults, setTopicResults] = useState(initialTopicResults);
+  const {userProfile} = useContext(AuthContext);
+  const userID = userProfile.id;
+  const saveFollowOptions = async () => {
+    setIsSubmittingOptions(true);
+    const blockedTopics = [];
+    const blockedPostTypes = [];
+    const findUnselectedItems = (allOptions, selectedOptions) =>
+      allOptions.filter(
+        (option) =>
+          !selectedOptions.some(
+            (selectedOption) => selectedOption.id === option.id
+          )
+      );
+    if (
+      !selectedTopics.some(
+        (selectedTopic) => selectedTopic.id === initialTopicResults[0].id
+      )
+    )
+      findUnselectedItems(
+        topicResults.filter(
+          (topicResult) => topicResult.id !== topicResults[0].id
+        ),
+        selectedTopics
+      ).forEach((unselectedItem) => blockedTopics.push(unselectedItem));
+    if (
+      !selectedPostTypes.some(
+        (selectedPostType) => selectedPostType.id === postTypesOptions[0].id
+      )
+    )
+      findUnselectedItems(
+        postTypesOptions.filter(
+          (postTypeOption) => postTypeOption.id !== postTypesOptions[0].id
+        ),
+        selectedPostTypes
+      ).forEach((unselectedItem) => blockedPostTypes.push(unselectedItem));
+    const capitaliseFirstLetter = (targetString) =>
+      targetString[0].toUpperCase() + targetString.slice(1);
+
+    batch.update(
+      db.doc(
+        `${resourceTypeToCollection(resourceType)}/${
+          targetResourceData.id
+        }/followedByUsers/${userID}`
+      ),
+      {omittedTopics: blockedTopics, omittedPostTypes: blockedPostTypes}
+    );
+    batch.update(
+      db.doc(
+        `users/${userID}/follows${capitaliseFirstLetter(
+          resourceTypeToCollection(resourceType)
+        )}/${targetResourceData.id}`
+      ),
+      {omittedTopics: blockedTopics, omittedPostTypes: blockedPostTypes}
+    );
+    return batch
+      .commit()
+      .then(() => {
+        setIsSubmittingOptions(false);
+        setExpanded(false);
+      })
+      .catch((err) => {
+        console.error(
+          `unable to save follow preferences for user ${userID} ${err}`
+        );
+        setIsSubmittingOptions(false);
+        setExpanded(false);
+      });
   };
   const optionsForm = (
     <>
@@ -38,15 +125,17 @@ export default function FollowOptionsPopover({
         selectedTopics={selectedTopics}
         setSelectedTopics={setSelectedTopics}
         resourceType={resourceType}
+        topicResults={topicResults}
+        setTopicResults={setTopicResults}
       />
       <div className="follow-options-actions-container">
-        {!submittingOptions && (
+        {!isSubmittingOptions && (
           <CancelButton cancelAction={() => setExpanded(false)}>
             Cancel
           </CancelButton>
         )}
         <PrimaryButton
-          disabled={submittingOptions}
+          disabled={isSubmittingOptions}
           onClick={saveFollowOptions}
           smallVersion={true}
         >
@@ -76,30 +165,32 @@ function ResourceFollowPostTypesOptions({
   selectedPostTypes,
   setSelectedPostTypes,
 }) {
-  const isPostTypeSelected = (postType) => selectedPostTypes.includes(postType);
+  const isPostTypeSelected = (postType) =>
+    selectedPostTypes.some(
+      (selectedPostType) => selectedPostType.id === postType.id
+    );
 
-  const postTypesOptions = [
-    {id: 'all', text: 'All posts'},
-    {id: 'general', text: 'General posts'},
-    {id: PUBLICATIONS, text: 'Publication posts'},
-    {id: OPENPOSITIONS, text: 'Open position posts'},
-  ];
   const selectAll = () =>
-    setSelectedPostTypes(() => postTypesOptions.map((postType) => postType.id));
+    setSelectedPostTypes(() => postTypesOptions.map((postType) => postType));
 
+  useEffect(
+    () =>
+      setSelectedPostTypes(() => postTypesOptions.map((postType) => postType)),
+    []
+  );
   return (
     <div className="follow-options-post-types-container">
       {postTypesOptions.map((postType) => (
         <div className="follow-options-option-container" key={postType.id}>
-          <div>{postType.text}</div>
+          <div>{postType.name}</div>
           <SelectCheckBox
-            selected={isPostTypeSelected(postType.id)}
+            selected={isPostTypeSelected(postType)}
             selectAction={() =>
               setItemSelectedState(
-                postType.id,
-                !isPostTypeSelected(postType.id),
+                postType,
+                !isPostTypeSelected(postType),
                 setSelectedPostTypes,
-                'all',
+                postTypesOptions[0],
                 selectAll
               )
             }
@@ -118,16 +209,13 @@ function ResourceFollowTopicsOptions({
   setSelectedTopics,
   selectedTopics,
   resourceType,
+  topicResults,
+  setTopicResults,
 }) {
   const targetResourceTopicsRef = db.collection(
     `${resourceCollectionName}/${targetResourceData.id}/topics`
   );
-  const initialResults = [
-    {
-      name: 'All topics',
-      resourceType: TOPIC,
-    },
-  ];
+
   return (
     <div
       className="follow-options-topics-container"
@@ -143,12 +231,15 @@ function ResourceFollowTopicsOptions({
         resourceType={TOPIC}
         isSmallVersion={true}
         customEndMessage={`No more topics associated with this ${resourceType}`}
-        initialResults={initialResults}
         useSmallListItems={true}
         useSmallCheckBox={true}
         noDivider={true}
         rankByName={true}
         scrollableTarget={INFINITE_SCROLL_TARGET_ID}
+        selectAllOption={initialTopicResults[0]}
+        results={topicResults}
+        setResults={setTopicResults}
+        selectedByDefault={true}
       />
     </div>
   );

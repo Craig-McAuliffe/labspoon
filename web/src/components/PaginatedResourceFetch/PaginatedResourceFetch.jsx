@@ -11,18 +11,20 @@ export default function PaginatedResourceFetch({
   limit,
   resourceType,
   customEndMessage,
-  initialResults,
   useSmallCheckBox,
   useSmallListItems,
   noDivider,
   rankByName,
   scrollableTarget,
+  selectAllOption,
+  results,
+  setResults,
+  selectedByDefault,
 }) {
   const [lastFetchedResource, setLastFetchedResource] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [results, setResults] = useState(initialResults ? initialResults : []);
 
   const fetchTargetUserTopics = () => {
     setLoading(true);
@@ -41,6 +43,11 @@ export default function PaginatedResourceFetch({
         }
         setLastFetchedResource(fetchedResults[limit - 1]);
         if (fetchedResults.length < limit) setHasMore(false);
+        if (selectedByDefault)
+          setSelectedItems((currentSelectedItems) => [
+            ...currentSelectedItems,
+            ...fetchedResults.slice(0, limit - 1),
+          ]);
         setResults((currentResults) => [
           ...currentResults,
           ...fetchedResults.slice(0, limit - 1),
@@ -74,6 +81,7 @@ export default function PaginatedResourceFetch({
         customEndMessage={customEndMessage}
         noDivider={noDivider}
         scrollableTarget={scrollableTarget}
+        selectAllOption={selectAllOption}
       />
     );
 }

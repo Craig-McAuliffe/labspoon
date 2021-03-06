@@ -256,9 +256,17 @@ export function SelectableResults({
   useSmallCheckBox,
   noDivider,
   scrollableTarget,
+  selectAllOption,
 }) {
   if (error) return <h1>{error}</h1>;
   const selectedIDs = new Set(selectedItems.map((item) => item.id));
+
+  const selectAll = () => setSelectedItems(results);
+
+  // select all on load
+  useEffect(() => {
+    if (selectAllOption) selectAll();
+  }, []);
 
   const items = results.map((result) => {
     const selected = selectedIDs.has(result.id);
@@ -268,11 +276,18 @@ export function SelectableResults({
         result={result}
         selected={selected}
         setSelected={() =>
-          setItemSelectedState(result, !selected, setSelectedItems)
+          setItemSelectedState(
+            result,
+            !selected,
+            setSelectedItems,
+            selectAllOption,
+            selectAll
+          )
         }
         useSmallListItem={useSmallListItems}
         useSmallCheckBox={useSmallCheckBox}
         noDivider={noDivider}
+        selectAllOption={selectAllOption}
       />
     );
   });
@@ -305,6 +320,7 @@ function SelectableGenericListItem({
   useSmallCheckBox,
   useSmallListItem,
   noDivider,
+  selectAllOption,
 }) {
   return (
     <div

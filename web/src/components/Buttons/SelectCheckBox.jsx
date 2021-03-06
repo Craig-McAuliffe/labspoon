@@ -36,14 +36,14 @@ export function setItemSelectedState(
   setAllSelected
 ) {
   if (willAdd) {
-    if (result === selectAllResult) setAllSelected();
+    if (result.id === selectAllResult.id) setAllSelected();
     else setSelectedItems((items) => [...items, result]);
 
     return;
   }
   if (result !== selectAllResult)
     setSelectedItems((items) =>
-      items.filter((item) => item !== selectAllResult)
+      items.filter((item) => item.id !== selectAllResult.id)
     );
-  setSelectedItems((items) => items.filter((item) => item !== result));
+  setSelectedItems((items) => items.filter((item) => item.id !== result.id));
 }

@@ -35,9 +35,6 @@
 .follow-options-toggle-container-expanded,
 .follow-options-toggle-container-minimised {
   position: absolute;
-  width: 30vw;
-  min-width: 140px;
-  max-width: 400px;
   padding: 10px 0px 0px;
   border: 1px solid #00507c;
   box-shadow: 0px 0px 4px rgba(48, 153, 211, 0.8);
@@ -48,7 +45,18 @@
   overflow-y: hidden;
 }
 
+.follow-options-toggle-container-minimised {
+  width: 20vw;
+  min-width: 140px;
+  max-width: 400px;
+  -webkit-transition: 0.4s;
+}
+
 .follow-options-toggle-container-expanded {
+  width: 30vw;
+  min-width: 140px;
+  max-width: 400px;
+  -webkit-transition: 0.4s;
 }
 
 .follow-options-toggle-container-minimised {
