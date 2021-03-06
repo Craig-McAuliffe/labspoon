@@ -16,6 +16,10 @@ import {
 import {addRecentPostsToFollowingFeed, Post} from './posts';
 import {admin} from './config';
 import {firestore} from 'firebase-admin';
+import {
+  doFollowPreferencesBlockPost,
+  FollowPostTypePreferences,
+} from './helpers';
 
 const db = admin.firestore();
 
@@ -410,6 +414,17 @@ export const addTopicPostToFollowersFeeds = functions.firestore
         if (qs.empty) return;
         const topicFollowersIDs: string[] = [];
         qs.forEach((doc) => {
+          const followerData = doc.data();
+          const omittedPostTypes: Array<FollowPostTypePreferences> =
+            followerData.omittedPostTypes;
+          let postIsBlockedByFollowPreferences = false;
+          if (omittedPostTypes && omittedPostTypes.length > 0) {
+            if (
+              doFollowPreferencesBlockPost('postTypes', post, omittedPostTypes)
+            )
+              postIsBlockedByFollowPreferences = true;
+          }
+          if (postIsBlockedByFollowPreferences) return;
           topicFollowersIDs.push(doc.id);
         });
         const topicFollowersPromisesArray = topicFollowersIDs.map(

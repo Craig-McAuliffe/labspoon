@@ -38,6 +38,7 @@ const initialTopicResults = [
 export default function FollowOptionsPopover({
   targetResourceData,
   resourceType,
+  noTopicOptions,
 }) {
   const [expanded, setExpanded] = useState(false);
   const [selectedTopics, setSelectedTopics] = useState([]);
@@ -86,7 +87,7 @@ export default function FollowOptionsPopover({
       ).forEach((unselectedItem) => blockedPostTypes.push(unselectedItem));
     const capitaliseFirstLetter = (targetString) =>
       targetString[0].toUpperCase() + targetString.slice(1);
-
+    if (noTopicOptions) blockedTopics.splice(0, blockedTopics.length);
     const batch = db.batch();
     batch.update(
       db.doc(
@@ -127,15 +128,17 @@ export default function FollowOptionsPopover({
         selectedPostTypes={selectedPostTypes}
         setSelectedPostTypes={setSelectedPostTypes}
       />
-      <ResourceFollowTopicsOptions
-        targetResourceData={targetResourceData}
-        resourceCollectionName={resourceTypeToCollection(resourceType)}
-        selectedTopics={selectedTopics}
-        setSelectedTopics={setSelectedTopics}
-        resourceType={resourceType}
-        topicResults={topicResults}
-        setTopicResults={setTopicResults}
-      />
+      {!noTopicOptions && (
+        <ResourceFollowTopicsOptions
+          targetResourceData={targetResourceData}
+          resourceCollectionName={resourceTypeToCollection(resourceType)}
+          selectedTopics={selectedTopics}
+          setSelectedTopics={setSelectedTopics}
+          resourceType={resourceType}
+          topicResults={topicResults}
+          setTopicResults={setTopicResults}
+        />
+      )}
       <div className="follow-options-actions-container">
         {!isSubmittingOptions && (
           <CancelButton cancelAction={() => setExpanded(false)}>
