@@ -9,17 +9,17 @@ import Popover from '../../Popovers/Popover';
 export default function FollowUserButton({targetUser}) {
   const [following, setFollowing] = useState();
   const featureFlags = useContext(FeatureFlags);
-  const {authUser, userProfile} = useContext(AuthContext);
+  const {user, userProfile} = useContext(AuthContext);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!targetUser.id) return;
-    if (!authUser) {
+    if (!user) {
       setFollowing(false);
       return;
     }
-    if (!featureFlags.has('disable-cloud-firestore') && authUser) {
-      db.doc(`users/${authUser.uid}/followsUsers/${targetUser.id}`)
+    if (!featureFlags.has('disable-cloud-firestore') && user) {
+      db.doc(`users/${user.uid}/followsUsers/${targetUser.id}`)
         .get()
         .then((doc) => setFollowing(doc.exists))
         .catch((err) => console.log(err));
@@ -31,10 +31,10 @@ export default function FollowUserButton({targetUser}) {
     if (!featureFlags.has('disable-cloud-firestore')) {
       const batch = db.batch();
       const followsUsersDoc = db.doc(
-        `users/${authUser.uid}/followsUsers/${targetUser.id}`
+        `users/${user.uid}/followsUsers/${targetUser.id}`
       );
       const followedByUsersDoc = db.doc(
-        `users/${targetUser.id}/followedByUsers/${authUser.uid}`
+        `users/${targetUser.id}/followedByUsers/${user.uid}`
       );
       if (!following) {
         batch.set(followsUsersDoc, {
@@ -43,8 +43,8 @@ export default function FollowUserButton({targetUser}) {
           avatar: targetUser.avatar ? targetUser.avatar : null,
         });
         batch.set(followedByUsersDoc, {
-          id: authUser.uid,
-          name: authUser.displayName,
+          id: user.uid,
+          name: user.displayName,
           avatar: userProfile.avatar ? userProfile.avatar : null,
         });
         batch

@@ -44,11 +44,15 @@ export default function FollowOptionsPopover({
   const [selectedPostTypes, setSelectedPostTypes] = useState(['all']);
   const [isSubmittingOptions, setIsSubmittingOptions] = useState(false);
   const [topicResults, setTopicResults] = useState(initialTopicResults);
+  const [success, setSuccess] = useState(false);
+  const [submittingError, setSubmittingError] = useState(false);
   const {userProfile} = useContext(AuthContext);
   if (!userProfile) return null;
   const userID = userProfile.id;
   const saveFollowOptions = async () => {
     setIsSubmittingOptions(true);
+    if (success) setSuccess(false);
+    if (submittingError) setSubmittingError(false);
     const blockedTopics = [];
     const blockedPostTypes = [];
     const findUnselectedItems = (allOptions, selectedOptions) =>
@@ -103,15 +107,17 @@ export default function FollowOptionsPopover({
     return batch
       .commit()
       .then(() => {
-        setIsSubmittingOptions(false);
+        setSuccess(true);
         setExpanded(false);
+        setIsSubmittingOptions(false);
       })
       .catch((err) => {
         console.error(
           `unable to save follow preferences for user ${userID} ${err}`
         );
-        setIsSubmittingOptions(false);
+        setSubmittingError(true);
         setExpanded(false);
+        setIsSubmittingOptions(false);
       });
   };
   const optionsForm = (
@@ -146,6 +152,11 @@ export default function FollowOptionsPopover({
       </div>
     </>
   );
+  const minimisedOptionsText = () => {
+    if (success && !expanded) return 'Preferences Saved.';
+    if (submittingError && !expanded) return 'Something went wrong.';
+    return 'Customise your follow';
+  };
   return (
     <div
       className={`follow-options-toggle-container${
@@ -156,7 +167,7 @@ export default function FollowOptionsPopover({
         onClick={() => setExpanded(true)}
         className="follow-options-toggle"
       >
-        Customise your follow
+        {minimisedOptionsText()}
       </button>
       {expanded && optionsForm}
     </div>

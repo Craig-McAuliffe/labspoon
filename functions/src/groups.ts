@@ -18,6 +18,11 @@ import {OpenPosition} from './openPositions';
 import {ResearchFocus} from './researchFocuses';
 import {Technique} from './techniques';
 import {MAX_RECENT_TOPICS, toUserFilterRef, UserRef} from './users';
+import {
+  doFollowPreferencesBlockPost,
+  FollowNoTopicsPreference,
+  FollowPostTypePreferences,
+} from './helpers';
 
 const db: firestore.Firestore = admin.firestore();
 
@@ -983,6 +988,21 @@ export const addGroupPostToFollowersFeeds = functions.firestore
 
     const groupFollowersIDs: string[] = [];
     groupFollowersQS.forEach((ds) => {
+      const followerData = ds.data();
+      const omittedPostTypes: Array<FollowPostTypePreferences> =
+        followerData.omittedPostTypes;
+      const omittedTopics: Array<Topic | FollowNoTopicsPreference> =
+        followerData.omittedTopics;
+      let postIsBlockedByFollowPreferences = false;
+      if (omittedPostTypes && omittedPostTypes.length > 0) {
+        if (doFollowPreferencesBlockPost('postTypes', post, omittedPostTypes))
+          postIsBlockedByFollowPreferences = true;
+      }
+      if (omittedTopics && omittedTopics.length > 0) {
+        if (doFollowPreferencesBlockPost('topics', post, omittedTopics))
+          postIsBlockedByFollowPreferences = true;
+      }
+      if (postIsBlockedByFollowPreferences) return;
       groupFollowersIDs.push(ds.id);
     });
 
