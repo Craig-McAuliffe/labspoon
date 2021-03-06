@@ -20,11 +20,11 @@ export enum ResourceTypes {
 
 export enum ResourceTypesCollections {
   USERS = 'users',
-  GROUP = 'groups',
-  POST = 'posts',
-  PUBLICATION = 'publications',
-  TOPIC = 'topics',
-  OPEN_POSITION = 'openPositions',
+  GROUPS = 'groups',
+  POSTS = 'posts',
+  PUBLICATIONS = 'publications',
+  TOPICS = 'topics',
+  OPEN_POSITIONS = 'openPositions',
   RESEARCH_FOCUSES = 'researchFocuses',
   TECHNIQUES = 'techniques',
 }

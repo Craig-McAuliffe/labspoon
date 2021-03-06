@@ -2,6 +2,11 @@ import {firestore} from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import {admin} from './config';
 import {GroupRef} from './groups';
+import {
+  doFollowPreferencesBlockPost,
+  FollowNoTopicsPreference,
+  FollowPostTypePreferences,
+} from './helpers';
 import {MAKAuthor} from './microsoft';
 import {OpenPosition} from './openPositions';
 import {
@@ -1186,6 +1191,21 @@ export const addUserPostToFollowersFeeds = functions.firestore
     const postAddedPromises: Promise<void>[] = [];
     followers.forEach(async (followerSnapshot) => {
       const followerID = followerSnapshot.id;
+      const followerData = followerSnapshot.data();
+      const omittedPostTypes: Array<FollowPostTypePreferences> =
+        followerData.omittedPostTypes;
+      const omittedTopics: Array<Topic | FollowNoTopicsPreference> =
+        followerData.omittedTopics;
+      let postIsBlockedByFollowPreferences = false;
+      if (omittedPostTypes && omittedPostTypes.length > 0) {
+        if (doFollowPreferencesBlockPost('postTypes', post, omittedPostTypes))
+          postIsBlockedByFollowPreferences = true;
+      }
+      if (omittedTopics && omittedTopics.length > 0) {
+        if (doFollowPreferencesBlockPost('topics', post, omittedTopics))
+          postIsBlockedByFollowPreferences = true;
+      }
+      if (postIsBlockedByFollowPreferences) return;
       const followingFeedPostRef = db.doc(
         `users/${followerID}/feeds/followingFeed/posts/${postID}`
       );

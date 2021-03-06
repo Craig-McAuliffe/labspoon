@@ -9,7 +9,7 @@ import Popover from '../../Popovers/Popover';
 export default function FollowUserButton({targetUser}) {
   const [following, setFollowing] = useState();
   const featureFlags = useContext(FeatureFlags);
-  const {user: authUser, userProfile} = useContext(AuthContext);
+  const {authUser, userProfile} = useContext(AuthContext);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -66,16 +66,20 @@ export default function FollowUserButton({targetUser}) {
     <FollowOptionsPopover targetResourceData={targetUser} resourceType={USER} />
   );
 
+  const followButtonComponent = (
+    <FollowButton
+      following={following}
+      setFollowing={setFollowingAndUpdateDB}
+      actionAndTriggerPopUp={() => {}}
+    />
+  );
+  if (!userProfile) return followButtonComponent;
   return (
     <Popover
       getPopUpComponent={getFollowOptionsPopover}
       shouldNotOpen={following}
     >
-      <FollowButton
-        following={following}
-        setFollowing={setFollowingAndUpdateDB}
-        actionAndTriggerPopUp={() => {}}
-      />
+      {followButtonComponent}
     </Popover>
   );
 }

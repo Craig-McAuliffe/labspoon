@@ -45,6 +45,7 @@ export default function FollowOptionsPopover({
   const [isSubmittingOptions, setIsSubmittingOptions] = useState(false);
   const [topicResults, setTopicResults] = useState(initialTopicResults);
   const {userProfile} = useContext(AuthContext);
+  if (!userProfile) return null;
   const userID = userProfile.id;
   const saveFollowOptions = async () => {
     setIsSubmittingOptions(true);
