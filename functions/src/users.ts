@@ -158,68 +158,6 @@ export const addPublicationTopicsToRecentUserTopics = functions.firestore
     );
   });
 
-export const checkExistingPublicationsFilterAuthorIDs = functions
-  .runWith({
-    timeoutSeconds: 30,
-    memory: '2GB',
-  })
-  .https.onRequest(async (req, resp) => {
-    const usersQS = await db.collection(`users`).get();
-    const userIDs: string[] = [];
-    usersQS.forEach((ds) => {
-      userIDs.push(ds.id);
-    });
-    const publicationsWithoutFilterAuthorIDs: Array<{
-      publicationID: string;
-      userID: string;
-    }> = [];
-    const publicationsWithoutAuthorInAuthorIDs: Array<{
-      publicationID: string;
-      userID: string;
-    }> = [];
-    const publicationsChecksPromises = userIDs.map((userID) =>
-      db
-        .collection(`users/${userID}/publications`)
-        .get()
-        .then((userPublicationsQS) =>
-          userPublicationsQS.forEach((ds) => {
-            const publication = ds.data() as PublicationRef;
-            if (!publication.filterAuthorIDs)
-              publicationsWithoutFilterAuthorIDs.push({
-                publicationID: ds.id,
-                userID: userID,
-              });
-            else if (!publication.filterAuthorIDs.includes(userID))
-              publicationsWithoutAuthorInAuthorIDs.push({
-                publicationID: ds.id,
-                userID: userID,
-              });
-          })
-        )
-    );
-    await Promise.all(publicationsChecksPromises).catch((err: Error) =>
-      resp.json(err)
-    );
-    const batch1 = db.batch();
-    publicationsWithoutFilterAuthorIDs.map((entity) =>
-      batch1.set(
-        db.collection('publicationsWithoutFilterAuthorIDs').doc(),
-        entity
-      )
-    );
-    await batch1.commit().catch((err: Error) => resp.json(err));
-    const batch2 = db.batch();
-    publicationsWithoutAuthorInAuthorIDs.map((entity) =>
-      batch2.set(
-        db.collection(`publicationsWithoutAuthorInAuthorIDs`).doc(),
-        entity
-      )
-    );
-    await batch2.commit().catch((err: Error) => resp.json(err));
-    resp.json('success');
-    resp.end();
-  });
-
 export const checkPublicationFilterAuthorIDs = functions.firestore
   .document('users/{userID}/publications/{publicationID}')
   .onCreate(async (change, context) => {
