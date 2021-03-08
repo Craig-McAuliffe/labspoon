@@ -10,6 +10,7 @@ export default function GroupListItem({
   LinkOverride = undefined,
   noBorder,
   children,
+  isFollowsPageResults,
 }) {
   const [displayFullDescription, setDisplayFullDescription] = useState({
     display: false,

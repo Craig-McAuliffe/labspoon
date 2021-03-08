@@ -286,7 +286,7 @@ export function ResourceTabs({
   );
 }
 
-export function NewResultsWrapper() {
+export function NewResultsWrapper({isFollowsPageResults}) {
   const filterableResults = useContext(FilterableResultsContext);
   if (filterableResults.resultsError)
     return <h1>{filterableResults.resultsError}</h1>;
@@ -298,6 +298,7 @@ export function NewResultsWrapper() {
         hasMore={filterableResults.hasMore}
         fetchMore={filterableResults.fetchMore}
         activeTabID={activeTabID}
+        isFollowsPageResults={isFollowsPageResults}
       />
       {filterableResults.loadingResults ? <LoadingSpinner /> : null}
     </>
@@ -413,7 +414,13 @@ export function Tabs({
   );
 }
 
-function Results({results, hasMore, fetchMore, activeTabID}) {
+function Results({
+  results,
+  hasMore,
+  fetchMore,
+  activeTabID,
+  isFollowsPageResults,
+}) {
   const currentLocation = useLocation().pathname;
   const filterableResults = useContext(FilterableResultsContext);
   const loading = filterableResults.loadingResults;
@@ -424,6 +431,7 @@ function Results({results, hasMore, fetchMore, activeTabID}) {
         hasMore={hasMore}
         fetchMore={fetchMore}
         activeTabID={activeTabID}
+        isFollowsPageResults={isFollowsPageResults}
       />
     );
   } else {

@@ -75,6 +75,11 @@
   display: none;
 }
 
+.user-list-item-options-button-position {
+  position: relative;
+  width: 65px;
+}
+
 @media screen and (max-width: 560px) {
   .user-listItem-institution {
     color: #5d5d65;

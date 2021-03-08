@@ -5,12 +5,17 @@ import PrimaryButton from '../Buttons/PrimaryButton';
 import DefaultUserIcon from '../../assets/DefaultUserIcon.svg';
 import {AuthContext} from '../../App';
 import './UserListItem.css';
+import Popover from '../Popovers/Popover';
+import TertiaryButton from '../Buttons/TertiaryButton';
+import FollowOptionsPopover from '../Popovers/FollowOptionsPopover';
+import {USER} from '../../helpers/resourceTypeDefinitions';
 
 export default function UserListItem({
   user,
   children,
   LinkOverride = undefined,
   noBorder,
+  isFollowsPageResults,
 }) {
   const {userProfile} = useContext(AuthContext);
   const userID = userProfile ? userProfile.id : undefined;
@@ -57,13 +62,42 @@ export default function UserListItem({
     <div className={`user-listItem-container${noBorder ? '-no-border' : ''}`}>
       {details}
       <div className="user-listItem-institution">
-        <h3>{user.institution}</h3>
+        {isFollowsPageResults ? (
+          <UserFollowOptions user={user} />
+        ) : (
+          <h3>{user.institution}</h3>
+        )}
       </div>
       {userID === user.id ? null : <div className="Follow">{children}</div>}
     </div>
   );
 }
 
+function UserFollowOptions({user}) {
+  const getFollowOptionsPopover = () => (
+    <FollowOptionsPopover
+      targetResourceData={user}
+      resourceType={USER}
+      isPreSelected={true}
+      top="40px"
+      left="-15vw"
+    />
+  );
+
+  return (
+    <Popover getPopUpComponent={getFollowOptionsPopover}>
+      <TriggerFollowOptionsButton actionAndTriggerPopUp={() => {}} />
+    </Popover>
+  );
+}
+
+function TriggerFollowOptionsButton({actionAndTriggerPopUp}) {
+  return (
+    <div className="user-list-item-options-button-position">
+      <TertiaryButton onClick={actionAndTriggerPopUp}>Options</TertiaryButton>
+    </div>
+  );
+}
 export function UserListItemEmailOnly({user, children}) {
   return (
     <div className="user-listItem-container">

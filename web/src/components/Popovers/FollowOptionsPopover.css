@@ -43,18 +43,19 @@
   background: #ffffff;
   border-radius: 10px;
   overflow-y: hidden;
+  z-index: 1;
 }
 
 .follow-options-toggle-container-minimised {
   width: 20vw;
-  min-width: 140px;
+  min-width: 250px;
   max-width: 400px;
   -webkit-transition: 0.4s;
 }
 
 .follow-options-toggle-container-expanded {
   width: 30vw;
-  min-width: 140px;
+  min-width: 250px;
   max-width: 400px;
   -webkit-transition: 0.4s;
 }

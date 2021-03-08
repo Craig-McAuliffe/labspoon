@@ -36,7 +36,13 @@ import SelectCheckBox, {setItemSelectedState} from '../Buttons/SelectCheckBox';
  * @param {Function} fetchMore - when called returns the next page of results
  * @return {React.ReactElement}
  */
-export default function Results({results, hasMore, fetchMore, activeTabID}) {
+export default function Results({
+  results,
+  hasMore,
+  fetchMore,
+  activeTabID,
+  isFollowsPageResults,
+}) {
   const [resourceTypes, setResourceTypes] = useState(new Set());
   const [resultComponents, setResultComponents] = useState([]);
   const currentLocation = useLocation().pathname;
@@ -53,6 +59,7 @@ export default function Results({results, hasMore, fetchMore, activeTabID}) {
             key={result.id || result.microsoftID}
             result={result}
             bookmarkedVariation
+            isFollowsPageResults={isFollowsPageResults}
           />
         );
       })
@@ -81,7 +88,7 @@ export default function Results({results, hasMore, fetchMore, activeTabID}) {
       hasMore={hasMore}
       next={fetchMore}
       endMessage={endMessage}
-      style={{minWidth: '100%'}}
+      style={{minWidth: '100%', overflow: 'visible'}}
     >
       {loading && <LoadingSpinner />}
       {content}
@@ -101,6 +108,7 @@ export function GenericListItem({
   nameOnly,
   useSmallListItem,
   noDivider,
+  isFollowsPageResults,
 }) {
   switch (result.resourceType) {
     case POST:
@@ -125,13 +133,21 @@ export function GenericListItem({
       );
     case 'user':
       return (
-        <UserListItem user={result} key={result.id + 'user'}>
+        <UserListItem
+          user={result}
+          key={result.id + 'user'}
+          isFollowsPageResults={isFollowsPageResults}
+        >
           <FollowUserButton targetUser={result} />
         </UserListItem>
       );
     case 'group':
       return (
-        <GroupListItem key={result.id + 'group'} group={result}>
+        <GroupListItem
+          key={result.id + 'group'}
+          group={result}
+          isFollowsPageResults={isFollowsPageResults}
+        >
           <FollowGroupButton targetGroup={result} />
         </GroupListItem>
       );
@@ -144,6 +160,7 @@ export function GenericListItem({
           nameOnly={nameOnly}
           isSmallVersion={useSmallListItem}
           noDivider={noDivider}
+          isFollowsPageResults={isFollowsPageResults}
         >
           <FollowTopicButton targetTopic={result} />
         </TopicListItem>

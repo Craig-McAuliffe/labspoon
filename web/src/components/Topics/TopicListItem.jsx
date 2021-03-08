@@ -12,6 +12,7 @@ export default function TopicListItem({
   nameOnly,
   isSmallVersion,
   noDivider,
+  isFollowsPageResults,
 }) {
   if (!topic) {
     return null;

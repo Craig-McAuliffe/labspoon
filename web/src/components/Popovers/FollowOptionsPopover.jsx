@@ -41,10 +41,19 @@ export default function FollowOptionsPopover({
   targetResourceData,
   resourceType,
   noTopicOptions,
+  isPreSelected,
+  top,
+  left,
+  right,
+  bottom,
 }) {
-  const [expanded, setExpanded] = useState(false);
-  const [selectedTopics, setSelectedTopics] = useState([]);
-  const [selectedPostTypes, setSelectedPostTypes] = useState(['all']);
+  const [expanded, setExpanded] = useState(isPreSelected ? true : false);
+  const [selectedTopics, setSelectedTopics] = useState([
+    initialTopicResults[0].id,
+  ]);
+  const [selectedPostTypes, setSelectedPostTypes] = useState([
+    postTypesOptions[0].id,
+  ]);
   const [isSubmittingOptions, setIsSubmittingOptions] = useState(false);
   const [noPostOptionsSelectedError, setNoPostOptionsSelectedError] = useState(
     false
@@ -54,6 +63,56 @@ export default function FollowOptionsPopover({
   const [submittingError, setSubmittingError] = useState(false);
   const {userProfile} = useContext(AuthContext);
   if (!userProfile) return null;
+
+  const capitaliseFirstLetter = (targetString) =>
+    targetString[0].toUpperCase() + targetString.slice(1);
+
+  useEffect(async () => {
+    if (!isPreSelected) return;
+    const existingFollowPreferences = await db
+      .doc(
+        `users/${userProfile.id}/follows${capitaliseFirstLetter(
+          resourceTypeToCollection(resourceType)
+        )}/${targetResourceData.id}`
+      )
+      .get()
+      .catch((err) => console.error('unable to fetch follow preferences', err));
+
+    if (!existingFollowPreferences) return;
+    if (!existingFollowPreferences.exists) {
+      console.error(
+        `user ${userProfile.id} does not follow this ${resourceType} even though it is on their following page.`
+      );
+      return;
+    }
+
+    const existingUserFollowOptions = existingFollowPreferences.data();
+    const existingOmittedPostTypes = existingUserFollowOptions.omittedPostTypes;
+    if (existingOmittedPostTypes && existingOmittedPostTypes.length > 0)
+      setSelectedPostTypes((currentSelectedPostTypes) =>
+        currentSelectedPostTypes.filter(
+          (currentSelectedPostType) =>
+            !existingOmittedPostTypes.some(
+              (existingOmittedPostType) =>
+                existingOmittedPostType.id === currentSelectedPostType.id
+            )
+        )
+      );
+
+    const existingOmittedTopics = existingUserFollowOptions.omittedTopics;
+    if (existingOmittedTopics && existingOmittedTopics.length > 0) {
+      setSelectedTopics((currentSelectedTopics) =>
+        currentSelectedTopics.filter(
+          (currentSelectedTopic) =>
+            !existingOmittedTopics.some(
+              (existingOmittedTopic) =>
+                existingOmittedTopic.id === currentSelectedTopic.id
+            )
+        )
+      );
+    }
+  }, [targetResourceData]);
+
   const userID = userProfile.id;
   const saveFollowOptions = async () => {
     setIsSubmittingOptions(true);
@@ -102,8 +161,7 @@ export default function FollowOptionsPopover({
       return;
     }
     if (noTopicOptions) blockedTopics.splice(0, blockedTopics.length);
-    const capitaliseFirstLetter = (targetString) =>
-      targetString[0].toUpperCase() + targetString.slice(1);
+
     const batch = db.batch();
     batch.update(
       db.doc(
@@ -184,6 +242,7 @@ export default function FollowOptionsPopover({
       className={`follow-options-toggle-container${
         expanded ? '-expanded' : '-minimised'
       }`}
+      style={{top: top, left: left, right: right, bottom: bottom}}
     >
       <button
         onClick={() => setExpanded(true)}

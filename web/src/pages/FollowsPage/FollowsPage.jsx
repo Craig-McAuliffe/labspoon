@@ -12,6 +12,10 @@ import FilterableResults, {
   NewFilterMenuWrapper,
   FilterManager,
 } from '../../components/FilterableResults/FilterableResults';
+import {
+  PaddedContent,
+  UnpaddedPageContainer,
+} from '../../components/Layout/Content';
 
 const FollowsPage = () => {
   const {user} = useContext(AuthContext);
@@ -52,20 +56,20 @@ const FollowsPage = () => {
   ];
 
   return (
-    <div className="content-layout">
-      <div className="details-container">
-        <h2>Manage that which you follow here.</h2>
-      </div>
+    <UnpaddedPageContainer>
+      <PaddedContent>
+        <h2>Manage the things you follow here.</h2>
+      </PaddedContent>
       <FilterableResults fetchResults={fetchFeedData} limit={10}>
         <div className="feed-container">
           <FilterManager>
             <ResourceTabs tabs={relationshipFilter} />
             <NewFilterMenuWrapper />
           </FilterManager>
-          <NewResultsWrapper />
+          <NewResultsWrapper isFollowsPageResults={true} />
         </div>
       </FilterableResults>
-    </div>
+    </UnpaddedPageContainer>
   );
 };
 
