@@ -92,7 +92,7 @@ export default function EditGroupPosts({children, groupID, group}) {
       getDefaultFilter={getDefaultFilter}
       addSelected={addPostsToGroup}
       removeSelected={removePostsFromGroup}
-      customEndMessage="This group member does not have any posts. Try another."
+      customEndMessage="This group member does not have any more posts. Try another."
     >
       {children}
     </FilteredSelector>

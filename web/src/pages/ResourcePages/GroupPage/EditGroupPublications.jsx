@@ -77,7 +77,7 @@ export default function EditGroupPublications({children, groupID, groupData}) {
       getDefaultFilter={getDefaultFilter}
       addSelected={addSelected}
       removeSelected={removeSelected}
-      customEndMessage="This group member does not have any publications. Try another."
+      customEndMessage="This group member does not have any more publications. Try another."
     >
       {children}
     </FilteredSelector>
@@ -171,6 +171,19 @@ async function addPublicationsToGroup(
   setErrorCount(0);
   const writePromises = selectedPublications.map((publication) => {
     delete publication._alreadyPresent;
+    const publicationAuthorWithIDs = publication.authors.filter(
+      (author) => author.id
+    );
+    const authorsToBeAddedToFilterAuthorIDs = publicationAuthorWithIDs.filter(
+      (authorWithID) => {
+        if (!publication.filterAuthorIDs) return true;
+        if (!publication.filterAuthorIDs.includes(authorWithID.id)) return true;
+        return false;
+      }
+    );
+    authorsToBeAddedToFilterAuthorIDs.forEach((unlistedAuthor) =>
+      publication.filterAuthorIDs.push(unlistedAuthor.id)
+    );
     const batch = db.batch();
     batch.set(
       db.doc(`groups/${groupID}/publications/${publication.id}`),

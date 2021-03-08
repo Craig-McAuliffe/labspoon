@@ -158,6 +158,26 @@ export const addPublicationTopicsToRecentUserTopics = functions.firestore
     );
   });
 
+export const checkPublicationFilterAuthorIDs = functions.firestore
+  .document('users/{userID}/publications/{publicationID}')
+  .onCreate(async (change, context) => {
+    const publication = change.data() as PublicationRef;
+    const authorID = context.params.userID;
+    const publicationID = context.params.publicationID;
+    if (
+      publication.filterAuthorIDs &&
+      publication.filterAuthorIDs.includes(authorID)
+    )
+      return;
+    // this will automatically update the author pub
+    const publicationRef = db.doc(`publications/${publicationID}`);
+    if (!publication.filterAuthorIDs)
+      return publicationRef.update({filterAuthorIDs: [authorID]});
+    return publicationRef.update({
+      filterAuthorIDs: firestore.FieldValue.arrayUnion(authorID),
+    });
+  });
+
 async function addRecentResourceTopicsToUserDoc(
   authorID: string,
   newTopics: TaggedTopic[],
