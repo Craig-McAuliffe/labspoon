@@ -1,6 +1,5 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
-import Linkify from 'linkifyjs/react';
 import PostTaggedContent from './PostParts/PostTaggedContent';
 import PostActions from './PostParts/PostActions';
 import DefaultUserIcon from '../../../assets/DefaultUserIcon.svg';
@@ -93,26 +92,14 @@ function PostTextContent({post, dedicatedPage}) {
   if (dedicatedPage)
     return (
       <div className="post-text-content">
-        <Linkify tagName="p">
-          {Array.isArray(post.text) ? (
-            <RichTextBody body={post.text} />
-          ) : (
-            post.text
-          )}
-        </Linkify>
+        <RichTextBody body={post.text} shouldLinkify={true} />
       </div>
     );
 
   return (
     <div className="post-text-content">
       <Link to={`/post/${post.id}`} className="post-text-as-link">
-        <Linkify tagName="p">
-          {Array.isArray(post.text) ? (
-            <RichTextBody body={post.text} />
-          ) : (
-            post.text
-          )}
-        </Linkify>
+        <RichTextBody body={post.text} shouldLinkify={true} />
       </Link>
     </div>
   );
@@ -123,11 +110,7 @@ export function PinnedPost({post}) {
   return (
     <div className="pinned-post">
       <h3>
-        {Array.isArray(post.text) ? (
-          <RichTextBody body={post.text} />
-        ) : (
-          post.text
-        )}
+        <RichTextBody body={post.text} shouldLinkify={true} />
       </h3>
       <div>
         {post.topics

@@ -1,3 +1,4 @@
+import Linkify from 'linkifyjs/react';
 import React, {useContext} from 'react';
 import {Link} from 'react-router-dom';
 import {AuthContext} from '../../App';
@@ -82,9 +83,9 @@ export function ArticleHeaderAndType({
   );
 }
 
-export function RichTextBody({body}) {
+export function RichTextBody({body, shouldLinkify}) {
   if (!body) return null;
-  return (
+  const bodyDisplay = (
     <div className="rich-body-section">
       {body.map((bodySection, i) =>
         bodySection.type === 'paragraph' ? (
@@ -95,6 +96,8 @@ export function RichTextBody({body}) {
       )}
     </div>
   );
+  if (shouldLinkify) return <Linkify>{bodyDisplay}</Linkify>;
+  return bodyDisplay;
 }
 
 export function getTweetTextFromRichText(text) {
