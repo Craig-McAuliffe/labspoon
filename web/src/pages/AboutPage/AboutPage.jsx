@@ -41,10 +41,10 @@ export default function AboutPage() {
             <div className="about-page-headline-text-container">
               <p>For all curious people</p>
               <h1 className="about-page-super-title">
-                Find and follow experts in any topic
+                Find and follow research in any topic
               </h1>
               <h2 className="about-page-super-points">
-                Hear straight from innovators
+                Hear straight from labs
               </h2>
               <h2 className="about-page-super-points">
                 Be the first to know about breakthroughs
