@@ -11,3 +11,7 @@ export default function ErrorMessage({noBorder, children}) {
     </div>
   );
 }
+
+export function SimpleErrorText({children}) {
+  return <h4 className="simple-error-text">{children}</h4>;
+}

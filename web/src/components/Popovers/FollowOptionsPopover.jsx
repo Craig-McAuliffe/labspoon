@@ -7,9 +7,11 @@ import {
   resourceTypeToCollection,
   TOPIC,
 } from '../../helpers/resourceTypeDefinitions';
+import {convertTopicToTaggedTopic} from '../../helpers/topics';
 import CancelButton from '../Buttons/CancelButton';
 import PrimaryButton from '../Buttons/PrimaryButton';
 import SelectCheckBox, {setItemSelectedState} from '../Buttons/SelectCheckBox';
+import {SimpleErrorText} from '../Forms/ErrorMessage';
 import PaginatedResourceFetch from '../PaginatedResourceFetch/PaginatedResourceFetch';
 
 import './FollowOptionsPopover.css';
@@ -44,6 +46,9 @@ export default function FollowOptionsPopover({
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [selectedPostTypes, setSelectedPostTypes] = useState(['all']);
   const [isSubmittingOptions, setIsSubmittingOptions] = useState(false);
+  const [noPostOptionsSelectedError, setNoPostOptionsSelectedError] = useState(
+    false
+  );
   const [topicResults, setTopicResults] = useState(initialTopicResults);
   const [success, setSuccess] = useState(false);
   const [submittingError, setSubmittingError] = useState(false);
@@ -54,6 +59,7 @@ export default function FollowOptionsPopover({
     setIsSubmittingOptions(true);
     if (success) setSuccess(false);
     if (submittingError) setSubmittingError(false);
+    if (noPostOptionsSelectedError) setNoPostOptionsSelectedError(false);
     const blockedTopics = [];
     const blockedPostTypes = [];
     const findUnselectedItems = (allOptions, selectedOptions) =>
@@ -73,7 +79,12 @@ export default function FollowOptionsPopover({
           (topicResult) => topicResult.id !== topicResults[0].id
         ),
         selectedTopics
-      ).forEach((unselectedItem) => blockedTopics.push(unselectedItem));
+        // remove resourceType from topic
+      ).forEach((unselectedItem) =>
+        blockedTopics.push(
+          convertTopicToTaggedTopic(unselectedItem, unselectedItem.id)
+        )
+      );
     if (
       !selectedPostTypes.some(
         (selectedPostType) => selectedPostType.id === postTypesOptions[0].id
@@ -85,9 +96,14 @@ export default function FollowOptionsPopover({
         ),
         selectedPostTypes
       ).forEach((unselectedItem) => blockedPostTypes.push(unselectedItem));
+    if (blockedPostTypes.length === 3) {
+      setNoPostOptionsSelectedError(true);
+      setIsSubmittingOptions(false);
+      return;
+    }
+    if (noTopicOptions) blockedTopics.splice(0, blockedTopics.length);
     const capitaliseFirstLetter = (targetString) =>
       targetString[0].toUpperCase() + targetString.slice(1);
-    if (noTopicOptions) blockedTopics.splice(0, blockedTopics.length);
     const batch = db.batch();
     batch.update(
       db.doc(
@@ -127,6 +143,7 @@ export default function FollowOptionsPopover({
       <ResourceFollowPostTypesOptions
         selectedPostTypes={selectedPostTypes}
         setSelectedPostTypes={setSelectedPostTypes}
+        noPostOptionsSelectedError={noPostOptionsSelectedError}
       />
       {!noTopicOptions && (
         <ResourceFollowTopicsOptions
@@ -140,10 +157,12 @@ export default function FollowOptionsPopover({
         />
       )}
       <div className="follow-options-actions-container">
-        {!isSubmittingOptions && (
+        {!isSubmittingOptions ? (
           <CancelButton cancelAction={() => setExpanded(false)}>
             Cancel
           </CancelButton>
+        ) : (
+          <div></div>
         )}
         <PrimaryButton
           disabled={isSubmittingOptions}
@@ -180,6 +199,7 @@ export default function FollowOptionsPopover({
 function ResourceFollowPostTypesOptions({
   selectedPostTypes,
   setSelectedPostTypes,
+  noPostOptionsSelectedError,
 }) {
   const isPostTypeSelected = (postType) =>
     selectedPostTypes.some(
@@ -196,6 +216,11 @@ function ResourceFollowPostTypesOptions({
   );
   return (
     <div className="follow-options-post-types-container">
+      {noPostOptionsSelectedError && (
+        <SimpleErrorText>
+          You must select at least one post type
+        </SimpleErrorText>
+      )}
       {postTypesOptions.map((postType) => (
         <div className="follow-options-option-container" key={postType.id}>
           <div>{postType.name}</div>

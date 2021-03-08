@@ -116,9 +116,9 @@ export async function waitThenReFetchMSField(topic) {
 export function convertTopicToTaggedTopic(topic, topicID) {
   const taggedTopic = {
     name: topic.name,
-    normalisedName: topic.normalisedName,
+    normalisedName: topic.normalisedName ? topic.normalisedName : null,
     id: topicID,
-    microsoftID: topic.microsoftID,
+    microsoftID: topic.microsoftID ? topic.microsoftID : null,
   };
   return taggedTopic;
 }
