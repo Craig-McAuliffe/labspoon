@@ -73,7 +73,7 @@ export default function AboutPage() {
               <div className="about-page-feature-right-container">
                 <h2 className="about-page-feature-description">
                   Discover the major researchers in a topic space with our
-                  natural language search engine and network of experts.
+                  search engine and network of experts.
                 </h2>
               </div>
             </div>
