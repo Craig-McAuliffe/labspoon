@@ -213,7 +213,12 @@ function userPageFeedDataFromDB(skip, limit, filterOptions, userID, last) {
     case 'follows':
       const followsQuery = db.collection(`/users/${userID}/followsUsers`);
       return [
-        getPaginatedUserReferencesFromCollectionRef(followsQuery, limit, last),
+        getPaginatedUserReferencesFromCollectionRef(
+          followsQuery,
+          limit,
+          last,
+          userID
+        ),
         null,
       ];
     case 'recommends':

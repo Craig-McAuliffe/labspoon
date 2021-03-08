@@ -82,7 +82,8 @@ function followsPageFeedDataFromDB(limit, filterOptions, last, userID) {
         getPaginatedUserReferencesFromCollectionRef(
           usersCollection,
           limit,
-          last
+          last,
+          userID
         ),
         null,
       ];

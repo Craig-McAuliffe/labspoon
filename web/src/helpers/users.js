@@ -8,7 +8,8 @@ import firebase, {db} from '../firebase';
 export function getPaginatedUserReferencesFromCollectionRef(
   userRefCollection,
   limit,
-  last
+  last,
+  filterID
 ) {
   if (typeof last !== 'undefined') {
     userRefCollection = userRefCollection.startAt(last.id);
@@ -20,6 +21,8 @@ export function getPaginatedUserReferencesFromCollectionRef(
       const users = [];
       qs.forEach((doc) => {
         const user = doc.data();
+        if (filterID && filterID === doc.id) return;
+        user.id = doc.id;
         user.resourceType = 'user';
         users.push(user);
       });
