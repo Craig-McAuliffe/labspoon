@@ -144,6 +144,19 @@ function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip) {
         ),
         null,
       ];
+    case 'followedByUsers':
+      const followersCollection = db.collection(
+        `groups/${groupID}/followedByUsers`
+      );
+      return [
+        getPaginatedUserReferencesFromCollectionRef(
+          followersCollection,
+          limit,
+          last,
+          true
+        ),
+        null,
+      ];
     default:
       results = [];
   }
@@ -196,6 +209,15 @@ const checkIfTabsAreUsed = async (setUsedTabs, usedTabs, groupID) => {
     .then((qs) => {
       if (qs.empty) return;
       confirmedUsedTabs.push(TOPICS);
+    })
+    .catch((err) => console.error(err));
+  await db
+    .collection(`groups/${groupID}/followedByUsers`)
+    .limit(1)
+    .get()
+    .then((qs) => {
+      if (qs.empty) return;
+      confirmedUsedTabs.push('followedByUsers');
     })
     .catch((err) => console.error(err));
 
@@ -300,6 +322,9 @@ export default function GroupPage() {
           break;
         case TOPICS:
           tabName = 'Topics';
+          break;
+        case 'followedByUsers':
+          tabName = 'Followed By';
           break;
         default:
           tabName = null;

@@ -23,6 +23,8 @@ export default function UserPage() {
   const featureFlags = useContext(FeatureFlags);
   const [userID, setUserID] = useState(undefined);
   const [userDetails, setUserDetails] = useState(undefined);
+  const [usedTabs, setUsedTabs] = useState({checked: false, tabs: []});
+  const [tabsLoading, setTabsLoading] = useState(true);
   const history = useHistory();
   const route = useRouteMatch();
 
@@ -45,53 +47,81 @@ export default function UserPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userID, route]);
 
+  useEffect(async () => {
+    await checkIfTabsAreUsed(setUsedTabs, usedTabs, userID);
+    if (tabsLoading) setTabsLoading(false);
+  }, [userID]);
+
   const fetchFeedData = (skip, limit, filterOptions, last) =>
     userPageFeedDataFromDB(skip, limit, filterOptions, userID, last);
 
-  const relationshipFilter = [
-    {
-      collectionName: 'Relationship Types',
-      options: [
-        {
-          enabled: false,
-          data: {
-            id: 'posts',
-            name: 'Posts',
+  const fetchTabs = () => {
+    if (usedTabs.checked !== true) return;
+    const tabOptions = [
+      {
+        collectionName: 'Relationship Types',
+        options: [
+          {
+            enabled: false,
+            data: {
+              id: 'posts',
+              name: 'Posts',
+            },
           },
-        },
-        {
-          enabled: false,
-          data: {
-            id: 'publications',
-            name: 'Publications',
+          {
+            enabled: false,
+            data: {
+              id: 'publications',
+              name: 'Publications',
+            },
           },
-        },
-        {
-          enabled: false,
-          data: {
-            id: 'follows',
-            name: 'Follows',
+          {
+            enabled: false,
+            data: {
+              id: 'follows',
+              name: 'Follows',
+            },
           },
-        },
-        {
-          enabled: false,
-          data: {
-            id: 'groups',
-            name: 'Groups',
+          {
+            enabled: false,
+            data: {
+              id: 'groups',
+              name: 'Groups',
+            },
           },
-        },
-        {
-          enabled: false,
-          data: {
-            id: 'topics',
-            name: 'Topics',
+          {
+            enabled: false,
+            data: {
+              id: 'topics',
+              name: 'Topics',
+            },
           },
-        },
-      ],
+        ],
 
-      mutable: false,
-    },
-  ];
+        mutable: false,
+      },
+    ];
+    usedTabs.tabs.forEach((usedTabID) => {
+      let tabName;
+      switch (usedTabID) {
+        case 'followedByUsers':
+          tabName = 'Followed By';
+          break;
+        default:
+          tabName = null;
+      }
+      if (!tabName) return;
+
+      tabOptions[0].options.push({
+        enabled: false,
+        data: {
+          id: usedTabID,
+          name: tabName,
+        },
+      });
+    });
+    return tabOptions;
+  };
 
   if (featureFlags.has('coauthors')) {
     relationshipFilter[0].options.push({
@@ -123,11 +153,7 @@ export default function UserPage() {
     });
   }
   return (
-    <ResourcesFeed
-      fetchResults={fetchFeedData}
-      limit={10}
-      tabs={relationshipFilter}
-    >
+    <ResourcesFeed fetchResults={fetchFeedData} limit={10} tabs={fetchTabs()}>
       <UserInfo user={userDetails} />
     </ResourcesFeed>
   );
@@ -257,8 +283,37 @@ function userPageFeedDataFromDB(skip, limit, filterOptions, userID, last) {
         ),
         null,
       ];
+    case 'followedByUsers':
+      const followersCollection = db.collection(
+        `users/${userID}/followedByUsers`
+      );
+      return [
+        getPaginatedUserReferencesFromCollectionRef(
+          followersCollection,
+          limit,
+          last,
+          true
+        ),
+        null,
+      ];
     default:
       results = [];
   }
   return results;
 }
+
+const checkIfTabsAreUsed = async (setUsedTabs, usedTabs, userID) => {
+  if (usedTabs && usedTabs.checked === true) return;
+  const confirmedUsedTabs = [];
+  await db
+    .collection(`users/${userID}/followedByUsers`)
+    .limit(2)
+    .get()
+    .then((qs) => {
+      if (qs.empty || qs.size < 2) return;
+      confirmedUsedTabs.push('followedByUsers');
+    })
+    .catch((err) => console.error(err));
+
+  setUsedTabs({checked: true, tabs: confirmedUsedTabs});
+};

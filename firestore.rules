@@ -99,7 +99,8 @@ service cloud.firestore {
       }
 
       match /followedByUsers/{followerUserID} {
-        allow read, write: if request.auth != null && request.auth.uid == followerUserID;
+        allow read;
+        allow write: if request.auth != null && request.auth.uid == followerUserID;
       }
 
       match /feeds/followingFeed/{doc=**} {
