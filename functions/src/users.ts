@@ -169,6 +169,9 @@ export const checkPublicationFilterAuthorIDs = functions.firestore
       publication.filterAuthorIDs.includes(authorID)
     )
       return;
+    console.error(
+      `publication ${publicationID} filterAuthorIDs was not updated with the userID`
+    );
     // this will automatically update the author pub
     const publicationRef = db.doc(`publications/${publicationID}`);
     if (!publication.filterAuthorIDs)
