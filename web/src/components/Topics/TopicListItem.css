@@ -14,6 +14,10 @@
   border-bottom: 1px solid #dcdce0;
 }
 
+.topic-list-item-action-container {
+  justify-self: flex-end;
+}
+
 .topic-list-item-container {
   border-bottom: 1px solid #dcdce0;
 }

@@ -47,7 +47,7 @@ export default function TopicListItem({
           targetResourceData={topic}
           noTopicOptions={true}
         />
-        {children}
+        <div className="topic-list-item-action-container">{children}</div>
       </div>
     );
   return (
