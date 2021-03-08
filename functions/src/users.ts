@@ -178,6 +178,32 @@ export const checkPublicationFilterAuthorIDs = functions.firestore
     });
   });
 
+export const addUserIDToFilterAuthorIDs = functions
+  .runWith({
+    timeoutSeconds: 20,
+    memory: '2GB',
+  })
+  .https.onRequest(async (req, res) => {
+    const missingAuthorIDQS = await db
+      .collection('publicationsWithoutAuthorInAuthorIDs')
+      .get();
+    const targets: Array<any> = [];
+    missingAuthorIDQS.forEach((ds) => {
+      const targetUserAndPub = ds.data() as any;
+      targetUserAndPub.id = ds.id;
+      targets.push(targetUserAndPub);
+    });
+    const promisesArray = targets.map((target) => {
+      const batch = db.batch();
+      batch.update(db.doc(`publications/${target.publicationID}`), {
+        filterAuthorIDs: firestore.FieldValue.arrayUnion(target.userID),
+      });
+      batch.delete(db.doc(`publicationsWithoutAuthorInAuthorIDs/${target.id}`));
+    });
+    await Promise.all(promisesArray);
+    res.end();
+  });
+
 async function addRecentResourceTopicsToUserDoc(
   authorID: string,
   newTopics: TaggedTopic[],
