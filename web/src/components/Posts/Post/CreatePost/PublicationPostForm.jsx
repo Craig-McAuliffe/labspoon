@@ -248,7 +248,10 @@ function SelectPublication({
         )}
       {userIsLinkedToMicrosoft && (
         <div className="create-post-alt-tagging-method-container">
-          <button className="create-publication-search-publications-button"></button>
+          <button
+            className="create-publication-search-publications-button"
+            type="button"
+          ></button>
           <p>
             {isQuickCreatingPub
               ? ''

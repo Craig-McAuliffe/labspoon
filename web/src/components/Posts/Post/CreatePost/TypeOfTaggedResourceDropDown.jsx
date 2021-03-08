@@ -34,6 +34,7 @@ export default function TypeOfTaggedResourceDropDown({
         className="create-post-post-resource-type-suggestion"
         onClick={() => setTaggedResourceType(resourceType)}
         key={resourceType}
+        type="button"
       >
         <h4>{resourceType}</h4>
       </button>
@@ -65,6 +66,7 @@ export default function TypeOfTaggedResourceDropDown({
           <button
             className="create-post-post-tagged-resource-type-button"
             onClick={() => setTaggedResourceType(DEFAULT_POST)}
+            type="button"
           >
             {matchResourceTypeToIcon(taggedResourceType)}
             <h4>{taggedResourceType}</h4>
