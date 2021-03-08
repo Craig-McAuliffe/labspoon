@@ -199,6 +199,7 @@ export const addUserIDToFilterAuthorIDs = functions
         filterAuthorIDs: firestore.FieldValue.arrayUnion(target.userID),
       });
       batch.delete(db.doc(`publicationsWithoutAuthorInAuthorIDs/${target.id}`));
+      return batch.commit();
     });
     await Promise.all(promisesArray);
     res.end();
