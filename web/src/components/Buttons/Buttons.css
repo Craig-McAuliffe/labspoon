@@ -1,8 +1,16 @@
-.cancel-button {
-  color: #5d5d65;
+.cancel-button,
+.cancel-button-inactive {
   padding-top: 10px;
   display: flex;
   justify-content: flex-start;
+}
+
+.cancel-button {
+  color: #5d5d65;
+}
+
+.cancel-button-inactive {
+  color: #dcdce0;
 }
 
 .cancel-button h3 {

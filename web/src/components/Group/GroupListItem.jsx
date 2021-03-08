@@ -4,6 +4,10 @@ import SeeMore from '../SeeMore';
 import GroupAvatar from '../Avatar/GroupAvatar';
 
 import './GroupListItem.css';
+import FollowOptionsPopover from '../Popovers/FollowOptionsPopover';
+import {GROUP} from '../../helpers/resourceTypeDefinitions';
+import Popover from '../Popovers/Popover';
+import TertiaryButton from '../Buttons/TertiaryButton';
 
 export default function GroupListItem({
   group,
@@ -50,6 +54,14 @@ export default function GroupListItem({
           </div>
           <div className="group-list-item-follow-button-container">
             {children}
+            {isFollowsPageResults && (
+              <div className="group-list-item-follow-options-container">
+                <FollowsPageGroupListItemOptions
+                  resourceType={GROUP}
+                  targetResourceData={group}
+                />
+              </div>
+            )}
           </div>
         </div>
         <div className="group-list-item-text-container">
@@ -116,5 +128,33 @@ function GroupNameInstitution({name, institution}) {
       <h3 className="group-dropdown-item-name">{name}</h3>
       <h4 className="group-dropdown-item-institution">{institution}</h4>
     </>
+  );
+}
+
+export function FollowsPageGroupListItemOptions({
+  targetResourceData,
+  resourceType,
+}) {
+  const getFollowOptionsPopover = () => (
+    <FollowOptionsPopover
+      targetResourceData={targetResourceData}
+      resourceType={resourceType}
+      isPreSelected={true}
+      top="40px"
+      right="0vw"
+    />
+  );
+  return (
+    <Popover getPopUpComponent={getFollowOptionsPopover}>
+      <TriggerGroupFollowOptionsButton actionAndTriggerPopUp={() => {}} />
+    </Popover>
+  );
+}
+
+function TriggerGroupFollowOptionsButton({actionAndTriggerPopUp}) {
+  return (
+    <div className="group-list-item-follow-options-button-container">
+      <TertiaryButton onClick={actionAndTriggerPopUp}>Options</TertiaryButton>
+    </div>
   );
 }

@@ -1,5 +1,7 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
+import {TOPIC} from '../../helpers/resourceTypeDefinitions';
+import {FollowsPageListItemOptions} from '../Popovers/FollowOptionsPopover';
 
 import './TopicListItem.css';
 
@@ -36,6 +38,18 @@ export default function TopicListItem({
         </Link>
       );
   };
+  if (isFollowsPageResults)
+    return (
+      <div className="topic-list-item-container-with-follow-options">
+        {displayType()}
+        <FollowsPageListItemOptions
+          resourceType={TOPIC}
+          targetResourceData={topic}
+          noTopicOptions={true}
+        />
+        {children}
+      </div>
+    );
   return (
     <div
       className={`topic-list-item-container${noDivider ? '-no-divider' : ''}`}

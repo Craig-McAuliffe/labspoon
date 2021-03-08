@@ -121,6 +121,16 @@
   color: #99999f;
 }
 
+.group-list-item-follow-options-container {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 5px;
+}
+
+.group-list-item-follow-options-button-container {
+  position: relative;
+}
+
 @media screen and (max-width: 600px) {
   .group-list-item-icon img {
     width: 80px;

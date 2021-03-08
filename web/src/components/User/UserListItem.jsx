@@ -5,9 +5,7 @@ import PrimaryButton from '../Buttons/PrimaryButton';
 import DefaultUserIcon from '../../assets/DefaultUserIcon.svg';
 import {AuthContext} from '../../App';
 import './UserListItem.css';
-import Popover from '../Popovers/Popover';
-import TertiaryButton from '../Buttons/TertiaryButton';
-import FollowOptionsPopover from '../Popovers/FollowOptionsPopover';
+import {FollowsPageListItemOptions} from '../Popovers/FollowOptionsPopover';
 import {USER} from '../../helpers/resourceTypeDefinitions';
 
 export default function UserListItem({
@@ -26,8 +24,8 @@ export default function UserListItem({
   }
 
   const details = (
-    <WrapWithLinkOrOverride>
-      <div className="user-listItem-link">
+    <div className="user-listItem-link">
+      <WrapWithLinkOrOverride>
         <div className="Avatar">
           {user.avatar ? (
             <UserAvatar src={user.avatar} width="60px" height="60px" />
@@ -50,20 +48,32 @@ export default function UserListItem({
             />
           )}
         </div>
-        <div className="user-listItem-name">
+      </WrapWithLinkOrOverride>
+
+      <div className="user-listItem-name">
+        <WrapWithLinkOrOverride>
           <h2>{user.name}</h2>
           <h4>{user.name}</h4>
-        </div>
+        </WrapWithLinkOrOverride>
       </div>
-    </WrapWithLinkOrOverride>
+    </div>
   );
 
   return (
-    <div className={`user-listItem-container${noBorder ? '-no-border' : ''}`}>
+    <div
+      className={
+        isFollowsPageResults
+          ? 'user-listItem-container-follows-options'
+          : `user-listItem-container${noBorder ? '-no-border' : ''}`
+      }
+    >
       {details}
       <div className="user-listItem-institution">
         {isFollowsPageResults ? (
-          <UserFollowOptions user={user} />
+          <FollowsPageListItemOptions
+            targetResourceData={user}
+            resourceType={USER}
+          />
         ) : (
           <h3>{user.institution}</h3>
         )}
@@ -73,31 +83,6 @@ export default function UserListItem({
   );
 }
 
-function UserFollowOptions({user}) {
-  const getFollowOptionsPopover = () => (
-    <FollowOptionsPopover
-      targetResourceData={user}
-      resourceType={USER}
-      isPreSelected={true}
-      top="40px"
-      left="-15vw"
-    />
-  );
-
-  return (
-    <Popover getPopUpComponent={getFollowOptionsPopover}>
-      <TriggerFollowOptionsButton actionAndTriggerPopUp={() => {}} />
-    </Popover>
-  );
-}
-
-function TriggerFollowOptionsButton({actionAndTriggerPopUp}) {
-  return (
-    <div className="user-list-item-options-button-position">
-      <TertiaryButton onClick={actionAndTriggerPopUp}>Options</TertiaryButton>
-    </div>
-  );
-}
 export function UserListItemEmailOnly({user, children}) {
   return (
     <div className="user-listItem-container">

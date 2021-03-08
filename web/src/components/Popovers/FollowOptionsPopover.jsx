@@ -8,13 +8,16 @@ import {
   TOPIC,
 } from '../../helpers/resourceTypeDefinitions';
 import {convertTopicToTaggedTopic} from '../../helpers/topics';
+import {TriggerFollowOptionsButton} from '../../pages/FollowsPage/FollowsPage';
 import CancelButton from '../Buttons/CancelButton';
 import PrimaryButton from '../Buttons/PrimaryButton';
 import SelectCheckBox, {setItemSelectedState} from '../Buttons/SelectCheckBox';
 import {SimpleErrorText} from '../Forms/ErrorMessage';
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import PaginatedResourceFetch from '../PaginatedResourceFetch/PaginatedResourceFetch';
 
 import './FollowOptionsPopover.css';
+import Popover from './Popover';
 
 const INFINITE_SCROLL_TARGET_ID = 'scrollableFollowOptions';
 const postTypesOptions = [
@@ -202,6 +205,7 @@ export default function FollowOptionsPopover({
         selectedPostTypes={selectedPostTypes}
         setSelectedPostTypes={setSelectedPostTypes}
         noPostOptionsSelectedError={noPostOptionsSelectedError}
+        isSubmittingOptions={isSubmittingOptions}
       />
       {!noTopicOptions && (
         <ResourceFollowTopicsOptions
@@ -212,16 +216,16 @@ export default function FollowOptionsPopover({
           resourceType={resourceType}
           topicResults={topicResults}
           setTopicResults={setTopicResults}
+          isSubmittingOptions={isSubmittingOptions}
         />
       )}
       <div className="follow-options-actions-container">
-        {!isSubmittingOptions ? (
-          <CancelButton cancelAction={() => setExpanded(false)}>
-            Cancel
-          </CancelButton>
-        ) : (
-          <div></div>
-        )}
+        <CancelButton
+          cancelAction={() => setExpanded(false)}
+          isDisabled={isSubmittingOptions}
+        >
+          Cancel
+        </CancelButton>
         <PrimaryButton
           disabled={isSubmittingOptions}
           onClick={saveFollowOptions}
@@ -259,6 +263,7 @@ function ResourceFollowPostTypesOptions({
   selectedPostTypes,
   setSelectedPostTypes,
   noPostOptionsSelectedError,
+  isSubmittingOptions,
 }) {
   const isPostTypeSelected = (postType) =>
     selectedPostTypes.some(
@@ -273,6 +278,12 @@ function ResourceFollowPostTypesOptions({
       setSelectedPostTypes(() => postTypesOptions.map((postType) => postType)),
     []
   );
+  if (isSubmittingOptions)
+    return (
+      <div className="follow-options-popover-loading-spinner-container">
+        <LoadingSpinner />
+      </div>
+    );
   return (
     <div className="follow-options-post-types-container">
       {noPostOptionsSelectedError && (
@@ -311,11 +322,18 @@ function ResourceFollowTopicsOptions({
   resourceType,
   topicResults,
   setTopicResults,
+  isSubmittingOptions,
 }) {
   const targetResourceTopicsRef = db.collection(
     `${resourceCollectionName}/${targetResourceData.id}/topics`
   );
 
+  if (isSubmittingOptions)
+    return (
+      <div className="follow-options-popover-loading-spinner-container">
+        <LoadingSpinner />
+      </div>
+    );
   return (
     <div
       className="follow-options-topics-container"
@@ -342,5 +360,27 @@ function ResourceFollowTopicsOptions({
         selectedByDefault={true}
       />
     </div>
+  );
+}
+
+export function FollowsPageListItemOptions({
+  targetResourceData,
+  resourceType,
+  noTopicOptions = false,
+}) {
+  const getFollowOptionsPopover = () => (
+    <FollowOptionsPopover
+      targetResourceData={targetResourceData}
+      resourceType={resourceType}
+      isPreSelected={true}
+      top="40px"
+      left="-15vw"
+      noTopicOptions={noTopicOptions}
+    />
+  );
+  return (
+    <Popover getPopUpComponent={getFollowOptionsPopover}>
+      <TriggerFollowOptionsButton actionAndTriggerPopUp={() => {}} />
+    </Popover>
   );
 }

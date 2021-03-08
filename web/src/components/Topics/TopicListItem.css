@@ -6,6 +6,14 @@
   padding: 20px 0px;
 }
 
+.topic-list-item-container-with-follow-options {
+  display: grid;
+  grid-template-columns: 4fr 1fr 1fr;
+  align-items: center;
+  padding: 20px 5px;
+  border-bottom: 1px solid #dcdce0;
+}
+
 .topic-list-item-container {
   border-bottom: 1px solid #dcdce0;
 }

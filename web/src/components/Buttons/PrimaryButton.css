@@ -3,7 +3,8 @@
 .primary-button-inactive,
 .primary-button-spinner,
 .negative-button,
-.negative-button-smallVersion {
+.negative-button-smallVersion,
+.primary-button-smallVersion-inactive {
   border: none;
   border-radius: 4%;
   text-decoration: none;
@@ -16,11 +17,15 @@
 .primary-button,
 .primary-button-smallVersion,
 .primary-button-inactive,
-.primary-button-spinner {
+.primary-button-spinner,
+.primary-button-smallVersion-inactive {
   background: #00507c;
   color: #ffffff;
 }
 
+.primary-button-smallVersion-inactive {
+  opacity: 0.4;
+}
 .negative-button,
 .negative-button-smallVersion {
   background: #dcdce0;
@@ -38,7 +43,8 @@
 }
 
 .primary-button-smallVersion,
-.negative-button-smallVersion {
+.negative-button-smallVersion,
+.primary-button-smallVersion-inactive {
   padding: 10px 10px;
 }
 

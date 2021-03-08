@@ -16,6 +16,7 @@ import {
   PaddedContent,
   UnpaddedPageContainer,
 } from '../../components/Layout/Content';
+import TertiaryButton from '../../components/Buttons/TertiaryButton';
 
 const FollowsPage = () => {
   const {user} = useContext(AuthContext);
@@ -100,9 +101,7 @@ function followsPageFeedDataFromDB(limit, filterOptions, last, userID) {
         null,
       ];
     case 'topics':
-      const topicsCollection = db
-        .collection(`users/${userID}/followsTopics`)
-        .orderBy('name');
+      const topicsCollection = db.collection(`users/${userID}/followsTopics`);
       return [
         getPaginatedTopicsFromCollectionRef(topicsCollection, limit, last),
         null,
@@ -110,6 +109,14 @@ function followsPageFeedDataFromDB(limit, filterOptions, last, userID) {
     default:
       return [[], null];
   }
+}
+
+export function TriggerFollowOptionsButton({actionAndTriggerPopUp}) {
+  return (
+    <div className="user-list-item-options-button-position">
+      <TertiaryButton onClick={actionAndTriggerPopUp}>Options</TertiaryButton>
+    </div>
+  );
 }
 
 export default FollowsPage;

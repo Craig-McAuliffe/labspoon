@@ -13,12 +13,11 @@ export default function PrimaryButton({
   ...props
 }) {
   let className = 'primary-button';
-  if (smallVersion) {
-    className = className + '-smallVersion';
-    if (light) className = className + '-light';
-  } else {
-    if (disabled) className = className + '-inactive';
-  }
+  if (smallVersion) className = className + '-smallVersion';
+
+  if (light) className = className + '-light';
+
+  if (disabled) className = className + '-inactive';
 
   return (
     <button
