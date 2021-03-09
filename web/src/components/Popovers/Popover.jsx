@@ -112,3 +112,14 @@ export default function Popover({getPopUpComponent, shouldNotOpen, children}) {
     );
   return popOverChild;
 }
+
+export function StandardPopoverDisplay({left, right, top, bottom, text}) {
+  return (
+    <div
+      className="standard-popover-display"
+      style={{right: right, left: left, top: top, bottom: bottom}}
+    >
+      {text}
+    </div>
+  );
+}

@@ -31,3 +31,27 @@
 .sign-up-prompt-center p {
   line-height: 16px;
 }
+
+.standard-popover-display {
+  display: block;
+  position: absolute;
+  padding: 10px;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
+  background: #ffffff;
+  color: #5d5d65;
+  border-radius: 10px;
+  z-index: 1;
+  width: 30vw;
+}
+
+@media screen and (max-width: 1197px) {
+  .standard-popover-display {
+    width: 60vw;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .standard-popover-display {
+    width: 90vw;
+  }
+}

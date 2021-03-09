@@ -1,11 +1,12 @@
 import React, {useState, useEffect} from 'react';
 import PrimaryButton from '../Buttons/PrimaryButton';
 import TopicListItem from './TopicListItem';
-import {RemoveIcon} from '../../assets/GeneralActionIcons';
+import {AttentionIcon, RemoveIcon} from '../../assets/GeneralActionIcons';
 import SearchMSFields from './SearchMSFields';
 
 import '../Posts/Post/CreatePost/CreatePost.css';
 import './TagTopics.css';
+import Popover, {StandardPopoverDisplay} from '../Popovers/Popover';
 
 export default function TagTopics({
   submittingForm,
@@ -45,6 +46,17 @@ export default function TagTopics({
           setFetchedTopics={setDisplayedTopics}
           setCurrentInputValue={setTypedTopic}
         />
+        <Popover
+          getPopUpComponent={() => (
+            <StandardPopoverDisplay
+              text={topicTaggingExplained}
+              right="0px"
+              top="20px"
+            />
+          )}
+        >
+          <TagTopicsAttention actionAndTriggerPopUp={() => {}} />
+        </Popover>
       </div>
       <div>
         <TopicsList
@@ -62,6 +74,22 @@ export default function TagTopics({
           />
         )}
       </div>
+    </div>
+  );
+}
+
+const topicTaggingExplained =
+  'Tagging topics improves the visibility of your post and is more convenient for your followers.';
+function TagTopicsAttention({actionAndTriggerPopUp}) {
+  return (
+    <div className="tag-topics-attention-icon-button-container">
+      <button
+        className="tag-topics-attention-icon-button"
+        onClick={actionAndTriggerPopUp}
+        style={{cursor: 'default'}}
+      >
+        <AttentionIcon />
+      </button>
     </div>
   );
 }

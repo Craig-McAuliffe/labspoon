@@ -150,3 +150,32 @@ export function MessageIcon() {
     </svg>
   );
 }
+
+export function AttentionIcon() {
+  return (
+    <svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect
+        x="2.82843"
+        y="12.728"
+        width="14"
+        height="14"
+        transform="rotate(-45 2.82843 12.728)"
+        stroke="url(#paint0_linear)"
+        strokeWidth="4"
+      />
+      <defs>
+        <linearGradient
+          id="paint0_linear"
+          x1="9"
+          y1="12.728"
+          x2="7.03794"
+          y2="45.2136"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#00507C" />
+          <stop offset="1" stopColor="#00507C" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
