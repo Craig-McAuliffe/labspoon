@@ -112,8 +112,8 @@ async function sendUserNotificationEmail(
   // If there are no posts don't send an email.
   if (newUserPostsSnapshot.empty) return;
   const postsData: Array<PostRef> = [];
-  newUserPostsSnapshot.forEach((ds) => {
-    const postData = ds.data() as PostRef;
+  newUserPostsSnapshot.forEach((newUserPostsDS) => {
+    const postData = newUserPostsDS.data() as PostRef;
     postsData.push(postData);
   });
   const postsNotMadeByUser = postsData.filter(
@@ -126,7 +126,7 @@ async function sendUserNotificationEmail(
     .getUser(userID)
     .catch((err: any) =>
       console.error(
-        `Unable to retrieve user information for user with ID ${ds.id}:`,
+        `Unable to retrieve user information for user with ID ${userID}:`,
         err
       )
     );
@@ -164,8 +164,8 @@ function getTemplateDataFromPosts(posts: Array<PostRef>) {
   const activeUsersMap = new Map();
   const activeTopicsMap = new Map();
   posts.forEach((post: PostRef) => {
-    activeUsersMap.set(post!.author.id, post!.author);
-    post!.topics.forEach((topic: TaggedTopic) =>
+    activeUsersMap.set(post.author.id, post.author);
+    post.topics.forEach((topic: TaggedTopic) =>
       activeTopicsMap.set(topic.id, topic)
     );
   });
