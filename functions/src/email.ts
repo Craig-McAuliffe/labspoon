@@ -8,7 +8,7 @@ import {TaggedTopic} from './topics';
 import {toUserRef} from './users';
 import {GroupRef, toGroupRef} from './groups';
 import {Invitation} from './invitations';
-import {Post} from './posts';
+import {PostRef} from './posts';
 
 export let mailgun: any;
 if (config.mailgun) {
@@ -111,9 +111,9 @@ async function sendUserNotificationEmail(
     .get();
   // If there are no posts don't send an email.
   if (newUserPostsSnapshot.empty) return;
-  const postsData: Array<Post> = [];
+  const postsData: Array<PostRef> = [];
   newUserPostsSnapshot.forEach((ds) => {
-    const postData = ds.data() as Post;
+    const postData = ds.data() as PostRef;
     postsData.push(postData);
   });
   const postsNotMadeByUser = postsData.filter(
@@ -160,10 +160,10 @@ async function sendUserNotificationEmail(
   return;
 }
 
-function getTemplateDataFromPosts(posts: Array<Post>) {
+function getTemplateDataFromPosts(posts: Array<PostRef>) {
   const activeUsersMap = new Map();
   const activeTopicsMap = new Map();
-  posts.forEach((post: Post) => {
+  posts.forEach((post: PostRef) => {
     activeUsersMap.set(post!.author.id, post!.author);
     post!.topics.forEach((topic: TaggedTopic) =>
       activeTopicsMap.set(topic.id, topic)
