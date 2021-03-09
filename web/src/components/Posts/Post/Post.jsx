@@ -144,10 +144,10 @@ function PostHeader({
 
 function PostStats({recommendedCount}) {
   return (
-    <button className="post-stats-container">
+    <div className="post-stats-container">
       <span>{recommendedCount}</span>
       <RecommendIconSelected />
-    </button>
+    </div>
   );
 }
 

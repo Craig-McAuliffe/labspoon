@@ -112,7 +112,7 @@ function getFiltersFromFilterCollection(filterCollectionsQS) {
     const filterCollectionData = filterCollectionDoc.data();
     const filterOptionsPromise = filterCollectionDoc.ref
       .collection('filterOptions')
-      .orderBy('rank')
+      .orderBy('rank', 'desc')
       .orderBy('name')
       .orderBy('id')
       .limit(FILTER_OPTIONS_LIMIT + 1)
@@ -175,7 +175,7 @@ export default function FollowingFeedPage() {
       .collection(
         `users/${user.uid}/feeds/followingFeed/filterCollections/${filterCollectionResourceType}/filterOptions`
       )
-      .orderBy('rank')
+      .orderBy('rank', 'desc')
       .orderBy('name')
       .orderBy('id')
       .startAfter(last.data.rank, last.data.name, last.data.id)
