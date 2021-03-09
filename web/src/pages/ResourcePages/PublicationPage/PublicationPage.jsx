@@ -247,12 +247,19 @@ function QuickCreatePublicationPost({publication}) {
     );
 
   return (
-    <CreatePost
-      preTaggedResourceType={PUBLICATION}
-      preTaggedResourceDetails={publication}
-      onSuccess={() => setIsCreating(false)}
-      keepExpanded={true}
-    />
+    <>
+      <div className="publication-page-quick-post-cancel-container">
+        <button onClick={() => setIsCreating(false)}>
+          <h4>Cancel Post</h4>
+        </button>
+      </div>
+      <CreatePost
+        preTaggedResourceType={PUBLICATION}
+        preTaggedResourceDetails={publication}
+        onSuccess={() => setIsCreating(false)}
+        keepExpanded={true}
+      />
+    </>
   );
 }
 

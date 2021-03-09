@@ -105,3 +105,23 @@
   color: #5d5d65;
   margin-top: 20px;
 }
+
+.publication-page-quick-post-cancel-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 5px;
+}
+
+.publication-page-quick-post-cancel-container button {
+  padding: 0px;
+}
+
+.publication-page-quick-post-cancel-container button:hover h4 {
+  color: #000000;
+  text-decoration: underline;
+}
+
+.publication-page-quick-post-cancel-container h4 {
+  margin: 0px;
+  color: #5d5d65;
+}
