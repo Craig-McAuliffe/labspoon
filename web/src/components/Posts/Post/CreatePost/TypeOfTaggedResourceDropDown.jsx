@@ -5,9 +5,7 @@ import {
   OpenPositionIcon,
 } from '../../../../assets/ResourceTypeIcons';
 import {RemoveIcon} from '../../../../assets/GeneralActionIcons';
-// import {DropDownTriangle} from '../../../../assets/GeneralActionIcons';
 import {PUBLICATION_POST, DEFAULT_POST, OPEN_POSITION_POST} from './CreatePost';
-// import DropDown, {DropdownOption} from '../../../Dropdown';
 
 import './CreatePost.css';
 
@@ -50,15 +48,6 @@ export default function TypeOfTaggedResourceDropDown({
               <h4 className="create-post-tag-a">Tag a...</h4>
             </div>
             {suggestedResourceTags()}
-            {/* <div className="type-of-tagged-resource-dropdown-container">
-              <DropDown customToggle={TaggedResourceDropdownToggle}>
-                {getResourceTypesDropDownOptions(
-                  setTaggedResourceType,
-                  matchResourceTypeToIcon,
-                  resourceTypeOptions
-                )}
-              </DropDown>
-            </div> */}
           </div>
         </div>
       ) : (
@@ -79,41 +68,3 @@ export default function TypeOfTaggedResourceDropDown({
     </div>
   );
 }
-
-// function TaggedResourceDropdownToggle({setOpen}) {
-//   return (
-//     <div className="create-post-post-resource-dropdown-toggle-container">
-//       <button
-//         className="create-post-post-resource-dropdown-toggle"
-//         onClick={() => setOpen((openState) => !openState)}
-//         type="button"
-//       >
-//         Other options
-//         <DropDownTriangle />
-//       </button>
-//     </div>
-//   );
-// }
-
-// function getResourceTypesDropDownOptions(
-//   setTaggedResourceType,
-//   matchResourceTypeToIcon,
-//   resourceTypeOptions
-// ) {
-//   return resourceTypeOptions.map((resourceType) => (
-//     <DropdownOption
-//       key={resourceType}
-//       onSelect={() => {
-//         setTaggedResourceType(resourceType);
-//       }}
-//       height="70px"
-//     >
-//       <div className="create-post-resource-tag-dropdown-option">
-//         <div>{matchResourceTypeToIcon(resourceType)}</div>
-//         <h4 className="create-post-resource-tag-dropdown-option-name">
-//           {resourceType}
-//         </h4>
-//       </div>
-//     </DropdownOption>
-//   ));
-// }
