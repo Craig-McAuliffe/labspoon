@@ -25,7 +25,7 @@ import {getUserGroups} from '../../helpers/users';
 import './CreateOpenPosition.css';
 import Select, {LabelledDropdownContainer} from '../Forms/Select/Select';
 
-const POSITIONS = ['Masters', 'Phd', 'Post Doc'];
+const POSITIONS = ['Masters', 'Phd', 'Post Doc', 'Technician'];
 
 const createOpenPosition = firebase
   .functions()
