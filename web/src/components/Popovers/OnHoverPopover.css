@@ -18,4 +18,5 @@
   background: #ffffff;
   color: #5d5d65;
   border-radius: 10px;
+  z-index: 1;
 }

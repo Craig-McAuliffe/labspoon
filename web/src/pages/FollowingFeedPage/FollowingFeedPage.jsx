@@ -14,7 +14,7 @@ import {LoadingSpinnerPage} from '../../components/LoadingSpinner/LoadingSpinner
 import {UnpaddedPageContainer} from '../../components/Layout/Content';
 
 const arrayContainsAnyErrorMessage =
-  'Cannot select multiple of more than one resource type. Try deselecting the last option.';
+  'You cannot select multiple filters in separate sections. Try deselecting the last option.';
 
 // Due to the limitations in firestore filters described in
 // https://firebase.google.com/docs/firestore/query-data/queries it is not
@@ -103,19 +103,27 @@ function sortAndPaginateFeedData(results, last, limit) {
     .catch((err) => console.log(err));
 }
 
-function getFiltersFromFilterCollection(filterCollection) {
+const FILTER_OPTIONS_LIMIT = 10;
+const FETCH_MORE_FILTER_OPTIONS_LIMIT = 30;
+
+function getFiltersFromFilterCollection(filterCollectionsQS) {
   const filterCollections = [];
-  filterCollection.forEach((filterCollectionDoc) => {
+  filterCollectionsQS.forEach((filterCollectionDoc) => {
     const filterCollectionData = filterCollectionDoc.data();
     const filterOptionsPromise = filterCollectionDoc.ref
       .collection('filterOptions')
       .orderBy('rank')
+      .orderBy('name')
+      .orderBy('id')
+      .limit(FILTER_OPTIONS_LIMIT + 1)
       .get()
       .then((qs) => {
         const filterCollection = {
           collectionName: filterCollectionData.resourceName,
+          collectionType: filterCollectionData.resourceType,
           options: [],
           mutable: true,
+          hasMore: qs.size > FILTER_OPTIONS_LIMIT,
         };
         qs.forEach((doc) => {
           const filterOptionData = doc.data();
@@ -123,10 +131,12 @@ function getFiltersFromFilterCollection(filterCollection) {
             data: {
               id: filterOptionData.id,
               name: filterOptionData.name,
+              rank: filterOptionData.rank,
             },
             enabled: false,
           });
         });
+        if (filterCollection.hasMore) filterCollection.options.pop();
         return filterCollection;
       })
       .catch((err) => console.log('filter err', err));
@@ -135,7 +145,7 @@ function getFiltersFromFilterCollection(filterCollection) {
   return Promise.all(filterCollections);
 }
 
-function fetchUserFeedFilters(uuid) {
+function initialFetchUserFeedFilters(uuid) {
   const results = db
     .collection(`users/${uuid}/feeds/followingFeed/filterCollections`)
     .get()
@@ -149,7 +159,7 @@ export default function FollowingFeedPage() {
 
   const getDefaultFilter = () => {
     if (!user) return [];
-    return fetchUserFeedFilters(user.uid);
+    return initialFetchUserFeedFilters(user.uid);
   };
 
   const fetchResults = (skip, limit, filter, last) => {
@@ -157,10 +167,51 @@ export default function FollowingFeedPage() {
     return fetchUserFeedData(user.uid, skip, limit, filter, last);
   };
 
+  async function fetchMoreOptionsFromFilterCollection(
+    filterCollectionResourceType,
+    last
+  ) {
+    const newOptionsFetchPromise = await db
+      .collection(
+        `users/${user.uid}/feeds/followingFeed/filterCollections/${filterCollectionResourceType}/filterOptions`
+      )
+      .orderBy('rank')
+      .orderBy('name')
+      .orderBy('id')
+      .startAfter(last.data.rank, last.data.name, last.data.id)
+      .limit(FETCH_MORE_FILTER_OPTIONS_LIMIT + 1)
+      .get()
+      .catch((err) =>
+        console.error(`unable to fetch more filter options ${err}`)
+      );
+    if (!newOptionsFetchPromise) return [];
+    const newFilterOptions = [];
+    newOptionsFetchPromise.forEach((optionDS) => {
+      const optionData = optionDS.data();
+
+      newFilterOptions.push({
+        data: {
+          id: optionDS.id,
+          name: optionData.name,
+          rank: optionData.rank,
+        },
+        enabled: false,
+      });
+    });
+    return {
+      newOptions: newFilterOptions,
+      hasMore: newOptionsFetchPromise.size > FETCH_MORE_FILTER_OPTIONS_LIMIT,
+    };
+  }
+
   if (authLoaded === false) return <LoadingSpinnerPage />;
   return (
     <FilterableResults fetchResults={fetchResults} limit={10} loadingFilter>
-      <FilterManager>
+      <FilterManager
+        fetchMoreSiderFilter={fetchMoreOptionsFromFilterCollection}
+        siderFilterOptionsLimit={FILTER_OPTIONS_LIMIT}
+        siderFilterFetchMoreOptionsLimit={FETCH_MORE_FILTER_OPTIONS_LIMIT}
+      >
         <NewFilterMenuWrapper getDefaultFilter={getDefaultFilter} />
         <ResourceTabs />
       </FilterManager>

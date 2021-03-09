@@ -7,6 +7,8 @@ export default function OnHoverPopover({
   popoverText,
   minWidth,
   width,
+  left,
+  top,
 }) {
   const [isInfoDisplayed, setIsInfoDisplayed] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
@@ -35,7 +37,7 @@ export default function OnHoverPopover({
         className={`on-hover-pop-up-info${
           isInfoDisplayed ? '-visible' : '-hidden'
         }`}
-        style={{minWidth: minWidth, width: width}}
+        style={{minWidth: minWidth, width: width, top: top, left: left}}
       >
         {popoverText}
       </div>

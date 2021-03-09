@@ -98,20 +98,22 @@
   outline: none;
 }
 
-.filter-options-container {
+.filter-option-container {
   display: grid;
   grid-template-columns: 1fr 20px;
   align-items: center;
   grid-template-rows: none;
   color: #287fad;
-  height: 30px;
+  height: 28px;
   margin: 10px 0px;
 }
 
 .filter-option-name {
   grid-column: 1/2;
-  padding-top: 4px;
+  padding: 4px 4px 0px 0px;
   align-self: center;
+  line-height: 1em;
+  word-break: break-all;
 }
 
 .filter-checkbox-container {
@@ -210,13 +212,16 @@
 
 .filter-option-pagination-button {
   padding-left: 0px;
-  float: right;
   color: #5d5d65;
 }
 
+.filter-option-pagination-button:hover {
+  color: #99999f;
+}
+
 .filter-options-pagination-container {
-  display: inline-block;
-  width: 100%;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .mobile-filter-button,
@@ -284,13 +289,15 @@
 .mobile-sider-layout {
   position: fixed;
   top: 65px;
-  padding: 20px 20px 20px 10px;
+  padding: 20px 20px 40px 10px;
   background: #ffffff;
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.4);
   width: 500px;
   max-width: 400px;
-  min-height: 100%;
   z-index: 1;
+  /* minus the height of the header */
+  height: calc(100% - 65px);
+  overflow-y: auto;
 }
 
 @media screen and (max-width: 1197px) {

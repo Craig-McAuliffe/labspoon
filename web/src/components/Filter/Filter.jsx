@@ -1,42 +1,37 @@
 import React, {useContext, useState, useRef, useEffect} from 'react';
-import PropTypes from 'prop-types';
 import {FiltersIcon, SearchIconGrey} from '../../assets/HeaderIcons';
 import {FeatureFlags} from '../../App';
 import withSizes from 'react-sizes';
 import './Filter.css';
 import {RemoveIcon} from '../../assets/GeneralActionIcons';
+import {FilterManagerContext} from '../FilterableResults/FilterableResults';
+import OnHoverPopover from '../Popovers/OnHoverPopover';
 
-/**
- * Filter menu that allows the users to refine what is displayed in the feed
- * or search results. Must be used within a feed or search component that is
- * responsible for managing the state of the filter options.
- * @param {Array} options - an array of option collections that can be used in
- * filtering, such as people
- * @param {func} updateFilterOption - update the status of an option
- * @param {func} resetFilterCollection - reset the state of a filter collection
- * @return {React.ReactElement}
- */
 function FilterMenu({
-  options,
+  filterCollectionsWithOptions,
   updateFilterOption,
   resetFilterCollection,
   radio,
   isMobile,
 }) {
-  const filterCollections = options.map((optionCollection, index) => {
-    if (!optionCollection.mutable) return null;
-    return (
-      <FilterCollection
-        key={optionCollection.collectionName}
-        index={index}
-        name={optionCollection.collectionName}
-        options={optionCollection.options}
-        updateFilterOption={updateFilterOption}
-        resetFilterCollection={resetFilterCollection}
-        radio={radio}
-      />
-    );
-  });
+  const filterCollections = filterCollectionsWithOptions.map(
+    (optionCollection, index) => {
+      if (!optionCollection.mutable) return null;
+      return (
+        <FilterCollection
+          key={optionCollection.collectionName}
+          index={index}
+          collectionName={optionCollection.collectionName}
+          collectionType={optionCollection.collectionType}
+          options={optionCollection.options}
+          updateFilterOption={updateFilterOption}
+          resetFilterCollection={resetFilterCollection}
+          radio={radio}
+          collectionHasMore={optionCollection.hasMore}
+        />
+      );
+    }
+  );
   if (isMobile) return <MobileFilter filterCollections={filterCollections} />;
 
   return (
@@ -48,11 +43,6 @@ function FilterMenu({
     </div>
   );
 }
-FilterMenu.propTypes = {
-  options: PropTypes.array.isRequired,
-  updateFilterOption: PropTypes.func.isRequired,
-  resetFilterCollection: PropTypes.func.isRequired,
-};
 
 const mapSizesToPropsForFilter = ({width}) => ({
   isMobile: width && width <= 1197,
@@ -60,62 +50,37 @@ const mapSizesToPropsForFilter = ({width}) => ({
 
 export default withSizes(mapSizesToPropsForFilter)(FilterMenu);
 
-// How many filter options to display on each page of the filter.
-const FILTER_PAGE_COUNT = 20;
-
-/**
- * A collection of selectable filter options with a heading describing the collection
- * @param {string} name - name of the collection
- * @param {array} options - list of options in this collection
- * @param {func} filterOptionsDispatch - update the status of an option
- * @return {React.ReactElement} - a collection of filter options
- */
 function FilterCollection({
-  name,
+  collectionName,
+  collectionType,
+  collectionHasMore,
   options,
   index,
   updateFilterOption,
   resetFilterCollection,
   radio,
 }) {
-  const [count, setCount] = useState(10);
+  const {siderFilterOptionsLimit} = useContext(FilterManagerContext);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [showMoreOptionNoFetch, setShowMoreOptionNoFetch] = useState(false);
+  const [displayedOptions, setDisplayedOptions] = useState([]);
 
-  /**
-   * Callback used for updating the enabled status of an option within this
-   * filter collection.
-   * @param {Number} optionIndex - index of the option within this filter collection
-   * @param {Boolean} state - new enabled status
-   */
   function updateFilterCollectionOption(optionIndex) {
     updateFilterOption(index, optionIndex);
   }
 
-  let showMoreButton;
-  if (options.length > count)
-    showMoreButton = (
-      <button
-        onClick={() => setCount((oldCount) => oldCount + FILTER_PAGE_COUNT)}
-        className="filter-option-pagination-button"
-      >
-        Show more
-      </button>
-    );
-
-  let showLessButton;
-  if (count > FILTER_PAGE_COUNT)
-    showLessButton = (
-      <button
-        onClick={() => setCount((oldCount) => oldCount - FILTER_PAGE_COUNT)}
-        className="filter-option-pagination-button"
-      >
-        Show fewer
-      </button>
-    );
-
+  useEffect(() => {
+    if (options.length > siderFilterOptionsLimit && !showMoreOptionNoFetch)
+      setShowMoreOptionNoFetch(true);
+  }, []);
+  useEffect(() => {
+    if (isExpanded) return setDisplayedOptions(options);
+    return setDisplayedOptions(options.slice(0, siderFilterOptionsLimit));
+  }, [isExpanded, options]);
   return (
     <div className="filter-collection">
       <div className="filter-collection-header">
-        <h3 className="filter-collection-title">{name}</h3>
+        <h3 className="filter-collection-title">{collectionName}</h3>
         {radio === undefined ? (
           <button
             onClick={() => resetFilterCollection(index)}
@@ -125,42 +90,91 @@ function FilterCollection({
           </button>
         ) : null}
       </div>
-      {options.slice(0, count).map((option, index) => (
+      {displayedOptions.map((option, index) => (
         <FilterOption
-          key={name + option.data.id}
+          key={collectionName + option.data.id}
           index={index}
           data={option.data}
           enabled={option.enabled}
           setOption={updateFilterCollectionOption}
           radio={radio}
+          isExpanded={isExpanded}
         />
       ))}
-      <div className="filter-options-pagination-container">
-        {showMoreButton}
-        {showLessButton}
-      </div>
+      {(collectionHasMore || showMoreOptionNoFetch) && (
+        <FilterShowMoreOrFewerButton
+          moreOrFewer="more"
+          collectionType={collectionType}
+          collectionIndex={index}
+          last={options[options.length - 1]}
+          setIsExpanded={setIsExpanded}
+          showMoreOptionNoFetch={showMoreOptionNoFetch}
+          setShowMoreOptionNoFetch={setShowMoreOptionNoFetch}
+        />
+      )}
+      {isExpanded && (
+        <FilterShowMoreOrFewerButton
+          moreOrFewer="fewer"
+          setIsExpanded={setIsExpanded}
+          setShowMoreOptionNoFetch={setShowMoreOptionNoFetch}
+        />
+      )}
     </div>
   );
 }
-FilterCollection.propTypes = {
-  name: PropTypes.string.isRequired,
-  options: PropTypes.array.isRequired,
-  index: PropTypes.number.isRequired,
-};
 
-/**
- * A single selectable filter option
- * @param {Object} data - data to be displayed relating to the option (eg. name)
- * @param {Number} index - index of the option within its filter collection
- * @param {Boolean} enabled - whether the filter is currently enabled
- * @param {Function} setOption - function that sets whether the option is
- * enabled
- * @return {React.ReactElement} - a filter option
- */
-function FilterOption({data, index, enabled, setOption, radio}) {
+function FilterShowMoreOrFewerButton({
+  moreOrFewer,
+  collectionType,
+  collectionIndex,
+  last,
+  setIsExpanded,
+  setShowMoreOptionNoFetch,
+  showMoreOptionNoFetch,
+}) {
+  const {fetchMoreSiderFilter} = useContext(FilterManagerContext);
+  if (moreOrFewer === 'more')
+    return (
+      <div className="filter-options-pagination-container">
+        <button
+          onClick={() => {
+            if (!showMoreOptionNoFetch)
+              fetchMoreSiderFilter(collectionIndex, collectionType, last);
+            setIsExpanded(true);
+            setShowMoreOptionNoFetch(false);
+          }}
+          className="filter-option-pagination-button"
+        >
+          Show more
+        </button>
+      </div>
+    );
+
   return (
-    <div className="filter-options-container">
-      <div className="filter-option-name">{data.name}</div>
+    <div className="filter-options-pagination-container">
+      <button
+        onClick={() => {
+          setIsExpanded(false);
+          setShowMoreOptionNoFetch(true);
+        }}
+        className="filter-option-pagination-button"
+      >
+        Show fewer
+      </button>
+    </div>
+  );
+}
+
+function FilterOption({data, index, enabled, setOption, radio, isExpanded}) {
+  return (
+    <div className={`filter-option-container`}>
+      <OnHoverPopover popoverText={data.name} left="0px" top="100%">
+        <FilterOptionName
+          name={data.name}
+          setIsHovering={() => {}}
+          cutOffLength={isExpanded ? 22 : 28}
+        />
+      </OnHoverPopover>
       <label className="filter-checkbox-container">
         <input
           type={radio === undefined ? 'checkbox' : 'radio'}
@@ -181,19 +195,20 @@ function FilterOption({data, index, enabled, setOption, radio}) {
     </div>
   );
 }
-FilterOption.propTypes = {
-  data: PropTypes.object.isRequired,
-  index: PropTypes.number.isRequired,
-  enabled: PropTypes.bool.isRequired,
-  setOption: PropTypes.func.isRequired,
-};
 
-/**
- * Gets the IDs of the enabled options in a filter collection.
- * @param {Object} filterCollection - filter collection of the structure specified in
- * FeedPage
- * @return {Set}
- */
+function FilterOptionName({name, setIsHovering, cutOffLength}) {
+  return (
+    <p
+      className="filter-option-name"
+      onMouseOver={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+    >
+      {name.slice(0, cutOffLength)}
+      {name.length > cutOffLength && '...'}
+    </p>
+  );
+}
+
 export function getFilterCollectionEnabledIDsSet(filterCollection) {
   const enabledIDs = filterCollection.options
     .filter((option) => option.enabled)

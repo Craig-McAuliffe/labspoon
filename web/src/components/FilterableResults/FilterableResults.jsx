@@ -32,7 +32,7 @@ export default function FilterableResults({children, fetchResults, limit}) {
   const [hasMore, setHasMore] = useState(false);
   // `last` is used by Cloud Firestore as a pagination cursor, it is the last
   // result returned by the previous query
-  const [last, setLast] = useState();
+  const [last, setLast] = useState(false);
   // `skip` is the number of results to skip, if this is used for pagination
   // instead of the last result
   const [skip, setSkip] = useState(0);
@@ -139,7 +139,11 @@ export default function FilterableResults({children, fetchResults, limit}) {
   );
 }
 // combine tab filtering with sider filtering
-export function FilterManager({children}) {
+export function FilterManager({
+  children,
+  fetchMoreSiderFilter,
+  siderFilterOptionsLimit,
+}) {
   const filterableResults = useContext(FilterableResultsContext);
   const [displayedTabFilter, setDisplayedTabFilter] = useState([]);
   const [displayedSiderFilter, setDisplayedSiderFilter] = useState([]);
@@ -159,6 +163,36 @@ export function FilterManager({children}) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabsFilterLoading, siderFilterLoading]);
 
+  const fetchMoreSiderFilterOptions = async (
+    filterCollectionsIndex,
+    filterCollectionResourceType,
+    last
+  ) => {
+    if (!last || !filterCollectionResourceType || !filterCollectionsIndex)
+      return;
+    const {newOptions, hasMore} = await fetchMoreSiderFilter(
+      filterCollectionResourceType,
+      last
+    );
+    if (!newOptions || newOptions.length === 0) {
+      setDisplayedSiderFilter((currentSiderFilter) => {
+        const newSiderFilter = [...currentSiderFilter];
+        newSiderFilter[filterCollectionsIndex].hasMore = false;
+        return newSiderFilter;
+      });
+      return;
+    }
+
+    setDisplayedSiderFilter((currentSiderFilter) => {
+      const newSiderFilter = [...currentSiderFilter];
+      if (!hasMore) newSiderFilter[filterCollectionsIndex].hasMore = false;
+      newOptions.forEach((newOption) => {
+        newSiderFilter[filterCollectionsIndex].options.push(newOption);
+      });
+      return newSiderFilter;
+    });
+  };
+
   return (
     <FilterManagerContext.Provider
       value={{
@@ -168,6 +202,8 @@ export function FilterManager({children}) {
         setDisplayedSiderFilter,
         setSiderFilterLoading,
         setTabsFilterLoading,
+        fetchMoreSiderFilter: fetchMoreSiderFilterOptions,
+        siderFilterOptionsLimit: siderFilterOptionsLimit,
       }}
     >
       {children}
@@ -222,7 +258,7 @@ export function NewFilterMenuWrapper({
   if (filterableResults.loadingFilter) return <LoadingSpinner />;
   return (
     <FilterMenu
-      options={siderFilter}
+      filterCollectionsWithOptions={siderFilter}
       updateFilterOption={(collectionIndex, optionIndex) => {
         const updatedFilterOptions = updateFilterOption(
           siderFilter,
@@ -289,7 +325,11 @@ export function ResourceTabs({
 export function NewResultsWrapper({isFollowsPageResults}) {
   const filterableResults = useContext(FilterableResultsContext);
   if (filterableResults.resultsError)
-    return <h1>{filterableResults.resultsError}</h1>;
+    return (
+      <h2 className="filterable-results-results-error">
+        {filterableResults.resultsError}
+      </h2>
+    );
   const activeTabID = getActiveTabID(filterableResults.filter);
   return (
     <>
