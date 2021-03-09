@@ -19,6 +19,7 @@ import {PaddedPageContainer} from '../../components/Layout/Content';
 import SearchMSFields from '../../components/Topics/SearchMSFields';
 
 import './OnboardingPage.css';
+import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 
 const FOLLOW = 'follow';
 const LINKAUTHOR = 'link-author';
@@ -110,6 +111,7 @@ export default function OnboardingPage() {
 function OnboardingFollow({user}) {
   const [displayedUsers, setDisplayedUsers] = useState([]);
   const [displayedTopics, setDisplayedTopics] = useState([]);
+  const [loadingTopics, setLoadingTopics] = useState(false);
 
   return (
     <div className="onboarding-page-container">
@@ -153,7 +155,13 @@ function OnboardingFollow({user}) {
             setFetchedTopics={setDisplayedTopics}
             placeholder="Search for topics"
             searchIcon={true}
+            setLoading={setLoadingTopics}
           />
+          {loadingTopics && (
+            <div className="onboarding-page-topic-search-loading-container">
+              <LoadingSpinner />
+            </div>
+          )}
         </div>
         <div className="onboarding-topics-to-follow-container">
           {displayedTopics.map((displayedTopic) => {

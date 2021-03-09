@@ -91,6 +91,12 @@
   padding-left: 0px;
 }
 
+.onboarding-page-topic-search-loading-container {
+  display: flex;
+  justify-content: center;
+  padding-top: 10px;
+}
+
 .onboarding-topic-search-container input::placeholder {
   color: #99999f;
 }

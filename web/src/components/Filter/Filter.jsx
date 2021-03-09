@@ -172,7 +172,7 @@ function FilterOption({data, index, enabled, setOption, radio, isExpanded}) {
         <FilterOptionName
           name={data.name}
           setIsHovering={() => {}}
-          cutOffLength={isExpanded ? 22 : 28}
+          cutOffLength={isExpanded ? 20 : 25}
         />
       </OnHoverPopover>
       <label className="filter-checkbox-container">
