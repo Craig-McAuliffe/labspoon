@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
 import firebase from '../../../firebase';
-import {FeatureFlags} from '../../../App';
+import {AuthContext, FeatureFlags} from '../../../App';
 import {db} from '../../../firebase';
 import {useParams} from 'react-router-dom';
 
@@ -236,6 +236,8 @@ function RetrieveMoreReferences({publicationID, publication}) {
 
 function QuickCreatePublicationPost({publication}) {
   const [isCreating, setIsCreating] = useState(false);
+  const {userProfile} = useContext(AuthContext);
+  if (!userProfile) return null;
   if (!isCreating)
     return (
       <div className="publication-page-quick-post-button-container">
