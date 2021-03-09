@@ -8,6 +8,7 @@ import {TaggedTopic} from './topics';
 import {toUserRef} from './users';
 import {GroupRef, toGroupRef} from './groups';
 import {Invitation} from './invitations';
+import {Post} from './posts';
 
 export let mailgun: any;
 if (config.mailgun) {
@@ -110,7 +111,16 @@ async function sendUserNotificationEmail(
     .get();
   // If there are no posts don't send an email.
   if (newUserPostsSnapshot.empty) return;
-  const templateData = getTemplateDataFromPostsSnapshot(newUserPostsSnapshot);
+  const postsData: Array<Post> = [];
+  newUserPostsSnapshot.forEach((ds) => {
+    const postData = ds.data() as Post;
+    postsData.push(postData);
+  });
+  const postsNotMadeByUser = postsData.filter(
+    (post) => post.author.id !== userID
+  );
+  if (postsNotMadeByUser.length === 0) return;
+  const templateData = getTemplateDataFromPosts(postsNotMadeByUser);
 
   const authUserResult = await auth
     .getUser(userID)
@@ -150,11 +160,10 @@ async function sendUserNotificationEmail(
   return;
 }
 
-function getTemplateDataFromPostsSnapshot(postsQS: any) {
+function getTemplateDataFromPosts(posts: Array<Post>) {
   const activeUsersMap = new Map();
   const activeTopicsMap = new Map();
-  postsQS.forEach((ds: DocumentSnapshot) => {
-    const post = ds.data();
+  posts.forEach((post: Post) => {
     activeUsersMap.set(post!.author.id, post!.author);
     post!.topics.forEach((topic: TaggedTopic) =>
       activeTopicsMap.set(topic.id, topic)
