@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Link} from 'react-router-dom';
 import PostTaggedContent from './PostParts/PostTaggedContent';
 import PostActions from './PostParts/PostActions';
@@ -15,6 +15,8 @@ import {
   PUBLICATION,
 } from '../../../helpers/resourceTypeDefinitions';
 import {RichTextBody} from '../../Article/Article';
+import {RecommendIconSelected} from '../../../assets/PostActionIcons';
+import {db} from '../../../firebase';
 
 export default function Post({post, dedicatedPage, bookmarkedVariation}) {
   const taggedContent = [];
@@ -33,7 +35,9 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
         <div className="post-container">
           <PostHeader
             postAuthor={post.author}
-            postCreationDate={post.createdAt}
+            postUnixTimestamp={post.unixTimeStamp}
+            existingRecommendedCount={post.recommendedCount}
+            postID={post.id}
           />
           <PostTextContent post={post} />
         </div>
@@ -48,8 +52,10 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
     >
       <PostHeader
         postAuthor={post.author}
-        postCreationDate={post.createdAt}
+        postUnixTimestamp={post.unixTimeStamp}
         dedicatedPage={dedicatedPage}
+        existingRecommendedCount={post.recommendedCount}
+        postID={post.id}
       />
       <PostTextContent post={post} dedicatedPage={dedicatedPage} />
       <PostTaggedContent taggedContent={taggedContent} />
@@ -63,7 +69,55 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
   );
 }
 
-function PostHeader({postAuthor, postCreationDate, dedicatedPage}) {
+const calculateHoursAndDaysSincePost = (postUnixTimestamp) => {
+  const secondsSincePost =
+    Math.floor(new Date().getTime() / 1000) - postUnixTimestamp;
+  if (secondsSincePost < 60)
+    return `${secondsSincePost} second${secondsSincePost === 1 ? '' : 's'} ago`;
+  const minutesSincePost = Math.floor(secondsSincePost / 60);
+  if (minutesSincePost < 60)
+    return `${minutesSincePost} minute${minutesSincePost === 1 ? '' : 's'} ago`;
+  const hoursSincePost = Math.floor(minutesSincePost / 60);
+  if (hoursSincePost < 24)
+    return `${hoursSincePost} hour${hoursSincePost === 1 ? '' : 's'} ago`;
+  const daysSincePost = Math.floor(hoursSincePost / 24);
+  if (daysSincePost < 7)
+    return `${daysSincePost} day${daysSincePost === 1 ? '' : 's'} ago`;
+  const weeksSincePost = Math.floor(daysSincePost / 7);
+  if (weeksSincePost < 4.5)
+    return `${weeksSincePost} week${weeksSincePost === 1 ? '' : 's'} ago`;
+  const monthsSincePost = Math.floor(daysSincePost / 30);
+  if (monthsSincePost < 12)
+    return `${monthsSincePost} month${monthsSincePost === 1 ? '' : 's'} ago`;
+  const yearsSincePost = Math.floor(monthsSincePost / 12);
+  return `${yearsSincePost} year${yearsSincePost === 1 ? '' : 's'} ago`;
+};
+
+function PostHeader({
+  postAuthor,
+  postUnixTimestamp,
+  dedicatedPage,
+  existingRecommendedCount,
+  postID,
+}) {
+  const [recommendedCount, setRecommendedCount] = useState(false);
+
+  useEffect(async () => {
+    if (existingRecommendedCount)
+      return setRecommendedCount(existingRecommendedCount);
+    const fetchedRecommendedCount = await db
+      .doc(`posts/${postID}`)
+      .get()
+      .then((ds) => ds.data().recommendedCount)
+      .catch((err) =>
+        console.error(
+          `unable to fetch recommended count for post ${postID} ${err}`
+        )
+      );
+    if (!fetchedRecommendedCount) return;
+    setRecommendedCount(fetchedRecommendedCount);
+  }, [postID]);
+
   return (
     <div
       className={dedicatedPage ? 'post-header-dedicated-page' : 'post-header'}
@@ -80,11 +134,20 @@ function PostHeader({postAuthor, postCreationDate, dedicatedPage}) {
           <h3>
             <Link to={`/user/${postAuthor.id}`}>{postAuthor.name}</Link>
           </h3>
-          <p>{postCreationDate}</p>
+          <p>{calculateHoursAndDaysSincePost(postUnixTimestamp)}</p>
         </div>
       </div>
-      <div className="post-type-container"></div>
+      {recommendedCount && <PostStats recommendedCount={recommendedCount} />}
     </div>
+  );
+}
+
+function PostStats({recommendedCount}) {
+  return (
+    <button className="post-stats-container">
+      <span>{recommendedCount}</span>
+      <RecommendIconSelected />
+    </button>
   );
 }
 

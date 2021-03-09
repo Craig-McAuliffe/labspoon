@@ -81,6 +81,11 @@
 
 .post-header-profile p {
   color: #5d5d65;
+  margin: 0px;
+}
+
+.post-header-profile h3 {
+  margin: 0px;
 }
 
 .post-with-selector-container {
@@ -178,6 +183,20 @@
 .post-selector-inactive-text {
   text-align: center;
   color: #99999f;
+}
+
+.post-stats-container {
+  padding: 0px;
+}
+
+.post-stats-container path {
+  fill: #dcdce0;
+}
+
+.post-stats-container span {
+  display: inline-block;
+  margin-right: 5px;
+  color: #5d5d65;
 }
 
 @media screen and (max-width: 590px) {
