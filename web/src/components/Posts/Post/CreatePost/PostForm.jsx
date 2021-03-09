@@ -10,13 +10,18 @@ import {
 import './CreatePost';
 import LoadingSpinner from '../../../LoadingSpinner/LoadingSpinner';
 import {Alert} from 'react-bootstrap';
+import {yupPostValidation} from '../../../Forms/Articles/HeaderAndBodyArticleInput';
+import * as Yup from 'yup';
+
+const postValidationSchema = Yup.object({
+  title: yupPostValidation,
+});
 
 export const CreatePostTitleContext = React.createContext();
 export default function PostForm({
   children,
   onSubmit,
   initialValues,
-  validationSchema,
   postType,
   setPostType,
   formID,
@@ -54,7 +59,7 @@ export default function PostForm({
       <div className={submittingPost ? 'create-post-loading-greyed-out' : null}>
         <Formik
           initialValues={initialValues}
-          validationSchema={validationSchema}
+          validationSchema={postValidationSchema}
           onSubmit={createPost}
         >
           <Form id={formID}>

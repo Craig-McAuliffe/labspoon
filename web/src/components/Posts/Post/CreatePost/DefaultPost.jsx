@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import firebase from '../../../../firebase';
-import * as Yup from 'yup';
+
 import PostForm from './PostForm';
 import {CreatePostTextArea} from '../../../Forms/FormTextInput';
 import {
@@ -12,18 +12,11 @@ import {handlePostTopics} from '../../../Topics/TagTopics';
 import TypeOfTaggedResourceDropDown from './TypeOfTaggedResourceDropDown';
 import {FilterableResultsContext} from '../../../FilterableResults/FilterableResults';
 import {POST} from '../../../../helpers/resourceTypeDefinitions';
-import {
-  initialValueNoTitle,
-  yupPostValidation,
-} from '../../../Forms/Articles/HeaderAndBodyArticleInput';
+import {initialValueNoTitle} from '../../../Forms/Articles/HeaderAndBodyArticleInput';
 
 import './CreatePost.css';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
-
-export const postValidationSchema = Yup.object({
-  title: yupPostValidation,
-});
 
 export default function DefaultPost({setCreatingPost, postType, setPostType}) {
   const {
@@ -64,7 +57,6 @@ export default function DefaultPost({setCreatingPost, postType, setPostType}) {
     <PostForm
       onSubmit={submitChanges}
       initialValues={initialValues}
-      validationSchema={postValidationSchema}
       formID="create-default-post-form"
     >
       <div className="creating-post-main-text-container">

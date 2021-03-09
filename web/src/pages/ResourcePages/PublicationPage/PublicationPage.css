@@ -10,6 +10,12 @@
   justify-content: space-between;
 }
 
+.publication-page-quick-post-button-container {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 40px;
+}
+
 .publication-journal-logo {
   min-width: 150px;
   max-height: 50px;

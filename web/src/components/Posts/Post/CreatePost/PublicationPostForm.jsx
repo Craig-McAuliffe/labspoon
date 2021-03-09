@@ -36,7 +36,6 @@ import {algoliaPublicationToDBPublicationListItem} from '../../../../helpers/pub
 import {Alert} from 'react-bootstrap';
 import {FilterableResultsContext} from '../../../FilterableResults/FilterableResults';
 import {POST} from '../../../../helpers/resourceTypeDefinitions';
-import {postValidationSchema} from './DefaultPost';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
@@ -69,86 +68,36 @@ export default function PublicationPostForm({
   ] = useState(false);
   const {setResults} = useContext(FilterableResultsContext);
 
-  const submitChanges = async (res, isTweeting) => {
-    if (customPublicationErrors) setCustomPublicationErrors();
-    if (pubSubmissionError) setPubSubmissionError(false);
-    if (customPublication) setCustomPubSuccessfullyCreated(false);
-    const submitCustomPublication = async () => {
-      if (!isQuickCreatingPub) return false;
-      const pubValidationErrors = await validateCustomPublication(
-        customPublication
-      );
-      if (pubValidationErrors.length > 0) {
-        setCustomPublicationErrors(pubValidationErrors);
-        setSubmittingPost(false);
-        return false;
-      }
-      return createCustomPublication(
-        customPublication,
-        customPublicationAuthors,
-        undefined,
-        undefined,
-        () => {
-          setPubSubmissionError(true);
-          setSubmittingPost(false);
-        },
-        selectedTopics,
-        undefined,
-        undefined
-      );
-    };
-    const customPublicationSubmissionResult = await submitCustomPublication();
-    if (isQuickCreatingPub && !customPublicationSubmissionResult) return;
-
-    if (!isQuickCreatingPub && !publication) {
-      alert('You must select a publication or create one');
-      setSubmittingPost(false);
-      return false;
-    }
-    if (isQuickCreatingPub) {
-      const customPublicationWithID =
-        customPublicationSubmissionResult.createdCustomPublication;
-      customPublicationWithID.id = customPublicationSubmissionResult.id;
-      res.publication = customPublicationWithID;
-    } else
-      res.publication = algoliaPublicationToDBPublicationListItem(publication);
-    res.postType = {id: 'publicationPost', name: 'Publication'};
-    res.topics = selectedTopics;
-    createPost(res)
-      .then((response) => {
-        if (isTweeting)
-          openTwitterWithPopulatedTweet(res.title, selectedTopics);
-        setCreatingPost(false);
-        setPostSuccess(true);
-        setSubmittingPost(false);
-        if (setResults) {
-          const newPost = response.data;
-          newPost.resourceType = POST;
-          setResults((currentResults) => [newPost, ...currentResults]);
-        }
-      })
-      .catch((err) => {
-        setIsQuickCreatingPub(false);
-        setCustomPublication({
-          title: '',
-          url: '',
-        });
-        setCustomPubSuccessfullyCreated(true);
-        sortThrownCreatePostErrors(err);
-        setSubmittingPost(false);
-      });
-  };
-
   const initialValues = {
     title: savedTitleText ? savedTitleText : '',
   };
 
+  const submitChanges = (res, isTweeting) =>
+    submitPublicationPost(
+      res,
+      isTweeting,
+      customPublicationErrors,
+      setCustomPublicationErrors,
+      pubSubmissionError,
+      setPubSubmissionError,
+      customPublication,
+      setCustomPubSuccessfullyCreated,
+      isQuickCreatingPub,
+      setSubmittingPost,
+      setCreatingPost,
+      setPostSuccess,
+      setResults,
+      setIsQuickCreatingPub,
+      setCustomPublication,
+      selectedTopics,
+      customPublicationAuthors,
+      publication
+    );
   return (
     <>
       <PostForm
         onSubmit={submitChanges}
         initialValues={initialValues}
-        validationSchema={postValidationSchema}
         formID="create-publication-post-form"
         outsideFormComponents={
           isQuickCreatingPub && (
@@ -413,4 +362,121 @@ function PublicationSearchResults({publications, setTaggedPublication}) {
       </div>
     );
   });
+}
+
+export async function submitPublicationPost(
+  res,
+  isTweeting,
+  customPublicationErrors,
+  setCustomPublicationErrors,
+  pubSubmissionError,
+  setPubSubmissionError,
+  customPublication,
+  setCustomPubSuccessfullyCreated,
+  isQuickCreatingPub,
+  setSubmittingPost,
+  setCreatingPost,
+  setPostSuccess,
+  setResults,
+  setIsQuickCreatingPub,
+  setCustomPublication,
+  selectedTopics,
+  customPublicationAuthors,
+  publication
+) {
+  if (customPublicationErrors) setCustomPublicationErrors();
+  if (pubSubmissionError) setPubSubmissionError(false);
+  if (customPublication) setCustomPubSuccessfullyCreated(false);
+  const submitCustomPublication = async () => {
+    if (!isQuickCreatingPub) return false;
+    const pubValidationErrors = await validateCustomPublication(
+      customPublication
+    );
+    if (pubValidationErrors.length > 0) {
+      setCustomPublicationErrors(pubValidationErrors);
+      setSubmittingPost(false);
+      return false;
+    }
+    return createCustomPublication(
+      customPublication,
+      customPublicationAuthors,
+      undefined,
+      undefined,
+      () => {
+        setPubSubmissionError(true);
+        setSubmittingPost(false);
+      },
+      selectedTopics,
+      undefined,
+      undefined
+    );
+  };
+  const customPublicationSubmissionResult = await submitCustomPublication();
+  if (isQuickCreatingPub && !customPublicationSubmissionResult) return;
+
+  if (!isQuickCreatingPub && !publication) {
+    alert('You must select a publication or create one');
+    setSubmittingPost(false);
+    return false;
+  }
+  if (isQuickCreatingPub) {
+    const customPublicationWithID =
+      customPublicationSubmissionResult.createdCustomPublication;
+    customPublicationWithID.id = customPublicationSubmissionResult.id;
+    res.publication = customPublicationWithID;
+  } else
+    res.publication = algoliaPublicationToDBPublicationListItem(publication);
+
+  return submitCreatePostWithPublication(
+    res,
+    isTweeting,
+    setCreatingPost,
+    setPostSuccess,
+    setSubmittingPost,
+    setIsQuickCreatingPub,
+    setCustomPublication,
+    setCustomPubSuccessfullyCreated,
+    selectedTopics,
+    setResults
+  );
+}
+
+export function submitCreatePostWithPublication(
+  res,
+  isTweeting,
+  setCreatingPost,
+  setPostSuccess,
+  setSubmittingPost,
+  setIsQuickCreatingPub,
+  setCustomPublication,
+  setCustomPubSuccessfullyCreated,
+  selectedTopics,
+  setResults
+) {
+  res.postType = {id: 'publicationPost', name: 'Publication'};
+  res.topics = selectedTopics;
+  createPost(res)
+    .then((response) => {
+      if (isTweeting) openTwitterWithPopulatedTweet(res.title, selectedTopics);
+      if (setCreatingPost) setCreatingPost(false);
+      setPostSuccess(true);
+      setSubmittingPost(false);
+      if (setResults) {
+        const newPost = response.data;
+        newPost.resourceType = POST;
+        setResults((currentResults) => [newPost, ...currentResults]);
+      }
+    })
+    .catch((err) => {
+      if (setIsQuickCreatingPub) setIsQuickCreatingPub(false);
+      if (setCustomPublication)
+        setCustomPublication({
+          title: '',
+          url: '',
+        });
+      if (setCustomPubSuccessfullyCreated)
+        setCustomPubSuccessfullyCreated(true);
+      sortThrownCreatePostErrors(err);
+      setSubmittingPost(false);
+    });
 }

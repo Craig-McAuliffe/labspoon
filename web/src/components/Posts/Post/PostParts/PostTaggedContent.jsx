@@ -1,4 +1,5 @@
 import React from 'react';
+import {useLocation} from 'react-router';
 import {
   OPENPOSITION,
   PUBLICATION,
@@ -13,7 +14,7 @@ import './PostTaggedContent.css';
 
 export default function PostOptionalTags({taggedContent}) {
   if (!taggedContent || taggedContent.length === 0) return null;
-
+  const locationPathname = useLocation().pathname;
   const taggedContentItems = taggedContent.map((taggedItem, i) => {
     switch (taggedItem.type) {
       case USER:
@@ -23,6 +24,7 @@ export default function PostOptionalTags({taggedContent}) {
           </UserListItem>
         );
       case PUBLICATION:
+        if (locationPathname.includes(PUBLICATION)) return null;
         return (
           <PublicationListItem
             publication={taggedItem.content}
@@ -31,6 +33,7 @@ export default function PostOptionalTags({taggedContent}) {
           />
         );
       case OPENPOSITION:
+        if (locationPathname.includes(OPENPOSITION)) return null;
         return (
           <ReducedOpenPositionListItem
             openPosition={taggedItem.content}

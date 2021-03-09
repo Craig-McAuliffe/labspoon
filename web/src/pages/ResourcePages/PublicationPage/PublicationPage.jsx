@@ -25,8 +25,11 @@ import ResourcesFeed from '../ResourcesFeeds';
 import {PaddedContent} from '../../../components/Layout/Content';
 import {LoadingSpinnerPage} from '../../../components/LoadingSpinner/LoadingSpinner';
 import NotFoundPage from '../../NotFoundPage/NotFoundPage';
+import CreateButton from '../../../components/Buttons/CreateButton';
 
 import './PublicationPage.css';
+import CreatePost from '../../../components/Posts/Post/CreatePost/CreatePost';
+import {PUBLICATION} from '../../../helpers/resourceTypeDefinitions';
 
 const REFERENCES_TAB = 'references';
 
@@ -149,6 +152,9 @@ export default function PublicationPage() {
         fetchResults={fetchFeedData}
         limit={10}
         tabs={relationshipFilter}
+        getCustomComponentAboveFeed={() => (
+          <QuickCreatePublicationPost publication={publicationDetails} />
+        )}
       >
         <PaddedContent>
           <PublicationDetails publicationDetails={publicationDetails} />
@@ -225,6 +231,28 @@ function RetrieveMoreReferences({publicationID, publication}) {
         )}
       </div>
     </div>
+  );
+}
+
+function QuickCreatePublicationPost({publication}) {
+  const [isCreating, setIsCreating] = useState(false);
+  if (!isCreating)
+    return (
+      <div className="publication-page-quick-post-button-container">
+        <CreateButton
+          text="Create a post about this publication"
+          buttonAction={() => setIsCreating(true)}
+        />
+      </div>
+    );
+
+  return (
+    <CreatePost
+      preTaggedResourceType={PUBLICATION}
+      preTaggedResourceDetails={publication}
+      onSuccess={() => setIsCreating(false)}
+      keepExpanded={true}
+    />
   );
 }
 

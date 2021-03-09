@@ -1,13 +1,20 @@
 import React, {useState, useContext, createContext, useEffect} from 'react';
 import {AuthContext} from '../../../../App';
 import DefaultPost from './DefaultPost';
-import PublicationPostForm from './PublicationPostForm';
+import PublicationPostForm, {
+  submitCreatePostWithPublication,
+} from './PublicationPostForm';
 import {WriteIcon} from '../../../../assets/GeneralActionIcons';
 import {Redirect, useLocation} from 'react-router-dom';
 import OpenPositionPostForm from './OpenPositionPostForm';
+import {getTweetTextFromRichText} from '../../../Article/Article';
+import PostForm from './PostForm';
+import {CreatePostTextArea} from '../../../Forms/FormTextInput';
+import {initialValueNoTitle} from '../../../Forms/Articles/HeaderAndBodyArticleInput';
+import {PUBLICATION} from '../../../../helpers/resourceTypeDefinitions';
+import {FilterableResultsContext} from '../../../FilterableResults/FilterableResults';
 
 import './CreatePost.css';
-import {getTweetTextFromRichText} from '../../../Article/Article';
 
 export const DEFAULT_POST = 'Default';
 export const PUBLICATION_POST = 'Publication';
@@ -19,6 +26,9 @@ export default function CreatePost({
   pinnedPost,
   keepExpanded = false,
   redirect = undefined,
+  preTaggedResourceType,
+  preTaggedResourceDetails,
+  onSuccess,
 }) {
   const {user, userProfile} = useContext(AuthContext);
   const [creatingPost, setCreatingPost] = useState(keepExpanded);
@@ -27,7 +37,6 @@ export default function CreatePost({
   const [taggedResourceType, setTaggedResourceType] = useState(DEFAULT_POST);
   const [submittingPost, setSubmittingPost] = useState(false);
   const [savedTitleText, setSavedTitleText] = useState();
-
   const locationPathname = useLocation().pathname;
   const setCreatingPostIfNotExpanded = (newValue) => {
     if (!keepExpanded) setCreatingPost(newValue);
@@ -39,6 +48,8 @@ export default function CreatePost({
   };
 
   useEffect(() => {
+    if (!postSuccess) return;
+    if (onSuccess) onSuccess();
     setSavedTitleText();
     setTaggedResourceType(DEFAULT_POST);
     setTimeout(() => setPostSuccess(false), 3000);
@@ -71,11 +82,19 @@ export default function CreatePost({
         <div
           className={locationPathname === '/' ? 'create-post-margin-top' : ''}
         >
-          <PostTypeSpecificForm
-            setCreatingPost={setCreatingPostIfNotExpanded}
-            postType={taggedResourceType}
-            setPostType={setTaggedResourceType}
-          />
+          {preTaggedResourceType ? (
+            <QuickCreatePostFromResource
+              taggedResourceType={preTaggedResourceType}
+              taggedResourceDetails={preTaggedResourceDetails}
+              onSuccess={onSuccess}
+            />
+          ) : (
+            <PostTypeSpecificForm
+              setCreatingPost={setCreatingPostIfNotExpanded}
+              postType={taggedResourceType}
+              setPostType={setTaggedResourceType}
+            />
+          )}
         </div>
       </CreatingPostContext.Provider>
     );
@@ -182,5 +201,53 @@ export function openTwitterWithPopulatedTweet(richText, topics) {
   window.open(
     getTweetPostURL(getTweetTextFromRichText(richText), topics),
     '_blank'
+  );
+}
+
+export function QuickCreatePostFromResource({
+  taggedResourceType,
+  taggedResourceDetails,
+}) {
+  const {selectedTopics, setPostSuccess, setSubmittingPost} = useContext(
+    CreatingPostContext
+  );
+
+  const {setResults} = useContext(FilterableResultsContext);
+  const submitChanges = async (res, isTweeting) => {
+    switch (taggedResourceType) {
+      case PUBLICATION:
+        res[PUBLICATION] = taggedResourceDetails;
+        return submitCreatePostWithPublication(
+          res,
+          isTweeting,
+          undefined,
+          setPostSuccess,
+          setSubmittingPost,
+          undefined,
+          undefined,
+          undefined,
+          selectedTopics,
+          setResults
+        );
+      default: {
+        setSubmittingPost(false);
+        alert(
+          'Something went wrong. If the problem persists, let us know through the contact page.'
+        );
+      }
+    }
+  };
+
+  const initialValues = {title: initialValueNoTitle};
+  return (
+    <PostForm
+      onSubmit={submitChanges}
+      initialValues={initialValues}
+      formID="create-default-post-form"
+    >
+      <div className="creating-post-main-text-container">
+        <CreatePostTextArea name="title" />
+      </div>
+    </PostForm>
   );
 }

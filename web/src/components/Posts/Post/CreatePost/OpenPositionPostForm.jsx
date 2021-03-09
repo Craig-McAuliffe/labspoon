@@ -21,7 +21,6 @@ import {TagResourceIcon} from '../../../../assets/ResourceTypeIcons';
 import {algoliaOpenPosToDBOpenPosListItem} from '../../../../helpers/openPositions';
 import {FilterableResultsContext} from '../../../FilterableResults/FilterableResults';
 import {POST} from '../../../../helpers/resourceTypeDefinitions';
-import {postValidationSchema} from './DefaultPost';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
@@ -96,7 +95,6 @@ export default function OpenPositionPostForm({
     <PostForm
       onSubmit={submitChanges}
       initialValues={initialValues}
-      validationSchema={postValidationSchema}
       formID="create-openPosition-post-form"
       algoliaFormSearch={
         <SelectOpenPosition

@@ -40,7 +40,14 @@ function HeaderCreateButtonContent({createAction, user, hoverControl}) {
   );
 }
 
-export default function CreateButton({link, text}) {
+export default function CreateButton({link, buttonAction, text}) {
+  if (buttonAction)
+    return (
+      <button className="create-button" onClick={buttonAction}>
+        <CreateIcon hoverControl={true} />
+        {text ? <h3>{text}</h3> : null}
+      </button>
+    );
   return (
     <Link to={link} className="create-button">
       <CreateIcon hoverControl={true} />
