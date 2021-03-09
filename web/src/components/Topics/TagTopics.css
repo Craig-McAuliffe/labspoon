@@ -96,6 +96,12 @@
   color: #00507c;
 }
 
+.tag-topics-loading-topics-spinner-container {
+  display: flex;
+  justify-content: center;
+  padding-top: 10px;
+}
+
 @media screen and (max-width: 350px) {
   .create-post-topic-search-container {
     display: block;

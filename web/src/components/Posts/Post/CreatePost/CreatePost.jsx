@@ -166,7 +166,8 @@ export function getTweetPostURL(text, topics) {
     .replace(/\s/g, '')
     .replace('-', '')
     .replace('(', '')
-    .replace(')', '');
+    .replace(')', '')
+    .replace(',', '');
   return `https://twitter.com/intent/tweet?text=${text}&hashtags=${commaSeparatedTopics}&via=Labspoon`;
 }
 

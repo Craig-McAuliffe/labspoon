@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {SearchIconGrey} from '../../assets/HeaderIcons';
 import firebase from '../../firebase';
-import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 
 import './SearchMSFields.css';
 
@@ -12,8 +11,8 @@ export default function SearchMSFields({
   placeholder,
   setCurrentInputValue,
   searchIcon,
+  setLoading,
 }) {
-  const [loading, setLoading] = useState();
   const [typedTopic, setTypedTopic] = useState('');
 
   useEffect(() => {
@@ -39,11 +38,6 @@ export default function SearchMSFields({
           placeholder={placeholder}
         />
       </div>
-      {loading ? (
-        <div className="ms-fields-search-loading-spinner-container">
-          <LoadingSpinner />
-        </div>
-      ) : null}
     </>
   );
 }

@@ -7,6 +7,7 @@ import SearchMSFields from './SearchMSFields';
 import '../Posts/Post/CreatePost/CreatePost.css';
 import './TagTopics.css';
 import Popover, {StandardPopoverDisplay} from '../Popovers/Popover';
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 
 export default function TagTopics({
   submittingForm,
@@ -17,7 +18,7 @@ export default function TagTopics({
   const [displayedTopics, setDisplayedTopics] = useState([]);
   const [duplicateTopic, setDuplicateTopic] = useState(false);
   const [typedTopic, setTypedTopic] = useState('');
-
+  const [loadingTopics, setLoadingTopics] = useState(false);
   // Tells user that they are trying to input a duplicate topic
   useEffect(() => {
     if (duplicateTopic) {
@@ -45,6 +46,7 @@ export default function TagTopics({
           placeholder="this post is about..."
           setFetchedTopics={setDisplayedTopics}
           setCurrentInputValue={setTypedTopic}
+          setLoading={setLoadingTopics}
         />
         <Popover
           getPopUpComponent={() => (
@@ -58,6 +60,11 @@ export default function TagTopics({
           <TagTopicsAttention actionAndTriggerPopUp={() => {}} />
         </Popover>
       </div>
+      {loadingTopics && (
+        <div className="tag-topics-loading-topics-spinner-container">
+          <LoadingSpinner />
+        </div>
+      )}
       <div>
         <TopicsList
           topics={displayedTopics}
