@@ -75,6 +75,7 @@ export function createUserDocOnSignUp(
         id: result.user.uid,
         name: result.user.displayName,
         nameChangeTimeStamp: firebase.firestore.FieldValue.serverTimestamp(),
+        isVerified: true,
       })
       .then(() => {
         updateUserDetails(result.user);

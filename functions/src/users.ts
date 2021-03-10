@@ -1417,3 +1417,20 @@ export interface ExpressionAndName {
   name: string;
   expression: string;
 }
+
+export const verifyExistingUsers = functions.https.onRequest(
+  async (req, resp) => {
+    const usersQS = await db.collection(`users`).get();
+    const usersIDs: string[] = [];
+    usersQS.forEach((userDS) => {
+      usersIDs.push(userDS.id);
+    });
+    const promisesArray = usersIDs.map((userID) =>
+      db.doc(`users/${userID}`).update({isVerified: true})
+    );
+    await Promise.all(promisesArray)
+      .then(() => resp.json('all users verified'))
+      .catch((err: Error) => resp.json(err));
+    resp.end();
+  }
+);

@@ -126,7 +126,7 @@ export default function PublicationPostForm({
           isQuickCreatingPub={isQuickCreatingPub}
           setIsQuickCreatingPub={setIsQuickCreatingPub}
           customPubSuccessfullyCreated={customPubSuccessfullyCreated}
-          userIsLinkedToMicrosoft={userProfile.microsoftID}
+          userIsVerified={userProfile.isVerified}
         />
       </PostForm>
     </>
@@ -139,7 +139,7 @@ function SelectPublication({
   setIsQuickCreatingPub,
   isQuickCreatingPub,
   customPubSuccessfullyCreated,
-  userIsLinkedToMicrosoft,
+  userIsVerified,
 }) {
   const [displayedPublications, setDisplayedPublications] = useState([]);
   if (publication) {
@@ -195,7 +195,7 @@ function SelectPublication({
             setTaggedPublication={setPublication}
           />
         )}
-      {userIsLinkedToMicrosoft && (
+      {userIsVerified && (
         <div className="create-post-alt-tagging-method-container">
           <button
             className="create-publication-search-publications-button"
