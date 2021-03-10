@@ -1,7 +1,7 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import NegativeButton from '../../../Buttons/NegativeButton';
 import * as Yup from 'yup';
-import firebase from '../../../../firebase';
+import firebase, {db} from '../../../../firebase';
 import {CreatePostTextArea, TextInput} from '../../../Forms/FormTextInput';
 import PostForm from './PostForm';
 import {
@@ -39,6 +39,7 @@ import {POST} from '../../../../helpers/resourceTypeDefinitions';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
+const MAX_DAILY_PUBLICATIONS_COUNT = 30;
 export default function PublicationPostForm({
   setCreatingPost,
   postType,
@@ -245,7 +246,32 @@ function PostQuickCreatePub({
       currentAuthors.filter((currentAuthor) => currentAuthor !== author)
     );
   };
+  const [hasHitMaxDailyPublications, setHasHitMaxDailyPublications] = useState(
+    false
+  );
+  useEffect(async () => {
+    if (hasHitMaxDailyPublications) return;
+    const publicationActivityCount = await db
+      .doc(`activity/publicationsActivity/creators/${userID}`)
+      .get()
+      .catch((err) => console.error(err));
+    if (
+      publicationActivityCount &&
+      publicationActivityCount.exists &&
+      publicationActivityCount.data().dailyPublicationCount >=
+        MAX_DAILY_PUBLICATIONS_COUNT
+    )
+      setHasHitMaxDailyPublications(true);
+  }, [userID]);
 
+  if (hasHitMaxDailyPublications)
+    return (
+      <Alert variant="warning">
+        {' '}
+        You have created the maximum number of publications for today (
+        {MAX_DAILY_PUBLICATIONS_COUNT}). Please try again tomorrow.
+      </Alert>
+    );
   return (
     <div className="publication-post-quick-create-section">
       {pubSubmissionError && (
@@ -254,6 +280,7 @@ function PostQuickCreatePub({
           again.
         </ErrorMessage>
       )}
+
       <div className="create-post-quick-create-pub-container">
         <div className="create-custom-publication-icon-container">
           <PublicationIcon />

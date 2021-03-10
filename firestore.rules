@@ -228,6 +228,10 @@ function userIsVerified(userID){
       }
     }
 
+    match /activity/publicationsActivity/creators/{userID} {
+      allow read;
+    }
+
     match /verifiedGroups/{groupID} {
       allow read;
     }

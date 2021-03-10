@@ -20,6 +20,23 @@ export const resetPostsActivity = functions
     });
   });
 
+export const resetPublicationsActivity = functions
+  .runWith({
+    timeoutSeconds: 540,
+    memory: '2GB',
+  })
+  .pubsub.schedule('every 24 hours')
+  .onRun((context) => {
+    const collectionRef = db.collection(
+      'activity/publicationsActivity/creators'
+    );
+    const query = collectionRef.limit(50);
+
+    return new Promise((resolve, reject) => {
+      deleteQueryBatch(query, resolve).catch(reject);
+    });
+  });
+
 async function deleteQueryBatch(query: firestore.DocumentData, resolve: any) {
   const snapshot = await query.get();
   const batchSize = snapshot.size;

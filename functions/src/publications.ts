@@ -17,6 +17,7 @@ import {
   UserCustomPublicationRef,
 } from './users';
 import * as adminNS from 'firebase-admin';
+import {firestore} from 'firebase-admin';
 const pubSubClient = new PubSub();
 const db = admin.firestore();
 
@@ -99,6 +100,25 @@ export const microsoftAcademicKnowledgePublicationSearch = functions.https.onCal
     return response;
   }
 );
+
+export const addPublicationActivity = functions.firestore
+  .document(`publications/{publicationID}`)
+  .onCreate(async (change) => {
+    const publication = change.data() as Publication;
+    if (!publication.isCustomPublication) return;
+    const authors = publication.authors;
+
+    const authorActivityPromises = authors!.map((author) => {
+      if (!author.id) return;
+      return db
+        .doc(`activity/publicationsActivity/creators/${author.id}`)
+        .set(
+          {dailyPublicationCount: firestore.FieldValue.increment(1)},
+          {merge: true}
+        );
+    });
+    return Promise.all(authorActivityPromises);
+  });
 
 export function publishAddPublicationRequests(
   makPublications: MAKPublication[]
