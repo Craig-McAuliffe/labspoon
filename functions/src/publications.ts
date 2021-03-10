@@ -17,7 +17,6 @@ import {
   UserCustomPublicationRef,
 } from './users';
 import * as adminNS from 'firebase-admin';
-import {firestore} from 'firebase-admin';
 const pubSubClient = new PubSub();
 const db = admin.firestore();
 
@@ -113,7 +112,7 @@ export const addPublicationActivity = functions.firestore
       return db
         .doc(`activity/publicationsActivity/creators/${author.id}`)
         .set(
-          {dailyPublicationCount: firestore.FieldValue.increment(1)},
+          {dailyPublicationCount: adminNS.firestore.FieldValue.increment(1)},
           {merge: true}
         );
     });
