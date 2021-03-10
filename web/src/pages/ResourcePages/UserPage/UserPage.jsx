@@ -48,7 +48,7 @@ export default function UserPage() {
   }, [userID, route]);
 
   useEffect(async () => {
-    await checkIfTabsAreUsed(setUsedTabs, usedTabs, userID);
+    await checkIfTabsAreUsed(setUsedTabs, userID);
     if (tabsLoading) setTabsLoading(false);
   }, [userID]);
 
@@ -302,8 +302,7 @@ function userPageFeedDataFromDB(skip, limit, filterOptions, userID, last) {
   return results;
 }
 
-const checkIfTabsAreUsed = async (setUsedTabs, usedTabs, userID) => {
-  if (usedTabs && usedTabs.checked === true) return;
+const checkIfTabsAreUsed = async (setUsedTabs, userID) => {
   const confirmedUsedTabs = [];
   await db
     .collection(`users/${userID}/followedByUsers`)
