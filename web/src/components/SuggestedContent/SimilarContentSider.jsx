@@ -3,7 +3,6 @@ import firebase from '../../firebase';
 import {Link, useLocation} from 'react-router-dom';
 import withSizes from 'react-sizes';
 import {MainItemIcon, SimilarContentIcon} from '../../assets/HeaderIcons';
-import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import {PUBLICATION} from '../../helpers/resourceTypeDefinitions';
 
 import './SimilarContentSider.css';
@@ -78,7 +77,7 @@ function SiderContent({suggestedContent, resourceType, loading}) {
   );
   if (!suggestedContent || suggestedContent.length === 0)
     similarSiderContent = null;
-  if (loading) similarSiderContent = <LoadingSpinner />;
+  if (loading) similarSiderContent = null;
   return (
     <div className="suggested-content-sider-container">
       <h3 className="suggested-content-sider-title">
