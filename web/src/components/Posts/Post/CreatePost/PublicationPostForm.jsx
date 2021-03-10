@@ -101,17 +101,21 @@ export default function PublicationPostForm({
         initialValues={initialValues}
         formID="create-publication-post-form"
         outsideFormComponents={
-          isQuickCreatingPub && (
-            <PostQuickCreatePub
-              customPublicationAuthors={customPublicationAuthors}
-              setCustomPublicationAuthors={setCustomPublicationAuthors}
-              customPublication={customPublication}
-              setCustomPublication={setCustomPublication}
-              userID={userProfile.id}
-              customPublicationErrors={customPublicationErrors}
-              pubSubmissionError={pubSubmissionError}
-            />
-          )
+          <SelectAndCreatePublication
+            publication={publication}
+            setPublication={setPublication}
+            isQuickCreatingPub={isQuickCreatingPub}
+            setIsQuickCreatingPub={setIsQuickCreatingPub}
+            customPubSuccessfullyCreated={customPubSuccessfullyCreated}
+            userIsVerified={userProfile.isVerified}
+            customPublicationAuthors={customPublicationAuthors}
+            setCustomPublicationAuthors={setCustomPublicationAuthors}
+            customPublication={customPublication}
+            setCustomPublication={setCustomPublication}
+            userID={userProfile.id}
+            customPublicationErrors={customPublicationErrors}
+            pubSubmissionError={pubSubmissionError}
+          />
         }
       >
         <div className="creating-post-main-text-container">
@@ -121,19 +125,50 @@ export default function PublicationPostForm({
           setTaggedResourceType={setPostType}
           taggedResourceType={postType}
         />
-        <SelectPublication
-          publication={publication}
-          setPublication={setPublication}
-          isQuickCreatingPub={isQuickCreatingPub}
-          setIsQuickCreatingPub={setIsQuickCreatingPub}
-          customPubSuccessfullyCreated={customPubSuccessfullyCreated}
-          userIsVerified={userProfile.isVerified}
-        />
       </PostForm>
     </>
   );
 }
 
+function SelectAndCreatePublication({
+  publication,
+  setPublication,
+  isQuickCreatingPub,
+  setIsQuickCreatingPub,
+  customPubSuccessfullyCreated,
+  userIsVerified,
+  customPublicationAuthors,
+  setCustomPublicationAuthors,
+  customPublication,
+  setCustomPublication,
+  userID,
+  customPublicationErrors,
+  pubSubmissionError,
+}) {
+  return (
+    <>
+      <SelectPublication
+        publication={publication}
+        setPublication={setPublication}
+        isQuickCreatingPub={isQuickCreatingPub}
+        setIsQuickCreatingPub={setIsQuickCreatingPub}
+        customPubSuccessfullyCreated={customPubSuccessfullyCreated}
+        userIsVerified={userIsVerified}
+      />
+      {isQuickCreatingPub && (
+        <PostQuickCreatePub
+          customPublicationAuthors={customPublicationAuthors}
+          setCustomPublicationAuthors={setCustomPublicationAuthors}
+          customPublication={customPublication}
+          setCustomPublication={setCustomPublication}
+          userID={userID}
+          customPublicationErrors={customPublicationErrors}
+          pubSubmissionError={pubSubmissionError}
+        />
+      )}
+    </>
+  );
+}
 function SelectPublication({
   publication,
   setPublication,
