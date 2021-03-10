@@ -146,8 +146,8 @@ function CreateCustomPublicationForm({setIsAdding, setSuccess}) {
         }}
       >
         <Form id="create-custom-publication-form">
-          <FormTextInput name="url" label="Url of the publication" />
           <FormTextInput name="title" label="Title of the publication" />
+          <FormTextInput name="url" label="Url of the publication" />
         </Form>
       </Formik>
 
