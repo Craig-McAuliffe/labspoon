@@ -216,9 +216,7 @@ export const addUserToRelatedTopic = functions.firestore
   .onCreate(async (change, context) => {
     const userID = context.params.userID;
     const topicID = context.params.topicID;
-    setUserOnTopic(topicID, userID).catch((err) =>
-      console.log(err, 'could not add user to topic')
-    );
+    return setUserOnTopic(topicID, userID);
   });
 
 export const addOpenPositionTopicsToUser = functions.firestore
@@ -263,6 +261,21 @@ export const updateUserRankOnTopic = functions.firestore
     const topicID = context.params.topicID;
     const userID = context.params.userID;
     const topic = change.after.data() as Topic;
+    const updatePromise = await db
+      .doc(`topics/${topicID}/users/${userID}`)
+      .update({rank: topic.rank})
+      .then(() => true)
+      .catch((err) => {
+        console.error(
+          'unable to update rank of user with id ' +
+            userID +
+            ' on topic with id ' +
+            topicID,
+          err
+        );
+        return false;
+      });
+    if (updatePromise) return;
     return setUserOnTopic(topicID, userID, topic.rank);
   });
 
@@ -295,7 +308,7 @@ export async function setUserOnTopic(
     .catch((err) =>
       console.log(
         err,
-        'could not search for user in order to add user ref to topic.'
+        'could not fetch user in order to add user ref to topic.'
       )
     );
 }
@@ -1137,47 +1150,6 @@ export const removePublicationTopicsToUser = functions.firestore
     const publicationTopics = publication.topics;
     if (!publicationTopics || publicationTopics.length === 0) return null;
     return await removeTopicsFromResource(publicationTopics, userID, 'user');
-  });
-
-export const addPostsInTopicToFollowingFeeds = functions.firestore
-  .document(`topics/{topicID}/posts/{postID}`)
-  .onCreate(async (change, context) => {
-    const topicID = context.params.topicID;
-    const postID = context.params.postID;
-    const post = change.data() as Post;
-    const topicFollowersCollectionRef = db.collection(
-      `topics/${topicID}/followedByUsers`
-    );
-
-    const updateFollowersOfTopic = async () => {
-      return topicFollowersCollectionRef
-        .get()
-        .then((qs) => {
-          const topicFollowers = [] as UserRef[];
-          qs.forEach((doc) => {
-            topicFollowers.push(doc.data() as UserRef);
-          });
-          const topicFollowersPromisesArray = topicFollowers.map(
-            async (topicFollower) => {
-              const userID = topicFollower.id;
-              const userPostsDocRef = db.doc(
-                `users/${userID}/feeds/followingFeed/posts/${postID}`
-              );
-              return userPostsDocRef
-                .set(post)
-                .catch((err) =>
-                  console.log(
-                    err,
-                    'failed to add posts from topic to user following feed'
-                  )
-                );
-            }
-          );
-          return Promise.all(topicFollowersPromisesArray);
-        })
-        .catch((err) => console.log(err, 'could not fetch followers of topic'));
-    };
-    return updateFollowersOfTopic();
   });
 
 export const addUserPostToFollowersFeeds = functions.firestore

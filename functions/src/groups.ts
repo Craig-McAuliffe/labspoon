@@ -274,7 +274,7 @@ export const addGroupToRelatedTopicPage = functions.firestore
   .onCreate(async (change, context) => {
     const topicID = context.params.topicID;
     const groupID = context.params.groupID;
-    await setGroupOnTopic(groupID, topicID);
+    return setGroupOnTopic(groupID, topicID);
   });
 
 export const removeGroupOnRelatedTopicPage = functions.firestore
@@ -323,13 +323,7 @@ export async function setGroupOnTopic(
         );
     })
     .catch((err) =>
-      console.error(
-        err,
-        'could not find group with id ' +
-          groupID +
-          ' on topic with id' +
-          topicID
-      )
+      console.error(err, 'could not fetch group with id ' + groupID)
     );
 }
 
@@ -348,6 +342,21 @@ export const updateGroupRankOnTopic = functions.firestore
     const topic = change.after.data() as Topic;
     const topicID = context.params.topicID;
     const groupID = context.params.groupID;
+    const topicUpdatePromise = await db
+      .doc(`topics/${topicID}/groups/${groupID}`)
+      .update({rank: topic.rank})
+      .then(() => true)
+      .catch((err) => {
+        console.error(
+          'unable to update rank on group with id ' +
+            groupID +
+            ' in topic with id ' +
+            topicID,
+          err
+        );
+        return false;
+      });
+    if (topicUpdatePromise) return;
     return setGroupOnTopic(groupID, topicID, topic.rank);
   });
 

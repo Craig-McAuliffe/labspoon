@@ -20,6 +20,7 @@ import {
   doFollowPreferencesBlockPost,
   FollowPostTypePreferences,
 } from './helpers';
+import {UserRef} from './users';
 
 const db = admin.firestore();
 
@@ -456,6 +457,47 @@ export const addTopicPostToFollowersFeeds = functions.firestore
         return Promise.all(topicFollowersPromisesArray);
       })
       .catch((err) => console.log(err, 'could not fetch followers of topic'));
+  });
+
+export const addTopicPostsToFollowingFeeds = functions.firestore
+  .document(`topics/{topicID}/posts/{postID}`)
+  .onCreate(async (change, context) => {
+    const topicID = context.params.topicID;
+    const postID = context.params.postID;
+    const post = change.data() as Post;
+    const topicFollowersCollectionRef = db.collection(
+      `topics/${topicID}/followedByUsers`
+    );
+
+    const updateFollowersOfTopic = async () => {
+      return topicFollowersCollectionRef
+        .get()
+        .then((qs) => {
+          const topicFollowers = [] as UserRef[];
+          qs.forEach((doc) => {
+            topicFollowers.push(doc.data() as UserRef);
+          });
+          const topicFollowersPromisesArray = topicFollowers.map(
+            async (topicFollower) => {
+              const userID = topicFollower.id;
+              const userPostsDocRef = db.doc(
+                `users/${userID}/feeds/followingFeed/posts/${postID}`
+              );
+              return userPostsDocRef
+                .set(post)
+                .catch((err) =>
+                  console.log(
+                    err,
+                    'failed to add posts from topic to user following feed'
+                  )
+                );
+            }
+          );
+          return Promise.all(topicFollowersPromisesArray);
+        })
+        .catch((err) => console.log(err, 'could not fetch followers of topic'));
+    };
+    return updateFollowersOfTopic();
   });
 
 interface expressionField {
