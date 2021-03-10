@@ -10,6 +10,7 @@ import FormTextInput from '../../components/Forms/FormTextInput';
 
 import './SettingsPage.css';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
+import {PaddedPageContainer} from '../../components/Layout/Content';
 
 const EMAIL = 'email';
 const PASSWORD = 'password';
@@ -89,18 +90,13 @@ const SettingsPage = () => {
   }
 
   return (
-    <>
-      <div className="sider-layout-no-border"></div>
-      <div className="content-layout">
-        <div className="settings-page-content">
-          <div className="settings-page-header">
-            <UserAvatar src={userProfile.avatar} width="100" height="100" />
-            <h2>{user.displayName}</h2>
-          </div>
-          {settings}
-        </div>
+    <PaddedPageContainer>
+      <div className="settings-page-header">
+        <UserAvatar src={userProfile.avatar} width="100" height="100" />
+        <h2>{user.displayName}</h2>
       </div>
-    </>
+      {settings}
+    </PaddedPageContainer>
   );
 };
 
@@ -179,11 +175,13 @@ function ChangeEmailForm({user, cancelChanges, reauthenticate, setEditState}) {
     newEmail: Yup.string()
       .email('Please enter a valid email address')
       .required('Email is required')
-      .test('same-email', 'This is your current email address ', function (
-        value
-      ) {
-        return user.email !== value;
-      }),
+      .test(
+        'same-email',
+        'This is your current email address ',
+        function (value) {
+          return user.email !== value;
+        }
+      ),
   });
   const submitChanges = (values) => {
     reauthenticate(values.currentPassword)
