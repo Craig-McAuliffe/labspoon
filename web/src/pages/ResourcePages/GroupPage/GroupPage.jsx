@@ -163,8 +163,7 @@ function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip) {
   return [results, null];
 }
 
-const checkIfTabsAreUsed = async (setUsedTabs, usedTabs, groupID) => {
-  if (usedTabs && usedTabs.checked === true) return;
+const checkIfTabsAreUsed = async (setUsedTabs, groupID) => {
   const confirmedUsedTabs = [];
   await db
     .collection(`groups/${groupID}/techniques`)
@@ -261,7 +260,7 @@ export default function GroupPage() {
       .then((ds) => setVerified(ds.exists))
       .catch((err) => console.error(err));
 
-    await checkIfTabsAreUsed(setUsedTabs, usedTabs, groupID);
+    await checkIfTabsAreUsed(setUsedTabs, groupID);
     if (tabsLoading) setTabsLoading(false);
   }, [groupID]);
 
