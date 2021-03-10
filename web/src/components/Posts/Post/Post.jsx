@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useHistory} from 'react-router-dom';
 import PostTaggedContent from './PostParts/PostTaggedContent';
 import PostActions from './PostParts/PostActions';
 import DefaultUserIcon from '../../../assets/DefaultUserIcon.svg';
@@ -152,6 +152,7 @@ function PostStats({recommendedCount}) {
 }
 
 function PostTextContent({post, dedicatedPage}) {
+  const history = useHistory();
   if (dedicatedPage)
     return (
       <div className="post-text-content">
@@ -159,11 +160,12 @@ function PostTextContent({post, dedicatedPage}) {
       </div>
     );
 
+  const goToPost = () => history.push(`/post/${post.id}`);
   return (
     <div className="post-text-content">
-      <Link to={`/post/${post.id}`} className="post-text-as-link">
+      <div className="post-text-as-link" onMouseDown={goToPost}>
         <RichTextBody body={post.text} shouldLinkify={true} />
-      </Link>
+      </div>
     </div>
   );
 }
