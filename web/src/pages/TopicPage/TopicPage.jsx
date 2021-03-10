@@ -21,6 +21,7 @@ import TopicPageSider from './TopicPageSider';
 
 import './TopicPage.css';
 import MAGRouterDisplay from '../../components/MAGRouter';
+import {USERS} from '../../helpers/resourceTypeDefinitions';
 
 async function fetchTopicDetailsFromDB(topicID) {
   return db
@@ -58,7 +59,7 @@ function topicPageFeedDataFromDB(skip, limit, filterOptions, topicID, last) {
         ),
         null,
       ];
-    case 'researchers':
+    case USERS:
       const usersCollection = db.collection(`topics/${topicID}/users`);
       return [
         getPaginatedUserReferencesFromCollectionRef(
@@ -136,8 +137,8 @@ export default function TopicPage() {
         {
           enabled: false,
           data: {
-            id: 'researchers',
-            name: 'Researchers',
+            id: USERS,
+            name: 'Users',
           },
         },
         {

@@ -263,22 +263,7 @@ export const updateUserRankOnTopic = functions.firestore
     const topicID = context.params.topicID;
     const userID = context.params.userID;
     const topic = change.after.data() as Topic;
-    const updatePromise = await db
-      .doc(`topics/${topicID}/users/${userID}`)
-      .update({rank: topic.rank})
-      .then(() => true)
-      .catch((err) => {
-        console.error(
-          'unable to update rank of user with id ' +
-            userID +
-            ' on topic with id' +
-            topicID,
-          err
-        );
-        return false;
-      });
-    if (updatePromise) return;
-    return await setUserOnTopic(topicID, userID, topic.rank);
+    return setUserOnTopic(topicID, userID, topic.rank);
   });
 
 export async function setUserOnTopic(

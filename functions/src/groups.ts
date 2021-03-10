@@ -348,35 +348,7 @@ export const updateGroupRankOnTopic = functions.firestore
     const topic = change.after.data() as Topic;
     const topicID = context.params.topicID;
     const groupID = context.params.groupID;
-    const topicUpdatePromise = await db
-      .doc(`topics/${topicID}/groups/${groupID}`)
-      .update({rank: topic.rank})
-      .then(() => true)
-      .catch((err) => {
-        console.error(
-          'unable to update rank on group with id ' +
-            groupID +
-            ' in topic with id' +
-            topicID,
-          err
-        );
-        return false;
-      });
-    if (topicUpdatePromise) return;
-    return db
-      .doc(`topics/${topicID}/groups/${groupID}`)
-      .get()
-      .then(async (ds) => {
-        if (!ds.exists) return setGroupOnTopic(groupID, topicID, topic.rank);
-      })
-      .catch(() =>
-        console.error(
-          'unable to check whether group with id ' +
-            groupID +
-            ' exists on topic with id ' +
-            topicID
-        )
-      );
+    return setGroupOnTopic(groupID, topicID, topic.rank);
   });
 
 export const updateGroupRefOnTopics = functions.firestore
