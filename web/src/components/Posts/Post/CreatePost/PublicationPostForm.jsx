@@ -17,6 +17,8 @@ import {FindAndAddUsersToForm} from '../../../Forms/AddUserToForm';
 import {
   SelectedAuthors,
   createCustomPublication,
+  MAX_DAILY_PUBLICATIONS_COUNT,
+  MaxDailyPublicationLimitReached,
 } from '../../../Publication/CreateCustomPublication';
 import {AuthContext} from '../../../../App';
 import {
@@ -39,7 +41,6 @@ import {POST} from '../../../../helpers/resourceTypeDefinitions';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
-const MAX_DAILY_PUBLICATIONS_COUNT = 30;
 export default function PublicationPostForm({
   setCreatingPost,
   postType,
@@ -67,6 +68,26 @@ export default function PublicationPostForm({
     customPubSuccessfullyCreated,
     setCustomPubSuccessfullyCreated,
   ] = useState(false);
+  const [hasHitMaxDailyPublications, setHasHitMaxDailyPublications] = useState(
+    false
+  );
+  const userID = userProfile ? userProfile.id : undefined;
+  useEffect(async () => {
+    if (!userID) return;
+    if (hasHitMaxDailyPublications || !isQuickCreatingPub) return;
+    const publicationActivityCount = await db
+      .doc(`activity/publicationsActivity/creators/${userID}`)
+      .get()
+      .catch((err) => console.error(err));
+    if (
+      publicationActivityCount &&
+      publicationActivityCount.exists &&
+      publicationActivityCount.data().dailyPublicationCount >=
+        MAX_DAILY_PUBLICATIONS_COUNT
+    )
+      setHasHitMaxDailyPublications(true);
+  }, [userID, isQuickCreatingPub]);
+
   const {setResults} = useContext(FilterableResultsContext);
 
   const initialValues = {
@@ -92,7 +113,8 @@ export default function PublicationPostForm({
       setCustomPublication,
       selectedTopics,
       customPublicationAuthors,
-      publication
+      publication,
+      hasHitMaxDailyPublications
     );
   return (
     <>
@@ -112,9 +134,10 @@ export default function PublicationPostForm({
             setCustomPublicationAuthors={setCustomPublicationAuthors}
             customPublication={customPublication}
             setCustomPublication={setCustomPublication}
-            userID={userProfile.id}
+            userID={userID}
             customPublicationErrors={customPublicationErrors}
             pubSubmissionError={pubSubmissionError}
+            hasHitMaxDailyPublications={hasHitMaxDailyPublications}
           />
         }
       >
@@ -144,6 +167,7 @@ function SelectAndCreatePublication({
   userID,
   customPublicationErrors,
   pubSubmissionError,
+  hasHitMaxDailyPublications,
 }) {
   return (
     <>
@@ -164,6 +188,7 @@ function SelectAndCreatePublication({
           userID={userID}
           customPublicationErrors={customPublicationErrors}
           pubSubmissionError={pubSubmissionError}
+          hasHitMaxDailyPublications={hasHitMaxDailyPublications}
         />
       )}
     </>
@@ -275,38 +300,15 @@ function PostQuickCreatePub({
   userID,
   customPublicationErrors,
   pubSubmissionError,
+  hasHitMaxDailyPublications,
 }) {
   const removeAuthor = (author) => {
     setCustomPublicationAuthors((currentAuthors) =>
       currentAuthors.filter((currentAuthor) => currentAuthor !== author)
     );
   };
-  const [hasHitMaxDailyPublications, setHasHitMaxDailyPublications] = useState(
-    false
-  );
-  useEffect(async () => {
-    if (hasHitMaxDailyPublications) return;
-    const publicationActivityCount = await db
-      .doc(`activity/publicationsActivity/creators/${userID}`)
-      .get()
-      .catch((err) => console.error(err));
-    if (
-      publicationActivityCount &&
-      publicationActivityCount.exists &&
-      publicationActivityCount.data().dailyPublicationCount >=
-        MAX_DAILY_PUBLICATIONS_COUNT
-    )
-      setHasHitMaxDailyPublications(true);
-  }, [userID]);
 
-  if (hasHitMaxDailyPublications)
-    return (
-      <Alert variant="warning">
-        {' '}
-        You have created the maximum number of publications for today (
-        {MAX_DAILY_PUBLICATIONS_COUNT}). Please try again tomorrow.
-      </Alert>
-    );
+  if (hasHitMaxDailyPublications) return <MaxDailyPublicationLimitReached />;
   return (
     <div className="publication-post-quick-create-section">
       {pubSubmissionError && (
@@ -444,7 +446,8 @@ export async function submitPublicationPost(
   setCustomPublication,
   selectedTopics,
   customPublicationAuthors,
-  publication
+  publication,
+  hasHitMaxDailyPublications
 ) {
   if (customPublicationErrors) setCustomPublicationErrors();
   if (pubSubmissionError) setPubSubmissionError(false);
@@ -470,7 +473,8 @@ export async function submitPublicationPost(
       },
       selectedTopics,
       undefined,
-      undefined
+      undefined,
+      hasHitMaxDailyPublications
     );
   };
   const customPublicationSubmissionResult = await submitCustomPublication();

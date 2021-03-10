@@ -1,5 +1,5 @@
 import {Form, Formik} from 'formik';
-import React, {useState, useContext} from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 import TertiaryButton from '../Buttons/TertiaryButton';
 import FormTextInput from '../Forms/FormTextInput';
 import {FindAndAddUsersToForm} from '../Forms/AddUserToForm';
@@ -19,6 +19,9 @@ import {AuthContext} from '../../App';
 import {userToCustomPubUserRef} from '../../helpers/users';
 import TagTopics from '../Topics/TagTopics';
 import {handleTaggedTopicsNoIDs} from '../../helpers/topics';
+import {Alert} from 'react-bootstrap';
+
+export const MAX_DAILY_PUBLICATIONS_COUNT = 30;
 
 export default function CreateCustomPublication() {
   const [isAdding, setIsAdding] = useState(false);
@@ -62,6 +65,25 @@ function CreateCustomPublicationForm({setIsAdding, setSuccess}) {
   const {userProfile} = useContext(AuthContext);
   const [authors, setAuthors] = useState([userProfile]);
   const [savedFormData, setSavedFormData] = useState();
+  const [hasHitMaxDailyPublications, setHasHitMaxDailyPublications] = useState(
+    false
+  );
+  const userID = userProfile ? userProfile.id : undefined;
+  useEffect(async () => {
+    if (!userID) return;
+    if (hasHitMaxDailyPublications) return;
+    const publicationActivityCount = await db
+      .doc(`activity/publicationsActivity/creators/${userID}`)
+      .get()
+      .catch((err) => console.error(err));
+    if (
+      publicationActivityCount &&
+      publicationActivityCount.exists &&
+      publicationActivityCount.data().dailyPublicationCount >=
+        MAX_DAILY_PUBLICATIONS_COUNT
+    )
+      setHasHitMaxDailyPublications(true);
+  }, [userID]);
 
   const initialValues = savedFormData
     ? savedFormData
@@ -85,6 +107,7 @@ function CreateCustomPublicationForm({setIsAdding, setSuccess}) {
     );
   };
   if (submitting) return <LoadingSpinner />;
+  if (hasHitMaxDailyPublications) return <MaxDailyPublicationLimitReached />;
   return (
     <div className="create-custom-pub-form-container">
       {error && (
@@ -117,7 +140,8 @@ function CreateCustomPublicationForm({setIsAdding, setSuccess}) {
             () => setError(true),
             selectedTopics,
             setIsAdding,
-            setSavedFormData
+            setSavedFormData,
+            hasHitMaxDailyPublications
           );
         }}
       >
@@ -136,7 +160,7 @@ function CreateCustomPublicationForm({setIsAdding, setSuccess}) {
       <SelectedAuthors
         authors={authors}
         removeAuthor={removeAuthor}
-        exceptionID={userProfile.id}
+        exceptionID={userID}
       />
       <TagTopics
         submittingForm={submitting}
@@ -180,6 +204,15 @@ export function SelectedAuthors({authors, removeAuthor, exceptionID}) {
   );
 }
 
+export function MaxDailyPublicationLimitReached() {
+  return (
+    <Alert variant="warning">
+      You have created the maximum number of publications for today (
+      {MAX_DAILY_PUBLICATIONS_COUNT}). Please try again tomorrow.
+    </Alert>
+  );
+}
+
 export async function createCustomPublication(
   res,
   authors,
@@ -188,8 +221,13 @@ export async function createCustomPublication(
   setError,
   selectedTopics,
   setIsAdding,
-  setSavedFormData
+  setSavedFormData,
+  hasHitMaxDailyPublications
 ) {
+  if (hasHitMaxDailyPublications) {
+    if (setSubmitting) setSubmitting(false);
+    return;
+  }
   if (setSubmitting) setSubmitting(true);
   const authorRefs = authors.map((author) =>
     userToCustomPubUserRef(author, author.id, author.microsoftID)

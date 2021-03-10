@@ -1144,4 +1144,5 @@ export interface CustomPublication {
   topics: TaggedTopic[];
   filterTopicIDs?: string[];
   isCustomPublication: boolean;
+  createdByUserID: string;
 }
