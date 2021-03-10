@@ -118,9 +118,9 @@ export default function AboutPage() {
             </Link>
           </div>
           <div className="about-page-final-about-us-container">
-            <Link to="/aboutUs">
+            <a href="https://www.labspoon.com/aboutUs">
               <h3>About Us</h3>
-            </Link>
+            </a>
           </div>
         </div>
         <div></div>
