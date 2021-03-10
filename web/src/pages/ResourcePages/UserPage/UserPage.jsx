@@ -18,6 +18,7 @@ import UserCoverPhoto from '../../../components/User/UserCoverPhoto';
 
 import './UserPage.css';
 import ResourcesFeed from '../ResourcesFeeds';
+import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 
 export default function UserPage() {
   const featureFlags = useContext(FeatureFlags);
@@ -162,7 +163,7 @@ export default function UserPage() {
 function UserInfo({user}) {
   const {userProfile} = useContext(AuthContext);
   const featureFlags = useContext(FeatureFlags);
-  if (user === undefined) return <></>;
+  if (user === undefined) return <LoadingSpinner />;
   const ownProfile = userProfile && userProfile.id === user.id;
   return (
     <div>

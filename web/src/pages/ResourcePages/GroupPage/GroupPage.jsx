@@ -41,6 +41,7 @@ import ResourcesFeed from '../ResourcesFeeds';
 import {PaddedContent} from '../../../components/Layout/Content';
 
 import './GroupPage.css';
+import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 
 function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip) {
   const activeTab = filterOptions ? getActiveTabID(filterOptions) : null;
@@ -414,7 +415,7 @@ const GroupDetails = ({
     size: 100,
   });
 
-  if (group === undefined) return <></>;
+  if (group === undefined) return <LoadingSpinner />;
 
   const descriptionSize = {
     height: `${displayFullDescription.size}px`,
