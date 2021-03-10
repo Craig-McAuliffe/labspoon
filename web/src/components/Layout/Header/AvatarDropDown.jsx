@@ -71,6 +71,11 @@ const AvatarDropDown = () => {
               <p className="dropdown-link-item-less-emphasis">Contact us</p>
             </div>
           </Dropdown.Item>
+          <Dropdown.Item href="/aboutUs">
+            <div className="avatar-dropdown-item-container">
+              <p className="dropdown-link-item-less-emphasis">About us</p>
+            </div>
+          </Dropdown.Item>
 
           <div className="log-out-container">
             <button

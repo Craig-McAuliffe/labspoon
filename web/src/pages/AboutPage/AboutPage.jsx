@@ -117,6 +117,11 @@ export default function AboutPage() {
               <PrimaryButton>Get Started</PrimaryButton>
             </Link>
           </div>
+          <div className="about-page-final-about-us-container">
+            <Link to="/aboutUs">
+              <h3>About Us</h3>
+            </Link>
+          </div>
         </div>
         <div></div>
       </div>

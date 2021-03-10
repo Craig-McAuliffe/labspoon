@@ -226,6 +226,12 @@
   justify-content: center;
 }
 
+.about-page-final-about-us-container {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0px;
+}
+
 @media only screen and (max-width: 1650px) {
   .about-page-background-sweep-container svg {
     width: 1650px;

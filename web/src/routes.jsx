@@ -35,6 +35,7 @@ import ContactPage from './pages/ContactPage/ContactPage';
 import PoliciesPage from './pages/PoliciesPage/PoliciesPage';
 import CookiesPolicyPage from './pages/Info/CookiesPolicyPage';
 import ResearchFocuses from './pages/ResourcePages/ResearchFocusPage/ResearchFocuses';
+import AboutUsPage from './pages/AboutPage/AboutUsPage';
 
 /**
  * Top level routing structure for the app.
@@ -119,6 +120,9 @@ export default function Routes({user, setUser}) {
       </Route>
       <Route path="/cookies-policy">
         <CookiesPolicyPage />
+      </Route>
+      <Route path="/aboutUs">
+        <AboutUsPage />
       </Route>
       <Route path="/contact">
         <ContactPage />
