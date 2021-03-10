@@ -28,16 +28,25 @@ const ContactPage = lazy(() => import('./pages/ContactPage/ContactPage'));
 const PoliciesPage = lazy(() => import('./pages/PoliciesPage/PoliciesPage'));
 const CookiesPolicyPage = lazy(() => import('./pages/Info/CookiesPolicyPage'));
 const AboutUsPage = lazy(() => import('./pages/AboutPage/AboutUsPage'));
+const ResearchFocuses = lazy(() =>
+  import('./pages/ResourcePages/ResearchFocusPage/ResearchFocuses')
+);
+const Techniques = lazy(() =>
+  import('./pages/ResourcePages/TechniquePage/Techniques')
+);
+const ChooseUserName = lazy(() =>
+  import('./pages/LoginSignup/ChooseUserName/ChooseUserName')
+);
+const OpenPositionPage = lazy(() =>
+  import('./pages/ResourcePages/OpenPositionPage/OpenPositionPage')
+);
+
 import {SkeletonUserPage} from './pages/ResourcePages/UserPage';
 import AboutPage from './pages/AboutPage';
 import {MAGPublicationRouter} from './pages/ResourcePages/PublicationPage/PublicationPage';
 import TopicPage, {MAGFieldRouter} from './pages/TopicPage';
 import Groups from './pages/ResourcePages/GroupPage/Groups';
 import Users from './pages/ResourcePages/UserPage/Users';
-import ChooseUserName from './pages/LoginSignup/ChooseUserName/ChooseUserName';
-import ResearchFocuses from './pages/ResourcePages/ResearchFocusPage/ResearchFocuses';
-import Techniques from './pages/ResourcePages/TechniquePage/Techniques';
-import OpenPositionPage from './pages/ResourcePages/OpenPositionPage/OpenPositionPage';
 import {LoadingSpinnerPage} from './components/LoadingSpinner/LoadingSpinner';
 import SearchPage from './pages/SearchPage';
 import FollowingFeedPage from './pages/FollowingFeedPage';
