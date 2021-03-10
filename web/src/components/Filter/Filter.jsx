@@ -68,7 +68,7 @@ function FilterCollection({
   function updateFilterCollectionOption(optionIndex) {
     updateFilterOption(index, optionIndex);
   }
-
+  // this is required in case of resize and therefore filter component change
   useEffect(() => {
     if (options.length > siderFilterOptionsLimit && !showMoreOptionNoFetch)
       setShowMoreOptionNoFetch(true);
