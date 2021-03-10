@@ -14,7 +14,7 @@ import PrimaryButton from '../Buttons/PrimaryButton';
 import SelectCheckBox, {setItemSelectedState} from '../Buttons/SelectCheckBox';
 import {SimpleErrorText} from '../Forms/ErrorMessage';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
-import PaginatedResourceFetch from '../PaginatedResourceFetch/PaginatedResourceFetch';
+import PaginatedResourceFetchAndResults from '../PaginatedResourceFetch/PaginatedResourceFetchAndResults';
 
 import './FollowOptionsPopover.css';
 import Popover from './Popover';
@@ -64,6 +64,7 @@ export default function FollowOptionsPopover({
   const [topicResults, setTopicResults] = useState(initialTopicResults);
   const [success, setSuccess] = useState(false);
   const [submittingError, setSubmittingError] = useState(false);
+  const [isNewlyPreselected, setIsNewlyPreselected] = useState(false);
   const {userProfile} = useContext(AuthContext);
   if (!userProfile) return null;
 
@@ -71,7 +72,7 @@ export default function FollowOptionsPopover({
     targetString[0].toUpperCase() + targetString.slice(1);
 
   useEffect(async () => {
-    if (!isPreSelected) return;
+    if (!isPreSelected && !isNewlyPreselected) return;
     const existingFollowPreferences = await db
       .doc(
         `users/${userProfile.id}/follows${capitaliseFirstLetter(
@@ -114,7 +115,11 @@ export default function FollowOptionsPopover({
         )
       );
     }
-  }, [targetResourceData]);
+  }, [targetResourceData, expanded]);
+  // saves preferences after submission in case user re-expands popover
+  useEffect(() => {
+    if (success && !isPreSelected) setIsNewlyPreselected(true);
+  });
 
   const userID = userProfile.id;
   const saveFollowOptions = async () => {
@@ -340,7 +345,7 @@ function ResourceFollowTopicsOptions({
       id={INFINITE_SCROLL_TARGET_ID}
     >
       <h4 className="follow-options-topics-note">I&#39;m interested in...</h4>
-      <PaginatedResourceFetch
+      <PaginatedResourceFetchAndResults
         isSelectable={true}
         collectionRef={targetResourceTopicsRef}
         setSelectedItems={setSelectedTopics}

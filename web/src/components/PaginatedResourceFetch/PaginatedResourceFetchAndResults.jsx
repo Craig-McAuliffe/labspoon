@@ -3,7 +3,7 @@ import {getPaginatedResourcesFromCollectionRef} from '../../helpers/resources';
 import ErrorMessage from '../Forms/ErrorMessage';
 import {SelectableResults} from '../Results/Results';
 
-export default function PaginatedResourceFetch({
+export default function PaginatedResourceFetchAndResults({
   isSelectable,
   collectionRef,
   setSelectedItems,
