@@ -130,6 +130,46 @@
   color: #3099d3;
 }
 
+.group-page-details-loading {
+  height: 250px;
+  animation: pulse 2s infinite;
+  -webkit-animation: pulse 2s infinite;
+  -moz-animation: pulse 2s infinite;
+  -o-animation: pulse 2s infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ffffff;
+}
+
+.group-page-details-loading .spinner-border {
+  color: #ffffff;
+}
+
+@keyframes pulse {
+  0% {
+    background-color: rgba(243, 243, 243);
+  }
+  50% {
+    background-color: rgba(223, 223, 224);
+  }
+  100% {
+    background-color: rgba(243, 243, 243);
+  }
+}
+
+@-webkit-keyframes pulse {
+  0% {
+    background-color: rgba(243, 243, 243);
+  }
+  50% {
+    background-color: rgba(223, 223, 224);
+  }
+  100% {
+    background-color: rgba(243, 243, 243);
+  }
+}
+
 @media screen and (max-width: 600px) {
   .group-icon-and-message img {
     width: 90px;

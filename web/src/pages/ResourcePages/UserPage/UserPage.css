@@ -81,6 +81,70 @@
   margin-left: 10px;
 }
 
+.user-cover-photo-container-loading {
+  height: 200px;
+}
+
+.user-page-details-loading {
+  animation: pulse 2s infinite;
+  -webkit-animation: pulse 2s infinite;
+  -moz-animation: pulse 2s infinite;
+  -o-animation: pulse 2s infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.user-page-info-loading-container {
+  margin-bottom: 80px;
+}
+
+.user-page-avatar-container-loading {
+  position: relative;
+  width: 100%;
+  height: 10px;
+}
+
+.user-page-details-loading-avatar {
+  height: 80px;
+  width: 80px;
+  border-radius: 50%;
+  position: absolute;
+  /* top: -10px; */
+  left: 90%;
+  bottom: -30px;
+  background: #99999f;
+}
+
+.user-page-details-loading .spinner-border {
+  color: #ffffff;
+}
+
+@keyframes pulse {
+  0% {
+    background-color: rgba(243, 243, 243);
+  }
+  50% {
+    background-color: rgba(223, 223, 224);
+  }
+  100% {
+    background-color: rgba(243, 243, 243);
+  }
+}
+
+@-webkit-keyframes pulse {
+  0% {
+    background-color: rgba(243, 243, 243);
+  }
+  50% {
+    background-color: rgba(223, 223, 224);
+  }
+  100% {
+    background-color: rgba(243, 243, 243);
+  }
+}
+
 @media screen and (max-width: 550px) {
   .user-page-avatar-container img {
     width: 90px;

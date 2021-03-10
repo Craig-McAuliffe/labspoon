@@ -25,7 +25,9 @@ export default function ResourcesFeed({
         <UnpaddedPageContainer>
           {children}
           {tabsLoading ? (
-            <LoadingSpinner />
+            <div style={{marginTop: '20px'}}>
+              <LoadingSpinner />
+            </div>
           ) : (
             <>
               <ResourceTabs

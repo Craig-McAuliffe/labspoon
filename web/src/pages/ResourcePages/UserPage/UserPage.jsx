@@ -154,7 +154,12 @@ export default function UserPage() {
     });
   }
   return (
-    <ResourcesFeed fetchResults={fetchFeedData} limit={10} tabs={fetchTabs()}>
+    <ResourcesFeed
+      fetchResults={fetchFeedData}
+      limit={10}
+      tabs={fetchTabs()}
+      tabsLoading={tabsLoading}
+    >
       <UserInfo user={userDetails} />
     </ResourcesFeed>
   );
@@ -163,7 +168,21 @@ export default function UserPage() {
 function UserInfo({user}) {
   const {userProfile} = useContext(AuthContext);
   const featureFlags = useContext(FeatureFlags);
-  if (user === undefined) return <LoadingSpinner />;
+  if (user === undefined)
+    return (
+      <div className="user-page-info-loading-container">
+        <div className="user-cover-photo-container-loading">
+          <div className="user-page-details-loading">
+            <LoadingSpinner />
+          </div>
+        </div>
+        <div className="user-headline">
+          <div className="user-page-avatar-container-loading">
+            <div className="user-page-details-loading-avatar"></div>
+          </div>
+        </div>
+      </div>
+    );
   const ownProfile = userProfile && userProfile.id === user.id;
   return (
     <div>

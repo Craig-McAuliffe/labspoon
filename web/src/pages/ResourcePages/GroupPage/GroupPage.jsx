@@ -415,7 +415,15 @@ const GroupDetails = ({
     size: 100,
   });
 
-  if (group === undefined) return <LoadingSpinner />;
+  if (group === undefined)
+    return (
+      <div className="group-header">
+        <div className="group-page-details-loading"></div>
+        <div className="group-page-details-loading">
+          <LoadingSpinner />
+        </div>
+      </div>
+    );
 
   const descriptionSize = {
     height: `${displayFullDescription.size}px`,
