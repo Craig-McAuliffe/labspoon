@@ -38,9 +38,9 @@ export const topicSearch = functions.https.onCall(async (data) => {
   const formattedTopics = searchResults.map((azureTopic) =>
     azureTopicToTopicNoID(azureTopic)
   );
-  const createTopicsPromises = formattedTopics.map((topicNoLabspoonID) =>
+  const createTopicsPromises = formattedTopics.map((topicNoLabspoonID, i) =>
     db
-      .doc(`MSFields/${topicNoLabspoonID.id}`)
+      .doc(`MSFields/${topicNoLabspoonID.microsoftID}`)
       .get()
       .then((doc) => {
         if (doc.exists) return;
