@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
 import {MAKField, makFieldToTopic, TopicToMAKField} from './microsoft';
 import {addRecentPostsToFollowingFeed, Post} from './posts';
-import {admin} from './config';
+import {admin, config} from './config';
 import {firestore} from 'firebase-admin';
 import {
   doFollowPreferencesBlockPost,
@@ -9,7 +9,6 @@ import {
 } from './helpers';
 import {UserRef} from './users';
 import Axios from 'axios';
-import {config} from './config';
 
 const db = admin.firestore();
 
@@ -39,14 +38,15 @@ export const topicSearch = functions.https.onCall(async (data) => {
   const formattedTopics = searchResults.map((azureTopic) =>
     azureTopicToTopicNoID(azureTopic)
   );
-  const createTopicsPromises = formattedTopics.map((topicNoLabspoonID) => {
-    db.doc(`MSFields/${topicNoLabspoonID.id}`)
+  const createTopicsPromises = formattedTopics.map((topicNoLabspoonID) =>
+    db
+      .doc(`MSFields/${topicNoLabspoonID.id}`)
       .get()
       .then((doc) => {
         if (doc.exists) return;
         return createFieldAndTopic(topicNoLabspoonID);
-      });
-  });
+      })
+  );
   await Promise.all(createTopicsPromises);
   return formattedTopics;
 });

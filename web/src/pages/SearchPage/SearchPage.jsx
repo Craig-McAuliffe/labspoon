@@ -11,7 +11,7 @@ import {
   Configure,
   connectStateResults,
 } from 'react-instantsearch-dom';
-import {abbrEnv} from '../../config';
+import {abbrEnv, reCaptchaSiteKey} from '../../config';
 import {searchClient} from '../../algolia';
 import {createURL} from '../../helpers/search';
 import {GenericListItem} from '../../components/Results/Results';
@@ -22,7 +22,6 @@ import LatestPosts from '../../components/Posts/LatestPosts/LatestPosts';
 import reCaptcha from '../../helpers/activity';
 import useScript from '../../helpers/useScript';
 import useDomRemover from '../../helpers/useDomRemover';
-import {reCaptchaSiteKey} from '../../config';
 import ManualRecaptcha from '../../components/Recaptcha/ManualRecaptcha';
 
 import './SearchPage.css';
