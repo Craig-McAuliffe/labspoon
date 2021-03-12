@@ -12,7 +12,6 @@ const algoliaConfig = config.algolia;
 const USERS_INDEX = environment + '_USERS';
 const GROUPS_INDEX = environment + '_GROUPS';
 const POSTS_INDEX = environment + '_POSTS';
-const TOPICS_INDEX = environment + '_TOPICS';
 const OPENPOSITIONS_INDEX = environment + '_OPENPOSITIONS';
 const PUBLICATIONS_INDEX = environment + '_PUBLICATIONS';
 
@@ -240,21 +239,6 @@ export const updateOpenPositionToSearchIndex = functions.firestore
       OPENPOSITIONS_INDEX
     );
   });
-
-export const configureTopicSearchIndex = functions.https.onRequest((_, res) =>
-  configureSearchIndex(res, TOPICS_INDEX, ['name'])
-);
-
-export const addTopicToSearchIndex = functions.firestore
-  .document(`topics/{topicID}`)
-  .onCreate((change, context): boolean =>
-    addToIndex(
-      context.params.topicID,
-      change.data(),
-      ResourceTypes.TOPIC,
-      TOPICS_INDEX
-    )
-  );
 
 export const configurePublicationSearchIndex = functions.https.onRequest(
   (_, res) =>

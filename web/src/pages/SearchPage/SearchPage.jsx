@@ -31,14 +31,12 @@ const OVERVIEW = 'Overview';
 const POSTS = 'Posts';
 const USERS = 'Users';
 const GROUPS = 'Groups';
-const TOPICS = 'Topics';
 
 const urlToTabsMap = new Map([
   ['overview', OVERVIEW],
   ['posts', POSTS],
   ['users', USERS],
   ['groups', GROUPS],
-  ['topics', TOPICS],
 ]);
 
 const tabsToURLMap = new Map([
@@ -46,7 +44,6 @@ const tabsToURLMap = new Map([
   [POSTS, 'posts'],
   [USERS, 'users'],
   [GROUPS, 'groups'],
-  [TOPICS, 'topics'],
 ]);
 
 const SearchPageActiveTabContext = React.createContext();
@@ -88,7 +85,7 @@ export default function SearchPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 
-  const tabs = [OVERVIEW, POSTS, USERS, GROUPS, TOPICS].map((tabName) => (
+  const tabs = [OVERVIEW, POSTS, USERS, GROUPS].map((tabName) => (
     <button
       onClick={() => updateTab(tabName)}
       key={tabName}
@@ -111,9 +108,6 @@ export default function SearchPage() {
       break;
     case GROUPS:
       results = <GroupsResults />;
-      break;
-    case TOPICS:
-      results = <TopicsResults />;
       break;
     default:
       break;
@@ -186,7 +180,6 @@ const AllResults = connectStateResults(({allSearchResults, children}) => {
       <Index indexName={`${abbrEnv}_POSTS`} />
       <Index indexName={`${abbrEnv}_USERS`} />
       <Index indexName={`${abbrEnv}_GROUPS`} />
-      <Index indexName={`${abbrEnv}_TOPICS`} />
       <div className="search-page-no-results-message">
         {`Hmm, looks like there's nothing on Labspoon that matches your search.`}
       </div>
@@ -266,14 +259,6 @@ const OverviewResults = ({setTab}) => (
       >
         <GroupsResults />
       </OverviewResultsSection>
-      <OverviewResultsSection
-        setTab={setTab}
-        indexSuffix={'_TOPICS'}
-        tabName={TOPICS}
-        resourceType={'Topics'}
-      >
-        <TopicsResults />
-      </OverviewResultsSection>
     </AllResults>
   </>
 );
@@ -305,19 +290,6 @@ const PostsResults = () => (
     />
   </IndexResults>
 );
-
-const TopicsResults = () => {
-  return (
-    <IndexResults>
-      <Hits
-        hitComponent={({hit}) => {
-          hit.id = hit.objectID;
-          return <GenericListItem result={hit} />;
-        }}
-      />
-    </IndexResults>
-  );
-};
 
 const urlToSearchState = (location) => qs.parse(location.search.slice(1));
 
