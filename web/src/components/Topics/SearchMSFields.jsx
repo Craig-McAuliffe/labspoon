@@ -12,6 +12,7 @@ export default function SearchMSFields({
   setCurrentInputValue,
   searchIcon,
   setLoading,
+  limit,
 }) {
   const [typedTopic, setTypedTopic] = useState('');
 
@@ -21,7 +22,12 @@ export default function SearchMSFields({
       setLoading(false);
       return;
     }
-    return searchMicrosoftTopics(typedTopic, setLoading, setFetchedTopics);
+    return searchMicrosoftTopics(
+      typedTopic,
+      setLoading,
+      setFetchedTopics,
+      limit
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [typedTopic]);
 
@@ -43,11 +49,11 @@ export default function SearchMSFields({
 }
 
 // clearTimeout is called on unmount from useEffect hook
-const searchMicrosoftTopics = (query, setLoading, setFetchedTopics) => {
+const searchMicrosoftTopics = (query, setLoading, setFetchedTopics, limit) => {
   setLoading(true);
   const apiCallTimeout = setTimeout(
     () =>
-      topicSearch({topicQuery: query})
+      topicSearch({topicQuery: query, limit: limit})
         .then((microsoftTopics) => {
           setLoading(false);
           setFetchedTopics(microsoftTopics.data);
@@ -57,7 +63,7 @@ const searchMicrosoftTopics = (query, setLoading, setFetchedTopics) => {
           setFetchedTopics([]);
           console.log(err, 'could not search topics');
         }),
-    1400
+    500
   );
   return () => clearTimeout(apiCallTimeout);
 };

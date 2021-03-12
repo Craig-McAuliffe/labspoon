@@ -1,18 +1,5 @@
 import * as functions from 'firebase-functions';
-import {
-  interpretationResult,
-  interpretQuery,
-  executeExpression,
-  MAKPublication,
-  makPublicationToPublication,
-  MAKField,
-  makFieldToTopic,
-  TopicToMAKField,
-} from './microsoft';
-import {
-  allPublicationFields,
-  publishAddPublicationRequests,
-} from './publications';
+import {MAKField, makFieldToTopic, TopicToMAKField} from './microsoft';
 import {addRecentPostsToFollowingFeed, Post} from './posts';
 import {admin} from './config';
 import {firestore} from 'firebase-admin';
@@ -21,71 +8,52 @@ import {
   FollowPostTypePreferences,
 } from './helpers';
 import {UserRef} from './users';
+import Axios from 'axios';
+import {config} from './config';
 
 const db = admin.firestore();
 
-const fieldNameExprRegex = /^Composite\(F.FN==\'(?<fieldName>[a-zA-Z0-9 -]+)\'\)$/;
-
 export const topicSearch = functions.https.onCall(async (data) => {
   const topicQuery = data.topicQuery;
+  const limit = data.limit;
   if (topicQuery === undefined)
     throw new functions.https.HttpsError(
       'invalid-argument',
       'A topic query must be provided'
     );
-  // Get an array of up to 10 interpretations of the query and filter to ensure they match the field name pattern.
-  const expressions: expressionField[] = await interpretQuery({
-    query: topicQuery,
-    complete: 1,
-    count: 100,
-  })
-    .then((resp) =>
-      resp.data.interpretations
-        .map((result: interpretationResult) => result.rules[0].output.value)
-        .map((expr: string): expressionField | null => {
-          const match = fieldNameExprRegex.exec(expr);
-          if (!match) return null;
-          return {
-            expr: `And(${expr}, Ty=='0')`,
-            fieldName: match.groups!.fieldName,
-          };
-        })
-        .filter((res: expressionField | null) => res !== null)
-        .slice(0, 10)
-    )
-    .catch((err: Error) => {
+  const searchUrl = `https://topics-basic.search.windows.net/indexes/topic-search-by-name/docs?search=${topicQuery}&$top=${limit}&api-version=2020-06-30`;
+  const apiCallConfig = {
+    headers: {
+      ['Content-Type']: 'application/json',
+      ['api-key']: config.azure.admin_key,
+    },
+  };
+
+  const searchResponse: any = await Axios.get(searchUrl, apiCallConfig).catch(
+    (err: Error) => {
       console.error(err);
       throw new functions.https.HttpsError('internal', 'An error occurred.');
-    });
-  const executePromises = expressions.map((fieldExpr) =>
-    executeExpression({
-      expr: fieldExpr.expr,
-      count: 1,
-      attributes: allPublicationFields,
-    })
-      .then(async (resp) => {
-        const publications: MAKPublication[] = resp.data.entities;
-        if (publications.length === 0) return undefined;
-        await publishAddPublicationRequests(publications);
-
-        const publication = makPublicationToPublication(publications[0]);
-        if (!publication.topics) return undefined;
-        const topicMatch = publication.topics.find(
-          (topic) => topic.normalisedName === fieldExpr.fieldName
-        );
-        return topicMatch;
-      })
-      .catch((err: Error) => {
-        console.error(err);
-        throw new functions.https.HttpsError('internal', 'An error occurred.');
-      })
+    }
   );
-  return await Promise.all(executePromises);
+  const searchResults: AzureTopicResult[] = searchResponse.data.value;
+  const formattedTopics = searchResults.map((azureTopic) =>
+    azureTopicToTopicNoID(azureTopic)
+  );
+  const createTopicsPromises = formattedTopics.map((topicNoLabspoonID) => {
+    db.doc(`MSFields/${topicNoLabspoonID.id}`)
+      .get()
+      .then((doc) => {
+        if (doc.exists) return;
+        return createFieldAndTopic(topicNoLabspoonID);
+      });
+  });
+  await Promise.all(createTopicsPromises);
+  return formattedTopics;
 });
 
 export async function createFieldAndTopic(
   topic: Topic,
-  addTopicWithIDToTaggedResource: Function
+  addTopicWithIDToTaggedResource?: Function
 ) {
   const MSFieldID = topic.microsoftID;
   const labspoonTopicRef = db.collection('topics').doc();
@@ -104,7 +72,10 @@ export async function createFieldAndTopic(
         `An error occurred while processing the field, ${topic}`
       );
     })
-    .then(() => addTopicWithIDToTaggedResource(labspoonTopicID));
+    .then(() => {
+      if (addTopicWithIDToTaggedResource)
+        return addTopicWithIDToTaggedResource(labspoonTopicID);
+    });
 }
 
 export function convertTaggedTopicToTopic(
@@ -500,9 +471,14 @@ export const addTopicPostsToFollowingFeeds = functions.firestore
     return updateFollowersOfTopic();
   });
 
-interface expressionField {
-  expr: string;
-  fieldName: string;
+function azureTopicToTopicNoID(azureTopic: AzureTopicResult): Topic {
+  const capitaliseFirstLetter = (string: string) =>
+    string[0].toUpperCase() + string.slice(1);
+  return {
+    microsoftID: azureTopic.id,
+    name: capitaliseFirstLetter(azureTopic.name),
+    normalisedName: azureTopic.name,
+  };
 }
 
 // Rank relates to how often the resource mentions this topic
@@ -519,4 +495,10 @@ export interface TaggedTopic {
   microsoftID: string;
   name: string;
   normalisedName: string;
+}
+
+interface AzureTopicResult {
+  ['@search.score']: number;
+  id: string;
+  name: string;
 }

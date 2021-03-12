@@ -47,6 +47,7 @@ export default function TagTopics({
           setFetchedTopics={setDisplayedTopics}
           setCurrentInputValue={setTypedTopic}
           setLoading={setLoadingTopics}
+          limit={15}
         />
         <Popover
           getPopUpComponent={() => (
