@@ -49,11 +49,18 @@ export default function SearchMSFields({
 }
 
 // clearTimeout is called on unmount from useEffect hook
-const searchMicrosoftTopics = (query, setLoading, setFetchedTopics, limit) => {
+export const searchMicrosoftTopics = (
+  query,
+  setLoading,
+  setFetchedTopics,
+  limit,
+  timeBeforeSearch = 900,
+  skip
+) => {
   setLoading(true);
   const apiCallTimeout = setTimeout(
     () =>
-      topicSearch({topicQuery: query, limit: limit})
+      topicSearch({topicQuery: query, limit: limit, skip: skip})
         .then((microsoftTopics) => {
           setLoading(false);
           setFetchedTopics(microsoftTopics.data);
@@ -63,7 +70,7 @@ const searchMicrosoftTopics = (query, setLoading, setFetchedTopics, limit) => {
           setFetchedTopics([]);
           console.log(err, 'could not search topics');
         }),
-    900
+    timeBeforeSearch
   );
   return () => clearTimeout(apiCallTimeout);
 };

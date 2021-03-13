@@ -3,11 +3,11 @@ import PrimaryButton from '../Buttons/PrimaryButton';
 import TopicListItem from './TopicListItem';
 import {AttentionIcon, RemoveIcon} from '../../assets/GeneralActionIcons';
 import SearchMSFields from './SearchMSFields';
+import Popover, {StandardPopoverDisplay} from '../Popovers/Popover';
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 
 import '../Posts/Post/CreatePost/CreatePost.css';
 import './TagTopics.css';
-import Popover, {StandardPopoverDisplay} from '../Popovers/Popover';
-import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 
 export default function TagTopics({
   submittingForm,

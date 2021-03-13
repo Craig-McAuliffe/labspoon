@@ -14,7 +14,7 @@ import {
 import {abbrEnv, reCaptchaSiteKey} from '../../config';
 import {searchClient} from '../../algolia';
 import {createURL} from '../../helpers/search';
-import {GenericListItem} from '../../components/Results/Results';
+import Results, {GenericListItem} from '../../components/Results/Results';
 import 'instantsearch.css/themes/algolia.css';
 import {useContext} from 'react';
 import SearchBar from '../../components/SearchBar';
@@ -23,6 +23,10 @@ import reCaptcha from '../../helpers/activity';
 import useScript from '../../helpers/useScript';
 import useDomRemover from '../../helpers/useDomRemover';
 import ManualRecaptcha from '../../components/Recaptcha/ManualRecaptcha';
+import {TOPIC} from '../../helpers/resourceTypeDefinitions';
+import {UnpaddedPageContainer} from '../../components/Layout/Content';
+import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
+import {searchMicrosoftTopics} from '../../components/Topics/SearchMSFields';
 
 import './SearchPage.css';
 
@@ -30,12 +34,14 @@ const OVERVIEW = 'Overview';
 const POSTS = 'Posts';
 const USERS = 'Users';
 const GROUPS = 'Groups';
+const TOPICS_TAB_NAME = 'Topics';
 
 const urlToTabsMap = new Map([
   ['overview', OVERVIEW],
   ['posts', POSTS],
   ['users', USERS],
   ['groups', GROUPS],
+  ['topics', TOPICS_TAB_NAME],
 ]);
 
 const tabsToURLMap = new Map([
@@ -43,6 +49,7 @@ const tabsToURLMap = new Map([
   [POSTS, 'posts'],
   [USERS, 'users'],
   [GROUPS, 'groups'],
+  [TOPICS_TAB_NAME, 'topics'],
 ]);
 
 const SearchPageActiveTabContext = React.createContext();
@@ -52,7 +59,11 @@ export default function SearchPage() {
   const [tab, setTab] = useState(OVERVIEW);
   const [searchState, setSearchState] = useState(urlToSearchState(location));
   const [isBot, setIsBot] = useState(false);
+  const [topicsResults, setTopicsResults] = useState([]);
   const history = useHistory();
+  useEffect(() => {
+    setTopicsResults([]);
+  }, [searchState.query]);
 
   useScript(
     `https://www.google.com/recaptcha/api.js?render=${reCaptchaSiteKey}`
@@ -84,15 +95,17 @@ export default function SearchPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 
-  const tabs = [OVERVIEW, POSTS, USERS, GROUPS].map((tabName) => (
-    <button
-      onClick={() => updateTab(tabName)}
-      key={tabName}
-      className={tabName === tab ? 'feed-tab-active' : 'feed-tab-inactive'}
-    >
-      <h3>{tabName}</h3>
-    </button>
-  ));
+  const tabs = [OVERVIEW, POSTS, USERS, GROUPS, TOPICS_TAB_NAME].map(
+    (tabName) => (
+      <button
+        onClick={() => updateTab(tabName)}
+        key={tabName}
+        className={tabName === tab ? 'feed-tab-active' : 'feed-tab-inactive'}
+      >
+        <h3>{tabName}</h3>
+      </button>
+    )
+  );
 
   let results;
   switch (tab) {
@@ -112,6 +125,45 @@ export default function SearchPage() {
       break;
   }
   if (isBot) return <ManualRecaptcha successFunction={() => setIsBot(false)} />;
+
+  const tabsDisplay = (
+    <div className="feed-tabs-container">
+      <div className="feed-tabs-layout">{tabs}</div>
+    </div>
+  );
+  let pageContent = (
+    <InstantSearch
+      searchClient={searchClient}
+      indexName={tabToIndex(tab)}
+      searchState={searchState}
+      createURL={createURL}
+      refresh
+    >
+      <SearchBox
+        translations={{
+          placeholder: 'Edit your query',
+        }}
+        submit={<img src="" alt="" />}
+      />
+      {tabsDisplay}
+      {searchState.query ? results : <></>}
+    </InstantSearch>
+  );
+  if (tab === TOPICS_TAB_NAME)
+    pageContent = (
+      <>
+        {tabsDisplay}
+        {searchState.query ? (
+          <TopicsSearchAndResults
+            query={searchState.query}
+            topicsResults={topicsResults}
+            setTopicsResults={setTopicsResults}
+          />
+        ) : (
+          <></>
+        )}
+      </>
+    );
   return (
     <SearchPageActiveTabContext.Provider
       value={{
@@ -119,30 +171,10 @@ export default function SearchPage() {
         setActiveTab: updateTab,
       }}
     >
-      <div className="content-layout">
-        <div className="feed-container">
-          <div className="search-page-search-container">
-            <InstantSearch
-              searchClient={searchClient}
-              indexName={tabToIndex(tab)}
-              searchState={searchState}
-              createURL={createURL}
-              refresh
-            >
-              <SearchBox
-                translations={{
-                  placeholder: 'Edit your query',
-                }}
-                submit={<img src="" alt="" />}
-              />
-              <div className="feed-tabs-container">
-                <div className="feed-tabs-layout">{tabs}</div>
-              </div>
-              {searchState.query ? results : <></>}
-            </InstantSearch>
-          </div>
-        </div>
-      </div>
+      {' '}
+      <UnpaddedPageContainer>
+        <div className="search-page-search-container">{pageContent}</div>
+      </UnpaddedPageContainer>
     </SearchPageActiveTabContext.Provider>
   );
 }
@@ -290,6 +322,54 @@ const PostsResults = () => (
   </IndexResults>
 );
 
+function TopicsSearchAndResults({query, topicsResults, setTopicsResults}) {
+  const [loading, setLoading] = useState(false);
+  const [skip, setSkip] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const LIMIT = 15;
+  const addResourceTypeThenSetTopics = (topics) => {
+    setTopicsResults((currentTopics) => [
+      ...currentTopics,
+      ...topics
+        .map((topic) => {
+          topic.resourceType = TOPIC;
+          return topic;
+        })
+        .slice(0, LIMIT),
+    ]);
+    if (topics.length <= LIMIT) setHasMore(false);
+    setSkip((currentSkip) => currentSkip + LIMIT);
+  };
+
+  useEffect(() => {
+    if (query.length === 0) return;
+    // already results from tab change
+    if (topicsResults.length > 0) return;
+    return fetchTopics();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query]);
+
+  const fetchTopics = () =>
+    searchMicrosoftTopics(
+      query,
+      setLoading,
+      addResourceTypeThenSetTopics,
+      LIMIT + 1,
+      0,
+      skip
+    );
+
+  return (
+    <>
+      <Results
+        results={topicsResults}
+        hasMore={hasMore}
+        fetchMore={fetchTopics}
+      />
+      {loading && <LoadingSpinner />}
+    </>
+  );
+}
 const urlToSearchState = (location) => qs.parse(location.search.slice(1));
 
 const tabToIndex = (tab) => {

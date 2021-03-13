@@ -15,12 +15,15 @@ const db = admin.firestore();
 export const topicSearch = functions.https.onCall(async (data) => {
   const topicQuery = data.topicQuery;
   const limit = data.limit;
+  const skip = data.skip;
   if (topicQuery === undefined)
     throw new functions.https.HttpsError(
       'invalid-argument',
       'A topic query must be provided'
     );
-  const searchUrl = `https://topics-basic.search.windows.net/indexes/topic-search-by-name/docs?search=${topicQuery}&$top=${limit}&api-version=2020-06-30`;
+  const searchUrl = `https://topics-basic.search.windows.net/indexes/topic-search-by-name/docs?search=${topicQuery}&$top=${limit}${
+    skip ? '&$skip=' + skip : ''
+  }&api-version=2020-06-30`;
   const apiCallConfig = {
     headers: {
       ['Content-Type']: 'application/json',

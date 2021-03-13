@@ -48,7 +48,6 @@ export default function Results({
   const currentLocation = useLocation().pathname;
   const filterableResults = useContext(FilterableResultsContext);
   const loading = filterableResults.loadingResults;
-
   useEffect(() => {
     const currentResourceTypes = new Set();
     setResultComponents(
