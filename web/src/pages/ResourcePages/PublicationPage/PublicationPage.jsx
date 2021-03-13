@@ -153,7 +153,10 @@ export default function PublicationPage() {
         limit={10}
         tabs={relationshipFilter}
         getCustomComponentAboveFeed={() => (
-          <QuickCreatePublicationPost publication={publicationDetails} />
+          <QuickCreatePublicationPost
+            publication={publicationDetails}
+            publicationID={publicationID}
+          />
         )}
       >
         <PaddedContent>
@@ -234,7 +237,7 @@ function RetrieveMoreReferences({publicationID, publication}) {
   );
 }
 
-function QuickCreatePublicationPost({publication}) {
+function QuickCreatePublicationPost({publication, publicationID}) {
   const [isCreating, setIsCreating] = useState(false);
   const {userProfile} = useContext(AuthContext);
   if (!userProfile) return null;
@@ -257,6 +260,7 @@ function QuickCreatePublicationPost({publication}) {
       </div>
       <CreatePost
         preTaggedResourceType={PUBLICATION}
+        preTaggedResourceID={publicationID}
         preTaggedResourceDetails={publication}
         onSuccess={() => setIsCreating(false)}
         keepExpanded={true}

@@ -29,6 +29,7 @@ export default function CreatePost({
   preTaggedResourceType,
   preTaggedResourceDetails,
   onSuccess,
+  preTaggedResourceID,
 }) {
   const {user, userProfile} = useContext(AuthContext);
   const [creatingPost, setCreatingPost] = useState(keepExpanded);
@@ -87,6 +88,7 @@ export default function CreatePost({
               taggedResourceType={preTaggedResourceType}
               taggedResourceDetails={preTaggedResourceDetails}
               onSuccess={onSuccess}
+              preTaggedResourceID={preTaggedResourceID}
             />
           ) : (
             <PostTypeSpecificForm
@@ -207,6 +209,7 @@ export function openTwitterWithPopulatedTweet(richText, topics) {
 export function QuickCreatePostFromResource({
   taggedResourceType,
   taggedResourceDetails,
+  preTaggedResourceID,
 }) {
   const {selectedTopics, setPostSuccess, setSubmittingPost} = useContext(
     CreatingPostContext
@@ -217,6 +220,7 @@ export function QuickCreatePostFromResource({
     switch (taggedResourceType) {
       case PUBLICATION:
         res[PUBLICATION] = taggedResourceDetails;
+        res[PUBLICATION].id = preTaggedResourceID;
         return submitCreatePostWithPublication(
           res,
           isTweeting,
