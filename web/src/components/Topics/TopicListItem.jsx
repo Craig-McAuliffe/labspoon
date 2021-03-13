@@ -29,7 +29,7 @@ export default function TopicListItem({
               className="topic-list-item-ms-acknowledgement"
               href="https://aka.ms/msracad"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
             >
               Powered by Microsoft Academic
             </a>
