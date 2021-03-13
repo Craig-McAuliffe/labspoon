@@ -42,6 +42,7 @@ export default function Results({
   fetchMore,
   activeTabID,
   isFollowsPageResults,
+  customEndMessage,
 }) {
   const [resourceTypes, setResourceTypes] = useState(new Set());
   const [resultComponents, setResultComponents] = useState([]);
@@ -86,7 +87,7 @@ export default function Results({
       dataLength={resultComponents.length}
       hasMore={hasMore}
       next={fetchMore}
-      endMessage={endMessage}
+      endMessage={customEndMessage ? customEndMessage : endMessage}
       style={{minWidth: '100%', overflow: 'visible'}}
     >
       {loading && <LoadingSpinner />}

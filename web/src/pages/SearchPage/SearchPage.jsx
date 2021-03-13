@@ -52,6 +52,7 @@ const tabsToURLMap = new Map([
   [TOPICS_TAB_NAME, 'topics'],
 ]);
 
+const TOPIC_SEARCH_LIMIT = 15;
 const SearchPageActiveTabContext = React.createContext();
 
 export default function SearchPage() {
@@ -110,7 +111,14 @@ export default function SearchPage() {
   let results;
   switch (tab) {
     case OVERVIEW:
-      results = <OverviewResults setTab={updateTab} />;
+      results = (
+        <OverviewResults
+          setTab={updateTab}
+          query={searchState ? searchState.query : undefined}
+          topicsResults={topicsResults}
+          setTopicsResults={setTopicsResults}
+        />
+      );
       break;
     case POSTS:
       results = <PostsResults />;
@@ -197,28 +205,42 @@ const IndexResults = connectStateResults(
   }
 );
 
-const AllResults = connectStateResults(({allSearchResults, children}) => {
-  const hasResults =
-    allSearchResults &&
-    Object.values(allSearchResults).some(
-      (individualIndexResults) => individualIndexResults.nbHits > 0
+const AllResults = connectStateResults(
+  ({allSearchResults, query, topicsResults, setTopicsResults, children}) => {
+    const hasResults =
+      allSearchResults &&
+      Object.values(allSearchResults).some(
+        (individualIndexResults) => individualIndexResults.nbHits > 0
+      );
+    return hasResults ? (
+      children
+    ) : (
+      // These indexes trigger the AllResults to re-render and check other indexes
+      <>
+        <Index indexName={`${abbrEnv}_POSTS`} />
+        <Index indexName={`${abbrEnv}_USERS`} />
+        <Index indexName={`${abbrEnv}_GROUPS`} />
+        <div className="search-page-no-results-message">
+          Hmm, looks like there&#39;s no content on Labspoon that matches your
+          search.
+        </div>
+        {topicsResults.length > 0 && (
+          <h3 className="search-page-no-results-topics-title">
+            Follow topics for future updates:
+          </h3>
+        )}
+        <TopicsSearchAndResults
+          query={query}
+          topicsResults={topicsResults}
+          setTopicsResults={setTopicsResults}
+          overview={true}
+        />
+        <LatestPosts />
+        <TryAnotherSearch />
+      </>
     );
-  return hasResults ? (
-    children
-  ) : (
-    // These indexes trigger the AllResults to re-render and check other indexes
-    <>
-      <Index indexName={`${abbrEnv}_POSTS`} />
-      <Index indexName={`${abbrEnv}_USERS`} />
-      <Index indexName={`${abbrEnv}_GROUPS`} />
-      <div className="search-page-no-results-message">
-        {`Hmm, looks like there's nothing on Labspoon that matches your search.`}
-      </div>
-      <TryAnotherSearch />
-      <LatestPosts />
-    </>
-  );
-});
+  }
+);
 
 // Adds a 'see more' button to the end of a hits component. Used for switching to tabs from the federated overview search.
 function SeeMoreWrapper({onClick, resourceType, children}) {
@@ -263,9 +285,13 @@ function OverviewResultsSection({
   );
 }
 
-const OverviewResults = ({setTab}) => (
+const OverviewResults = ({setTab, query, topicsResults, setTopicsResults}) => (
   <>
-    <AllResults>
+    <AllResults
+      query={query}
+      topicsResults={topicsResults}
+      setTopicsResults={setTopicsResults}
+    >
       <OverviewResultsSection
         setTab={setTab}
         indexSuffix={'_POSTS'}
@@ -322,11 +348,20 @@ const PostsResults = () => (
   </IndexResults>
 );
 
-function TopicsSearchAndResults({query, topicsResults, setTopicsResults}) {
+function TopicsSearchAndResults({
+  query,
+  topicsResults,
+  setTopicsResults,
+  overview,
+}) {
   const [loading, setLoading] = useState(false);
   const [skip, setSkip] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const LIMIT = 15;
+
+  useEffect(() => {
+    if (overview) setHasMore(false);
+  }, [overview]);
+
   const addResourceTypeThenSetTopics = (topics) => {
     setTopicsResults((currentTopics) => [
       ...currentTopics,
@@ -335,10 +370,10 @@ function TopicsSearchAndResults({query, topicsResults, setTopicsResults}) {
           topic.resourceType = TOPIC;
           return topic;
         })
-        .slice(0, LIMIT),
+        .slice(0, TOPIC_SEARCH_LIMIT),
     ]);
-    if (topics.length <= LIMIT) setHasMore(false);
-    setSkip((currentSkip) => currentSkip + LIMIT);
+    if (topics.length <= TOPIC_SEARCH_LIMIT) setHasMore(false);
+    setSkip((currentSkip) => currentSkip + TOPIC_SEARCH_LIMIT);
   };
 
   useEffect(() => {
@@ -354,7 +389,7 @@ function TopicsSearchAndResults({query, topicsResults, setTopicsResults}) {
       query,
       setLoading,
       addResourceTypeThenSetTopics,
-      LIMIT + 1,
+      TOPIC_SEARCH_LIMIT + 1,
       0,
       skip
     );
@@ -362,9 +397,10 @@ function TopicsSearchAndResults({query, topicsResults, setTopicsResults}) {
   return (
     <>
       <Results
-        results={topicsResults}
+        results={overview ? topicsResults.slice(0, 8) : topicsResults}
         hasMore={hasMore}
         fetchMore={fetchTopics}
+        customEndMessage={overview ? ' ' : null}
       />
       {loading && <LoadingSpinner />}
     </>

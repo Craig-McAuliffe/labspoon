@@ -82,3 +82,12 @@
   margin-top: 10vh;
   color: #5d5d65;
 }
+
+.search-page-no-results-topics-title {
+  margin-top: 20px;
+  color: #5d5d65;
+}
+
+.search-page-try-another-search {
+  margin-bottom: 80px;
+}
