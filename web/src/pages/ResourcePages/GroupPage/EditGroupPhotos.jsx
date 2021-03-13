@@ -125,7 +125,7 @@ function GroupImageUpload({groupID, refresh, tooManyPhotos}) {
   if (tooManyPhotos)
     return (
       <div className="edit-group-photos-more-pictures-section">
-        <h3>Max photos reached. 1000.</h3>
+        <h3>Max photos reached. {MAX_PHOTOS_PER_GROUP}.</h3>
         <p>
           You have uploaded the maximum number of photos allowed for a group.
           Please delete some if you would like to add new ones. If this is a
