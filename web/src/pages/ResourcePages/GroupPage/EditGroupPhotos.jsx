@@ -11,7 +11,7 @@ import ImageUpload from '../../../components/Images/ImageUpload';
 
 import './EditGroupPhotos.css';
 
-const MAX_PHOTOS_PER_GROUP = 1000;
+const MAX_PHOTOS_PER_GROUP = 200;
 export default function EditGroupPhotos({children}) {
   const limit = 9;
   const [photos, setPhotos] = useState([]);
