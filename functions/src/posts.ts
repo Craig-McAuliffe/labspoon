@@ -16,11 +16,7 @@ import {
   User,
   UserStatsRef,
 } from './users';
-import {
-  TaggedTopic,
-  convertTaggedTopicToTopic,
-  handleTopicsNoID,
-} from './topics';
+import {TaggedTopic, convertTaggedTopicToTopic} from './topics';
 import {OpenPosition} from './openPositions';
 import {ArticleBodyChild} from './researchFocuses';
 
@@ -38,10 +34,6 @@ export const createPost = functions.https.onCall(async (data, context) => {
 
   const postDocRef = db.collection('posts').doc();
   const postID = postDocRef.id;
-
-  const postTopics: TaggedTopic[] = [];
-  const matchedTopicsPromises = await handleTopicsNoID(data.topics, postTopics);
-  await Promise.all(matchedTopicsPromises);
 
   if (data.publication && !data.publication.id) {
     if (data.isCustomPublication) {
@@ -71,11 +63,11 @@ export const createPost = functions.https.onCall(async (data, context) => {
     postType: data.postType,
     author: author,
     text: data.title,
-    topics: postTopics,
+    topics: data.topics,
     customTopics: data.customTopics,
     timestamp: new Date(),
     unixTimeStamp: Math.floor(new Date().getTime() / 1000),
-    filterTopicIDs: postTopics.map(
+    filterTopicIDs: data.topics.map(
       (taggedTopic: TaggedTopic) => taggedTopic.id
     ),
     id: postID,

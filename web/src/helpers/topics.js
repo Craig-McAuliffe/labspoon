@@ -40,58 +40,6 @@ export function getPaginatedTopicsFromCollectionRef(
     .catch((err) => console.log(err));
 }
 
-export function handleTaggedTopicsNoIDs(taggedResourceTopics, collectedTopics) {
-  const mappingTopicsPromises = taggedResourceTopics.map(
-    async (taggedTopicNoID) => {
-      return db
-        .doc(`MSFields/${taggedTopicNoID.microsoftID}`)
-        .get()
-        .then(async (ds) => {
-          function addLabspoonTopicToTaggedResource(
-            correspondingLabspoonTopicID
-          ) {
-            collectedTopics.push(
-              convertTopicToTaggedTopic(
-                taggedTopicNoID,
-                correspondingLabspoonTopicID
-              )
-            );
-          }
-          if (ds.exists) {
-            const MSFieldData = ds.data();
-            if (MSFieldData.processed)
-              addLabspoonTopicToTaggedResource(MSFieldData.processed);
-            else {
-              // This should not be possible. All dbMSFields should be processed
-              // upon creation.
-              console.error(
-                'no Labspoon topic corresponding to MSField ' +
-                  taggedTopicNoID.microsoftID
-              );
-            }
-          } else {
-            const labspoonTopicID = await waitThenReFetchMSField(
-              taggedTopicNoID
-            );
-            if (labspoonTopicID === undefined) {
-              console.error(
-                `could not find MSField with id ${taggedTopicNoID.microsoftID} after delayed refetch`
-              );
-            } else {
-              addLabspoonTopicToTaggedResource(labspoonTopicID);
-            }
-          }
-        })
-        .catch((err) =>
-          console.error(
-            `could not fetch msfield with id ${taggedTopicNoID.microsoftID}, therefore the topic has not been added ${err}`
-          )
-        );
-    }
-  );
-  return Promise.all(mappingTopicsPromises);
-}
-
 export async function waitThenReFetchMSField(topic) {
   const MSFieldID = topic.microsoftID;
   const timeoutPromise = new Promise((resolve) => {

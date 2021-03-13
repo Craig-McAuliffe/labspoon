@@ -3,7 +3,6 @@ import firebase from '../../../../firebase';
 import {CreatePostTextArea} from '../../../Forms/FormTextInput';
 import PostForm from './PostForm';
 import TypeOfTaggedResourceDropDown from './TypeOfTaggedResourceDropDown';
-import {handlePostTopics} from '../../../Topics/TagTopics';
 import {
   CreatingPostContext,
   sortThrownCreatePostErrors,
@@ -61,9 +60,7 @@ export default function OpenPositionPostForm({
       return;
     }
     res.postType = {id: 'openPositionPost', name: 'Open Position'};
-    const taggedTopics = handlePostTopics(selectedTopics);
-    res.customTopics = taggedTopics.customTopics;
-    res.topics = taggedTopics.DBTopics;
+    res.topics = selectedTopics;
     const dbOpenPosition = algoliaOpenPosToDBOpenPosListItem(
       taggedOpenPosition
     );

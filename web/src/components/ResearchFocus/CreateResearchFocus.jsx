@@ -161,6 +161,7 @@ export default function CreateResearchFocus() {
           submittingForm={submitting}
           selectedTopics={selectedTopics}
           setSelectedTopics={setSelectedTopics}
+          noCustomTopics={true}
         />
         <FormImageUpload name="photos" multiple={true} maxImages={9} />
         <CreateResourceFormActions

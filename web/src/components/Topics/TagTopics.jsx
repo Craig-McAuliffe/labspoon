@@ -122,7 +122,8 @@ const TopicsList = ({
             setDuplicateTopic,
             displayedTopic.microsoftID,
             displayedTopic.normalisedName,
-            displayedTopics
+            displayedTopics,
+            displayedTopic.id
           )
         }
         smallVersion
@@ -204,7 +205,8 @@ const addTopicToPost = (
   setDuplicateTopic,
   microsoftID,
   normalisedTopicName,
-  displayedTopics
+  displayedTopics,
+  topicID
 ) => {
   let preExistingTopic = undefined;
   if (microsoftID === undefined) {
@@ -215,6 +217,7 @@ const addTopicToPost = (
             name: displayedTopic.name,
             microsoftID: displayedTopic.microsoftID,
             normalisedName: displayedTopic.normalisedName,
+            id: topicID,
           },
         ];
     });
@@ -224,6 +227,7 @@ const addTopicToPost = (
       name: topicName,
       microsoftID: microsoftID,
       normalisedName: normalisedTopicName,
+      id: topicID,
     };
     if (
       selectedTopics.some(

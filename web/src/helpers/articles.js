@@ -1,9 +1,7 @@
 import {getTitleTextAndBody} from '../components/Forms/Articles/HeaderAndBodyArticleInput';
-import {handlePostTopics} from '../components/Topics/TagTopics';
 import {db, firebaseFirestoreOptions} from '../firebase';
 import {convertGroupToGroupRef} from './groups';
 import {RESEARCHFOCUSES, TECHNIQUES} from './resourceTypeDefinitions';
-import {handleTaggedTopicsNoIDs} from './topics';
 import {userToUserRef} from './users';
 
 const MAX_ARTICLE_TYPE_PER_GROUP = 20;
@@ -48,12 +46,8 @@ export default async function addArticleToDB(
     }
   }
   const article = {};
-  const {customTopics, DBTopics} = handlePostTopics(selectedTopics);
-  article.customTopics = customTopics;
-  const taggedTopicsArray = [];
-  await handleTaggedTopicsNoIDs(DBTopics, taggedTopicsArray);
-  article.topics = taggedTopicsArray;
-  article.filterTopicIDs = taggedTopicsArray.map((topic) => topic.id);
+  article.topics = selectedTopics;
+  article.filterTopicIDs = selectedTopics.map((topic) => topic.id);
   article.group = convertGroupToGroupRef(selectedGroup);
   article.photoURLs = photoURLs;
   article.author = userToUserRef(userProfile, userProfile.id);

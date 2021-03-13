@@ -2,7 +2,7 @@ import * as functions from 'firebase-functions';
 import {admin} from './config';
 import {GroupRef, groupRefToGroupSignature, GroupSignature} from './groups';
 
-import {TaggedTopic, handleTopicsNoID} from './topics';
+import {TaggedTopic} from './topics';
 import {UserRef, checkAuthAndGetUserFromContext} from './users';
 
 const db = admin.firestore();
@@ -41,20 +41,14 @@ export const createOpenPosition = functions.https.onCall(
       description: data.description,
     };
 
-    const openPositionTopics: TaggedTopic[] = [];
-    const matchedTopicsPromises = await handleTopicsNoID(
-      data.topics,
-      openPositionTopics
-    );
-    await Promise.all(matchedTopicsPromises);
     const processedOpenPosition: OpenPosition = {
       author: author,
       content: content,
-      topics: openPositionTopics,
+      topics: data.topics,
       group: data.group,
       timestamp: new Date(),
       unixTimeStamp: Math.floor(new Date().getTime() / 1000),
-      filterTopicIDs: openPositionTopics.map(
+      filterTopicIDs: data.topics.map(
         (taggedTopic: TaggedTopic) => taggedTopic.id
       ),
     };

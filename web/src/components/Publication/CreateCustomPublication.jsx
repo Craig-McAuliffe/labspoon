@@ -18,7 +18,6 @@ import ErrorMessage from '../Forms/ErrorMessage';
 import {AuthContext} from '../../App';
 import {userToCustomPubUserRef} from '../../helpers/users';
 import TagTopics from '../Topics/TagTopics';
-import {handleTaggedTopicsNoIDs} from '../../helpers/topics';
 import {Alert} from 'react-bootstrap';
 
 export const MAX_DAILY_PUBLICATIONS_COUNT = 30;
@@ -235,10 +234,8 @@ export async function createCustomPublication(
   res.authors = authorRefs;
   res.isCustomPublication = true;
   res.date = new Date().toISOString();
-  const taggedTopicsArray = [];
-  await handleTaggedTopicsNoIDs(selectedTopics, taggedTopicsArray);
-  res.topics = taggedTopicsArray;
-  res.filterTopicIDs = taggedTopicsArray.map((topic) => topic.id);
+  res.topics = selectedTopics;
+  res.filterTopicIDs = selectedTopics.map((topic) => topic.id);
   res.filterAuthorIDs = authors.map((author) => author.id);
   res.sources = [
     {

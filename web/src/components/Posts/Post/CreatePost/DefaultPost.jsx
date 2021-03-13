@@ -8,7 +8,6 @@ import {
   openTwitterWithPopulatedTweet,
   sortThrownCreatePostErrors,
 } from './CreatePost';
-import {handlePostTopics} from '../../../Topics/TagTopics';
 import TypeOfTaggedResourceDropDown from './TypeOfTaggedResourceDropDown';
 import {FilterableResultsContext} from '../../../FilterableResults/FilterableResults';
 import {POST} from '../../../../helpers/resourceTypeDefinitions';
@@ -28,9 +27,7 @@ export default function DefaultPost({setCreatingPost, postType, setPostType}) {
   const {setResults} = useContext(FilterableResultsContext);
   const submitChanges = (res, isTweeting) => {
     res.postType = {id: 'defaultPost', name: 'Default'};
-    const taggedTopics = handlePostTopics(selectedTopics);
-    res.customTopics = taggedTopics.customTopics;
-    res.topics = taggedTopics.DBTopics;
+    res.topics = selectedTopics;
     createPost(res)
       .then((response) => {
         if (isTweeting)

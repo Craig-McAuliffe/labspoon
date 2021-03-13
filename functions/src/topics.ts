@@ -38,17 +38,32 @@ export const topicSearch = functions.https.onCall(async (data) => {
   const formattedTopics = searchResults.map((azureTopic) =>
     azureTopicToTopicNoID(azureTopic)
   );
-  const createTopicsPromises = formattedTopics.map((topicNoLabspoonID, i) =>
+  const topicsWithIDs: Topic[] = [];
+  const createTopicsPromises = formattedTopics.map((topicNoLabspoonID) =>
     db
       .doc(`MSFields/${topicNoLabspoonID.microsoftID}`)
       .get()
       .then((doc) => {
-        if (doc.exists) return;
-        return createFieldAndTopic(topicNoLabspoonID);
+        const addTopicWithID = (topicID: string) => {
+          const topicWithID: TaggedTopic = {
+            id: topicID,
+            microsoftID: topicNoLabspoonID.microsoftID,
+            name: topicNoLabspoonID.name,
+            normalisedName: topicNoLabspoonID.normalisedName,
+          };
+          topicsWithIDs.push(topicWithID);
+        };
+
+        if (doc.exists) {
+          const msFieldData = doc.data() as MAKField;
+          addTopicWithID(msFieldData.processed);
+          return;
+        }
+        return createFieldAndTopic(topicNoLabspoonID, addTopicWithID);
       })
   );
   await Promise.all(createTopicsPromises);
-  return formattedTopics;
+  return topicsWithIDs;
 });
 
 export async function createFieldAndTopic(

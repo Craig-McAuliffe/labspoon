@@ -63,7 +63,7 @@ const searchMicrosoftTopics = (query, setLoading, setFetchedTopics, limit) => {
           setFetchedTopics([]);
           console.log(err, 'could not search topics');
         }),
-    500
+    900
   );
   return () => clearTimeout(apiCallTimeout);
 };

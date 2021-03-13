@@ -5,7 +5,6 @@ import {toUserAlgoliaFilterRef, User} from './users';
 import {Group, groupToAlgoliaGroupRef} from './groups';
 import {Post, postToPostRef} from './posts';
 import {OpenPosition, openPosToOpenPosListItem} from './openPositions';
-import {Publication, publicationToPublicationRef} from './publications';
 
 const algoliaConfig = config.algolia;
 
@@ -13,7 +12,6 @@ const USERS_INDEX = environment + '_USERS';
 const GROUPS_INDEX = environment + '_GROUPS';
 const POSTS_INDEX = environment + '_POSTS';
 const OPENPOSITIONS_INDEX = environment + '_OPENPOSITIONS';
-const PUBLICATIONS_INDEX = environment + '_PUBLICATIONS';
 
 let algoliaClient: SearchClient;
 if (algoliaConfig) {
@@ -237,49 +235,5 @@ export const updateOpenPositionToSearchIndex = functions.firestore
       openPosToOpenPosListItem(newOpenPositionData, openPositionID),
       ResourceTypes.OPEN_POSITION,
       OPENPOSITIONS_INDEX
-    );
-  });
-
-export const configurePublicationSearchIndex = functions.https.onRequest(
-  (_, res) =>
-    configureSearchIndex(res, PUBLICATIONS_INDEX, [
-      'unordered(title)',
-      'unordered(topics)',
-      'unordered(authors.name)',
-    ])
-);
-
-export const addPublicationToSearchIndex = functions.firestore
-  .document(`publications/{publicationID}`)
-  .onCreate((change, context): boolean => {
-    const publication = change.data() as Publication;
-    return addToIndex(
-      context.params.publicationID,
-      publicationToPublicationRef(publication),
-      ResourceTypes.PUBLICATION,
-      PUBLICATIONS_INDEX
-    );
-  });
-
-export const updatePublicationToSearchIndex = functions.firestore
-  .document(`publications/{publicationID}`)
-  .onUpdate((change, context): boolean => {
-    const newPublicationData = change.after.data() as Publication;
-    const oldPublicationData = change.before.data() as Publication;
-    const publicationID = context.params.publicationID;
-    if (
-      JSON.stringify(
-        publicationToPublicationRef(newPublicationData, publicationID)
-      ) ===
-      JSON.stringify(
-        publicationToPublicationRef(oldPublicationData, publicationID)
-      )
-    )
-      return false;
-    return addToIndex(
-      context.params.publicationID,
-      publicationToPublicationRef(newPublicationData, publicationID),
-      ResourceTypes.PUBLICATION,
-      PUBLICATIONS_INDEX
     );
   });
