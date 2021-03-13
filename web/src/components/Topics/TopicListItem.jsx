@@ -23,16 +23,17 @@ export default function TopicListItem({
     if (dedicatedPage)
       return (
         <div>
-          {' '}
           <h2>{topic.name}</h2>
-          <a
-            className="topic-list-item-ms-acknowledgement"
-            href="https://aka.ms/msracad"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Powered by Microsoft Academic
-          </a>
+          {topic.microsoftID && (
+            <a
+              className="topic-list-item-ms-acknowledgement"
+              href="https://aka.ms/msracad"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Powered by Microsoft Academic
+            </a>
+          )}
         </div>
       );
     if (noLink) {
