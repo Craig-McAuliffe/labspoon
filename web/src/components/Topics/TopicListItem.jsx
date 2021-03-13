@@ -20,7 +20,21 @@ export default function TopicListItem({
     return null;
   }
   const displayType = () => {
-    if (dedicatedPage) return <h2>{topic.name}</h2>;
+    if (dedicatedPage)
+      return (
+        <div>
+          {' '}
+          <h2>{topic.name}</h2>
+          <a
+            className="topic-list-item-ms-acknowledgement"
+            href="https://aka.ms/msracad"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Powered by Microsoft Academic
+          </a>
+        </div>
+      );
     if (noLink) {
       if (isSmallVersion) return <h4>{topic.name}</h4>;
       return <h3>{topic.name}</h3>;

@@ -26,3 +26,13 @@
 .topic-list-item-container h3 {
   margin-bottom: 0px;
 }
+
+.topic-list-item-ms-acknowledgement {
+  color: #99999f;
+  font-size: 0.9em;
+}
+
+.topic-list-item-ms-acknowledgement:hover {
+  text-decoration: none;
+  color: #99999f;
+}
