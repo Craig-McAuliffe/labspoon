@@ -18,10 +18,15 @@ import FilterableResults, {
   NewFilterMenuWrapper,
 } from '../../components/FilterableResults/FilterableResults';
 import TopicPageSider from './TopicPageSider';
+import MAGRouterDisplay from '../../components/MAGRouter';
+import {
+  OPENPOSITION,
+  OPENPOSITIONS,
+  USERS,
+} from '../../helpers/resourceTypeDefinitions';
+import {getPaginatedResourcesFromCollectionRef} from '../../helpers/resources';
 
 import './TopicPage.css';
-import MAGRouterDisplay from '../../components/MAGRouter';
-import {USERS} from '../../helpers/resourceTypeDefinitions';
 
 async function fetchTopicDetailsFromDB(topicID) {
   return db
@@ -76,6 +81,19 @@ function topicPageFeedDataFromDB(skip, limit, filterOptions, topicID, last) {
           groupsCollection,
           limit,
           last
+        ),
+        null,
+      ];
+    case OPENPOSITIONS:
+      const openPositionsCollection = db.collection(
+        `topics/${topicID}/openPositions`
+      );
+      return [
+        getPaginatedResourcesFromCollectionRef(
+          openPositionsCollection,
+          limit,
+          last,
+          OPENPOSITION
         ),
         null,
       ];
@@ -146,6 +164,13 @@ export default function TopicPage() {
           data: {
             id: 'groups',
             name: 'Groups',
+          },
+        },
+        {
+          enabled: false,
+          data: {
+            id: OPENPOSITIONS,
+            name: 'Open Positions',
           },
         },
       ],

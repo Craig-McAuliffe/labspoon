@@ -198,6 +198,10 @@ service cloud.firestore {
       match /groups/{groupID} {
         allow read;
       }
+
+      match /openPositions/{openPositionID} {
+        allow read;
+      }
     }
 function userIsVerified(userID){
    return get(/databases/$(database)/documents/users/$(userID)).data.keys().hasAny(["isVerified"])
