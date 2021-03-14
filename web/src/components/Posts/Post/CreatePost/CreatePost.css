@@ -1,14 +1,15 @@
 .not-creating-post-button {
   box-shadow: 0px 0px 4px rgba(0, 0, 0, 30%);
-  padding: 15px;
+  padding: 13px;
   margin-bottom: 40px;
   min-width: 100%;
   text-align: start;
+  border: 2px solid #00507c;
 }
 
 .not-creating-post-button:hover {
-  border: 2px solid #00507c;
-  padding: 13px;
+  border: 3px solid #00507c;
+  padding: 12px;
 }
 .not-creating-post-button:hover .not-creating-post-text {
   color: #00507c;
