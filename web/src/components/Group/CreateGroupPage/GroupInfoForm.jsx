@@ -19,7 +19,7 @@ import './CreateGroupPage.css';
 import './GroupInfoForm.css';
 
 const CHARITY = 'charity';
-const RESEARCH_GROUP = 'researchGroup';
+export const RESEARCH_GROUP = 'researchGroup';
 
 // To do: check if the group exists OR pass argument that declares if editing or creating
 // Change onSubmit function depending on editing or creating

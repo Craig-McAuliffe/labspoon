@@ -15,8 +15,8 @@ import GoogleSignIn from '../GoogleSignIn.jsx';
 import {reCaptchaSiteKey} from '../../../config';
 import useScript from '../../../helpers/useScript';
 import useDomRemover from '../../../helpers/useDomRemover.js';
-import './SignupPage.css';
 import reCaptcha from '../../../helpers/activity.js';
+import './SignupPage.css';
 
 /**
  * Sign up page using the Firebase authentication handler
@@ -109,60 +109,6 @@ const SignUpForm = ({
 }) => {
   const {updateUserDetails} = useContext(AuthContext);
 
-  const submitChanges = async (values) => {
-    setLoading(true);
-
-    const defaultAlert = () =>
-      alert(
-        'Something went wrong. Please try refreshing the page and signing up again.'
-      );
-    const authenticateThenUpdateDB = () => {
-      firebase
-        .auth()
-        .createUserWithEmailAndPassword(values.email, values.password)
-        .then((result) => {
-          createUserDocOnSignUp(
-            result,
-            setLoading,
-            values.userName,
-            updateUserDetails
-          );
-        })
-        .catch((error) => {
-          console.log(error);
-          setLoading(false);
-          if (
-            error.message.includes(
-              'The email address is already in use by another account.'
-            )
-          ) {
-            alert(
-              `There is already a Labspoon account linked to that address.`
-            );
-          } else {
-            defaultAlert();
-          }
-        });
-    };
-    const reCaptchaFailFunction = () => {
-      setSavedInitialValues(values);
-      alert('Our security system thinks you might be a bot. Please try again');
-      setLoading(false);
-    };
-    const reCaptchaErrorFunction = () => {
-      setSavedInitialValues(values);
-      defaultAlert();
-      setLoading(false);
-    };
-    return reCaptcha(
-      0.4,
-      'sign_up',
-      authenticateThenUpdateDB,
-      reCaptchaFailFunction,
-      reCaptchaErrorFunction
-    );
-  };
-
   const initialValues = savedInitialValues
     ? savedInitialValues
     : {
@@ -203,7 +149,14 @@ const SignUpForm = ({
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
-      onSubmit={submitChanges}
+      onSubmit={(values) =>
+        submitSignUp(
+          values,
+          setLoading,
+          updateUserDetails,
+          setSavedInitialValues
+        )
+      }
     >
       <Form className="signup-form-title">
         <FormTextInput name="email" autoComplete="email" label="Email" />
@@ -240,6 +193,66 @@ function ReferrerAlert({referrer}) {
     default:
       return <></>;
   }
+}
+
+export async function submitSignUp(
+  values,
+  setLoading,
+  updateUserDetails,
+  setSavedInitialValues
+) {
+  if (setLoading) setLoading(true);
+  const defaultAlert = () =>
+    alert(
+      'Something went wrong. Please try refreshing the page and signing up again.'
+    );
+  const authenticateThenUpdateDB = () =>
+    firebase
+      .auth()
+      .createUserWithEmailAndPassword(values.email, values.password)
+      .then((result) =>
+        createUserDocOnSignUp(
+          result,
+          setLoading,
+          values.userName,
+          updateUserDetails
+        )
+      )
+      .catch((error) => {
+        console.log(error);
+        if (setLoading) setLoading(false);
+        if (
+          error.message.includes(
+            'The email address is already in use by another account.'
+          )
+        ) {
+          alert(`There is already a Labspoon account linked to that address.`);
+        } else {
+          defaultAlert();
+        }
+        return false;
+      });
+
+  const reCaptchaFailFunction = () => {
+    setSavedInitialValues(values);
+    alert('Our security system thinks you might be a bot. Please try again');
+    if (setLoading) setLoading(false);
+    return false;
+  };
+  const reCaptchaErrorFunction = () => {
+    setSavedInitialValues(values);
+    defaultAlert();
+    if (setLoading) setLoading(false);
+    return false;
+  };
+
+  return reCaptcha(
+    0.4,
+    'sign_up',
+    authenticateThenUpdateDB,
+    reCaptchaFailFunction,
+    reCaptchaErrorFunction
+  );
 }
 
 export default SignupPage;

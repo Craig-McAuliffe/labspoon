@@ -80,14 +80,16 @@ export function createUserDocOnSignUp(
       .then(() => {
         updateUserDetails(result.user);
         if (setLoading) setLoading(false);
+        return true;
       })
       .catch((err) => {
         console.log(err);
         firebase
           .auth()
-          .currentUser.delete.then(() =>
-            alert('Something went wrong. Please try again.')
-          )
+          .currentUser.delete.then(() => {
+            alert('Something went wrong. Please try again.');
+            return false;
+          })
           .catch((err) => {
             console.error(
               'unable to delete auth user with id' + result.user.uid,
@@ -96,16 +98,16 @@ export function createUserDocOnSignUp(
             alert(
               'Something went wrong. Please contact our support team at help@labspoon.com from the email address that you are trying to sign up with. We apologise for the inconvenience.'
             );
+            return false;
           });
         if (setLoading) setLoading(false);
       });
 
-  result.user
+  return result.user
     .updateProfile({displayName: userName})
     .then(() => addUserToDB())
     .catch((err) => {
       console.error(err);
-      addUserToDB();
     });
 }
 

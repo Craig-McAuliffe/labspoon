@@ -101,7 +101,9 @@ export default function LinkAuthorIDForm({submitBehaviour, cancel}) {
   return (
     <div>
       <h3>Connect your Labspoon account to your publications</h3>
-      <Alert variant="warning">Note: You can only do this once.</Alert>
+      <Alert variant="warning">
+        Note: This will permanently link your profile to the author.
+      </Alert>
       <form
         className="onboarding-author-link-form"
         onSubmit={(e) => {

@@ -42,6 +42,7 @@ import {PaddedContent} from '../../../components/Layout/Content';
 
 import './GroupPage.css';
 import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
+import {RichTextBody} from '../../../components/Article/Article';
 
 function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip) {
   const activeTab = filterOptions ? getActiveTabID(filterOptions) : null;
@@ -449,7 +450,13 @@ const GroupDetails = ({
         style={descriptionSize}
         ref={groupDescriptionRef}
       >
-        <Linkify tagName="p">{group.about}</Linkify>
+        <Linkify tagName="p">
+          {Array.isArray(group.about) ? (
+            <RichTextBody body={group.about} />
+          ) : (
+            group.about
+          )}
+        </Linkify>
       </div>
 
       <SeeMore

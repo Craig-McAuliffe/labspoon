@@ -40,6 +40,12 @@ const ChooseUserName = lazy(() =>
 const OpenPositionPage = lazy(() =>
   import('./pages/ResourcePages/OpenPositionPage/OpenPositionPage')
 );
+const QuickCreateGroup = lazy(() =>
+  import('./pages/ResourcePages/QuickCreateGroup')
+);
+const GeneratedPasswordPage = lazy(() =>
+  import('./pages/GeneratedPasswordPage')
+);
 
 import {SkeletonUserPage} from './pages/ResourcePages/UserPage';
 import AboutPage from './pages/AboutPage';
@@ -150,6 +156,12 @@ export default function Routes({user, setUser}) {
         </Route>
         <Route path="/researchFocus/:researchFocusID">
           <ResearchFocuses />
+        </Route>
+        <Route path="/quickCreateGroup">
+          <QuickCreateGroup />
+        </Route>
+        <Route path="/generatedPassword">
+          <GeneratedPasswordPage />
         </Route>
         <Route path="/notfound">
           <NotFoundPage />

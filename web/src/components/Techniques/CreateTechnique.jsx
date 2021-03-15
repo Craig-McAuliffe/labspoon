@@ -150,7 +150,7 @@ export default function CreateTechnique() {
           selectedGroup={selectedGroup}
           setSelectedGroup={setSelectedGroup}
         />
-        <HeaderAndBodyArticleInput name="technique" />
+        <HeaderAndBodyArticleInput name="technique" shouldAutoFocus={true} />
         <TagTopics
           submittingForm={submitting}
           selectedTopics={selectedTopics}

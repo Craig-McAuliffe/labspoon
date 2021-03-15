@@ -24,7 +24,7 @@ export default function CreateArticlePage() {
         onSubmit={(vals) => {}}
       >
         <Form>
-          <HeaderAndBodyArticleInput name="article" />
+          <HeaderAndBodyArticleInput name="article" shouldAutoFocus={true} />
           <PrimaryButton submit>Submit</PrimaryButton>
         </Form>
       </Formik>

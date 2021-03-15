@@ -1,0 +1,31 @@
+.quick-create-group-title {
+    color: #5D5D65;
+}
+
+.quick-create-group-twitter-url-input-container { 
+    display: flex;
+    align-items: center;
+    align-content: center;
+    flex-direction: column;
+    padding-top: 50px;
+}
+
+.quick-create-group-twitter-url-input-container h3 { 
+    color: #00507C;
+}
+
+.quick-create-group-submit-logo-container {
+    display: flex;
+    align-items: center;
+    align-content: center;
+    flex-direction: column;
+    padding: 50px 0px;
+}
+
+.quick-create-group-submit-logo-container button {
+    margin-bottom: 40px;
+}
+
+.quick-create-group-submit-logo-container svg {
+    height: 40px;
+}

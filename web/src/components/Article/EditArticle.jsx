@@ -110,7 +110,10 @@ export default function EditArticle({
         onSubmit={onSubmit}
       >
         <Form>
-          <HeaderAndBodyArticleInput name="articleText" />
+          <HeaderAndBodyArticleInput
+            name="articleText"
+            shouldAutoFocus={true}
+          />
           <CreateResourceFormActions
             submitting={submitting}
             submitText="Create"

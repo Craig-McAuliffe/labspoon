@@ -156,7 +156,10 @@ export default function CreateResearchFocus() {
           selectedGroup={selectedGroup}
           setSelectedGroup={setSelectedGroup}
         />
-        <HeaderAndBodyArticleInput name="researchFocus" />
+        <HeaderAndBodyArticleInput
+          name="researchFocus"
+          shouldAutoFocus={true}
+        />
         <TagTopics
           submittingForm={submitting}
           selectedTopics={selectedTopics}

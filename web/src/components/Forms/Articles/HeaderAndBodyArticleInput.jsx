@@ -13,6 +13,8 @@ export default function HeaderAndBodyArticleInput({
   label,
   noTitle,
   customPlaceholderText,
+  containerRef,
+  shouldAutoFocus,
   ...props
 }) {
   const [field, meta, helpers] = useField(props);
@@ -31,11 +33,19 @@ export default function HeaderAndBodyArticleInput({
 
   return (
     <>
-      <div className={`editor-container${noTitle ? '-no-title' : ''}`}>
+      {label && (
+        <label htmlFor={props.name} className="form-input-label">
+          <h4>{label}</h4>
+        </label>
+      )}
+      <div
+        className={`editor-container${noTitle ? '-no-title' : ''}`}
+        ref={containerRef}
+      >
         <Slate editor={editor} {...field} {...props}>
           <Editable
             renderElement={renderElement}
-            autoFocus
+            autoFocus={shouldAutoFocus}
             spellCheck
             placeholder={customPlaceholderText}
           />

@@ -15,6 +15,7 @@ export default function FormTextInput({
   passwordInput,
   sideLabel,
   placeholder,
+  inputRef,
   ...props
 }) {
   const [field, meta] = useField(props);
@@ -28,6 +29,7 @@ export default function FormTextInput({
       placeholder={placeholder}
       passwordInput={passwordInput}
       sideLabel={sideLabel}
+      inputRef={inputRef}
       {...props}
     />
   );
@@ -41,6 +43,7 @@ export function TextInput({
   sideLabel,
   placeholder,
   disabled,
+  inputRef,
   ...props
 }) {
   let containerClassName = 'form-text-input-container';
@@ -63,6 +66,7 @@ export function TextInput({
         {...props}
         placeholder={placeholder}
         disabled={disabled}
+        ref={inputRef}
       />
       {error}
     </div>
@@ -89,6 +93,7 @@ export function CreatePostTextArea({...props}) {
         className="create-post-main-text"
         {...props}
         customPlaceholderText="...What's happening?"
+        shouldAutoFocus={true}
       />
       <CreatePostCharacterCount count={titleLength} />
     </>

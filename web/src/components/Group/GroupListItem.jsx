@@ -8,6 +8,7 @@ import FollowOptionsPopover from '../Popovers/FollowOptionsPopover';
 import {GROUP} from '../../helpers/resourceTypeDefinitions';
 import Popover from '../Popovers/Popover';
 import TertiaryButton from '../Buttons/TertiaryButton';
+import {RichTextBody} from '../Article/Article';
 
 export default function GroupListItem({
   group,
@@ -70,7 +71,13 @@ export default function GroupListItem({
             style={descriptionSize}
             className="group-list-item-description"
           >
-            <p>{group.about}</p>
+            <p>
+              {Array.isArray(group.about) ? (
+                <RichTextBody body={group.about} />
+              ) : (
+                group.about
+              )}
+            </p>
           </div>
           <SeeMore
             displayFullDescription={displayFullDescription}
