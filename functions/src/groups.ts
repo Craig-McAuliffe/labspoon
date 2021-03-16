@@ -1153,12 +1153,12 @@ async function convertGroupsBatch(query: firestore.DocumentData, resolve: any) {
   let lastDoc: firestore.DocumentSnapshot;
   snapshot.docs.forEach((doc: firestore.DocumentSnapshot) => {
     if (!doc.exists) return;
-    const reformattedDescription: any = doc.data();
-    if (!reformattedDescription.content) return;
+    const groupData: any = doc.data();
+    if (!groupData.about || Array.isArray(groupData.about)) return;
     batch.update(doc.ref, {
       about: [
         {
-          children: [{text: reformattedDescription.content.text}],
+          children: [{text: groupData.about}],
           type: 'paragraph',
         },
       ],
