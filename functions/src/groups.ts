@@ -1129,61 +1129,6 @@ async function addRecentResourceTopicsToGroupDoc(
   );
 }
 
-export const convertGroupDescriptionsToRichText = functions
-  .runWith({
-    timeoutSeconds: 10,
-    memory: '2GB',
-  })
-  .https.onRequest(async (req, resp) => {
-    const collectionRef = db.collection('groups');
-    const query = collectionRef.limit(50);
-
-    await new Promise((resolve, reject) => {
-      convertGroupsBatch(query, resolve).catch(reject);
-    });
-    resp.json({result: `reformatted group descriptions to rich text`});
-    resp.end();
-  });
-
-async function convertGroupsBatch(query: firestore.DocumentData, resolve: any) {
-  const snapshot = await query.get();
-  const batchSize = snapshot.size;
-
-  const batch = db.batch();
-  let lastDoc: firestore.DocumentSnapshot;
-  snapshot.docs.forEach((doc: firestore.DocumentSnapshot) => {
-    if (!doc.exists) return;
-    const groupData: any = doc.data();
-    if (Array.isArray(groupData.about)) return;
-    batch.update(doc.ref, {
-      about: [
-        {
-          children: [{text: groupData.about}],
-          type: 'paragraph',
-        },
-      ],
-    });
-    lastDoc = doc;
-  });
-
-  await batch.commit();
-  if (batchSize < 20) {
-    resolve();
-    return;
-  }
-  // Recurse on the next process tick, to avoid
-  // exploding the stack.
-  process.nextTick(async () => {
-    await convertGroupsBatch(fetchGroupsForReformatting(lastDoc), resolve);
-  });
-}
-
-const fetchGroupsForReformatting = (last?: firestore.DocumentSnapshot) => {
-  const collectionRef = db.collection('groups');
-  if (last) return collectionRef.limit(20).startAfter(last);
-  return collectionRef.limit(20);
-};
-
 export function groupToGroupRef(group: Group, groupID: string) {
   const groupRef = {
     id: groupID,

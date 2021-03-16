@@ -1,4 +1,4 @@
-import React, {useState, useContext, useEffect} from 'react';
+import React, {useState, useContext} from 'react';
 import {Formik, Form} from 'formik';
 import FormTextInput from '../../components/Forms/FormTextInput';
 import {PaddedPageContainer} from '../../components/Layout/Content';
@@ -35,11 +35,6 @@ export default function QuickCreateGroup() {
   );
 
   useDomRemover('.grecaptcha-badge');
-
-  // prevents redirect after creating user
-  useEffect(() => {
-    if (!user) setBlockRedirect(true);
-  }, []);
 
   const initialValues = savedValues
     ? savedValues
@@ -86,7 +81,9 @@ export default function QuickCreateGroup() {
             setSubmitting,
             updateUserDetails,
             setSavedValues,
-            history
+            history,
+            setBlockRedirect,
+            blockRedirect
           )
         }
       >
@@ -127,9 +124,12 @@ async function createGroupAndUser(
   setSubmitting,
   updateUserDetails,
   setSavedValues,
-  history
+  history,
+  setBlockRedirect,
+  blockRedirect
 ) {
   setSubmitting(true);
+  if (!blockRedirect) setBlockRedirect(true);
   const password = uuid();
   values.password = password;
   return submitSignUp(
