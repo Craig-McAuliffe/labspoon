@@ -6,7 +6,7 @@ import PrimaryButton from '../../components/Buttons/PrimaryButton';
 import * as Yup from 'yup';
 import HeaderAndBodyArticleInput, {
   initialValueNoTitle,
-  yupPostValidation,
+  yupRichBodyOnlyValidation,
 } from '../../components/Forms/Articles/HeaderAndBodyArticleInput';
 import {v4 as uuid} from 'uuid';
 import {LabspoonLogoAndName} from '../../assets/AboutPageIcons';
@@ -45,7 +45,7 @@ export default function QuickCreateGroup() {
     ? savedValues
     : {
         groupName: '',
-        description: initialValueNoTitle,
+        about: initialValueNoTitle,
         email: '',
         userName: '',
       };
@@ -54,7 +54,7 @@ export default function QuickCreateGroup() {
     groupName: Yup.string()
       .required('You need to write a group name')
       .max(500, 'Must have fewer than 500 characters'),
-    description: yupPostValidation,
+    about: yupRichBodyOnlyValidation(4000, 15),
     email: Yup.string()
       .required('Please enter your email address')
       .email('Please enter a valid email')
@@ -98,7 +98,7 @@ export default function QuickCreateGroup() {
                 <HeaderAndBodyArticleInput
                   noTitle={true}
                   label="Group description"
-                  name="description"
+                  name="about"
                   {...props}
                   shouldAutoFocus={false}
                 />
@@ -153,7 +153,7 @@ async function createGroupAndUser(
       location: '',
       institution: '',
       website: '',
-      about: values.description,
+      about: values.about,
     };
     const groupDoc = db.collection(`groups`).doc();
     const groupID = groupDoc.id;

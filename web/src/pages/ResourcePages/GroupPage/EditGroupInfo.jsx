@@ -6,9 +6,13 @@ import {PaddedPageContainer} from '../../../components/Layout/Content';
 import {LoadingSpinnerPage} from '../../../components/LoadingSpinner/LoadingSpinner';
 import {Form, Formik} from 'formik';
 import * as Yup from 'yup';
+import CreateResourceFormActions from '../../../components/Forms/CreateResourceFormActions';
+import {
+  initialValueNoTitle,
+  yupRichBodyOnlyValidation,
+} from '../../../components/Forms/Articles/HeaderAndBodyArticleInput';
 
 import './GroupPage.css';
-import CreateResourceFormActions from '../../../components/Forms/CreateResourceFormActions';
 
 export default function EditingGroupInfo({groupData, children}) {
   const groupID = groupData.id;
@@ -38,7 +42,7 @@ export default function EditingGroupInfo({groupData, children}) {
     location: groupData.location ? groupData.location : '',
     institution: groupData.institution ? groupData.institution : '',
     website: groupData.website ? groupData.website : '',
-    about: groupData.about ? groupData.about : '',
+    about: groupData.about ? groupData.about : initialValueNoTitle,
   };
   if (groupData.donationLink)
     initialValues.donationLink = groupData.donationLink;
@@ -50,10 +54,7 @@ export default function EditingGroupInfo({groupData, children}) {
     location: Yup.string(),
     institution: Yup.string(),
     website: Yup.string().url('Must be a valid url'),
-    about: Yup.string().max(
-      3000,
-      'Too long. Must have fewer than 3000 characters'
-    ),
+    about: yupRichBodyOnlyValidation(4000, 15),
     donationLink: Yup.string().url('Must be a valid url'),
   });
 

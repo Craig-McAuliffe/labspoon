@@ -7,7 +7,6 @@ import {withHistory} from 'slate-history';
 import InputError from '../InputError';
 
 import './HeaderAndBodyArticleInput.css';
-import {MAX_POST_CHARACTERS} from '../../Posts/Post/CreatePost/CreatePost';
 
 export default function HeaderAndBodyArticleInput({
   label,
@@ -156,50 +155,54 @@ const withLayoutNoTitle = (editor) => {
   return editor;
 };
 
-export const yupPostValidation = Yup.array()
-  .test(
-    'isEmptyBody',
-    // eslint-disable-next-line no-template-curly-in-string
-    'You must write something!',
-    (value) => {
-      // Check body is not empty
-      if (!value) return false;
-      if (!value[0]) return false;
-      if (value[0].type !== 'paragraph') return false;
-      if (value[0].children === undefined) return false;
-      if (value[0].children[0].text === undefined) return false;
-      if (value[0].children[0].text.length === 0) return false;
+export const yupRichBodyOnlyValidation = (
+  characterLimit = 800,
+  paragraphLimit = 10
+) =>
+  Yup.array()
+    .test(
+      'isEmptyBody',
+      // eslint-disable-next-line no-template-curly-in-string
+      'You must write something!',
+      (value) => {
+        // Check body is not empty
+        if (!value) return false;
+        if (!value[0]) return false;
+        if (value[0].type !== 'paragraph') return false;
+        if (value[0].children === undefined) return false;
+        if (value[0].children[0].text === undefined) return false;
+        if (value[0].children[0].text.length === 0) return false;
 
-      return true;
-    }
-  )
-  .test(
-    'isTooLong',
-    // eslint-disable-next-line no-template-curly-in-string
-    'Your post is too long. It must have fewer than 1500 characters.',
-    (value) => {
-      if (value[0].children === undefined) return false;
-      if (value[0].children[0].text === undefined) return false;
-      if (
-        value.reduce((accumulator, section) => {
-          if (!section.children[0].text) return accumulator;
-          return accumulator + section.children[0].text.length;
-        }, 0) > MAX_POST_CHARACTERS
-      )
-        return false;
-      return true;
-    }
-  )
-  .test(
-    'isTooLong',
-    // eslint-disable-next-line no-template-curly-in-string
-    'Too many paragraphs. Max 15.',
-    (value) => {
-      if (value === undefined) return false;
-      if (value.length > 15) return false;
-      return true;
-    }
-  );
+        return true;
+      }
+    )
+    .test(
+      'isTooLong',
+      // eslint-disable-next-line no-template-curly-in-string
+      `Too long. It must have fewer than ${characterLimit} characters.`,
+      (value) => {
+        if (value[0].children === undefined) return false;
+        if (value[0].children[0].text === undefined) return false;
+        if (
+          value.reduce((accumulator, section) => {
+            if (!section.children[0].text) return accumulator;
+            return accumulator + section.children[0].text.length;
+          }, 0) > characterLimit
+        )
+          return false;
+        return true;
+      }
+    )
+    .test(
+      'isTooLong',
+      // eslint-disable-next-line no-template-curly-in-string
+      `Too many paragraphs. Max ${paragraphLimit}.`,
+      (value) => {
+        if (value === undefined) return false;
+        if (value.length > paragraphLimit) return false;
+        return true;
+      }
+    );
 
 export const yupArticleValidation = Yup.array()
   .test(

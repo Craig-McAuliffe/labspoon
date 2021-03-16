@@ -132,7 +132,7 @@ export function GenericContactPage({contactFormType, mainLabel, children}) {
       break;
     case 'somethingWrong':
       typeSpecificMessage =
-        'We will look into the issue. If you provided us with an email, we will let you know when it is fixed.';
+        'We will look into the issue and let you know when it is fixed.';
       typeSpecificTitle = 'Something Wrong';
       break;
     case 'suggestion':
@@ -170,9 +170,6 @@ export function GenericContactPage({contactFormType, mainLabel, children}) {
   };
 
   const validationSchema = Yup.object({
-    email: Yup.string()
-      .email('Must be a valid email address')
-      .max(100, 'Too long. Must have fewer than 100 characters'),
     contactFormDescription: Yup.string()
       .required('You need to write something')
       .max(1000, 'Too long. Must have fewer than 1000 characters'),
@@ -316,9 +313,6 @@ export function GenericContactPage({contactFormType, mainLabel, children}) {
                 label={mainLabel}
                 name="contactFormDescription"
               />
-              {contactFormType !== 'suggestion' && (
-                <FormTextInput label="Your Email" name="email" />
-              )}
               <FormTextInput label="Please Write: I am hum4n" name="isHuman" />
               <div className="contact-page-submit-container">
                 <PrimaryButton type="submit">Submit</PrimaryButton>

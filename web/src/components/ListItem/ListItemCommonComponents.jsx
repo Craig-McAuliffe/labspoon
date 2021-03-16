@@ -10,10 +10,10 @@ export function ListItemContainer({children}) {
   return <div className="general-list-item-container">{children}</div>;
 }
 
-export function ExpandableText({children, resourceID}) {
+export function ExpandableText({children, resourceID, initialHeight = 144}) {
   const [displayFullText, setDisplayFullText] = useState({
     display: false,
-    size: 150,
+    size: initialHeight,
   });
 
   const containerRef = useRef();
@@ -36,6 +36,7 @@ export function ExpandableText({children, resourceID}) {
         setDisplayFullDescription={setDisplayFullText}
         descriptionRef={containerRef}
         id={resourceID}
+        initialHeight={initialHeight}
       />
     </>
   );
@@ -46,7 +47,9 @@ export function ListItemOptionsDropdown({resourceType, resourceID}) {
   const getListItemDropdownOptions = () => (
     <DropdownOption
       onSelect={() => {
-        history.replace(`/${resourceType}/${resourceID}/edit`);
+        history.replace(`/${resourceType}/${resourceID}/edit`, {
+          previousLocation: history.location.pathname,
+        });
       }}
     >
       <h4 className="list-item-options-dropdown-text">Edit</h4>

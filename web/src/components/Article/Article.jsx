@@ -96,10 +96,52 @@ export function RichTextBody({body, shouldLinkify}) {
       )}
     </div>
   );
-  if (shouldLinkify) return <Linkify>{bodyDisplay}</Linkify>;
+  if (shouldLinkify)
+    return (
+      <Linkify>
+        <SecureLinks>{bodyDisplay}</SecureLinks>
+      </Linkify>
+    );
   return bodyDisplay;
 }
 
+function SecureLinks({children}) {
+  const parsedTextAndLinks = [];
+  children[0].props.children.forEach((paragraph, i) => {
+    const textAndLinks = [];
+    paragraph.props.children.forEach((linkOrText) => {
+      if (React.isValidElement(linkOrText))
+        return textAndLinks.push({
+          content: linkOrText.props.children,
+          type: 'link',
+        });
+      return textAndLinks.push({content: linkOrText, type: 'text'});
+    });
+    parsedTextAndLinks.push(textAndLinks);
+  });
+
+  return parsedTextAndLinks.map((paragraph, i) => {
+    return (
+      <p key={'paragraph ' + i} className="rich-body-paragraph">
+        {paragraph.map((line, i) => {
+          if (line.type === 'link')
+            return (
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href={line.content}
+                key={'line ' + line.content + i}
+                className="rich-body-link"
+              >
+                {line.content}
+              </a>
+            );
+          return line.content;
+        })}
+      </p>
+    );
+  });
+}
 export function getTweetTextFromRichText(text) {
   if (!text) return null;
   return text.reduce((accumulator, current, index) => {

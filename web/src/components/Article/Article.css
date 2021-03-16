@@ -42,3 +42,21 @@
 .rich-body-section {
   margin: 0px 0px;
 }
+
+.rich-body-link {
+word-wrap: break-word;
+word-break: break-all;
+line-height: 1.5em;
+}
+
+.rich-body-paragraph {
+word-wrap: break-word;
+word-break: break-all;
+line-height: 1.5em;
+margin-bottom: 24px;
+}
+
+.rich-body-link:hover {
+color: #00507C;
+text-decoration: underline;
+}

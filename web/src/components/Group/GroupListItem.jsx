@@ -10,6 +10,7 @@ import Popover from '../Popovers/Popover';
 import TertiaryButton from '../Buttons/TertiaryButton';
 import {RichTextBody} from '../Article/Article';
 
+const GROUP_LIST_ITEM_DESCRIPTION_HEIGHT = 96;
 export default function GroupListItem({
   group,
   LinkOverride = undefined,
@@ -19,7 +20,7 @@ export default function GroupListItem({
 }) {
   const [displayFullDescription, setDisplayFullDescription] = useState({
     display: false,
-    size: 100,
+    size: GROUP_LIST_ITEM_DESCRIPTION_HEIGHT,
   });
 
   const groupDescriptionRef = useRef();
@@ -71,19 +72,14 @@ export default function GroupListItem({
             style={descriptionSize}
             className="group-list-item-description"
           >
-            <p>
-              {Array.isArray(group.about) ? (
-                <RichTextBody body={group.about} />
-              ) : (
-                group.about
-              )}
-            </p>
+            <RichTextBody body={group.about} shouldLinkify={true} />
           </div>
           <SeeMore
             displayFullDescription={displayFullDescription}
             setDisplayFullDescription={setDisplayFullDescription}
             descriptionRef={groupDescriptionRef}
             id={group.id}
+            initialHeight={GROUP_LIST_ITEM_DESCRIPTION_HEIGHT}
           />
         </div>
       </div>

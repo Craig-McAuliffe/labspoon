@@ -1,6 +1,5 @@
 import React, {useRef, useEffect, useState, useContext} from 'react';
 import {Link, useParams, useHistory} from 'react-router-dom';
-import Linkify from 'linkifyjs/react';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faCheckCircle} from '@fortawesome/free-solid-svg-icons';
 
@@ -43,6 +42,7 @@ import {PaddedContent} from '../../../components/Layout/Content';
 import './GroupPage.css';
 import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 import {RichTextBody} from '../../../components/Article/Article';
+import TertiaryButton from '../../../components/Buttons/TertiaryButton';
 
 function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip) {
   const activeTab = filterOptions ? getActiveTabID(filterOptions) : null;
@@ -402,6 +402,8 @@ function SuggestedGroups({groupData}) {
   );
 }
 
+const GROUP_DESCRIPTION_HEIGHT = 144;
+
 const GroupDetails = ({
   group,
   groupDescriptionRef,
@@ -411,10 +413,24 @@ const GroupDetails = ({
   routedTabID,
 }) => {
   const featureFlags = useContext(FeatureFlags);
+  const [shouldRefresh, setShouldRefresh] = useState(false);
   const [displayFullDescription, setDisplayFullDescription] = useState({
     display: false,
-    size: 100,
+    size: GROUP_DESCRIPTION_HEIGHT,
   });
+  useEffect(() => {
+    if (group && shouldRefresh) {
+      setShouldRefresh(false);
+      return;
+    }
+    const refreshAdviceTimer = setTimeout(() => {
+      if (group) return;
+      setShouldRefresh(true);
+    }, 8000);
+    return () => {
+      clearTimeout(refreshAdviceTimer);
+    };
+  }, [group, shouldRefresh]);
 
   if (group === undefined)
     return (
@@ -422,6 +438,14 @@ const GroupDetails = ({
         <div className="group-page-details-loading"></div>
         <div className="group-page-details-loading">
           <LoadingSpinner />
+          {shouldRefresh && (
+            <p>
+              This is taking a while... try{' '}
+              <TertiaryButton onClick={() => window.location.reload()}>
+                refreshing the page
+              </TertiaryButton>
+            </p>
+          )}
         </div>
       </div>
     );
@@ -450,13 +474,7 @@ const GroupDetails = ({
         style={descriptionSize}
         ref={groupDescriptionRef}
       >
-        <Linkify tagName="p">
-          {Array.isArray(group.about) ? (
-            <RichTextBody body={group.about} />
-          ) : (
-            group.about
-          )}
-        </Linkify>
+        <RichTextBody body={group.about} shouldLinkify={true} />
       </div>
 
       <SeeMore
@@ -464,6 +482,7 @@ const GroupDetails = ({
         setDisplayFullDescription={setDisplayFullDescription}
         descriptionRef={groupDescriptionRef}
         id={group.id}
+        initialHeight={GROUP_DESCRIPTION_HEIGHT}
       />
 
       <DonationLink verified={verified} donationLink={group.donationLink} />

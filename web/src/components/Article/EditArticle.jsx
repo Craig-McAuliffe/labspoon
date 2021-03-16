@@ -1,6 +1,6 @@
 import {Form, Formik} from 'formik';
 import React, {useContext, useEffect, useState} from 'react';
-import {useHistory} from 'react-router-dom';
+import {useHistory, useLocation} from 'react-router-dom';
 import HeaderAndBodyArticleInput, {
   getTitleTextAndBody,
   mergeTitleAndBody,
@@ -29,6 +29,7 @@ export default function EditArticle({
   const [savedInitialValues, setSavedInitialValues] = useState();
   const [uploadError, setUploadError] = useState(false);
   const history = useHistory();
+  const locationState = useLocation().state;
   const articleDBRef = db.doc(`${articleCollectionName}/${articleID}`);
   const {userProfile} = useContext(AuthContext);
   useEffect(async () => {
@@ -81,7 +82,9 @@ export default function EditArticle({
         body: body,
       })
       .then(() => {
-        history.push(`/${articleType}/${articleID}`);
+        locationState
+          ? history.push(locationState.previousLocation)
+          : history.push(`/${articleType}/${articleID}`);
       })
       .catch((err) => {
         console.error(
@@ -116,7 +119,12 @@ export default function EditArticle({
           />
           <CreateResourceFormActions
             submitting={submitting}
-            submitText="Create"
+            submitText="Save"
+            cancelForm={() => {
+              locationState
+                ? history.push(locationState.previousLocation)
+                : history.push(`/${articleType}/${articleID}`);
+            }}
           />
         </Form>
       </Formik>

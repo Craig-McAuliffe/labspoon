@@ -2,7 +2,7 @@ import React, {useState, useContext, useEffect} from 'react';
 import {Formik, Form, useField} from 'formik';
 import * as Yup from 'yup';
 import {AuthContext} from '../../../App';
-import FormTextInput, {FormTextArea} from '../../Forms/FormTextInput';
+import FormTextInput from '../../Forms/FormTextInput';
 import PrimaryButton from '../../Buttons/PrimaryButton';
 import NegativeButton from '../../Buttons/NegativeButton';
 import {AddMemberIcon} from '../../../assets/CreateGroupIcons';
@@ -17,6 +17,9 @@ import AddMemberContainer from '../../Forms/AddUserToForm';
 
 import './CreateGroupPage.css';
 import './GroupInfoForm.css';
+import HeaderAndBodyArticleInput, {
+  yupRichBodyOnlyValidation,
+} from '../../Forms/Articles/HeaderAndBodyArticleInput';
 
 const CHARITY = 'charity';
 export const RESEARCH_GROUP = 'researchGroup';
@@ -48,10 +51,7 @@ export default function GroupInfoForm({
     location: Yup.string(),
     institution: Yup.string(),
     website: Yup.string().url('Must be a valid url'),
-    about: Yup.string().max(
-      3000,
-      'Too long. Must have fewer than 3000 characters'
-    ),
+    about: yupRichBodyOnlyValidation(4000, 15),
     donationLink: Yup.string().url('Must be a valid url'),
   };
   if (!editingGroup)
@@ -152,7 +152,15 @@ export function EditInfo({verified, groupType, ...props}) {
         <FormTextInput label="Institution" name="institution" sideLabel />
         <FormTextInput label="Website" name="website" sideLabel />
       </div>
-      <FormTextArea height="200px" label="About" name="about" bigLabel />
+      <div className="rich-text-input-area">
+        <HeaderAndBodyArticleInput
+          noTitle={true}
+          label="Group description"
+          name="about"
+          {...props}
+          shouldAutoFocus={false}
+        />
+      </div>
       {(props.values.groupType === CHARITY || groupType === CHARITY) && (
         <VerificationFormOrDonationLinkField verified={verified} />
       )}

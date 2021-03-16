@@ -6,13 +6,17 @@ export default function SeeMore({
   setDisplayFullDescription,
   descriptionRef,
   id,
+  initialHeight = 100,
 }) {
   const [displaySeeMore, setDisplaySeeMore] = useState();
   const windowWidth = window.innerWidth;
 
   useEffect(() => {
     setDisplaySeeMore(
-      descriptionRef.current.firstElementChild.scrollHeight > 100
+      Array.from(descriptionRef.current.firstElementChild.children).reduce(
+        (accumulator, current) => accumulator + current.scrollHeight + 24,
+        0
+      ) > initialHeight
     );
   }, [windowWidth, id, descriptionRef]);
 
@@ -23,10 +27,19 @@ export default function SeeMore({
         className="see-more-button"
         onClick={() =>
           displayFullDescription.display
-            ? setDisplayFullDescription({display: false, size: 100})
+            ? setDisplayFullDescription({
+                display: false,
+                size: initialHeight ? initialHeight : 100,
+              })
             : setDisplayFullDescription({
                 display: true,
-                size: descriptionRef.current.firstElementChild.scrollHeight,
+                size: Array.from(
+                  descriptionRef.current.firstElementChild.children
+                ).reduce(
+                  (accumulator, current, i) =>
+                    accumulator + current.scrollHeight + 24,
+                  0
+                ),
               })
         }
       >

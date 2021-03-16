@@ -10,11 +10,11 @@ import {
 import './CreatePost';
 import LoadingSpinner from '../../../LoadingSpinner/LoadingSpinner';
 import {Alert} from 'react-bootstrap';
-import {yupPostValidation} from '../../../Forms/Articles/HeaderAndBodyArticleInput';
+import {yupRichBodyOnlyValidation} from '../../../Forms/Articles/HeaderAndBodyArticleInput';
 import * as Yup from 'yup';
 
 const postValidationSchema = Yup.object({
-  title: yupPostValidation,
+  title: yupRichBodyOnlyValidation(),
 });
 
 export const CreatePostTitleContext = React.createContext();

@@ -5,9 +5,10 @@ import {db} from '../../../firebase';
 import {AuthContext} from '../../../App';
 import {LoadingSpinnerPage} from '../../LoadingSpinner/LoadingSpinner';
 import {editGroupAvatarStorageInForm} from '../../../helpers/groups';
+import {PaddedPageContainer} from '../../Layout/Content';
+import {initialValueNoTitle} from '../../Forms/Articles/HeaderAndBodyArticleInput';
 
 import './CreateGroupPage.css';
-import {PaddedPageContainer} from '../../Layout/Content';
 
 const MAXGROUPS = 12;
 export default function CreateGroupPage({
@@ -54,7 +55,7 @@ export default function CreateGroupPage({
     location: '',
     institution: '',
     website: '',
-    about: '',
+    about: initialValueNoTitle,
   };
 
   async function onSubmit(values) {
