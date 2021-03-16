@@ -75,8 +75,9 @@ export default function QuickCreateGroup() {
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
-        onSubmit={(values) =>
-          createGroupAndUser(
+        onSubmit={(values) => {
+          if (user) return;
+          return createGroupAndUser(
             values,
             setSubmitting,
             updateUserDetails,
@@ -84,8 +85,8 @@ export default function QuickCreateGroup() {
             history,
             setBlockRedirect,
             blockRedirect
-          )
-        }
+          );
+        }}
       >
         {(props) => (
           <Form>
