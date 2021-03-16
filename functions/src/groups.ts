@@ -1154,7 +1154,7 @@ async function convertGroupsBatch(query: firestore.DocumentData, resolve: any) {
   snapshot.docs.forEach((doc: firestore.DocumentSnapshot) => {
     if (!doc.exists) return;
     const groupData: any = doc.data();
-    if (!groupData.about || Array.isArray(groupData.about)) return;
+    if (Array.isArray(groupData.about)) return;
     batch.update(doc.ref, {
       about: [
         {
