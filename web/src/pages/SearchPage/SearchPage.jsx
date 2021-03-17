@@ -61,10 +61,13 @@ export default function SearchPage() {
   const [searchState, setSearchState] = useState(urlToSearchState(location));
   const [isBot, setIsBot] = useState(false);
   const [topicsResults, setTopicsResults] = useState([]);
+  const [shouldResetTopics, setShouldResetTopics] = useState(false);
   const history = useHistory();
+
   useEffect(() => {
     setTopicsResults([]);
-  }, [searchState.query]);
+    setShouldResetTopics(true);
+  }, [searchState]);
 
   useScript(
     `https://www.google.com/recaptcha/api.js?render=${reCaptchaSiteKey}`
@@ -117,6 +120,8 @@ export default function SearchPage() {
           query={searchState ? searchState.query : undefined}
           topicsResults={topicsResults}
           setTopicsResults={setTopicsResults}
+          shouldResetTopics={shouldResetTopics}
+          setShouldResetTopics={setShouldResetTopics}
         />
       );
       break;
@@ -206,7 +211,15 @@ const IndexResults = connectStateResults(
 );
 
 const AllResults = connectStateResults(
-  ({allSearchResults, query, topicsResults, setTopicsResults, children}) => {
+  ({
+    allSearchResults,
+    query,
+    topicsResults,
+    setTopicsResults,
+    children,
+    shouldResetTopics,
+    setShouldResetTopics,
+  }) => {
     const hasResults =
       allSearchResults &&
       Object.values(allSearchResults).some(
@@ -234,6 +247,8 @@ const AllResults = connectStateResults(
           topicsResults={topicsResults}
           setTopicsResults={setTopicsResults}
           overview={true}
+          shouldResetTopics={shouldResetTopics}
+          setShouldResetTopics={setShouldResetTopics}
         />
         <LatestPosts />
         <TryAnotherSearch />
@@ -285,12 +300,21 @@ function OverviewResultsSection({
   );
 }
 
-const OverviewResults = ({setTab, query, topicsResults, setTopicsResults}) => (
+const OverviewResults = ({
+  setTab,
+  query,
+  topicsResults,
+  setTopicsResults,
+  shouldResetTopics,
+  setShouldResetTopics,
+}) => (
   <>
     <AllResults
       query={query}
       topicsResults={topicsResults}
       setTopicsResults={setTopicsResults}
+      shouldResetTopics={shouldResetTopics}
+      setShouldResetTopics={setShouldResetTopics}
     >
       <OverviewResultsSection
         setTab={setTab}
@@ -353,6 +377,8 @@ function TopicsSearchAndResults({
   topicsResults,
   setTopicsResults,
   overview,
+  shouldResetTopics,
+  setShouldResetTopics,
 }) {
   const [loading, setLoading] = useState(false);
   const [skip, setSkip] = useState(0);
@@ -379,7 +405,8 @@ function TopicsSearchAndResults({
   useEffect(() => {
     if (query.length === 0) return;
     // already results from tab change
-    if (topicsResults.length > 0) return;
+    if (topicsResults.length > 0 && !shouldResetTopics) return;
+    setShouldResetTopics(false);
     return fetchTopics();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
