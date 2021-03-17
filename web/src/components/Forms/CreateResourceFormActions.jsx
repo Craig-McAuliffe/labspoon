@@ -19,7 +19,9 @@ export default function CreateResourceFormActions({
       }`}
     >
       <div>
-        {cancelForm ? <CancelButton cancelAction={cancelForm} /> : null}
+        {cancelForm && !submitting && (
+          <CancelButton cancelAction={cancelForm} />
+        )}
       </div>
       <div>
         <PrimaryButton

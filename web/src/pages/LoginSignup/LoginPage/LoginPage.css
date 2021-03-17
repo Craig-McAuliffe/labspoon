@@ -26,3 +26,8 @@
   justify-content: flex-end;
   margin-bottom: 10px;
 }
+
+.login-page-forgot-page {
+  display: flex;
+  justify-content: flex-end;
+}

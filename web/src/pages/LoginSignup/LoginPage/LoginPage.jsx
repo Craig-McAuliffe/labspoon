@@ -14,21 +14,43 @@ import GoogleSignIn from '../GoogleSignIn.jsx';
 import {PaddedPageContainer} from '../../../components/Layout/Content.jsx';
 
 import './LoginPage.css';
+import TertiaryButton from '../../../components/Buttons/TertiaryButton.jsx';
+import CreateResourceFormActions from '../../../components/Forms/CreateResourceFormActions.jsx';
+import SuccessMessage from '../../../components/Forms/SuccessMessage.jsx';
 
 /**
  * Log in page using the Firebase authentication handler
  * @return {React.ReactElement}
  */
 function LoginPage() {
-  const location = useLocation().state;
-  const returnLocation = location ? location.returnLocation : undefined;
+  const locationState = useLocation().state;
+  const returnLocation = locationState
+    ? locationState.returnLocation
+    : undefined;
+  const resetPasswordState = locationState
+    ? locationState.resetPassword
+    : undefined;
   const {userProfile} = useContext(AuthContext);
   const history = useHistory();
   const {updateUserDetails} = useContext(AuthContext);
   const [loading, setLoading] = useState();
   const [googleSignInFlow, setGoogleSignInFlow] = useState(false);
+  const [forgottenPassword, setForgottenPassword] = useState(false);
+  const [resetPasswordEmailWasSent, setResetPasswordEmailWasSent] = useState(
+    false
+  );
   if (loading) return <LoadingSpinnerPage />;
   if (!userProfile) {
+    if (forgottenPassword)
+      return (
+        <PaddedPageContainer>
+          <ForgottenPasswordForm
+            setForgottenPassword={setForgottenPassword}
+            resetPasswordEmailWasSent={resetPasswordEmailWasSent}
+            setResetPasswordEmailWasSent={setResetPasswordEmailWasSent}
+          />
+        </PaddedPageContainer>
+      );
     return (
       <PaddedPageContainer>
         {googleSignInFlow && (
@@ -43,7 +65,16 @@ function LoginPage() {
           {`Don't have an account yet?`}
           <button onClick={() => history.push('/signup')}>Sign up here</button>
         </p>
-        <SignInForm returnLocation={returnLocation} />
+        {resetPasswordEmailWasSent && (
+          <SuccessMessage>Password reset email sent</SuccessMessage>
+        )}
+        {resetPasswordState && (
+          <SuccessMessage>Password reset was successful</SuccessMessage>
+        )}
+        <SignInForm
+          returnLocation={returnLocation}
+          setForgottenPassword={setForgottenPassword}
+        />
         <div className="login-submit-button-container">
           <GoogleButton
             onClick={() => {
@@ -73,7 +104,7 @@ function LoginPage() {
   }
 }
 
-const SignInForm = ({returnLocation}) => {
+const SignInForm = ({returnLocation, setForgottenPassword}) => {
   const [loading, setLoading] = useState(false);
   const history = useHistory();
   const submitChanges = (values) => {
@@ -116,8 +147,12 @@ const SignInForm = ({returnLocation}) => {
 
   const validationSchema = Yup.object({
     email: Yup.string()
+      .required('Email is required')
       .email('Please enter a valid email address')
-      .required('Email is required'),
+      .max(
+        1000,
+        'Email address is too long. It must have fewer than 1000 characters.'
+      ),
     password: Yup.string()
       .required('Password is required')
       .min(8, 'Password must be at least 8 characters long.'),
@@ -131,7 +166,12 @@ const SignInForm = ({returnLocation}) => {
     >
       <Form className="signin-form">
         <FormTextInput name="email" autoComplete="email" label="Email" />
-        <FormTextInput name="password" label="Password" passwordInput={true} />
+        <FormTextInput name="password" label="Password" passwordInput={true}>
+          <ForgottenPassWordButton
+            setForgottenPassword={setForgottenPassword}
+          />
+        </FormTextInput>
+
         <div className="cancel-or-submit">
           <div></div>
           <div className="login-submit-button-container">
@@ -143,5 +183,73 @@ const SignInForm = ({returnLocation}) => {
     </Formik>
   );
 };
+
+function ForgottenPassWordButton({setForgottenPassword}) {
+  return (
+    <div className="login-page-forgot-page">
+      <TertiaryButton onClick={() => setForgottenPassword(true)}>
+        Forgotten password
+      </TertiaryButton>
+    </div>
+  );
+}
+function ForgottenPasswordForm({
+  setForgottenPassword,
+  resetPasswordEmailWasSent,
+  setResetPasswordEmailWasSent,
+}) {
+  const [savedEmailInput, setSavedEmailInput] = useState({});
+  const [submittingReset, setSubmittingReset] = useState(false);
+  const submitPasswordReset = (values) => {
+    if (resetPasswordEmailWasSent) setResetPasswordEmailWasSent(false);
+    setSubmittingReset(true);
+    return firebase
+      .auth()
+      .sendPasswordResetEmail(values.email)
+      .then(function () {
+        setForgottenPassword(false);
+        setResetPasswordEmailWasSent(true);
+      })
+      .catch(function (error) {
+        setSavedEmailInput(values.email);
+        console.error(`unable to send password reset email ${error}`);
+        console.log('handle error codes');
+      });
+  };
+  return (
+    <Formik
+      validationSchema={Yup.object({
+        email: Yup.string()
+          .required('Email is required')
+          .email('Please enter a valid email address')
+          .max(
+            1000,
+            'Email address is too long. It must have fewer than 1000 characters.'
+          ),
+      })}
+      initialValues={{
+        email: savedEmailInput.email ? savedEmailInput.email : '',
+      }}
+      onSubmit={submitPasswordReset}
+    >
+      <Form>
+        <p>
+          We will send a password reset email to the address you enter here.
+        </p>
+        <FormTextInput
+          name="email"
+          autoComplete="email"
+          label="Email address of Labspoon account"
+        />
+        <CreateResourceFormActions
+          cancelForm={() => setForgottenPassword(false)}
+          submitText="Send Reset Email"
+          noBorder={true}
+          submitting={submittingReset}
+        />
+      </Form>
+    </Formik>
+  );
+}
 
 export default LoginPage;

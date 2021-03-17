@@ -8,10 +8,17 @@
   border: none;
   border-radius: 4%;
   text-decoration: none;
-  cursor: pointer;
   text-align: center;
   -webkit-appearance: none;
   -moz-appearance: none;
+}
+
+.primary-button,
+.primary-button-smallVersion,
+.negative-button,
+.negative-button-smallVersion
+{
+  cursor: pointer;
 }
 
 .primary-button,
@@ -25,6 +32,7 @@
 
 .primary-button-smallVersion-inactive {
   opacity: 0.4;
+  cursor: default;
 }
 .negative-button,
 .negative-button-smallVersion {
@@ -40,6 +48,7 @@
 .primary-button-inactive,
 .negative-button {
   padding: 10px 10px;
+  cursor: default;
 }
 
 .primary-button-smallVersion,

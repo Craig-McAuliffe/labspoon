@@ -1,6 +1,5 @@
 import React, {lazy, useContext, Suspense} from 'react';
 import PropTypes from 'prop-types';
-
 import Spinner from 'react-bootstrap/Spinner';
 
 import {AuthContext, FeatureFlags} from './App';
@@ -45,6 +44,9 @@ const QuickCreateGroup = lazy(() =>
 );
 const GeneratedPasswordPage = lazy(() =>
   import('./pages/GeneratedPasswordPage')
+);
+const PasswordResetPage = lazy(() =>
+  import('./pages/AuthenticationPages/PasswordResetPage')
 );
 
 import {SkeletonUserPage} from './pages/ResourcePages/UserPage';
@@ -162,6 +164,9 @@ export default function Routes({user, setUser}) {
         </Route>
         <Route path="/generatedPassword">
           <GeneratedPasswordPage />
+        </Route>
+        <Route path="/authentication">
+          <PasswordResetPage />
         </Route>
         <Route path="/notfound">
           <NotFoundPage />

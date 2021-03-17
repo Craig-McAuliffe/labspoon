@@ -261,7 +261,7 @@ function SuggestedPublications({
                 return;
               });
           }}
-          disabled={selectedPublicationsAuthorID || submitting ? false : true}
+          disabled={!selectedPublicationsAuthorID || submitting ? true : false}
         >
           Link Papers to Profile
         </PrimaryButton>

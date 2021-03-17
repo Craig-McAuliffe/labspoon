@@ -16,6 +16,7 @@ export default function FormTextInput({
   sideLabel,
   placeholder,
   inputRef,
+  children,
   ...props
 }) {
   const [field, meta] = useField(props);
@@ -31,7 +32,9 @@ export default function FormTextInput({
       sideLabel={sideLabel}
       inputRef={inputRef}
       {...props}
-    />
+    >
+      {children}
+    </TextInput>
   );
 }
 
@@ -44,6 +47,8 @@ export function TextInput({
   placeholder,
   disabled,
   inputRef,
+  attachedComponent,
+  children,
   ...props
 }) {
   let containerClassName = 'form-text-input-container';
@@ -69,6 +74,7 @@ export function TextInput({
         ref={inputRef}
       />
       {error}
+      {children}
     </div>
   );
 }
