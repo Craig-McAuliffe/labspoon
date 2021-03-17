@@ -22,6 +22,7 @@ import useDomRemover from '../../helpers/useDomRemover';
 import {reCaptchaSiteKey} from '../../config';
 
 import './QuickCreateGroup.css';
+import {Link} from 'react-router-dom';
 
 export default function QuickCreateGroup() {
   const [submitting, setSubmitting] = useState(false);
@@ -110,6 +111,11 @@ export default function QuickCreateGroup() {
                 <PrimaryButton type="submit">
                   Create Labspoon Group
                 </PrimaryButton>
+                <span className="sign-up-privacy-policy-disclaimer">
+                  By clicking Create Labspoon Group, you are signing up to
+                  Labspoon and agreeing to our{' '}
+                  <Link to="/privacy-policy">Privacy Policy</Link>
+                </span>
                 <LabspoonLogoAndName />
               </div>
             </>
