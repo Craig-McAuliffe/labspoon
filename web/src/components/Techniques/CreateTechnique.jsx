@@ -25,7 +25,12 @@ import addArticleToDB from '../../helpers/articles';
 import {TECHNIQUES} from '../../helpers/resourceTypeDefinitions';
 import {uploadImagesAndGetURLs} from '../../helpers/images';
 import FormTextInput from '../Forms/FormTextInput';
-import {AboutArticles, articleTitleValidation} from '../Article/Article';
+import {
+  AboutArticles,
+  articleTitleValidation,
+  CreateArticleCharacterCount,
+  MAX_ARTICLE_CHARACTERS,
+} from '../Article/Article';
 
 export default function CreateTechnique() {
   const preSelectedGroupID = useParams().groupID;
@@ -144,7 +149,7 @@ export default function CreateTechnique() {
     <Formik
       initialValues={savedInitialValues}
       validationSchema={Yup.object({
-        body: yupRichBodyOnlyValidation(10000, 40),
+        body: yupRichBodyOnlyValidation(MAX_ARTICLE_CHARACTERS, 40),
         title: articleTitleValidation,
       })}
       onSubmit={onSubmit}
@@ -164,6 +169,7 @@ export default function CreateTechnique() {
           customPlaceholderText="...describe a technique that your group uses"
           minHeight={300}
         />
+        <CreateArticleCharacterCount name="body" />
         <TagTopics
           submittingForm={submitting}
           selectedTopics={selectedTopics}

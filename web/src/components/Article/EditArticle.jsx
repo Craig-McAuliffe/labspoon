@@ -13,7 +13,11 @@ import ErrorMessage from '../Forms/ErrorMessage';
 import NotFoundPage from '../../pages/NotFoundPage/NotFoundPage';
 import {AuthContext} from '../../App';
 import {PaddedPageContainer} from '../Layout/Content';
-import {articleTitleValidation} from './Article';
+import {
+  articleTitleValidation,
+  CreateArticleCharacterCount,
+  MAX_ARTICLE_CHARACTERS,
+} from './Article';
 import FormTextInput from '../Forms/FormTextInput';
 
 export default function EditArticle({
@@ -110,7 +114,7 @@ export default function EditArticle({
         initialValues={savedInitialValues}
         validationSchema={Yup.object({
           title: articleTitleValidation,
-          body: yupRichBodyOnlyValidation(10000, 40),
+          body: yupRichBodyOnlyValidation(MAX_ARTICLE_CHARACTERS, 40),
         })}
         onSubmit={onSubmit}
       >
@@ -122,6 +126,7 @@ export default function EditArticle({
             label="Body"
             minHeight={300}
           />
+          <CreateArticleCharacterCount name="body" />
           <CreateResourceFormActions
             submitting={submitting}
             submitText="Save"

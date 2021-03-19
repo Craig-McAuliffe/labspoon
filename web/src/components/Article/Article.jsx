@@ -7,6 +7,8 @@ import {ListItemOptionsDropdown} from '../ListItem/ListItemCommonComponents';
 import * as Yup from 'yup';
 
 import './Article.css';
+import {getArticleLengthFromBody} from '../../helpers/articles';
+import {useField} from 'formik';
 
 export function Author({authorID, name}) {
   return (
@@ -182,5 +184,24 @@ export function AboutArticles({articleType}) {
       a group. Unlike posts, articles do not appear on your followers&#39;
       feeds. You can post about articles you have created.
     </p>
+  );
+}
+
+export const MAX_ARTICLE_CHARACTERS = 10000;
+
+export function CreateArticleCharacterCount({...props}) {
+  const [field] = useField(props);
+  const count = getArticleLengthFromBody(field.value);
+  let color;
+  color = '#99999F';
+  if (count >= (MAX_ARTICLE_CHARACTERS / 3) * 2) color = '#FF8A00';
+  if (count > MAX_ARTICLE_CHARACTERS) color = '#DA0000';
+  return (
+    <div
+      style={{color: color}}
+      className="article-character-length-warning-container"
+    >
+      {count} characters. Max {MAX_ARTICLE_CHARACTERS}
+    </div>
   );
 }

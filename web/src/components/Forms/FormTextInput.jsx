@@ -9,6 +9,7 @@ import {CreatingPostContext} from '../Posts/Post/CreatePost/CreatePost';
 
 import './FormTextInput.css';
 import HeaderAndBodyArticleInput from './Articles/HeaderAndBodyArticleInput';
+import {getArticleLengthFromBody} from '../../helpers/articles';
 
 export default function FormTextInput({
   label,
@@ -84,11 +85,7 @@ export function CreatePostTextArea({...props}) {
   const {setTitleLength, titleLength} = useContext(CreatePostTitleContext);
   const {setSavedTitleText} = useContext(CreatingPostContext);
   useEffect(() => {
-    const titleLength = field.value.reduce((accumulator, current) => {
-      // + 1 is for the paragraph break character itself
-      return accumulator + current.children[0].text.length + 1;
-    }, 0);
-    setTitleLength(titleLength);
+    setTitleLength(getArticleLengthFromBody(field.value));
     setSavedTitleText(field.value);
   }, [field.value]);
 

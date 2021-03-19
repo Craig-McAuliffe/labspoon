@@ -91,3 +91,10 @@ function resourceTypeToWord(resourceTypePlural) {
       'articles';
   }
 }
+
+export function getArticleLengthFromBody(body) {
+  return body.reduce((accumulator, current) => {
+    // + 1 is for the paragraph break character itself
+    return accumulator + current.children[0].text.length + 1;
+  }, 0);
+}

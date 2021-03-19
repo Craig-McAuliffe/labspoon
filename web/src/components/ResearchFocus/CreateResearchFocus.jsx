@@ -27,7 +27,12 @@ import {uploadImagesAndGetURLs} from '../../helpers/images';
 
 import './CreateResearchFocus.css';
 import FormTextInput from '../Forms/FormTextInput';
-import {AboutArticles, articleTitleValidation} from '../Article/Article';
+import {
+  AboutArticles,
+  articleTitleValidation,
+  CreateArticleCharacterCount,
+  MAX_ARTICLE_CHARACTERS,
+} from '../Article/Article';
 
 export default function CreateResearchFocus() {
   const preSelectedGroupID = useParams().groupID;
@@ -151,7 +156,7 @@ export default function CreateResearchFocus() {
     <Formik
       initialValues={savedInitialValues}
       validationSchema={Yup.object({
-        body: yupRichBodyOnlyValidation(10000, 40),
+        body: yupRichBodyOnlyValidation(MAX_ARTICLE_CHARACTERS, 40),
         title: articleTitleValidation,
       })}
       onSubmit={onSubmit}
@@ -172,6 +177,7 @@ export default function CreateResearchFocus() {
           label="Body"
           minHeight={300}
         />
+        <CreateArticleCharacterCount name="body" />
         <TagTopics
           submittingForm={submitting}
           selectedTopics={selectedTopics}
