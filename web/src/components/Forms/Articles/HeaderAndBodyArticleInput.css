@@ -1,26 +1,10 @@
-.editor-container {
-  margin: 40px 0px;
-  border: 1px solid #dcdce0;
-  padding: 20px;
-  border-bottom: 1px solid #99999f;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  min-height: 300px;
-}
-
 .editor-container-no-title {
-  border: 1px solid #dcdce0;
+  border: 1px solid #99999f;
   padding: 10px;
-  min-height: 100px;
 }
 
 .editor-container-no-title div {
   min-height: 100px;
-}
-
-.editor-container h2 {
-  border-bottom: 1px solid #dcdce0;
-  padding: 10px 0px;
 }
 
 .editor-container p {
@@ -29,4 +13,8 @@
 
 .rich-text-input-area .editor-container-no-title {
   border: 1px solid #99999f;
+}
+
+.editor-container-no-title span[contenteditable='false'] {
+  color: rgba(0, 0, 0, 1);
 }

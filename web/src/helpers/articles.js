@@ -1,4 +1,3 @@
-import {getTitleTextAndBody} from '../components/Forms/Articles/HeaderAndBodyArticleInput';
 import {db, firebaseFirestoreOptions} from '../firebase';
 import {convertGroupToGroupRef} from './groups';
 import {RESEARCHFOCUSES, TECHNIQUES} from './resourceTypeDefinitions';
@@ -6,7 +5,8 @@ import {userToUserRef} from './users';
 
 const MAX_ARTICLE_TYPE_PER_GROUP = 20;
 export default async function addArticleToDB(
-  articleText,
+  title,
+  body,
   photoURLs,
   selectedTopics,
   selectedGroup,
@@ -51,7 +51,6 @@ export default async function addArticleToDB(
   article.group = convertGroupToGroupRef(selectedGroup);
   article.photoURLs = photoURLs;
   article.author = userToUserRef(userProfile, userProfile.id);
-  const [title, body] = getTitleTextAndBody(articleText);
   article.title = title;
   article.body = body;
   article.timestamp = new Date();

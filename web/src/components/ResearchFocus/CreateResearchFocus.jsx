@@ -15,8 +15,8 @@ import LoadingSpinner, {
 } from '../LoadingSpinner/LoadingSpinner';
 import {getUserGroups} from '../../helpers/users';
 import HeaderAndBodyArticleInput, {
-  initialValue,
-  yupArticleValidation,
+  initialValueNoTitle,
+  yupRichBodyOnlyValidation,
 } from '../Forms/Articles/HeaderAndBodyArticleInput';
 import TagTopics from '../Topics/TagTopics';
 import CreateResourceFormActions from '../Forms/CreateResourceFormActions';
@@ -26,6 +26,8 @@ import {RESEARCHFOCUSES} from '../../helpers/resourceTypeDefinitions';
 import {uploadImagesAndGetURLs} from '../../helpers/images';
 
 import './CreateResearchFocus.css';
+import FormTextInput from '../Forms/FormTextInput';
+import {AboutArticles, articleTitleValidation} from '../Article/Article';
 
 export default function CreateResearchFocus() {
   const preSelectedGroupID = useParams().groupID;
@@ -35,7 +37,8 @@ export default function CreateResearchFocus() {
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [savedInitialValues, setSavedInitialValues] = useState({
-    researchFocus: initialValue,
+    title: '',
+    body: initialValueNoTitle,
     photos: [],
   });
   const {userProfile, authLoaded, user} = useContext(AuthContext);
@@ -99,7 +102,8 @@ export default function CreateResearchFocus() {
       });
     if (res.photos.length === 0) {
       addArticleToDB(
-        res.researchFocus,
+        res.title,
+        res.body,
         [],
         selectedTopics,
         selectedGroup,
@@ -127,7 +131,8 @@ export default function CreateResearchFocus() {
         fullSizeURL.replace('_fullSize', '')
       );
       addArticleToDB(
-        res.researchFocus,
+        res.title,
+        res.body,
         resizedPhotoURLs,
         selectedTopics,
         selectedGroup,
@@ -146,7 +151,8 @@ export default function CreateResearchFocus() {
     <Formik
       initialValues={savedInitialValues}
       validationSchema={Yup.object({
-        researchFocus: yupArticleValidation,
+        body: yupRichBodyOnlyValidation(10000, 40),
+        title: articleTitleValidation,
       })}
       onSubmit={onSubmit}
     >
@@ -156,9 +162,15 @@ export default function CreateResearchFocus() {
           selectedGroup={selectedGroup}
           setSelectedGroup={setSelectedGroup}
         />
+        <AboutArticles articleType="research focus" />
+        <FormTextInput name="title" label="Title" />
         <HeaderAndBodyArticleInput
-          name="researchFocus"
+          name="body"
           shouldAutoFocus={true}
+          customPlaceholderText="...describe a research focus of your group"
+          noTitle={true}
+          label="Body"
+          minHeight={300}
         />
         <TagTopics
           submittingForm={submitting}

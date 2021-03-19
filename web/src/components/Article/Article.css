@@ -62,6 +62,18 @@
   text-decoration: underline;
 }
 
+.about-articles {
+  color: #5d5d65;
+}
+
+.about-articles-button {
+  color: #5d5d65;
+  padding: 0px;
+}
+
+.about-articles-button:hover {
+  text-decoration: underline;
+}
 @media screen and (max-width: 500px) {
   .rich-body-link {
     line-height: 1.4em;

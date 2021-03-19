@@ -98,7 +98,7 @@ export function CreatePostTextArea({...props}) {
         noTitle={true}
         className="create-post-main-text"
         {...props}
-        customPlaceholderText="...What's happening?"
+        customPlaceholderText="...what's happening?"
         shouldAutoFocus={true}
       />
       <CreatePostCharacterCount count={titleLength} />

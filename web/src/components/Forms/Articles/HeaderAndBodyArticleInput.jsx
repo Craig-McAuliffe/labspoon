@@ -10,24 +10,23 @@ import './HeaderAndBodyArticleInput.css';
 
 export default function HeaderAndBodyArticleInput({
   label,
-  noTitle,
   customPlaceholderText,
   containerRef,
   shouldAutoFocus,
+  minHeight = 100,
   ...props
 }) {
   const [field, meta, helpers] = useField(props);
   const editor = useMemo(
-    () =>
-      noTitle
-        ? withLayoutNoTitle(withHistory(withReact(createEditor())))
-        : withLayout(withHistory(withReact(createEditor()))),
+    () => withLayoutNoTitle(withHistory(withReact(createEditor()))),
     []
   );
   const renderElement = useCallback((props) => <Element {...props} />, []);
 
   field.onChange = (content) => {
     helpers.setValue(content);
+    if (content[0].children[0].text === '') return;
+    if (!meta.touched) helpers.setTouched(true);
   };
 
   return (
@@ -38,8 +37,9 @@ export default function HeaderAndBodyArticleInput({
         </label>
       )}
       <div
-        className={`editor-container${noTitle ? '-no-title' : ''}`}
+        className="editor-container-no-title"
         ref={containerRef}
+        style={{minHeight: minHeight}}
       >
         <Slate editor={editor} {...field} {...props}>
           <Editable
@@ -57,29 +57,12 @@ export default function HeaderAndBodyArticleInput({
 
 const Element = ({attributes, children, element}) => {
   switch (element.type) {
-    case 'title':
-      return <h2 {...attributes}>{children}</h2>;
     case 'paragraph':
       return <p {...attributes}>{children}</p>;
     default:
       return <p {...attributes}>{children}</p>;
   }
 };
-
-export const initialValue = [
-  {
-    type: 'title',
-    children: [{text: 'Title goes here'}],
-  },
-  {
-    type: 'paragraph',
-    children: [
-      {
-        text: 'Body goes here',
-      },
-    ],
-  },
-];
 
 export const initialValueNoTitle = [
   {
@@ -91,40 +74,6 @@ export const initialValueNoTitle = [
     ],
   },
 ];
-
-const withLayout = (editor) => {
-  const {normalizeNode} = editor;
-
-  editor.normalizeNode = ([node, path]) => {
-    if (path.length === 0) {
-      if (editor.children.length < 1) {
-        const title = {type: 'title', children: [{text: 'Title goes here'}]};
-        Transforms.insertNodes(editor, title, {at: path.concat(0)});
-      }
-
-      if (editor.children.length < 2) {
-        const paragraph = {
-          type: 'paragraph',
-          children: [{text: 'Body goes here'}],
-        };
-        Transforms.insertNodes(editor, paragraph, {at: path.concat(1)});
-      }
-
-      for (const [child, childPath] of Node.children(editor, path)) {
-        const type = childPath[0] === 0 ? 'title' : 'paragraph';
-
-        if (SlateElement.isElement(child) && child.type !== type) {
-          const newProperties = {type};
-          Transforms.setNodes(editor, newProperties, {at: childPath});
-        }
-      }
-    }
-
-    return normalizeNode([node, path]);
-  };
-
-  return editor;
-};
 
 const withLayoutNoTitle = (editor) => {
   const {normalizeNode} = editor;
@@ -203,93 +152,3 @@ export const yupRichBodyOnlyValidation = (
         return true;
       }
     );
-
-export const yupArticleValidation = Yup.array()
-  .test(
-    'tooFewSections',
-    // eslint-disable-next-line no-template-curly-in-string
-    'You must provide a title and body section.',
-    (value) => {
-      if (value.length < 2) return false;
-      return true;
-    }
-  )
-  .test(
-    'isEmptyTitle',
-    // eslint-disable-next-line no-template-curly-in-string
-    'You must enter a title',
-    (value) => {
-      // Check title is not empty
-      if (!value[0]) return false;
-      if (value[0].type !== 'title') return false;
-      if (value[0].children.length === 0) return false;
-      if (value[0].children[0].text === undefined) return false;
-      if (value[0].children[0].length === 0) return false;
-
-      return true;
-    }
-  )
-  .test(
-    'isEmptyBody',
-    // eslint-disable-next-line no-template-curly-in-string
-    'You must write something!',
-    (value) => {
-      // Check body is not empty
-      if (value[1].type !== 'paragraph') return false;
-      if (value[1].children === undefined) return false;
-      if (value[1].children[0].text === undefined) return false;
-      if (value[1].children[0].text.length === 0) return false;
-
-      return true;
-    }
-  )
-  .test(
-    'isTooLong',
-    // eslint-disable-next-line no-template-curly-in-string
-    'Your article is too long. The title and body together must contain fewer than 10,000 characters.',
-    (value) => {
-      if (value[1].children === undefined) return false;
-      if (value[1].children[0].text === undefined) return false;
-      if (
-        value.reduce((accumulator, section) => {
-          if (!section.children[0].text) return accumulator;
-          return accumulator + section.children[0].text.length;
-        }, 0) > 10000
-      )
-        return false;
-      return true;
-    }
-  )
-  .test(
-    'isTooLong',
-    // eslint-disable-next-line no-template-curly-in-string
-    'The title is too long. It must contain fewer than 250 characters.',
-    (value) => {
-      if (value[0].children[0].text === undefined) return false;
-      if (value[0].children[0].text.length > 250) return false;
-      return true;
-    }
-  )
-  .test(
-    'isTooLong',
-    // eslint-disable-next-line no-template-curly-in-string
-    'Too many paragraphs.',
-    (value) => {
-      if (value === undefined) return false;
-      if (value.length > 30) return false;
-      return true;
-    }
-  );
-
-// assumes the article is properly validated
-export function getTitleTextAndBody(article) {
-  return [article[0].children[0].text, article.slice(1)];
-}
-
-export function mergeTitleAndBody(title, body) {
-  const mergedTitleAndBody = [
-    {type: 'title', children: [{text: title}]},
-    ...body,
-  ];
-  return mergedTitleAndBody;
-}

@@ -13,12 +13,10 @@ import {RESEARCHFOCUS} from '../../helpers/resourceTypeDefinitions';
 import './ResearchFocusListItem.css';
 
 export default function ResearchFocusListItem({researchFocus}) {
-  const title = researchFocus.title;
-  const body = researchFocus.body;
   return (
     <ListItemContainer>
       <ArticleHeaderAndType
-        title={title}
+        title={researchFocus.title}
         resourceType={RESEARCHFOCUS}
         icon={<ResearchFocusIcon />}
         resourceID={researchFocus.id}
@@ -29,7 +27,11 @@ export default function ResearchFocusListItem({researchFocus}) {
         customMargin="20px"
       />
       <ExpandableText resourceID={researchFocus.id}>
-        <RichTextBody body={body} expandable={true} id={researchFocus.id} />
+        <RichTextBody
+          body={researchFocus.body}
+          expandable={true}
+          id={researchFocus.id}
+        />
       </ExpandableText>
       <ListItemTopics
         dbTopics={researchFocus.topics}

@@ -1,9 +1,10 @@
 import Linkify from 'linkifyjs/react';
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import {Link} from 'react-router-dom';
 import {AuthContext} from '../../App';
 import {RESEARCHFOCUS, TECHNIQUE} from '../../helpers/resourceTypeDefinitions';
 import {ListItemOptionsDropdown} from '../ListItem/ListItemCommonComponents';
+import * as Yup from 'yup';
 
 import './Article.css';
 
@@ -150,4 +151,36 @@ export function getTweetTextFromRichText(text) {
     if (index === 0) return current.children[0].text;
     return accumulator + '%0a' + current.children[0].text;
   }, '');
+}
+
+export function ArticleHeaderAndTitlePlaceholderWrapper({children}) {
+  return (
+    <div className="placeholder-wrapper-for-rich-body-and-title">
+      {children}
+    </div>
+  );
+}
+
+export const articleTitleValidation = Yup.string()
+  .required('You need to enter a title')
+  .max(500, 'Title must container fewer than 500 characters');
+
+export function AboutArticles({articleType}) {
+  const [isHidden, setIsHidden] = useState(true);
+  if (isHidden)
+    return (
+      <button
+        className="about-articles-button"
+        onClick={() => setIsHidden(false)}
+      >
+        What is a {articleType}?
+      </button>
+    );
+  return (
+    <p className="about-articles">
+      This is an article. Articles are longer than posts and are associated with
+      a group. Unlike posts, articles do not appear on your followers&#39;
+      feeds. You can post about articles you have created.
+    </p>
+  );
 }

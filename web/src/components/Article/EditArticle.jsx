@@ -2,9 +2,7 @@ import {Form, Formik} from 'formik';
 import React, {useContext, useEffect, useState} from 'react';
 import {useHistory, useLocation} from 'react-router-dom';
 import HeaderAndBodyArticleInput, {
-  getTitleTextAndBody,
-  mergeTitleAndBody,
-  yupArticleValidation,
+  yupRichBodyOnlyValidation,
 } from '../Forms/Articles/HeaderAndBodyArticleInput';
 import GeneralError from '../GeneralError';
 import {LoadingSpinnerPage} from '../LoadingSpinner/LoadingSpinner';
@@ -15,6 +13,8 @@ import ErrorMessage from '../Forms/ErrorMessage';
 import NotFoundPage from '../../pages/NotFoundPage/NotFoundPage';
 import {AuthContext} from '../../App';
 import {PaddedPageContainer} from '../Layout/Content';
+import {articleTitleValidation} from './Article';
+import FormTextInput from '../Forms/FormTextInput';
 
 export default function EditArticle({
   articleCollectionName,
@@ -57,7 +57,8 @@ export default function EditArticle({
   useEffect(() => {
     if (!articleDetails || savedInitialValues) return;
     setSavedInitialValues({
-      articleText: mergeTitleAndBody(articleDetails.title, articleDetails.body),
+      body: articleDetails.body,
+      title: articleDetails.title,
     });
   }, [articleDetails]);
 
@@ -68,18 +69,17 @@ export default function EditArticle({
   if (userProfile.id !== articleDetails.author.id) history.replace('/');
   const onSubmit = async (res) => {
     setSubmitting(true);
-    const [title, body] = getTitleTextAndBody(res.articleText);
     if (
-      title === articleDetails.title &&
-      JSON.stringify(body) === JSON.stringify(articleDetails.body)
+      res.title === articleDetails.title &&
+      JSON.stringify(res.body) === JSON.stringify(articleDetails.body)
     ) {
       history.push(`/${articleType}/${articleID}`);
       return;
     }
     await articleDBRef
       .update({
-        title: title,
-        body: body,
+        title: res.title,
+        body: res.body,
       })
       .then(() => {
         locationState
@@ -93,7 +93,8 @@ export default function EditArticle({
         setUploadError(true);
       });
     setSavedInitialValues({
-      articleText: res.articleText,
+      articleTitle: res.title,
+      body: res.body,
     });
     setSubmitting(false);
   };
@@ -108,14 +109,18 @@ export default function EditArticle({
       <Formik
         initialValues={savedInitialValues}
         validationSchema={Yup.object({
-          articleText: yupArticleValidation,
+          title: articleTitleValidation,
+          body: yupRichBodyOnlyValidation(10000, 40),
         })}
         onSubmit={onSubmit}
       >
         <Form>
+          <FormTextInput name="title" label="Title" />
           <HeaderAndBodyArticleInput
-            name="articleText"
+            name="body"
             shouldAutoFocus={true}
+            label="Body"
+            minHeight={300}
           />
           <CreateResourceFormActions
             submitting={submitting}

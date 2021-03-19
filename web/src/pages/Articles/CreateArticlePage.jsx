@@ -5,12 +5,14 @@ import * as Yup from 'yup';
 import {PaddedPageContainer} from '../../components/Layout/Content';
 import PrimaryButton from '../../components/Buttons/PrimaryButton';
 import HeaderAndBodyArticleInput, {
-  yupArticleValidation,
-  initialValue,
+  initialValueNoTitle,
+  yupRichBodyOnlyValidation,
 } from '../../components/Forms/Articles/HeaderAndBodyArticleInput';
+import FormTextInput from '../../components/Forms/FormTextInput';
+import {articleTitleValidation} from '../../components/Article/Article';
 
 const validationSchema = Yup.object({
-  article: yupArticleValidation,
+  article: yupRichBodyOnlyValidation(10000, 40),
 });
 
 export default function CreateArticlePage() {
@@ -18,13 +20,20 @@ export default function CreateArticlePage() {
     <PaddedPageContainer>
       <Formik
         initialValues={{
-          article: initialValue,
+          body: initialValueNoTitle,
+          title: articleTitleValidation,
         }}
         validationSchema={validationSchema}
         onSubmit={(vals) => {}}
       >
         <Form>
-          <HeaderAndBodyArticleInput name="article" shouldAutoFocus={true} />
+          <FormTextInput label="Title" name="title" />
+          <HeaderAndBodyArticleInput
+            name="body"
+            shouldAutoFocus={true}
+            label="Body"
+            minHeight={300}
+          />
           <PrimaryButton submit>Submit</PrimaryButton>
         </Form>
       </Formik>

@@ -14,8 +14,8 @@ import LoadingSpinner, {
 } from '../LoadingSpinner/LoadingSpinner';
 import {getUserGroups} from '../../helpers/users';
 import HeaderAndBodyArticleInput, {
-  initialValue,
-  yupArticleValidation,
+  initialValueNoTitle,
+  yupRichBodyOnlyValidation,
 } from '../Forms/Articles/HeaderAndBodyArticleInput';
 import TagTopics from '../Topics/TagTopics';
 import CreateResourceFormActions from '../Forms/CreateResourceFormActions';
@@ -24,6 +24,8 @@ import FormImageUpload from '../Images/FormImageUpload';
 import addArticleToDB from '../../helpers/articles';
 import {TECHNIQUES} from '../../helpers/resourceTypeDefinitions';
 import {uploadImagesAndGetURLs} from '../../helpers/images';
+import FormTextInput from '../Forms/FormTextInput';
+import {AboutArticles, articleTitleValidation} from '../Article/Article';
 
 export default function CreateTechnique() {
   const preSelectedGroupID = useParams().groupID;
@@ -33,7 +35,7 @@ export default function CreateTechnique() {
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [savedInitialValues, setSavedInitialValues] = useState({
-    technique: initialValue,
+    body: initialValueNoTitle,
     photos: [],
   });
   const {userProfile, authLoaded, user} = useContext(AuthContext);
@@ -93,7 +95,8 @@ export default function CreateTechnique() {
       setSavedInitialValues({technique: res.technique, photos: res.photos});
     if (res.photos.length === 0) {
       addArticleToDB(
-        res.technique,
+        res.title,
+        res.body,
         [],
         selectedTopics,
         selectedGroup,
@@ -121,7 +124,8 @@ export default function CreateTechnique() {
         fullSizeURL.replace('_fullSize', '')
       );
       addArticleToDB(
-        res.technique,
+        res.title,
+        res.body,
         resizedPhotoURLs,
         selectedTopics,
         selectedGroup,
@@ -140,7 +144,8 @@ export default function CreateTechnique() {
     <Formik
       initialValues={savedInitialValues}
       validationSchema={Yup.object({
-        technique: yupArticleValidation,
+        body: yupRichBodyOnlyValidation(10000, 40),
+        title: articleTitleValidation,
       })}
       onSubmit={onSubmit}
     >
@@ -150,7 +155,15 @@ export default function CreateTechnique() {
           selectedGroup={selectedGroup}
           setSelectedGroup={setSelectedGroup}
         />
-        <HeaderAndBodyArticleInput name="technique" shouldAutoFocus={true} />
+        <AboutArticles articleType="technique" />
+        <FormTextInput name="title" label="Title" />
+        <HeaderAndBodyArticleInput
+          name="body"
+          shouldAutoFocus={true}
+          label="Body"
+          customPlaceholderText="...describe a technique that your group uses"
+          minHeight={300}
+        />
         <TagTopics
           submittingForm={submitting}
           selectedTopics={selectedTopics}

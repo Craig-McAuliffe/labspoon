@@ -11,12 +11,10 @@ import GroupSignature from '../Group/GroupSignature';
 import {TECHNIQUE} from '../../helpers/resourceTypeDefinitions';
 
 export default function TechniqueListItem({technique}) {
-  const title = technique.title;
-  const body = technique.body;
   return (
     <ListItemContainer>
       <ArticleHeaderAndType
-        title={title}
+        title={technique.title}
         resourceType={TECHNIQUE}
         icon={<TechniqueIcon />}
         resourceID={technique.id}
@@ -27,7 +25,7 @@ export default function TechniqueListItem({technique}) {
         customMargin="20px"
       />
       <ExpandableText resourceID={technique.id}>
-        <RichTextBody body={body} />
+        <RichTextBody body={technique.body} />
       </ExpandableText>
       <ListItemTopics
         dbTopics={technique.topics}
