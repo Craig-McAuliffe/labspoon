@@ -229,27 +229,35 @@ export const getPublicationsByAuthorIDExpression = functions.https.onCall(
         'invalid-argument',
         'An expression and count are required in the request'
       );
-    const fetchedPubs = await executeExpression({
-      expr: expression,
-      count: count,
-      attributes: allPublicationFields,
-      offset: offset,
-    })
-      .then(async (resp) => {
-        const makPublications: MAKPublication[] = resp.data.entities;
-        await publishAddPublicationRequests(makPublications);
-        return makPublications;
-      })
-      .catch((err) => {
-        console.error(`unable to execute expression ${expression} ${err}`);
-        throw new functions.https.HttpsError(
-          'internal',
-          'Microsoft evaluate failed for given expression'
-        );
-      });
-    return fetchedPubs.map((makPub) => makPublicationToPublication(makPub));
+    return fetchAndHandlePublicationsForAuthor(expression, count, offset);
   }
 );
+
+export async function fetchAndHandlePublicationsForAuthor(
+  expression: string,
+  count: number,
+  offset: number
+) {
+  const fetchedPubs = await executeExpression({
+    expr: expression,
+    count: count,
+    attributes: allPublicationFields,
+    offset: offset,
+  })
+    .then(async (resp) => {
+      const makPublications: MAKPublication[] = resp.data.entities;
+      await publishAddPublicationRequests(makPublications);
+      return makPublications;
+    })
+    .catch((err) => {
+      console.error(`unable to execute expression ${expression} ${err}`);
+      throw new functions.https.HttpsError(
+        'internal',
+        'Microsoft evaluate failed for given expression'
+      );
+    });
+  return fetchedPubs.map((makPub) => makPublicationToPublication(makPub));
+}
 
 interface executeParams {
   expr: string;

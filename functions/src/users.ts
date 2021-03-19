@@ -1,13 +1,13 @@
 import {firestore} from 'firebase-admin';
 import * as functions from 'firebase-functions';
-import {admin} from './config';
+import {admin, environment} from './config';
 import {GroupRef} from './groups';
 import {
   doFollowPreferencesBlockPost,
   FollowNoTopicsPreference,
   FollowPostTypePreferences,
 } from './helpers';
-import {MAKAuthor} from './microsoft';
+import {fetchAndHandlePublicationsForAuthor, MAKAuthor} from './microsoft';
 import {OpenPosition} from './openPositions';
 import {
   Post,
@@ -1256,6 +1256,21 @@ export const updateUserRefOnFollowFeedFilters = functions.firestore
     return Promise.all(followersUpdatePromise);
   });
 
+export const fetchPublicationsForNewLinkedUser = functions.firestore
+  .document('users/{userID}')
+  .onUpdate(async (change) => {
+    const newUserData = change.after.data() as User;
+    const oldUserData = change.before.data() as User;
+    if (newUserData.microsoftID && !oldUserData.microsoftID) {
+      const convertedMicrosoftID = Number(newUserData.microsoftID);
+      const expression = `Composite(AA.AuId=${convertedMicrosoftID})`;
+      const count = environment === 'local' ? 20 : 50;
+      const offset = 0;
+      return fetchAndHandlePublicationsForAuthor(expression, count, offset);
+    }
+    return;
+  });
+
 // Rank relates to how often the user posts in this topic
 export interface UserRef {
   id: string;
@@ -1285,7 +1300,6 @@ export function toUserRef(userID: string, user: any) {
     avatar: user.avatar ? user.avatar : null,
   };
   if (user.rank) userRef.rank = user.rank;
-  if (user.microsoftID) userRef.microsoftID = user.microsoftID;
   if (user.reputation) userRef.reputation = user.reputation;
   return userRef;
 }
