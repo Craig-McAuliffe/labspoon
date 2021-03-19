@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React from 'react';
 import {useHistory} from 'react-router-dom';
 import {DottedBurgerMenuIcon} from '../../assets/MenuIcons';
 import Dropdown, {DropdownOption} from '../Dropdown';
@@ -11,34 +11,10 @@ export function ListItemContainer({children}) {
 }
 
 export function ExpandableText({children, resourceID, initialHeight = 144}) {
-  const [displayFullText, setDisplayFullText] = useState({
-    display: false,
-    size: initialHeight,
-  });
-
-  const containerRef = useRef();
-
-  const containerSize = {
-    height: `${displayFullText.size}px`,
-  };
-
   return (
-    <>
-      <div
-        ref={containerRef}
-        style={containerSize}
-        className="list-item-expandable-container"
-      >
-        {children}
-      </div>
-      <SeeMore
-        displayFullDescription={displayFullText}
-        setDisplayFullDescription={setDisplayFullText}
-        descriptionRef={containerRef}
-        id={resourceID}
-        initialHeight={initialHeight}
-      />
-    </>
+    <SeeMore id={resourceID} initialHeight={initialHeight}>
+      {children}
+    </SeeMore>
   );
 }
 

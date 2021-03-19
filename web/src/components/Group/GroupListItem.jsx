@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React from 'react';
 import {Link} from 'react-router-dom';
 import SeeMore from '../SeeMore';
 import GroupAvatar from '../Avatar/GroupAvatar';
@@ -18,17 +18,6 @@ export default function GroupListItem({
   children,
   isFollowsPageResults,
 }) {
-  const [displayFullDescription, setDisplayFullDescription] = useState({
-    display: false,
-    size: GROUP_LIST_ITEM_DESCRIPTION_HEIGHT,
-  });
-
-  const groupDescriptionRef = useRef();
-
-  const descriptionSize = {
-    height: `${displayFullDescription.size}px`,
-  };
-
   function WrapWithLinkOrOverride({children}) {
     if (LinkOverride) return <LinkOverride>{children}</LinkOverride>;
     return <Link to={`/group/${group.id}`}>{children}</Link>;
@@ -67,20 +56,12 @@ export default function GroupListItem({
           </div>
         </div>
         <div className="group-list-item-text-container">
-          <div
-            ref={groupDescriptionRef}
-            style={descriptionSize}
-            className="group-list-item-description"
-          >
-            <RichTextBody body={group.about} shouldLinkify={true} />
-          </div>
           <SeeMore
-            displayFullDescription={displayFullDescription}
-            setDisplayFullDescription={setDisplayFullDescription}
-            descriptionRef={groupDescriptionRef}
             id={group.id}
             initialHeight={GROUP_LIST_ITEM_DESCRIPTION_HEIGHT}
-          />
+          >
+            <RichTextBody body={group.about} shouldLinkify={true} />
+          </SeeMore>
         </div>
       </div>
     </div>

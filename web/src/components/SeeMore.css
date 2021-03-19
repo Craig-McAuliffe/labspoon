@@ -13,3 +13,8 @@
   outline: none;
   color: #3099d3;
 }
+
+.see-more-container {
+  overflow-x: none;
+  overflow-y: hidden;
+}

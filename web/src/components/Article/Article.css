@@ -44,19 +44,31 @@
 }
 
 .rich-body-link {
-word-wrap: break-word;
-word-break: break-all;
-line-height: 1.5em;
+  word-wrap: break-word;
+  word-break: break-all;
+  line-height: 1.5em;
+  margin-bottom: 24px;
 }
 
 .rich-body-paragraph {
-word-wrap: break-word;
-word-break: break-all;
-line-height: 1.5em;
-margin-bottom: 24px;
+  word-wrap: break-word;
+  word-break: normal;
+  line-height: 1.5em;
+  margin-bottom: 24px;
 }
 
 .rich-body-link:hover {
-color: #00507C;
-text-decoration: underline;
+  color: #00507c;
+  text-decoration: underline;
+}
+
+@media screen and (max-width: 500px) {
+  .rich-body-link {
+    line-height: 1.4em;
+    margin-bottom: 22px;
+  }
+
+  .rich-body-paragraph {
+    margin-bottom: 22px;
+  }
 }

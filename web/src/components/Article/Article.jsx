@@ -83,13 +83,15 @@ export function ArticleHeaderAndType({
   );
 }
 
-export function RichTextBody({body, shouldLinkify}) {
+export function RichTextBody({body, shouldLinkify = true}) {
   if (!body) return null;
   const bodyDisplay = (
     <div className="rich-body-section">
       {body.map((bodySection, i) =>
         bodySection.type === 'paragraph' ? (
-          <p key={bodySection.type + i}>{bodySection.children[0].text}</p>
+          <p className="rich-body-paragraph" key={bodySection.type + i}>
+            {bodySection.children[0].text}
+          </p>
         ) : (
           <h3 key={bodySection.type + i}>{bodySection.children[0].text}</h3>
         )

@@ -5,10 +5,6 @@
   margin: 2px 2px 30px 2px;
 }
 
-.list-item-expandable-container {
-  overflow-y: hidden;
-}
-
 .list-options-container {
   display: flex;
   justify-content: flex-end;

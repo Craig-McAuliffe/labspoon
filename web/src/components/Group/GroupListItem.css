@@ -21,11 +21,6 @@
   text-decoration: none;
 }
 
-.group-list-item-description {
-  overflow-x: none;
-  overflow-y: hidden;
-}
-
 .group-list-item-name-institution-container {
   margin-right: 5px;
 }

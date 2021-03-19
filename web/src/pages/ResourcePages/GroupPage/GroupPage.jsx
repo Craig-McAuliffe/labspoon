@@ -414,10 +414,6 @@ const GroupDetails = ({
 }) => {
   const featureFlags = useContext(FeatureFlags);
   const [shouldRefresh, setShouldRefresh] = useState(false);
-  const [displayFullDescription, setDisplayFullDescription] = useState({
-    display: false,
-    size: GROUP_DESCRIPTION_HEIGHT,
-  });
   useEffect(() => {
     if (group && shouldRefresh) {
       setShouldRefresh(false);
@@ -450,10 +446,6 @@ const GroupDetails = ({
       </div>
     );
 
-  const descriptionSize = {
-    height: `${displayFullDescription.size}px`,
-  };
-
   return (
     <>
       <div className="group-header">
@@ -469,21 +461,11 @@ const GroupDetails = ({
           <FollowGroupButton targetGroup={group} />
         </div>
       </div>
-      <div
-        className={'group-description'}
-        style={descriptionSize}
-        ref={groupDescriptionRef}
-      >
-        <RichTextBody body={group.about} shouldLinkify={true} />
+      <div className="group-description">
+        <SeeMore id={group.id} initialHeight={GROUP_DESCRIPTION_HEIGHT}>
+          <RichTextBody body={group.about} shouldLinkify={true} />
+        </SeeMore>
       </div>
-
-      <SeeMore
-        displayFullDescription={displayFullDescription}
-        setDisplayFullDescription={setDisplayFullDescription}
-        descriptionRef={groupDescriptionRef}
-        id={group.id}
-        initialHeight={GROUP_DESCRIPTION_HEIGHT}
-      />
 
       <DonationLink verified={verified} donationLink={group.donationLink} />
       {featureFlags.has('group-pinned-post') ? (
