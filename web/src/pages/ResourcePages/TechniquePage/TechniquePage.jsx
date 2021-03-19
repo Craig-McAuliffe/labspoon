@@ -5,12 +5,11 @@ import GeneralError from '../../../components/GeneralError';
 import {LoadingSpinnerPage} from '../../../components/LoadingSpinner/LoadingSpinner';
 import {PaddedPageContainer} from '../../../components/Layout/Content';
 import ListItemTopics from '../../../components/ListItem/ListItemTopics';
-import GroupListItem from '../../../components/Group/GroupListItem';
-import FollowGroupButton from '../../../components/Group/FollowGroupButton';
 import {
   Author,
   RichTextBody,
   ArticleHeaderAndType,
+  ArticlePageGroupSection,
 } from '../../../components/Article/Article';
 import {
   formatTaggedImages,
@@ -69,9 +68,7 @@ export default function TechniquePage() {
         dbTopics={technique.topics}
         customTopics={technique.customTopics}
       />
-      <GroupListItem group={technique.group} noBorder={true}>
-        <FollowGroupButton targetGroup={technique.group} />
-      </GroupListItem>
+      <ArticlePageGroupSection group={technique.group} />
       <ImagesSection
         images={formatTaggedImages(technique.photoURLs)}
         customMargin="30px"

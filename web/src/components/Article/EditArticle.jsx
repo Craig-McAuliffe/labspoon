@@ -35,6 +35,11 @@ export default function EditArticle({
   const history = useHistory();
   const locationState = useLocation().state;
   const articleDBRef = db.doc(`${articleCollectionName}/${articleID}`);
+  const articleGroupRef = articleDetails
+    ? db.doc(
+        `groups/${articleDetails.group.id}/${articleCollectionName}/${articleID}`
+      )
+    : undefined;
   const {userProfile} = useContext(AuthContext);
   useEffect(async () => {
     const articleDS = await articleDBRef
@@ -80,15 +85,24 @@ export default function EditArticle({
       history.push(`/${articleType}/${articleID}`);
       return;
     }
-    await articleDBRef
-      .update({
-        title: res.title,
-        body: res.body,
-      })
+    const batch = db.batch();
+
+    batch.update(articleDBRef, {
+      title: res.title,
+      body: res.body,
+    });
+    batch.update(articleGroupRef, {
+      title: res.title,
+      body: res.body,
+    });
+    await batch
+      .commit()
       .then(() => {
         locationState
           ? history.push(locationState.previousLocation)
-          : history.push(`/${articleType}/${articleID}`);
+          : history.push(
+              `/groups/${articleDetails.group.id}/${articleCollectionName}`
+            );
       })
       .catch((err) => {
         console.error(

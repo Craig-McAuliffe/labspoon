@@ -7,15 +7,6 @@ import {ArticleBodyChild} from './researchFocuses';
 
 const db = admin.firestore();
 
-export const addTechniqueToGroup = functions.firestore
-  .document(`techniques/{techniqueID}`)
-  .onCreate((techniqueDS, context) => {
-    const technique = techniqueDS.data() as Technique;
-    const techniqueID = context.params.techniqueID;
-    const groupID = technique.group.id;
-    return db.doc(`groups/${groupID}/techniques/${techniqueID}`).set(technique);
-  });
-
 export const addTechniqueToAuthor = functions.firestore
   .document(`techniques/{techniqueID}`)
   .onCreate((techniqueDS) => {
@@ -48,16 +39,6 @@ export const addTechniqueToTopics = functions.firestore
         );
     });
     return await Promise.all(topicsPromises);
-  });
-
-export const updateTechniqueOnGroup = functions.firestore
-  .document(`techniques/{techniqueID}`)
-  .onUpdate((techniqueDS) => {
-    const technique = techniqueDS.after.data();
-    const groupID = technique.group.id;
-    return db
-      .doc(`groups/${groupID}/techniques/${techniqueDS.after.id}`)
-      .set(technique);
   });
 
 export const updateTechniqueOnAuthor = functions.firestore

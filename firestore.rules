@@ -165,10 +165,12 @@ service cloud.firestore {
 
       match /techniques/{techniqueID} {
         allow read;
+        allow write: if request.auth != null && exists(/databases/$(database)/documents/groups/$(groupID)/members/$(request.auth.uid));
       }
 
       match /researchFocuses/{researchFocusID} {
         allow read;
+        allow write: if request.auth != null && exists(/databases/$(database)/documents/groups/$(groupID)/members/$(request.auth.uid));
       }
 
       match /openPositions/{openPositionID} {

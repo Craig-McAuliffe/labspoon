@@ -12,6 +12,7 @@ export default async function addArticleToDB(
   selectedGroup,
   userProfile,
   articleDBRef,
+  articleOnGroupRef,
   setSubmitting,
   history,
   resourceTypePlural,
@@ -55,8 +56,12 @@ export default async function addArticleToDB(
   article.body = body;
   article.timestamp = new Date();
   article.unixTimeStamp = Math.floor(new Date().getTime() / 1000);
-  articleDBRef
-    .set(article)
+  const batch = db.batch();
+  batch.set(articleDBRef, article);
+  batch.set(articleOnGroupRef, article);
+
+  return batch
+    .commit()
     .then(async () => {
       await db
         .doc(`groupsStats/${selectedGroup.id}`)
@@ -71,7 +76,7 @@ export default async function addArticleToDB(
             `unable to add article count to group with id ${selectedGroup.id} ${err}`
           )
         );
-      history.push(`/group/${selectedGroup.id}`);
+      history.push(`/group/${selectedGroup.id}/${resourceTypePlural}`);
     })
     .catch((err) => {
       console.error(err);

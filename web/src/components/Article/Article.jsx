@@ -5,10 +5,12 @@ import {AuthContext} from '../../App';
 import {RESEARCHFOCUS, TECHNIQUE} from '../../helpers/resourceTypeDefinitions';
 import {ListItemOptionsDropdown} from '../ListItem/ListItemCommonComponents';
 import * as Yup from 'yup';
-
-import './Article.css';
 import {getArticleLengthFromBody} from '../../helpers/articles';
 import {useField} from 'formik';
+import GroupListItem from '../Group/GroupListItem';
+import FollowGroupButton from '../Group/FollowGroupButton';
+
+import './Article.css';
 
 export function Author({authorID, name}) {
   return (
@@ -202,6 +204,17 @@ export function CreateArticleCharacterCount({...props}) {
       className="article-character-length-warning-container"
     >
       {count} characters. Max {MAX_ARTICLE_CHARACTERS}
+    </div>
+  );
+}
+
+export function ArticlePageGroupSection({group}) {
+  return (
+    <div className="article-page-group-section">
+      <h4 className="article-page-group-section-title">Associated Group</h4>
+      <GroupListItem group={group} noBorder={true}>
+        <FollowGroupButton targetGroup={group} />
+      </GroupListItem>
     </div>
   );
 }

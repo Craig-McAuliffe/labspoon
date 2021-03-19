@@ -96,10 +96,13 @@ export default function CreateTechnique() {
     setSubmitting(true);
     const techniqueDBRef = db.collection(`techniques`).doc();
     const techniqueID = techniqueDBRef.id;
+    const techniqueOnGroupRef = db.doc(
+      `groups/${selectedGroup.id}/techniques/${techniqueID}`
+    );
     const failFunction = () =>
       setSavedInitialValues({technique: res.technique, photos: res.photos});
     if (res.photos.length === 0) {
-      addArticleToDB(
+      return addArticleToDB(
         res.title,
         res.body,
         [],
@@ -107,13 +110,13 @@ export default function CreateTechnique() {
         selectedGroup,
         userProfile,
         techniqueDBRef,
+        techniqueOnGroupRef,
         setSubmitting,
         history,
         TECHNIQUES,
         'techniquesCount',
         failFunction
       );
-      return;
     }
     uploadImagesAndGetURLs(
       Array.from(res.photos),
@@ -128,7 +131,7 @@ export default function CreateTechnique() {
       const resizedPhotoURLs = fullSizePhotoURLs.map((fullSizeURL) =>
         fullSizeURL.replace('_fullSize', '')
       );
-      addArticleToDB(
+      return addArticleToDB(
         res.title,
         res.body,
         resizedPhotoURLs,
@@ -136,6 +139,7 @@ export default function CreateTechnique() {
         selectedGroup,
         userProfile,
         techniqueDBRef,
+        techniqueOnGroupRef,
         setSubmitting,
         history,
         TECHNIQUES,
@@ -143,7 +147,6 @@ export default function CreateTechnique() {
         failFunction
       );
     });
-    return;
   }
   return (
     <Formik

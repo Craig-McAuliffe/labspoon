@@ -25,7 +25,7 @@ export default function HeaderAndBodyArticleInput({
 
   field.onChange = (content) => {
     helpers.setValue(content);
-    if (content[0].children[0].text === '') return;
+    if (content[0] && content[0].children[0].text === '') return;
     if (!meta.touched) helpers.setTouched(true);
   };
 

@@ -100,13 +100,16 @@ export default function CreateResearchFocus() {
     setSubmitting(true);
     const researchFocusDBRef = db.collection(`researchFocuses`).doc();
     const researchFocusID = researchFocusDBRef.id;
+    const researchFocusOnGroupRef = db.doc(
+      `groups/${selectedGroup.id}/researchFocuses/${researchFocusID}`
+    );
     const failFunction = () =>
       setSavedInitialValues({
         researchFocus: res.researchFocus,
         photos: res.photos,
       });
     if (res.photos.length === 0) {
-      addArticleToDB(
+      return addArticleToDB(
         res.title,
         res.body,
         [],
@@ -114,13 +117,13 @@ export default function CreateResearchFocus() {
         selectedGroup,
         userProfile,
         researchFocusDBRef,
+        researchFocusOnGroupRef,
         setSubmitting,
         history,
         RESEARCHFOCUSES,
         'researchFocusesCount',
         failFunction
       );
-      return;
     }
     uploadImagesAndGetURLs(
       Array.from(res.photos),
@@ -135,7 +138,7 @@ export default function CreateResearchFocus() {
       const resizedPhotoURLs = fullSizePhotoURLs.map((fullSizeURL) =>
         fullSizeURL.replace('_fullSize', '')
       );
-      addArticleToDB(
+      return addArticleToDB(
         res.title,
         res.body,
         resizedPhotoURLs,
@@ -143,6 +146,7 @@ export default function CreateResearchFocus() {
         selectedGroup,
         userProfile,
         researchFocusDBRef,
+        researchFocusOnGroupRef,
         setSubmitting,
         history,
         RESEARCHFOCUSES,
@@ -150,7 +154,6 @@ export default function CreateResearchFocus() {
         failFunction
       );
     });
-    return;
   }
   return (
     <Formik

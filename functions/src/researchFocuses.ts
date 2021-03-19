@@ -6,17 +6,6 @@ import {UserRef} from './users';
 
 const db = admin.firestore();
 
-export const addResearchFocusToGroup = functions.firestore
-  .document(`researchFocuses/{researchFocusID}`)
-  .onCreate((researchFocusDS, context) => {
-    const researchFocus = researchFocusDS.data() as ResearchFocus;
-    const researchFocusID = context.params.researchFocusID;
-    const groupID = researchFocus.group.id;
-    return db
-      .doc(`groups/${groupID}/researchFocuses/${researchFocusID}`)
-      .set(researchFocus);
-  });
-
 export const addResearchFocusToAuthor = functions.firestore
   .document(`researchFocuses/{researchFocusID}`)
   .onCreate((researchFocusDS) => {
@@ -51,16 +40,6 @@ export const addResearchFocusToTopics = functions.firestore
       }
     );
     return await Promise.all(topicsPromises);
-  });
-
-export const updateResearchFocusOnGroup = functions.firestore
-  .document(`researchFocuses/{researchFocusID}`)
-  .onUpdate((researchFocusDS) => {
-    const researchFocus = researchFocusDS.after.data();
-    const groupID = researchFocus.group.id;
-    return db
-      .doc(`groups/${groupID}/researchFocuses/${researchFocusDS.after.id}`)
-      .set(researchFocus);
   });
 
 export const updateResearchFocusOnAuthor = functions.firestore

@@ -80,6 +80,17 @@
   justify-content: flex-end;
 }
 
+.article-page-group-section-title {
+  color: #5d5d65;
+}
+
+.article-page-group-section {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding-top: 20px;
+  margin-bottom: 20px;
+}
+
 @media screen and (max-width: 500px) {
   .rich-body-link {
     line-height: 1.4em;

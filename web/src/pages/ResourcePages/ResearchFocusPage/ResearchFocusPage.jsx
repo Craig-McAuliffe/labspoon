@@ -5,12 +5,11 @@ import GeneralError from '../../../components/GeneralError';
 import {LoadingSpinnerPage} from '../../../components/LoadingSpinner/LoadingSpinner';
 import {PaddedPageContainer} from '../../../components/Layout/Content';
 import ListItemTopics from '../../../components/ListItem/ListItemTopics';
-import GroupListItem from '../../../components/Group/GroupListItem';
-import FollowGroupButton from '../../../components/Group/FollowGroupButton';
 import {
   Author,
   RichTextBody,
   ArticleHeaderAndType,
+  ArticlePageGroupSection,
 } from '../../../components/Article/Article';
 import {
   formatTaggedImages,
@@ -70,9 +69,7 @@ export default function ResearchFocusPage() {
         dbTopics={researchFocus.topics}
         customTopics={researchFocus.customTopics}
       />
-      <GroupListItem group={researchFocus.group} noBorder={true}>
-        <FollowGroupButton targetGroup={researchFocus.group} />
-      </GroupListItem>
+      <ArticlePageGroupSection group={researchFocus.group} />
       <ImagesSection
         images={formatTaggedImages(researchFocus.photoURLs)}
         customMargin="30px"
