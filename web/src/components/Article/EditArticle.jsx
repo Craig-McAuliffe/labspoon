@@ -2,6 +2,7 @@ import {Form, Formik} from 'formik';
 import React, {useContext, useEffect, useState} from 'react';
 import {useHistory, useLocation} from 'react-router-dom';
 import HeaderAndBodyArticleInput, {
+  CreateRichTextCharacterCount,
   yupRichBodyOnlyValidation,
 } from '../Forms/Articles/HeaderAndBodyArticleInput';
 import GeneralError from '../GeneralError';
@@ -13,11 +14,7 @@ import ErrorMessage from '../Forms/ErrorMessage';
 import NotFoundPage from '../../pages/NotFoundPage/NotFoundPage';
 import {AuthContext} from '../../App';
 import {PaddedPageContainer} from '../Layout/Content';
-import {
-  articleTitleValidation,
-  CreateArticleCharacterCount,
-  MAX_ARTICLE_CHARACTERS,
-} from './Article';
+import {articleTitleValidation, MAX_ARTICLE_CHARACTERS} from './Article';
 import FormTextInput from '../Forms/FormTextInput';
 
 export default function EditArticle({
@@ -140,7 +137,10 @@ export default function EditArticle({
             label="Body"
             minHeight={300}
           />
-          <CreateArticleCharacterCount name="body" />
+          <CreateRichTextCharacterCount
+            name="body"
+            maxCount={MAX_ARTICLE_CHARACTERS}
+          />
           <CreateResourceFormActions
             submitting={submitting}
             submitText="Save"

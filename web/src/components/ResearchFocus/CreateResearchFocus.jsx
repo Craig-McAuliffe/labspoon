@@ -15,6 +15,7 @@ import LoadingSpinner, {
 } from '../LoadingSpinner/LoadingSpinner';
 import {getUserGroups} from '../../helpers/users';
 import HeaderAndBodyArticleInput, {
+  CreateRichTextCharacterCount,
   initialValueNoTitle,
   yupRichBodyOnlyValidation,
 } from '../Forms/Articles/HeaderAndBodyArticleInput';
@@ -24,15 +25,14 @@ import FormImageUpload from '../Images/FormImageUpload';
 import addArticleToDB from '../../helpers/articles';
 import {RESEARCHFOCUSES} from '../../helpers/resourceTypeDefinitions';
 import {uploadImagesAndGetURLs} from '../../helpers/images';
-
-import './CreateResearchFocus.css';
 import FormTextInput from '../Forms/FormTextInput';
 import {
   AboutArticles,
   articleTitleValidation,
-  CreateArticleCharacterCount,
   MAX_ARTICLE_CHARACTERS,
 } from '../Article/Article';
+
+import './CreateResearchFocus.css';
 
 export default function CreateResearchFocus() {
   const preSelectedGroupID = useParams().groupID;
@@ -180,7 +180,10 @@ export default function CreateResearchFocus() {
           label="Body"
           minHeight={300}
         />
-        <CreateArticleCharacterCount name="body" />
+        <CreateRichTextCharacterCount
+          name="body"
+          maxCount={MAX_ARTICLE_CHARACTERS}
+        />
         <TagTopics
           submittingForm={submitting}
           selectedTopics={selectedTopics}

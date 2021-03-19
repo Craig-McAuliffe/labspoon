@@ -1,15 +1,17 @@
 import React, {useContext, useEffect} from 'react';
 import {useField} from 'formik';
 import InputError from './InputError';
+import {CreatePostTitleContext} from '../Posts/Post/CreatePost/PostForm';
 import {
-  CreatePostCharacterCount,
-  CreatePostTitleContext,
-} from '../Posts/Post/CreatePost/PostForm';
-import {CreatingPostContext} from '../Posts/Post/CreatePost/CreatePost';
+  CreatingPostContext,
+  MAX_POST_CHARACTERS,
+} from '../Posts/Post/CreatePost/CreatePost';
+import HeaderAndBodyArticleInput, {
+  CreateRichTextCharacterCount,
+} from './Articles/HeaderAndBodyArticleInput';
+import {getArticleLengthFromBody} from '../../helpers/articles';
 
 import './FormTextInput.css';
-import HeaderAndBodyArticleInput from './Articles/HeaderAndBodyArticleInput';
-import {getArticleLengthFromBody} from '../../helpers/articles';
 
 export default function FormTextInput({
   label,
@@ -82,7 +84,7 @@ export function TextInput({
 
 export function CreatePostTextArea({...props}) {
   const [field] = useField(props);
-  const {setTitleLength, titleLength} = useContext(CreatePostTitleContext);
+  const {setTitleLength} = useContext(CreatePostTitleContext);
   const {setSavedTitleText} = useContext(CreatingPostContext);
   useEffect(() => {
     setTitleLength(getArticleLengthFromBody(field.value));
@@ -98,7 +100,7 @@ export function CreatePostTextArea({...props}) {
         customPlaceholderText="...what's happening?"
         shouldAutoFocus={true}
       />
-      <CreatePostCharacterCount count={titleLength} />
+      <CreateRichTextCharacterCount maxCount={MAX_POST_CHARACTERS} {...props} />
     </>
   );
 }

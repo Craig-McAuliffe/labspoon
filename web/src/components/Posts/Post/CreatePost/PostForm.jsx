@@ -2,11 +2,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import {Form, Formik} from 'formik';
 import TagTopics from '../../../Topics/TagTopics';
 import CreatePostActions from './CreatePostActions';
-import {
-  CreatingPostContext,
-  MAX_POST_CHARACTERS,
-  validateTweetPostLength,
-} from './CreatePost';
+import {CreatingPostContext, validateTweetPostLength} from './CreatePost';
 import './CreatePost';
 import LoadingSpinner from '../../../LoadingSpinner/LoadingSpinner';
 import {Alert} from 'react-bootstrap';
@@ -94,18 +90,6 @@ export default function PostForm({
           hasTweetOption={true}
         />
       </div>
-    </div>
-  );
-}
-
-export function CreatePostCharacterCount({count}) {
-  let color;
-  color = '#99999F';
-  if (count >= (MAX_POST_CHARACTERS / 3) * 2) color = '#FF8A00';
-  if (count > MAX_POST_CHARACTERS) color = '#DA0000';
-  return (
-    <div style={{color: color}} className="character-length-warning-container">
-      {count} characters. Max {MAX_POST_CHARACTERS}
     </div>
   );
 }

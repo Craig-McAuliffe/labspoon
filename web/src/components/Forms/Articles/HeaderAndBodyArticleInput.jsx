@@ -7,6 +7,7 @@ import {withHistory} from 'slate-history';
 import InputError from '../InputError';
 
 import './HeaderAndBodyArticleInput.css';
+import {getArticleLengthFromBody} from '../../../helpers/articles';
 
 export default function HeaderAndBodyArticleInput({
   label,
@@ -152,3 +153,20 @@ export const yupRichBodyOnlyValidation = (
         return true;
       }
     );
+
+export function CreateRichTextCharacterCount({maxCount, ...props}) {
+  const [field] = useField(props);
+  const count = getArticleLengthFromBody(field.value);
+  let color;
+  color = '#99999F';
+  if (count >= (maxCount / 3) * 2) color = '#FF8A00';
+  if (count > maxCount) color = '#DA0000';
+  return (
+    <div
+      style={{color: color}}
+      className="article-character-length-warning-container"
+    >
+      {count} characters. Max {maxCount}
+    </div>
+  );
+}

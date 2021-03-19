@@ -14,6 +14,7 @@ import LoadingSpinner, {
 } from '../LoadingSpinner/LoadingSpinner';
 import {getUserGroups} from '../../helpers/users';
 import HeaderAndBodyArticleInput, {
+  CreateRichTextCharacterCount,
   initialValueNoTitle,
   yupRichBodyOnlyValidation,
 } from '../Forms/Articles/HeaderAndBodyArticleInput';
@@ -28,7 +29,6 @@ import FormTextInput from '../Forms/FormTextInput';
 import {
   AboutArticles,
   articleTitleValidation,
-  CreateArticleCharacterCount,
   MAX_ARTICLE_CHARACTERS,
 } from '../Article/Article';
 
@@ -172,7 +172,10 @@ export default function CreateTechnique() {
           customPlaceholderText="...describe a technique that your group uses"
           minHeight={300}
         />
-        <CreateArticleCharacterCount name="body" />
+        <CreateRichTextCharacterCount
+          name="body"
+          maxCount={MAX_ARTICLE_CHARACTERS}
+        />
         <TagTopics
           submittingForm={submitting}
           selectedTopics={selectedTopics}
