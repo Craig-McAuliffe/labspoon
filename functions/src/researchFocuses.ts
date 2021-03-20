@@ -42,6 +42,23 @@ export const addResearchFocusToTopics = functions.firestore
     return await Promise.all(topicsPromises);
   });
 
+export const updateResearchFocusOnGroup = functions.firestore
+  .document(`researchFocuses/{researchFocusID}`)
+  .onUpdate((researchFocusDS) => {
+    const researchFocus = researchFocusDS.after.data();
+    const oldResearchFocusData = researchFocusDS.before.data();
+    // if user edited article, this will already be updated
+    if (
+      JSON.stringify(researchFocus.body) !==
+      JSON.stringify(oldResearchFocusData.body)
+    )
+      return;
+    const groupID = researchFocus.group.id;
+    return db
+      .doc(`groups/${groupID}/researchFocuses/${researchFocusDS.after.id}`)
+      .set(researchFocus);
+  });
+
 export const updateResearchFocusOnAuthor = functions.firestore
   .document(`researchFocuses/{researchFocusID}`)
   .onUpdate((researchFocusDS) => {

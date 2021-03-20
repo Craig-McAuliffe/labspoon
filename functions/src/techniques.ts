@@ -41,6 +41,22 @@ export const addTechniqueToTopics = functions.firestore
     return await Promise.all(topicsPromises);
   });
 
+export const updateTechniqueOnGroup = functions.firestore
+  .document(`techniques/{techniqueID}`)
+  .onUpdate((techniqueDS) => {
+    const technique = techniqueDS.after.data();
+    const oldTechniqueData = techniqueDS.before.data();
+    // if user edited article, this will already be updated
+    if (
+      JSON.stringify(technique.body) !== JSON.stringify(oldTechniqueData.body)
+    )
+      return;
+    const groupID = technique.group.id;
+    return db
+      .doc(`groups/${groupID}/techniques/${techniqueDS.after.id}`)
+      .set(technique);
+  });
+
 export const updateTechniqueOnAuthor = functions.firestore
   .document(`techniques/{techniqueID}`)
   .onUpdate((techniqueDS) => {
