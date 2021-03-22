@@ -43,6 +43,7 @@ import './GroupPage.css';
 import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 import {RichTextBody} from '../../../components/Article/Article';
 import TertiaryButton from '../../../components/Buttons/TertiaryButton';
+import UserCoverPhoto from '../../../components/User/UserCoverPhoto';
 
 function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip) {
   const activeTab = filterOptions ? getActiveTabID(filterOptions) : null;
@@ -450,16 +451,34 @@ const GroupDetails = ({
     <>
       <div className="group-header">
         <div className="group-icon-and-message">
-          <GroupAvatar src={group.avatar} height="160" width="160" />
+          <div className="group-avatar-positioning">
+            <GroupAvatar src={group.avatar} height="160" width="160" />
+          </div>
           {featureFlags.has('group-message-button') ? <MessageButton /> : null}
         </div>
         <div className="group-header-info">
           <div className="group-header-name-insitution">
             <h2>{group.name}</h2>
-            <h3>{group.institution}</h3>
+            <h4>{group.institution}</h4>
           </div>
-          <FollowGroupButton targetGroup={group} />
         </div>
+      </div>
+      <div className="group-cover-photo-container">
+        <UserCoverPhoto
+          src={group.coverPhoto}
+          alt={`group cover picture`}
+          isGroup={true}
+        />
+      </div>
+      <div className="group-email-follow-container">
+        <WebsiteLink link={group.website} />
+        {userIsMember ? (
+          <Link to={routedTabID ? `edit/info` : `${groupID}/edit/info`}>
+            <EditButton editAction={() => {}}>Edit Group</EditButton>
+          </Link>
+        ) : (
+          <FollowGroupButton targetGroup={group} />
+        )}
       </div>
       <div className="group-description">
         <SeeMore id={group.id} initialHeight={GROUP_DESCRIPTION_HEIGHT}>
@@ -473,14 +492,6 @@ const GroupDetails = ({
           <PinnedPost post={group.pinnedPost} />
         </div>
       ) : null}
-      <div className="group-email-edit-container">
-        <WebsiteLink link={group.website} />
-        {userIsMember ? (
-          <Link to={routedTabID ? `edit/info` : `${groupID}/edit/info`}>
-            <EditButton editAction={() => {}}>Edit Group</EditButton>
-          </Link>
-        ) : null}
-      </div>
     </>
   );
 };

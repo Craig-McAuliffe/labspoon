@@ -92,3 +92,7 @@ export function editGroupAvatarStorageInForm(
       }
     );
 }
+
+export function getDefaultGroupCoverPhoto() {
+  return `https://storage.googleapis.com/${firebaseConfig.storageBucket}/avatars/default_group_cover_photo.png`;
+}

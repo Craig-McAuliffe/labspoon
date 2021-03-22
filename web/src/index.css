@@ -19,15 +19,15 @@ h6 {
 }
 
 h1 {
-  font-size: 2em;
+  font-size: 1.7em;
 }
 
 h2 {
-  font-size: 1.5em;
+  font-size: 1.4em;
 }
 
 h3 {
-  font-size: 1.3em;
+  font-size: 1.2em;
 }
 
 h4 {
@@ -60,14 +60,9 @@ input:focus {
   outline: none;
 }
 
-@media screen and (max-width: 500px) {
-  body {
-    font-size: 15px;
-    scrollbar-width: none;
-  }
-
+@media screen and (max-width: 1500px) {
   h1 {
-    font-size: 1.7em;
+    font-size: 1.5em;
   }
 
   h2 {
@@ -80,6 +75,30 @@ input:focus {
 
   h4 {
     font-size: 1em;
+    margin: 0;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  body {
+    font-size: 15px;
+    scrollbar-width: none;
+  }
+
+  h1 {
+    font-size: 1.4em;
+  }
+
+  h2 {
+    font-size: 1.2em;
+  }
+
+  h3 {
+    font-size: 1em;
+  }
+
+  h4 {
+    font-size: 0.9em;
     margin: 0;
   }
 

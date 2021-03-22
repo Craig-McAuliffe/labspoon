@@ -95,6 +95,7 @@ export default function EditGroupPhotos({children}) {
         groupAvatar={groupAvatar}
         refresh={refresh}
       />
+      <EditGroupCoverPicture groupID={groupID} />
       <GroupImageUpload
         groupID={groupID}
         refresh={refresh}
@@ -116,6 +117,20 @@ function GroupAvatarUpload({groupID, groupAvatar, refresh}) {
         isAvatar={true}
         shouldResize={true}
         refresh={refresh}
+      />
+    </div>
+  );
+}
+
+function EditGroupCoverPicture({groupID}) {
+  return (
+    <div className="edit-user-photos-section">
+      <h3 className="edit-group-photos-sub-title">Group Cover Photo</h3>
+      <ImageUpload
+        storageDir={`groups/${groupID}/coverPhoto`}
+        isCover={true}
+        noGif={true}
+        shouldResize={true}
       />
     </div>
   );

@@ -47,12 +47,16 @@ export default function GroupInfoForm({
   const validationObj = {
     name: Yup.string()
       .required('Name is required')
-      .max(500, 'Must have fewer than 500 characters'),
-    location: Yup.string(),
-    institution: Yup.string(),
-    website: Yup.string().url('Must be a valid url'),
+      .max(60, 'Must have fewer than 60 characters'),
+    location: Yup.string().max(60, 'Must have fewer than 60 characters'),
+    institution: Yup.string().max(60, 'Must have fewer than 60 characters'),
+    website: Yup.string()
+      .url('Must be a valid url')
+      .max(200, 'Must have fewer than 200 characters'),
     about: yupRichBodyOnlyValidation(4000, 15),
-    donationLink: Yup.string().url('Must be a valid url'),
+    donationLink: Yup.string()
+      .url('Must be a valid url')
+      .max(200, 'Must have fewer than 200 characters'),
   };
   if (!editingGroup)
     validationObj.groupType = Yup.mixed()

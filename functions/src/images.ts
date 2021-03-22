@@ -165,6 +165,15 @@ function getResizeOptions(filePath: string) {
         '-extent',
         '200x200',
       ];
+    if (filePath.includes('cover'))
+      return [
+        '-thumbnail',
+        '1605x300^',
+        '-gravity',
+        'center',
+        '-extent',
+        '1605x300',
+      ];
     return [
       '-thumbnail',
       '400x400^',

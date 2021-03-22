@@ -187,10 +187,7 @@ function UserInfo({user}) {
   return (
     <div>
       <div className="user-cover-photo-container">
-        <UserCoverPhoto
-          src={user.coverPhoto}
-          alt={`user cover picture from source ${user.coverPhoto}`}
-        />
+        <UserCoverPhoto src={user.coverPhoto} alt={`user cover picture`} />
       </div>
       <div className="user-headline">
         <div className="user-page-avatar-container">
