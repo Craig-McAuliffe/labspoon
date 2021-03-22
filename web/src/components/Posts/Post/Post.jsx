@@ -6,19 +6,36 @@ import DefaultUserIcon from '../../../assets/DefaultUserIcon.svg';
 import ListItemTopics from '../../ListItem/ListItemTopics';
 import PublicationListItem from '../../Publication/PublicationListItem';
 import UserAvatar from '../../Avatar/UserAvatar';
-
 import 'bootstrap/dist/css/bootstrap.min.css';
-
-import './Post.css';
 import {
   OPENPOSITION,
   PUBLICATION,
 } from '../../../helpers/resourceTypeDefinitions';
 import {RichTextBody} from '../../Article/Article';
-import {RecommendIconSelected} from '../../../assets/PostActionIcons';
 import {db} from '../../../firebase';
 
+import './Post.css';
+import {PinListItem} from '../../ListItem/ListItemCommonComponents';
+
 export default function Post({post, dedicatedPage, bookmarkedVariation}) {
+  const [recommendedCount, setRecommendedCount] = useState(false);
+
+  useEffect(async () => {
+    if (post.recommendedCount)
+      return setRecommendedCount(post.recommendedCount);
+    const fetchedRecommendedCount = await db
+      .doc(`posts/${post.id}`)
+      .get()
+      .then((ds) => ds.data().recommendedCount)
+      .catch((err) =>
+        console.error(
+          `unable to fetch recommended count for post ${post.id} ${err}`
+        )
+      );
+    if (!fetchedRecommendedCount) return;
+    setRecommendedCount(fetchedRecommendedCount);
+  }, [post.id]);
+
   const taggedContent = [];
   if (post[PUBLICATION])
     taggedContent.push({type: PUBLICATION, content: post.publication});
@@ -36,8 +53,8 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
           <PostHeader
             postAuthor={post.author}
             postUnixTimestamp={post.unixTimeStamp}
-            existingRecommendedCount={post.recommendedCount}
             postID={post.id}
+            post={post}
           />
           <PostTextContent post={post} />
         </div>
@@ -54,8 +71,7 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
         postAuthor={post.author}
         postUnixTimestamp={post.unixTimeStamp}
         dedicatedPage={dedicatedPage}
-        existingRecommendedCount={post.recommendedCount}
-        postID={post.id}
+        post={post}
       />
       <PostTextContent post={post} dedicatedPage={dedicatedPage} />
       <PostTaggedContent taggedContent={taggedContent} />
@@ -64,6 +80,8 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
         post={post}
         dedicatedPage={dedicatedPage}
         bookmarkedVariation={bookmarkedVariation}
+        recommendedCount={recommendedCount}
+        setRecommendedCount={setRecommendedCount}
       />
     </div>
   );
@@ -93,31 +111,7 @@ const calculateHoursAndDaysSincePost = (postUnixTimestamp) => {
   return `${yearsSincePost} year${yearsSincePost === 1 ? '' : 's'} ago`;
 };
 
-function PostHeader({
-  postAuthor,
-  postUnixTimestamp,
-  dedicatedPage,
-  existingRecommendedCount,
-  postID,
-}) {
-  const [recommendedCount, setRecommendedCount] = useState(false);
-
-  useEffect(async () => {
-    if (existingRecommendedCount)
-      return setRecommendedCount(existingRecommendedCount);
-    const fetchedRecommendedCount = await db
-      .doc(`posts/${postID}`)
-      .get()
-      .then((ds) => ds.data().recommendedCount)
-      .catch((err) =>
-        console.error(
-          `unable to fetch recommended count for post ${postID} ${err}`
-        )
-      );
-    if (!fetchedRecommendedCount) return;
-    setRecommendedCount(fetchedRecommendedCount);
-  }, [postID]);
-
+function PostHeader({postAuthor, postUnixTimestamp, dedicatedPage, post}) {
   return (
     <div
       className={dedicatedPage ? 'post-header-dedicated-page' : 'post-header'}
@@ -137,16 +131,13 @@ function PostHeader({
           <p>{calculateHoursAndDaysSincePost(postUnixTimestamp)}</p>
         </div>
       </div>
-      {recommendedCount && <PostStats recommendedCount={recommendedCount} />}
-    </div>
-  );
-}
-
-function PostStats({recommendedCount}) {
-  return (
-    <div className="post-stats-container">
-      <span>{recommendedCount}</span>
-      <RecommendIconSelected />
+      {post.hasPinOption && (
+        <PinListItem
+          item={post}
+          pinProfileID={post.pinProfileID}
+          pinProfileCollection={post.pinProfileTypePlural}
+        />
+      )}
     </div>
   );
 }

@@ -18,7 +18,6 @@ import GroupAvatar from '../../../components/Avatar/GroupAvatar';
 import FollowGroupButton from '../../../components/Group/FollowGroupButton';
 import MessageButton from '../../../components/Buttons/MessageButton';
 import EditButton from '../../../components/Buttons/EditButton';
-import {PinnedPost} from '../../../components/Posts/Post/Post';
 import SeeMore from '../../../components/SeeMore';
 import {getGroup} from '../../../helpers/groups';
 import {getPaginatedVideosFromCollectionRef} from '../../../helpers/videos';
@@ -35,6 +34,7 @@ import {
   PUBLICATIONS,
   POSTS,
   TOPICS,
+  GROUPS,
 } from '../../../helpers/resourceTypeDefinitions';
 import ResourcesFeed from '../ResourcesFeeds';
 import {PaddedContent} from '../../../components/Layout/Content';
@@ -44,6 +44,7 @@ import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 import {RichTextBody} from '../../../components/Article/Article';
 import TertiaryButton from '../../../components/Buttons/TertiaryButton';
 import UserCoverPhoto from '../../../components/User/UserCoverPhoto';
+import {GenericListItem} from '../../../components/Results/Results';
 
 function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip) {
   const activeTab = filterOptions ? getActiveTabID(filterOptions) : null;
@@ -56,114 +57,115 @@ function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip) {
       const postsCollection = db
         .collection(`groups/${groupID}/posts`)
         .orderBy('timestamp', 'desc');
-      return [
-        getPaginatedPostsFromCollectionRef(postsCollection, limit, last),
-        null,
-      ];
+      results = getPaginatedPostsFromCollectionRef(
+        postsCollection,
+        limit,
+        last
+      );
+      break;
     case 'publications':
       const publicationsCollection = db.collection(
         `groups/${groupID}/publications`
       );
-      return [
-        getPaginatedPublicationsFromCollectionRef(
-          publicationsCollection,
-          limit,
-          last
-        ),
-        null,
-      ];
+      results = getPaginatedPublicationsFromCollectionRef(
+        publicationsCollection,
+        limit,
+        last
+      );
+      break;
     case 'members':
       const usersCollection = db.collection(`groups/${groupID}/members`);
-      return [
-        getPaginatedUserReferencesFromCollectionRef(
-          usersCollection,
-          limit,
-          last
-        ),
-        null,
-      ];
+      results = getPaginatedUserReferencesFromCollectionRef(
+        usersCollection,
+        limit,
+        last
+      );
+      break;
     case 'topics':
       const topicsCollection = db.collection(`groups/${groupID}/topics`);
-      return [
-        getPaginatedTopicsFromCollectionRef(
-          topicsCollection,
-          limit,
-          last,
-          true
-        ),
-        null,
-      ];
+      results = getPaginatedTopicsFromCollectionRef(
+        topicsCollection,
+        limit,
+        last,
+        true
+      );
+      break;
     case PHOTOS:
       const photosCollection = db.collection(`groups/${groupID}/photos`);
-      return [
-        getPaginatedImagesFromCollectionRef(photosCollection, limit, last),
-        null,
-      ];
+      results = getPaginatedImagesFromCollectionRef(
+        photosCollection,
+        limit,
+        last
+      );
+      break;
     case VIDEOS:
       const videosCollection = db.collection(`groups/${groupID}/videos`);
-      return [
-        getPaginatedVideosFromCollectionRef(videosCollection, limit, last),
-        null,
-      ];
+      results = getPaginatedVideosFromCollectionRef(
+        videosCollection,
+        limit,
+        last
+      );
+      break;
     case OPENPOSITIONS:
       const openPositionsCollection = db.collection(
         `groups/${groupID}/openPositions`
       );
 
-      return [
-        getPaginatedResourcesFromCollectionRef(
-          openPositionsCollection,
-          limit,
-          last,
-          OPENPOSITION
-        ),
-        null,
-      ];
+      results = getPaginatedResourcesFromCollectionRef(
+        openPositionsCollection,
+        limit,
+        last,
+        OPENPOSITION
+      );
+      break;
     case RESEARCHFOCUSES:
       const researchFocusesCollection = db.collection(
         `groups/${groupID}/${RESEARCHFOCUSES}`
       );
 
-      return [
-        getPaginatedResourcesFromCollectionRef(
-          researchFocusesCollection,
-          limit,
-          last,
-          RESEARCHFOCUS
-        ),
-        null,
-      ];
+      results = getPaginatedResourcesFromCollectionRef(
+        researchFocusesCollection,
+        limit,
+        last,
+        RESEARCHFOCUS
+      );
+      break;
     case TECHNIQUES:
       const techniquesCollection = db.collection(
         `groups/${groupID}/techniques`
       );
 
-      return [
-        getPaginatedResourcesFromCollectionRef(
-          techniquesCollection,
-          limit,
-          last,
-          TECHNIQUE
-        ),
-        null,
-      ];
+      results = getPaginatedResourcesFromCollectionRef(
+        techniquesCollection,
+        limit,
+        last,
+        TECHNIQUE
+      );
+      break;
     case 'followedByUsers':
       const followersCollection = db.collection(
         `groups/${groupID}/followedByUsers`
       );
-      return [
-        getPaginatedUserReferencesFromCollectionRef(
-          followersCollection,
-          limit,
-          last,
-          true
-        ),
-        null,
-      ];
+      results = getPaginatedUserReferencesFromCollectionRef(
+        followersCollection,
+        limit,
+        last,
+        true
+      );
+      break;
     default:
       results = [];
+      break;
   }
-  return [results, null];
+  return [
+    results,
+    null,
+    {
+      pinned: true,
+      pinProfileTypePlural: GROUPS,
+      pinProfileID: groupID,
+    },
+  ];
 }
 
 const checkIfTabsAreUsed = async (setUsedTabs, groupID) => {
@@ -244,6 +246,7 @@ export default function GroupPage() {
   if (groupID !== groupIDParam) {
     setGroupID(groupIDParam);
   }
+
   useEffect(() => {
     Promise.resolve(getGroup(groupID))
       .then((groupData) => {
@@ -415,6 +418,24 @@ const GroupDetails = ({
 }) => {
   const featureFlags = useContext(FeatureFlags);
   const [shouldRefresh, setShouldRefresh] = useState(false);
+  const [pinnedItem, setPinnedItem] = useState(null);
+
+  useEffect(() => {
+    if (!group) return;
+    if (group.pinnedItem) setPinnedItem(group.pinnedItem);
+  }, [groupID]);
+
+  useEffect(() => {
+    if (!groupID) return;
+    const groupDocObserver = db
+      .doc(`groups/${groupID}`)
+      .onSnapshot((docSnapshot) => {
+        const newGroupData = docSnapshot.data();
+        setPinnedItem(newGroupData.pinnedItem);
+      });
+    return () => groupDocObserver();
+  }, [groupID]);
+
   useEffect(() => {
     if (group && shouldRefresh) {
       setShouldRefresh(false);
@@ -487,11 +508,8 @@ const GroupDetails = ({
       </div>
 
       <DonationLink verified={verified} donationLink={group.donationLink} />
-      {featureFlags.has('group-pinned-post') ? (
-        <div className="pinned-post-container">
-          <PinnedPost post={group.pinnedPost} />
-        </div>
-      ) : null}
+
+      {pinnedItem && <PinnedItem pinnedItem={pinnedItem} />}
     </>
   );
 };
@@ -542,5 +560,13 @@ function DonateButton() {
     <button type="button" className="donate-button">
       <h3>Donate</h3>
     </button>
+  );
+}
+
+function PinnedItem({pinnedItem}) {
+  return (
+    <div className="pinned-item-container">
+      <GenericListItem result={pinnedItem} />
+    </div>
   );
 }

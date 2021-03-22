@@ -1,0 +1,33 @@
+.resource-result-pin-button,
+.resource-result-pin-button-pinned {
+  color: #00507c;
+  width: 55px;
+}
+
+.resource-result-pin-button svg,
+.resource-result-pin-button-pinned svg {
+  height: 30px;
+}
+
+.resource-result-pin-button:hover svg circle {
+  fill: #00507c;
+}
+
+.resource-result-pin-button:hover svg path {
+  fill: #ffffff;
+}
+
+.resource-result-pin-button-pinned svg path {
+  fill: #ffffff;
+}
+
+.resource-result-pin-button-pinned svg circle {
+  fill: #00507c;
+}
+.resource-result-pin-button-pinned:hover svg path {
+  fill: #00507c;
+}
+
+.resource-result-pin-button-pinned:hover svg circle {
+  fill: #ffffff;
+}

@@ -174,7 +174,6 @@ export default function CreateResearchFocus() {
         <FormTextInput name="title" label="Title" />
         <HeaderAndBodyArticleInput
           name="body"
-          shouldAutoFocus={true}
           customPlaceholderText="...describe a research focus of your group"
           noTitle={true}
           label="Body"

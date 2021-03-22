@@ -22,6 +22,7 @@ export const TOPIC = 'topic';
 export const IMAGE = 'image';
 export const VIDEO = 'video';
 export const RECOMMENDATION = 'recommendation';
+export const PHOTO = 'photo';
 
 export function resourceTypeToCollection(resourceType) {
   switch (resourceType) {

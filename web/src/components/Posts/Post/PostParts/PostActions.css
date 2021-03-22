@@ -47,3 +47,12 @@
   display: flex;
   justify-content: flex-end;
 }
+
+.post-actions-button-container {
+  display: flex;
+  align-items: center;
+}
+
+.post-actions-button-container span {
+  color: #5d5d65;
+}

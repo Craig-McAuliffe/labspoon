@@ -32,7 +32,8 @@
   line-height: 16px;
 }
 
-.standard-popover-display {
+.standard-popover-display,
+.standard-popover-display-no-fixed-width {
   display: block;
   position: absolute;
   padding: 10px;
@@ -41,6 +42,8 @@
   color: #5d5d65;
   border-radius: 10px;
   z-index: 1;
+}
+.standard-popover-display {
   width: 30vw;
 }
 

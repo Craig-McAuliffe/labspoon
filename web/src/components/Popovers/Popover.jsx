@@ -107,19 +107,28 @@ export default function Popover({getPopUpComponent, shouldNotOpen, children}) {
     return (
       <div className="pop-up-relative-container">
         {popOverChild}
-        <div ref={popOverRef}>{getPopUpComponent()}</div>
+        <div ref={popOverRef}>{getPopUpComponent(setOpen)}</div>
       </div>
     );
   return popOverChild;
 }
 
-export function StandardPopoverDisplay({left, right, top, bottom, text}) {
+export function StandardPopoverDisplay({
+  left,
+  right,
+  top,
+  bottom,
+  content,
+  noFixedWidth,
+}) {
   return (
     <div
-      className="standard-popover-display"
+      className={`standard-popover-display${
+        noFixedWidth ? '-no-fixed-width' : ''
+      }`}
       style={{right: right, left: left, top: top, bottom: bottom}}
     >
-      {text}
+      {content}
     </div>
   );
 }

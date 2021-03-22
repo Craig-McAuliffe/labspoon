@@ -25,9 +25,9 @@ import {
   RESEARCHFOCUS,
   TECHNIQUE,
 } from '../../helpers/resourceTypeDefinitions';
+import SelectCheckBox, {setItemSelectedState} from '../Buttons/SelectCheckBox';
 
 import './Results.css';
-import SelectCheckBox, {setItemSelectedState} from '../Buttons/SelectCheckBox';
 
 /**
  * Displays an infinitely scrolling list of posts.

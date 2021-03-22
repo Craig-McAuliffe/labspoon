@@ -56,7 +56,7 @@ export default function FilterableResults({children, fetchResults, limit}) {
     // wait until the filter is loaded to avoid an unnecessary reload of the results
     if (loadingFilter) return;
     setLoadingResults(true);
-    const [resultsPromise, errorMessage] = fetchResultsFunction(
+    const [resultsPromise, errorMessage, parameters] = fetchResultsFunction(
       0,
       limit + 1,
       filter,
@@ -74,6 +74,7 @@ export default function FilterableResults({children, fetchResults, limit}) {
         setLoadingResults(false);
       } else {
         setHasMore(!(newResults.length <= limit));
+        if (parameters) handleResultParameters(newResults, parameters);
         setResults(newResults.slice(0, limit));
         setLast(newResults[newResults.length - 1]);
         setSkip(limit);
@@ -85,7 +86,7 @@ export default function FilterableResults({children, fetchResults, limit}) {
   // fetches results by triggering an effect
   function fetchMore() {
     setLoadingResults(true);
-    const [resultsPromise, errorMessage] = fetchResultsFunction(
+    const [resultsPromise, errorMessage, parameters] = fetchResultsFunction(
       skip,
       limit + 1,
       filter,
@@ -99,6 +100,7 @@ export default function FilterableResults({children, fetchResults, limit}) {
     return Promise.resolve(resultsPromise)
       .then((newResults) => {
         setHasMore(!(newResults.length <= limit));
+        if (parameters) handleResultParameters(newResults, parameters);
         const updatedResults = [...results, ...newResults.slice(0, limit)];
         setResults(updatedResults);
         setLast(updatedResults[updatedResults.length - 1]);
@@ -278,6 +280,15 @@ export function NewFilterMenuWrapper({
       radio={radio}
     />
   );
+}
+
+function handleResultParameters(results, parameters) {
+  if (parameters.pinned)
+    results.forEach((result) => {
+      result.hasPinOption = true;
+      result.pinProfileTypePlural = parameters.pinProfileTypePlural;
+      result.pinProfileID = parameters.pinProfileID;
+    });
 }
 
 export function ResourceTabs({

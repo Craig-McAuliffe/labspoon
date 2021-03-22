@@ -52,7 +52,7 @@ export default function TagTopics({
         <Popover
           getPopUpComponent={() => (
             <StandardPopoverDisplay
-              text={topicTaggingExplained}
+              content={topicTaggingExplained}
               right="0px"
               top="20px"
             />

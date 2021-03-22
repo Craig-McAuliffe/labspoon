@@ -30,3 +30,14 @@
   padding: 0px;
   margin-bottom: 10px;
 }
+
+.resource-result-with-pin-container {
+  position: relative;
+  align-self: flex-start;
+}
+
+.resource-result-pin-container {
+  position: absolute;
+  padding: 5px;
+  right: 0px;
+}

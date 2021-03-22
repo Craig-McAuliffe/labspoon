@@ -167,7 +167,6 @@ export default function CreateTechnique() {
         <FormTextInput name="title" label="Title" />
         <HeaderAndBodyArticleInput
           name="body"
-          shouldAutoFocus={true}
           label="Body"
           customPlaceholderText="...describe a technique that your group uses"
           minHeight={300}

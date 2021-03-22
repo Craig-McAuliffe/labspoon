@@ -19,6 +19,7 @@ const RecommendButton = ({
   recommendedResourceType,
   recommendedResourceID,
   recommendedByCollection,
+  setRecommendedCount,
 }) => {
   const [isRecommended, setIsRecommended] = useState(undefined);
   const [loading, setLoading] = useState(true);
@@ -61,6 +62,7 @@ const RecommendButton = ({
       batch
         .commit()
         .then(() => {
+          setRecommendedCount((currentCount) => currentCount + 1);
           setSubmitting(false);
           setIsRecommended(true);
         })
@@ -76,7 +78,8 @@ const RecommendButton = ({
         recommendedResourceDoc,
         user.uid,
         setSubmitting,
-        setIsRecommended
+        setIsRecommended,
+        setRecommendedCount
       );
     }
   };
@@ -152,7 +155,8 @@ export async function removeRecommendation(
   recommendedResourceDoc,
   userID,
   setSubmitting,
-  setIsRecommended
+  setIsRecommended,
+  setRecommendedCount
 ) {
   const batch = db.batch();
   batch.delete(userRecommendationsCollection.doc(recommendedResourceID));
@@ -163,6 +167,8 @@ export async function removeRecommendation(
   return batch
     .commit()
     .then(() => {
+      if (setRecommendedCount)
+        setRecommendedCount((currentCount) => currentCount - 1);
       if (setIsRecommended) setIsRecommended(false);
       if (setSubmitting) setSubmitting(false);
     })

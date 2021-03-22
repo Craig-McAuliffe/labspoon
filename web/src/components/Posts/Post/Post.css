@@ -186,16 +186,6 @@
   color: #99999f;
 }
 
-.post-stats-container path {
-  fill: #dcdce0;
-}
-
-.post-stats-container span {
-  display: inline-block;
-  margin-right: 5px;
-  color: #5d5d65;
-}
-
 @media screen and (max-width: 590px) {
   .post-type-name {
     font-size: 16px;
