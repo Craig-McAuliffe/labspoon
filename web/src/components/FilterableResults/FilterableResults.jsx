@@ -283,10 +283,10 @@ export function NewFilterMenuWrapper({
 }
 
 function handleResultParameters(results, parameters) {
-  if (parameters.pinned)
+  if (parameters.showPinOption)
     results.forEach((result) => {
-      result.hasPinOption = true;
-      result.pinProfileTypePlural = parameters.pinProfileTypePlural;
+      result.showPinOption = true;
+      result.pinProfileCollection = parameters.pinProfileCollection;
       result.pinProfileID = parameters.pinProfileID;
     });
 }

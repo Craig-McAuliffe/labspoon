@@ -85,6 +85,22 @@
   stroke: #ffffff;
 }
 
+.dropdown-option-button:hover .pin-icon path,
+.dropdown-option-button:focus .pin-icon path {
+  stroke: #ffffff;
+}
+
+.dropdown-option-button:hover .pin-icon,
+.dropdown-option-button:focus .pin-icon {
+  stroke: #00507c;
+}
+
+.dropdown-option-button:hover .pin-icon circle,
+.dropdown-option-button:focus .pin-icon circle {
+  stroke: #ffffff;
+  fill: #00507c;
+}
+
 .dropdown-option-button svg {
   width: 50px;
 }

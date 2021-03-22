@@ -21,6 +21,7 @@ export default function ResearchFocusListItem({researchFocus}) {
         icon={<ResearchFocusIcon />}
         resourceID={researchFocus.id}
         authorID={researchFocus.author.id}
+        article={researchFocus}
       />
       <ImagesSection
         images={formatTaggedImages(researchFocus.photoURLs)}

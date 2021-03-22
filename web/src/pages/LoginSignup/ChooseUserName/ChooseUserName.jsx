@@ -24,8 +24,8 @@ export default function ChooseUserName() {
     userName: Yup.string()
       .required('Please enter your name')
       .max(
-        150,
-        'Too long! Your username must contain fewer than 150 characters.'
+        100,
+        'Too long! Your username must contain fewer than 100 characters.'
       ),
   });
 

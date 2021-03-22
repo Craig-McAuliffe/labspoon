@@ -1,12 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {useHistory} from 'react-router-dom';
+import {EditIcon, PinIcon} from '../../assets/GeneralActionIcons';
 import {DottedBurgerMenuIcon} from '../../assets/MenuIcons';
 import {db} from '../../firebase';
 import PinButton from '../Buttons/PinButton';
-import PrimaryButton from '../Buttons/PrimaryButton';
 import Dropdown, {DropdownOption} from '../Dropdown';
-import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
-import Popover, {StandardPopoverDisplay} from '../Popovers/Popover';
 import SeeMore from '../SeeMore';
 
 import './ListItemCommonComponents.css';
@@ -23,20 +21,13 @@ export function ExpandableText({children, resourceID, initialHeight = 144}) {
   );
 }
 
-export function ListItemOptionsDropdown({resourceType, resourceID}) {
-  const history = useHistory();
-  const getListItemDropdownOptions = () => (
-    <DropdownOption
-      onSelect={() => {
-        history.replace(`/${resourceType}/${resourceID}/edit`, {
-          previousLocation: history.location.pathname,
-        });
-      }}
-    >
-      <h4 className="list-item-options-dropdown-text">Edit</h4>
-    </DropdownOption>
-  );
-
+export function ListItemOptionsDropdown({
+  resourceType,
+  resourceID,
+  item,
+  pinProfileID,
+  pinProfileCollection,
+}) {
   const listItemOptionsDropDownToggle = (setOpen) => (
     <button
       className="list-item-dropdown-toggle"
@@ -49,14 +40,79 @@ export function ListItemOptionsDropdown({resourceType, resourceID}) {
     // <BrowserRouter basename="">
     <div className="list-options-container">
       <Dropdown customToggle={listItemOptionsDropDownToggle}>
-        {getListItemDropdownOptions()}
+        <ListItemOptionsDropDownOptions
+          onSelect={() => {}}
+          resourceType={resourceType}
+          resourceID={resourceID}
+          item={item}
+          pinProfileID={pinProfileID}
+          pinProfileCollection={pinProfileCollection}
+        />
       </Dropdown>
     </div>
     // </BrowserRouter>
   );
 }
 
-export function PinListItem({pinProfileID, pinProfileCollection, item}) {
+function ListItemOptionsDropDownOptions({
+  onSelect,
+  resourceType,
+  resourceID,
+  item,
+  pinProfileID,
+  pinProfileCollection,
+}) {
+  const history = useHistory();
+
+  const getCustomDisplay = (isPinned, pinItem) => {
+    return (
+      <DropdownOption
+        onSelect={() => {
+          onSelect();
+          pinItem();
+        }}
+      >
+        <h4 className="list-item-options-dropdown-text">
+          <PinIcon />
+          {isPinned ? 'Unpin' : 'Pin'}
+        </h4>
+      </DropdownOption>
+    );
+  };
+
+  return (
+    <>
+      <DropdownOption
+        onSelect={() => {
+          onSelect();
+          history.replace(`/${resourceType}/${resourceID}/edit`, {
+            previousLocation: history.location.pathname,
+          });
+        }}
+      >
+        <h4 className="list-item-options-dropdown-text">
+          <EditIcon />
+          Edit
+        </h4>
+      </DropdownOption>
+      {item.showPinOption && (
+        <PinListItem
+          item={item}
+          getCustomDisplay={getCustomDisplay}
+          pinProfileID={pinProfileID}
+          pinProfileCollection={pinProfileCollection}
+        />
+      )}
+    </>
+  );
+}
+
+export function PinListItem({
+  pinProfileID,
+  pinProfileCollection,
+  item,
+  getCustomDisplay,
+}) {
   const [isPinned, setIsPinned] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -77,7 +133,7 @@ export function PinListItem({pinProfileID, pinProfileCollection, item}) {
     if (item.id === currentPinnedItem.id) setIsPinned(true);
   };
 
-  const pinItemToProfile = async (setOpen) => {
+  const pinItemToProfile = async () => {
     setSubmitting(true);
     if (isPinned) {
       return db
@@ -86,12 +142,10 @@ export function PinListItem({pinProfileID, pinProfileCollection, item}) {
           pinnedItem: null,
         })
         .then(() => {
-          setSubmitting(false);
-          setOpen(false);
+          if (submitting) setSubmitting(false);
           testIfItemIsPinned();
         })
         .catch(() => {
-          setOpen(false);
           alert(
             'Something went wrong while pinning that item. Please try again.'
           );
@@ -107,14 +161,12 @@ export function PinListItem({pinProfileID, pinProfileCollection, item}) {
       .update({pinnedItem: pinnedItem})
       .then(() => {
         setSubmitting(false);
-        setOpen(false);
         testIfItemIsPinned();
       })
       .catch((err) => {
         console.error(
           `unable to pin ${item.resourceType} to ${pinProfileCollection} with id ${pinProfileID} ${err}`
         );
-        setOpen(false);
         alert(
           'Something went wrong while pinning that item. Please try again.'
         );
@@ -122,51 +174,15 @@ export function PinListItem({pinProfileID, pinProfileCollection, item}) {
       });
   };
 
-  const getPopUpComponent = (setOpen) => (
-    <StandardPopoverDisplay
-      noFixedWidth={true}
-      right="20px"
-      content={
-        <PinPopOverContent
-          isPinned={isPinned}
-          submitting={submitting}
-          pinItemToProfile={() => pinItemToProfile(setOpen)}
-        />
-      }
-    />
-  );
+  if (getCustomDisplay) return getCustomDisplay(isPinned, pinItemToProfile);
   return (
     <div className="resource-result-with-pin-container ">
       <div className="resource-result-pin-container">
-        <Popover getPopUpComponent={getPopUpComponent}>
-          <PinButtonIntermediate
-            actionAndTriggerPopUp={() => {}}
-            isPinned={isPinned}
-          />
-        </Popover>
+        <PinButton
+          onClick={submitting ? () => {} : pinItemToProfile}
+          isPinned={isPinned}
+        />
       </div>
     </div>
   );
-}
-
-function PinPopOverContent({isPinned, submitting, pinItemToProfile}) {
-  if (submitting) return <LoadingSpinner />;
-
-  if (isPinned)
-    return (
-      <div>
-        <p>This will remove the pinned item from the page.</p>
-        <PrimaryButton onClick={pinItemToProfile}>Confirm</PrimaryButton>
-      </div>
-    );
-  return (
-    <div>
-      <p>This will replace the current pinned item.</p>
-      <PrimaryButton onClick={pinItemToProfile}>Confirm</PrimaryButton>
-    </div>
-  );
-}
-
-function PinButtonIntermediate({actionAndTriggerPopUp, isPinned}) {
-  return <PinButton onClick={actionAndTriggerPopUp} isPinned={isPinned} />;
 }

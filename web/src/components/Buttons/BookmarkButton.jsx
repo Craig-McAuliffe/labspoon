@@ -135,11 +135,13 @@ function BookmarkButton({
 
 const BookmarkButtonContent = ({onBookmark, isBookmarked, loading}) => (
   <div className="button-container">
-    <button className="action-button" href="/" onClick={onBookmark}>
+    <button
+      className="action-button"
+      href="/"
+      onClick={loading ? () => {} : onBookmark}
+    >
       {isBookmarked ? <BookmarkIconSelected /> : <BookmarkIconUnselected />}
-      <span className="action-button-text">
-        Bookmark {loading ? '(loading...)' : ''}
-      </span>
+      <span className="action-button-text">Bookmark</span>
     </button>
   </div>
 );

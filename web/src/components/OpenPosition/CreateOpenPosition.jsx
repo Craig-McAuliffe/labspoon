@@ -51,7 +51,7 @@ export default function CreateOpenPosition() {
     createOpenPosition(res)
       .then(() => {
         setSubmitting(false);
-        history.push(`/group/${selectedGroup.id}`);
+        history.push(`/group/${selectedGroup.id}/openPositions`);
       })
       .catch((err) => {
         console.log(err);
@@ -99,16 +99,30 @@ export default function CreateOpenPosition() {
   };
 
   const validationSchema = Yup.object({
-    title: Yup.string().required('You need to provide a title.'),
+    title: Yup.string()
+      .required('You need to provide a title.')
+      .max(
+        100,
+        'The title is too long. It must be no longer than 100 characters.'
+      ),
     description: Yup.string()
       .required('You need to write a description.')
       .max(
         7000,
         'The description is too long. It must have fewer than 7000 characters.'
       ),
-    address: Yup.string(),
-    salary: Yup.string(),
-    startDate: Yup.string(),
+    address: Yup.string().max(
+      100,
+      'Too long. It must be no longer than 100 characters.'
+    ),
+    salary: Yup.string().max(
+      15,
+      'Too long. It must be no longer than 15 characters.'
+    ),
+    startDate: Yup.string().max(
+      15,
+      'Too long. It must be no longer than 15 characters.'
+    ),
     applyEmail: Yup.string()
       .test(
         'one-apply-method',
@@ -118,7 +132,8 @@ export default function CreateOpenPosition() {
           if (this.parent.applyLink || value) return true;
         }
       )
-      .email('Must be a valid email address'),
+      .email('Must be a valid email address')
+      .max(100, 'Too long. It must be no longer than 100 characters.'),
     applyLink: Yup.string()
       .test(
         'one-apply-method',
@@ -128,7 +143,8 @@ export default function CreateOpenPosition() {
           if (this.parent.applyEmail || value) return true;
         }
       )
-      .url('Must be a valid url'),
+      .url('Must be a valid url')
+      .max(200, 'Too long. It must be no longer than 200 characters.'),
     position: Yup.mixed().oneOf(POSITIONS),
   });
 

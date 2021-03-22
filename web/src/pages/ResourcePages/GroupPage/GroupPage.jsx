@@ -46,7 +46,14 @@ import TertiaryButton from '../../../components/Buttons/TertiaryButton';
 import UserCoverPhoto from '../../../components/User/UserCoverPhoto';
 import {GenericListItem} from '../../../components/Results/Results';
 
-function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip) {
+function fetchGroupPageFeedFromDB(
+  groupID,
+  last,
+  limit,
+  filterOptions,
+  skip,
+  userIsMember
+) {
   const activeTab = filterOptions ? getActiveTabID(filterOptions) : null;
   let results;
   switch (activeTab) {
@@ -157,15 +164,14 @@ function fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip) {
       results = [];
       break;
   }
-  return [
-    results,
-    null,
-    {
-      pinned: true,
-      pinProfileTypePlural: GROUPS,
-      pinProfileID: groupID,
-    },
-  ];
+  const pinOption = userIsMember
+    ? {
+        showPinOption: true,
+        pinProfileCollection: GROUPS,
+        pinProfileID: groupID,
+      }
+    : null;
+  if (userIsMember) return [results, null, pinOption];
 }
 
 const checkIfTabsAreUsed = async (setUsedTabs, groupID) => {
@@ -348,7 +354,14 @@ export default function GroupPage() {
   };
 
   const fetchFeedData = (skip, limit, filterOptions, last) =>
-    fetchGroupPageFeedFromDB(groupID, last, limit, filterOptions, skip);
+    fetchGroupPageFeedFromDB(
+      groupID,
+      last,
+      limit,
+      filterOptions,
+      skip,
+      userIsMember
+    );
 
   if (user) {
     db.collection(`groups/${groupID}/members`)
@@ -421,17 +434,22 @@ const GroupDetails = ({
   const [pinnedItem, setPinnedItem] = useState(null);
 
   useEffect(() => {
-    if (!group) return;
-    if (group.pinnedItem) setPinnedItem(group.pinnedItem);
-  }, [groupID]);
-
-  useEffect(() => {
     if (!groupID) return;
     const groupDocObserver = db
       .doc(`groups/${groupID}`)
       .onSnapshot((docSnapshot) => {
         const newGroupData = docSnapshot.data();
-        setPinnedItem(newGroupData.pinnedItem);
+        const fetchedPinnedItem = newGroupData.pinnedItem;
+        if (!fetchedPinnedItem) {
+          if (pinnedItem) return setPinnedItem(null);
+          return;
+        }
+        if (userIsMember) {
+          fetchedPinnedItem.showPinOption = true;
+          fetchedPinnedItem.pinProfileCollection = GROUPS;
+          fetchedPinnedItem.pinProfileID = groupID;
+        }
+        return setPinnedItem(fetchedPinnedItem);
       });
     return () => groupDocObserver();
   }, [groupID]);

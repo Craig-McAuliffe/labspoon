@@ -5,15 +5,27 @@ import GroupSignature from '../Group/GroupSignature';
 import {
   ExpandableText,
   ListItemContainer,
+  ListItemOptionsDropdown,
 } from '../ListItem/ListItemCommonComponents';
+import {OPENPOSITION} from '../../helpers/resourceTypeDefinitions';
 
 import './OpenPositionListItem.css';
+
 export default function OpenPositionListItem({openPosition}) {
   const content = openPosition.content;
 
   if (!openPosition) return null;
   return (
     <ListItemContainer>
+      {openPosition.showPinOption && (
+        <ListItemOptionsDropdown
+          resourceType={OPENPOSITION}
+          resourceID={openPosition.id}
+          item={openPosition}
+          pinProfileID={openPosition.pinProfileID}
+          pinProfileCollection={openPosition.pinProfileCollection}
+        />
+      )}
       <Link to={`/openPosition/${openPosition.id}`}>
         <h3>{content.title}</h3>
       </Link>

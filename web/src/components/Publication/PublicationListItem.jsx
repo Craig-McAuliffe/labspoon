@@ -11,6 +11,7 @@ import {
   getLinkForAuthor,
   getUniqueAuthorsFromAuthors,
 } from '../../helpers/publications';
+import {PinListItem} from '../ListItem/ListItemCommonComponents';
 
 export default function PublicationListItem({
   publication,
@@ -93,10 +94,25 @@ function PublicationListItemHeader({publication}) {
     journal = <h4>Journal Article</h4>;
   }
   return (
-    <div className="publication-list-item-header">
-      <div className="publication-list-item-journal-container">{journal}</div>
-      <p className="publication-list-item-date">{publication.datePublished}</p>
-    </div>
+    <>
+      <div className="publication-list-item-header">
+        <div>
+          <div className="publication-list-item-journal-container">
+            {journal}
+          </div>
+          <p className="publication-list-item-date">{publication.date}</p>
+        </div>
+        {publication.showPinOption && (
+          <div className="publication-list-item-pin-container">
+            <PinListItem
+              item={publication}
+              pinProfileID={publication.pinProfileID}
+              pinProfileCollection={publication.pinProfileCollection}
+            />
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 

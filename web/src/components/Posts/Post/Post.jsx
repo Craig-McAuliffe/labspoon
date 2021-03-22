@@ -131,11 +131,11 @@ function PostHeader({postAuthor, postUnixTimestamp, dedicatedPage, post}) {
           <p>{calculateHoursAndDaysSincePost(postUnixTimestamp)}</p>
         </div>
       </div>
-      {post.hasPinOption && (
+      {post.showPinOption && (
         <PinListItem
           item={post}
           pinProfileID={post.pinProfileID}
-          pinProfileCollection={post.pinProfileTypePlural}
+          pinProfileCollection={post.pinProfileCollection}
         />
       )}
     </div>

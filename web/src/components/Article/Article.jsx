@@ -26,6 +26,7 @@ export function ArticleHeaderAndType({
   resourceID,
   dedicatedPage,
   authorID,
+  article,
 }) {
   const {userProfile} = useContext(AuthContext);
   const userID = userProfile ? userProfile.id : undefined;
@@ -63,10 +64,13 @@ export function ArticleHeaderAndType({
 
   return (
     <>
-      {userID && userID === authorID && (
+      {((userID && userID === authorID) || article.hasPinOption) && (
         <ListItemOptionsDropdown
           resourceType={resourceType}
           resourceID={resourceID}
+          item={article}
+          pinProfileID={article ? article.pinProfileID : null}
+          pinProfileCollection={article ? article.pinProfileCollection : null}
         />
       )}
       <div

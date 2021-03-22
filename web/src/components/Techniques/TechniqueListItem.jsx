@@ -19,6 +19,7 @@ export default function TechniqueListItem({technique}) {
         icon={<TechniqueIcon />}
         resourceID={technique.id}
         authorID={technique.author.id}
+        article={technique}
       />
       <ImagesSection
         images={formatTaggedImages(technique.photoURLs)}

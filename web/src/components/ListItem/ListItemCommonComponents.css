@@ -16,15 +16,21 @@
 }
 
 .list-item-dropdown-option-container {
-  margin: 0px 10px;
 }
 
 .list-item-options-dropdown-text {
-  margin: 0px 10px;
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.list-item-options-dropdown-text svg {
+  height: 30px;
 }
 
 .list-item-dropdown-toggle {
-  width: 80px;
+  width: 120px;
   display: flex;
   justify-content: flex-end;
   padding: 0px;
@@ -40,4 +46,8 @@
   position: absolute;
   padding: 5px;
   right: 0px;
+}
+
+.resource-result-pin-container button {
+  background: #ffffff;
 }

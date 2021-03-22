@@ -139,11 +139,13 @@ const RecommendButton = ({
 
 const RecommendButtonContent = ({onRecommend, isRecommended, loading}) => (
   <div className="button-container">
-    <button className="action-button" href="/" onClick={onRecommend}>
+    <button
+      className="action-button"
+      href="/"
+      onClick={loading ? () => {} : onRecommend}
+    >
       {isRecommended ? <RecommendIconSelected /> : <RecommendIconUnselected />}
-      <span className="action-button-text">
-        Recommend {loading ? '(loading...)' : ''}
-      </span>
+      <span className="action-button-text">Recommend</span>
     </button>
   </div>
 );

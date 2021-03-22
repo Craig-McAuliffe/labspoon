@@ -140,8 +140,8 @@ const SignUpForm = ({
     userName: Yup.string()
       .required('Please enter your name')
       .max(
-        150,
-        'Username is too long. It must have fewer than 150 characters.'
+        100,
+        'Username is too long. It must have fewer than 100 characters.'
       ),
   });
 
