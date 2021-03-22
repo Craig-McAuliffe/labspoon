@@ -1,7 +1,11 @@
 import {firestore} from 'firebase-admin';
 import * as functions from 'firebase-functions';
-import {admin} from './config';
-import {MAKAuthor, User} from './microsoft';
+import {admin, environment} from './config';
+import {
+  fetchAndHandlePublicationsForAuthor,
+  MAKAuthor,
+  User,
+} from './microsoft';
 import {Publication} from './publications';
 import {toUserPublicationRef} from './users';
 
@@ -118,6 +122,21 @@ export const addMSUserPubsToNewLinkedUser = functions.firestore
         promises.push(batch.commit());
       });
       return Promise.all(promises);
+    }
+    return;
+  });
+
+// make this on pubsub. pubsub topic trigger should be the linking function
+export const fetchPublicationsForNewLinkedUser = functions.firestore
+  .document('MSUsers/{msUserID}')
+  .onUpdate(async (change) => {
+    const newUserData = change.after.data() as MAKAuthor;
+    const oldUserData = change.before.data() as MAKAuthor;
+    if (newUserData.processed && !oldUserData.processed) {
+      const expression = `Composite(AA.AuId=${newUserData.AuId})`;
+      const count = environment === 'local' ? 20 : 50;
+      const offset = 0;
+      return fetchAndHandlePublicationsForAuthor(expression, count, offset);
     }
     return;
   });

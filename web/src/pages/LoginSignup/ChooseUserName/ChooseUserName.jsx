@@ -4,10 +4,10 @@ import firebase, {auth, db} from '../../../firebase';
 import {Form, Formik} from 'formik';
 import * as Yup from 'yup';
 import FormTextInput from '../../../components/Forms/FormTextInput';
-import PrimaryButton from '../../../components/Buttons/PrimaryButton.jsx';
 import {AuthContext} from '../../../App.jsx';
 import {useLocation, Redirect} from 'react-router-dom';
 import {LoadingSpinnerPage} from '../../../components/LoadingSpinner/LoadingSpinner';
+import CreateResourceFormActions from '../../../components/Forms/CreateResourceFormActions';
 
 export default function ChooseUserName() {
   const locationState = useLocation().state;
@@ -90,9 +90,7 @@ export default function ChooseUserName() {
             name="userName"
             label="Your Full Name (this will be displayed on your profile)"
           />
-          <div className="signup-submit-button-container">
-            <PrimaryButton type="submit">Submit</PrimaryButton>
-          </div>
+          <CreateResourceFormActions submitText="Submit" noBorder={true} />
         </Form>
       </Formik>
     </PaddedPageContainer>

@@ -7,7 +7,10 @@ import ListItemTopics from '../ListItem/ListItemTopics';
 import {FeatureFlags} from '../../App';
 
 import './PublicationListItem.css';
-import {getLinkForAuthor} from '../../helpers/publications';
+import {
+  getLinkForAuthor,
+  getUniqueAuthorsFromAuthors,
+} from '../../helpers/publications';
 
 export default function PublicationListItem({
   publication,
@@ -108,15 +111,7 @@ const AUTHORS_DISPLAY_LIMIT = 3;
 
 function PublicationListItemAuthors({authors}) {
   if (!authors) return <></>;
-  // MS Publications have duplication
-  const seenMicrosoftIDs = new Set();
-  const uniqueAuthors = [];
-  authors.forEach((possiblyDuplicateAuthor) => {
-    if (!possiblyDuplicateAuthor.microsoftID) return;
-    if (seenMicrosoftIDs.has(possiblyDuplicateAuthor.microsoftID)) return;
-    uniqueAuthors.push(possiblyDuplicateAuthor);
-    seenMicrosoftIDs.add(possiblyDuplicateAuthor.microsoftID);
-  });
+  const uniqueAuthors = getUniqueAuthorsFromAuthors(authors);
   let authorsList;
   if (uniqueAuthors.length <= AUTHORS_DISPLAY_LIMIT) {
     authorsList = authorsToAuthorList(uniqueAuthors);

@@ -76,3 +76,23 @@ export function algoliaPublicationToDBPublicationListItem(algoliaPublication) {
     publicationListItem.filterAuthorIDs = algoliaPublication.filterAuthorIDs;
   return publicationListItem;
 }
+
+// MS Publications have duplication
+export function getUniqueAuthorsFromAuthors(authors) {
+  const seenMicrosoftIDs = new Set();
+  const seenLabspoonUserIDs = new Set();
+  const uniqueAuthors = [];
+  authors.forEach((possiblyDuplicateAuthor) => {
+    if (!possiblyDuplicateAuthor.microsoftID && !possiblyDuplicateAuthor.id)
+      return;
+    if (!possiblyDuplicateAuthor.microsoftID) {
+      if (seenLabspoonUserIDs.has(possiblyDuplicateAuthor.id)) return;
+      uniqueAuthors.push(possiblyDuplicateAuthor);
+      seenLabspoonUserIDs.add(possiblyDuplicateAuthor.id);
+    }
+    if (seenMicrosoftIDs.has(possiblyDuplicateAuthor.microsoftID)) return;
+    uniqueAuthors.push(possiblyDuplicateAuthor);
+    seenMicrosoftIDs.add(possiblyDuplicateAuthor.microsoftID);
+  });
+  return uniqueAuthors;
+}
