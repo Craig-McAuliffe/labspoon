@@ -171,7 +171,7 @@ function fetchGroupPageFeedFromDB(
         pinProfileID: groupID,
       }
     : null;
-  if (userIsMember) return [results, null, pinOption];
+  return [results, null, pinOption];
 }
 
 const checkIfTabsAreUsed = async (setUsedTabs, groupID) => {

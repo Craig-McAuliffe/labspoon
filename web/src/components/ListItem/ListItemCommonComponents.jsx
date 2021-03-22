@@ -3,6 +3,7 @@ import {useHistory} from 'react-router-dom';
 import {EditIcon, PinIcon} from '../../assets/GeneralActionIcons';
 import {DottedBurgerMenuIcon} from '../../assets/MenuIcons';
 import {db} from '../../firebase';
+import {OPENPOSITION} from '../../helpers/resourceTypeDefinitions';
 import PinButton from '../Buttons/PinButton';
 import Dropdown, {DropdownOption} from '../Dropdown';
 import SeeMore from '../SeeMore';
@@ -82,19 +83,21 @@ function ListItemOptionsDropDownOptions({
 
   return (
     <>
-      <DropdownOption
-        onSelect={() => {
-          onSelect();
-          history.replace(`/${resourceType}/${resourceID}/edit`, {
-            previousLocation: history.location.pathname,
-          });
-        }}
-      >
-        <h4 className="list-item-options-dropdown-text">
-          <EditIcon />
-          Edit
-        </h4>
-      </DropdownOption>
+      {resourceType !== OPENPOSITION && (
+        <DropdownOption
+          onSelect={() => {
+            onSelect();
+            history.replace(`/${resourceType}/${resourceID}/edit`, {
+              previousLocation: history.location.pathname,
+            });
+          }}
+        >
+          <h4 className="list-item-options-dropdown-text">
+            <EditIcon />
+            Edit
+          </h4>
+        </DropdownOption>
+      )}
       {item.showPinOption && (
         <PinListItem
           item={item}
@@ -153,9 +156,9 @@ export function PinListItem({
         });
     }
     const pinnedItem = {...item};
-    delete pinnedItem.hasPinOption;
+    delete pinnedItem.showPinOption;
     delete pinnedItem.pinProfileID;
-    delete pinnedItem.pinProfileTypePlural;
+    delete pinnedItem.pinProfileCollection;
     return db
       .doc(`${pinProfileCollection}/${pinProfileID}`)
       .update({pinnedItem: pinnedItem})

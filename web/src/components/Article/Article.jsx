@@ -64,7 +64,8 @@ export function ArticleHeaderAndType({
 
   return (
     <>
-      {((userID && userID === authorID) || article.hasPinOption) && (
+      {((userID && userID === authorID) ||
+        (article && article.showPinOption)) && (
         <ListItemOptionsDropdown
           resourceType={resourceType}
           resourceID={resourceID}
