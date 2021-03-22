@@ -11,13 +11,14 @@ export default function UserCoverPhoto({src, alt, spinner, isGroup}) {
       <img
         className={spinner ? 'cover-image-greyed' : 'cover-image'}
         title={alt}
-        src={src ? src : getDefaultCoverPhoto()}
-        alt={`cover for user page`}
-        onError={(img) =>
-          (img.target.src = isGroup
+        src={
+          src
+            ? src
+            : isGroup
             ? getDefaultGroupCoverPhoto()
-            : getDefaultCoverPhoto())
+            : getDefaultCoverPhoto()
         }
+        alt={`cover for user page`}
       />
       {spinner && (
         <div className="cover-image-spinner-container">

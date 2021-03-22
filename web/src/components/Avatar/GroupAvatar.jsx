@@ -13,7 +13,6 @@ const GroupAvatar = ({src, width, height}) => {
       roundedCircle
       width={width}
       height={height}
-      onError={(img) => (img.target.src = getDefaultAvatar())}
     />
   );
 };
