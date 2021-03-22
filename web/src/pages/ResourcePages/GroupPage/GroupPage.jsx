@@ -452,7 +452,7 @@ const GroupDetails = ({
         return setPinnedItem(fetchedPinnedItem);
       });
     return () => groupDocObserver();
-  }, [groupID]);
+  }, [groupID, userIsMember]);
 
   useEffect(() => {
     if (group && shouldRefresh) {
