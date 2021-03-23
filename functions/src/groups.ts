@@ -1160,13 +1160,13 @@ export function groupToAlgoliaGroupRef(group: Group, groupID: string) {
   return groupAlgoliaRef;
 }
 
-export function groupRefToGroupSignature(groupRef: GroupRef) {
+export function groupRefToGroupSignature(groupRef: GroupRef, groupID: string) {
   const groupSignature: GroupSignature = {
-    id: groupRef.id,
+    id: groupID,
     name: groupRef.name,
   };
   if (groupRef.avatar) groupSignature.avatar = groupRef.avatar;
-  if (groupRef.institution) groupSignature.avatar = groupRef.institution;
+  if (groupRef.institution) groupSignature.institution = groupRef.institution;
   return groupSignature;
 }
 interface VerifiedGroup {

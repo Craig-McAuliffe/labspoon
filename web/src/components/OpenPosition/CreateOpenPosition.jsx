@@ -24,6 +24,12 @@ import {getUserGroups} from '../../helpers/users';
 
 import './CreateOpenPosition.css';
 import Select, {LabelledDropdownContainer} from '../Forms/Select/Select';
+import HeaderAndBodyArticleInput, {
+  CreateRichTextCharacterCount,
+  initialValueNoTitle,
+  yupRichBodyOnlyValidation,
+} from '../Forms/Articles/HeaderAndBodyArticleInput';
+import {MAX_ARTICLE_CHARACTERS} from '../Article/Article';
 
 const POSITIONS = ['Masters', 'Phd', 'Post Doc', 'Technician'];
 
@@ -40,6 +46,16 @@ export default function CreateOpenPosition() {
   const [submitting, setSubmitting] = useState(false);
   const [pageError, setPageError] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [savedInitialValues, setSavedInitialValues] = useState({
+    title: '',
+    address: '',
+    salary: '',
+    startDate: '',
+    applyEmail: '',
+    applyLink: '',
+    description: initialValueNoTitle,
+    position: '',
+  });
   const history = useHistory();
   const {user, authLoaded} = useContext(AuthContext);
   const userID = user.uid;
@@ -59,7 +75,7 @@ export default function CreateOpenPosition() {
           'Something went wrong trying to create the open position. Sorry about that. Please try again later.'
         );
         setSubmitting(false);
-        history.push(`/group/${selectedGroup.id}`);
+        setSavedInitialValues(res);
       });
   };
 
@@ -87,16 +103,7 @@ export default function CreateOpenPosition() {
       });
   }, [userID, preSelectedGroupID]);
 
-  const initialValues = {
-    title: '',
-    address: '',
-    salary: '',
-    startDate: '',
-    applyEmail: '',
-    applyLink: '',
-    description: '',
-    position: '',
-  };
+  const initialValues = savedInitialValues;
 
   const validationSchema = Yup.object({
     title: Yup.string()
@@ -105,12 +112,7 @@ export default function CreateOpenPosition() {
         100,
         'The title is too long. It must be no longer than 100 characters.'
       ),
-    description: Yup.string()
-      .required('You need to write a description.')
-      .max(
-        7000,
-        'The description is too long. It must have fewer than 7000 characters.'
-      ),
+    description: yupRichBodyOnlyValidation(MAX_ARTICLE_CHARACTERS, 40),
     address: Yup.string().max(
       100,
       'Too long. It must be no longer than 100 characters.'
@@ -192,6 +194,16 @@ export default function CreateOpenPosition() {
           <FormTextArea height="100px" name="address" label="Address" />
           <FormTextInput name="salary" label="Salary" />
           <FormDateInput sideLabel={true} name="startDate" label="Start Date" />
+          <HeaderAndBodyArticleInput
+            name="description"
+            noTitle={true}
+            label="Description"
+            minHeight={300}
+          />
+          <CreateRichTextCharacterCount
+            name="body"
+            maxCount={MAX_ARTICLE_CHARACTERS}
+          />
           <FormTextArea height="300px" name="description" label="Description" />
           <TagTopics
             submittingForm={submitting}

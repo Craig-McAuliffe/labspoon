@@ -10,6 +10,7 @@ import {
 import {OPENPOSITION} from '../../helpers/resourceTypeDefinitions';
 
 import './OpenPositionListItem.css';
+import {RichTextBody} from '../Article/Article';
 
 export default function OpenPositionListItem({openPosition}) {
   const content = openPosition.content;
@@ -56,8 +57,13 @@ export default function OpenPositionListItem({openPosition}) {
       ) : null}
       <h4 className="resource-list-item-subtitle">Description of Role</h4>
       <ExpandableText resourceID={openPosition.id}>
-        <p>{content.description}</p>
+        <RichTextBody
+          body={content.description}
+          expandable={true}
+          id={openPosition.id}
+        />
       </ExpandableText>
+
       <GroupSignature group={openPosition.group} />
     </ListItemContainer>
   );

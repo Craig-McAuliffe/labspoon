@@ -1,6 +1,8 @@
+import {firestore} from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import {admin} from './config';
 import {GroupRef, groupRefToGroupSignature, GroupSignature} from './groups';
+import {ArticleBodyChild} from './researchFocuses';
 
 import {TaggedTopic} from './topics';
 import {UserRef, checkAuthAndGetUserFromContext} from './users';
@@ -236,7 +238,7 @@ export function openPosToOpenPosListItem(
     topics: openPosition.topics,
     timestamp: openPosition.timestamp,
     unixTimeStamp: openPosition.unixTimeStamp,
-    group: groupRefToGroupSignature(openPosition.group),
+    group: groupRefToGroupSignature(openPosition.group, openPosition.group.id),
     id: openPositionID,
     filterTopicIDs: openPosition.filterTopicIDs,
   };
@@ -263,7 +265,7 @@ interface OpenPositionContent {
   startDate: string;
   applyEmail: string;
   applyLink: string;
-  description: string;
+  description: ArticleBodyChild[];
 }
 
 export interface OpenPositionListItem {
@@ -282,5 +284,77 @@ interface OpenPositionListItemContent {
   position: string;
   salary: string;
   startDate: string;
-  description: string;
+  description: ArticleBodyChild[];
 }
+
+export const convertOpenPosDescriptionsToRichText = functions
+  .runWith({
+    timeoutSeconds: 10,
+    memory: '2GB',
+  })
+  .https.onRequest(async (req, resp) => {
+    const collectionRef = db.collection('openPositions');
+    const query = collectionRef.limit(50);
+
+    await new Promise((resolve, reject) => {
+      convertOpenPositionsBatch(query, resolve).catch(reject);
+    });
+    resp.json({result: `reformatted open position descriptions to rich text`});
+    resp.end();
+  });
+
+async function convertOpenPositionsBatch(
+  query: firestore.DocumentData,
+  resolve: any
+) {
+  const snapshot = await query.get();
+  const batchSize = snapshot.size;
+
+  const batch = db.batch();
+  let lastDoc: firestore.DocumentSnapshot;
+  snapshot.docs.forEach((doc: firestore.DocumentSnapshot) => {
+    if (!doc.exists) return;
+    const openPositionData: any = doc.data();
+    if (Array.isArray(openPositionData.content.description)) return;
+    batch.update(doc.ref, {
+      content: {
+        address: openPositionData.content.address,
+        applyEmail: openPositionData.content.applyEmail,
+        applyLink: openPositionData.content.applyLink,
+        position: openPositionData.content.position,
+        salary: openPositionData.content.salary,
+        startDate: openPositionData.content.startDate,
+        title: openPositionData.content.title,
+        description: [
+          {
+            children: [{text: openPositionData.content.description}],
+            type: 'paragraph',
+          },
+        ],
+      },
+    });
+    lastDoc = doc;
+  });
+
+  await batch.commit();
+  if (batchSize < 20) {
+    resolve();
+    return;
+  }
+  // Recurse on the next process tick, to avoid
+  // exploding the stack.
+  process.nextTick(async () => {
+    await convertOpenPositionsBatch(
+      fetchOpenPositionsForReformatting(lastDoc),
+      resolve
+    );
+  });
+}
+
+const fetchOpenPositionsForReformatting = (
+  last?: firestore.DocumentSnapshot
+) => {
+  const collectionRef = db.collection('openPositions');
+  if (last) return collectionRef.limit(20).startAfter(last);
+  return collectionRef.limit(20);
+};

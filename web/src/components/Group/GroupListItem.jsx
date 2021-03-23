@@ -56,12 +56,14 @@ export default function GroupListItem({
           </div>
         </div>
         <div className="group-list-item-text-container">
-          <SeeMore
-            id={group.id}
-            initialHeight={GROUP_LIST_ITEM_DESCRIPTION_HEIGHT}
-          >
-            <RichTextBody body={group.about} shouldLinkify={true} />
-          </SeeMore>
+          {group.about && (
+            <SeeMore
+              id={group.id}
+              initialHeight={GROUP_LIST_ITEM_DESCRIPTION_HEIGHT}
+            >
+              <RichTextBody body={group.about} shouldLinkify={true} />
+            </SeeMore>
+          )}
         </div>
       </div>
     </div>

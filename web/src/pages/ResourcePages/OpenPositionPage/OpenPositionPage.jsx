@@ -10,6 +10,7 @@ import {db} from '../../../firebase';
 
 import './OpenPositionPage.css';
 import NotFoundPage from '../../NotFoundPage/NotFoundPage';
+import {RichTextBody} from '../../../components/Article/Article';
 
 export default function OpenPositionPage() {
   const [openPosition, setOpenPosition] = useState();
@@ -91,7 +92,11 @@ export default function OpenPositionPage() {
       </GroupListItem>
       <div className="open-position-description-container">
         <h4 className="open-position-section-title">Description of Role</h4>
-        <p>{openPosition.content.description}</p>
+        <RichTextBody
+          body={openPosition.content.description}
+          expandable={true}
+          id={openPosition.id}
+        />
       </div>
       <h3 className="open-position-apply-title">
         Apply
