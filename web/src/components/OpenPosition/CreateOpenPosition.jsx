@@ -201,10 +201,9 @@ export default function CreateOpenPosition() {
             minHeight={300}
           />
           <CreateRichTextCharacterCount
-            name="body"
+            name="description"
             maxCount={MAX_ARTICLE_CHARACTERS}
           />
-          <FormTextArea height="300px" name="description" label="Description" />
           <TagTopics
             submittingForm={submitting}
             selectedTopics={selectedTopics}
@@ -214,7 +213,7 @@ export default function CreateOpenPosition() {
           <h4>How to Apply</h4>
           <HowToApply />
           <CreateResourceFormActions
-            submitted={submitting}
+            submitting={submitting}
             submitText="Create"
           />
         </Form>
