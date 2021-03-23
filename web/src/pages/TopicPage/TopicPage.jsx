@@ -11,20 +11,19 @@ import {getPaginatedGroupReferencesFromCollectionRef} from '../../helpers/groups
 
 import TopicListItem from '../../components/Topics/TopicListItem';
 import FollowTopicButton from '../../components/Topics/FollowTopicButton';
-import FilterableResults, {
-  NewResultsWrapper,
-  ResourceTabs,
-  FilterManager,
-  NewFilterMenuWrapper,
-} from '../../components/FilterableResults/FilterableResults';
 import TopicPageSider from './TopicPageSider';
 import MAGRouterDisplay from '../../components/MAGRouter';
 import {
   OPENPOSITION,
   OPENPOSITIONS,
+  RESEARCHFOCUSES,
+  TECHNIQUE,
+  TECHNIQUES,
   USERS,
 } from '../../helpers/resourceTypeDefinitions';
 import {getPaginatedResourcesFromCollectionRef} from '../../helpers/resources';
+import ResourcesFeed from '../ResourcePages/ResourcesFeeds';
+import {PaddedContent} from '../../components/Layout/Content';
 
 import './TopicPage.css';
 
@@ -97,6 +96,32 @@ function topicPageFeedDataFromDB(skip, limit, filterOptions, topicID, last) {
         ),
         null,
       ];
+    case TECHNIQUES:
+      const techniquesCollection = db.collection(
+        `topics/${topicID}/techniques`
+      );
+      return [
+        getPaginatedResourcesFromCollectionRef(
+          techniquesCollection,
+          limit,
+          last,
+          TECHNIQUE
+        ),
+        null,
+      ];
+    case RESEARCHFOCUSES:
+      const researchFocusesCollection = db.collection(
+        `topics/${topicID}/researchFocuses`
+      );
+      return [
+        getPaginatedResourcesFromCollectionRef(
+          researchFocusesCollection,
+          limit,
+          last,
+          TECHNIQUE
+        ),
+        null,
+      ];
     case 'overview':
       results = [];
       break;
@@ -106,10 +131,45 @@ function topicPageFeedDataFromDB(skip, limit, filterOptions, topicID, last) {
   return [results, null];
 }
 
+const checkIfTabsAreUsed = async (setUsedTabs, topicID) => {
+  const confirmedUsedTabs = [];
+  await db
+    .collection(`topics/${topicID}/techniques`)
+    .limit(1)
+    .get()
+    .then((qs) => {
+      if (qs.empty) return;
+      confirmedUsedTabs.push(TECHNIQUES);
+    })
+    .catch((err) => console.error(err));
+  await db
+    .collection(`topics/${topicID}/openPositions`)
+    .limit(1)
+    .get()
+    .then((qs) => {
+      if (qs.empty) return;
+      confirmedUsedTabs.push(OPENPOSITIONS);
+    })
+    .catch((err) => console.error(err));
+
+  await db
+    .collection(`topics/${topicID}/researchFocuses`)
+    .limit(1)
+    .get()
+    .then((qs) => {
+      if (qs.empty) return;
+      confirmedUsedTabs.push(RESEARCHFOCUSES);
+    })
+    .catch((err) => console.error(err));
+  setUsedTabs({checked: true, tabs: confirmedUsedTabs});
+};
+
 export default function TopicPage() {
   const featureFlags = useContext(FeatureFlags);
   const [topicID, setTopicID] = useState(undefined);
   const [topicDetails, setTopicDetails] = useState(undefined);
+  const [usedTabs, setUsedTabs] = useState({checked: false, tabs: []});
+  const [tabsLoading, setTabsLoading] = useState(true);
   const history = useHistory();
 
   const topicIDParam = useParams().topicID;
@@ -131,63 +191,82 @@ export default function TopicPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [topicID]);
 
+  useEffect(async () => {
+    if (!topicID) return;
+    await checkIfTabsAreUsed(setUsedTabs, topicID);
+    if (tabsLoading) setTabsLoading(false);
+  }, [topicID]);
+
   const fetchFeedData = (skip, limit, filterOptions, last) =>
     topicPageFeedDataFromDB(skip, limit, filterOptions, topicID, last);
 
-  const relationshipFilter = [
-    {
-      collectionName: 'Relationship Types',
-      options: [
-        {
-          enabled: false,
-          data: {
-            id: 'posts',
-            name: 'Posts',
+  const fetchTabs = () => {
+    if (usedTabs.checked !== true) return;
+    const tabOptions = [
+      {
+        collectionName: 'Relationship Types',
+        options: [
+          {
+            enabled: false,
+            data: {
+              id: 'posts',
+              name: 'Posts',
+            },
           },
-        },
-        {
-          enabled: false,
-          data: {
-            id: 'publications',
-            name: 'Publications',
+          {
+            enabled: false,
+            data: {
+              id: 'publications',
+              name: 'Publications',
+            },
           },
-        },
-        {
-          enabled: false,
-          data: {
-            id: USERS,
-            name: 'Users',
+          {
+            enabled: false,
+            data: {
+              id: USERS,
+              name: 'Users',
+            },
           },
-        },
-        {
-          enabled: false,
-          data: {
-            id: 'groups',
-            name: 'Groups',
+          {
+            enabled: false,
+            data: {
+              id: 'groups',
+              name: 'Groups',
+            },
           },
-        },
-        {
-          enabled: false,
-          data: {
-            id: OPENPOSITIONS,
-            name: 'Open Positions',
-          },
-        },
-      ],
+        ],
 
-      mutable: false,
-    },
-  ];
-
-  if (featureFlags.has('overview')) {
-    relationshipFilter[0].options.push({
-      enabled: false,
-      data: {
-        id: 'overview',
-        name: 'Overview',
+        mutable: false,
       },
+    ];
+
+    usedTabs.tabs.forEach((usedTabID) => {
+      let tabName;
+      switch (usedTabID) {
+        case TECHNIQUES:
+          tabName = 'Techniques';
+          break;
+        case OPENPOSITIONS:
+          tabName = 'Open Positions';
+          break;
+        case RESEARCHFOCUSES:
+          tabName = 'Research Focuses';
+          break;
+        default:
+          tabName = null;
+      }
+      if (!tabName) return;
+
+      tabOptions[0].options.push({
+        enabled: false,
+        data: {
+          id: usedTabID,
+          name: tabName,
+        },
+      });
     });
-  }
+    return tabOptions;
+  };
 
   return (
     <>
@@ -196,22 +275,18 @@ export default function TopicPage() {
       ) : (
         <></>
       )}
-      <FilterableResults fetchResults={fetchFeedData} limit={10}>
-        <FilterManager>
-          <NewFilterMenuWrapper />
-          <div className="content-layout">
-            <div className="details-container">
-              <TopicListItem topic={topicDetails} dedicatedPage={true}>
-                <FollowTopicButton targetTopic={topicDetails} />
-              </TopicListItem>
-            </div>
-            <div className="feed-container">
-              <ResourceTabs tabs={relationshipFilter} />
-              <NewResultsWrapper />
-            </div>
-          </div>
-        </FilterManager>
-      </FilterableResults>
+      <ResourcesFeed
+        fetchResults={fetchFeedData}
+        limit={10}
+        tabs={fetchTabs()}
+        tabsLoading={tabsLoading}
+      >
+        <PaddedContent>
+          <TopicListItem topic={topicDetails} dedicatedPage={true}>
+            <FollowTopicButton targetTopic={topicDetails} />
+          </TopicListItem>
+        </PaddedContent>
+      </ResourcesFeed>
     </>
   );
 }

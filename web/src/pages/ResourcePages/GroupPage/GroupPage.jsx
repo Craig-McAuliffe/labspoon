@@ -266,6 +266,7 @@ export default function GroupPage() {
   }, [groupID]);
 
   useEffect(async () => {
+    if (!groupID) return;
     await db
       .doc(`verifiedGroups/${groupID}`)
       .get()
