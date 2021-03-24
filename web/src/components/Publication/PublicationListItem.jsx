@@ -100,7 +100,9 @@ function PublicationListItemHeader({publication}) {
           <div className="publication-list-item-journal-container">
             {journal}
           </div>
-          <p className="publication-list-item-date">{publication.date}</p>
+          <p className="publication-list-item-date">
+            {publicationDateDisplay(publication.date)}
+          </p>
         </div>
         {publication.showPinOption && (
           <div className="publication-list-item-pin-container">
@@ -116,6 +118,11 @@ function PublicationListItemHeader({publication}) {
   );
 }
 
+export function publicationDateDisplay(date) {
+  if (!date) return null;
+  if (date.length > 10) return date.slice(0, 10);
+  return date;
+}
 function PublicationListItemTitle({pathName, title, noLink}) {
   const titleHeader = <h3 className="publication-list-item-title">{title}</h3>;
   if (!pathName || noLink) return titleHeader;

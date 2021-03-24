@@ -31,6 +31,7 @@ import CreateButton from '../../../components/Buttons/CreateButton';
 import './PublicationPage.css';
 import CreatePost from '../../../components/Posts/Post/CreatePost/CreatePost';
 import {PUBLICATION} from '../../../helpers/resourceTypeDefinitions';
+import {publicationDateDisplay} from '../../../components/Publication/PublicationListItem';
 
 const REFERENCES_TAB = 'references';
 
@@ -274,6 +275,9 @@ const PublicationDetails = ({publicationDetails}) => {
   if (publicationDetails === undefined) return <></>;
   return (
     <div className="publication-body">
+      <span className="publication-page-date">
+        {publicationDateDisplay(publicationDetails.date)}
+      </span>
       <h2 className="publication-page-title">{publicationDetails.title}</h2>
       <PublicationSources sources={publicationDetails.sources} />
       <div>
