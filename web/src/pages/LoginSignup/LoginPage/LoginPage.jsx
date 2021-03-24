@@ -36,11 +36,12 @@ function LoginPage() {
   const [loading, setLoading] = useState();
   const [googleSignInFlow, setGoogleSignInFlow] = useState(false);
   const [forgottenPassword, setForgottenPassword] = useState(false);
+  const [isSigningUp, setIsSigningUp] = useState(false);
   const [resetPasswordEmailWasSent, setResetPasswordEmailWasSent] = useState(
     false
   );
   if (loading) return <LoadingSpinnerPage />;
-  if (!userProfile) {
+  if (!userProfile || isSigningUp) {
     if (forgottenPassword)
       return (
         <PaddedPageContainer>
@@ -58,6 +59,7 @@ function LoginPage() {
             updateUserDetails={updateUserDetails}
             setLoading={setLoading}
             setGoogleSignInFlow={setGoogleSignInFlow}
+            setIsSigningUp={setIsSigningUp}
           />
         )}
         <h2 className="signin-form-title">{`Welcome Back`}</h2>
@@ -74,6 +76,7 @@ function LoginPage() {
         <SignInForm
           returnLocation={returnLocation}
           setForgottenPassword={setForgottenPassword}
+          setIsSigningUp={setIsSigningUp}
         />
         <div className="login-submit-button-container">
           <GoogleButton
@@ -104,17 +107,19 @@ function LoginPage() {
   }
 }
 
-const SignInForm = ({returnLocation, setForgottenPassword}) => {
+const SignInForm = ({returnLocation, setForgottenPassword, setIsSigningUp}) => {
   const [loading, setLoading] = useState(false);
   const history = useHistory();
   const submitChanges = (values) => {
+    setIsSigningUp(true);
     setLoading(true);
     firebase
       .auth()
       .signInWithEmailAndPassword(values.email, values.password)
       .then(() => {
         setLoading(false);
-        if (returnLocation) history.push(returnLocation);
+        if (returnLocation) return history.push(returnLocation);
+        setIsSigningUp(false);
       })
       .catch((error) => {
         setLoading(false);
@@ -137,6 +142,7 @@ const SignInForm = ({returnLocation, setForgottenPassword}) => {
             'Something went wrong. We will look into it. Please try signing in later.'
           );
         }
+        setIsSigningUp(false);
       });
   };
 
