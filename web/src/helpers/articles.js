@@ -1,5 +1,8 @@
 import {db, firebaseFirestoreOptions} from '../firebase';
-import {convertGroupToGroupRef} from './groups';
+import {
+  convertGroupToGroupRef,
+  convertGroupToGroupSignatureRef,
+} from './groups';
 import {RESEARCHFOCUSES, TECHNIQUES} from './resourceTypeDefinitions';
 import {userToUserRef} from './users';
 
