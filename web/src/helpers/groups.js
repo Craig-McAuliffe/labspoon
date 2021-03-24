@@ -61,6 +61,15 @@ export function convertGroupToGroupRef(group) {
   return groupRef;
 }
 
+export function convertGroupToGroupSignatureRef(group) {
+  const groupRef = {
+    id: group.id,
+    name: group.name,
+  };
+  if (group.avatar) groupRef.avatar = group.avatar;
+  return groupRef;
+}
+
 export function editGroupAvatarStorageInForm(
   avatar,
   groupID,

@@ -56,9 +56,11 @@ export default async function addArticleToDB(
   article.body = body;
   article.timestamp = new Date();
   article.unixTimeStamp = Math.floor(new Date().getTime() / 1000);
+  const articleListItem = {...article};
+  articleListItem.group = convertGroupToGroupSignatureRef(selectedGroup);
   const batch = db.batch();
   batch.set(articleDBRef, article);
-  batch.set(articleOnGroupRef, article);
+  batch.set(articleOnGroupRef, articleListItem);
 
   return batch
     .commit()
