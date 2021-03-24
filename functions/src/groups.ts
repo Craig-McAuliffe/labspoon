@@ -1294,7 +1294,7 @@ const filterWords: any = {
 
 export const createGeneratedGroupsFromJSON = functions
   .runWith({
-    timeoutSeconds: 60,
+    timeoutSeconds: 20,
     memory: '2GB',
   })
   .https.onRequest(async (req, resp) => {
@@ -1321,7 +1321,7 @@ export const createGeneratedGroupsFromJSON = functions
       groupsArray.push(groups[n]);
     }
 
-    const batchedArray = groupsArray.slice(0, 100);
+    const batchedArray = groupsArray.slice(0, 20);
 
     for (const groupElement of batchedArray) {
       await handleGeneratedGroup(groupElement);

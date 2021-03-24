@@ -22,15 +22,6 @@ before_script:
   - npm i -g firebase-tools
   - npm i -g n
 
-deploy_dev_functions:
-  stage: deploy_dev
-  environment: dev
-  rules:
-    - changes:
-        - functions/**/*
-  script:
-    - echo "there are functions to deploy"
-
 deploy_dev_firestore:
   stage: deploy_dev
   environment: dev
