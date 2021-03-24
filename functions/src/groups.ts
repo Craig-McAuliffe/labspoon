@@ -1,5 +1,5 @@
 import * as functions from 'firebase-functions';
-import {admin, ResourceTypes} from './config';
+import {admin, ResourceTypes, config} from './config';
 import {firestore} from 'firebase-admin';
 import {
   updateFilterCollection,
@@ -12,6 +12,9 @@ import {
   removeTopicsFromResource,
   addTopicsToResource,
   TaggedTopic,
+  AzureTopicResult,
+  azureTopicToTopicNoID,
+  createFieldAndTopic,
 } from './topics';
 import {Publication, PublicationRef} from './publications';
 import {OpenPosition} from './openPositions';
@@ -23,6 +26,11 @@ import {
   FollowNoTopicsPreference,
   FollowPostTypePreferences,
 } from './helpers';
+import Axios from 'axios';
+import * as path from 'path';
+import * as os from 'os';
+import * as fs from 'fs';
+import {MAKField} from './microsoft';
 
 const db: firestore.Firestore = admin.firestore();
 
@@ -1178,7 +1186,7 @@ export interface GroupRef {
   id: string;
   name: string;
   avatar?: string;
-  about?: ArticleBodyChild;
+  about?: ArticleBodyChild[];
   institution?: string;
   rank?: number;
 }
@@ -1200,7 +1208,7 @@ export interface Group {
   groupType: string;
   avatar?: string;
   avatarCloudID?: string;
-  about?: ArticleBodyChild;
+  about?: ArticleBodyChild[];
   location?: string;
   website?: string;
   donationLink?: string;
@@ -1209,6 +1217,7 @@ export interface Group {
   recentPostTopics?: TaggedTopic[];
   recentPublicationTopics?: TaggedTopic[];
   recentArticleTopics?: TaggedTopic[];
+  isGeneratedFromTwitter?: boolean;
 }
 
 export interface GroupSignature {
@@ -1216,4 +1225,221 @@ export interface GroupSignature {
   name: string;
   avatar?: string;
   institution?: string;
+}
+
+const filterWords: any = {
+  the: true,
+  be: true,
+  to: true,
+  of: true,
+  and: true,
+  a: true,
+  in: true,
+  that: true,
+  have: true,
+  i: true,
+  it: true,
+  for: true,
+  not: true,
+  on: true,
+  with: true,
+  he: true,
+  as: true,
+  you: true,
+  do: true,
+  at: true,
+  this: true,
+  but: true,
+  his: true,
+  by: true,
+  from: true,
+  they: true,
+  we: true,
+  say: true,
+  her: true,
+  she: true,
+  or: true,
+  an: true,
+  will: true,
+  my: true,
+  one: true,
+  all: true,
+  would: true,
+  there: true,
+  their: true,
+  what: true,
+  so: true,
+  up: true,
+  out: true,
+  if: true,
+  about: true,
+  who: true,
+  view: true,
+  views: true,
+  prof: true,
+  dr: true,
+  doctor: true,
+  group: true,
+  lab: true,
+  professor: true,
+  uni: true,
+  university: true,
+  tweet: true,
+  tweets: true,
+  director: true,
+  pi: true,
+  laboratories: true,
+  laboratory: true,
+};
+
+export const createGeneratedGroupsFromJSON = functions
+  .runWith({
+    timeoutSeconds: 60,
+    memory: '2GB',
+  })
+  .https.onRequest(async (req, resp) => {
+    const tmpfileName = `groupsFromTwitter.json`;
+    const tmp = path.join(os.tmpdir(), tmpfileName);
+    const file = storage
+      .bucket()
+      .file('marketing/groups-from-twitter-attempt-2.json');
+    await file.download({destination: tmp});
+
+    const groupsJSON = fs.readFileSync(tmp);
+    const groups = JSON.parse(groupsJSON.toString());
+
+    // free up disk space
+    try {
+      fs.unlinkSync(tmp);
+    } catch {
+      console.error('error when freeing up local memory during image resize');
+    }
+
+    const groupsArray: {name: string; description: string}[] = [];
+    let n;
+    for (n in groups) {
+      groupsArray.push(groups[n]);
+    }
+
+    const batchedArray = groupsArray.slice(0, 100);
+
+    for (const groupElement of batchedArray) {
+      await handleGeneratedGroup(groupElement);
+      // Recurse on the next process tick, to avoid
+      // exploding the stack.
+      // return process.nextTick(async () => {
+      // });
+    }
+
+    resp.json({result: 'Success'});
+    resp.end();
+    return;
+  });
+
+async function handleGeneratedGroup(generatedGroup: {
+  name: string;
+  description: string;
+}): Promise<void> {
+  const escapedDescription = generatedGroup.description.replace(
+    /[^\w\s]/gi,
+    ''
+  );
+  const splitGroup = escapedDescription.split(' ');
+
+  const normalisedSplitDescription = splitGroup.map((word) =>
+    word.toLowerCase().trim()
+  );
+
+  const filteredSplitGroupDescription = normalisedSplitDescription.filter(
+    (word: any) => {
+      if (word.length < 3) return false;
+      return !filterWords[word];
+    }
+  );
+  let firstWord = '';
+  const descriptionDoublets: string[] = [];
+  filteredSplitGroupDescription.forEach((word, i) => {
+    if ((i + 1) % 2 === 0) descriptionDoublets.push(firstWord + ' ' + word);
+    firstWord = word;
+  });
+
+  const taggedTopics: TaggedTopic[] = [];
+
+  for (const descriptionDublet of descriptionDoublets) {
+    const searchUrl = `https://topics-basic.search.windows.net/indexes/topic-search-by-name/docs?search=${descriptionDublet}&$top=${14}&api-version=2020-06-30`;
+    const apiCallConfig = {
+      headers: {
+        ['Content-Type']: 'application/json',
+        ['api-key']: config.azure.admin_key,
+      },
+    };
+
+    const topicSearchResponse = await Axios.get(searchUrl, apiCallConfig).catch(
+      (err) => {
+        console.error(`bad fetch ${err}`);
+      }
+    );
+
+    if (!topicSearchResponse) return;
+    const searchResults: AzureTopicResult[] = topicSearchResponse.data.value;
+    await handleAzureTopicSearchResults(
+      searchResults,
+      escapedDescription,
+      taggedTopics
+    );
+  }
+
+  const groupRef = db.collection('groups').doc();
+  const groupID = groupRef.id;
+  const group: Group = {
+    name: generatedGroup.name,
+    about: [{children: [{text: escapedDescription}], type: 'paragraph'}],
+    id: groupID,
+    groupType: 'researchGroup',
+    isGeneratedFromTwitter: true,
+  };
+  if (taggedTopics.length > 0) group.recentArticleTopics = taggedTopics;
+  console.log(group);
+  await groupRef.set(group);
+}
+
+async function handleAzureTopicSearchResults(
+  azureTopics: AzureTopicResult[],
+  escapedDescription: string,
+  taggedTopics: TaggedTopic[]
+): Promise<void> {
+  const formattedTopics = azureTopics.map((azureTopic) =>
+    azureTopicToTopicNoID(azureTopic)
+  );
+  const topicsWithIDs: TaggedTopic[] = [];
+  const createTopicsPromises = formattedTopics.map((topicNoLabspoonID) =>
+    db
+      .doc(`MSFields/${topicNoLabspoonID.microsoftID}`)
+      .get()
+      .then(async (doc) => {
+        const addTopicWithID = (topicID: string) => {
+          const topicWithID: TaggedTopic = {
+            id: topicID,
+            microsoftID: topicNoLabspoonID.microsoftID,
+            name: topicNoLabspoonID.name,
+            normalisedName: topicNoLabspoonID.normalisedName,
+          };
+          topicsWithIDs.push(topicWithID);
+        };
+
+        if (doc.exists) {
+          const msFieldData = doc.data() as MAKField;
+          addTopicWithID(msFieldData.processed);
+          return;
+        }
+        await createFieldAndTopic(topicNoLabspoonID, addTopicWithID);
+      })
+  );
+  await Promise.all(createTopicsPromises);
+  topicsWithIDs.forEach((processedTopic) => {
+    if (
+      escapedDescription.toLowerCase().includes(processedTopic.normalisedName)
+    )
+      taggedTopics.push(processedTopic);
+  });
 }

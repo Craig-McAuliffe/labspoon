@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useContext, useRef} from 'react';
-import {useHistory, useLocation, useParams} from 'react-router-dom';
+import {Link, useHistory, useLocation, useParams} from 'react-router-dom';
 import {AuthContext} from '../../App';
 import {db} from '../../firebase';
 import {getPaginatedGroupReferencesFromCollectionRef} from '../../helpers/groups';
@@ -9,17 +9,15 @@ import FollowGroupButton from '../../components/Group/FollowGroupButton';
 import GroupListItem from '../../components/Group/GroupListItem';
 import FollowUserButton from '../../components/User/FollowUserButton/FollowUserButton';
 import SecondaryButton from '../../components/Buttons/SecondaryButton';
-import {CreateGroupIcon} from '../../assets/MenuIcons';
 import CreateGroupPage from '../../components/Group/CreateGroupPage/CreateGroupPage';
 import UserListItem from '../../components/User/UserListItem';
 import FormDatabaseSearch from '../../components/Forms/FormDatabaseSearch';
-import SuccessMessage from '../../components/Forms/SuccessMessage';
 import LinkAuthorIDForm from '../../components/Publication/ConnectToPublications/ConnectToPublications';
 import {PaddedPageContainer} from '../../components/Layout/Content';
 import SearchMSFields from '../../components/Topics/SearchMSFields';
+import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 
 import './OnboardingPage.css';
-import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 
 const FOLLOW = 'follow';
 const LINKAUTHOR = 'link-author';
@@ -27,13 +25,14 @@ const GROUPS = 'groups';
 
 export default function OnboardingPage() {
   const history = useHistory();
-  const {user} = useContext(AuthContext);
+  const {user, userProfile} = useContext(AuthContext);
   const location = useLocation();
   const onboardingStage = useParams().onboardingStage;
   const locationState = location.state;
   const returnLocation = locationState
     ? locationState.returnLocation
     : undefined;
+  const claimGroupID = locationState ? locationState.claimGroupID : undefined;
   if (user === undefined) history.push('/');
   const OnboardingStageDisplay = () => {
     switch (onboardingStage) {
@@ -44,7 +43,7 @@ export default function OnboardingPage() {
           <OnboardingAuthorLink nextOnboardingStage={nextOnboardingStage} />
         );
       case GROUPS:
-        return <OnboardingGroup user={user} />;
+        return <OnboardingGroup user={user} claimGroupID={claimGroupID} />;
       default:
         return <OnboardingFollow user={user} />;
     }
@@ -53,13 +52,20 @@ export default function OnboardingPage() {
   const nextOnboardingStage = () => {
     switch (onboardingStage) {
       case FOLLOW:
-        history.push(`/onboarding/${LINKAUTHOR}`);
+        history.push(`/onboarding/${LINKAUTHOR}`, locationState);
         break;
       case LINKAUTHOR:
-        history.push(`/onboarding/${GROUPS}`);
+        history.push(`/onboarding/${GROUPS}`, locationState);
         break;
       case GROUPS:
-        history.push(returnLocation ? returnLocation : '/');
+        db.doc(`users/${userProfile.id}`)
+          .update({hasCompletedOnboarding: true})
+          .then(() => history.push(returnLocation ? returnLocation : '/'))
+          .catch((err) => {
+            console.error(err);
+            history.push(returnLocation ? returnLocation : '/');
+          });
+
         break;
       default:
         throw new Error('invalid stage');
@@ -231,17 +237,11 @@ function Popover({children, open, setClosed, content}) {
   );
 }
 
-function OnboardingGroup({user}) {
+function OnboardingGroup({user, claimGroupID}) {
   const [displayedGroups, setDisplayedGroups] = useState([]);
   const [creatingGroup, setCreatingGroup] = useState(false);
-  const [confirmGroupCreation, setConfirmGroupCreation] = useState(false);
+  const [createdGroupID, setCreatedGroupID] = useState(false);
   const groupSearchRef = useRef();
-
-  useEffect(() => {
-    if (confirmGroupCreation) {
-      setTimeout(() => setConfirmGroupCreation(false), 5000);
-    }
-  }, [confirmGroupCreation]);
 
   const getGroups = () => {
     const groupsCollection = db.collection(`groups`);
@@ -261,6 +261,42 @@ function OnboardingGroup({user}) {
       getGroups().then((res) => setDisplayedGroups(res));
   }, [displayedGroups]);
 
+  let createOrClaimGroup = creatingGroup ? (
+    <CreateGroupPage
+      onboardingCancelOrSubmitAction={() => setCreatingGroup(false)}
+      setCreatedGroupID={setCreatedGroupID}
+    />
+  ) : (
+    <>
+      <h4 className="onboarding-page-instructions">
+        {`Want your group to appear on Labspoon? Create it now.`}
+      </h4>
+      <div className="onboarding-create-group-button-container">
+        <SecondaryButton onClick={() => setCreatingGroup(true)}>
+          Create a group
+        </SecondaryButton>
+      </div>
+      <p className="onboarding-hint-do-it-later">
+        {`Don't worry, you can always make one later, just click on your profile picture in the top right!`}
+      </p>
+    </>
+  );
+  if (claimGroupID)
+    createOrClaimGroup = (
+      <div className="go-to-claimed-group-section">
+        <h2>
+          <Link to={`/group/${claimGroupID}`}>Go to claimed group</Link>
+        </h2>
+      </div>
+    );
+  if (createdGroupID)
+    createOrClaimGroup = (
+      <div className="go-to-claimed-group-section">
+        <h2>
+          <Link to={`/group/${createdGroupID}`}>Go to created group</Link>
+        </h2>
+      </div>
+    );
   return (
     <div className="onboarding-page-container">
       <h3>Group pages are a great place to share updates from the lab.</h3>
@@ -285,36 +321,7 @@ function OnboardingGroup({user}) {
           ))}
         </div>
       </div>
-      {creatingGroup ? (
-        <CreateGroupPage
-          onboardingCancelOrSubmitAction={() => setCreatingGroup(false)}
-          confirmGroupCreation={() => setConfirmGroupCreation(true)}
-        />
-      ) : (
-        <>
-          <h4 className="onboarding-page-instructions">
-            {`Want your group to appear on Labspoon? Create it now.`}
-          </h4>
-          <div className="onboarding-create-group-button-container">
-            {confirmGroupCreation ? (
-              <SuccessMessage>
-                Group Created! Find it by clicking on your profile picture in
-                the top right.
-              </SuccessMessage>
-            ) : (
-              <button onClick={() => setCreatingGroup(true)}>
-                <div className="onboarding-create-group-button">
-                  <CreateGroupIcon />
-                  <h4>Create a Group</h4>
-                </div>
-              </button>
-            )}
-          </div>
-          <p className="onboarding-hint-do-it-later">
-            {`Don't worry, you can always make one later, just click on your profile picture in the top right!`}
-          </p>
-        </>
-      )}
+      {createOrClaimGroup}
     </div>
   );
 }

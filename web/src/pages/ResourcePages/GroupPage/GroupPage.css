@@ -87,6 +87,23 @@
   padding: 10px 10px;
 }
 
+.generated-group-container {
+  display: grid;
+  grid-template-columns: 1fr 130px;
+  align-items: center;
+}
+
+.claim-group-button-container {
+  justify-self: flex-end;
+}
+.generated-group-title {
+  color: #00507c;
+}
+
+.generated-group-explanation {
+  color: #5d5d65;
+}
+
 .donate-button:hover {
   border-width: 3px;
   padding: 9px 9px;

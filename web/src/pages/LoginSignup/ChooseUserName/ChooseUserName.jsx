@@ -12,6 +12,7 @@ import CreateResourceFormActions from '../../../components/Forms/CreateResourceF
 export default function ChooseUserName() {
   const locationState = useLocation().state;
   const returnLocation = locationState ? locationState.returnLocation : '';
+  const claimGroupID = locationState ? locationState.claimGroupID : undefined;
   const {user, userProfile, authLoaded} = useContext(AuthContext);
   const {updateUserDetails} = useContext(AuthContext);
   const [goToOnboarding, setGoToOnboarding] = useState(false);
@@ -73,7 +74,7 @@ export default function ChooseUserName() {
       <Redirect
         to={{
           pathname: '/onboarding/follow',
-          state: {returnLocation: returnLocation},
+          state: {returnLocation: returnLocation, claimGroupID: claimGroupID},
         }}
       />
     );

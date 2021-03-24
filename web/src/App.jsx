@@ -1,11 +1,12 @@
 import React, {createContext, useState, useEffect, useContext} from 'react';
-import {BrowserRouter as Router, useLocation} from 'react-router-dom';
+import {BrowserRouter as Router, Link, useLocation} from 'react-router-dom';
 import Routes from './routes.jsx';
 import {auth, db} from './firebase';
 import Header from './components/Layout/Header/Header';
 import {getDefaultAvatar, getDefaultCoverPhoto} from './helpers/users.js';
 
 import './App.css';
+import {CopyrightIcon} from './assets/MenuIcons.jsx';
 
 /**
  * Primary entry point into the app
@@ -86,6 +87,7 @@ function BotDetection({children}) {
 }
 
 const AppLayout = ({children}) => {
+  const {user} = useContext(AuthContext);
   const locationPathName = useLocation().pathname;
   if (locationPathName === '/about') return children;
   return (
@@ -94,6 +96,20 @@ const AppLayout = ({children}) => {
         <Header />
       </div>
       <div className="main-layout">{children}</div>
+      {!user && (
+        <div className="contact-us-footer-section">
+          <div className="contact-us-footer">
+            <Link to="/contact">Contact</Link>
+            <Link to="/aboutUs">About us</Link>
+            <Link to="/privacy-policy">Privacy Policy</Link>
+            <Link to="/cookies-policy">Cookies Policy</Link>
+          </div>
+          <div className="footer-copyright-section">
+            <CopyrightIcon />
+            Labspoon Ltd.
+          </div>
+        </div>
+      )}
     </div>
   );
 };

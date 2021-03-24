@@ -489,7 +489,7 @@ export const addTopicPostsToFollowingFeeds = functions.firestore
     return updateFollowersOfTopic();
   });
 
-function azureTopicToTopicNoID(azureTopic: AzureTopicResult): Topic {
+export function azureTopicToTopicNoID(azureTopic: AzureTopicResult): Topic {
   const capitaliseFirstLetter = (string: string) =>
     string[0].toUpperCase() + string.slice(1);
   return {
@@ -515,7 +515,7 @@ export interface TaggedTopic {
   normalisedName: string;
 }
 
-interface AzureTopicResult {
+export interface AzureTopicResult {
   ['@search.score']: number;
   id: string;
   name: string;

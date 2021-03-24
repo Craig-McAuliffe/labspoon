@@ -1,6 +1,6 @@
 import React, {useContext, useState} from 'react';
 import qs from 'qs';
-import firebase from '../../../firebase.js';
+import firebase, {db} from '../../../firebase.js';
 import {Link, Redirect, useHistory, useLocation} from 'react-router-dom';
 import {AuthContext} from '../../../App';
 import {Form, Formik} from 'formik';
@@ -16,6 +16,7 @@ import {reCaptchaSiteKey} from '../../../config';
 import useScript from '../../../helpers/useScript';
 import useDomRemover from '../../../helpers/useDomRemover.js';
 import reCaptcha from '../../../helpers/activity.js';
+import {convertGroupToGroupRef} from '../../../helpers/groups.js';
 import './SignupPage.css';
 
 /**
@@ -24,9 +25,12 @@ import './SignupPage.css';
  */
 function SignupPage() {
   const [loading, setLoading] = useState(false);
-  const location = useLocation().state;
+  const locationState = useLocation().state;
   const search = useLocation().search;
-  const returnLocation = location ? location.returnLocation : undefined;
+  const returnLocation = locationState
+    ? locationState.returnLocation
+    : undefined;
+  const claimGroupID = locationState ? locationState.claimGroupID : undefined;
   const {userProfile} = useContext(AuthContext);
   const history = useHistory();
   const {updateUserDetails} = useContext(AuthContext);
@@ -34,6 +38,7 @@ function SignupPage() {
   const referrer = searchParams.referrer;
   const [googleSignInFlow, setGoogleSignInFlow] = useState(false);
   const [savedInitialValues, setSavedInitialValues] = useState();
+  const [isSigningUp, setIsSigningUp] = useState(false);
 
   useScript(
     `https://www.google.com/recaptcha/api.js?render=${reCaptchaSiteKey}`
@@ -42,7 +47,7 @@ function SignupPage() {
   useDomRemover('.grecaptcha-badge');
 
   if (loading) return <LoadingSpinnerPage />;
-  if (!userProfile) {
+  if (!userProfile || isSigningUp) {
     return (
       <PaddedPageContainer>
         {googleSignInFlow && (
@@ -50,6 +55,8 @@ function SignupPage() {
             updateUserDetails={updateUserDetails}
             setLoading={setLoading}
             setGoogleSignInFlow={setGoogleSignInFlow}
+            claimGroupID={claimGroupID}
+            setIsSigningUp={setIsSigningUp}
           />
         )}
         <ReferrerAlert referrer={referrer} />
@@ -63,6 +70,8 @@ function SignupPage() {
             setLoading={setLoading}
             setSavedInitialValues={setSavedInitialValues}
             savedInitialValues={savedInitialValues}
+            claimGroupID={claimGroupID}
+            setIsSigningUp={setIsSigningUp}
           />
           <div className="signup-submit-button-container">
             <GoogleButton
@@ -86,16 +95,16 @@ function SignupPage() {
         <Redirect
           to={{
             pathname: '/userName',
-            state: {returnLocation: returnLocation},
+            state: {returnLocation: returnLocation, claimGroupID: claimGroupID},
           }}
         />
       );
-    if (googleSignInFlow) return <Redirect to="/" />;
+    if (userProfile.hasCompletedOnboarding) return <Redirect to="/" />;
     return (
       <Redirect
         to={{
           pathname: '/onboarding/follow',
-          state: {returnLocation: returnLocation},
+          state: {returnLocation: returnLocation, claimGroupID: claimGroupID},
         }}
       />
     );
@@ -106,6 +115,8 @@ const SignUpForm = ({
   setLoading,
   setSavedInitialValues,
   savedInitialValues,
+  claimGroupID,
+  setIsSigningUp,
 }) => {
   const {updateUserDetails} = useContext(AuthContext);
 
@@ -154,7 +165,9 @@ const SignUpForm = ({
           values,
           setLoading,
           updateUserDetails,
-          setSavedInitialValues
+          setSavedInitialValues,
+          claimGroupID,
+          setIsSigningUp
         )
       }
     >
@@ -199,7 +212,9 @@ export async function submitSignUp(
   values,
   setLoading,
   updateUserDetails,
-  setSavedInitialValues
+  setSavedInitialValues,
+  claimGroupID,
+  setIsSigningUp
 ) {
   if (setLoading) setLoading(true);
   const defaultAlert = () =>
@@ -210,14 +225,22 @@ export async function submitSignUp(
     firebase
       .auth()
       .createUserWithEmailAndPassword(values.email, values.password)
-      .then((result) =>
-        createUserDocOnSignUp(
+      .then(async (result) => {
+        setIsSigningUp(true);
+        await createUserDocOnSignUp(
           result,
           setLoading,
           values.userName,
           updateUserDetails
-        )
-      )
+        );
+        if (claimGroupID)
+          await claimGroupFromTwitter(
+            claimGroupID,
+            values.userName,
+            result.user.uid
+          );
+        setIsSigningUp(false);
+      })
       .catch((error) => {
         console.log(error);
         if (setLoading) setLoading(false);
@@ -230,6 +253,7 @@ export async function submitSignUp(
         } else {
           defaultAlert();
         }
+        setIsSigningUp(false);
         return false;
       });
 
@@ -253,6 +277,42 @@ export async function submitSignUp(
     reCaptchaFailFunction,
     reCaptchaErrorFunction
   );
+}
+
+export async function claimGroupFromTwitter(
+  claimGroupID,
+  userName,
+  userID,
+  group
+) {
+  const groupData = group
+    ? group
+    : await db
+        .doc(`groups/${claimGroupID}`)
+        .get()
+        .then((ds) => ds.data())
+        .catch((err) => console.error(err));
+  if (groupData) {
+    const batch = db.batch();
+    batch.set(db.doc(`groups/${claimGroupID}/members/${userID}`), {
+      id: userID,
+      name: userName,
+    });
+    batch.set(
+      db.doc(`users/${userID}/groups/${claimGroupID}`),
+      convertGroupToGroupRef(groupData)
+    );
+    batch.update(db.doc(`groups/${claimGroupID}`), {
+      isGeneratedFromTwitter: false,
+    });
+    return batch.commit().catch((err) => {
+      console.error(err);
+      <alert>
+        Something went wrong while claiming that group. Go to the group page and
+        try again.
+      </alert>;
+    });
+  }
 }
 
 export default SignupPage;

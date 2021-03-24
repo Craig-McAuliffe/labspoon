@@ -1,29 +1,40 @@
-import {useEffect, useState} from 'react';
+import {useEffect} from 'react';
 import {googleAuthProvider, auth, db} from '../../firebase.js';
 import {createUserDocOnSignUp} from '../../helpers/users.js';
+import {claimGroupFromTwitter} from './SignupPage/SignupPage.jsx';
 
 export default function GoogleSignIn({
   updateUserDetails,
   setLoading,
   setGoogleSignInFlow,
+  claimGroupID,
+  setIsSigningUp,
 }) {
-  const [signInCompleted, setSignInCompleted] = useState(false);
-
   useEffect(() => {
-    if (signInCompleted) return;
-    let isMounted = true;
+    setIsSigningUp(true);
 
     triggerGoogleSignInPopup()
       .then(async (result) => {
-        if (!isMounted) return;
-
-        setSignInCompleted(true);
         await db
           .doc(`users/${result.user.uid}`)
           .get()
-          .then((ds) => {
-            if (ds.exists) return;
-            createUserDocOnSignUp(result, undefined, '', updateUserDetails);
+          .then(async (ds) => {
+            if (!ds.exists) {
+              await createUserDocOnSignUp(
+                result,
+                undefined,
+                '',
+                updateUserDetails
+              );
+            }
+            if (claimGroupID) {
+              await claimGroupFromTwitter(
+                claimGroupID,
+                result.user.displayName,
+                result.user.uid
+              );
+            }
+            setIsSigningUp(false);
             setGoogleSignInFlow(false);
           })
           .catch((err) => {
@@ -31,12 +42,14 @@ export default function GoogleSignIn({
             alert(
               'We could not verify if you email address is already linked to an account. Please email help@labspoon.com from the google email address with which you are trying to sign up.'
             );
+            setIsSigningUp(false);
             setGoogleSignInFlow(false);
           });
       })
       .catch((err) => {
         console.log(err.code, err.message, err.email);
         if ((err.code = 'auth/popup-closed-by-user')) {
+          setIsSigningUp(false);
           setGoogleSignInFlow(false);
           return;
         }
@@ -44,11 +57,9 @@ export default function GoogleSignIn({
           alert(
             'Something went wrong while trying to sign you in with google. Please try again.'
           );
+        setIsSigningUp(false);
         setGoogleSignInFlow(false);
       });
-    return () => {
-      isMounted = false;
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setLoading]);
   return null;

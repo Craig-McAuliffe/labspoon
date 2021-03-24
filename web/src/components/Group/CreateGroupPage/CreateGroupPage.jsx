@@ -13,7 +13,7 @@ import './CreateGroupPage.css';
 const MAXGROUPS = 12;
 export default function CreateGroupPage({
   onboardingCancelOrSubmitAction,
-  confirmGroupCreation,
+  setCreatedGroupID,
 }) {
   const history = useHistory();
   const {user, userProfile} = useContext(AuthContext);
@@ -111,7 +111,7 @@ export default function CreateGroupPage({
           setSubmitting(false);
           if (onboardingCancelOrSubmitAction) {
             onboardingCancelOrSubmitAction();
-            confirmGroupCreation();
+            if (setCreatedGroupID) setCreatedGroupID(groupID);
           } else {
             history.push(`/group/${groupID}`);
           }

@@ -120,6 +120,38 @@
   color: #3f3f45;
 }
 
+.contact-us-footer {
+  display: flex;
+}
+
+.contact-us-footer-section {
+  display: flex;
+  justify-content: space-between;
+  position: fixed;
+  bottom: 0px;
+  height: 50px;
+  border-top: 1px solid #dcdce0;
+  width: 100%;
+  background: #ffffff;
+  z-index: 1;
+  padding: 5px;
+}
+
+.footer-copyright-section svg {
+  height: 10px;
+  padding-right: 3px;
+}
+
+.footer-copyright-section {
+  color: #5d5d65;
+}
+
+.contact-us-footer a {
+  color: #5d5d65;
+  display: inline-block;
+  padding-right: 10px;
+}
+
 @media screen and (max-width: 1550px) {
   .main-layout {
     grid-template-columns: 350px 1fr 350px;
