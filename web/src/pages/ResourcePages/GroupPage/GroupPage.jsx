@@ -456,8 +456,7 @@ const GroupDetails = ({
         if (!newGroupData) return;
         const fetchedPinnedItem = newGroupData.pinnedItem;
         if (!fetchedPinnedItem) {
-          if (pinnedItem) return setPinnedItem(null);
-          return;
+          return setPinnedItem(null);
         }
         if (userIsMember) {
           fetchedPinnedItem.showPinOption = true;
@@ -538,7 +537,6 @@ const GroupDetails = ({
           <RichTextBody body={group.about} shouldLinkify={true} />
         </SeeMore>
       </div>
-
       <DonationLink verified={verified} donationLink={group.donationLink} />
       {group.isGeneratedFromTwitter && (
         <ClaimGroup groupID={groupID} group={group} />

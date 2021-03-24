@@ -161,8 +161,8 @@ export function PinListItem({
         .then(() => {
           if (isPinnedComponentRenderedOnPage)
             setResultsShouldCheckPinToggle((currentToggle) => !currentToggle);
-          if (submitting) setSubmitting(false);
           testIfItemIsPinned();
+          setSubmitting(false);
         })
         .catch(() => {
           alert(
@@ -181,8 +181,8 @@ export function PinListItem({
       .then(() => {
         if (isPinnedComponentRenderedOnPage)
           setResultsShouldCheckPinToggle((currentToggle) => !currentToggle);
-        setSubmitting(false);
         testIfItemIsPinned();
+        setSubmitting(false);
       })
       .catch((err) => {
         console.error(
