@@ -1294,7 +1294,7 @@ const filterWords: any = {
 
 export const createGeneratedGroupsFromJSON = functions
   .runWith({
-    timeoutSeconds: 20,
+    timeoutSeconds: 60,
     memory: '2GB',
   })
   .https.onRequest(async (req, resp) => {
@@ -1321,7 +1321,7 @@ export const createGeneratedGroupsFromJSON = functions
       groupsArray.push(groups[n]);
     }
 
-    const batchedArray = groupsArray.slice(0, 20);
+    const batchedArray = groupsArray.slice(0, 40);
 
     for (const groupElement of batchedArray) {
       await handleGeneratedGroup(groupElement);
@@ -1399,7 +1399,6 @@ async function handleGeneratedGroup(generatedGroup: {
     isGeneratedFromTwitter: true,
   };
   if (taggedTopics.length > 0) group.recentArticleTopics = taggedTopics;
-  console.log(group);
   await groupRef.set(group);
 }
 
@@ -1437,9 +1436,18 @@ async function handleAzureTopicSearchResults(
   );
   await Promise.all(createTopicsPromises);
   topicsWithIDs.forEach((processedTopic) => {
-    if (
-      escapedDescription.toLowerCase().includes(processedTopic.normalisedName)
-    )
-      taggedTopics.push(processedTopic);
+    const individualWordsFromTopic = processedTopic.normalisedName.split(' ');
+    const trimmedWords = individualWordsFromTopic.map((individualTopicWord) => {
+      let formattedWord = individualTopicWord.trim();
+      if (formattedWord.endsWith('s'))
+        formattedWord = formattedWord.slice(0, formattedWord.length - 1);
+      return formattedWord;
+    });
+    let topicHasPassed = true;
+    trimmedWords.forEach((trimmedWord) => {
+      if (!escapedDescription.toLowerCase().includes(trimmedWord))
+        topicHasPassed = false;
+    });
+    if (topicHasPassed) taggedTopics.push(processedTopic);
   });
 }
