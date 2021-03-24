@@ -1,9 +1,13 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {useHistory} from 'react-router-dom';
 import {EditIcon, PinIcon} from '../../assets/GeneralActionIcons';
 import {DottedBurgerMenuIcon} from '../../assets/MenuIcons';
 import {db} from '../../firebase';
 import {OPENPOSITION} from '../../helpers/resourceTypeDefinitions';
+import {
+  CurrentPinnedItemContext,
+  PinnedItemChangeContext,
+} from '../../pages/ResourcePages/GroupPage/GroupPage';
 import PinButton from '../Buttons/PinButton';
 import Dropdown, {DropdownOption} from '../Dropdown';
 import SeeMore from '../SeeMore';
@@ -118,10 +122,20 @@ export function PinListItem({
 }) {
   const [isPinned, setIsPinned] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const isPinnedComponentRenderedOnPage = useContext(CurrentPinnedItemContext);
+  const {
+    resultsShouldCheckPinToggle,
+    setResultsShouldCheckPinToggle,
+  } = useContext(PinnedItemChangeContext);
+
+  useEffect(() => {
+    if (isPinnedComponentRenderedOnPage) return setIsPinned(true);
+    testIfItemIsPinned();
+  }, []);
 
   useEffect(() => {
     testIfItemIsPinned();
-  }, []);
+  }, [resultsShouldCheckPinToggle]);
 
   const testIfItemIsPinned = async () => {
     const profileDoc = await db
@@ -145,6 +159,8 @@ export function PinListItem({
           pinnedItem: null,
         })
         .then(() => {
+          if (isPinnedComponentRenderedOnPage)
+            setResultsShouldCheckPinToggle((currentToggle) => !currentToggle);
           if (submitting) setSubmitting(false);
           testIfItemIsPinned();
         })
@@ -163,6 +179,8 @@ export function PinListItem({
       .doc(`${pinProfileCollection}/${pinProfileID}`)
       .update({pinnedItem: pinnedItem})
       .then(() => {
+        if (isPinnedComponentRenderedOnPage)
+          setResultsShouldCheckPinToggle((currentToggle) => !currentToggle);
         setSubmitting(false);
         testIfItemIsPinned();
       })

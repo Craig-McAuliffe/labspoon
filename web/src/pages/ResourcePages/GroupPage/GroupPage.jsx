@@ -235,6 +235,7 @@ const checkIfTabsAreUsed = async (setUsedTabs, groupID) => {
   setUsedTabs({checked: true, tabs: confirmedUsedTabs});
 };
 
+export const PinnedItemChangeContext = React.createContext();
 export default function GroupPage() {
   const featureFlags = useContext(FeatureFlags);
   const [groupID, setGroupID] = useState(undefined);
@@ -243,6 +244,10 @@ export default function GroupPage() {
   const [userIsMember, setUserIsMember] = useState(false);
   const [tabsLoading, setTabsLoading] = useState(true);
   const [usedTabs, setUsedTabs] = useState({checked: false, tabs: []});
+  const [
+    resultsShouldCheckPinToggle,
+    setResultsShouldCheckPinToggle,
+  ] = useState(false);
   const history = useHistory();
   const {user} = useContext(AuthContext);
   const params = useParams();
@@ -384,26 +389,33 @@ export default function GroupPage() {
       ) : (
         <></>
       )}
-      <ResourcesFeed
-        fetchResults={fetchFeedData}
-        limit={9}
-        tabs={fetchTabs()}
-        tabsLoading={tabsLoading}
-        // the route matched path is different if the url is extended changes
-        routedTabBasePathname={routedTabID ? undefined : `${groupID}`}
-        useRoutedTabs={true}
+      <PinnedItemChangeContext.Provider
+        value={{
+          resultsShouldCheckPinToggle: resultsShouldCheckPinToggle,
+          setResultsShouldCheckPinToggle: setResultsShouldCheckPinToggle,
+        }}
       >
-        <PaddedContent>
-          <GroupDetails
-            group={groupData}
-            groupDescriptionRef={groupDescriptionRef}
-            userIsMember={userIsMember}
-            verified={verified}
-            groupID={groupID}
-            routedTabID={routedTabID}
-          />
-        </PaddedContent>
-      </ResourcesFeed>
+        <ResourcesFeed
+          fetchResults={fetchFeedData}
+          limit={9}
+          tabs={fetchTabs()}
+          tabsLoading={tabsLoading}
+          // the route matched path is different if the url is extended changes
+          routedTabBasePathname={routedTabID ? undefined : `${groupID}`}
+          useRoutedTabs={true}
+        >
+          <PaddedContent>
+            <GroupDetails
+              group={groupData}
+              groupDescriptionRef={groupDescriptionRef}
+              userIsMember={userIsMember}
+              verified={verified}
+              groupID={groupID}
+              routedTabID={routedTabID}
+            />
+          </PaddedContent>
+        </ResourcesFeed>
+      </PinnedItemChangeContext.Provider>
     </>
   );
 }
@@ -432,7 +444,7 @@ const GroupDetails = ({
   routedTabID,
 }) => {
   const featureFlags = useContext(FeatureFlags);
-  const [shouldRefresh, setShouldRefresh] = useState(false);
+  const [isSlowLoad, setIsSlowLoad] = useState(false);
   const [pinnedItem, setPinnedItem] = useState(null);
 
   useEffect(() => {
@@ -441,6 +453,7 @@ const GroupDetails = ({
       .doc(`groups/${groupID}`)
       .onSnapshot((docSnapshot) => {
         const newGroupData = docSnapshot.data();
+        if (!newGroupData) return;
         const fetchedPinnedItem = newGroupData.pinnedItem;
         if (!fetchedPinnedItem) {
           if (pinnedItem) return setPinnedItem(null);
@@ -455,20 +468,19 @@ const GroupDetails = ({
       });
     return () => groupDocObserver();
   }, [groupID, userIsMember]);
-
   useEffect(() => {
-    if (group && shouldRefresh) {
-      setShouldRefresh(false);
+    if (group && isSlowLoad) {
+      setIsSlowLoad(false);
       return;
     }
     const refreshAdviceTimer = setTimeout(() => {
       if (group) return;
-      setShouldRefresh(true);
+      setIsSlowLoad(true);
     }, 8000);
     return () => {
       clearTimeout(refreshAdviceTimer);
     };
-  }, [group, shouldRefresh]);
+  }, [group, isSlowLoad]);
 
   if (group === undefined)
     return (
@@ -476,7 +488,7 @@ const GroupDetails = ({
         <div className="group-page-details-loading"></div>
         <div className="group-page-details-loading">
           <LoadingSpinner />
-          {shouldRefresh && (
+          {isSlowLoad && (
             <p>
               This is taking a while... try{' '}
               <TertiaryButton onClick={() => window.location.reload()}>
@@ -531,7 +543,7 @@ const GroupDetails = ({
       {group.isGeneratedFromTwitter && (
         <ClaimGroup groupID={groupID} group={group} />
       )}
-      {pinnedItem && <PinnedItem pinnedItem={pinnedItem} />}
+      {pinnedItem ? <PinnedItem pinnedItem={pinnedItem} /> : null}
     </>
   );
 };
@@ -625,11 +637,13 @@ function DonateButton() {
     </button>
   );
 }
-
+export const CurrentPinnedItemContext = React.createContext();
 function PinnedItem({pinnedItem}) {
   return (
-    <div className="pinned-item-container">
-      <GenericListItem result={pinnedItem} />
-    </div>
+    <CurrentPinnedItemContext.Provider value={true}>
+      <div className="pinned-item-container">
+        <GenericListItem result={pinnedItem} />
+      </div>
+    </CurrentPinnedItemContext.Provider>
   );
 }
