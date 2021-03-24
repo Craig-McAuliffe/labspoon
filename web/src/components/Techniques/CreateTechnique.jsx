@@ -41,6 +41,7 @@ export default function CreateTechnique() {
   const [submitting, setSubmitting] = useState(false);
   const [savedInitialValues, setSavedInitialValues] = useState({
     body: initialValueNoTitle,
+    title: '',
     photos: [],
   });
   const {userProfile, authLoaded, user} = useContext(AuthContext);

@@ -135,8 +135,9 @@ export const yupRichBodyOnlyValidation = (
         if (value[0].children[0].text === undefined) return false;
         if (
           value.reduce((accumulator, section) => {
-            if (!section.children[0].text) return accumulator;
-            return accumulator + section.children[0].text.length;
+            // + 1 for paragraph break
+            if (!section.children[0].text) return accumulator + 1;
+            return accumulator + section.children[0].text.length + 1;
           }, 0) > characterLimit
         )
           return false;
