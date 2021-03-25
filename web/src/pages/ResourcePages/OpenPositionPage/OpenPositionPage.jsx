@@ -47,44 +47,43 @@ export default function OpenPositionPage() {
   if (!openPosition || loading) return <LoadingSpinnerPage />;
   return (
     <PaddedPageContainer>
-      <div className="open-position-headline-section">
-        <div className="open-position-headline-section-left-container">
-          <h2>{openPosition.content.title}</h2>
-          <h3 className="open-position-headline-section-institution">
-            {openPosition.group.institution}
-          </h3>
-          {openPosition.content.salary.length > 0 ? (
-            <div className="open-position-headline-sub-title-container">
-              <h4 className="open-position-headline-sub-title">Salary</h4>
-              <h4 className="open-position-headline-sub-title-value">
-                {openPosition.content.salary}
-              </h4>
-            </div>
-          ) : null}
-          {openPosition.content.startDate.length > 0 ? (
-            <div className="open-position-headline-sub-title-container">
-              <h4 className="open-position-headline-sub-title">Start Date</h4>
-              <h4 className="open-position-headline-sub-title-value">
-                {openPosition.content.startDate}
-              </h4>
-            </div>
-          ) : null}
-          {openPosition.topics.length > 0 ? (
-            <>
-              <ListItemTopics
-                dbTopics={openPosition.topics}
-                customTopics={openPosition.customTopics}
-              />
-            </>
-          ) : null}
+      <h2>{openPosition.content.title}</h2>
+      <h3 className="open-position-headline-section-institution">
+        {openPosition.group.institution}
+      </h3>
+      {openPosition.content.salary.length > 0 ? (
+        <div className="open-position-headline-sub-title-container">
+          <h4 className="open-position-headline-sub-title">Salary</h4>
+          <h4 className="open-position-headline-sub-title-value">
+            {openPosition.content.salary}
+          </h4>
         </div>
-        <div>
-          {openPosition.content.address.length > 0 ? (
+      ) : null}
+      {openPosition.content.startDate.length > 0 ? (
+        <div className="open-position-headline-sub-title-container">
+          <h4 className="open-position-headline-sub-title">Start Date</h4>
+          <h4 className="open-position-headline-sub-title-value">
+            {openPosition.content.startDate}
+          </h4>
+        </div>
+      ) : null}
+      {openPosition.topics.length > 0 ? (
+        <>
+          <ListItemTopics
+            dbTopics={openPosition.topics}
+            customTopics={openPosition.customTopics}
+          />
+        </>
+      ) : null}
+      <div>
+        {openPosition.content.address.length > 0 && (
+          <div style={{marginTop: '20px'}}>
+            <h4 className="open-position-headline-sub-title">Address</h4>
             <h4 className="open-position-headline-address">
               {openPosition.content.address}
             </h4>
-          ) : null}
-        </div>
+          </div>
+        )}
       </div>
       <h4 className="open-position-section-title">Affiliated Research Group</h4>
       <GroupListItem group={openPosition.group} noBorder={true}>
