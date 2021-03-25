@@ -20,7 +20,11 @@ export default function GroupListItem({
 }) {
   function WrapWithLinkOrOverride({children}) {
     if (LinkOverride) return <LinkOverride>{children}</LinkOverride>;
-    return <Link to={`/group/${group.id}`}>{children}</Link>;
+    return (
+      <Link to={`/group/${group.id}`} className="group-list-item-name-link">
+        {children}
+      </Link>
+    );
   }
 
   const name = (

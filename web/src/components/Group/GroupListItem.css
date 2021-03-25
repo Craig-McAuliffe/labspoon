@@ -56,6 +56,11 @@
   margin-top: 4px;
 }
 
+.group-list-item-name-link:hover h3 {
+  color: #00507c;
+  text-decoration: underline;
+}
+
 .group-list-item-icon:hover p {
   color: #000000;
 }
