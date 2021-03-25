@@ -18,15 +18,37 @@
 .list-item-dropdown-option-container {
 }
 
-.list-item-options-dropdown-text {
+.list-item-options-dropdown-text,
+.list-item-options-dropdown-text-loading {
   display: grid;
   grid-template-columns: 40px 1fr;
   justify-content: flex-start;
   align-items: center;
 }
 
-.list-item-options-dropdown-text svg {
-  height: 30px;
+.list-item-options-dropdown-text-loading {
+  color: #5d5d65;
+}
+
+.list-item-options-dropdown-text svg,
+.list-item-options-dropdown-text-loading svg {
+  height: 25px;
+}
+
+.list-item-options-dropdown-text-loading {
+  color: #dcdce0;
+}
+
+.list-item-options-dropdown-text-loading svg {
+  stroke: #dcdce0;
+}
+
+.list-item-options-dropdown-text-loading path {
+  fill: #dcdce0;
+}
+
+.list-item-options-dropdown-text-loading circle {
+  stroke: #dcdce0;
 }
 
 .list-item-dropdown-toggle {

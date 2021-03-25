@@ -11,7 +11,7 @@
 
 .publication-list-item-header {
   display: grid;
-  grid-template-columns: 1fr 80px;
+  grid-template-columns: 1fr 130px;
 }
 
 .publication-list-item-journal-container {
@@ -20,11 +20,6 @@
 
 .publication-list-item-journal-container h3 {
   color: #99999f;
-}
-
-.publication-list-item-pin-container {
-  padding-top: 10px;
-  position: relative;
 }
 
 .publication-list-item-journal-logo {
@@ -112,4 +107,10 @@
 
 .tertiary-button:hover {
   color: #3099d3;
+}
+
+.publication-list-item-options-dropdown-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 }

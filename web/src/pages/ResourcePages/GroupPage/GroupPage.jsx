@@ -244,10 +244,6 @@ export default function GroupPage() {
   const [userIsMember, setUserIsMember] = useState(false);
   const [tabsLoading, setTabsLoading] = useState(true);
   const [usedTabs, setUsedTabs] = useState({checked: false, tabs: []});
-  const [
-    resultsShouldCheckPinToggle,
-    setResultsShouldCheckPinToggle,
-  ] = useState(false);
   const history = useHistory();
   const {user} = useContext(AuthContext);
   const params = useParams();
@@ -389,33 +385,26 @@ export default function GroupPage() {
       ) : (
         <></>
       )}
-      <PinnedItemChangeContext.Provider
-        value={{
-          resultsShouldCheckPinToggle: resultsShouldCheckPinToggle,
-          setResultsShouldCheckPinToggle: setResultsShouldCheckPinToggle,
-        }}
+      <ResourcesFeed
+        fetchResults={fetchFeedData}
+        limit={9}
+        tabs={fetchTabs()}
+        tabsLoading={tabsLoading}
+        // the route matched path is different if the url is extended changes
+        routedTabBasePathname={routedTabID ? undefined : `${groupID}`}
+        useRoutedTabs={true}
       >
-        <ResourcesFeed
-          fetchResults={fetchFeedData}
-          limit={9}
-          tabs={fetchTabs()}
-          tabsLoading={tabsLoading}
-          // the route matched path is different if the url is extended changes
-          routedTabBasePathname={routedTabID ? undefined : `${groupID}`}
-          useRoutedTabs={true}
-        >
-          <PaddedContent>
-            <GroupDetails
-              group={groupData}
-              groupDescriptionRef={groupDescriptionRef}
-              userIsMember={userIsMember}
-              verified={verified}
-              groupID={groupID}
-              routedTabID={routedTabID}
-            />
-          </PaddedContent>
-        </ResourcesFeed>
-      </PinnedItemChangeContext.Provider>
+        <PaddedContent>
+          <GroupDetails
+            group={groupData}
+            groupDescriptionRef={groupDescriptionRef}
+            userIsMember={userIsMember}
+            verified={verified}
+            groupID={groupID}
+            routedTabID={routedTabID}
+          />
+        </PaddedContent>
+      </ResourcesFeed>
     </>
   );
 }
@@ -635,13 +624,11 @@ function DonateButton() {
     </button>
   );
 }
-export const CurrentPinnedItemContext = React.createContext();
+
 function PinnedItem({pinnedItem}) {
   return (
-    <CurrentPinnedItemContext.Provider value={true}>
-      <div className="pinned-item-container">
-        <GenericListItem result={pinnedItem} />
-      </div>
-    </CurrentPinnedItemContext.Provider>
+    <div className="pinned-item-container">
+      <GenericListItem result={pinnedItem} />
+    </div>
   );
 }

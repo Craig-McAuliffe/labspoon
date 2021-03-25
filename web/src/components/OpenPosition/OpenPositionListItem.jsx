@@ -6,6 +6,7 @@ import {
   ExpandableText,
   ListItemContainer,
   ListItemOptionsDropdown,
+  PIN,
 } from '../ListItem/ListItemCommonComponents';
 import {OPENPOSITION} from '../../helpers/resourceTypeDefinitions';
 
@@ -25,6 +26,7 @@ export default function OpenPositionListItem({openPosition}) {
           item={openPosition}
           pinProfileID={openPosition.pinProfileID}
           pinProfileCollection={openPosition.pinProfileCollection}
+          options={[PIN]}
         />
       )}
       <Link to={`/openPosition/${openPosition.id}`}>

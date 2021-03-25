@@ -63,6 +63,20 @@
   color: #ffffff;
 }
 
+.dropdown-option-button-loading,
+.dropdown-option-button-loading:hover,
+.dropdown-option-button-loading:focus {
+  color: #5d5d65;
+  padding: 4px 12px;
+  width: 100%;
+  border-bottom: 1px solid #5d5d65;
+  text-align: start;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  cursor: default;
+}
+
 .dropdown-option-button:hover h4,
 .dropdown-option-button:focus h4,
 .dropdown-option-button:hover h3,

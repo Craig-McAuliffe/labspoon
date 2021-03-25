@@ -9,13 +9,17 @@ import UserAvatar from '../../Avatar/UserAvatar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {
   OPENPOSITION,
+  POST,
   PUBLICATION,
 } from '../../../helpers/resourceTypeDefinitions';
 import {RichTextBody} from '../../Article/Article';
 import {db} from '../../../firebase';
+import {
+  ListItemOptionsDropdown,
+  PIN,
+} from '../../ListItem/ListItemCommonComponents';
 
 import './Post.css';
-import {PinListItem} from '../../ListItem/ListItemCommonComponents';
 
 export default function Post({post, dedicatedPage, bookmarkedVariation}) {
   const [recommendedCount, setRecommendedCount] = useState(false);
@@ -132,10 +136,13 @@ function PostHeader({postAuthor, postUnixTimestamp, dedicatedPage, post}) {
         </div>
       </div>
       {post.showPinOption && (
-        <PinListItem
+        <ListItemOptionsDropdown
+          resourceType={POST}
+          resourceID={post.id}
           item={post}
           pinProfileID={post.pinProfileID}
           pinProfileCollection={post.pinProfileCollection}
+          options={[PIN]}
         />
       )}
     </div>

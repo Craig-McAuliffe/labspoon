@@ -3,7 +3,11 @@ import React, {useContext, useState} from 'react';
 import {Link} from 'react-router-dom';
 import {AuthContext} from '../../App';
 import {RESEARCHFOCUS, TECHNIQUE} from '../../helpers/resourceTypeDefinitions';
-import {ListItemOptionsDropdown} from '../ListItem/ListItemCommonComponents';
+import {
+  EDIT,
+  ListItemOptionsDropdown,
+  PIN,
+} from '../ListItem/ListItemCommonComponents';
 import * as Yup from 'yup';
 import GroupListItem from '../Group/GroupListItem';
 import FollowGroupButton from '../Group/FollowGroupButton';
@@ -72,6 +76,7 @@ export function ArticleHeaderAndType({
           item={article}
           pinProfileID={article ? article.pinProfileID : null}
           pinProfileCollection={article ? article.pinProfileCollection : null}
+          options={[PIN, EDIT]}
         />
       )}
       <div

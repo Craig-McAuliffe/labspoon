@@ -1,14 +1,8 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {useHistory} from 'react-router-dom';
 import {EditIcon, PinIcon} from '../../assets/GeneralActionIcons';
 import {DottedBurgerMenuIcon} from '../../assets/MenuIcons';
 import {db} from '../../firebase';
-import {OPENPOSITION} from '../../helpers/resourceTypeDefinitions';
-import {
-  CurrentPinnedItemContext,
-  PinnedItemChangeContext,
-} from '../../pages/ResourcePages/GroupPage/GroupPage';
-import PinButton from '../Buttons/PinButton';
 import Dropdown, {DropdownOption} from '../Dropdown';
 import SeeMore from '../SeeMore';
 
@@ -25,14 +19,21 @@ export function ExpandableText({children, resourceID, initialHeight = 144}) {
     </SeeMore>
   );
 }
-
+export const PIN = 'pin';
+export const EDIT = 'edit';
 export function ListItemOptionsDropdown({
   resourceType,
   resourceID,
   item,
   pinProfileID,
   pinProfileCollection,
+  options,
 }) {
+  const [isPinned, setIsPinned] = useState(false);
+  const [submittingPin, setSubmittingPin] = useState(false);
+  const [loadingPinState, setLoadingPinState] = useState(true);
+
+  if (!options || options.length === 0) return null;
   const listItemOptionsDropDownToggle = (setOpen) => (
     <button
       className="list-item-dropdown-toggle"
@@ -44,7 +45,20 @@ export function ListItemOptionsDropdown({
   return (
     // <BrowserRouter basename="">
     <div className="list-options-container">
-      <Dropdown customToggle={listItemOptionsDropDownToggle}>
+      <Dropdown
+        customToggle={listItemOptionsDropDownToggle}
+        loadOnExpand={() =>
+          options.includes(PIN)
+            ? testIfItemIsPinned(
+                setIsPinned,
+                setLoadingPinState,
+                item,
+                pinProfileCollection,
+                pinProfileID
+              )
+            : null
+        }
+      >
         <ListItemOptionsDropDownOptions
           onSelect={() => {}}
           resourceType={resourceType}
@@ -52,6 +66,11 @@ export function ListItemOptionsDropdown({
           item={item}
           pinProfileID={pinProfileID}
           pinProfileCollection={pinProfileCollection}
+          options={options}
+          isPinned={isPinned}
+          loadingPinState={loadingPinState}
+          submittingPin={submittingPin}
+          setSubmittingPin={setSubmittingPin}
         />
       </Dropdown>
     </div>
@@ -66,82 +85,85 @@ function ListItemOptionsDropDownOptions({
   item,
   pinProfileID,
   pinProfileCollection,
+  options,
+  isPinned,
+  loadingPinState,
+  submittingPin,
+  setSubmittingPin,
 }) {
   const history = useHistory();
+  const optionsDisplayed = [];
 
-  const getCustomDisplay = (isPinned, pinItem) => {
-    return (
-      <DropdownOption
-        onSelect={() => {
-          onSelect();
-          pinItem();
-        }}
-      >
-        <h4 className="list-item-options-dropdown-text">
-          <PinIcon />
-          {isPinned ? 'Unpin' : 'Pin'}
-        </h4>
-      </DropdownOption>
-    );
-  };
+  options.forEach((option) => {
+    switch (option) {
+      case PIN:
+        if (item.showPinOption)
+          optionsDisplayed.push(
+            <DropdownOption
+              loading={loadingPinState}
+              onSelect={() => {
+                if (loadingPinState || submittingPin) return;
+                onSelect();
+                pinItemToProfile(
+                  setSubmittingPin,
+                  item,
+                  isPinned,
+                  pinProfileID,
+                  pinProfileCollection
+                );
+              }}
+            >
+              <h4
+                className={`list-item-options-dropdown-text${
+                  loadingPinState ? '-loading' : ''
+                }`}
+              >
+                <PinIcon />
+                {isPinned ? 'Unpin' : 'Pin'}
+              </h4>
+            </DropdownOption>
+          );
 
-  return (
-    <>
-      {resourceType !== OPENPOSITION && (
-        <DropdownOption
-          onSelect={() => {
-            onSelect();
-            history.replace(`/${resourceType}/${resourceID}/edit`, {
-              previousLocation: history.location.pathname,
-            });
-          }}
-        >
-          <h4 className="list-item-options-dropdown-text">
-            <EditIcon />
-            Edit
-          </h4>
-        </DropdownOption>
-      )}
-      {item.showPinOption && (
-        <PinListItem
-          item={item}
-          getCustomDisplay={getCustomDisplay}
-          pinProfileID={pinProfileID}
-          pinProfileCollection={pinProfileCollection}
-        />
-      )}
-    </>
-  );
+        break;
+      case EDIT:
+        optionsDisplayed.push(
+          <DropdownOption
+            onSelect={() => {
+              onSelect();
+              history.replace(`/${resourceType}/${resourceID}/edit`, {
+                previousLocation: history.location.pathname,
+              });
+            }}
+          >
+            <h4 className="list-item-options-dropdown-text">
+              <EditIcon />
+              Edit
+            </h4>
+          </DropdownOption>
+        );
+        break;
+      default:
+        return;
+    }
+  });
+  return optionsDisplayed.map((option, i) => (
+    <React.Fragment key={option + ' ' + i}> {option}</React.Fragment>
+  ));
 }
 
-export function PinListItem({
-  pinProfileID,
-  pinProfileCollection,
+async function testIfItemIsPinned(
+  setIsPinned,
+  setLoadingPinState,
   item,
-  getCustomDisplay,
-}) {
-  const [isPinned, setIsPinned] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const isPinnedComponentRenderedOnPage = useContext(CurrentPinnedItemContext);
-  const {
-    resultsShouldCheckPinToggle,
-    setResultsShouldCheckPinToggle,
-  } = useContext(PinnedItemChangeContext);
-
-  useEffect(() => {
-    if (isPinnedComponentRenderedOnPage) return setIsPinned(true);
-    testIfItemIsPinned();
-  }, []);
-
-  useEffect(() => {
-    testIfItemIsPinned();
-  }, [resultsShouldCheckPinToggle]);
-
-  const testIfItemIsPinned = async () => {
-    const profileDoc = await db
-      .doc(`${pinProfileCollection}/${pinProfileID}`)
-      .get()
-      .catch((err) => console.error(err));
+  pinProfileCollection,
+  pinProfileID
+) {
+  setLoadingPinState(true);
+  const profileDoc = await db
+    .doc(`${pinProfileCollection}/${pinProfileID}`)
+    .get()
+    .catch((err) => console.error(err));
+  const handleFetch = () => {
     if (!profileDoc) return setIsPinned(false);
     const profileData = profileDoc.data();
     if (!profileData) return setIsPinned(false);
@@ -149,61 +171,49 @@ export function PinListItem({
     if (!currentPinnedItem) return setIsPinned(false);
     if (item.id === currentPinnedItem.id) setIsPinned(true);
   };
+  handleFetch();
+  setLoadingPinState(false);
+}
 
-  const pinItemToProfile = async () => {
-    setSubmitting(true);
-    if (isPinned) {
-      return db
-        .doc(`${pinProfileCollection}/${pinProfileID}`)
-        .update({
-          pinnedItem: null,
-        })
-        .then(() => {
-          if (isPinnedComponentRenderedOnPage)
-            setResultsShouldCheckPinToggle((currentToggle) => !currentToggle);
-          testIfItemIsPinned();
-          setSubmitting(false);
-        })
-        .catch(() => {
-          alert(
-            'Something went wrong while pinning that item. Please try again.'
-          );
-          setSubmitting(false);
-        });
-    }
-    const pinnedItem = {...item};
-    delete pinnedItem.showPinOption;
-    delete pinnedItem.pinProfileID;
-    delete pinnedItem.pinProfileCollection;
+async function pinItemToProfile(
+  setSubmittingPin,
+  item,
+  isPinned,
+  pinProfileID,
+  pinProfileCollection
+) {
+  setSubmittingPin(true);
+  if (isPinned) {
     return db
       .doc(`${pinProfileCollection}/${pinProfileID}`)
-      .update({pinnedItem: pinnedItem})
-      .then(() => {
-        if (isPinnedComponentRenderedOnPage)
-          setResultsShouldCheckPinToggle((currentToggle) => !currentToggle);
-        testIfItemIsPinned();
-        setSubmitting(false);
+      .update({
+        pinnedItem: null,
       })
-      .catch((err) => {
-        console.error(
-          `unable to pin ${item.resourceType} to ${pinProfileCollection} with id ${pinProfileID} ${err}`
-        );
+      .then(() => {
+        setSubmittingPin(false);
+      })
+      .catch(() => {
         alert(
           'Something went wrong while pinning that item. Please try again.'
         );
-        setSubmitting(false);
+        setSubmittingPin(false);
       });
-  };
-
-  if (getCustomDisplay) return getCustomDisplay(isPinned, pinItemToProfile);
-  return (
-    <div className="resource-result-with-pin-container ">
-      <div className="resource-result-pin-container">
-        <PinButton
-          onClick={submitting ? () => {} : pinItemToProfile}
-          isPinned={isPinned}
-        />
-      </div>
-    </div>
-  );
+  }
+  const pinnedItem = {...item};
+  delete pinnedItem.showPinOption;
+  delete pinnedItem.pinProfileID;
+  delete pinnedItem.pinProfileCollection;
+  return db
+    .doc(`${pinProfileCollection}/${pinProfileID}`)
+    .update({pinnedItem: pinnedItem})
+    .then(() => {
+      setSubmittingPin(false);
+    })
+    .catch((err) => {
+      console.error(
+        `unable to pin ${item.resourceType} to ${pinProfileCollection} with id ${pinProfileID} ${err}`
+      );
+      alert('Something went wrong while pinning that item. Please try again.');
+      setSubmittingPin(false);
+    });
 }

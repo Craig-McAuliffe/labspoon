@@ -11,7 +11,11 @@ import {
   getLinkForAuthor,
   getUniqueAuthorsFromAuthors,
 } from '../../helpers/publications';
-import {PinListItem} from '../ListItem/ListItemCommonComponents';
+import {
+  ListItemOptionsDropdown,
+  PIN,
+} from '../ListItem/ListItemCommonComponents';
+import {PUBLICATION} from '../../helpers/resourceTypeDefinitions';
 
 export default function PublicationListItem({
   publication,
@@ -104,15 +108,18 @@ function PublicationListItemHeader({publication}) {
             {publicationDateDisplay(publication.date)}
           </p>
         </div>
-        {publication.showPinOption && (
-          <div className="publication-list-item-pin-container">
-            <PinListItem
+        <div className="publication-list-item-options-dropdown-container">
+          {publication.showPinOption && (
+            <ListItemOptionsDropdown
+              resourceType={PUBLICATION}
+              resourceID={publication.id}
               item={publication}
               pinProfileID={publication.pinProfileID}
               pinProfileCollection={publication.pinProfileCollection}
+              options={[PIN]}
             />
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </>
   );

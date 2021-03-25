@@ -12,6 +12,7 @@ export default function Dropdown({
   containerTopPosition,
   loading,
   children,
+  loadOnExpand,
 }) {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef();
@@ -24,6 +25,11 @@ export default function Dropdown({
     };
     document.addEventListener('mousedown', handleDocumentClick);
   });
+
+  useEffect(async () => {
+    if (!open) return;
+    if (loadOnExpand) await loadOnExpand();
+  }, [open]);
 
   const menuChildren = React.Children.map(children, (child) => {
     if (React.isValidElement(child)) {
@@ -109,12 +115,18 @@ function DropdownOptions({dropdownRef, containerTopPosition, children}) {
   );
 }
 
-export function DropdownOption({children, onSelect, height, onSomethingElse}) {
+export function DropdownOption({
+  children,
+  onSelect,
+  height,
+  onSomethingElse,
+  loading,
+}) {
   if (onSomethingElse) onSomethingElse();
   return (
     <button
       onClick={onSelect}
-      className="dropdown-option-button"
+      className={`dropdown-option-button${loading ? '-loading' : ''}`}
       type="button"
       style={{height: height}}
     >
