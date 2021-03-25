@@ -106,7 +106,7 @@ function SignupPage() {
     return (
       <Redirect
         to={{
-          pathname: '/onboarding/follow',
+          pathname: '/onboarding/link-author',
           state: {returnLocation: returnLocation, claimGroupID: claimGroupID},
         }}
       />

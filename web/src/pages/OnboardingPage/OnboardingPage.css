@@ -29,6 +29,10 @@
   margin-right: 6px;
 }
 
+.onboarding-back-button:hover {
+  text-decoration: underline;
+}
+
 .onboarding-skip-button {
   color: #99999f;
 }

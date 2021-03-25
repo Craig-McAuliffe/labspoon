@@ -3,23 +3,16 @@ import {Link, useHistory, useLocation, useParams} from 'react-router-dom';
 import {AuthContext} from '../../App';
 import {db} from '../../firebase';
 import {getPaginatedGroupReferencesFromCollectionRef} from '../../helpers/groups';
-import TopicListItem from '../../components/Topics/TopicListItem';
-import FollowTopicButton from '../../components/Topics/FollowTopicButton';
 import FollowGroupButton from '../../components/Group/FollowGroupButton';
 import GroupListItem from '../../components/Group/GroupListItem';
-import FollowUserButton from '../../components/User/FollowUserButton/FollowUserButton';
 import SecondaryButton from '../../components/Buttons/SecondaryButton';
 import CreateGroupPage from '../../components/Group/CreateGroupPage/CreateGroupPage';
-import UserListItem from '../../components/User/UserListItem';
 import FormDatabaseSearch from '../../components/Forms/FormDatabaseSearch';
 import LinkAuthorIDForm from '../../components/Publication/ConnectToPublications/ConnectToPublications';
 import {PaddedPageContainer} from '../../components/Layout/Content';
-import SearchMSFields from '../../components/Topics/SearchMSFields';
-import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 
 import './OnboardingPage.css';
 
-const FOLLOW = 'follow';
 const LINKAUTHOR = 'link-author';
 const GROUPS = 'groups';
 
@@ -36,8 +29,6 @@ export default function OnboardingPage() {
   if (user === undefined) history.push('/');
   const OnboardingStageDisplay = () => {
     switch (onboardingStage) {
-      case FOLLOW:
-        return <OnboardingFollow user={user} />;
       case LINKAUTHOR:
         return (
           <OnboardingAuthorLink nextOnboardingStage={nextOnboardingStage} />
@@ -45,15 +36,12 @@ export default function OnboardingPage() {
       case GROUPS:
         return <OnboardingGroup user={user} claimGroupID={claimGroupID} />;
       default:
-        return <OnboardingFollow user={user} />;
+        return <OnboardingGroup user={user} claimGroupID={claimGroupID} />;
     }
   };
 
   const nextOnboardingStage = () => {
     switch (onboardingStage) {
-      case FOLLOW:
-        history.push(`/onboarding/${LINKAUTHOR}`, locationState);
-        break;
       case LINKAUTHOR:
         history.push(`/onboarding/${GROUPS}`, locationState);
         break;
@@ -74,9 +62,6 @@ export default function OnboardingPage() {
 
   const previousOnboardingStage = () => {
     switch (onboardingStage) {
-      case LINKAUTHOR:
-        history.push(`/onboarding/${FOLLOW}`);
-        break;
       case GROUPS:
         history.push(`/onboarding/${LINKAUTHOR}`);
         break;
@@ -90,100 +75,23 @@ export default function OnboardingPage() {
       <h2 className="onboarding-main-title">Welcome to Labspoon!</h2>
       <OnboardingStageDisplay />
       <div className="onboarding-skip-next-container">
-        <button
-          className="onboarding-skip-button"
-          onClick={() => nextOnboardingStage()}
-        >
-          Skip
-        </button>
+        {onboardingStage !== LINKAUTHOR ? (
+          <button
+            className="onboarding-back-button"
+            onClick={() => previousOnboardingStage()}
+          >
+            Back
+          </button>
+        ) : (
+          <div></div>
+        )}
         <div className="onboarding-next-back-container">
-          {onboardingStage !== FOLLOW ? (
-            <button
-              className="onboarding-back-button"
-              onClick={() => previousOnboardingStage()}
-            >
-              Back
-            </button>
-          ) : null}
           <SecondaryButton onClick={() => nextOnboardingStage()}>
             {onboardingStage === GROUPS ? 'Finish' : 'Next'}
           </SecondaryButton>
         </div>
       </div>
     </PaddedPageContainer>
-  );
-}
-
-function OnboardingFollow({user}) {
-  const [displayedUsers, setDisplayedUsers] = useState([]);
-  const [displayedTopics, setDisplayedTopics] = useState([]);
-  const [loadingTopics, setLoadingTopics] = useState(false);
-
-  return (
-    <div className="onboarding-page-container">
-      <div>
-        <h3>
-          Labspoon is all about finding and following research that interests
-          you.
-        </h3>
-        <h4 className="onboarding-page-instructions">
-          Find researchers who are active in your field of interest:
-        </h4>
-        <div className="onboarding-user-container">
-          <FormDatabaseSearch
-            setDisplayedItems={setDisplayedUsers}
-            indexName="_USERS"
-            placeholderText="Find researchers"
-            displayedItems={displayedUsers}
-            clearListOnNoResults={true}
-          />
-          <div>
-            <div className="onboarding-users-to-follow-container">
-              {displayedUsers.map((displayedUser) =>
-                displayedUser.id === user.uid ? null : (
-                  <UserListItem
-                    user={displayedUser}
-                    key={displayedUser.id}
-                    LinkOverride={WarnOnClick}
-                  >
-                    <FollowUserButton targetUser={displayedUser} />
-                  </UserListItem>
-                )
-              )}
-            </div>
-          </div>
-        </div>
-        <h4 className="onboarding-page-instructions">
-          Or try looking for a specific topic:
-        </h4>
-        <div className="onboarding-topic-search-container">
-          <SearchMSFields
-            setFetchedTopics={setDisplayedTopics}
-            placeholder="Search for topics"
-            searchIcon={true}
-            setLoading={setLoadingTopics}
-          />
-          {loadingTopics && (
-            <div className="onboarding-page-topic-search-loading-container">
-              <LoadingSpinner />
-            </div>
-          )}
-        </div>
-        <div className="onboarding-topics-to-follow-container">
-          {displayedTopics.map((displayedTopic) => {
-            return (
-              <TopicListItem
-                topic={displayedTopic}
-                key={displayedTopic.microsoftID}
-                LinkOverride={WarnOnClick}
-              >
-                <FollowTopicButton targetTopic={displayedTopic} />
-              </TopicListItem>
-            );
-          })}
-        </div>
-      </div>
-    </div>
   );
 }
 

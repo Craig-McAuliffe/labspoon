@@ -1224,7 +1224,7 @@ export interface GroupSignature {
 
 export const createGeneratedGroupsFromJSON = functions
   .runWith({
-    timeoutSeconds: 20,
+    timeoutSeconds: 120,
     memory: '2GB',
   })
   .https.onRequest(async (req, resp) => {
@@ -1251,7 +1251,7 @@ export const createGeneratedGroupsFromJSON = functions
       groupsArray.push(groups[n]);
     }
 
-    const batchedArray = groupsArray.slice(0, 200);
+    const batchedArray = groupsArray.slice(200, 400);
 
     for (const groupElement of batchedArray) {
       // Recurse on the next process tick, to avoid
