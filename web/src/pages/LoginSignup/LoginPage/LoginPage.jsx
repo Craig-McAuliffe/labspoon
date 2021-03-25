@@ -1,6 +1,6 @@
 import React, {useContext, useState} from 'react';
 import firebase from '../../../firebase.js';
-import {Link, Redirect, useHistory, useLocation} from 'react-router-dom';
+import {Link, Redirect, useLocation} from 'react-router-dom';
 import {AuthContext} from '../../../App';
 import {Form, Formik} from 'formik';
 import PrimaryButton from '../../../components/Buttons/PrimaryButton';
@@ -30,8 +30,8 @@ function LoginPage() {
   const resetPasswordState = locationState
     ? locationState.resetPassword
     : undefined;
+  const claimGroupID = locationState ? locationState.claimGroupID : undefined;
   const {userProfile} = useContext(AuthContext);
-  const history = useHistory();
   const {updateUserDetails} = useContext(AuthContext);
   const [loading, setLoading] = useState();
   const [googleSignInFlow, setGoogleSignInFlow] = useState(false);
@@ -64,8 +64,10 @@ function LoginPage() {
         )}
         <h2 className="signin-form-title">{`Welcome Back`}</h2>
         <p className="sign-in-option">
-          {`Don't have an account yet?`}
-          <button onClick={() => history.push('/signup')}>Sign up here</button>
+          {`Don't have an account yet? `}
+          <Link to={{pathname: '/signup', state: locationState}}>
+            Sign up here
+          </Link>
         </p>
         {resetPasswordEmailWasSent && (
           <SuccessMessage>Password reset email sent</SuccessMessage>
@@ -74,7 +76,6 @@ function LoginPage() {
           <SuccessMessage>Password reset was successful</SuccessMessage>
         )}
         <SignInForm
-          returnLocation={returnLocation}
           setForgottenPassword={setForgottenPassword}
           setIsSigningUp={setIsSigningUp}
         />
@@ -103,13 +104,22 @@ function LoginPage() {
           }}
         />
       );
-    return <Redirect to="/" />;
+    if (userProfile.hasCompletedOnboarding && returnLocation)
+      return <Redirect to={returnLocation} />;
+    if (userProfile.hasCompletedOnboarding) return <Redirect to="/" />;
+    return (
+      <Redirect
+        to={{
+          pathname: '/onboarding/follow',
+          state: {returnLocation: returnLocation, claimGroupID: claimGroupID},
+        }}
+      />
+    );
   }
 }
 
-const SignInForm = ({returnLocation, setForgottenPassword, setIsSigningUp}) => {
+const SignInForm = ({setForgottenPassword, setIsSigningUp}) => {
   const [loading, setLoading] = useState(false);
-  const history = useHistory();
   const submitChanges = (values) => {
     setIsSigningUp(true);
     setLoading(true);
@@ -118,7 +128,6 @@ const SignInForm = ({returnLocation, setForgottenPassword, setIsSigningUp}) => {
       .signInWithEmailAndPassword(values.email, values.password)
       .then(() => {
         setLoading(false);
-        if (returnLocation) return history.push(returnLocation);
         setIsSigningUp(false);
       })
       .catch((error) => {

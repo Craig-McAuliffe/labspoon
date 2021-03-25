@@ -1,7 +1,7 @@
 import React, {useContext, useState} from 'react';
 import qs from 'qs';
 import firebase, {db} from '../../../firebase.js';
-import {Link, Redirect, useHistory, useLocation} from 'react-router-dom';
+import {Link, Redirect, useLocation} from 'react-router-dom';
 import {AuthContext} from '../../../App';
 import {Form, Formik} from 'formik';
 import PrimaryButton from '../../../components/Buttons/PrimaryButton';
@@ -32,7 +32,6 @@ function SignupPage() {
     : undefined;
   const claimGroupID = locationState ? locationState.claimGroupID : undefined;
   const {userProfile} = useContext(AuthContext);
-  const history = useHistory();
   const {updateUserDetails} = useContext(AuthContext);
   const searchParams = qs.parse(search.slice(1));
   const referrer = searchParams.referrer;
@@ -63,7 +62,9 @@ function SignupPage() {
         <h2 className="signup-form-title">{`Sign up to Labspoon`}</h2>
         <p className="signup-option">
           Already have an account?{' '}
-          <button onClick={() => history.push('/login')}>Login here</button>
+          <Link to={{pathname: '/login', state: locationState}}>
+            Login here
+          </Link>
         </p>
         <div className="sign-up-form">
           <SignUpForm
@@ -99,6 +100,8 @@ function SignupPage() {
           }}
         />
       );
+    if (userProfile.hasCompletedOnboarding && returnLocation)
+      return <Redirect to={returnLocation} />;
     if (userProfile.hasCompletedOnboarding) return <Redirect to="/" />;
     return (
       <Redirect

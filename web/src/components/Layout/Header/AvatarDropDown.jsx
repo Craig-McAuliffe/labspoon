@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useLocation} from 'react-router-dom';
 import {
   BookmarksMenuIcon,
   GroupMenuIcon,
@@ -21,11 +21,15 @@ import './AvatarDropDown.css';
 
 const AvatarDropDown = () => {
   const {user, userProfile, authLoaded} = useContext(AuthContext);
+  const locationPathname = useLocation().pathname;
   if (!authLoaded) return <LoadingSpinner />;
   if (!user) {
     return (
       <Dropdown variant="success" id="dropdown-basic">
-        <Link to="/login" className="sign-in">
+        <Link
+          to={{pathname: '/login', state: {returnLocation: locationPathname}}}
+          className="sign-in"
+        >
           <h3>Sign In</h3>
         </Link>
       </Dropdown>
