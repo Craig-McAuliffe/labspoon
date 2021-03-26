@@ -17,6 +17,18 @@
   display: none;
 }
 
+.search-page-error-message {
+  color: #5d5d65;
+}
+
+.search-page-error-message button {
+  color: #00507c;
+}
+
+.search-page-error-message button:hover {
+  text-decoration: underline;
+}
+
 .ais-Hits-list {
   display: block;
   flex-wrap: nowrap;

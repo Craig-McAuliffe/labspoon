@@ -107,6 +107,7 @@ function LoginPage() {
     if (userProfile.hasCompletedOnboarding && returnLocation)
       return <Redirect to={returnLocation} />;
     if (userProfile.hasCompletedOnboarding) return <Redirect to="/" />;
+
     return (
       <Redirect
         to={{

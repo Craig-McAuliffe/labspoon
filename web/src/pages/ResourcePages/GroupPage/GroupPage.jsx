@@ -1,5 +1,5 @@
 import React, {useRef, useEffect, useState, useContext} from 'react';
-import {Link, useParams, useHistory} from 'react-router-dom';
+import {Link, useParams, useHistory, Redirect} from 'react-router-dom';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faCheckCircle} from '@fortawesome/free-solid-svg-icons';
 
@@ -238,13 +238,12 @@ const checkIfTabsAreUsed = async (setUsedTabs, groupID) => {
 export const PinnedItemChangeContext = React.createContext();
 export default function GroupPage() {
   const featureFlags = useContext(FeatureFlags);
-  const [groupID, setGroupID] = useState(undefined);
-  const [groupData, setGroupData] = useState(undefined);
+  const [groupID, setGroupID] = useState(false);
+  const [groupData, setGroupData] = useState(false);
   const [verified, setVerified] = useState(false);
   const [userIsMember, setUserIsMember] = useState(false);
   const [tabsLoading, setTabsLoading] = useState(true);
   const [usedTabs, setUsedTabs] = useState({checked: false, tabs: []});
-  const history = useHistory();
   const {user} = useContext(AuthContext);
   const params = useParams();
   const routedTabID = params.routedTabID;
@@ -259,7 +258,7 @@ export default function GroupPage() {
     Promise.resolve(getGroup(groupID))
       .then((groupData) => {
         if (!groupData) {
-          history.push('/notfound');
+          setGroupData(null);
         }
         setGroupData(groupData);
       })
@@ -377,7 +376,7 @@ export default function GroupPage() {
       })
       .catch((err) => console.error(err));
   }
-
+  if (groupData === null) return <Redirect to="/notfound" />;
   return (
     <>
       {featureFlags.has('related-resources') ? (
@@ -470,7 +469,7 @@ const GroupDetails = ({
     };
   }, [group, isSlowLoad]);
 
-  if (group === undefined)
+  if (!group)
     return (
       <div className="group-header">
         <div className="group-page-details-loading"></div>

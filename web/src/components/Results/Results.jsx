@@ -43,6 +43,7 @@ export default function Results({
   activeTabID,
   isFollowsPageResults,
   customEndMessage,
+  customLoading,
 }) {
   const [resourceTypes, setResourceTypes] = useState(new Set());
   const [resultComponents, setResultComponents] = useState([]);
@@ -90,7 +91,7 @@ export default function Results({
       endMessage={customEndMessage ? customEndMessage : endMessage}
       style={{minWidth: '100%', overflow: 'visible'}}
     >
-      {loading && <LoadingSpinner />}
+      {(loading || customLoading) && <LoadingSpinner />}
       {content}
     </InfiniteScroll>
   );

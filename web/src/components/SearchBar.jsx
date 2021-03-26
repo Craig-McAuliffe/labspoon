@@ -45,28 +45,28 @@ export default function SearchBar({
               Suggested Searches:
             </span>
             <Link
-              to="/search?query=Covid-19&page=1"
+              to="/search?query=Regenerative%20Medicine"
               className="big-search-suggested-search"
             >
-              Covid-19
+              Regenerative Medicine
             </Link>
             <Link
               className="big-search-suggested-search"
-              to="/search?search?query=Fusion%20Reactors&page=1"
+              to="/search?query=Biophysics"
             >
-              Fusion Reactors
+              Biophysics
             </Link>
             <Link
-              to="/search?query=Early%20Cancer%20Detection&page=1"
+              to="/search?query=Autoimmunity"
               className="big-search-suggested-search"
             >
-              Early Cancer Detection
+              Autoimmunity
             </Link>
             <Link
               className="big-search-suggested-search"
-              to="/search?query=Biodegradable%20Plastic&page=1"
+              to="/search?query=Neurogenomics"
             >
-              Biodegradable Plastic
+              Neurogenomics
             </Link>
           </div>
           <div></div>
@@ -96,13 +96,11 @@ function SearchForm({
   onFocus,
 }) {
   const history = useHistory();
-  const [query, setQuery] = useState(undefined);
+  const [query, setQuery] = useState('');
   function onSubmit(event) {
     event.preventDefault();
     if (!query) return;
-    history.push(
-      searchStateToURL({pathname: '/search'}, {query: query, page: 1})
-    );
+    history.push(searchStateToURL({pathname: '/search'}, {query: query}));
   }
   return (
     <form onSubmit={onSubmit} className={formClassName}>

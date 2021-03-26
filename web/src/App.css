@@ -152,6 +152,9 @@
   padding-right: 10px;
 }
 
+.grecaptcha-badge {
+  z-index: 99999;
+}
 @media screen and (max-width: 1550px) {
   .main-layout {
     grid-template-columns: 350px 1fr 350px;

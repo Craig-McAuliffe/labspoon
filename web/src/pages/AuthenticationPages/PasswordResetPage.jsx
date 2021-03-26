@@ -8,18 +8,18 @@ import firebase from '../../firebase';
 import {useHistory} from 'react-router-dom';
 import * as Yup from 'yup';
 import CreateResourceFormActions from '../../components/Forms/CreateResourceFormActions';
+import qs from 'qs';
 
 export default function PasswordResetPage() {
   const [resetCode, setResetCode] = useState(false);
   const [codeResetError, setResetCodeError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const history = useHistory();
-  const urlParams = new URLSearchParams(window.location.search);
-  const resetCodeFromURL = urlParams.get('oobCode');
+  const resetCodeFromURL = qs.parse(window.location.search).oobCode;
   if (!resetCode) setResetCode(resetCodeFromURL);
 
   useEffect(() => {
-    if (resetCode) return;
+    if (!resetCode) return;
     firebase
       .auth()
       .verifyPasswordResetCode(resetCode)
