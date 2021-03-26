@@ -148,7 +148,7 @@ export const configurePostSearchIndex = functions.https.onRequest((_, res) =>
     res,
     POSTS_INDEX,
     [
-      'unordered(content.text)',
+      'unordered(unformattedText)',
       'unordered(topics.name)',
       'author.name',
       'publication.title',
@@ -165,7 +165,7 @@ export const addPostToSearchIndex = functions.firestore
     const post = change.data() as Post;
     return addToIndex(
       context.params.postID,
-      postToPostRef(post),
+      postToPostRef(post, true),
       ResourceTypes.POST,
       POSTS_INDEX
     );
@@ -177,13 +177,13 @@ export const updatePostToSearchIndex = functions.firestore
     const newPostData = change.after.data() as Post;
     const oldPostData = change.before.data() as Post;
     if (
-      JSON.stringify(postToPostRef(newPostData)) ===
-      JSON.stringify(postToPostRef(oldPostData))
+      JSON.stringify(postToPostRef(newPostData, true)) ===
+      JSON.stringify(postToPostRef(oldPostData, true))
     )
       return false;
     return addToIndex(
       context.params.postID,
-      postToPostRef(newPostData),
+      postToPostRef(newPostData, true),
       ResourceTypes.POST,
       POSTS_INDEX
     );
@@ -196,7 +196,7 @@ export const configureOpenPositionSearchIndex = functions.https.onRequest(
       OPENPOSITIONS_INDEX,
       [
         'unordered(content.title)',
-        'unordered(content.description)',
+        'unordered(unformattedDescription)',
         'topics.name',
       ],
       ['content.position'],
@@ -211,7 +211,7 @@ export const addOpenPositionToSearchIndex = functions.firestore
     const openPositionID = context.params.openPositionID;
     return addToIndex(
       openPositionID,
-      openPosToOpenPosListItem(openPosition, openPositionID),
+      openPosToOpenPosListItem(openPosition, openPositionID, true),
       ResourceTypes.OPEN_POSITION,
       OPENPOSITIONS_INDEX
     );
@@ -225,16 +225,16 @@ export const updateOpenPositionToSearchIndex = functions.firestore
     const openPositionID = context.params.openPositionID;
     if (
       JSON.stringify(
-        openPosToOpenPosListItem(newOpenPositionData, openPositionID)
+        openPosToOpenPosListItem(newOpenPositionData, openPositionID, true)
       ) ===
       JSON.stringify(
-        openPosToOpenPosListItem(oldOpenPositionData, openPositionID)
+        openPosToOpenPosListItem(oldOpenPositionData, openPositionID, true)
       )
     )
       return false;
     return addToIndex(
       context.params.openPositionID,
-      openPosToOpenPosListItem(newOpenPositionData, openPositionID),
+      openPosToOpenPosListItem(newOpenPositionData, openPositionID, true),
       ResourceTypes.OPEN_POSITION,
       OPENPOSITIONS_INDEX
     );

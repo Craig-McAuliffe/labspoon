@@ -218,7 +218,8 @@ export const updateOpenPosOnTopic = functions.firestore
 
 export function openPosToOpenPosListItem(
   openPosition: OpenPosition,
-  openPositionID: string
+  openPositionID: string,
+  isAlgolia?: boolean
 ): OpenPositionListItem {
   const OpenPosContentToOpenPosListItemContent = (
     content: OpenPositionContent
@@ -241,6 +242,11 @@ export function openPosToOpenPosListItem(
     id: openPositionID,
     filterTopicIDs: openPosition.filterTopicIDs,
   };
+  if (isAlgolia)
+    openPositionListItem.unformattedDescription = openPositionListItem.content.description.reduce(
+      (accumulator, current) => accumulator + current.children[0].text + ' ',
+      ''
+    );
   return openPositionListItem;
 }
 
@@ -276,6 +282,7 @@ export interface OpenPositionListItem {
   group: GroupSignature;
   id?: string;
   filterTopicIDs: string[];
+  unformattedDescription?: string;
 }
 
 interface OpenPositionListItemContent {

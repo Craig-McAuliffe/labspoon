@@ -4,14 +4,19 @@ import qs from 'qs';
 import algoliasearch from 'algoliasearch';
 import {abbrEnv, reCaptchaSiteKey} from '../../config';
 import Results, {GenericListItem} from '../../components/Results/Results';
-import 'instantsearch.css/themes/algolia.css';
 import SearchBar from '../../components/SearchBar';
 import LatestPosts from '../../components/Posts/LatestPosts/LatestPosts';
 import reCaptcha from '../../helpers/activity';
 import useScript from '../../helpers/useScript';
 import useDomRemover from '../../helpers/useDomRemover';
 import ManualRecaptcha from '../../components/Recaptcha/ManualRecaptcha';
-import {GROUP, POST, TOPIC, USER} from '../../helpers/resourceTypeDefinitions';
+import {
+  GROUP,
+  OPENPOSITION,
+  POST,
+  TOPIC,
+  USER,
+} from '../../helpers/resourceTypeDefinitions';
 import {UnpaddedPageContainer} from '../../components/Layout/Content';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import {searchMicrosoftTopics} from '../../components/Topics/SearchMSFields';
@@ -23,6 +28,7 @@ const POSTS_TAB_NAME = 'Posts';
 const USERS_TAB_NAME = 'Users';
 const GROUPS_TAB_NAME = 'Groups';
 const TOPICS_TAB_NAME = 'Topics';
+const OPEN_POSITIONS_TAB_NAME = 'Open Positions';
 
 const client = algoliasearch(
   process.env.REACT_APP_ALGOLIA_APP_ID,
@@ -35,6 +41,7 @@ const urlToTabsNameMap = new Map([
   ['users', USERS_TAB_NAME],
   ['groups', GROUPS_TAB_NAME],
   ['topics', TOPICS_TAB_NAME],
+  ['openPositions', OPEN_POSITIONS_TAB_NAME],
 ]);
 
 const tabsToURLMap = new Map([
@@ -43,12 +50,14 @@ const tabsToURLMap = new Map([
   [USERS_TAB_NAME, 'users'],
   [GROUPS_TAB_NAME, 'groups'],
   [TOPICS_TAB_NAME, 'topics'],
+  [OPEN_POSITIONS_TAB_NAME, 'openPositions'],
 ]);
 
 const indexToResourceType = (index) => {
   if (index === `${abbrEnv}_POSTS`) return POST;
   if (index === `${abbrEnv}_GROUPS`) return GROUP;
   if (index === `${abbrEnv}_USERS`) return USER;
+  if (index === `${abbrEnv}_OPENPOSITIONS`) return OPENPOSITION;
 };
 
 const TOPIC_SEARCH_LIMIT = 20;
@@ -60,12 +69,21 @@ const RESET_TAB_RESULTS_STATE = {
   [TOPICS_TAB_NAME]: [],
   [GROUPS_TAB_NAME]: [],
   [OVERVIEW_TAB_NAME]: [],
+  [OPEN_POSITIONS_TAB_NAME]: [],
 };
 
 const RESET_TAB_PAGE_STATE = {
   [POSTS_TAB_NAME]: 0,
   [USERS_TAB_NAME]: 0,
   [GROUPS_TAB_NAME]: 0,
+  [OPEN_POSITIONS_TAB_NAME]: 0,
+};
+
+const RESET_TABS_HAS_MORE_STATE = {
+  [POSTS_TAB_NAME]: true,
+  [USERS_TAB_NAME]: true,
+  [GROUPS_TAB_NAME]: true,
+  [OPEN_POSITIONS_TAB_NAME]: true,
 };
 
 export default function SearchPage() {
@@ -93,7 +111,7 @@ export default function SearchPage() {
   // reset results and pagination and errors for new search
   useEffect(() => {
     setPage(RESET_TAB_PAGE_STATE);
-    if (!hasMore) setHasMore(true);
+    setHasMore(RESET_TABS_HAS_MORE_STATE);
     setTabbedResults(RESET_TAB_RESULTS_STATE);
     if (searchError) setSearchError(false);
   }, [searchQuery]);
@@ -183,6 +201,7 @@ function SearchTabs({searchQuery, history, tab}) {
     USERS_TAB_NAME,
     GROUPS_TAB_NAME,
     TOPICS_TAB_NAME,
+    OPEN_POSITIONS_TAB_NAME,
   ];
   return (
     <div className="feed-tabs-container">
@@ -231,7 +250,6 @@ function TabbedSearchResults({
     if (tabbedResults[tab].length !== 0) return;
 
     if (!searchQuery) return;
-
     if (tabToIndex(tab) !== currentIndex.indexName) return;
     setIsLoadingFeed(true);
     const searchResults = await currentIndex
@@ -257,7 +275,11 @@ function TabbedSearchResults({
       return searchResult;
     });
     if (searchResults.nbHits < SEARCH_PAGE_LIMIT + 1) {
-      setHasMore(false);
+      setHasMore((currentHasMoreState) => {
+        const newHasMoreState = {...currentHasMoreState};
+        newHasMoreState[tab] = false;
+        return newHasMoreState;
+      });
       setTabbedResults((currentTabbedResults) => {
         const newTabbedResults = {...currentTabbedResults};
         newTabbedResults[tab] = formattedResults.slice(0, SEARCH_PAGE_LIMIT);
@@ -300,8 +322,12 @@ function TabbedSearchResults({
       searchResult.id === searchResult.objectID;
       return searchResult;
     });
-    if (searchResults.nbHits < SEARCH_PAGE_LIMIT + 1) {
-      setHasMore(false);
+    if (formattedResults.length < SEARCH_PAGE_LIMIT + 1) {
+      setHasMore((currentHasMoreState) => {
+        const newHasMoreState = {...currentHasMoreState};
+        newHasMoreState[tab] = false;
+        return newHasMoreState;
+      });
       setTabbedResults((currentTabbedResults) => {
         const newTabbedResults = {...currentTabbedResults};
         newTabbedResults[tab] = [
@@ -331,7 +357,7 @@ function TabbedSearchResults({
 
   return (
     <Results
-      hasMore={hasMore}
+      hasMore={hasMore[tab]}
       fetchMore={fetchMore}
       results={tabbedResults[tab]}
       customLoading={isLoadingFeed}
@@ -391,6 +417,13 @@ const OverviewResults = ({
     },
     {
       indexName: `${abbrEnv}_${GROUPS_TAB_NAME.toUpperCase()}`,
+      query: searchQuery,
+      params: {
+        hitsPerPage: 4,
+      },
+    },
+    {
+      indexName: `${abbrEnv}_OPENPOSITIONS`,
       query: searchQuery,
       params: {
         hitsPerPage: 4,
@@ -556,6 +589,7 @@ const urlToSearchQuery = (location) => {
 
 const tabToIndex = (tab) => {
   if (tab === 'Overview') return `${abbrEnv}_POSTS`;
+  if (tab === OPEN_POSITIONS_TAB_NAME) return `${abbrEnv}_OPENPOSITIONS`;
   return `${abbrEnv}_${tab.toUpperCase()}`;
 };
 

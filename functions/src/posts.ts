@@ -769,7 +769,7 @@ interface FilterCollection {
 export interface Post {
   postType: PostType;
   author: UserRef;
-  text: ArticleBodyChild;
+  text: ArticleBodyChild[];
   topics: TaggedTopic[];
   customTopics?: string[];
   timestamp: Date;
@@ -786,7 +786,7 @@ export interface Post {
 export interface PostRef {
   postType: PostType;
   author: UserRef;
-  text: ArticleBodyChild;
+  text: ArticleBodyChild[];
   topics: TaggedTopic[];
   customTopics?: string[];
   timestamp: Date;
@@ -796,9 +796,10 @@ export interface PostRef {
   // filterable arrays must be array of strings
   filterTopicIDs: string[];
   unixTimeStamp: number;
+  unformattedText?: string;
 }
 
-export function postToPostRef(post: Post): PostRef {
+export function postToPostRef(post: Post, isAlgolia?: boolean): PostRef {
   const postRef: PostRef = {
     postType: post.postType,
     author: post.author,
@@ -812,6 +813,11 @@ export function postToPostRef(post: Post): PostRef {
   if (post.customTopics) postRef.customTopics = post.customTopics;
   if (post.publication) postRef.publication = post.publication;
   if (post.openPosition) postRef.openPosition = post.openPosition;
+  if (isAlgolia)
+    postRef.unformattedText = post.text.reduce(
+      (accumulator, current) => accumulator + current.children[0].text + ' ',
+      ''
+    );
   return postRef;
 }
 

@@ -35,26 +35,26 @@ function BotProvider({children}) {
   const [rapidLocationChanges, setRapidLocationChanges] = useState(0);
   const [previousLocationTime, setPreviousLocationTime] = useState([]);
   const [botConfirmed, setBotConfirmed] = useState(false);
-  if (botConfirmed) return <h2>Bot bot bot.</h2>;
-  if (rapidLocationChanges > 20)
-    return (
-      <div>
-        <h4>Recaptcha</h4>You are moving awfully fast. Are you a bot?{' '}
-        <button
-          onClick={() => setBotConfirmed(true)}
-          className="not-a-human-button"
-        >
-          Yes I am a bot
-        </button>{' '}
-        <button
-          onClick={() => setRapidLocationChanges(0)}
-          className="not-a-bot-button"
-        >
-          No, I am not a bot
-        </button>
-        .
-      </div>
-    );
+  const botState = botConfirmed ? (
+    <h2>Bot bot bot.</h2>
+  ) : (
+    <div>
+      <h4>Recaptcha</h4>You are moving awfully fast. Are you a bot?{' '}
+      <button
+        onClick={() => setBotConfirmed(true)}
+        className="not-a-human-button"
+      >
+        Yes I am a bot
+      </button>{' '}
+      <button
+        onClick={() => setRapidLocationChanges(0)}
+        className="not-a-bot-button"
+      >
+        No, I am not a bot
+      </button>
+      .
+    </div>
+  );
   return (
     <BotDetector.Provider
       value={{
@@ -64,7 +64,7 @@ function BotProvider({children}) {
         setBotConfirmed: setBotConfirmed,
       }}
     >
-      {children}
+      {rapidLocationChanges > 20 ? botState : children}
     </BotDetector.Provider>
   );
 }
