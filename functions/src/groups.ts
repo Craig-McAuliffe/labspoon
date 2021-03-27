@@ -780,9 +780,9 @@ export function toGroupRef(groupID: string, group: any) {
   const groupRef: GroupRef = {
     id: groupID,
     name: group.name,
+    about: group.about,
   };
   if (group.avatar) groupRef.avatar = group.avatar;
-  if (group.about) groupRef.about = group.about;
   if (group.institution) groupRef.institution = group.institution;
   return groupRef;
 }
@@ -1138,6 +1138,7 @@ export function groupToGroupRef(group: Group, groupID: string) {
     name: group.name,
     about: group.about,
     institution: group.institution,
+    groupType: group.groupType,
   } as GroupRef;
 
   if (group.avatar) groupRef.avatar = group.avatar;
@@ -1145,12 +1146,21 @@ export function groupToGroupRef(group: Group, groupID: string) {
   return groupRef;
 }
 
-export function groupToAlgoliaGroupRef(group: Group, groupID: string) {
+export function groupToAlgoliaGroupRef(
+  group: Group,
+  groupID: string
+): AlgoliaGroupRef {
   const groupAlgoliaRef = {
-    id: groupID,
+    objectID: groupID,
     name: group.name,
     about: group.about,
     institution: group.institution,
+    unformattedAbout: group.about.reduce(
+      (accumulator, current) => accumulator + current.children[0].text + ' ',
+      ''
+    ),
+    groupType: group.groupType,
+    resourceType: ResourceTypes.GROUP,
   } as AlgoliaGroupRef;
 
   if (group.avatar) groupAlgoliaRef.avatar = group.avatar;
@@ -1181,20 +1191,23 @@ export interface GroupRef {
   id: string;
   name: string;
   avatar?: string;
-  about?: ArticleBodyChild[];
+  about: ArticleBodyChild[];
   institution?: string;
   rank?: number;
 }
 
 export interface AlgoliaGroupRef {
-  id: string;
+  objectID: string;
   name: string;
   avatar?: string;
-  about?: string;
+  about: ArticleBodyChild[];
   institution?: string;
   recentPostTopics?: TaggedTopic[];
   recentPublicationTopics?: TaggedTopic[];
   recentArticleTopics?: TaggedTopic[];
+  unformattedAbout: string;
+  resourceType: string;
+  groupType: string;
 }
 
 export interface Group {
@@ -1203,7 +1216,7 @@ export interface Group {
   groupType: string;
   avatar?: string;
   avatarCloudID?: string;
-  about?: ArticleBodyChild[];
+  about: ArticleBodyChild[];
   location?: string;
   website?: string;
   donationLink?: string;

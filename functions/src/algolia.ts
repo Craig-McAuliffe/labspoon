@@ -1,11 +1,14 @@
 import * as functions from 'firebase-functions';
 import algoliasearch, {SearchClient} from 'algoliasearch';
-import {config, environment, ResourceTypes} from './config';
+import {config, environment, ResourceTypes, admin} from './config';
 import {toUserAlgoliaFilterRef, User} from './users';
-import {Group, groupToAlgoliaGroupRef} from './groups';
+import {AlgoliaGroupRef, Group, groupToAlgoliaGroupRef} from './groups';
 import {Post, postToPostRef} from './posts';
 import {OpenPosition, openPosToOpenPosListItem} from './openPositions';
 import {Publication, publicationToPublicationRef} from './publications';
+import {firestore} from 'firebase-admin';
+
+const db = admin.firestore();
 
 const algoliaConfig = config.algolia;
 
@@ -104,15 +107,20 @@ export const updateUserToSearchIndex = functions.firestore
   });
 
 export const configureGroupSearchIndex = functions.https.onRequest((_, res) =>
-  configureSearchIndex(res, GROUPS_INDEX, [
-    'unordered(name)',
-    'unordered(about)',
-    'unordered(institution)',
-    'unordered(location)',
-    'recentPostTopics.name',
-    'recentArticleTopics.name',
-    'recentPublicationTopics.name',
-  ])
+  configureSearchIndex(
+    res,
+    GROUPS_INDEX,
+    [
+      'unordered(name)',
+      'unformattedAbout',
+      'unordered(institution)',
+      'unordered(location)',
+      'recentPostTopics.name',
+      'recentArticleTopics.name',
+      'recentPublicationTopics.name',
+    ],
+    ['groupType']
+  )
 );
 
 export const addGroupToSearchIndex = functions.firestore
@@ -194,11 +202,7 @@ export const configureOpenPositionSearchIndex = functions.https.onRequest(
     configureSearchIndex(
       res,
       OPENPOSITIONS_INDEX,
-      [
-        'unordered(content.title)',
-        'unordered(unformattedDescription)',
-        'topics.name',
-      ],
+      ['unordered(content.title)', 'unformattedDescription', 'topics.name'],
       ['content.position'],
       ['desc(unixTimeStamp)']
     )
@@ -283,3 +287,62 @@ export const updatePublicationToSearchIndex = functions.firestore
       PUBLICATIONS_INDEX
     );
   });
+
+export const reformatExistingAlgoliaGroups = functions
+  .runWith({
+    timeoutSeconds: 20,
+    memory: '2GB',
+  })
+  .https.onRequest(async (req, resp) => {
+    const collectionRef = db.collection('groups');
+    const query = collectionRef.limit(50);
+    await new Promise((resolve, reject) => {
+      addBatchToAlgolia(query, resolve).catch((err) =>
+        reject('something went wrong ' + err)
+      );
+    });
+    resp.json({
+      result: `finished reformatting algolia groups to include unformattedAbout`,
+    });
+    resp.end();
+  });
+
+async function addBatchToAlgolia(query: firestore.DocumentData, resolve: any) {
+  const index = algoliaClient.initIndex(GROUPS_INDEX);
+  const snapshot = await query.get();
+  const batchSize = snapshot.size;
+  if (batchSize === 0) {
+    // When there are no documents left, we are done
+    resolve();
+    return;
+  }
+
+  let lastDoc: firestore.DocumentSnapshot;
+  const reformattedGroups: AlgoliaGroupRef[] = [];
+
+  snapshot.docs.forEach((doc: firestore.DocumentSnapshot) => {
+    if (!doc.exists) return;
+    lastDoc = doc;
+    const reformattedGroup = doc.data() as Group;
+    if (!reformattedGroup.about) return;
+    reformattedGroups.push(groupToAlgoliaGroupRef(reformattedGroup, doc.id));
+  });
+
+  await index.saveObjects(reformattedGroups);
+
+  if (batchSize < 50) {
+    resolve();
+    return;
+  }
+  // Recurse on the next process tick, to avoid
+  // exploding the stack.
+  process.nextTick(async () => {
+    await addBatchToAlgolia(fetchGroupsForReformatting(lastDoc), resolve);
+  });
+}
+
+const fetchGroupsForReformatting = (last?: firestore.DocumentSnapshot) => {
+  const collectionRef = db.collection('groups');
+  if (last) return collectionRef.limit(50).startAfter(last);
+  return collectionRef.limit(50);
+};

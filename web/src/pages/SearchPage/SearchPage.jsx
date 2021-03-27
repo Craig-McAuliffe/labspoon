@@ -42,6 +42,7 @@ const urlToTabsNameMap = new Map([
   ['groups', GROUPS_TAB_NAME],
   ['topics', TOPICS_TAB_NAME],
   ['openPositions', OPEN_POSITIONS_TAB_NAME],
+  [undefined, OVERVIEW_TAB_NAME],
 ]);
 
 const tabsToURLMap = new Map([
@@ -89,9 +90,7 @@ const RESET_TABS_HAS_MORE_STATE = {
 export default function SearchPage() {
   const history = useHistory();
   const location = history.location;
-  const tab = useParams().tab
-    ? urlToTabsNameMap.get(useParams().tab)
-    : OVERVIEW_TAB_NAME;
+  const tab = urlToTabsNameMap.get(useParams().tab);
   const [searchQuery, setSearchQuery] = useState(urlToSearchQuery(location));
   const [isBot, setIsBot] = useState(false);
   const [tabbedResults, setTabbedResults] = useState(RESET_TAB_RESULTS_STATE);
@@ -271,7 +270,7 @@ function TabbedSearchResults({
       return;
     }
     const formattedResults = searchResults.hits.map((searchResult) => {
-      searchResult.id === searchResult.objectID;
+      searchResult.id = searchResult.objectID;
       return searchResult;
     });
     if (searchResults.nbHits < SEARCH_PAGE_LIMIT + 1) {
@@ -319,7 +318,7 @@ function TabbedSearchResults({
       return newTabbedPages;
     });
     const formattedResults = searchResults.hits.map((searchResult) => {
-      searchResult.id === searchResult.objectID;
+      searchResult.id = searchResult.objectID;
       return searchResult;
     });
     if (formattedResults.length < SEARCH_PAGE_LIMIT + 1) {

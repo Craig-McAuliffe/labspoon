@@ -96,7 +96,7 @@ export const updateTechniqueOnTopics = functions.firestore
       if (!taggedTopic.id) return;
       return db
         .doc(`topics/${taggedTopic.id}/techniques/${techniqueID}`)
-        .set(articleToArticleListItem(articleToArticleListItem(technique)))
+        .set(articleToArticleListItem(technique))
         .catch((err) =>
           console.error(
             'unable to update technique with id ' +
