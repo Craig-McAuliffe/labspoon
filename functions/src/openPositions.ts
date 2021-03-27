@@ -243,10 +243,44 @@ export function openPosToOpenPosListItem(
     filterTopicIDs: openPosition.filterTopicIDs,
   };
   if (isAlgolia)
-    openPositionListItem.unformattedDescription = openPositionListItem.content.description.reduce(
+    openPositionListItem.unformattedDescription = openPosition.content.description.reduce(
       (accumulator, current) => accumulator + current.children[0].text + ' ',
       ''
     );
+  return openPositionListItem;
+}
+
+export function openPosToAlgoliaOpenPosListItem(
+  openPosition: OpenPosition,
+  openPositionID: string
+): AlgoliaOpenPositionListItem {
+  const OpenPosContentToOpenPosListItemContent = (
+    content: OpenPositionContent
+  ) => {
+    return {
+      title: content.title,
+      position: content.position,
+      salary: content.salary,
+      startDate: content.startDate,
+      description: content.description,
+    };
+  };
+  const openPositionListItem: AlgoliaOpenPositionListItem = {
+    content: OpenPosContentToOpenPosListItemContent(openPosition.content),
+    author: openPosition.author,
+    topics: openPosition.topics,
+    timestamp: openPosition.timestamp,
+    unixTimeStamp: openPosition.unixTimeStamp,
+    group: groupRefToGroupSignature(openPosition.group, openPosition.group.id),
+    objectID: openPositionID,
+    filterTopicIDs: openPosition.filterTopicIDs,
+    resourceType: 'openPosition',
+    unformattedDescription: openPosition.content.description.reduce(
+      (accumulator, current) => accumulator + current.children[0].text + ' ',
+      ''
+    ),
+  };
+
   return openPositionListItem;
 }
 
@@ -283,6 +317,19 @@ export interface OpenPositionListItem {
   id?: string;
   filterTopicIDs: string[];
   unformattedDescription?: string;
+}
+
+export interface AlgoliaOpenPositionListItem {
+  content: OpenPositionListItemContent;
+  author: UserRef;
+  topics?: TaggedTopic[];
+  timestamp: Date;
+  unixTimeStamp: number;
+  group: GroupSignature;
+  filterTopicIDs: string[];
+  unformattedDescription: string;
+  objectID: string;
+  resourceType: 'openPosition';
 }
 
 interface OpenPositionListItemContent {

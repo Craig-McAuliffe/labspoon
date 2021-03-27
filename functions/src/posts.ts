@@ -799,6 +799,23 @@ export interface PostRef {
   unformattedText?: string;
 }
 
+export interface AlgoliaPostRef {
+  postType: PostType;
+  author: UserRef;
+  text: ArticleBodyChild[];
+  topics: TaggedTopic[];
+  customTopics?: string[];
+  timestamp: Date;
+  publication?: PublicationRef | CustomPublicationRef;
+  openPosition?: OpenPosition;
+  // filterable arrays must be array of strings
+  filterTopicIDs: string[];
+  unixTimeStamp: number;
+  unformattedText: string;
+  objectID: string;
+  resourceType: string;
+}
+
 export function postToPostRef(post: Post, isAlgolia?: boolean): PostRef {
   const postRef: PostRef = {
     postType: post.postType,
@@ -818,6 +835,31 @@ export function postToPostRef(post: Post, isAlgolia?: boolean): PostRef {
       (accumulator, current) => accumulator + current.children[0].text + ' ',
       ''
     );
+  return postRef;
+}
+
+export function postToAlgoliaPostRef(
+  post: Post,
+  postID: string
+): AlgoliaPostRef {
+  const postRef: AlgoliaPostRef = {
+    postType: post.postType,
+    author: post.author,
+    text: post.text,
+    topics: post.topics,
+    timestamp: post.timestamp,
+    filterTopicIDs: post.filterTopicIDs,
+    unixTimeStamp: post.unixTimeStamp,
+    unformattedText: post.text.reduce(
+      (accumulator, current) => accumulator + current.children[0].text + ' ',
+      ''
+    ),
+    resourceType: 'post',
+    objectID: postID,
+  };
+  if (post.customTopics) postRef.customTopics = post.customTopics;
+  if (post.publication) postRef.publication = post.publication;
+  if (post.openPosition) postRef.openPosition = post.openPosition;
   return postRef;
 }
 

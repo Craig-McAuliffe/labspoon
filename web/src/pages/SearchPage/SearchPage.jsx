@@ -168,7 +168,7 @@ export default function SearchPage() {
         setTabbedResults={setTabbedResults}
       />
     );
-  if (!searchQuery)
+  if (!searchQuery || searchQuery.length === 0)
     pageContent = (
       <p className="search-page-error-message">
         No search query. Search for something in the search bar above. the

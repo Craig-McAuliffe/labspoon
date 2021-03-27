@@ -2,9 +2,14 @@ import * as functions from 'firebase-functions';
 import algoliasearch, {SearchClient} from 'algoliasearch';
 import {config, environment, ResourceTypes, admin} from './config';
 import {toUserAlgoliaFilterRef, User} from './users';
-import {AlgoliaGroupRef, Group, groupToAlgoliaGroupRef} from './groups';
+import {Group, groupToAlgoliaGroupRef} from './groups';
 import {Post, postToPostRef} from './posts';
-import {OpenPosition, openPosToOpenPosListItem} from './openPositions';
+import {
+  AlgoliaOpenPositionListItem,
+  OpenPosition,
+  openPosToAlgoliaOpenPosListItem,
+  openPosToOpenPosListItem,
+} from './openPositions';
 import {Publication, publicationToPublicationRef} from './publications';
 import {firestore} from 'firebase-admin';
 
@@ -288,13 +293,13 @@ export const updatePublicationToSearchIndex = functions.firestore
     );
   });
 
-export const reformatExistingAlgoliaGroups = functions
+export const reformatExistingAlgoliaOpenPositions = functions
   .runWith({
-    timeoutSeconds: 20,
+    timeoutSeconds: 120,
     memory: '2GB',
   })
   .https.onRequest(async (req, resp) => {
-    const collectionRef = db.collection('groups');
+    const collectionRef = db.collection('openPositions');
     const query = collectionRef.limit(50);
     await new Promise((resolve, reject) => {
       addBatchToAlgolia(query, resolve).catch((err) =>
@@ -302,13 +307,13 @@ export const reformatExistingAlgoliaGroups = functions
       );
     });
     resp.json({
-      result: `finished reformatting algolia groups to include unformattedAbout`,
+      result: `finished reformatting algolia openPositions to include unformattedDescription`,
     });
     resp.end();
   });
 
 async function addBatchToAlgolia(query: firestore.DocumentData, resolve: any) {
-  const index = algoliaClient.initIndex(GROUPS_INDEX);
+  const index = algoliaClient.initIndex(OPENPOSITIONS_INDEX);
   const snapshot = await query.get();
   const batchSize = snapshot.size;
   if (batchSize === 0) {
@@ -318,17 +323,18 @@ async function addBatchToAlgolia(query: firestore.DocumentData, resolve: any) {
   }
 
   let lastDoc: firestore.DocumentSnapshot;
-  const reformattedGroups: AlgoliaGroupRef[] = [];
+  const reformattedOpenPositions: AlgoliaOpenPositionListItem[] = [];
 
   snapshot.docs.forEach((doc: firestore.DocumentSnapshot) => {
     if (!doc.exists) return;
     lastDoc = doc;
-    const reformattedGroup = doc.data() as Group;
-    if (!reformattedGroup.about) return;
-    reformattedGroups.push(groupToAlgoliaGroupRef(reformattedGroup, doc.id));
+    const reformattedOpenPosition = doc.data() as OpenPosition;
+    reformattedOpenPositions.push(
+      openPosToAlgoliaOpenPosListItem(reformattedOpenPosition, doc.id)
+    );
   });
 
-  await index.saveObjects(reformattedGroups);
+  await index.saveObjects(reformattedOpenPositions);
 
   if (batchSize < 50) {
     resolve();
@@ -337,12 +343,17 @@ async function addBatchToAlgolia(query: firestore.DocumentData, resolve: any) {
   // Recurse on the next process tick, to avoid
   // exploding the stack.
   process.nextTick(async () => {
-    await addBatchToAlgolia(fetchGroupsForReformatting(lastDoc), resolve);
+    await addBatchToAlgolia(
+      fetchOpenPositionsForReformatting(lastDoc),
+      resolve
+    );
   });
 }
 
-const fetchGroupsForReformatting = (last?: firestore.DocumentSnapshot) => {
-  const collectionRef = db.collection('groups');
+const fetchOpenPositionsForReformatting = (
+  last?: firestore.DocumentSnapshot
+) => {
+  const collectionRef = db.collection('openPositions');
   if (last) return collectionRef.limit(50).startAfter(last);
   return collectionRef.limit(50);
 };
