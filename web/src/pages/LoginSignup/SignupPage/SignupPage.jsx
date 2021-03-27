@@ -278,7 +278,8 @@ export async function claimGroupFromTwitter(
   claimGroupID,
   userName,
   userID,
-  group
+  group,
+  userListItemData
 ) {
   const groupData = group
     ? group
@@ -289,10 +290,10 @@ export async function claimGroupFromTwitter(
         .catch((err) => console.error(err));
   if (groupData) {
     const batch = db.batch();
-    batch.set(db.doc(`groups/${claimGroupID}/members/${userID}`), {
-      id: userID,
-      name: userName,
-    });
+    const userDetails = userListItemData
+      ? userListItemData
+      : {id: userID, name: userName};
+    batch.set(db.doc(`groups/${claimGroupID}/members/${userID}`), userDetails);
     batch.set(
       db.doc(`users/${userID}/groups/${claimGroupID}`),
       convertGroupToGroupRef(groupData, claimGroupID)

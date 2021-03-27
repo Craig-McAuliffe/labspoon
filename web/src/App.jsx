@@ -3,7 +3,6 @@ import {BrowserRouter as Router, Link, useLocation} from 'react-router-dom';
 import Routes from './routes.jsx';
 import {auth, db} from './firebase';
 import Header from './components/Layout/Header/Header';
-import {getDefaultAvatar, getDefaultCoverPhoto} from './helpers/users.js';
 
 import './App.css';
 import {CopyrightIcon} from './assets/MenuIcons.jsx';
@@ -144,9 +143,7 @@ function AuthProvider({children}) {
           return;
         }
         const userData = profile.data();
-        if (userData && !userData.avatar) userData.avatar = getDefaultAvatar();
-        if (userData && !userData.coverPhoto)
-          userData.coverPhoto = getDefaultCoverPhoto();
+        if (userData && !userData.avatar) userData.avatar = null;
         setUserProfile(userData);
       })
       .catch((err) => console.log(err, 'could not retrieve user profile'));

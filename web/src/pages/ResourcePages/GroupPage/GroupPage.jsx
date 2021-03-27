@@ -7,7 +7,10 @@ import {FeatureFlags, AuthContext} from '../../../App';
 import {db} from '../../../firebase';
 
 import {getActiveTabID} from '../../../helpers/filters';
-import {getPaginatedUserReferencesFromCollectionRef} from '../../../helpers/users';
+import {
+  getPaginatedUserReferencesFromCollectionRef,
+  userToUserRef,
+} from '../../../helpers/users';
 import {getPaginatedTopicsFromCollectionRef} from '../../../helpers/topics';
 import {getPaginatedPublicationsFromCollectionRef} from '../../../helpers/publications';
 import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
@@ -601,7 +604,8 @@ function ClaimGroup({groupID, group}) {
                   groupID,
                   userProfile.name,
                   userProfile.id,
-                  group
+                  group,
+                  userToUserRef(userProfile, userProfile.id)
                 );
                 return window.location.reload();
               }

@@ -110,6 +110,7 @@ export function userToUserRef(user, userID) {
     name: user.name,
   };
   if (user.avatar) userRef.avatar = user.avatar;
+  if (user.institution) userRef.institution = user.institution;
   if (user.rank) userRef.rank = user.rank;
   return userRef;
 }
