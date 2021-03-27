@@ -1,19 +1,11 @@
 import * as functions from 'firebase-functions';
 import algoliasearch, {SearchClient} from 'algoliasearch';
-import {config, environment, ResourceTypes, admin} from './config';
+import {config, environment, ResourceTypes} from './config';
 import {toUserAlgoliaFilterRef, User} from './users';
 import {Group, groupToAlgoliaGroupRef} from './groups';
 import {Post, postToPostRef} from './posts';
-import {
-  AlgoliaOpenPositionListItem,
-  OpenPosition,
-  openPosToAlgoliaOpenPosListItem,
-  openPosToOpenPosListItem,
-} from './openPositions';
+import {OpenPosition, openPosToOpenPosListItem} from './openPositions';
 import {Publication, publicationToPublicationRef} from './publications';
-import {firestore} from 'firebase-admin';
-
-const db = admin.firestore();
 
 const algoliaConfig = config.algolia;
 
