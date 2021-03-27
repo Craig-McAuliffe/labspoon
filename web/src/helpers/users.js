@@ -62,12 +62,7 @@ export function getUserGroups(userID) {
     });
 }
 
-export function createUserDocOnSignUp(
-  result,
-  setLoading,
-  userName,
-  updateUserDetails
-) {
+export function createUserDocOnSignUp(result, userName, updateUserDetails) {
   const addUserToDB = () =>
     db
       .doc(`users/${result.user.uid}`)
@@ -79,7 +74,6 @@ export function createUserDocOnSignUp(
       })
       .then(() => {
         updateUserDetails(result.user);
-        if (setLoading) setLoading(false);
         return true;
       })
       .catch((err) => {
@@ -100,7 +94,6 @@ export function createUserDocOnSignUp(
             );
             return false;
           });
-        if (setLoading) setLoading(false);
       });
 
   return result.user

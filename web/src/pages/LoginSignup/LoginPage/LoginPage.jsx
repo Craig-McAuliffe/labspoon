@@ -5,9 +5,7 @@ import {AuthContext} from '../../../App';
 import {Form, Formik} from 'formik';
 import PrimaryButton from '../../../components/Buttons/PrimaryButton';
 import FormTextInput from '../../../components/Forms/FormTextInput';
-import LoadingSpinner, {
-  LoadingSpinnerPage,
-} from '../../../components/LoadingSpinner/LoadingSpinner';
+import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 import * as Yup from 'yup';
 import GoogleButton from 'react-google-button';
 import GoogleSignIn from '../GoogleSignIn.jsx';
@@ -33,14 +31,12 @@ function LoginPage() {
   const claimGroupID = locationState ? locationState.claimGroupID : undefined;
   const {userProfile} = useContext(AuthContext);
   const {updateUserDetails} = useContext(AuthContext);
-  const [loading, setLoading] = useState();
   const [googleSignInFlow, setGoogleSignInFlow] = useState(false);
   const [forgottenPassword, setForgottenPassword] = useState(false);
   const [isSigningUp, setIsSigningUp] = useState(false);
   const [resetPasswordEmailWasSent, setResetPasswordEmailWasSent] = useState(
     false
   );
-  if (loading) return <LoadingSpinnerPage />;
   if (!userProfile || isSigningUp) {
     if (forgottenPassword)
       return (
@@ -57,7 +53,6 @@ function LoginPage() {
         {googleSignInFlow && (
           <GoogleSignIn
             updateUserDetails={updateUserDetails}
-            setLoading={setLoading}
             setGoogleSignInFlow={setGoogleSignInFlow}
             setIsSigningUp={setIsSigningUp}
           />
@@ -78,6 +73,7 @@ function LoginPage() {
         <SignInForm
           setForgottenPassword={setForgottenPassword}
           setIsSigningUp={setIsSigningUp}
+          isSigningUp={isSigningUp}
         />
         <div className="login-submit-button-container">
           <GoogleButton
@@ -119,20 +115,16 @@ function LoginPage() {
   }
 }
 
-const SignInForm = ({setForgottenPassword, setIsSigningUp}) => {
-  const [loading, setLoading] = useState(false);
+const SignInForm = ({setForgottenPassword, setIsSigningUp, isSigningUp}) => {
   const submitChanges = (values) => {
     setIsSigningUp(true);
-    setLoading(true);
     firebase
       .auth()
       .signInWithEmailAndPassword(values.email, values.password)
       .then(() => {
-        setLoading(false);
         setIsSigningUp(false);
       })
       .catch((error) => {
-        setLoading(false);
         if (error.message.includes('password is invalid')) {
           alert(
             'The password you entered is not correct for that email address.'
@@ -191,10 +183,12 @@ const SignInForm = ({setForgottenPassword, setIsSigningUp}) => {
         <div className="cancel-or-submit">
           <div></div>
           <div className="login-submit-button-container">
-            <PrimaryButton submit={true}>Sign in</PrimaryButton>
+            <PrimaryButton disabled={isSigningUp} submit={true}>
+              Sign in
+            </PrimaryButton>
           </div>
         </div>
-        {loading ? <LoadingSpinner /> : null}
+        {isSigningUp ? <LoadingSpinner /> : null}
       </Form>
     </Formik>
   );

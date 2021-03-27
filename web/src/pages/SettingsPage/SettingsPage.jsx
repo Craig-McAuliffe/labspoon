@@ -241,6 +241,7 @@ function ChangePasswordForm({
   reauthenticate,
   setEditState,
 }) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const initialValues = {
     currentPassword: '',
     newPassword: '',
@@ -266,12 +267,14 @@ function ChangePasswordForm({
       }),
   });
   const submitChanges = (values) => {
+    setIsSubmitting(true);
     reauthenticate(values.currentPassword)
       .then(() => {
         user
           .updatePassword(values.newPassword)
           .then(function () {
-            alert('Password successfully updated.');
+            alert('Success! Password updated.');
+            setIsSubmitting(false);
             setEditState(false);
           })
           .catch((error) => {
@@ -279,10 +282,12 @@ function ChangePasswordForm({
               `We couldn't update your passowrd at this time. Please try again later.`
             );
             console.log(error);
+            setIsSubmitting(false);
             setEditState(false);
           });
       })
       .catch((error) => {
+        setIsSubmitting(false);
         console.log(error);
         if (error.message.toLowerCase().includes('too many'))
           alert(
@@ -291,6 +296,7 @@ function ChangePasswordForm({
         else alert('The current password that you entered is incorrect');
       });
   };
+  if (isSubmitting) return <LoadingSpinner />;
   return (
     <Formik
       initialValues={initialValues}

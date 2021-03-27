@@ -161,7 +161,7 @@ function FeaturesCarousel() {
     <div className="about-page-carousel-section">
       {nextSlideIcon()}
       <Carousel activeIndex={index} onSelect={handleSelect} interval={null}>
-        <Carousel.Item interval={300} pause="hover" slide controls>
+        <Carousel.Item interval={300} pause="hover" controls>
           <div className="about-page-carousel-item">
             <img
               className="d-block w-100"
@@ -170,7 +170,7 @@ function FeaturesCarousel() {
             />
           </div>
         </Carousel.Item>
-        <Carousel.Item interval={300} pause="hover" slide controls>
+        <Carousel.Item interval={300} pause="hover" controls>
           <div className="about-page-carousel-item">
             <img
               className="d-block w-100"
@@ -179,7 +179,7 @@ function FeaturesCarousel() {
             />
           </div>
         </Carousel.Item>
-        <Carousel.Item interval={300} pause="hover" slide controls>
+        <Carousel.Item interval={300} pause="hover" controls>
           <div className="about-page-carousel-item">
             <img
               className="d-block w-100"

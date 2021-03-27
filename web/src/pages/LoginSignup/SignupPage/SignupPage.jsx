@@ -6,7 +6,7 @@ import {AuthContext} from '../../../App';
 import {Form, Formik} from 'formik';
 import PrimaryButton from '../../../components/Buttons/PrimaryButton';
 import FormTextInput from '../../../components/Forms/FormTextInput';
-import {LoadingSpinnerPage} from '../../../components/LoadingSpinner/LoadingSpinner';
+import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 import * as Yup from 'yup';
 import {createUserDocOnSignUp} from '../../../helpers/users.js';
 import GoogleButton from 'react-google-button';
@@ -24,7 +24,7 @@ import './SignupPage.css';
  * @return {React.ReactElement}
  */
 function SignupPage() {
-  const [loading, setLoading] = useState(false);
+  const [isSigningUp, setIsSigningUp] = useState(false);
   const locationState = useLocation().state;
   const search = useLocation().search;
   const returnLocation = locationState
@@ -36,8 +36,7 @@ function SignupPage() {
   const searchParams = qs.parse(search.slice(1));
   const referrer = searchParams.referrer;
   const [googleSignInFlow, setGoogleSignInFlow] = useState(false);
-  const [savedInitialValues, setSavedInitialValues] = useState();
-  const [isSigningUp, setIsSigningUp] = useState(false);
+  const [savedInitialValues, setSavedInitialValues] = useState(false);
 
   useScript(
     `https://www.google.com/recaptcha/api.js?render=${reCaptchaSiteKey}`
@@ -45,17 +44,15 @@ function SignupPage() {
 
   useDomRemover('.grecaptcha-badge');
 
-  if (loading) return <LoadingSpinnerPage />;
   if (!userProfile || isSigningUp) {
     return (
       <PaddedPageContainer>
         {googleSignInFlow && (
           <GoogleSignIn
             updateUserDetails={updateUserDetails}
-            setLoading={setLoading}
+            setIsSigningUp={setIsSigningUp}
             setGoogleSignInFlow={setGoogleSignInFlow}
             claimGroupID={claimGroupID}
-            setIsSigningUp={setIsSigningUp}
           />
         )}
         <ReferrerAlert referrer={referrer} />
@@ -68,11 +65,11 @@ function SignupPage() {
         </p>
         <div className="sign-up-form">
           <SignUpForm
-            setLoading={setLoading}
+            setIsSigningUp={setIsSigningUp}
             setSavedInitialValues={setSavedInitialValues}
             savedInitialValues={savedInitialValues}
             claimGroupID={claimGroupID}
-            setIsSigningUp={setIsSigningUp}
+            isSigningUp={isSigningUp}
           />
           <div className="signup-submit-button-container">
             <GoogleButton
@@ -115,11 +112,11 @@ function SignupPage() {
 }
 
 const SignUpForm = ({
-  setLoading,
+  setIsSigningUp,
   setSavedInitialValues,
   savedInitialValues,
   claimGroupID,
-  setIsSigningUp,
+  isSigningUp,
 }) => {
   const {updateUserDetails} = useContext(AuthContext);
 
@@ -166,11 +163,10 @@ const SignUpForm = ({
       onSubmit={(values) =>
         submitSignUp(
           values,
-          setLoading,
+          setIsSigningUp,
           updateUserDetails,
           setSavedInitialValues,
-          claimGroupID,
-          setIsSigningUp
+          claimGroupID
         )
       }
     >
@@ -188,8 +184,11 @@ const SignUpForm = ({
           label="Your Full Name (this will be displayed on your profile)"
         />
         <div className="signup-submit-button-container">
-          <PrimaryButton submit={true}>Sign Up</PrimaryButton>
+          <PrimaryButton disabled={isSigningUp} submit={true}>
+            Sign Up
+          </PrimaryButton>
         </div>
+        {isSigningUp && <LoadingSpinner />}
       </Form>
     </Formik>
   );
@@ -210,16 +209,15 @@ function ReferrerAlert({referrer}) {
       return <></>;
   }
 }
-
+// isSigningUp is
 export async function submitSignUp(
   values,
-  setLoading,
+  setIsSigningUp,
   updateUserDetails,
   setSavedInitialValues,
-  claimGroupID,
-  setIsSigningUp
+  claimGroupID
 ) {
-  if (setLoading) setLoading(true);
+  if (setIsSigningUp) setIsSigningUp(true);
   const defaultAlert = () =>
     alert(
       'Something went wrong. Please try refreshing the page and signing up again.'
@@ -229,24 +227,18 @@ export async function submitSignUp(
       .auth()
       .createUserWithEmailAndPassword(values.email, values.password)
       .then(async (result) => {
-        setIsSigningUp(true);
-        await createUserDocOnSignUp(
-          result,
-          setLoading,
-          values.userName,
-          updateUserDetails
-        );
+        await createUserDocOnSignUp(result, values.userName, updateUserDetails);
         if (claimGroupID)
           await claimGroupFromTwitter(
             claimGroupID,
             values.userName,
             result.user.uid
           );
-        setIsSigningUp(false);
+        if (setIsSigningUp) setIsSigningUp(false);
       })
       .catch((error) => {
-        console.log(error);
-        if (setLoading) setLoading(false);
+        console.error(error);
+        if (setIsSigningUp) setIsSigningUp(false);
         if (
           error.message.includes(
             'The email address is already in use by another account.'
@@ -256,20 +248,20 @@ export async function submitSignUp(
         } else {
           defaultAlert();
         }
-        setIsSigningUp(false);
+        if (setIsSigningUp) setIsSigningUp(false);
         return false;
       });
 
   const reCaptchaFailFunction = () => {
     setSavedInitialValues(values);
     alert('Our security system thinks you might be a bot. Please try again');
-    if (setLoading) setLoading(false);
+    if (setIsSigningUp) setIsSigningUp(false);
     return false;
   };
   const reCaptchaErrorFunction = () => {
     setSavedInitialValues(values);
     defaultAlert();
-    if (setLoading) setLoading(false);
+    if (setIsSigningUp) setIsSigningUp(false);
     return false;
   };
 
@@ -303,7 +295,7 @@ export async function claimGroupFromTwitter(
     });
     batch.set(
       db.doc(`users/${userID}/groups/${claimGroupID}`),
-      convertGroupToGroupRef(groupData)
+      convertGroupToGroupRef(groupData, claimGroupID)
     );
     batch.update(db.doc(`groups/${claimGroupID}`), {
       isGeneratedFromTwitter: false,

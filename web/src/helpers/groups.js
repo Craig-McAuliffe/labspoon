@@ -50,9 +50,9 @@ export function getGroup(id) {
     .catch((err) => console.log(err));
 }
 
-export function convertGroupToGroupRef(group) {
+export function convertGroupToGroupRef(group, groupID) {
   const groupRef = {
-    id: group.id,
+    id: groupID ? groupID : group.id,
     name: group.name,
     about: group.about,
   };

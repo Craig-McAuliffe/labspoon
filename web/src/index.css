@@ -106,3 +106,30 @@ input:focus {
     line-height: 1.4em;
   }
 }
+
+@media screen and (max-width: 350px) {
+  body {
+    font-size: 14px;
+    scrollbar-width: none;
+  }
+
+  h1 {
+    font-size: 1.2em;
+  }
+
+  h2 {
+    font-size: 1.1em;
+  }
+
+  h3 {
+    font-size: 0.9em;
+  }
+
+  h4 {
+    font-size: 0.8em;
+    margin: 0;
+  }
+  p {
+    line-height: 1.3em;
+  }
+}

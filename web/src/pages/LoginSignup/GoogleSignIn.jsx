@@ -20,12 +20,7 @@ export default function GoogleSignIn({
           .get()
           .then(async (ds) => {
             if (!ds.exists) {
-              await createUserDocOnSignUp(
-                result,
-                undefined,
-                '',
-                updateUserDetails
-              );
+              await createUserDocOnSignUp(result, '', updateUserDetails);
             }
             if (claimGroupID) {
               await claimGroupFromTwitter(
@@ -35,7 +30,6 @@ export default function GoogleSignIn({
               );
             }
             setIsSigningUp(false);
-            setGoogleSignInFlow(false);
           })
           .catch((err) => {
             console.error(err);
