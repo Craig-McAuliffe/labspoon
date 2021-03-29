@@ -16,8 +16,7 @@
 .primary-button,
 .primary-button-smallVersion,
 .negative-button,
-.negative-button-smallVersion
-{
+.negative-button-smallVersion {
   cursor: pointer;
 }
 
@@ -86,7 +85,7 @@
 }
 
 .primary-button-clicked {
-  padding: 10px 5px;
+  padding: 0px 0px;
   border-radius: 4%;
   text-decoration: none;
   background: #ffffff;
@@ -123,8 +122,7 @@
   .primary-button,
   .primary-button-inactive,
   .negative-button,
-  .negative-button-smallVersion,
-  .primary-button-clicked {
+  .negative-button-smallVersion {
     padding: 10px 10px;
     border-radius: 3%;
   }
@@ -138,7 +136,6 @@
   .primary-button,
   .primary-button-inactive,
   .FollowButton:hover h2,
-  .primary-button-clicked,
   .negative-button,
   .negative-button-smallVersion {
     padding: 8px 8px;

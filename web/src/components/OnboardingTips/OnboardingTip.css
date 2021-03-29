@@ -59,7 +59,7 @@
 @media screen and (max-width: 500px) {
   .onboarding-tip-popup-container {
     width: 300px;
-    right: 20px;
+    right: 30px;
   }
   .onboarding-tip-popup-container::before {
     right: 27px;

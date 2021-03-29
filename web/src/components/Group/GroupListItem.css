@@ -34,10 +34,10 @@
   grid-template-columns: 1fr 80px;
   justify-content: space-between;
   flex-wrap: wrap;
+  padding-bottom: 10px;
 }
 
 .group-list-item-institution {
-  margin-bottom: 10px;
   color: #99999f;
 }
 
@@ -168,18 +168,27 @@
 }
 @media screen and (max-width: 500px) {
   .group-list-item-name-follow {
-    grid-template-columns: 1fr 65px;
+    grid-template-columns: 1fr minmax(60px, auto);
+  }
+  .group-list-item-container {
+    padding: 10px 5px;
   }
 }
 @media screen and (max-width: 460px) {
   .group-list-item-name-follow {
-    grid-template-columns: 1fr 55px;
+    grid-template-columns: 1fr minmax(55px, auto);
+  }
+
+  .group-list-item-name-follow {
+    padding-bottom: 0px;
+  }
+  .group-list-item-institution {
+    margin-bottom: 10px;
   }
 
   .group-list-item-container,
   .group-list-item-container-no-border {
     display: block;
-    padding-left: 10px;
   }
   .group-list-item-container .group-list-item-icon {
     margin: 0px 0px 15px 0px;
@@ -188,6 +197,6 @@
 
 @media screen and (max-width: 450px) {
   .group-list-item-name-follow {
-    grid-template-columns: 1fr 50px;
+    grid-template-columns: 1fr minmax(50px, auto);
   }
 }
