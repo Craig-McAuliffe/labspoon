@@ -23,9 +23,6 @@ import {
   FollowNoTopicsPreference,
   FollowPostTypePreferences,
 } from './helpers';
-import * as path from 'path';
-import * as os from 'os';
-import * as fs from 'fs';
 
 const db: firestore.Firestore = admin.firestore();
 
@@ -1233,73 +1230,4 @@ export interface GroupSignature {
   name: string;
   avatar?: string;
   institution?: string;
-}
-
-export const createGeneratedGroupsFromJSON = functions
-  .runWith({
-    timeoutSeconds: 120,
-    memory: '2GB',
-  })
-  .https.onRequest(async (req, resp) => {
-    const tmpfileName = `groupsFromTwitter.json`;
-    const tmp = path.join(os.tmpdir(), tmpfileName);
-    const file = storage
-      .bucket()
-      .file('marketing/groups-from-twitter-attempt-2.json');
-    await file.download({destination: tmp});
-
-    const groupsJSON = fs.readFileSync(tmp);
-    const groups = JSON.parse(groupsJSON.toString());
-
-    // free up disk space
-    try {
-      fs.unlinkSync(tmp);
-    } catch {
-      console.error('error when freeing up local memory during image resize');
-    }
-
-    const groupsArray: {name: string; description: string}[] = [];
-    let n;
-    for (n in groups) {
-      groupsArray.push(groups[n]);
-    }
-
-    const batchedArray1 = groupsArray.slice(1000, 1200);
-    const batchedArray2 = groupsArray.slice(1200, 1440);
-
-    await handleGroupArray(batchedArray1);
-    process.nextTick(async () => {
-      await handleGroupArray(batchedArray2);
-    });
-
-    resp.json({result: 'Success' + groupsArray.length});
-    resp.end();
-    return;
-  });
-
-async function handleGroupArray(
-  groupArray: {
-    name: string;
-    description: string;
-  }[]
-): Promise<void> {
-  const batch = db.batch();
-  groupArray.forEach((generatedGroup) => {
-    const escapedDescription = generatedGroup.description.replace(
-      /[^\w\s]/gi,
-      ' '
-    );
-
-    const groupRef = db.collection('groups').doc();
-    const groupID = groupRef.id;
-    const group: Group = {
-      name: generatedGroup.name,
-      about: [{children: [{text: escapedDescription}], type: 'paragraph'}],
-      id: groupID,
-      groupType: 'researchGroup',
-      isGeneratedFromTwitter: true,
-    };
-    batch.set(groupRef, group);
-  });
-  await batch.commit();
 }
