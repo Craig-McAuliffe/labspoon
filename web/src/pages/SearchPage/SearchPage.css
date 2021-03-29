@@ -85,7 +85,7 @@ input[type='search']::-webkit-search-results-decoration {
 .search-page-see-more-container {
   display: flex;
   justify-content: flex-end;
-  margin: 10px 0px 60px;
+  margin: 0px 0px 40px;
 }
 
 .search-page-see-more-button {
