@@ -78,6 +78,10 @@ input[type='search']::-webkit-search-results-decoration {
   display: none;
 }
 
+.search-page-tabs-container {
+  margin: 15px 0px 40px;
+}
+
 .search-page-see-more-container {
   display: flex;
   justify-content: flex-end;

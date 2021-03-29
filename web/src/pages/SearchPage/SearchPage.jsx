@@ -153,13 +153,13 @@ export default function SearchPage() {
         query={searchQuery}
         topicsResults={tabbedResults[TOPICS_TAB_NAME]}
         setTabbedResults={setTabbedResults}
-        tab={tab}
         tabbedResults={tabbedResults}
         setSearchError={setSearchError}
         searchError={searchError}
         searchQuery={searchQuery}
         isLoadingFeed={isLoadingFeed}
         setIsLoadingFeed={setIsLoadingFeed}
+        history={history}
       />
     );
 
@@ -229,7 +229,7 @@ function SearchTabs({searchQuery, history, tab}) {
 function updateTab(tab, searchQuery, history) {
   const tabPath = tabsToURLMap.get(tab);
   const changeTab = () =>
-    history.push(`/search/${tabPath}/?query=${searchQuery}`);
+    history.replace(`/search/${tabPath}/?query=${searchQuery}`);
   reCaptcha(0.5, 'navigate_search_tabs', changeTab(), () => setIsBot(true));
 }
 
@@ -376,16 +376,20 @@ function SeeMoreWrapper({onClick, resourceType, children}) {
       {children}
       <div className="search-page-see-more-container">
         <button onClick={onClick} className="search-page-see-more-button">
-          ...see more {resourceType.toLowerCase()}s
+          ...see more {urlToTabsNameMap.get(resourceType + 's')}
         </button>
       </div>
     </>
   );
 }
 
-function OverviewResultsSection({setTab, children, tabName, resourceType}) {
+function OverviewResultsSection({setTab, children, resourceType}) {
+  const targetTabName = urlToTabsNameMap.get(resourceType + 's');
   return (
-    <SeeMoreWrapper onClick={() => setTab(tabName)} resourceType={resourceType}>
+    <SeeMoreWrapper
+      onClick={() => setTab(targetTabName)}
+      resourceType={resourceType}
+    >
       {children}
     </SeeMoreWrapper>
   );
@@ -398,11 +402,11 @@ const OverviewResults = ({
   setTabbedResults,
   tabbedResults,
   setSearchError,
-  tab,
   searchError,
   searchQuery,
   isLoadingFeed,
   setIsLoadingFeed,
+  history,
 }) => {
   const overviewPageQueries = [
     {
@@ -508,8 +512,7 @@ const OverviewResults = ({
     );
   return tabbedResults[OVERVIEW_TAB_NAME].map((resultsSection, i) => (
     <OverviewResultsSection
-      setTab={setTab}
-      tabName={tab}
+      setTab={(targetTabName) => setTab(targetTabName, query, history)}
       resourceType={resultsSection.resourceType}
       key={i}
     >
