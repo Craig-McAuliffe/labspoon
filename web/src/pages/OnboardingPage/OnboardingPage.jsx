@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useContext, useRef} from 'react';
-import {Link, useHistory, useLocation, useParams} from 'react-router-dom';
+import {Redirect, useHistory, useLocation, useParams} from 'react-router-dom';
 import {AuthContext} from '../../App';
 import {db} from '../../firebase';
 import {getPaginatedGroupReferencesFromCollectionRef} from '../../helpers/groups';
@@ -10,6 +10,7 @@ import CreateGroupPage from '../../components/Group/CreateGroupPage/CreateGroupP
 import FormDatabaseSearch from '../../components/Forms/FormDatabaseSearch';
 import LinkAuthorIDForm from '../../components/Publication/ConnectToPublications/ConnectToPublications';
 import {PaddedPageContainer} from '../../components/Layout/Content';
+import TertiaryButton from '../../components/Buttons/TertiaryButton';
 
 import './OnboardingPage.css';
 
@@ -26,7 +27,8 @@ export default function OnboardingPage() {
     ? locationState.returnLocation
     : undefined;
   const claimGroupID = locationState ? locationState.claimGroupID : undefined;
-  if (user === undefined) history.push('/');
+  if (user === undefined) history.push('/signup');
+
   const OnboardingStageDisplay = () => {
     switch (onboardingStage) {
       case LINKAUTHOR:
@@ -34,29 +36,35 @@ export default function OnboardingPage() {
           <OnboardingAuthorLink nextOnboardingStage={nextOnboardingStage} />
         );
       case GROUPS:
-        return <OnboardingGroup user={user} claimGroupID={claimGroupID} />;
+        return (
+          <OnboardingGroup
+            userDetails={userProfile}
+            claimGroupID={claimGroupID}
+            returnLocation={returnLocation}
+          />
+        );
       default:
-        return <OnboardingGroup user={user} claimGroupID={claimGroupID} />;
+        return <p>Hmm, something has gone wrong. Try refreshing your page.</p>;
     }
   };
 
   const nextOnboardingStage = () => {
     switch (onboardingStage) {
       case LINKAUTHOR:
-        history.push(`/onboarding/${GROUPS}`, locationState);
-        break;
+        return history.push(`/onboarding/${GROUPS}`, locationState);
       case GROUPS:
-        db.doc(`users/${userProfile.id}`)
-          .update({hasCompletedOnboarding: true})
-          .then(() => history.push(returnLocation ? returnLocation : '/'))
-          .catch((err) => {
-            console.error(err);
-            history.push(returnLocation ? returnLocation : '/');
-          });
+        return completeOnboardingThenRedirect(
+          history,
+          userProfile.id,
+          returnLocation
+        );
 
-        break;
       default:
-        throw new Error('invalid stage');
+        return completeOnboardingThenRedirect(
+          history,
+          userProfile.id,
+          returnLocation
+        );
     }
   };
 
@@ -69,7 +77,15 @@ export default function OnboardingPage() {
         throw new Error('invalid stage');
     }
   };
-
+  if (onboardingStage !== LINKAUTHOR && onboardingStage !== GROUPS)
+    return (
+      <Redirect
+        to={{
+          pathname: '/onboarding/link-author',
+          state: locationState,
+        }}
+      />
+    );
   return (
     <PaddedPageContainer>
       <h2 className="onboarding-main-title">Welcome to Labspoon!</h2>
@@ -93,6 +109,26 @@ export default function OnboardingPage() {
       </div>
     </PaddedPageContainer>
   );
+}
+
+async function completeOnboardingThenRedirect(
+  history,
+  userID,
+  returnLocation,
+  customLocation
+) {
+  return db
+    .doc(`users/${userID}`)
+    .update({hasCompletedOnboarding: true})
+    .then(() => {
+      if (customLocation) return history.push(customLocation);
+      return history.push(returnLocation ? returnLocation : '/');
+    })
+    .catch((err) => {
+      console.error(err);
+      if (customLocation) return history.push(customLocation);
+      return history.push(returnLocation ? returnLocation : '/');
+    });
 }
 
 function WarnOnClick({children}) {
@@ -145,10 +181,11 @@ function Popover({children, open, setClosed, content}) {
   );
 }
 
-function OnboardingGroup({user, claimGroupID}) {
+function OnboardingGroup({userDetails, claimGroupID, returnLocation}) {
   const [displayedGroups, setDisplayedGroups] = useState([]);
   const [creatingGroup, setCreatingGroup] = useState(false);
   const [createdGroupID, setCreatedGroupID] = useState(false);
+  const history = useHistory();
   const groupSearchRef = useRef();
 
   const getGroups = () => {
@@ -156,17 +193,13 @@ function OnboardingGroup({user, claimGroupID}) {
     return getPaginatedGroupReferencesFromCollectionRef(groupsCollection, 10);
   };
 
-  useEffect(() => {
-    getGroups().then((res) => setDisplayedGroups(res));
-  }, [user]);
-
   // This checks whether the search input has any values and re-populates list if not.
-  useEffect(() => {
+  useEffect(async () => {
     if (
       groupSearchRef.current.lastChild.firstChild.firstChild.value.length < 1 &&
       displayedGroups.length === 0
     )
-      getGroups().then((res) => setDisplayedGroups(res));
+      await getGroups().then((res) => setDisplayedGroups(res));
   }, [displayedGroups]);
 
   let createOrClaimGroup = creatingGroup ? (
@@ -193,7 +226,18 @@ function OnboardingGroup({user, claimGroupID}) {
     createOrClaimGroup = (
       <div className="go-to-claimed-group-section">
         <h2>
-          <Link to={`/group/${claimGroupID}`}>Go to claimed group</Link>
+          <TertiaryButton
+            onClick={() =>
+              completeOnboardingThenRedirect(
+                history,
+                userDetails.id,
+                returnLocation,
+                `/group/${claimGroupID}`
+              )
+            }
+          >
+            Go to claimed group
+          </TertiaryButton>
         </h2>
       </div>
     );
@@ -201,7 +245,18 @@ function OnboardingGroup({user, claimGroupID}) {
     createOrClaimGroup = (
       <div className="go-to-claimed-group-section">
         <h2>
-          <Link to={`/group/${createdGroupID}`}>Go to created group</Link>
+          <TertiaryButton
+            onClick={() =>
+              completeOnboardingThenRedirect(
+                history,
+                userDetails.id,
+                returnLocation,
+                `/group/${createdGroupID}`
+              )
+            }
+          >
+            Go to created group
+          </TertiaryButton>
         </h2>
       </div>
     );

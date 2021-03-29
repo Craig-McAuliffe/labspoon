@@ -37,7 +37,6 @@ function SignupPage() {
   const referrer = searchParams.referrer;
   const [googleSignInFlow, setGoogleSignInFlow] = useState(false);
   const [savedInitialValues, setSavedInitialValues] = useState(false);
-
   useScript(
     `https://www.google.com/recaptcha/api.js?render=${reCaptchaSiteKey}`
   );

@@ -21,13 +21,18 @@ import './AvatarDropDown.css';
 
 const AvatarDropDown = () => {
   const {user, userProfile, authLoaded} = useContext(AuthContext);
-  const locationPathname = useLocation().pathname;
+  const location = useLocation();
+  const locationPathname = location.pathname;
+  const search = location.search;
   if (!authLoaded) return <LoadingSpinner />;
   if (!user) {
     return (
       <Dropdown variant="success" id="dropdown-basic">
         <Link
-          to={{pathname: '/login', state: {returnLocation: locationPathname}}}
+          to={{
+            pathname: '/login',
+            state: {returnLocation: locationPathname + search},
+          }}
           className="sign-in"
         >
           <h3>Sign In</h3>

@@ -9,7 +9,9 @@ export const CREATE = 'create';
 
 export function SignUpPopoverOverride({children, text, actionTaken}) {
   const [open, setOpen] = useState(false);
-  const locationPathName = useLocation().pathname;
+  const location = useLocation();
+  const locationPathName = location.pathname;
+  const search = location.search;
   const signUpPromptRef = useRef();
 
   useEffect(() => {
@@ -68,7 +70,7 @@ export function SignUpPopoverOverride({children, text, actionTaken}) {
           <Link
             to={{
               pathname: '/signup',
-              state: {returnLocation: locationPathName},
+              state: {returnLocation: locationPathName + search},
             }}
           >
             {text}

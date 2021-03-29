@@ -12,7 +12,6 @@ import CreateResourceFormActions from '../../../components/Forms/CreateResourceF
 export default function ChooseUserName() {
   const locationState = useLocation().state;
   const returnLocation = locationState ? locationState.returnLocation : '';
-  const claimGroupID = locationState ? locationState.claimGroupID : undefined;
   const {user, userProfile, authLoaded} = useContext(AuthContext);
   const {updateUserDetails} = useContext(AuthContext);
   const [goToOnboarding, setGoToOnboarding] = useState(false);
@@ -66,15 +65,15 @@ export default function ChooseUserName() {
 
   if (!authLoaded) return <LoadingSpinnerPage />;
   if (!user) {
-    return <Redirect to="/" />;
+    return <Redirect to={returnLocation ? returnLocation : '/'} />;
   }
 
   if (goToOnboarding)
     return (
       <Redirect
         to={{
-          pathname: '/onboarding/follow',
-          state: {returnLocation: returnLocation, claimGroupID: claimGroupID},
+          pathname: '/onboarding/link-author',
+          state: locationState,
         }}
       />
     );
