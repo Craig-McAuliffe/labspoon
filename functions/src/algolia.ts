@@ -155,7 +155,6 @@ export const configurePostSearchIndex = functions.https.onRequest((_, res) =>
     [
       'unordered(unformattedText)',
       'unordered(topics.name)',
-      'author.name',
       'publication.title',
       'openPosition.content.title',
     ],
@@ -246,7 +245,6 @@ export const configurePublicationSearchIndex = functions.https.onRequest(
     configureSearchIndex(res, PUBLICATIONS_INDEX, [
       'unordered(title)',
       'unordered(topics)',
-      'unordered(authors.name)',
     ])
 );
 
