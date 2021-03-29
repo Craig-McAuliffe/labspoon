@@ -1264,36 +1264,42 @@ export const createGeneratedGroupsFromJSON = functions
       groupsArray.push(groups[n]);
     }
 
-    const batchedArray = groupsArray.slice(200, 400);
+    const batchedArray1 = groupsArray.slice(1000, 1200);
+    const batchedArray2 = groupsArray.slice(1200, 1440);
 
-    for (const groupElement of batchedArray) {
-      // Recurse on the next process tick, to avoid
-      // exploding the stack.
-      await handleGeneratedGroup(groupElement);
-    }
+    await handleGroupArray(batchedArray1);
+    process.nextTick(async () => {
+      await handleGroupArray(batchedArray2);
+    });
 
-    resp.json({result: 'Success'});
+    resp.json({result: 'Success' + groupsArray.length});
     resp.end();
     return;
   });
 
-async function handleGeneratedGroup(generatedGroup: {
-  name: string;
-  description: string;
-}): Promise<void> {
-  const escapedDescription = generatedGroup.description.replace(
-    /[^\w\s]/gi,
-    ' '
-  );
+async function handleGroupArray(
+  groupArray: {
+    name: string;
+    description: string;
+  }[]
+): Promise<void> {
+  const batch = db.batch();
+  groupArray.forEach((generatedGroup) => {
+    const escapedDescription = generatedGroup.description.replace(
+      /[^\w\s]/gi,
+      ' '
+    );
 
-  const groupRef = db.collection('groups').doc();
-  const groupID = groupRef.id;
-  const group: Group = {
-    name: generatedGroup.name,
-    about: [{children: [{text: escapedDescription}], type: 'paragraph'}],
-    id: groupID,
-    groupType: 'researchGroup',
-    isGeneratedFromTwitter: true,
-  };
-  await groupRef.set(group);
+    const groupRef = db.collection('groups').doc();
+    const groupID = groupRef.id;
+    const group: Group = {
+      name: generatedGroup.name,
+      about: [{children: [{text: escapedDescription}], type: 'paragraph'}],
+      id: groupID,
+      groupType: 'researchGroup',
+      isGeneratedFromTwitter: true,
+    };
+    batch.set(groupRef, group);
+  });
+  await batch.commit();
 }

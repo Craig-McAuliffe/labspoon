@@ -218,7 +218,7 @@ function OnboardingGroup({userDetails, claimGroupID, returnLocation}) {
         </SecondaryButton>
       </div>
       <p className="onboarding-hint-do-it-later">
-        {`Don't worry, you can always make one later, just click on your profile picture in the top right!`}
+        {`Don't worry, you can always make one later, just click on the plus button in the top right!`}
       </p>
     </>
   );
