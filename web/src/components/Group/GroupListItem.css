@@ -25,18 +25,25 @@
   margin-right: 5px;
 }
 
+.group-list-item-name-institution-container h3 {
+  margin-bottom: 0px;
+}
+
 .group-list-item-name-follow {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 80px;
   justify-content: space-between;
   flex-wrap: wrap;
 }
 
-.group-list-item-name-follow h4 {
+.group-list-item-institution {
   margin-bottom: 10px;
+  color: #99999f;
 }
 
 .group-list-item-follow-button-container {
-  margin-bottom: 10px;
+  margin-bottom: 0px;
+  margin-left: 1px;
 }
 
 .group-list-item-icon {
@@ -117,10 +124,6 @@
   color: #000000;
 }
 
-.group-headline-item-container h4 {
-  color: #99999f;
-}
-
 .group-list-item-follow-options-container {
   display: flex;
   justify-content: flex-end;
@@ -163,7 +166,16 @@
     margin-left: 5px;
   }
 }
-@media screen and (max-width: 360px) {
+@media screen and (max-width: 500px) {
+  .group-list-item-name-follow {
+    grid-template-columns: 1fr 65px;
+  }
+}
+@media screen and (max-width: 460px) {
+  .group-list-item-name-follow {
+    grid-template-columns: 1fr 55px;
+  }
+
   .group-list-item-container,
   .group-list-item-container-no-border {
     display: block;
@@ -171,5 +183,11 @@
   }
   .group-list-item-container .group-list-item-icon {
     margin: 0px 0px 15px 0px;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  .group-list-item-name-follow {
+    grid-template-columns: 1fr 50px;
   }
 }

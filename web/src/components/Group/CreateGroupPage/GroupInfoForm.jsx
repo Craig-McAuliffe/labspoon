@@ -47,9 +47,9 @@ export default function GroupInfoForm({
   const validationObj = {
     name: Yup.string()
       .required('Name is required')
-      .max(60, 'Must have fewer than 60 characters'),
-    location: Yup.string().max(60, 'Must have fewer than 60 characters'),
-    institution: Yup.string().max(60, 'Must have fewer than 60 characters'),
+      .max(40, 'Must have fewer than 40 characters'),
+    location: Yup.string().max(40, 'Must have fewer than 40 characters'),
+    institution: Yup.string().max(40, 'Must have fewer than 40 characters'),
     website: Yup.string()
       .url('Must be a valid url')
       .max(200, 'Must have fewer than 200 characters'),

@@ -35,26 +35,24 @@ const FollowButton = ({following, setFollowing, actionAndTriggerPopUp}) => {
 
 function FollowButtonContent({actionAndTriggerPopUp, following}) {
   return (
-    <div className="button-position">
-      <button
-        className={
-          following == null
-            ? 'primary-button-spinner'
-            : following
-            ? 'primary-button-clicked'
-            : 'primary-button'
-        }
-        onClick={actionAndTriggerPopUp}
-      >
-        {following === undefined ? (
-          <LoadingSpinner />
-        ) : (
-          <h2 className="primary-button-text">
-            {following ? 'Unfollow' : 'Follow'}
-          </h2>
-        )}
-      </button>
-    </div>
+    <button
+      className={
+        following == null
+          ? 'primary-button-spinner'
+          : following
+          ? 'primary-button-clicked'
+          : 'primary-button'
+      }
+      onClick={actionAndTriggerPopUp}
+    >
+      {following === undefined ? (
+        <LoadingSpinner />
+      ) : (
+        <h2 className="primary-button-text">
+          {following ? 'Unfollow' : 'Follow'}
+        </h2>
+      )}
+    </button>
   );
 }
 

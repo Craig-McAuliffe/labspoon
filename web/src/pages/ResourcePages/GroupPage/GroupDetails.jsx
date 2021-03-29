@@ -251,6 +251,5 @@ function PinnedItem({pinnedItem}) {
   );
 }
 
-// Tracks window width and sends boolean prop to
-// SimilarContentSider if below 800px
+// Tracks window width and sends boolean prop
 export default withSizes(mapGroupDetailsSizesToProps)(GroupDetails);

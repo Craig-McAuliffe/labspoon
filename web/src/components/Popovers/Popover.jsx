@@ -73,7 +73,7 @@ export function SignUpPopoverOverride({children, text, actionTaken}) {
               state: {returnLocation: locationPathName + search},
             }}
           >
-            {text}
+            <span>{text}</span>
           </Link>
         </div>
       </div>

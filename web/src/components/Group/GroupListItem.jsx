@@ -5,10 +5,10 @@ import GroupAvatar from '../Avatar/GroupAvatar';
 
 import './GroupListItem.css';
 import FollowOptionsPopover from '../Popovers/FollowOptionsPopover';
-import {GROUP} from '../../helpers/resourceTypeDefinitions';
 import Popover from '../Popovers/Popover';
 import TertiaryButton from '../Buttons/TertiaryButton';
 import {RichTextBody} from '../Article/Article';
+import GroupListItemHeadline from './GroupListItemHeadline';
 
 const GROUP_LIST_ITEM_DESCRIPTION_HEIGHT = 96;
 export default function GroupListItem({
@@ -42,23 +42,13 @@ export default function GroupListItem({
         WrapWithLinkOrOverride={WrapWithLinkOrOverride}
       />
       <div>
-        <div className="group-list-item-name-follow">
-          <div className="group-list-item-name-institution-container">
-            {name}
-            <h4>{group.institution}</h4>
-          </div>
-          <div className="group-list-item-follow-button-container">
-            {children}
-            {isFollowsPageResults && (
-              <div className="group-list-item-follow-options-container">
-                <FollowsPageGroupListItemOptions
-                  resourceType={GROUP}
-                  targetResourceData={group}
-                />
-              </div>
-            )}
-          </div>
-        </div>
+        <GroupListItemHeadline
+          formattedName={name}
+          institution={group.institution}
+          isFollowsPageResults={isFollowsPageResults}
+        >
+          {children}
+        </GroupListItemHeadline>
         <div className="group-list-item-text-container">
           {group.about && (
             <SeeMore

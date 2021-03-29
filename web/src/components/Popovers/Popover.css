@@ -15,6 +15,11 @@
   z-index: 10;
 }
 
+.sign-up-prompt a:hover span {
+  color: #00507c;
+  text-decoration: underline;
+}
+
 .sign-up-prompt-center {
   position: absolute;
   padding: 20px 16px;
