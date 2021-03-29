@@ -33,7 +33,7 @@ const AvatarDropDown = () => {
             pathname: '/login',
             state: {returnLocation: locationPathname + search},
           }}
-          className="sign-in"
+          className="avatar-dropdown-sign-in"
         >
           <h3>Sign In</h3>
         </Link>

@@ -10,9 +10,13 @@ export default function Dropdown({
   customToggleWidth,
   customToggleTextOnly,
   containerTopPosition,
+  containerRightPosition,
   loading,
   children,
   loadOnExpand,
+  customDropdownContainerWidth,
+  top,
+  right,
 }) {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef();
@@ -64,6 +68,10 @@ export default function Dropdown({
         <DropdownOptions
           dropdownRef={dropdownRef}
           containerTopPosition={containerTopPosition}
+          containerRightPosition={containerRightPosition}
+          customWidth={customDropdownContainerWidth}
+          top={top}
+          right={right}
         >
           {dropdownContent}
         </DropdownOptions>
@@ -103,12 +111,22 @@ function DropdownToggle({
   );
 }
 
-function DropdownOptions({dropdownRef, containerTopPosition, children}) {
+function DropdownOptions({
+  dropdownRef,
+  containerTopPosition,
+  children,
+  customWidth,
+  containerRightPosition,
+}) {
   return (
     <div
       className="dropdown-container"
       ref={dropdownRef}
-      style={containerTopPosition ? {top: containerTopPosition} : null}
+      style={{
+        top: containerTopPosition,
+        width: customWidth,
+        right: containerRightPosition,
+      }}
     >
       {children}
     </div>

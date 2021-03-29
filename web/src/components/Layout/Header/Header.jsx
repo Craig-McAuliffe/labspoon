@@ -1,12 +1,14 @@
-import React, {useState} from 'react';
-import {Link} from 'react-router-dom';
+import React, {useContext, useState} from 'react';
+import {Link, useHistory} from 'react-router-dom';
 import SearchBar, {MinimisedSearchBar} from '../../SearchBar';
 import AvatarDropDown from './AvatarDropDown';
 import HeaderLogo from '../../../assets/HeaderLogo';
 import {HeaderCreateButton} from '../../Buttons/CreateButton';
-import {RemoveIcon} from '../../../assets/GeneralActionIcons';
+import {DropDownTriangle, RemoveIcon} from '../../../assets/GeneralActionIcons';
 import withSizes from 'react-sizes';
 import './Header.css';
+import {AuthContext} from '../../../App';
+import Dropdown, {DropdownOption} from '../../Dropdown';
 
 function Header({isMobile}) {
   if (isMobile) return <MobileHeader />;
@@ -37,6 +39,7 @@ function MobileHeader() {
 }
 
 function HeaderComponents({miniSearch, setExpandedSearch, expandedSearch}) {
+  const {user} = useContext(AuthContext);
   const leftSection = () =>
     expandedSearch ? (
       <button onClick={() => setExpandedSearch(false)}>
@@ -66,7 +69,7 @@ function HeaderComponents({miniSearch, setExpandedSearch, expandedSearch}) {
     ) : (
       <div className="header-right-section">
         <div className="header-add-button">
-          <HeaderCreateButton />
+          {user ? <HeaderCreateButton /> : <KeyLinksDropdown />}
         </div>
         <div className="header-drop-down">
           <AvatarDropDown />
@@ -80,5 +83,43 @@ function HeaderComponents({miniSearch, setExpandedSearch, expandedSearch}) {
       {searchSection()}
       {rightSection()}
     </div>
+  );
+}
+
+function KeyLinksDropdown() {
+  const history = useHistory();
+  const keyLinkOptions = [
+    {name: 'Contact', link: '/contact'},
+    {name: 'About us', link: '/aboutUs'},
+    {name: 'Privacy policy', link: '/privacy-policy'},
+    {name: 'Cookies Policy', link: '/cookies-policy'},
+  ];
+  const keyLinkOptionsDisplay = keyLinkOptions.map((option) => (
+    <DropdownOption
+      key={option.name}
+      onSelect={() => history.replace(option.link)}
+    >
+      <span className="key-links-dropdown-option">{option.name}</span>
+    </DropdownOption>
+  ));
+  return (
+    <Dropdown
+      customToggle={(onSelect) => (
+        <KeyLinksDropDownToggle onSelect={onSelect} />
+      )}
+      customDropdownContainerWidth="140px"
+      containerRightPosition="10px"
+      containerTopPosition="12px"
+    >
+      {keyLinkOptionsDisplay}
+    </Dropdown>
+  );
+}
+
+function KeyLinksDropDownToggle({onSelect}) {
+  return (
+    <button onClick={onSelect} className="key-links-options-toggle-button">
+      <DropDownTriangle />
+    </button>
   );
 }

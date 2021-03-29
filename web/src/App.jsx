@@ -1,12 +1,12 @@
 import React, {createContext, useState, useEffect, useContext} from 'react';
-import {BrowserRouter as Router, Link, useLocation} from 'react-router-dom';
+import {BrowserRouter as Router, useLocation} from 'react-router-dom';
 import Routes from './routes.jsx';
 import {auth, db} from './firebase';
 import Header from './components/Layout/Header/Header';
 
 import './App.css';
-import {CopyrightIcon} from './assets/MenuIcons.jsx';
 
+export const MAIN_SCROLL_TARGET = 'mainScrollTarget';
 /**
  * Primary entry point into the app
  * @return {React.ReactElement}
@@ -88,6 +88,9 @@ function BotDetection({children}) {
 const AppLayout = ({children}) => {
   const {user} = useContext(AuthContext);
   const locationPathName = useLocation().pathname;
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [locationPathName, user]);
   if (locationPathName === '/about') return children;
   return (
     <div className="layout">
@@ -95,20 +98,6 @@ const AppLayout = ({children}) => {
         <Header />
       </div>
       <div className="main-layout">{children}</div>
-      {!user && (
-        <div className="contact-us-footer-section">
-          <div className="contact-us-footer">
-            <Link to="/contact">Contact</Link>
-            <Link to="/aboutUs">About us</Link>
-            <Link to="/privacy-policy">Privacy Policy</Link>
-            <Link to="/cookies-policy">Cookies Policy</Link>
-          </div>
-          <div className="footer-copyright-section">
-            <CopyrightIcon />
-            Labspoon Ltd.
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -17,7 +17,10 @@ import {
   TOPIC,
   USER,
 } from '../../helpers/resourceTypeDefinitions';
-import {UnpaddedPageContainer} from '../../components/Layout/Content';
+import {
+  PaddedContent,
+  UnpaddedPageContainer,
+} from '../../components/Layout/Content';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import {searchMicrosoftTopics} from '../../components/Topics/SearchMSFields';
 
@@ -203,21 +206,23 @@ function SearchTabs({searchQuery, history, tab}) {
     OPEN_POSITIONS_TAB_NAME,
   ];
   return (
-    <div className="feed-tabs-container">
-      <div className="feed-tabs-layout">
-        {tabOptions.map((tabName) => (
-          <button
-            onClick={() => updateTab(tabName, searchQuery, history)}
-            key={tabName}
-            className={
-              tabName === tab ? 'feed-tab-active' : 'feed-tab-inactive'
-            }
-          >
-            <h3>{tabName}</h3>
-          </button>
-        ))}
+    <PaddedContent>
+      <div className="search-page-tabs-container">
+        <div className="feed-tabs-layout">
+          {tabOptions.map((tabName) => (
+            <button
+              onClick={() => updateTab(tabName, searchQuery, history)}
+              key={tabName}
+              className={
+                tabName === tab ? 'feed-tab-active' : 'feed-tab-inactive'
+              }
+            >
+              <h3>{tabName}</h3>
+            </button>
+          ))}
+        </div>
       </div>
-    </div>
+    </PaddedContent>
   );
 }
 // When clicking on a different tab

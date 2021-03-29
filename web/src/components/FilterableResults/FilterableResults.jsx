@@ -9,6 +9,7 @@ import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import './FilterableResults.css';
 import LatestPosts from '../Posts/LatestPosts/LatestPosts';
 import {getActiveTabID} from '../../helpers/filters';
+import {PaddedContent} from '../Layout/Content';
 
 export const FilterableResultsContext = createContext({});
 export const FilterManagerContext = createContext({});
@@ -459,9 +460,11 @@ export function Tabs({
   });
 
   return (
-    <div className="feed-tabs-container">
-      <div className="feed-tabs-layout">{tabs}</div>
-    </div>
+    <PaddedContent>
+      <div className="feed-tabs-container">
+        <div className="feed-tabs-layout">{tabs}</div>
+      </div>
+    </PaddedContent>
   );
 }
 

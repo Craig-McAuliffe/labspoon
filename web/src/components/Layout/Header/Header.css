@@ -25,6 +25,22 @@
   align-items: center;
 }
 
+.key-links-options-toggle-button path {
+  fill: #00507c;
+}
+
+.key-links-options-toggle-button svg {
+  height: 10px;
+}
+
+.key-links-options-toggle-button {
+  width: 100px;
+  padding: 0px;
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 4px;
+}
+
 .header-drop-down {
   display: inline-block;
   justify-self: flex-end;
@@ -103,13 +119,13 @@
     padding: 0px;
   }
   .header-right-section {
-    width: 100px;
+    width: 110px;
   }
 }
 
 @media screen and (max-width: 499px) {
   .header-container {
     display: grid;
-    grid-template-columns: 55px 1fr 100px;
+    grid-template-columns: 55px 1fr 110px;
   }
 }

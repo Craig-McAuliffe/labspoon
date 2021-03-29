@@ -36,3 +36,10 @@
   text-decoration: none;
   color: #99999f;
 }
+
+@media screen and (max-width: 800px) {
+  .topic-list-item-container,
+  .topic-list-item-container-no-divider {
+    padding: 20px 2px;
+  }
+}

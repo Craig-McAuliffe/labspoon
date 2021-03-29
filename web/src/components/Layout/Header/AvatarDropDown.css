@@ -8,8 +8,13 @@
   font-size: inherit;
 }
 
-.sign-in {
-  padding-right: 40px;
+.avatar-dropdown-sign-in {
+  padding-right: 10px;
+  flex-shrink: 0;
+}
+
+.avatar-dropdown-sign-in:hover {
+  color: #00507c;
 }
 
 .dropdown {
@@ -93,12 +98,19 @@
     display: none;
     padding: none;
   }
+  .avatar-dropdown-sign-in {
+    padding-right: 5px;
+  }
 }
 
 @media screen and (max-width: 500px) {
   .dropdown-header {
     padding-right: 0px;
     padding-left: 0px;
+  }
+
+  .avatar-dropdown-sign-in {
+    padding-right: 2px;
   }
 
   .dropdown-header img {
