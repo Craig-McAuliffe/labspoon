@@ -297,15 +297,39 @@ function PostQuickCreatePub({
   setCustomPublicationAuthors,
   customPublication,
   setCustomPublication,
-  userID,
   customPublicationErrors,
   pubSubmissionError,
   hasHitMaxDailyPublications,
 }) {
+  const [isDuplicateAuthor, setIsDuplicateAuthor] = useState(false);
+
+  useEffect(async () => {
+    if (!isDuplicateAuthor) return;
+    await new Promise((resolve) =>
+      setTimeout(() => {
+        setIsDuplicateAuthor(false);
+        resolve('resolved');
+      }, 1000)
+    );
+  }, [isDuplicateAuthor]);
   const removeAuthor = (author) => {
     setCustomPublicationAuthors((currentAuthors) =>
       currentAuthors.filter((currentAuthor) => currentAuthor !== author)
     );
+  };
+  const checkForDuplicateAndAddUser = (user) => {
+    if (
+      customPublicationAuthors.some(
+        (previouslySelectedAuthor) => previouslySelectedAuthor.id === user.id
+      )
+    ) {
+      setIsDuplicateAuthor(true);
+      return;
+    }
+    setCustomPublicationAuthors((existingAuthors) => [
+      ...existingAuthors,
+      user,
+    ]);
   };
 
   if (hasHitMaxDailyPublications) return <MaxDailyPublicationLimitReached />;
@@ -343,19 +367,16 @@ function PostQuickCreatePub({
           }
           label="Url of the publication"
         />
+        {isDuplicateAuthor && (
+          <Alert variant="warning">Author already added</Alert>
+        )}
         <FindAndAddUsersToForm
-          onUserSelect={(user) =>
-            setCustomPublicationAuthors((existingAuthors) => [
-              ...existingAuthors,
-              user,
-            ])
-          }
+          onUserSelect={(user) => checkForDuplicateAndAddUser(user)}
           searchBarLabel="Add authors on Labspoon"
         />
         <SelectedAuthors
           authors={customPublicationAuthors}
           removeAuthor={removeAuthor}
-          exceptionID={userID}
         />
       </div>
     </div>

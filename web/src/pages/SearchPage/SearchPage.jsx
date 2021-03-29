@@ -374,7 +374,7 @@ function SeeMoreWrapper({onClick, resourceType, children}) {
   return (
     <>
       {children}
-      <div className="seach-page-see-more-container">
+      <div className="search-page-see-more-container">
         <button onClick={onClick} className="search-page-see-more-button">
           ...see more {resourceType.toLowerCase()}s
         </button>

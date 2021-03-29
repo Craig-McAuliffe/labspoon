@@ -348,13 +348,16 @@
 
 .create-pub-post-quick-create-toggle {
   display: flex;
-  align-items: center;
 }
 
 .create-pub-post-quick-create-toggle:hover h4 {
   text-decoration: underline;
+  align-self: flex-start;
 }
 
+.create-pub-post-quick-create-toggle svg {
+  align-self: center;
+}
 .create-pub-post-quick-create-toggle path {
   fill: #00507c;
 }

@@ -180,25 +180,27 @@ function CreateCustomPublicationForm({setIsAdding, setSuccess}) {
 }
 
 export function SelectedAuthors({authors, removeAuthor, exceptionID}) {
-  const isException = (author) => {
-    author.id === exceptionID;
-  };
+  const isException = (author) => author.id === exceptionID;
   if (!authors || authors.length === 0) return null;
-  const authorList = authors.map((author) => (
-    <UserListItem user={author} key={author.id} noBorder={true}>
-      {isException(author) ? null : (
-        <NegativeButton onClick={() => removeAuthor(author)}>
-          Remove
-        </NegativeButton>
-      )}
-    </UserListItem>
-  ));
   return (
     <>
       <h4 className="create-custom-publication-selected-authors-title">
         Selected Authors
       </h4>
-      {authorList}
+      {authors.map((author) => (
+        <UserListItem
+          overrideDisplayForSelf={true}
+          user={author}
+          key={author.id}
+          noBorder={true}
+        >
+          {!isException(author) && (
+            <NegativeButton onClick={() => removeAuthor(author)}>
+              Remove
+            </NegativeButton>
+          )}
+        </UserListItem>
+      ))}
     </>
   );
 }

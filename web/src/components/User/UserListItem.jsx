@@ -14,6 +14,7 @@ export default function UserListItem({
   LinkOverride = undefined,
   noBorder,
   isFollowsPageResults,
+  overrideDisplayForSelf,
 }) {
   const {userProfile} = useContext(AuthContext);
   const userID = userProfile ? userProfile.id : undefined;
@@ -78,7 +79,9 @@ export default function UserListItem({
           <h3>{user.institution}</h3>
         )}
       </div>
-      {userID === user.id ? null : <div className="Follow">{children}</div>}
+      {userID === user.id && !overrideDisplayForSelf ? null : (
+        <div className="Follow">{children}</div>
+      )}
     </div>
   );
 }

@@ -1,7 +1,21 @@
-.search-page-tabs-container {
-  grid-column: 2/3;
-  grid-row: 3/4;
-  padding: 10px 0px 20px;
+/* ais required until we remove all instances of Instant Search across the platform */
+.ais-SearchBox-input {
+  flex-grow: 1;
+  border-radius: 0%;
+  border: none;
+  padding-left: 5px;
+}
+
+.search-page-search-container .ais-SearchBox-input {
+  display: none;
+}
+
+.ais-SearchBox-submit {
+  display: none;
+}
+
+.search-page-search-container .ais-SearchBox-reset {
+  display: none;
 }
 
 .search-page-error-message {
@@ -16,7 +30,58 @@
   text-decoration: underline;
 }
 
-.seach-page-see-more-container {
+.ais-Hits-list {
+  display: block;
+  flex-wrap: nowrap;
+  margin-top: 20px;
+  margin-left: 0px;
+  list-style-type: none;
+  padding-left: 0px;
+}
+
+.ais-Hits-item {
+  min-width: 100%;
+  width: 100%;
+  padding: 0px;
+  margin-left: 0px;
+  margin-top: 0px;
+  border: none;
+  box-shadow: none;
+}
+
+.ais-SearchBox-form {
+  display: flex;
+  max-width: 100%;
+}
+
+.search-page-search-container .ais-SearchBox-input {
+  display: none;
+}
+
+.ais-SearchBox-submit {
+  display: none;
+}
+
+.ais-SearchBox-reset {
+  display: none;
+}
+
+/* clears the ‘X’ from Internet Explorer */
+input[type='search']::-ms-clear {
+  cursor: pointer;
+}
+input[type='search']::-ms-reveal {
+  cursor: pointer;
+}
+/* clears the ‘X’ from Chrome */
+input[type='search']::-webkit-search-decoration,
+input[type='search']::-webkit-search-cancel-button,
+input[type='search']::-webkit-search-results-button,
+input[type='search']::-webkit-search-results-decoration {
+  cursor: pointer;
+}
+
+.search-page-see-more-container {
   display: flex;
   justify-content: flex-end;
   margin: 10px 0px 60px;
