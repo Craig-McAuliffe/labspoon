@@ -24,13 +24,17 @@
 .edit-button {
   color: #3099d3;
   padding-top: 10px;
-  margin-left: 5px;
+  margin-left: 2px;
   display: flex;
   justify-content: flex-start;
+  padding: 0px;
+  align-items: center;
 }
 
 .edit-button h3 {
   margin-left: -6px;
+  padding: 0px;
+  margin: 0px;
 }
 
 .edit-button:hover {
@@ -40,6 +44,10 @@
 .edit-button-container {
   display: flex;
   align-items: center;
+}
+
+.edit-button-container svg {
+  height: 20px;
 }
 
 .action-button-text {

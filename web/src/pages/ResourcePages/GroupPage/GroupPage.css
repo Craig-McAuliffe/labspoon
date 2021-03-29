@@ -27,11 +27,12 @@
 
 .group-header-info {
   grid-column: 2/3;
-  margin-left: 5px;
+  /* margin-left: 5px; */
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   margin-bottom: 10px;
+  margin-top: 0px;
 }
 
 .group-header-info h4 {
@@ -120,7 +121,7 @@
   color: #5d5d65;
 }
 
-.group-email-follow-container {
+.group-website-follow-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -128,12 +129,8 @@
   margin: 20px 0px;
 }
 
-.group-website-link {
-  margin-bottom: 4px;
-}
-
 .group-website-link svg {
-  height: 25px;
+  height: 20px;
 }
 
 .group-website-link path {
@@ -232,8 +229,47 @@
     display: block;
   }
   .group-avatar-positioning {
-    position: static;
-    display: flex;
-    justify-content: center;
+    top: -50px;
+    left: calc(50% - 45px);
+  }
+
+  .group-website-follow-container {
+    margin-top: 10px;
+  }
+}
+
+@media screen and (max-width: 300px) {
+  .group-icon-and-message img {
+    width: 60px;
+    height: 60px;
+  }
+  .group-header {
+    display: block;
+  }
+  .group-avatar-positioning {
+    top: -40px;
+    left: calc(50% - 30px);
+  }
+
+  .group-website-follow-container {
+    margin-top: 10px;
+  }
+}
+
+@media screen and (max-width: 250px) {
+  .group-icon-and-message img {
+    width: 60px;
+    height: 60px;
+  }
+  .group-header {
+    display: block;
+  }
+  .group-avatar-positioning {
+    top: -40px;
+    left: calc(50% - 30px);
+  }
+
+  .group-website-follow-container {
+    margin-top: 30px;
   }
 }

@@ -297,7 +297,7 @@ function VerificationRequest() {
     content = (
       <p>
         Please email{' '}
-        <a href="mailto:verify@labspoon.com">verify@labspoon.com</a> with your
+        <a href="mailto:verify@labspoon.com">verify@labspoon.com</a> from your
         institutional email address.
       </p>
     );
