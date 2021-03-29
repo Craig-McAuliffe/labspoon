@@ -149,6 +149,16 @@
     width: 90px;
     height: 90px;
   }
+  .user-headline {
+    grid-template-columns: 95px 1fr;
+  }
+  .user-page-avatar-container {
+    justify-self: flex-start;
+  }
+
+  .user-page-avatar-container {
+    left: 2px;
+  }
 }
 
 @media screen and (max-width: 500px) {
@@ -158,6 +168,10 @@
   .user-page-avatar-container img {
     width: 70px;
     height: 70px;
+    margin-right: 0px;
+  }
+  .user-headline {
+    grid-template-columns: 75px 1fr;
   }
 }
 
@@ -168,5 +182,8 @@
   .user-page-avatar-container {
     display: block;
     top: -10px;
+  }
+  .user-page-avatar-container img {
+    margin-right: 3px;
   }
 }
