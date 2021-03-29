@@ -102,7 +102,12 @@
   padding-top: 10px;
 }
 
-@media screen and (max-width: 350px) {
+.search-input-and-attention-symbol-container {
+  display: flex;
+  flex-grow: 1;
+}
+
+@media screen and (max-width: 390px) {
   .create-post-topic-search-container {
     display: block;
   }

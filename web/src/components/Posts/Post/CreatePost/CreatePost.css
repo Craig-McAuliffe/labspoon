@@ -185,6 +185,7 @@
 .create-post-post-resource-suggested-tags-container {
   display: flex;
   justify-content: flex-start;
+  flex-wrap: wrap;
 }
 
 .create-post-post-resource-type-suggestion {

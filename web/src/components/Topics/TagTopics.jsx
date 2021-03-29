@@ -42,24 +42,26 @@ export default function TagTopics({
       {duplicateTopic ? <DuplicateTopicWarning /> : null}
       <div className="create-post-topic-search-container">
         <h4 className="create-post-topic-tag-title">Add related topics</h4>
-        <SearchMSFields
-          placeholder="this post is about..."
-          setFetchedTopics={setDisplayedTopics}
-          setCurrentInputValue={setTypedTopic}
-          setLoading={setLoadingTopics}
-          limit={15}
-        />
-        <Popover
-          getPopUpComponent={() => (
-            <StandardPopoverDisplay
-              content={topicTaggingExplained}
-              right="0px"
-              top="20px"
-            />
-          )}
-        >
-          <TagTopicsAttention actionAndTriggerPopUp={() => {}} />
-        </Popover>
+        <div className="search-input-and-attention-symbol-container">
+          <SearchMSFields
+            placeholder="this post is about..."
+            setFetchedTopics={setDisplayedTopics}
+            setCurrentInputValue={setTypedTopic}
+            setLoading={setLoadingTopics}
+            limit={15}
+          />
+          <Popover
+            getPopUpComponent={() => (
+              <StandardPopoverDisplay
+                content={topicTaggingExplained}
+                right="0px"
+                top="20px"
+              />
+            )}
+          >
+            <TagTopicsAttention actionAndTriggerPopUp={() => {}} />
+          </Popover>
+        </div>
       </div>
       {loadingTopics && (
         <div className="tag-topics-loading-topics-spinner-container">
