@@ -87,7 +87,6 @@ export default function SearchBar({
     </div>
   );
 }
-
 function SearchForm({
   placeholderText,
   formClassName,
@@ -100,6 +99,7 @@ function SearchForm({
   function onSubmit(event) {
     event.preventDefault();
     if (!query) return;
+    document.getElementById('searchFormInput').blur();
     history.push(searchStateToURL({pathname: '/search'}, {query: query}));
   }
   return (
@@ -111,6 +111,7 @@ function SearchForm({
         onChange={(event) => setQuery(event.target.value)}
         onFocus={onFocus}
         type="text"
+        id="searchFormInput"
       />
       <button
         type="submit"

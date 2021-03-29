@@ -10,9 +10,10 @@ import Popover from '../Popovers/Popover';
 export default function FollowTopicButton({targetTopic}) {
   const [following, setFollowing] = useState(null);
   const [topicID, setTopicID] = useState();
-  const {user: authUser, userProfile} = useContext(AuthContext);
+  const {user: authUser, userProfile, authLoaded} = useContext(AuthContext);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
+    if (!authLoaded) return;
     if (!authUser) {
       setFollowing(false);
       return;
@@ -47,7 +48,7 @@ export default function FollowTopicButton({targetTopic}) {
   }, [authUser, targetTopic, topicID]);
 
   function setFollowingAndUpdateDB() {
-    if (!authUser) return;
+    if (!authUser || !userProfile) return;
     if (!topicID) {
       db.doc(`MSFields/${targetTopic.microsoftID}`)
         .get()
