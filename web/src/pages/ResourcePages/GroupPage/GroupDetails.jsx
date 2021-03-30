@@ -20,6 +20,11 @@ import TertiaryButton from '../../../components/Buttons/TertiaryButton';
 import UserCoverPhoto from '../../../components/User/UserCoverPhoto';
 import {GenericListItem} from '../../../components/Results/Results';
 import {claimGroupFromTwitter} from '../../LoginSignup/SignupPage/SignupPage';
+import Popover, {
+  StandardPopoverDisplay,
+} from '../../../components/Popovers/Popover';
+import PrimaryButton from '../../../components/Buttons/PrimaryButton';
+import NegativeButton from '../../../components/Buttons/NegativeButton';
 
 const mapGroupDetailsSizesToProps = ({width}) => ({
   // When the whole site has similar content, we will only switch to this view at 800
@@ -145,7 +150,7 @@ const GroupDetails = ({
       </div>
       <DonationLink verified={verified} donationLink={group.donationLink} />
       {group.isGeneratedFromTwitter && (
-        <ClaimGroup groupID={groupID} group={group} />
+        <ClaimGroup isMobile={isMobile} groupID={groupID} group={group} />
       )}
       {pinnedItem ? <PinnedItem pinnedItem={pinnedItem} /> : null}
     </>
@@ -193,9 +198,21 @@ function DonationLink({verified, donationLink}) {
   );
 }
 
-function ClaimGroup({groupID, group}) {
-  const history = useHistory();
-  const {userProfile} = useContext(AuthContext);
+function ClaimGroup({groupID, group, isMobile}) {
+  const getPopUpComponent = (setOpen) => (
+    <StandardPopoverDisplay
+      right={isMobile ? '-50px' : '0px'}
+      top="-5px"
+      width="200px"
+      content={
+        <ConfirmCancelPopOverContent
+          group={group}
+          groupID={groupID}
+          setOpen={setOpen}
+        />
+      }
+    />
+  );
   return (
     <>
       <div className="generated-group-container">
@@ -210,31 +227,70 @@ function ClaimGroup({groupID, group}) {
           </p>
         </div>
         <div className="claim-group-button-container">
-          <button
-            type="button"
-            className="donate-button"
-            onClick={async () => {
-              if (userProfile) {
-                await claimGroupFromTwitter(
-                  groupID,
-                  userProfile.name,
-                  userProfile.id,
-                  group,
-                  userToUserRef(userProfile, userProfile.id)
-                );
-                return window.location.reload();
-              }
-              history.push('/signup', {claimGroupID: groupID});
-            }}
-          >
-            <h3>Claim Group</h3>
-          </button>
+          <Popover getPopUpComponent={getPopUpComponent}>
+            <ClaimGeneratedGroupButtonIntermediate
+              actionAndTriggerPopUp={() => {}}
+              groupID={groupID}
+              group={group}
+            />
+          </Popover>
         </div>
       </div>
     </>
   );
 }
 
+function ConfirmCancelPopOverContent({group, groupID, setOpen}) {
+  const {userProfile} = useContext(AuthContext);
+  const [submitting, setSubmitting] = useState(false);
+  if (submitting) return <LoadingSpinner />;
+  const executeClaimGroup = async () => {
+    setSubmitting(true);
+    await claimGroupFromTwitter(
+      groupID,
+      userProfile.name,
+      userProfile.id,
+      group,
+      userToUserRef(userProfile, userProfile.id)
+    );
+    setOpen(false);
+    setSubmitting(false);
+    return window.location.reload();
+  };
+  return (
+    <div>
+      <p>You are confirming that this is your research group.</p>
+      <div className="group-details-claim-group-confirm-button-container">
+        <PrimaryButton onClick={executeClaimGroup}>Confirm</PrimaryButton>
+      </div>
+      <div className="group-details-claim-group-confirm-button-container">
+        <NegativeButton onClick={() => setOpen(false)}>Cancel</NegativeButton>
+      </div>
+    </div>
+  );
+}
+
+function ClaimGeneratedGroupButtonIntermediate({
+  actionAndTriggerPopUp,
+  groupID,
+}) {
+  const history = useHistory();
+  const {userProfile} = useContext(AuthContext);
+  return (
+    <button
+      type="button"
+      className="donate-button"
+      onClick={async () => {
+        if (userProfile) {
+          return actionAndTriggerPopUp();
+        }
+        history.push('/signup', {claimGroupID: groupID});
+      }}
+    >
+      <h3>Claim Group</h3>
+    </button>
+  );
+}
 function DonateButton() {
   return (
     <button type="button" className="donate-button">

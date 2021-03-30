@@ -137,6 +137,11 @@
   fill: #00507c;
 }
 
+.group-details-claim-group-confirm-button-container {
+  padding: 5px 0px;
+  text-align: center;
+}
+
 .group-website-link span {
   position: relative;
   display: inline-block;

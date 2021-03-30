@@ -50,9 +50,9 @@ export default function EditingGroupInfo({groupData, children}) {
   const validationSchema = Yup.object({
     name: Yup.string()
       .required('Name is required')
-      .max(40, 'Must have fewer than 40 characters'),
-    location: Yup.string().max(40, 'Must have fewer than 40 characters'),
-    institution: Yup.string().max(40, 'Must have fewer than 40 characters'),
+      .max(50, 'Must have fewer than 50 characters'),
+    location: Yup.string().max(50, 'Must have fewer than 50 characters'),
+    institution: Yup.string().max(50, 'Must have fewer than 50 characters'),
     website: Yup.string()
       .url('Must be a valid url')
       .max(200, 'Must have fewer than 200 characters'),

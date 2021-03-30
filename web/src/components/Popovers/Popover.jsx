@@ -122,13 +122,14 @@ export function StandardPopoverDisplay({
   bottom,
   content,
   noFixedWidth,
+  width,
 }) {
   return (
     <div
       className={`standard-popover-display${
         noFixedWidth ? '-no-fixed-width' : ''
       }`}
-      style={{right: right, left: left, top: top, bottom: bottom}}
+      style={{right: right, left: left, top: top, bottom: bottom, width: width}}
     >
       {content}
     </div>
