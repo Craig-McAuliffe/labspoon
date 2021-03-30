@@ -47,7 +47,9 @@ export default function PrivacyPolicyPage() {
         <p>
           We also collect the content you create, upload, or receive from others
           when using our services. This includes things like posts you write and
-          group you create.
+          group you create. You own this content. We reserve the right to use
+          this content for marketing purposes solely for promoting the usage of
+          Labspoon and nothing else.
         </p>
         <h3>Types of information we collect while you use our services</h3>
         <h4>Activity</h4>
@@ -149,8 +151,8 @@ export default function PrivacyPolicyPage() {
           account on the <Link to="/settings">settings page.</Link>
         </p>
         <p>
-          To can request to remove content on Labspoon, according to applicable
-          law, by contacting us. Go to the contact page to do so on the
+          You can request to remove content on Labspoon by contacting us. Go to
+          the contact page to do so on the
           <Link to="/contact"> contact page.</Link>
         </p>
         {/* <p>
