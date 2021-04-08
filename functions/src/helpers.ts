@@ -1,6 +1,5 @@
 import {Post} from './posts';
-import {ResourceTypes, ResourceTypesCollections} from './config';
-import {admin} from './config';
+import {admin, ResourceTypes, ResourceTypesCollections} from './config';
 import {TaggedTopic} from './topics';
 
 const db = admin.firestore();
