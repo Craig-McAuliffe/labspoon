@@ -1,0 +1,51 @@
+.edit-group-overview-page-toggles-section {
+  display: grid;
+  grid-template-columns: 1fr 150px;
+  row-gap: 20px;
+  align-items: center;
+  /* justify-items: flex-start; */
+  margin-bottom: 30px;
+}
+
+.edit-group-overview-page-toggles-section button {
+  justify-self: flex-end;
+}
+
+.edit-group-overview-page-no-group-news-text {
+  color: #5d5d65;
+}
+
+.edit-group-overview-page-no-group-posts-alert-container {
+  margin-top: 5px;
+}
+
+.edit-group-overview-page-toggle-description {
+  line-break: auto;
+  margin: 0px;
+  color: #5d5d65;
+  flex-shrink: 0;
+  padding-bottom: 20px;
+}
+.edit-group-overview-page-title {
+  padding-top: 20px;
+  color: #5d5d65;
+}
+
+.edit-group-overview-page-sub-sub-title {
+  color: #5d5d65;
+}
+
+.edit-group-overview-page-sub-title {
+  /* color: #5d5d65; */
+  padding-top: 20px;
+}
+
+.edit-group-overview-page-photos-section {
+  padding-bottom: 50px;
+  color: #5d5d65;
+}
+
+.edit-group-overview-page-see-more-photos-container {
+  display: flex;
+  justify-content: flex-end;
+}

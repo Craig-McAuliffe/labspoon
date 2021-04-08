@@ -24,7 +24,7 @@ export function getPaginatedResourcesFromCollectionRef(
       qs.forEach((doc) => {
         const fetchedResource = doc.data();
         if (fetchedResource.rank) delete fetchedResource.rank;
-        fetchedResource.resourceType = resourceType;
+        if (resourceType) fetchedResource.resourceType = resourceType;
         fetchedResource.id = doc.id;
         fetchedResources.push(fetchedResource);
       });

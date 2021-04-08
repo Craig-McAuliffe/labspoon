@@ -9,6 +9,6 @@ Background Blue: #EAF5FB
 Overlay Off Primary: #185E9C;
 
 Destructive color: #DA0000
-Warning color: #FF8A00
+Warning color: #DF6B00
 
 Background Grey: #f0f0f4

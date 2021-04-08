@@ -6,14 +6,18 @@ export default function NegativeButton({
   onClick,
   children,
   smallVersion,
+  disabled,
   ...props
 }) {
+  let className = 'negative-button';
+  if (smallVersion) className = className + '-smallVersion';
+
+  if (disabled) className = className + '-disabled';
   return (
     <button
       type="button"
-      className={
-        smallVersion ? 'negative-button-smallVersion' : 'negative-button'
-      }
+      disabled={disabled}
+      className={className}
       onClick={onClick ? onClick : null}
     >
       {smallVersion ? (

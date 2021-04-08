@@ -22,7 +22,7 @@ export default function SecondaryButton({
   let buttonClass = 'secondary-button';
   if (inactive) buttonClass = buttonClass + '-disabled';
   if (light) buttonClass = buttonClass + '-light';
-  buttonClass = `${buttonClass} ${className}`;
+  if (className) buttonClass = `${buttonClass} ${className}`;
 
   return (
     <button

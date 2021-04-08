@@ -4,7 +4,9 @@
 .primary-button-spinner,
 .negative-button,
 .negative-button-smallVersion,
-.primary-button-smallVersion-inactive {
+.primary-button-smallVersion-inactive,
+.negative-button-disabled,
+.negative-button-smallVersion-disabled {
   border: none;
   border-radius: 4%;
   text-decoration: none;
@@ -37,6 +39,12 @@
 .negative-button-smallVersion {
   background: #dcdce0;
   color: #000000;
+}
+
+.negative-button-disabled,
+.negative-button-smallVersion-disabled {
+  background: #dcdce0;
+  color: #5d5d65;
 }
 
 .primary-button-spinner {

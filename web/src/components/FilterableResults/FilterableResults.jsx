@@ -422,11 +422,7 @@ export function Tabs({
   const tabs = tabFilter.options.map((option) => {
     return useRoutedTabs && option.data.id !== selectedTabID ? (
       <Link
-        to={
-          routedTabBasePathname
-            ? `${routedTabBasePathname}/${option.data.id}`
-            : `${option.data.id}`
-        }
+        to={`/${routedTabBasePathname}/${option.data.id}`}
         key={option.data.id}
         className={
           option.data.id === selectedTabID

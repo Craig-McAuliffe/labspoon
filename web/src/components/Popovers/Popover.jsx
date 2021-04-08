@@ -1,6 +1,9 @@
 import React, {useRef, useState, useEffect, cloneElement} from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import {BOOKMARK, RECOMMENDATION} from '../../helpers/resourceTypeDefinitions';
+import NegativeButton from '../Buttons/NegativeButton';
+import PrimaryButton from '../Buttons/PrimaryButton';
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 
 import './Popover.css';
 
@@ -130,6 +133,35 @@ export function StandardPopoverDisplay({
         noFixedWidth ? '-no-fixed-width' : ''
       }`}
       style={{right: right, left: left, top: top, bottom: bottom, width: width}}
+    >
+      {content}
+    </div>
+  );
+}
+
+export function SaveOrCancelPopover({
+  onSave,
+  onCancel,
+  top,
+  right,
+  submitting,
+}) {
+  const content = submitting ? (
+    <LoadingSpinner />
+  ) : (
+    <>
+      <PrimaryButton disabled={submitting} onClick={onSave}>
+        Save
+      </PrimaryButton>
+      <NegativeButton disabled={submitting} onClick={onCancel}>
+        Cancel
+      </NegativeButton>
+    </>
+  );
+  return (
+    <div
+      style={{top: top, right: right}}
+      className="save-or-cancel-popover-container"
     >
       {content}
     </div>

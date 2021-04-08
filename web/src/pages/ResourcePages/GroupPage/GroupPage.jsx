@@ -374,7 +374,7 @@ export default function GroupPage() {
         tabs={fetchTabs()}
         tabsLoading={tabsLoading}
         // the route matched path is different if the url is extended changes
-        routedTabBasePathname={routedTabID ? undefined : `${groupID}`}
+        routedTabBasePathname={`group/${groupID}`}
         useRoutedTabs={true}
       >
         <PaddedContent>

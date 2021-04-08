@@ -1,9 +1,17 @@
 import React, {useRef, useEffect} from 'react';
+import SecondaryButton from '../Buttons/SecondaryButton';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 
 import './ImageListItem.css';
 
-export default function ImageListItem({src, alt, spinner}) {
+export default function ImageListItem({
+  src,
+  alt,
+  spinner,
+  selectAction,
+  selectText,
+  id,
+}) {
   const imageContainerRef = useRef();
   useEffect(() => {
     imageContainerRef.current.style.backgroundImage = `url(${src})`;
@@ -19,11 +27,25 @@ export default function ImageListItem({src, alt, spinner}) {
           <LoadingSpinner />
         </div>
       ) : null}
+      {selectAction && (
+        <div className="image-spinner-container">
+          <SecondaryButton onClick={() => selectAction({src: src, id: id})}>
+            {selectText ? selectText : 'Select'}
+          </SecondaryButton>
+        </div>
+      )}
     </div>
   );
 }
 
-export function ImagesSection({children, images, spinner, customMargin}) {
+export function ImagesSection({
+  children,
+  images,
+  spinner,
+  customMargin,
+  selectAction,
+  selectText,
+}) {
   if (!children && !images) return null;
   if (images) {
     if (images.length === 0) return null;
@@ -45,6 +67,9 @@ export function ImagesSection({children, images, spinner, customMargin}) {
               alt={'unknown'}
               spinner={spinner}
               key={image.src + i}
+              selectAction={selectAction}
+              selectText={selectText}
+              id={image.id}
             />
           ))
         : children}

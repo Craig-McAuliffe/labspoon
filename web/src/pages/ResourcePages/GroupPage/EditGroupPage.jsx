@@ -16,6 +16,7 @@ import LightTabLink, {
 } from '../../../components/Navigation/LightTab';
 import ReturnToPublicViewButton from '../../../components/Buttons/ReturnToPublicViewButton';
 import EditGroupMembers from './EditGroupMembers';
+import EditGroupOverviewPage from './EditGroupOverviewPage';
 
 import './EditGroupPage.css';
 
@@ -28,6 +29,7 @@ const VIDEOS_TAB = 'videos';
 const TECHNIQUES_TAB = 'techniques';
 const RESEARCHFOCUSES_TAB = 'researchFocuses';
 const OPENPOSITIONS_TAB = 'openPositions';
+const OVERVIEW_PAGE_TAB = 'overviewPage';
 
 const tabIDToDisplayName = {
   [INFO_TAB]: 'Info',
@@ -39,6 +41,7 @@ const tabIDToDisplayName = {
   [TECHNIQUES_TAB]: 'Techniques',
   [RESEARCHFOCUSES_TAB]: 'Research Focuses',
   [OPENPOSITIONS_TAB]: 'Open Positions',
+  [OVERVIEW_PAGE_TAB]: 'Overview Page',
 };
 
 export default function EditGroupPage() {
@@ -49,6 +52,7 @@ export default function EditGroupPage() {
   const [notFound, setNotFound] = useState(false);
   const tabs = [
     INFO_TAB,
+    OVERVIEW_PAGE_TAB,
     MEMBERS_TAB,
     POSTS_TAB,
     PUBLICATIONS_TAB,
@@ -130,6 +134,12 @@ export default function EditGroupPage() {
           <EditGroupTabs tabs={tabs} activeTab={OPENPOSITIONS_TAB} />
           <ReturnToPublicViewButton url={groupURL} />
         </EditGroupOpenPositions>
+      </Route>
+      <Route path={`${path}/${OVERVIEW_PAGE_TAB}`}>
+        <EditGroupOverviewPage groupData={group} groupID={groupID}>
+          <EditGroupTabs tabs={tabs} activeTab={OVERVIEW_PAGE_TAB} />
+          <ReturnToPublicViewButton url={groupURL} />
+        </EditGroupOverviewPage>
       </Route>
       <Route path={`${path}`}>
         <NotFoundPage />
