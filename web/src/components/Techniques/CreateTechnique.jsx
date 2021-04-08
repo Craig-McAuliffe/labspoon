@@ -93,7 +93,7 @@ export default function CreateTechnique() {
       </>
     );
 
-  function onSubmit(res) {
+  async function onSubmit(res) {
     setSubmitting(true);
     const techniqueDBRef = db.collection(`techniques`).doc();
     const techniqueID = techniqueDBRef.id;
@@ -119,35 +119,34 @@ export default function CreateTechnique() {
         failFunction
       );
     }
-    uploadImagesAndGetURLs(
+    const publicImageURLs = await uploadImagesAndGetURLs(
       Array.from(res.photos),
-      `groups/${selectedGroup.id}/techniques/${techniqueID}`
-    ).then((fullSizePhotoURLs) => {
-      if (!fullSizePhotoURLs) {
-        alert('Something went wrong, please try again');
-        failFunction();
-        setSubmitting(false);
-        return;
-      }
-      const resizedPhotoURLs = fullSizePhotoURLs.map((fullSizeURL) =>
-        fullSizeURL.replace('_fullSize', '')
-      );
-      return addArticleToDB(
-        res.title,
-        res.body,
-        resizedPhotoURLs,
-        selectedTopics,
-        selectedGroup,
-        userProfile,
-        techniqueDBRef,
-        techniqueOnGroupRef,
-        setSubmitting,
-        history,
-        TECHNIQUES,
-        'techniquesCount',
-        failFunction
-      );
-    });
+      `groups/${selectedGroup.id}/techniques/${techniqueID}`,
+      selectedGroup.id
+    );
+
+    if (!publicImageURLs) {
+      alert('Something went wrong, please try again');
+      failFunction();
+      setSubmitting(false);
+      return;
+    }
+    const filteredPhotoURLs = publicImageURLs.filter((photoURL) => photoURL);
+    return addArticleToDB(
+      res.title,
+      res.body,
+      filteredPhotoURLs,
+      selectedTopics,
+      selectedGroup,
+      userProfile,
+      techniqueDBRef,
+      techniqueOnGroupRef,
+      setSubmitting,
+      history,
+      TECHNIQUES,
+      'techniquesCount',
+      failFunction
+    );
   }
   return (
     <Formik
@@ -176,13 +175,13 @@ export default function CreateTechnique() {
           name="body"
           maxCount={MAX_ARTICLE_CHARACTERS}
         />
+        <FormImageUpload name="photos" multiple={true} maxImages={9} />
         <TagTopics
           submittingForm={submitting}
           selectedTopics={selectedTopics}
           setSelectedTopics={setSelectedTopics}
           noCustomTopics={true}
         />
-        <FormImageUpload name="photos" multiple={true} maxImages={9} />
         <CreateResourceFormActions
           submitting={submitting}
           submitText="Create"

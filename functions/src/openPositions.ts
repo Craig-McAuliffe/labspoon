@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions';
 import {admin} from './config';
 import {GroupRef, groupRefToGroupSignature, GroupSignature} from './groups';
+import {checkUserIsMemberOfGroup} from './helpers';
 import {ArticleBodyChild} from './researchFocuses';
 
 import {TaggedTopic} from './topics';
@@ -80,33 +81,6 @@ export const createOpenPosition = functions.https.onCall(
     });
   }
 );
-
-async function checkUserIsMemberOfGroup(authorID: string, groupID: string) {
-  return db
-    .doc(`users/${authorID}/groups/${groupID}`)
-    .get()
-    .then((ds) => {
-      if (!ds.exists) {
-        return false;
-      }
-      return true;
-    })
-    .catch((err) => {
-      console.error(
-        'unable to verify if user with id' +
-          authorID +
-          'is a member of group with id' +
-          groupID,
-        err
-      );
-      throw new Error(
-        'unable to verify if user with id' +
-          authorID +
-          'is a member of group with id' +
-          groupID
-      );
-    });
-}
 
 export const addOpenPosToTopics = functions.firestore
   .document(`openPositions/{openPositionID}`)

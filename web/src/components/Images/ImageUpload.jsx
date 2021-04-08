@@ -21,6 +21,10 @@ const TOOBIG = 'tooBig';
 const GIF = 'gif';
 const TOOMANY = 'maxImages';
 
+const resizeImageOnRequest = firebase
+  .functions()
+  .httpsCallable('images-resizeImageOnCall');
+
 // Check images resize function before defining filepath for this component
 export default function ImageUpload({
   storageDir,
@@ -31,8 +35,9 @@ export default function ImageUpload({
   noGif,
   isAvatar,
   existingAvatar,
-  shouldResize,
+  resizeOptions,
   maxImages,
+  groupID,
 }) {
   const [files, setFiles] = useState([]);
   const [imageURLs, setImageURLs] = useState([]);
@@ -76,11 +81,11 @@ export default function ImageUpload({
   async function uploadImages() {
     setUploading(UPLOADING);
     let uploadingCount = files.length;
-    let unsuccessfulUploadCount = 0;
+    const unsuccessfulUploadCount = [];
     const uploadPromisesArray = [];
     files.forEach(async (file) => {
       uploadingCount = uploadingCount - 1;
-      const photoID = uuid() + (shouldResize ? '_fullSize' : '');
+      const photoID = uuid() + (resizeOptions ? '_fullSize' : '');
       const filePath = storageDir + '/' + photoID;
       const photoStorageRef = storage.ref(filePath);
       uploadPromisesArray.push(
@@ -90,7 +95,7 @@ export default function ImageUpload({
             () => {},
             (err) => {
               console.error(err);
-              unsuccessfulUploadCount = unsuccessfulUploadCount + 1;
+              unsuccessfulUploadCount.push(filePath);
               reject(err);
             },
             async () => {
@@ -98,10 +103,13 @@ export default function ImageUpload({
                 photoStorageRef,
                 photoID,
                 unsuccessfulUploadCount,
-                updateDB
+                updateDB,
+                resizeOptions,
+                filePath,
+                groupID
               );
               if (uploadingCount === 0) {
-                if (unsuccessfulUploadCount === 0)
+                if (unsuccessfulUploadCount.length === 0)
                   setDisplaySuccessMessage(true);
                 else setDisplayErrorMessage(true);
               }
@@ -146,8 +154,33 @@ async function onSuccessfulStorageUpload(
   photoStorageRef,
   photoID,
   unsuccessfulUploadCount,
-  updateDB
+  updateDB,
+  resizeOptions,
+  filePath,
+  groupID
 ) {
+  if (resizeOptions) {
+    const dataOrSuccess = await resizeImageOnRequest({
+      filePath: filePath,
+      resizeOptions: resizeOptions,
+      groupID: groupID,
+    })
+      .then((publicPhotoURL) => publicPhotoURL)
+      .catch((err) => {
+        console.error('unable to resize image at filepath ' + filePath + err);
+        unsuccessfulUploadCount.push(filePath);
+        return deleteUploadedFileOnError(photoStorageRef);
+      });
+    if (!dataOrSuccess) return;
+    if (!updateDB) return;
+    const resizePublicURL = dataOrSuccess.data;
+    const reducedSizePhotoID = photoID.replace('_fullSize', '');
+    return updateDB(resizePublicURL, reducedSizePhotoID).catch((err) => {
+      console.error(err);
+      unsuccessfulUploadCount.push(filePath);
+      return deleteUploadedFileOnError(photoStorageRef);
+    });
+  }
   photoStorageRef
     .getDownloadURL()
     .catch(async (err) => {
@@ -157,20 +190,20 @@ async function onSuccessfulStorageUpload(
           ', therefore cannot update db',
         err
       );
-      unsuccessfulUploadCount = unsuccessfulUploadCount + 1;
-      return deleteUploadedFileOnError();
+      unsuccessfulUploadCount.push(filePath);
+      return deleteUploadedFileOnError(photoStorageRef);
     })
     .then((downloadURL) => {
       if (!updateDB) return;
       return updateDB(downloadURL, photoID).catch((err) => {
         console.error(err);
-        unsuccessfulUploadCount = unsuccessfulUploadCount + 1;
+        unsuccessfulUploadCount.push(filePath);
       });
     });
 }
 
-const deleteUploadedFileOnError = () =>
-  photoStorageRef
+export function deleteUploadedFileOnError(photoStorageRef) {
+  return photoStorageRef
     .delete()
     .catch((err) =>
       console.error(
@@ -178,6 +211,7 @@ const deleteUploadedFileOnError = () =>
         err
       )
     );
+}
 
 function NoImagesSelected({
   onChange,
@@ -397,11 +431,7 @@ export function ImagePreviews({urls, uploading, isCover, isAvatar}) {
 }
 
 function UploadSuccessMessage() {
-  return (
-    <SuccessMessage>
-      Success! It can take few seconds for the changes to appear.
-    </SuccessMessage>
-  );
+  return <SuccessMessage>Successfully uploaded!</SuccessMessage>;
 }
 
 function UploadErrorMessage() {

@@ -96,7 +96,7 @@ export default function CreateResearchFocus() {
       </>
     );
 
-  function onSubmit(res) {
+  async function onSubmit(res) {
     setSubmitting(true);
     const researchFocusDBRef = db.collection(`researchFocuses`).doc();
     const researchFocusID = researchFocusDBRef.id;
@@ -125,35 +125,34 @@ export default function CreateResearchFocus() {
         failFunction
       );
     }
-    uploadImagesAndGetURLs(
+    const publicImageURLs = await uploadImagesAndGetURLs(
       Array.from(res.photos),
-      `groups/${selectedGroup.id}/researchFocuses/${researchFocusID}`
-    ).then((fullSizePhotoURLs) => {
-      if (!fullSizePhotoURLs) {
-        alert('Something went wrong, please try again');
-        failFunction();
-        setSubmitting(false);
-        return;
-      }
-      const resizedPhotoURLs = fullSizePhotoURLs.map((fullSizeURL) =>
-        fullSizeURL.replace('_fullSize', '')
-      );
-      return addArticleToDB(
-        res.title,
-        res.body,
-        resizedPhotoURLs,
-        selectedTopics,
-        selectedGroup,
-        userProfile,
-        researchFocusDBRef,
-        researchFocusOnGroupRef,
-        setSubmitting,
-        history,
-        RESEARCHFOCUSES,
-        'researchFocusesCount',
-        failFunction
-      );
-    });
+      `groups/${selectedGroup.id}/researchFocuses/${researchFocusID}`,
+      selectedGroup.id
+    );
+
+    if (!publicImageURLs) {
+      alert('Something went wrong, please try again');
+      failFunction();
+      setSubmitting(false);
+      return;
+    }
+    const filteredPhotoURLs = publicImageURLs.filter((photoURL) => photoURL);
+    return addArticleToDB(
+      res.title,
+      res.body,
+      filteredPhotoURLs,
+      selectedTopics,
+      selectedGroup,
+      userProfile,
+      researchFocusDBRef,
+      researchFocusOnGroupRef,
+      setSubmitting,
+      history,
+      RESEARCHFOCUSES,
+      'researchFocusesCount',
+      failFunction
+    );
   }
   return (
     <Formik
@@ -183,13 +182,13 @@ export default function CreateResearchFocus() {
           name="body"
           maxCount={MAX_ARTICLE_CHARACTERS}
         />
+        <FormImageUpload name="photos" multiple={true} maxImages={9} />
         <TagTopics
           submittingForm={submitting}
           selectedTopics={selectedTopics}
           setSelectedTopics={setSelectedTopics}
           noCustomTopics={true}
         />
-        <FormImageUpload name="photos" multiple={true} maxImages={9} />
         <CreateResourceFormActions
           submitting={submitting}
           submitText="Create"

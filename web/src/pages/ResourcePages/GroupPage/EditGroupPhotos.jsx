@@ -108,21 +108,37 @@ export default function EditGroupPhotos({children}) {
 }
 
 function GroupAvatarUpload({groupID, groupAvatar, refresh}) {
+  const addAvatarToGroupDoc = async (url, photoID) => {
+    return addToGroupDoc(url, 'avatar', groupID, photoID, 'avatarCloudID');
+  };
+
   return (
     <div>
       <h3 className="edit-group-photos-sub-title">Group Profile Picture</h3>
       <ImageUpload
         storageDir={`groups/${groupID}/avatar`}
         existingAvatar={groupAvatar}
+        updateDB={addAvatarToGroupDoc}
         isAvatar={true}
-        shouldResize={true}
+        groupID={groupID}
         refresh={refresh}
+        resizeOptions={[
+          '-thumbnail',
+          '200x200^',
+          '-gravity',
+          'center',
+          '-extent',
+          '200x200',
+        ]}
       />
     </div>
   );
 }
 
 function EditGroupCoverPicture({groupID}) {
+  const addCoverPhotoToGroupDoc = async (url, photoID) =>
+    addToGroupDoc(url, 'coverPhoto', groupID, photoID, 'coverPhotoCloudID');
+
   return (
     <div className="edit-user-photos-section">
       <h3 className="edit-group-photos-sub-title">Group Cover Photo</h3>
@@ -130,7 +146,16 @@ function EditGroupCoverPicture({groupID}) {
         storageDir={`groups/${groupID}/coverPhoto`}
         isCover={true}
         noGif={true}
-        shouldResize={true}
+        groupID={groupID}
+        updateDB={addCoverPhotoToGroupDoc}
+        resizeOptions={[
+          '-thumbnail',
+          '1605x300^',
+          '-gravity',
+          'center',
+          '-extent',
+          '1605x300',
+        ]}
       />
     </div>
   );
@@ -149,6 +174,13 @@ function GroupImageUpload({groupID, refresh, tooManyPhotos}) {
         </p>
       </div>
     );
+
+  const updateDB = (url, id) => {
+    return db.doc(`groups/${groupID}/photos/${id}`).set({
+      src: url,
+      timestamp: new Date(),
+    });
+  };
   return (
     <div className="edit-group-photos-more-pictures-section">
       <h3 className="edit-group-photos-sub-title">More Pictures</h3>
@@ -157,8 +189,23 @@ function GroupImageUpload({groupID, refresh, tooManyPhotos}) {
         refresh={refresh}
         multipleImages={true}
         maxImages={12}
-        shouldResize={true}
+        resizeOptions={[
+          '-thumbnail',
+          '400x400^',
+          '-gravity',
+          'center',
+          '-extent',
+          '400x400',
+        ]}
+        groupID={groupID}
+        updateDB={updateDB}
       />
     </div>
   );
+}
+
+async function addToGroupDoc(url, urlField, groupID, photoID, photoIDField) {
+  return db
+    .doc(`groups/${groupID}`)
+    .update({[urlField]: url, [photoIDField]: photoID});
 }

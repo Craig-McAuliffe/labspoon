@@ -1,6 +1,9 @@
 import {Post} from './posts';
 import {ResourceTypes, ResourceTypesCollections} from './config';
+import {admin} from './config';
 import {TaggedTopic} from './topics';
+
+const db = admin.firestore();
 
 export function flatten(arr: Array<any>, result: Array<any> = []) {
   for (let i = 0, length = arr.length; i < length; i++) {
@@ -71,6 +74,36 @@ export function doFollowPreferencesBlockPost(
     return false;
   }
   return false;
+}
+
+export async function checkUserIsMemberOfGroup(
+  authorID: string,
+  groupID: string
+) {
+  return db
+    .doc(`users/${authorID}/groups/${groupID}`)
+    .get()
+    .then((ds) => {
+      if (!ds.exists) {
+        return false;
+      }
+      return true;
+    })
+    .catch((err) => {
+      console.error(
+        'unable to verify if user with id' +
+          authorID +
+          'is a member of group with id' +
+          groupID,
+        err
+      );
+      throw new Error(
+        'unable to verify if user with id' +
+          authorID +
+          'is a member of group with id' +
+          groupID
+      );
+    });
 }
 
 export interface FollowPostTypePreferences {

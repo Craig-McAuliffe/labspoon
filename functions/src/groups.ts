@@ -55,6 +55,33 @@ export const removeOldGroupAvatar = functions.firestore
     return null;
   });
 
+export const removeOldGroupCover = functions.firestore
+  .document(`groups/{groupID}`)
+  .onUpdate(async (change, context) => {
+    const oldGroupData = change.before.data() as Group;
+    const newGroupData = change.after.data() as Group;
+    const groupID = context.params.groupID;
+    const oldCoverPhotoCloudID = oldGroupData.coverPhotoCloudID;
+    const newCoverPhotoCloudID = newGroupData.coverPhotoCloudID;
+    if (oldCoverPhotoCloudID && oldCoverPhotoCloudID !== newCoverPhotoCloudID) {
+      const oldCoverPhotoPath = `groups/${groupID}/coverPhoto/${oldCoverPhotoCloudID}`;
+      return storage
+        .bucket()
+        .file(`${oldCoverPhotoPath}_fullSize`)
+        .delete()
+        .catch((err) =>
+          console.error(
+            'unable to delete old fullSize group coverPhoto with id ' +
+              oldCoverPhotoCloudID +
+              ' for group with id ' +
+              groupID,
+            err
+          )
+        );
+    }
+    return null;
+  });
+
 export const createGroupDocuments = functions.firestore
   .document(`groups/{groupID}`)
   .onCreate(async (change, context) => {
@@ -1213,6 +1240,8 @@ export interface Group {
   groupType: string;
   avatar?: string;
   avatarCloudID?: string;
+  coverPhotoCloudID?: string;
+  coverPhoto?: string;
   about: ArticleBodyChild[];
   location?: string;
   website?: string;

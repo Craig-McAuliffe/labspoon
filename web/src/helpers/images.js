@@ -1,5 +1,10 @@
-import {storage} from '../firebase';
+import firebase, {storage} from '../firebase';
 import {v4 as uuid} from 'uuid';
+import {deleteUploadedFileOnError} from '../components/Images/ImageUpload';
+
+const resizeImageOnRequest = firebase
+  .functions()
+  .httpsCallable('images-resizeImageOnCall');
 
 export function getPaginatedImagesFromCollectionRef(
   imagesCollectionRef,
@@ -24,13 +29,38 @@ export function getPaginatedImagesFromCollectionRef(
     });
 }
 
-export async function uploadImagesAndGetURLs(images, storageDir) {
+export async function uploadImagesAndGetURLs(images, storageDir, groupID) {
+  const resizeOptions = [
+    '-thumbnail',
+    '400x400^',
+    '-gravity',
+    'center',
+    '-extent',
+    '400x400',
+  ];
   const promises = images.map(async (image) => {
-    const imageStorageRef = storage.ref(`${storageDir}/${uuid()}_fullSize`);
+    const filePath = `${storageDir}/${uuid()}_fullSize`;
+    const imageStorageRef = storage.ref(filePath);
     await imageStorageRef
       .put(image, {contentType: image.type})
       .catch((err) => console.error(err));
-    return imageStorageRef.getDownloadURL();
+    return resizeImageOnRequest({
+      filePath: filePath,
+      resizeOptions: resizeOptions,
+      groupID: groupID,
+    })
+      .then(async (publicURL) => {
+        if (!publicURL || !publicURL.data) {
+          await deleteUploadedFileOnError(imageStorageRef);
+          return undefined;
+        }
+        return publicURL.data;
+      })
+      .catch(async (err) => {
+        console.error('unable to resize image at ' + filePath + err);
+        await deleteUploadedFileOnError(imageStorageRef);
+        return undefined;
+      });
   });
   return Promise.all(promises);
 }
