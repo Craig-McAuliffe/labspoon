@@ -45,6 +45,7 @@ export default function EditGroupOverviewPage({groupData, groupID, children}) {
   const [recentPosts, setRecentPosts] = useState([]);
   const [submitError, setSubmitError] = useState(false);
   const [successfulSubmit, setSuccessfulSubmit] = useState(false);
+  const [newPhotoHighlights, setNewPhotoHighlights] = useState([]);
 
   const initialToggleOptions = {
     [PAGE_DISPLAY_TOGGLE]: groupData.isDisplayingOverviewPage ? true : false,
@@ -60,24 +61,31 @@ export default function EditGroupOverviewPage({groupData, groupID, children}) {
 
   const resetDisplayOptions = () => {
     setToggleOptions(initialToggleOptions);
+    setSelectedPhotos([]);
+    setDeselectedPhotos([]);
   };
+
+  useEffect(() => {
+    const photoHighlightsWithAddedAndRemoved = [];
+    photoHighlights
+      .filter(
+        (photoHighlight) =>
+          !deselectedPhotos.some(
+            (deselectedPhoto) => deselectedPhoto.id === photoHighlight.id
+          )
+      )
+      .forEach((stillHighlightedPhoto) =>
+        photoHighlightsWithAddedAndRemoved.push(stillHighlightedPhoto)
+      );
+    selectedPhotos.forEach((justUploadedPhoto) =>
+      photoHighlightsWithAddedAndRemoved.push(justUploadedPhoto)
+    );
+    setNewPhotoHighlights(photoHighlightsWithAddedAndRemoved);
+  }, [selectedPhotos, deselectedPhotos, photoHighlights]);
 
   const refreshPageData = () => {
     if (selectedPhotos.length > 0 || deselectedPhotos.length > 0) {
-      const newPhotoHighlights = [];
-      photoHighlights
-        .filter(
-          (photoHighlight) =>
-            !deselectedPhotos.some(
-              (deselectedPhoto) => deselectedPhoto.id === photoHighlight.id
-            )
-        )
-        .forEach((stillHighlightedPhoto) =>
-          newPhotoHighlights.push(stillHighlightedPhoto)
-        );
-      selectedPhotos.forEach((justUploadedPhoto) =>
-        newPhotoHighlights.push(justUploadedPhoto)
-      );
+      setPhotoHighlights(newPhotoHighlights);
       setSelectedPhotos([]);
       setDeselectedPhotos([]);
     }
@@ -202,6 +210,18 @@ export default function EditGroupOverviewPage({groupData, groupID, children}) {
 
   useEffect(async () => fetchGroupNews(), []);
 
+  const deselectImage = (srcAndID) => {
+    const photoID = srcAndID.id;
+    if (photoHighlights.some((photoHighlight) => photoHighlight.id === photoID))
+      return setDeselectedPhotos((currentDeselectedPhotos) => [
+        ...currentDeselectedPhotos,
+        srcAndID,
+      ]);
+    const filteredSelectedPhotos = selectedPhotos.filter(
+      (newlySelectedPhoto) => newlySelectedPhoto.id !== photoID
+    );
+    return setSelectedPhotos(filteredSelectedPhotos);
+  };
   const changeToggleState = (toggleName) =>
     setToggleOptions((currentToggleOptions) => {
       const newToggleOptions = {...currentToggleOptions};
@@ -308,9 +328,14 @@ export default function EditGroupOverviewPage({groupData, groupID, children}) {
         <h3 className="edit-group-overview-page-sub-title">Photo Highlights</h3>
         {photoHighlights.length > 0 && (
           <div className="edit-group-overview-page-photos-section">
-            <h4 className="edit-group-overview-page-sub-sub-title">Current</h4>
+            <h3 className="edit-group-overview-page-sub-sub-title">
+              Current highlights
+            </h3>
             <ImagesSection
               images={photoHighlights}
+              selectedIDs={newPhotoHighlights.map(
+                (newPhotoHighlight) => newPhotoHighlight.id
+              )}
               spinner={submitting}
               selectText="Add"
               selectAction={(srcAndID) =>
@@ -319,11 +344,15 @@ export default function EditGroupOverviewPage({groupData, groupID, children}) {
                   srcAndID,
                 ])
               }
+              deselectAction={deselectAction}
+              deselectText="Remove"
             />
           </div>
         )}
         <div className="edit-group-overview-page-photos-section">
-          <h4 className="edit-group-overview-page-sub-sub-title">Choose</h4>
+          <h3 className="edit-group-overview-page-sub-sub-title">
+            All group photos
+          </h3>
           {photos.length > 0 ? (
             <ImagesSection
               images={photos}
@@ -334,6 +363,11 @@ export default function EditGroupOverviewPage({groupData, groupID, children}) {
                   srcAndID,
                 ])
               }
+              selectedIDs={newPhotoHighlights.map(
+                (newPhotoHighlight) => newPhotoHighlight.id
+              )}
+              deselectAction={deselectImage}
+              deselectText="Remove"
             />
           ) : (
             <div className="edit-group-overview-page-no-group-posts-alert-container">

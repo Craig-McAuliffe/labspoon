@@ -1,15 +1,40 @@
-.image-list-item-container,
-.image-list-item-container-loading {
-  width: 100%;
-  padding-bottom: 100%;
-  flex-grow: 1;
+.image-list-item-container {
   position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.image-list-item-image-div,
+.image-list-item-image-div-greyed-out,
+.image-list-item-image-div-with-selector,
+.image-list-item-image-div-with-selector-greyed-out {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
+  opacity: 1;
+  padding-bottom: 100%;
 }
 
-.image-spinner-container {
+.image-list-item-image-div-greyed-out,
+.image-list-item-container:hover .image-list-item-image-div-with-selector,
+.image-list-item-image-div-with-selector-greyed-out {
+  opacity: 0.4;
+}
+
+.image-list-item-container:hover .secondary-button-style {
+  border: 4px solid #00507c;
+  margin: 0px;
+}
+
+.image-selector-wrapper,
+.image-selector-wrapper-deselected {
+  padding: 0px;
+  height: 100%;
+}
+
+.image-spinner-container,
+.image-selector-container,
+.image-selector-container-deselected {
   position: absolute;
   top: 0%;
   width: 100%;
@@ -18,6 +43,7 @@
   align-items: center;
   justify-content: center;
   opacity: 1;
+  padding: 0px;
 }
 
 .images-section {
@@ -28,4 +54,20 @@
   grid-template-rows: auto;
   justify-items: center;
   align-items: center;
+}
+
+.secondary-button-style {
+  color: #00507c;
+  display: flex;
+  border: 2px solid #00507c;
+  margin: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #ffffff;
+  padding: 10px 14px;
+}
+
+.secondary-button-style h3 {
+  margin: 0px;
 }

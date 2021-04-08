@@ -1,5 +1,4 @@
 import React, {useRef, useEffect} from 'react';
-import SecondaryButton from '../Buttons/SecondaryButton';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 
 import './ImageListItem.css';
@@ -11,29 +10,62 @@ export default function ImageListItem({
   selectAction,
   selectText,
   id,
+  selectedIDs,
+  deselectAction,
+  deselectText,
 }) {
   const imageContainerRef = useRef();
   useEffect(() => {
     imageContainerRef.current.style.backgroundImage = `url(${src})`;
   });
+
+  const isSelected = selectedIDs ? selectedIDs.includes(id) : false;
+  let isGreyedOut = false;
+  if (spinner) isGreyedOut = true;
+  if (isSelected) isGreyedOut = true;
+  const selectorDisplay = () => {
+    let selectorText = selectText ? selectText : 'Select';
+    if (isSelected) selectorText = deselectText ? deselectText : 'Deselect';
+    const selectOrDeselectAction = () =>
+      isSelected
+        ? deselectAction({src: src, id: id})
+        : selectAction({src: src, id: id});
+
+    return (
+      <button
+        className={`image-selector-container${isSelected ? '-deselected' : ''}`}
+        onClick={selectOrDeselectAction}
+      >
+        <div className="secondary-button-style">
+          <h3>{selectorText}</h3>
+        </div>
+      </button>
+    );
+  };
+
+  let imageContainerClassName = 'image-list-item-image-div';
+  if (selectAction && deselectAction && selectedIDs)
+    imageContainerClassName = imageContainerClassName + '-with-selector';
+  if (isGreyedOut)
+    imageContainerClassName = imageContainerClassName + '-greyed-out';
+
   return (
-    <div
-      className="image-list-item-container"
-      ref={imageContainerRef}
-      title={alt}
-    >
-      {spinner ? (
+    <div className="image-list-item-container">
+      <div
+        className={imageContainerClassName}
+        ref={imageContainerRef}
+        title={alt}
+      ></div>
+      {spinner && (
         <div className="image-spinner-container">
           <LoadingSpinner />
         </div>
-      ) : null}
-      {selectAction && (
-        <div className="image-spinner-container">
-          <SecondaryButton onClick={() => selectAction({src: src, id: id})}>
-            {selectText ? selectText : 'Select'}
-          </SecondaryButton>
-        </div>
       )}
+      {selectAction &&
+        deselectAction &&
+        selectedIDs &&
+        !spinner &&
+        selectorDisplay()}
     </div>
   );
 }
@@ -45,6 +77,9 @@ export function ImagesSection({
   customMargin,
   selectAction,
   selectText,
+  selectedIDs,
+  deselectAction,
+  deselectText,
 }) {
   if (!children && !images) return null;
   if (images) {
@@ -70,6 +105,9 @@ export function ImagesSection({
               selectAction={selectAction}
               selectText={selectText}
               id={image.id}
+              selectedIDs={selectedIDs}
+              deselectAction={deselectAction}
+              deselectText={deselectText}
             />
           ))
         : children}
