@@ -1145,10 +1145,7 @@ async function checkThenUpdatePinnedItemOnGroup(
   resourceType: string
 ) {
   const isPinned = groupData.pinnedItem.id === itemID;
-  if (!isPinned) {
-    console.log('early exit, not pinned');
-    return;
-  }
+  if (!isPinned) return;
   itemData.id = itemID;
   itemData.resourceType = resourceType;
   return db
