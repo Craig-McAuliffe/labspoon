@@ -16,6 +16,8 @@ export enum ResourceTypes {
   OPEN_POSITION = 'openPosition',
   // meta type for all types of post
   POST_TYPE = 'postType',
+  RESEARCH_FOCUS = 'researchFocus',
+  TECHNIQUE = 'technique',
 }
 
 export enum ResourceTypesCollections {

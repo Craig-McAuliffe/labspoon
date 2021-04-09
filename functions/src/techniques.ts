@@ -1,8 +1,8 @@
 import * as functions from 'firebase-functions';
 import {admin} from './config';
-import {GroupRef} from './groups';
+import {GroupRef, GroupSignature} from './groups';
 import {TaggedTopic} from './topics';
-import {UserRef} from './users';
+import {UserFilterRef, UserRef} from './users';
 import {ArticleBodyChild, articleToArticleListItem} from './researchFocuses';
 
 const db = admin.firestore();
@@ -118,6 +118,19 @@ export interface Technique {
   timestamp: Date;
   photoURLs?: string[];
   group: GroupRef;
+  filterTopicIDs?: string[];
+  body: ArticleBodyChild[];
+  id?: string;
+}
+
+export interface TechniqueListItem {
+  title: string;
+  author: UserFilterRef;
+  topics?: TaggedTopic[];
+  customTopics?: string[];
+  timestamp: Date;
+  photoURLs?: string[];
+  group: GroupSignature;
   filterTopicIDs?: string[];
   body: ArticleBodyChild[];
   id?: string;

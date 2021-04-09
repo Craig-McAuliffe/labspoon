@@ -180,30 +180,6 @@
   color: #ffffff;
 }
 
-@keyframes pulse {
-  0% {
-    background-color: rgba(243, 243, 243);
-  }
-  50% {
-    background-color: rgba(223, 223, 224);
-  }
-  100% {
-    background-color: rgba(243, 243, 243);
-  }
-}
-
-@-webkit-keyframes pulse {
-  0% {
-    background-color: rgba(243, 243, 243);
-  }
-  50% {
-    background-color: rgba(223, 223, 224);
-  }
-  100% {
-    background-color: rgba(243, 243, 243);
-  }
-}
-
 @media screen and (max-width: 600px) {
   .group-icon-and-message img {
     width: 110px;

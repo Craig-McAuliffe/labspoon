@@ -3,7 +3,7 @@ import {admin} from './config';
 import {GroupRef, groupRefToGroupSignature, GroupSignature} from './groups';
 import {Technique} from './techniques';
 import {TaggedTopic} from './topics';
-import {UserRef} from './users';
+import {toUserFilterRef, UserFilterRef, UserRef} from './users';
 
 const db = admin.firestore();
 
@@ -121,7 +121,7 @@ export function articleToArticleListItem(
 ): ResearchFocusListItem {
   const researchFocusListItem: ResearchFocusListItem = {
     title: article.title,
-    author: article.author,
+    author: toUserFilterRef(article.author.name, article.author.id),
     timestamp: article.timestamp,
     group: groupRefToGroupSignature(article.group, article.group.id),
     body: article.body,
@@ -150,7 +150,7 @@ export interface ResearchFocus {
 
 export interface ResearchFocusListItem {
   title: string;
-  author: UserRef;
+  author: UserFilterRef;
   topics?: TaggedTopic[];
   customTopics?: string[];
   timestamp: Date;

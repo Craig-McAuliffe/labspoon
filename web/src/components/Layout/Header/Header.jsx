@@ -104,8 +104,8 @@ function KeyLinksDropdown() {
   ));
   return (
     <Dropdown
-      customToggle={(onSelect) => (
-        <KeyLinksDropDownToggle onSelect={onSelect} />
+      customToggle={(onSelect, toggleRef) => (
+        <KeyLinksDropDownToggle onSelect={onSelect} toggleRef={toggleRef} />
       )}
       customDropdownContainerWidth="140px"
       containerRightPosition="10px"
@@ -116,9 +116,13 @@ function KeyLinksDropdown() {
   );
 }
 
-function KeyLinksDropDownToggle({onSelect}) {
+function KeyLinksDropDownToggle({onSelect, toggleRef}) {
   return (
-    <button onClick={onSelect} className="key-links-options-toggle-button">
+    <button
+      onClick={() => onSelect((currentState) => !currentState)}
+      className="key-links-options-toggle-button"
+      ref={toggleRef}
+    >
       <DropDownTriangle />
     </button>
   );

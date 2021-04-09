@@ -50,8 +50,12 @@ export function SelectedGroup({selectedGroup, setSelectedGroup, groups}) {
           <SelectGroup
             groups={groups}
             setSelectedGroup={setSelectedGroup}
-            customToggle={(setOpen) => (
-              <SmallDropdownToggle setOpen={setOpen} text="Change Group" />
+            customToggle={(setOpen, toggleRef) => (
+              <SmallDropdownToggle
+                setOpen={setOpen}
+                toggleRef={toggleRef}
+                text="Change Group"
+              />
             )}
           />
         </div>

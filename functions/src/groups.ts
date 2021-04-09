@@ -14,9 +14,13 @@ import {
   TaggedTopic,
 } from './topics';
 import {Publication, PublicationRef} from './publications';
-import {OpenPosition} from './openPositions';
-import {ArticleBodyChild, ResearchFocus} from './researchFocuses';
-import {Technique} from './techniques';
+import {OpenPosition, OpenPositionListItem} from './openPositions';
+import {
+  ArticleBodyChild,
+  ResearchFocus,
+  ResearchFocusListItem,
+} from './researchFocuses';
+import {Technique, TechniqueListItem} from './techniques';
 import {MAX_RECENT_TOPICS, toUserFilterRef, UserRef} from './users';
 import {
   doFollowPreferencesBlockPost,
@@ -1123,6 +1127,130 @@ export const addOpenPosTopicsToRecentGroupTopics = functions.firestore
     );
   });
 
+async function getGroupDocDS(groupID: string) {
+  return db
+    .doc(`groups/${groupID}`)
+    .get()
+    .catch((err) =>
+      console.error(
+        `unable to fetch pinned item for group with id ${groupID} ${err}`
+      )
+    );
+}
+async function checkThenUpdatePinnedItemOnGroup(
+  groupData: Group,
+  itemData: any,
+  groupID: string,
+  itemID: string,
+  resourceType: string
+) {
+  const isPinned = groupData.pinnedItem.id === itemID;
+  if (!isPinned) {
+    console.log('early exit, not pinned');
+    return;
+  }
+  itemData.id = itemID;
+  itemData.resourceType = resourceType;
+  return db
+    .doc(`groups/${groupID}`)
+    .update({pinnedItem: itemData})
+    .catch((err) =>
+      console.error(
+        `unable to update pinned item on group with id ${groupID} ${err}`
+      )
+    );
+}
+
+export const updatePinnedPost = functions.firestore
+  .document('groups/{groupID}/posts/{postID}')
+  .onUpdate(async (change, context) => {
+    const groupID = context.params.groupID;
+    const postID = context.params.postID;
+    const groupDocDS = await getGroupDocDS(groupID);
+    if (!groupDocDS || !groupDocDS.exists) return;
+    const groupData = groupDocDS.data() as Group;
+    const postData = change.after.data() as PostRef;
+    return checkThenUpdatePinnedItemOnGroup(
+      groupData,
+      postData,
+      groupID,
+      postID,
+      ResourceTypes.POST
+    );
+  });
+
+export const updatePinnedPublication = functions.firestore
+  .document('groups/{groupID}/publications/{publicationID}')
+  .onUpdate(async (change, context) => {
+    const groupID = context.params.groupID;
+    const publicationID = context.params.publicationID;
+    const groupDocDS = await getGroupDocDS(groupID);
+    if (!groupDocDS || !groupDocDS.exists) return;
+    const publicationData = change.after.data() as PublicationRef;
+    const groupData = groupDocDS.data() as Group;
+    return checkThenUpdatePinnedItemOnGroup(
+      groupData,
+      publicationData,
+      groupID,
+      publicationID,
+      ResourceTypes.PUBLICATION
+    );
+  });
+
+export const updatePinnedOpenPosition = functions.firestore
+  .document('groups/{groupID}/openPositions/{openPositionID}')
+  .onUpdate(async (change, context) => {
+    const groupID = context.params.groupID;
+    const openPositionID = context.params.openPositionID;
+    const groupDocDS = await getGroupDocDS(groupID);
+    if (!groupDocDS || !groupDocDS.exists) return;
+    const openPositionData = change.after.data() as OpenPositionListItem;
+    const groupData = groupDocDS.data() as Group;
+    return checkThenUpdatePinnedItemOnGroup(
+      groupData,
+      openPositionData,
+      groupID,
+      openPositionID,
+      ResourceTypes.OPEN_POSITION
+    );
+  });
+
+export const updatePinnedResearchFocus = functions.firestore
+  .document('groups/{groupID}/researchFocuses/{researchFocusID}')
+  .onUpdate(async (change, context) => {
+    const groupID = context.params.groupID;
+    const researchFocusID = context.params.researchFocusID;
+    const groupDocDS = await getGroupDocDS(groupID);
+    if (!groupDocDS || !groupDocDS.exists) return;
+    const researchFocusData = change.after.data() as ResearchFocusListItem;
+    const groupData = groupDocDS.data() as Group;
+    return checkThenUpdatePinnedItemOnGroup(
+      groupData,
+      researchFocusData,
+      groupID,
+      researchFocusID,
+      ResourceTypes.RESEARCH_FOCUS
+    );
+  });
+
+export const updatePinnedTechnique = functions.firestore
+  .document('groups/{groupID}/techniques/{techniqueID}')
+  .onUpdate(async (change, context) => {
+    const groupID = context.params.groupID;
+    const techniqueID = context.params.techniqueID;
+    const groupDocDS = await getGroupDocDS(groupID);
+    if (!groupDocDS || !groupDocDS.exists) return;
+    const techniqueData = change.after.data() as TechniqueListItem;
+    const groupData = groupDocDS.data() as Group;
+    return checkThenUpdatePinnedItemOnGroup(
+      groupData,
+      techniqueData,
+      groupID,
+      techniqueID,
+      ResourceTypes.TECHNIQUE
+    );
+  });
+
 async function addRecentResourceTopicsToGroupDoc(
   groupID: string,
   newTopics: TaggedTopic[],
@@ -1252,6 +1380,7 @@ export interface Group {
   recentPublicationTopics?: TaggedTopic[];
   recentArticleTopics?: TaggedTopic[];
   isGeneratedFromTwitter?: boolean;
+  pinnedItem: any;
 }
 
 export interface GroupSignature {

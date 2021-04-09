@@ -52,15 +52,16 @@ export default async function addArticleToDB(
   const article = {};
   article.topics = selectedTopics;
   article.filterTopicIDs = selectedTopics.map((topic) => topic.id);
-  article.group = convertGroupToGroupRef(selectedGroup);
   article.photoURLs = photoURLs;
-  article.author = userToUserRef(userProfile, userProfile.id);
   article.title = title;
   article.body = body;
   article.timestamp = new Date();
   article.unixTimeStamp = Math.floor(new Date().getTime() / 1000);
   const articleListItem = {...article};
+  article.group = convertGroupToGroupRef(selectedGroup);
+  article.author = userToUserRef(userProfile, userProfile.id);
   articleListItem.group = convertGroupToGroupSignatureRef(selectedGroup);
+  articleListItem.author = {id: userProfile.id, name: userProfile.name};
   const batch = db.batch();
   batch.set(articleDBRef, article);
   batch.set(articleOnGroupRef, articleListItem);

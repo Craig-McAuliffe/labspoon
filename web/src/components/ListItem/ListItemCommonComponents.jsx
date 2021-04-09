@@ -34,10 +34,11 @@ export function ListItemOptionsDropdown({
   const [loadingPinState, setLoadingPinState] = useState(true);
 
   if (!options || options.length === 0) return null;
-  const listItemOptionsDropDownToggle = (setOpen) => (
+  const listItemOptionsDropDownToggle = (setOpen, toggleRef) => (
     <button
       className="list-item-dropdown-toggle"
       onClick={() => setOpen((isOpen) => !isOpen)}
+      ref={toggleRef}
     >
       <DottedBurgerMenuIcon />
     </button>

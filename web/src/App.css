@@ -128,6 +128,55 @@
 .grecaptcha-badge {
   z-index: 99999;
 }
+
+@keyframes pulse {
+  0% {
+    background-color: rgba(243, 243, 243);
+  }
+  50% {
+    background-color: rgba(210, 210, 210);
+  }
+  100% {
+    background-color: rgba(243, 243, 243);
+  }
+}
+
+@-webkit-keyframes pulse {
+  0% {
+    background-color: rgba(243, 243, 243);
+  }
+  50% {
+    background-color: rgba(210, 210, 210);
+  }
+  100% {
+    background-color: rgba(243, 243, 243);
+  }
+}
+
+@-o-keyframes pulse {
+  0% {
+    background-color: rgba(243, 243, 243);
+  }
+  50% {
+    background-color: rgba(210, 210, 210);
+  }
+  100% {
+    background-color: rgba(243, 243, 243);
+  }
+}
+
+@-moz-keyframes pulse {
+  0% {
+    background-color: rgba(243, 243, 243);
+  }
+  50% {
+    background-color: rgba(210, 210, 210);
+  }
+  100% {
+    background-color: rgba(243, 243, 243);
+  }
+}
+
 @media screen and (max-width: 1550px) {
   .main-layout {
     grid-template-columns: 350px 1fr 350px;

@@ -134,7 +134,7 @@ export const fetchPublicationsForNewLinkedUser = functions.firestore
     const oldUserData = change.before.data() as MAKAuthor;
     if (newUserData.processed && !oldUserData.processed) {
       const expression = `Composite(AA.AuId=${newUserData.AuId})`;
-      const count = environment === 'local' ? 20 : 50;
+      const count = environment === 'local' ? 2 : 50;
       const offset = 0;
       return fetchAndHandlePublicationsForAuthor(expression, count, offset);
     }

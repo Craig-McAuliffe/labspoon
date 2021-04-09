@@ -16,45 +16,12 @@
 }
 
 .image-list-item-image-div-loading {
-  animation: photoLoadingFade 1s infinite alternate;
+  animation: pulse 2s infinite;
+  -webkit-animation: pulse 2s infinite;
+  -moz-animation: pulse 2s infinite;
+  -o-animation: pulse 2s infinite;
   background-color: #99999f;
   padding-bottom: 100%;
-}
-
-@keyframes photoLoadingFade {
-  from {
-    opacity: 0.4;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@-o-keyframes photoLoadingFade {
-  from {
-    opacity: 0.4;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@-moz-keyframes photoLoadingFade {
-  from {
-    opacity: 0.4;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@-webkit-keyframes photoLoadingFade {
-  from {
-    opacity: 0.4;
-  }
-  to {
-    opacity: 1;
-  }
 }
 
 .image-list-item-image-div-greyed-out,

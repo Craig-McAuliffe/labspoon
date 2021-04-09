@@ -20,15 +20,18 @@ export default function Dropdown({
 }) {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef();
+  const toggleRef = useRef();
+
+  const handleDocumentClick = (e) => {
+    if (!dropdownRef.current) return;
+    if (toggleRef.current && toggleRef.current.contains(e.target)) return;
+    if (!dropdownRef.current.contains(e.target)) setOpen(false);
+  };
 
   useEffect(() => {
-    const handleDocumentClick = (e) => {
-      if (dropdownRef.current) {
-        if (!dropdownRef.current.contains(e.target)) setOpen(false);
-      }
-    };
     document.addEventListener('mousedown', handleDocumentClick);
-  });
+    return () => document.removeEventListener('mousedown', handleDocumentClick);
+  }, []);
 
   useEffect(async () => {
     if (!open) return;
@@ -63,6 +66,7 @@ export default function Dropdown({
         customToggleWidth={customToggleWidth}
         setOpen={setOpen}
         customToggleTextOnly={customToggleTextOnly}
+        toggleRef={toggleRef}
       />
       {open ? (
         <DropdownOptions
@@ -85,11 +89,12 @@ function DropdownToggle({
   customToggleWidth,
   setOpen,
   customToggleTextOnly,
+  toggleRef,
 }) {
   return (
     <div className="dropdown-toggle-container">
       {customToggle ? (
-        customToggle(setOpen)
+        customToggle(setOpen, toggleRef)
       ) : (
         <button
           className={`dropdown${
@@ -97,7 +102,8 @@ function DropdownToggle({
           }-toggle`}
           style={{width: customToggleWidth}}
           type="button"
-          onClick={() => setOpen(true)}
+          onClick={() => setOpen((currentState) => !currentState)}
+          ref={toggleRef}
         >
           <span>
             {customToggleTextOnly === undefined
@@ -153,9 +159,14 @@ export function DropdownOption({
   );
 }
 
-export function SmallDropdownToggle({setOpen, text}) {
+export function SmallDropdownToggle({setOpen, text, toggleRef}) {
   return (
-    <button className="small-dropdown-toggle" type="button" onClick={setOpen}>
+    <button
+      className="small-dropdown-toggle"
+      ref={toggleRef}
+      type="button"
+      onClick={() => setOpen((currentState) => !currentState)}
+    >
       <p>{text}</p>
       <DropDownTriangle />
     </button>
