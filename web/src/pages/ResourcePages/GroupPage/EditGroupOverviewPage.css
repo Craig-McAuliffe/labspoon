@@ -3,7 +3,6 @@
   grid-template-columns: 1fr 150px;
   row-gap: 20px;
   align-items: center;
-  /* justify-items: flex-start; */
   margin-bottom: 30px;
 }
 
@@ -37,8 +36,15 @@
   margin-top: 10px;
 }
 
+.edit-group-overview-page-success-error-container {
+  position: fixed;
+  top: 20vh;
+  width: 400px;
+  left: 50%;
+  margin-left: -200px;
+}
+
 .edit-group-overview-page-sub-title {
-  /* color: #5d5d65; */
   padding-top: 20px;
 }
 
@@ -50,4 +56,11 @@
 .edit-group-overview-page-see-more-photos-container {
   display: flex;
   justify-content: flex-end;
+}
+
+@media screen and (max-width: 600px) {
+  .edit-group-overview-page-success-error-container {
+    width: 200px;
+    margin-left: -100px;
+  }
 }

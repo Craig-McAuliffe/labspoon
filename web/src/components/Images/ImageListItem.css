@@ -15,6 +15,48 @@
   padding-bottom: 100%;
 }
 
+.image-list-item-image-div-loading {
+  animation: photoLoadingFade 1s infinite alternate;
+  background-color: #99999f;
+  padding-bottom: 100%;
+}
+
+@keyframes photoLoadingFade {
+  from {
+    opacity: 0.4;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@-o-keyframes photoLoadingFade {
+  from {
+    opacity: 0.4;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@-moz-keyframes photoLoadingFade {
+  from {
+    opacity: 0.4;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes photoLoadingFade {
+  from {
+    opacity: 0.4;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .image-list-item-image-div-greyed-out,
 .image-list-item-container:hover .image-list-item-image-div-with-selector,
 .image-list-item-image-div-with-selector-greyed-out {

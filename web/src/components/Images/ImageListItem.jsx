@@ -13,11 +13,13 @@ export default function ImageListItem({
   selectedIDs,
   deselectAction,
   deselectText,
+  loading,
 }) {
   const imageContainerRef = useRef();
   useEffect(() => {
+    if (!imageContainerRef.current) return;
     imageContainerRef.current.style.backgroundImage = `url(${src})`;
-  });
+  }, [imageContainerRef.current]);
 
   const isSelected = selectedIDs ? selectedIDs.includes(id) : false;
   let isGreyedOut = false;
@@ -48,7 +50,12 @@ export default function ImageListItem({
     imageContainerClassName = imageContainerClassName + '-with-selector';
   if (isGreyedOut)
     imageContainerClassName = imageContainerClassName + '-greyed-out';
-
+  if (loading)
+    return (
+      <div className="image-list-item-container">
+        <div className="image-list-item-image-div-loading"></div>
+      </div>
+    );
   return (
     <div className="image-list-item-container">
       <div
@@ -80,6 +87,7 @@ export function ImagesSection({
   selectedIDs,
   deselectAction,
   deselectText,
+  loading,
 }) {
   if (!children && !images) return null;
   if (images) {
@@ -108,6 +116,7 @@ export function ImagesSection({
               selectedIDs={selectedIDs}
               deselectAction={deselectAction}
               deselectText={deselectText}
+              loading={loading}
             />
           ))
         : children}

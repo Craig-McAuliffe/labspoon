@@ -80,6 +80,8 @@ export default function ImageUpload({
 
   async function uploadImages() {
     setUploading(UPLOADING);
+    if (displaySuccessMessage) setDisplaySuccessMessage(false);
+    if (displayErrorMessage) setDisplayErrorMessage(false);
     let uploadingCount = files.length;
     const unsuccessfulUploadCount = [];
     const uploadPromisesArray = [];
@@ -111,7 +113,7 @@ export default function ImageUpload({
               if (uploadingCount === 0) {
                 if (unsuccessfulUploadCount.length === 0)
                   setDisplaySuccessMessage(true);
-                else setDisplayErrorMessage(true);
+                else setDisplayErrorMessage(unsuccessfulUploadCount.length);
               }
               resolve('succeeded');
             }
@@ -247,7 +249,11 @@ function NoImagesSelected({
       {imageSelectionUI}
       <div className="after-upload-message-container">
         {displaySuccessMessage ? <UploadSuccessMessage /> : <></>}
-        {displayErrorMessage ? <UploadErrorMessage /> : <></>}
+        {displayErrorMessage ? (
+          <UploadErrorMessage numberOfErrors={displayErrorMessage} />
+        ) : (
+          <></>
+        )}
       </div>
     </div>
   );
@@ -434,9 +440,12 @@ function UploadSuccessMessage() {
   return <SuccessMessage>Successfully uploaded!</SuccessMessage>;
 }
 
-function UploadErrorMessage() {
+function UploadErrorMessage({numberOfErrors}) {
   return (
-    <ErrorMessage>Something went wrong. Please try again later.</ErrorMessage>
+    <ErrorMessage>
+      Something went wrong while uploading {numberOfErrors} of those photos.
+      Please try again.
+    </ErrorMessage>
   );
 }
 

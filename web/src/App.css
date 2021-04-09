@@ -73,8 +73,10 @@
   justify-content: center;
   border: 2px solid #287fad;
   box-shadow: 0px 0px 4px #287fad;
-  padding: 5px;
   margin: 10px 0px;
+  background: #ffffff;
+  z-index: 2;
+  opacity: 1;
 }
 
 .success-overlay h3 {
@@ -87,7 +89,9 @@
   justify-content: center;
   border: 2px solid #da0000;
   box-shadow: 0px 0px 4px #da0000;
-  padding: 5px;
+  background: #ffffff;
+  z-index: 2;
+  opacity: 1;
 }
 .error-overlay-no-border {
   display: flex;
