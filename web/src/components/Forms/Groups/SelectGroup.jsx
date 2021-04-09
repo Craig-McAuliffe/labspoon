@@ -50,7 +50,7 @@ export function SelectedGroup({selectedGroup, setSelectedGroup, groups}) {
           <SelectGroup
             groups={groups}
             setSelectedGroup={setSelectedGroup}
-            customToggle={({setOpen}) => (
+            customToggle={(setOpen) => (
               <SmallDropdownToggle setOpen={setOpen} text="Change Group" />
             )}
           />
