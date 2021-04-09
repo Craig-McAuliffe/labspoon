@@ -3,12 +3,11 @@ import {Link, useHistory} from 'react-router-dom';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faCheckCircle} from '@fortawesome/free-solid-svg-icons';
 import withSizes from 'react-sizes';
-import {FeatureFlags, AuthContext} from '../../../App';
+import {AuthContext} from '../../../App';
 import {db} from '../../../firebase';
 import {userToUserRef} from '../../../helpers/users';
 import GroupAvatar from '../../../components/Avatar/GroupAvatar';
 import FollowGroupButton from '../../../components/Group/FollowGroupButton';
-import MessageButton from '../../../components/Buttons/MessageButton';
 import EditButton from '../../../components/Buttons/EditButton';
 import SeeMore from '../../../components/SeeMore';
 import {WebsiteIcon} from '../../../assets/PostOptionalTagsIcons';
@@ -34,15 +33,7 @@ const mapGroupDetailsSizesToProps = ({width}) => ({
 
 const GROUP_DESCRIPTION_HEIGHT = 144;
 
-const GroupDetails = ({
-  group,
-  userIsMember,
-  verified,
-  groupID,
-  routedTabID,
-  isMobile,
-}) => {
-  const featureFlags = useContext(FeatureFlags);
+const GroupDetails = ({group, userIsMember, verified, groupID, isMobile}) => {
   const [isSlowLoad, setIsSlowLoad] = useState(false);
   const [pinnedItem, setPinnedItem] = useState(null);
 
@@ -98,51 +89,14 @@ const GroupDetails = ({
       </div>
     );
 
-  const groupCoverDisplay = (
-    <div className="group-cover-photo-container">
-      <UserCoverPhoto
-        src={group.coverPhoto}
-        alt={`group cover picture`}
-        isGroup={true}
-      />
-    </div>
-  );
-  const groupWebsiteAndFollowOrEditDisplay = (
-    <div className="group-website-follow-container">
-      <WebsiteLink link={group.website} />
-      {userIsMember ? (
-        <Link to={routedTabID ? `edit/info` : `${groupID}/edit/info`}>
-          <EditButton editAction={() => {}}>Edit Group</EditButton>
-        </Link>
-      ) : (
-        <FollowGroupButton targetGroup={group} />
-      )}
-    </div>
-  );
-
   return (
     <>
-      {isMobile && groupCoverDisplay}
-
-      <div className="group-header">
-        <div className="group-icon-and-message">
-          <div className="group-avatar-positioning">
-            <GroupAvatar src={group.avatar} height="160" width="160" />
-          </div>
-          {featureFlags.has('group-message-button') ? <MessageButton /> : null}
-        </div>
-        {isMobile && groupWebsiteAndFollowOrEditDisplay}
-        <div className="group-header-info">
-          <div className="group-header-name-insitution">
-            <h2>{group.name}</h2>
-            <h4>{group.institution}</h4>
-          </div>
-        </div>
-      </div>
-
-      {!isMobile && groupCoverDisplay}
-      {!isMobile && groupWebsiteAndFollowOrEditDisplay}
-
+      <GroupDetailsHeaderSection
+        group={group}
+        isMobile={isMobile}
+        userIsMember={userIsMember}
+        groupID={groupID}
+      />
       <div className="group-description">
         <SeeMore id={group.id} initialHeight={GROUP_DESCRIPTION_HEIGHT}>
           <RichTextBody body={group.about} shouldLinkify={true} />
@@ -157,6 +111,56 @@ const GroupDetails = ({
   );
 };
 
+export function GroupDetailsHeaderSection({
+  isMobile,
+  group,
+  userIsMember,
+  groupID,
+  designOnly,
+}) {
+  const groupCoverDisplay = (
+    <div className="group-cover-photo-container">
+      <UserCoverPhoto
+        src={group.coverPhoto}
+        alt={`group cover picture`}
+        isGroup={true}
+      />
+    </div>
+  );
+  const groupWebsiteAndFollowOrEditDisplay = designOnly ? null : (
+    <div className="group-website-follow-container">
+      <WebsiteLink link={group.website} />
+      {userIsMember ? (
+        <Link to={`/group/${groupID}/edit/info`}>
+          <EditButton editAction={() => {}}>Edit Group</EditButton>
+        </Link>
+      ) : (
+        <FollowGroupButton targetGroup={group} />
+      )}
+    </div>
+  );
+  return (
+    <>
+      {isMobile && groupCoverDisplay}
+      <div className="group-header">
+        <div className="group-icon-and-message">
+          <div className="group-avatar-positioning">
+            <GroupAvatar src={group.avatar} height="160" width="160" />
+          </div>
+        </div>
+        {isMobile && groupWebsiteAndFollowOrEditDisplay}
+        <div className="group-header-info">
+          <div className="group-header-name-insitution">
+            <h2>{group.name}</h2>
+            <h4>{group.institution}</h4>
+          </div>
+        </div>
+      </div>
+      {!isMobile && groupCoverDisplay}
+      {!isMobile && groupWebsiteAndFollowOrEditDisplay}
+    </>
+  );
+}
 function WebsiteLink({link}) {
   if (!link) return <div></div>;
   if (link.length === 0) return <div></div>;

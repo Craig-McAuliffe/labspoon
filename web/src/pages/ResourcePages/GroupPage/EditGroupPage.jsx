@@ -19,6 +19,7 @@ import EditGroupMembers from './EditGroupMembers';
 import EditGroupOverviewPage from './EditGroupOverviewPage';
 
 import './EditGroupPage.css';
+import EditGroupDisplay from './EditGroupDisplay';
 
 const INFO_TAB = 'info';
 const POSTS_TAB = 'posts';
@@ -30,6 +31,7 @@ const TECHNIQUES_TAB = 'techniques';
 const RESEARCHFOCUSES_TAB = 'researchFocuses';
 const OPENPOSITIONS_TAB = 'openPositions';
 const OVERVIEW_PAGE_TAB = 'overviewPage';
+const DISPLAY_TAB = 'display';
 
 const tabIDToDisplayName = {
   [INFO_TAB]: 'Info',
@@ -42,6 +44,7 @@ const tabIDToDisplayName = {
   [RESEARCHFOCUSES_TAB]: 'Research Focuses',
   [OPENPOSITIONS_TAB]: 'Open Positions',
   [OVERVIEW_PAGE_TAB]: 'Overview Page',
+  [DISPLAY_TAB]: 'Display',
 };
 
 export default function EditGroupPage() {
@@ -52,6 +55,7 @@ export default function EditGroupPage() {
   const [notFound, setNotFound] = useState(false);
   const tabs = [
     INFO_TAB,
+    DISPLAY_TAB,
     OVERVIEW_PAGE_TAB,
     MEMBERS_TAB,
     POSTS_TAB,
@@ -140,6 +144,12 @@ export default function EditGroupPage() {
           <EditGroupTabs tabs={tabs} activeTab={OVERVIEW_PAGE_TAB} />
           <ReturnToPublicViewButton url={groupURL} />
         </EditGroupOverviewPage>
+      </Route>
+      <Route path={`${path}/${DISPLAY_TAB}`}>
+        <EditGroupDisplay groupData={group} groupID={groupID}>
+          <EditGroupTabs tabs={tabs} activeTab={DISPLAY_TAB} />
+          <ReturnToPublicViewButton url={groupURL} />
+        </EditGroupDisplay>
       </Route>
       <Route path={`${path}`}>
         <NotFoundPage />

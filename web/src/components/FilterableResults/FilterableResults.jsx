@@ -455,6 +455,10 @@ export function Tabs({
     );
   });
 
+  return <TabsDisplay tabs={tabs} />;
+}
+
+export function TabsDisplay({tabs}) {
   return (
     <PaddedContent>
       <div className="feed-tabs-container">
