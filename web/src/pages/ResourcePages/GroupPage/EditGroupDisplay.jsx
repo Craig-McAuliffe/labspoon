@@ -1,5 +1,8 @@
 import React, {useState} from 'react';
-import {PaddedPageContainer} from '../../../components/Layout/Content';
+import {
+  PaddedContent,
+  UnpaddedPageContainer,
+} from '../../../components/Layout/Content';
 import {ListItemContainer} from '../../../components/ListItem/ListItemCommonComponents';
 import withSizes from 'react-sizes';
 import {GroupDetailsHeaderSection} from './GroupDetails';
@@ -9,6 +12,22 @@ import SecondaryButton from '../../../components/Buttons/SecondaryButton';
 import {TabsDisplay} from '../../../components/FilterableResults/FilterableResults';
 import Dropdown, {DropdownOption} from '../../../components/Dropdown';
 import NegativeButton from '../../../components/Buttons/NegativeButton';
+import ErrorMessage from '../../../components/Forms/ErrorMessage';
+import SuccessMessage from '../../../components/Forms/SuccessMessage';
+import SphericalLight from '../../../assets/SphericalLight';
+import SphericalDark from '../../../assets/SphericalDark';
+import SingularityLight from '../../../assets/SingularityLight';
+import SingularityDark from '../../../assets/SingularityDark';
+import SquaresDark from '../../../assets/SquaresDark';
+import SquaresLight from '../../../assets/SquaresLight';
+import TowersDark from '../../../assets/TowersDark';
+import TowersLight from '../../../assets/TowersLight';
+import MandelbrotDark from '../../../assets/MandelbrotDark';
+import MandelbrotLight from '../../../assets/MandelbrotLight';
+import CyclesDark from '../../../assets/CyclesDark';
+import CyclesLight from '../../../assets/CyclesLight';
+import {BlankLight} from '../../../assets/BlankBackgrounds';
+// import { SaveOrCancelPopover } from '../../../components/Popovers/Popover';
 
 export const AVATAR_EMBEDDED_DISPLAY = 'embeddedAvatarDisplay';
 export const AVATAR_INTERNAL_DISPLAY = 'internalAvatarDisplay';
@@ -35,41 +54,84 @@ export const TOWERS_DARK_BACKGROUND = 'towersDarkBackground';
 export const CYCLES_DARK_BACKGROUND = 'cyclesDarkBackground';
 export const SINGULARITY_DARK_BACKGROUND = 'singularityDarkBackground';
 
-function backgroundDesignIDToName(designID) {
-  switch (designID) {
+function backgroundColorBlindNameAndShadeToID(colorBlindDesignName, shade) {
+  if (shade === 'dark') {
+    switch (colorBlindDesignName) {
+      case 'BLANK':
+        return BLANK_DARK_BACKGROUND;
+      case 'SPHERICAL':
+        return SPHERICAL_DARK_BACKGROUND;
+      case 'SQUARES':
+        return SQUARES_DARK_BACKGROUND;
+      case 'MANDELBROT':
+        return MANDELBROT_DARK_BACKGROUND;
+      case 'TOWERS':
+        return TOWERS_DARK_BACKGROUND;
+      case 'CYCLES':
+        return CYCLES_DARK_BACKGROUND;
+      case 'SINGULARITY':
+        return SINGULARITY_DARK_BACKGROUND;
+      default:
+        return BLANK_DARK_BACKGROUND;
+    }
+  }
+  switch (colorBlindDesignName) {
+    case 'BLANK':
+      return BLANK_LIGHT_BACKGROUND;
+    case 'SPHERICAL':
+      return SPHERICAL_LIGHT_BACKGROUND;
+    case 'SQUARES':
+      return SQUARES_LIGHT_BACKGROUND;
+    case 'MANDELBROT':
+      return MANDELBROT_LIGHT_BACKGROUND;
+    case 'TOWERS':
+      return TOWERS_LIGHT_BACKGROUND;
+    case 'CYCLES':
+      return CYCLES_LIGHT_BACKGROUND;
+    case 'SINGULARITY':
+      return SINGULARITY_LIGHT_BACKGROUND;
+    default:
+      return BLANK_LIGHT_BACKGROUND;
+  }
+}
+
+function backgroundDesignIDToSVG(backgroundDesignID) {
+  switch (backgroundDesignID) {
     case BLANK_LIGHT_BACKGROUND:
-      return 'DEFAULT LIGHT';
+      return <BlankLight />;
     case SPHERICAL_LIGHT_BACKGROUND:
-      return 'SPHERICAL LIGHT';
+      return <SphericalLight />;
     case SQUARES_LIGHT_BACKGROUND:
-      return 'SQUARES LIGHT';
+      return <SquaresLight />;
     case MANDELBROT_LIGHT_BACKGROUND:
-      return 'MANDELBROT LIGHT';
+      return <MandelbrotLight />;
     case TOWERS_LIGHT_BACKGROUND:
-      return 'TOWERS LIGHT';
+      return <TowersLight />;
     case CYCLES_LIGHT_BACKGROUND:
-      return 'CYCLES LIGHT';
+      return <CyclesLight />;
     case SINGULARITY_LIGHT_BACKGROUND:
-      return 'SINGULARITY LIGHT';
+      return <SingularityLight />;
     case BLANK_DARK_BACKGROUND:
-      return 'DEFAULT DARK';
+      return null;
     case SPHERICAL_DARK_BACKGROUND:
-      return 'SPHERICAL DARK';
+      return <SphericalDark />;
     case SQUARES_DARK_BACKGROUND:
-      return 'SQUARES DARK';
+      return <SquaresDark />;
     case MANDELBROT_DARK_BACKGROUND:
-      return 'MANDELBROT DARK';
+      return <MandelbrotDark />;
     case TOWERS_DARK_BACKGROUND:
-      return 'TOWERS DARK';
+      return <TowersDark />;
     case CYCLES_DARK_BACKGROUND:
-      return 'CYCLES DARK';
+      return <CyclesDark />;
     case SINGULARITY_DARK_BACKGROUND:
-      return 'SINGULARITY DARK';
+      return <SingularityDark />;
+    default:
+      return <BlankLight />;
   }
 }
 
 const colorBlindDesignOptions = [
-  'DEFAULT',
+  'BLANK',
   'SPHERICAL',
   'SQUARES',
   'MANDELBROT',
@@ -94,163 +156,306 @@ const mapEditGroupDisplaySizesToProps = ({width}) => ({
   isMobile: width && width <= 400,
 });
 
+// TO DO - Selected Displays should have blue hover around them (including if current display for group)
+// TO DO - Can click anywhere on display to select or deselect them
+
 function EditGroupDisplay({groupData, groupID, children, isMobile}) {
   const [displayedBackgroundDesign, setDisplayedBackgroundDesign] = useState(
     groupData.backgroundDesign
       ? groupData.backgroundDesign
-      : BLANK_LIGHT_BACKGROUND
+      : colorBlindDesignOptions[0]
   );
   const [
     isDisplayingContentInPreview,
     setIsDisplayingContentInPreview,
   ] = useState(false);
+  const [successfulSubmit, setSuccessfulSubmit] = useState(false);
+  const [submitError, setSubmitError] = useState(false);
+  const [darkOrLightBackground, setDarkOrLightBackground] = useState(() => {
+    if (groupData.backgroundDesign) {
+      if (groupData.backgroundDesign.toLowerCase().includes('dark'))
+        return 'dark';
+      return 'light';
+    }
+    return 'light';
+  });
+  if (1 == 2) {
+    setSuccessfulSubmit(true);
+    setSubmitError(true);
+  }
   return (
-    <PaddedPageContainer>
-      {children}
-      <div className="edit-group-display-header-section">
-        <h2 className="edit-group-display-sub-title">Header</h2>
-        <ListItemContainer>
-          <div className="container-positioning">
+    <UnpaddedPageContainer>
+      <PaddedContent>
+        {children}
+        {submitError && (
+          <div className="edit-group-overview-page-success-error-container">
+            <ErrorMessage>
+              Something went wrong while saving those changes. Please try again.
+            </ErrorMessage>
+          </div>
+        )}
+        {successfulSubmit && (
+          <div className="edit-group-overview-page-success-error-container">
+            <SuccessMessage>
+              Your chosen options were successfully saved
+            </SuccessMessage>
+          </div>
+        )}
+        <div className="edit-group-display-header-section">
+          <h2 className="edit-group-display-sub-title">Header</h2>
+          <ListItemContainer>
             <div className="edit-group-display-selector-container">
               <SecondaryButton>Select</SecondaryButton>
-              <GroupDetailsHeaderSection
-                displayType={AVATAR_EMBEDDED_DISPLAY}
-                group={groupData}
-                groupID={groupID}
-                userIsMember={true}
-                isMobile={isMobile}
-                designOnly={true}
-              />
             </div>
-          </div>
-        </ListItemContainer>
-        <ListItemContainer>
-          <div className="container-positioning">
+            <GroupDetailsHeaderSection
+              displayType={AVATAR_EMBEDDED_DISPLAY}
+              group={groupData}
+              groupID={groupID}
+              userIsMember={true}
+              isMobile={isMobile}
+              designOnly={true}
+            />
+          </ListItemContainer>
+          <ListItemContainer>
             <div className="edit-group-display-selector-container">
               <SecondaryButton>Select</SecondaryButton>
-              <GroupDetailsHeaderSection
-                displayType={AVATAR_INTERNAL_DISPLAY}
-                group={groupData}
-                groupID={groupID}
-                userIsMember={true}
-                isMobile={isMobile}
-                designOnly={true}
-              />
             </div>
-          </div>
-        </ListItemContainer>
-        <ListItemContainer>
-          <div className="container-positioning">
+            <GroupDetailsHeaderSection
+              displayType={AVATAR_INTERNAL_DISPLAY}
+              group={groupData}
+              groupID={groupID}
+              userIsMember={true}
+              isMobile={isMobile}
+              designOnly={true}
+            />
+          </ListItemContainer>
+          <ListItemContainer>
             <div className="edit-group-display-selector-container">
               <SecondaryButton>Select</SecondaryButton>
-              <GroupDetailsHeaderSection
-                displayType={NO_AVATAR_LEFT_TEXT_DISPLAY}
-                group={groupData}
-                groupID={groupID}
-                userIsMember={true}
-                isMobile={isMobile}
-                designOnly={true}
-              />
             </div>
-          </div>
-        </ListItemContainer>
-        <ListItemContainer>
-          <div className="container-positioning">
+            <GroupDetailsHeaderSection
+              displayType={NO_AVATAR_LEFT_TEXT_DISPLAY}
+              group={groupData}
+              groupID={groupID}
+              userIsMember={true}
+              isMobile={isMobile}
+              designOnly={true}
+            />
+          </ListItemContainer>
+          <ListItemContainer>
             <div className="edit-group-display-selector-container">
               <SecondaryButton>Select</SecondaryButton>
-              <GroupDetailsHeaderSection
-                displayType={NO_AVATAR_CENTER_TEXT_DISPLAY}
-                group={groupData}
-                groupID={groupID}
-                userIsMember={true}
-                isMobile={isMobile}
-                designOnly={true}
-              />
             </div>
+            <GroupDetailsHeaderSection
+              displayType={NO_AVATAR_CENTER_TEXT_DISPLAY}
+              group={groupData}
+              groupID={groupID}
+              userIsMember={true}
+              isMobile={isMobile}
+              designOnly={true}
+            />
+          </ListItemContainer>
+        </div>
+        <div className="edit-group-display-navigation-section">
+          <h2 className="edit-group-display-sub-title">Navigation</h2>
+          <div className="edit-group-display-tab-container">
+            <div className="edit-group-display-selector-container">
+              <SecondaryButton>Select</SecondaryButton>
+            </div>
+            <TabsDisplay
+              noBorderOrMargin={true}
+              displayType={TAB_RECTANGLES_DISPLAY}
+              tabs={exampleTabs.map((tabName, i) => {
+                const tabClassName =
+                  i === 0 ? 'feed-tab-active' : 'feed-tab-inactive';
+                return (
+                  <div className={tabClassName} key={tabName}>
+                    {tabName}
+                  </div>
+                );
+              })}
+            />
           </div>
-        </ListItemContainer>
-      </div>
-      <div className="edit-group-display-navigation-section">
-        <h2 className="edit-group-display-sub-title">Navigation</h2>
-        <div className="edit-group-display-tab-container">
-          <TabsDisplay
-            displayType={TAB_RECTANGLES_DISPLAY}
-            tabs={exampleTabs.map((tabName, i) => {
-              const tabClassName =
-                i === 0 ? 'feed-tab-active' : 'feed-tab-inactive';
-              return (
-                <div className={tabClassName} key={tabName}>
-                  {tabName}
-                </div>
-              );
-            })}
-          />
+          <div className="edit-group-display-tab-container">
+            <div className="edit-group-display-selector-container">
+              <SecondaryButton>Select</SecondaryButton>
+            </div>
+            <TabsDisplay
+              noBorderOrMargin={true}
+              displayType={TAB_DOUBLE_LINE_DIVIDER_DISPLAY}
+              tabs={exampleTabs.map((tabName, i) => {
+                const tabClassName =
+                  i === 0 ? 'feed-tab-active' : 'feed-tab-inactive';
+                return (
+                  <div className={tabClassName} key={tabName}>
+                    {tabName}
+                  </div>
+                );
+              })}
+            />
+          </div>
+          <div className="edit-group-display-tab-container">
+            <div className="edit-group-display-selector-container">
+              <SecondaryButton>Select</SecondaryButton>
+            </div>
+            <TabsDisplay
+              noBorderOrMargin={true}
+              displayType={TAB_NO_DIVIDER_DISPLAY}
+              tabs={exampleTabs.map((tabName, i) => {
+                const tabClassName =
+                  i === 0 ? 'feed-tab-active' : 'feed-tab-inactive';
+                return (
+                  <div className={tabClassName} key={tabName}>
+                    {tabName}
+                  </div>
+                );
+              })}
+            />
+          </div>
+          <div className="edit-group-display-tab-container">
+            <div className="edit-group-display-selector-container">
+              <SecondaryButton>Select</SecondaryButton>
+            </div>
+            <TabsDisplay
+              noBorderOrMargin={true}
+              displayType={TAB_DROPDOWN_DISPLAY}
+              tabs={exampleTabs.map((tabName, i) => {
+                const tabClassName =
+                  i === 0 ? 'feed-tab-active' : 'feed-tab-inactive';
+                return (
+                  <div className={tabClassName} key={tabName}>
+                    {tabName}
+                  </div>
+                );
+              })}
+            />
+          </div>
         </div>
-        <div className="edit-group-display-tab-container">
-          <TabsDisplay
-            displayType={TAB_DOUBLE_LINE_DIVIDER_DISPLAY}
-            tabs={exampleTabs.map((tabName, i) => {
-              const tabClassName =
-                i === 0 ? 'feed-tab-active' : 'feed-tab-inactive';
-              return (
-                <div className={tabClassName} key={tabName}>
-                  {tabName}
-                </div>
-              );
-            })}
-          />
+        <div className="edit-group-display-background-section">
+          <Dropdown customToggleTextOnly={displayedBackgroundDesign}>
+            {getDesignOptions(setDisplayedBackgroundDesign)}
+          </Dropdown>
+          <div className="edit-group-display-light-or-dark-container">
+            <button
+              onClick={() => setDarkOrLightBackground('light')}
+              className={`edit-group-display-light-or-dark-button${
+                darkOrLightBackground === 'light' ? '-active' : '-inactive'
+              }`}
+            >
+              <h3>Light</h3>
+            </button>
+            <button
+              onClick={() => setDarkOrLightBackground('dark')}
+              className={`edit-group-display-light-or-dark-button${
+                darkOrLightBackground === 'dark' ? '-active' : '-inactive'
+              }`}
+            >
+              <h3>Dark</h3>
+            </button>
+          </div>
+          <div className="edit-group-display-show-content-button-container">
+            <NegativeButton
+              onClick={() =>
+                setIsDisplayingContentInPreview((currentState) => !currentState)
+              }
+            >
+              {isDisplayingContentInPreview
+                ? 'Hide content'
+                : 'Show with content'}
+            </NegativeButton>
+          </div>
         </div>
-        <div className="edit-group-display-tab-container">
-          <TabsDisplay
-            displayType={TAB_NO_DIVIDER_DISPLAY}
-            tabs={exampleTabs.map((tabName, i) => {
-              const tabClassName =
-                i === 0 ? 'feed-tab-active' : 'feed-tab-inactive';
-              return (
-                <div className={tabClassName} key={tabName}>
-                  {tabName}
-                </div>
-              );
-            })}
-          />
-        </div>
-        <div className="edit-group-display-tab-container">
-          <TabsDisplay
-            displayType={TAB_DROPDOWN_DISPLAY}
-            tabs={exampleTabs.map((tabName, i) => {
-              const tabClassName =
-                i === 0 ? 'feed-tab-active' : 'feed-tab-inactive';
-              return (
-                <div className={tabClassName} key={tabName}>
-                  {tabName}
-                </div>
-              );
-            })}
-          />
-        </div>
-      </div>
-      <div className="edit-group-display-background-section">
-        <Dropdown
-          customToggleTextOnly={backgroundDesignIDToName(
-            displayedBackgroundDesign
-          )}
-        >
-          {getDesignOptions(setDisplayedBackgroundDesign)}
-        </Dropdown>
-        <div className="edit-group-display-background-preview-container">
-          Here goes the background
-          <NegativeButton
-            onClick={() =>
-              setIsDisplayingContentInPreview((currentState) => !currentState)
+      </PaddedContent>
+
+      {isDisplayingContentInPreview ? (
+        <div className="edit-group-display-preview-positioning-sizing">
+          <div
+            className={
+              darkOrLightBackground === 'dark'
+                ? 'edit-group-display-preview-background-dark'
+                : 'light'
             }
           >
-            {isDisplayingContentInPreview
-              ? 'Hide content'
-              : 'Show with content'}
-          </NegativeButton>
+            <div className="background-container-preview">
+              {backgroundDesignIDToSVG(
+                backgroundColorBlindNameAndShadeToID(
+                  displayedBackgroundDesign,
+                  darkOrLightBackground
+                )
+              )}
+            </div>
+            <div className="edit-group-preview-layout">
+              <div
+                className={`edit-group-preview-sider-left${
+                  darkOrLightBackground === 'dark' ? '-dark' : ''
+                }`}
+              ></div>
+              <div className="edit-group-preview-content">
+                <div className="edit-group-preview-group-header-section">
+                  <div
+                    className={`edit-group-preview-group-name${
+                      darkOrLightBackground === 'dark' ? '-dark' : ''
+                    }`}
+                  >
+                    <h4>Group Name</h4>
+                    <h4 className="edit-group-display-preview-institution">
+                      Institution
+                    </h4>
+                  </div>
+                  <div
+                    className={`edit-group-preview-group-cover${
+                      darkOrLightBackground === 'dark' ? '-dark' : ''
+                    }`}
+                  >
+                    <div className="edit-group-preview-group-avatar"></div>
+                  </div>
+                </div>
+                <div
+                  className={`edit-group-preview-group-content-block${
+                    darkOrLightBackground === 'dark' ? '-dark' : ''
+                  }`}
+                ></div>
+                <div
+                  className={`edit-group-preview-group-content-block-2${
+                    darkOrLightBackground === 'dark' ? '-dark' : ''
+                  }`}
+                ></div>
+                <div
+                  className={`edit-group-preview-group-content-block-3${
+                    darkOrLightBackground === 'dark' ? '-dark' : ''
+                  }`}
+                ></div>
+              </div>
+              <div
+                className={`edit-group-preview-sider-right${
+                  darkOrLightBackground === 'dark' ? '-dark' : ''
+                }`}
+              ></div>
+            </div>
+          </div>
         </div>
-      </div>
-    </PaddedPageContainer>
+      ) : (
+        <div style={{height: '900px'}}>
+          <div style={{position: 'relative'}}>
+            <div className="background-container-preview">
+              {backgroundDesignIDToSVG(
+                backgroundColorBlindNameAndShadeToID(
+                  displayedBackgroundDesign,
+                  darkOrLightBackground
+                )
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      {/* {changesMade && (
+        <SaveOrCancelPopover
+          submitting={submitting}
+          onCancel={resetDisplayOptions}
+          onSave={submitChanges}
+        />
+      )} */}
+    </UnpaddedPageContainer>
   );
 }
 

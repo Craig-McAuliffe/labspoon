@@ -458,10 +458,14 @@ export function Tabs({
   return <TabsDisplay tabs={tabs} />;
 }
 
-export function TabsDisplay({tabs}) {
+export function TabsDisplay({tabs, noBorderOrMargin}) {
   return (
     <PaddedContent>
-      <div className="feed-tabs-container">
+      <div
+        className={`feed-tabs-container${
+          noBorderOrMargin ? '-no-border-or-padding' : ''
+        }`}
+      >
         <div className="feed-tabs-layout">{tabs}</div>
       </div>
     </PaddedContent>

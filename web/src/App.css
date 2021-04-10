@@ -177,6 +177,23 @@
   }
 }
 
+.background-container {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  z-index: -2;
+}
+
+.background-container-preview {
+  z-index: -2;
+  top: 0px;
+  position: absolute;
+  width: 100%;
+}
+
+.background-container svg {
+  width: 100vw;
+}
 @media screen and (max-width: 1550px) {
   .main-layout {
     grid-template-columns: 350px 1fr 350px;
@@ -203,6 +220,21 @@
   .main-layout {
     display: block;
     max-width: 100%;
+  }
+
+  .background-container {
+    left: -20%;
+    width: 150%;
+  }
+
+  .background-container-preview {
+    left: -20%;
+    width: 140%;
+  }
+
+  .background-container svg,
+  .background-container-preview svg {
+    width: 100%;
   }
 }
 

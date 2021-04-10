@@ -1,6 +1,10 @@
-.feed-tabs-container {
+.feed-tabs-container,
+.feed-tabs-container-no-border-or-padding {
   grid-column: 2/3;
   grid-row: 3/4;
+}
+
+.feed-tabs-container {
   padding: 40px 0px 30px;
   border-top: 1px solid #dcdce0;
 }
