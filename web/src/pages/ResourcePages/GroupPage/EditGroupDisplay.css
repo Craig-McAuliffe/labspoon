@@ -38,6 +38,10 @@
   padding: 18px 14px;
 }
 
+.edit-group-display-option-container-selected {
+  background: #e7f5fc;
+}
+
 .edit-group-display-option-container {
   border: none;
   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.2);
@@ -87,9 +91,12 @@
   padding: 10px 10px 0px 0px;
 }
 
+.edit-group-display-tab-container-selected {
+  background: #e7f5fc;
+}
+
 .edit-group-display-tab-container-selected
   .edit-group-display-selector-container {
-  background: #e7f5fc;
   display: flex;
   align-items: center;
 }

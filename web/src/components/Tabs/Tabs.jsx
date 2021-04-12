@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect} from 'react';
 import {Link} from 'react-router-dom';
 import {
   FilterManagerContext,
@@ -55,7 +55,7 @@ function RoutedTabOption({
   const className = getClassNameFromDisplayType(displayType);
   return (
     <Link
-      to={`/${routedTabBasePathname}/${option.data.id}`}
+      to={`/${routedTabBasePathname}/${tabOption.data.id}`}
       key={tabOption.data.id}
       className={`${className}${
         tabOption.data.id === currentTabID ? '-active' : '-inactive'
