@@ -42,6 +42,7 @@ export default function Tabs({
       useRoutedTabs={useRoutedTabs}
       tabOptions={tabOptions}
       displayType={displayType}
+      setTabFilter={setTabFilter}
     />
   );
 }
@@ -75,11 +76,12 @@ function NonRoutedTabOption({
   currentTabID,
   setSiderFilterLoading,
   index,
+  setTabFilter,
 }) {
   const className = getClassNameFromDisplayType(displayType);
   const onTabSelect = () => {
     if (!tabID) return;
-    if (tabID === selectedTabID) return;
+    if (tabID === currentTabID) return;
     // If the filter changes on tab change, we should not fetch results
     // until the new filter is loaded
     if (affectsFilter) {
@@ -140,6 +142,7 @@ export function TabsDisplay({
   tabOptions,
   routedTabBasePathname,
   setSiderFilterLoading,
+  setTabFilter,
 }) {
   if (displayType === TAB_DROPDOWN_DISPLAY)
     return (
@@ -187,6 +190,7 @@ export function TabsDisplay({
               />
             ) : (
               <NonRoutedTabOption
+                setTabFilter={setTabFilter}
                 displayType={displayType}
                 affectsFilter={affectsFilter}
                 setSiderFilterLoading={setSiderFilterLoading}
