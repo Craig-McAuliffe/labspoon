@@ -7,6 +7,7 @@ body {
   font-size: 16px;
   overflow-y: scroll;
   overflow-x: hidden;
+  color: #343a3e;
 }
 
 h1,
@@ -107,10 +108,9 @@ input:focus {
   }
 }
 
-@media screen and (max-width: 350px) {
+@media screen and (max-width: 400px) {
   body {
     font-size: 14px;
-    scrollbar-width: none;
   }
 
   h1 {

@@ -1,4 +1,5 @@
-.cover-image {
+.cover-image,
+.cover-image-greyed {
   width: 100%;
   position: relative;
   height: 100%;
@@ -6,10 +7,6 @@
 }
 
 .cover-image-greyed {
-  width: 100%;
-  position: relative;
-  height: 100%;
-  object-fit: cover;
   opacity: 0.4;
 }
 

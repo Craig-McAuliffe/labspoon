@@ -67,9 +67,9 @@ export default function SquaresLight() {
           gradientTransform="translate(759.5 469.5) rotate(0.447613) scale(576.018 459.75)"
         >
           <stop offset="0.252617" stopColor="white" />
-          <stop offset="0.356171" stopColor="white" stopOpacity="0" />
-          <stop offset="0.532059" stopColor="#A2D1EB" stopOpacity="0.11" />
-          <stop offset="1" stopColor="#00A4FF" stopOpacity="0" />
+          <stop offset="0.356171" stopColor="white" stopOpacity="0.1" />
+          <stop offset="0.532059" stopColor="#A2D1EB" stopOpacity="0.33" />
+          <stop offset="1" stopColor="#00A4FF" stopOpacity="0.04" />
         </radialGradient>
         <radialGradient
           id="paint1_radial"
@@ -80,9 +80,9 @@ export default function SquaresLight() {
           gradientTransform="translate(687 459) rotate(-179.446) scale(517.024 662.572)"
         >
           <stop offset="0.0885417" stopColor="white" />
-          <stop offset="0.302083" stopColor="#DFF4FF" stopOpacity="0" />
-          <stop offset="0.532059" stopColor="#A2D1EB" stopOpacity="0.13" />
-          <stop offset="1" stopColor="#00A4FF" stopOpacity="0" />
+          <stop offset="0.302083" stopColor="#DFF4FF" stopOpacity="0.2" />
+          <stop offset="0.532059" stopColor="#A2D1EB" stopOpacity="0.33" />
+          <stop offset="1" stopColor="#00A4FF" stopOpacity="0.04" />
         </radialGradient>
         <linearGradient
           id="paint2_linear"

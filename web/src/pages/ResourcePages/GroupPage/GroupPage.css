@@ -27,7 +27,6 @@
 
 .group-header-info {
   grid-column: 2/3;
-  /* margin-left: 5px; */
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -129,6 +128,87 @@
   margin: 20px 0px;
 }
 
+.group-details-internal-headline-section {
+  position: relative;
+  width: 100%;
+}
+
+.group-details-internal-headline-section .cover-image-greyed,
+.group-details-internal-headline-section .cover-image {
+  position: absolute;
+  width: 100%;
+}
+
+.group-details-internal-headline-avatar-text-container {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+}
+
+.group-details-internal-headline-avatar-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  z-index: 1;
+  padding: 20px 10px;
+}
+
+.group-details-internal-headline-avatar-container .rounded-circle {
+  border: 1px solid #ffffff;
+}
+
+.group-details-internal-headline-avatar-container img {
+  height: 160px;
+  width: 160px;
+}
+
+.group-details-internal-name-institution-light,
+.group-details-internal-name-institution-dark {
+  z-index: 1;
+  align-self: center;
+  padding-right: 5px;
+}
+
+.group-details-internal-name-institution-light {
+  color: #ffffff;
+}
+.group-details-internal-name-institution-dark {
+  color: #343a3e;
+}
+
+.group-details-internal-name-institution-dark h2,
+.group-details-internal-name-institution-light h2 {
+  font-size: 1.4em;
+}
+
+.group-details-internal-name-institution-dark h4,
+.group-details-internal-name-institution-light h4 {
+  font-size: 1.2em;
+}
+
+.group-details-no-avatar-name-institution-container {
+  padding-bottom: 10px;
+}
+
+.group-details-no-avatar-name-institution-container h2 {
+  margin-bottom: 0px;
+}
+
+.group-details-no-avatar-name-institution-container h4 {
+  color: #5d5d65;
+}
+
+.group-details-no-avatar-center-name {
+  letter-spacing: 0.07em;
+  font-size: 0.9em;
+  color: #343a3e;
+  text-align: center;
+}
+
+.group-details-no-avatar-institution {
+  padding-bottom: 10px;
+  color: #5d5d65;
+}
+
 .group-website-link svg {
   height: 20px;
 }
@@ -180,6 +260,26 @@
   color: #ffffff;
 }
 
+@media screen and (max-width: 1300px) {
+  .group-details-internal-headline-avatar-container img {
+    height: 140px;
+    width: 140px;
+  }
+  .group-details-internal-headline-avatar-text-container {
+    grid-template-columns: 160px 1fr;
+  }
+}
+
+@media screen and (max-width: 650px) {
+  .group-details-internal-headline-avatar-container img {
+    height: 110px;
+    width: 110px;
+  }
+  .group-details-internal-headline-avatar-text-container {
+    grid-template-columns: 150px 1fr;
+  }
+}
+
 @media screen and (max-width: 600px) {
   .group-icon-and-message img {
     width: 110px;
@@ -187,6 +287,27 @@
   }
   .group-header {
     grid-template-columns: 120px 1fr;
+  }
+
+  .group-details-internal-headline-avatar-container {
+    padding: 10px 10px 10px 2px;
+  }
+
+  .group-details-internal-name-institution-dark h2,
+  .group-details-internal-name-institution-light h2 {
+    font-size: 1.3em;
+  }
+
+  .group-details-internal-name-institution-dark h4,
+  .group-details-internal-name-institution-light h4 {
+    font-size: 1.1em;
+  }
+  .group-details-internal-headline-avatar-container img {
+    height: 100px;
+    width: 100px;
+  }
+  .group-details-internal-headline-avatar-text-container {
+    grid-template-columns: 130px 1fr;
   }
 }
 
@@ -198,6 +319,22 @@
   .claim-group-button-container {
     display: flex;
     justify-content: center;
+  }
+  .group-details-internal-name-institution-dark h2,
+  .group-details-internal-name-institution-light h2 {
+    font-size: 1.1em;
+  }
+
+  .group-details-internal-name-institution-dark h4,
+  .group-details-internal-name-institution-light h4 {
+    font-size: 0.8em;
+  }
+  .group-details-internal-headline-avatar-container img {
+    height: 90px;
+    width: 90px;
+  }
+  .group-details-internal-headline-avatar-text-container {
+    grid-template-columns: 110px 1fr;
   }
 }
 
@@ -217,6 +354,22 @@
   .group-website-follow-container {
     margin-top: 10px;
   }
+  .group-details-internal-headline-avatar-container img {
+    height: 70px;
+    width: 70px;
+  }
+  .group-details-internal-headline-avatar-text-container {
+    grid-template-columns: 77px 1fr;
+  }
+  .group-details-internal-name-institution-dark h2,
+  .group-details-internal-name-institution-light h2 {
+    font-size: 1em;
+  }
+
+  .group-details-internal-name-institution-dark h4,
+  .group-details-internal-name-institution-light h4 {
+    font-size: 0.7em;
+  }
 }
 
 @media screen and (max-width: 300px) {
@@ -234,6 +387,15 @@
 
   .group-website-follow-container {
     margin-top: 10px;
+  }
+  .group-details-internal-name-institution-dark h2,
+  .group-details-internal-name-institution-light h2 {
+    font-size: 0.9em;
+  }
+
+  .group-details-internal-name-institution-dark h4,
+  .group-details-internal-name-institution-light h4 {
+    font-size: 0.6em;
   }
 }
 

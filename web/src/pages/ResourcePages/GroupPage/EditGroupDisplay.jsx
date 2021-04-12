@@ -1,15 +1,14 @@
-import React, {useState} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {
   PaddedContent,
   UnpaddedPageContainer,
 } from '../../../components/Layout/Content';
-import {ListItemContainer} from '../../../components/ListItem/ListItemCommonComponents';
 import withSizes from 'react-sizes';
 import {GroupDetailsHeaderSection} from './GroupDetails';
 
 import './EditGroupDisplay.css';
 import SecondaryButton from '../../../components/Buttons/SecondaryButton';
-import {TabsDisplay} from '../../../components/FilterableResults/FilterableResults';
+import {TabsDisplay} from '../../../components/Tabs/Tabs';
 import Dropdown, {DropdownOption} from '../../../components/Dropdown';
 import NegativeButton from '../../../components/Buttons/NegativeButton';
 import ErrorMessage from '../../../components/Forms/ErrorMessage';
@@ -29,15 +28,15 @@ import CyclesLight from '../../../assets/CyclesLight';
 import {BlankLight} from '../../../assets/BlankBackgrounds';
 // import { SaveOrCancelPopover } from '../../../components/Popovers/Popover';
 
-export const AVATAR_EMBEDDED_DISPLAY = 'embeddedAvatarDisplay';
-export const AVATAR_INTERNAL_DISPLAY = 'internalAvatarDisplay';
-export const NO_AVATAR_LEFT_TEXT_DISPLAY = 'noAvatarLeftTextDisplay';
-export const NO_AVATAR_CENTER_TEXT_DISPLAY = 'noAvatarCenterTextDisplay';
+export const AVATAR_EMBEDDED_HEADER_DISPLAY = 'embeddedAvatarDisplay';
+export const AVATAR_INTERNAL_HEADER_DISPLAY = 'internalAvatarDisplay';
+export const NO_AVATAR_LEFT_TEXT_HEADER_DISPLAY = 'noAvatarLeftTextDisplay';
+export const NO_AVATAR_CENTER_TEXT_HEADER_DISPLAY = 'noAvatarCenterTextDisplay';
 
 export const TAB_RECTANGLES_DISPLAY = 'tabRectanglesDisplay';
-export const TAB_DOUBLE_LINE_DIVIDER_DISPLAY = 'tabRectanglesDisplay';
-export const TAB_NO_DIVIDER_DISPLAY = 'tabRectanglesDisplay';
-export const TAB_DROPDOWN_DISPLAY = 'tabRectanglesDisplay';
+export const TAB_SINGLE_LINE_DIVIDER_DISPLAY = 'tabDoubleLineDividerDisplay';
+export const TAB_NO_DIVIDER_DISPLAY = 'tabNoLineDividerDisplay';
+export const TAB_DROPDOWN_DISPLAY = 'tabDropdownDisplay';
 
 export const BLANK_LIGHT_BACKGROUND = 'blankLightBackground';
 export const SPHERICAL_LIGHT_BACKGROUND = 'sphericalLightBackground';
@@ -54,6 +53,8 @@ export const TOWERS_DARK_BACKGROUND = 'towersDarkBackground';
 export const CYCLES_DARK_BACKGROUND = 'cyclesDarkBackground';
 export const SINGULARITY_DARK_BACKGROUND = 'singularityDarkBackground';
 
+export const LIGHT_NAME_SHADE = 'light';
+export const DARK_NAME_SHADE = 'dark';
 function backgroundColorBlindNameAndShadeToID(colorBlindDesignName, shade) {
   if (shade === 'dark') {
     switch (colorBlindDesignName) {
@@ -165,12 +166,21 @@ function EditGroupDisplay({groupData, groupID, children, isMobile}) {
       ? groupData.backgroundDesign
       : colorBlindDesignOptions[0]
   );
-  const [
-    isDisplayingContentInPreview,
-    setIsDisplayingContentInPreview,
-  ] = useState(false);
+  const [selectedNavigationType, setSelectedNavigationType] = useState(
+    groupData.navigationDisplayType
+      ? groupData.navigationDisplayType
+      : TAB_RECTANGLES_DISPLAY
+  );
+  const [headerNameShade, setHeaderNameShade] = useState(
+    groupData.headerNameShade ? groupData.headerNameShade : LIGHT_NAME_SHADE
+  );
   const [successfulSubmit, setSuccessfulSubmit] = useState(false);
   const [submitError, setSubmitError] = useState(false);
+  const [selectedHeaderType, setSelectedHeaderType] = useState(
+    groupData.selectedHeaderType
+      ? groupData.selectedHeaderType
+      : AVATAR_EMBEDDED_HEADER_DISPLAY
+  );
   const [darkOrLightBackground, setDarkOrLightBackground] = useState(() => {
     if (groupData.backgroundDesign) {
       if (groupData.backgroundDesign.toLowerCase().includes('dark'))
@@ -201,136 +211,338 @@ function EditGroupDisplay({groupData, groupID, children, isMobile}) {
             </SuccessMessage>
           </div>
         )}
-        <div className="edit-group-display-header-section">
-          <h2 className="edit-group-display-sub-title">Header</h2>
-          <ListItemContainer>
-            <div className="edit-group-display-selector-container">
-              <SecondaryButton>Select</SecondaryButton>
-            </div>
-            <GroupDetailsHeaderSection
-              displayType={AVATAR_EMBEDDED_DISPLAY}
-              group={groupData}
-              groupID={groupID}
-              userIsMember={true}
-              isMobile={isMobile}
-              designOnly={true}
-            />
-          </ListItemContainer>
-          <ListItemContainer>
-            <div className="edit-group-display-selector-container">
-              <SecondaryButton>Select</SecondaryButton>
-            </div>
-            <GroupDetailsHeaderSection
-              displayType={AVATAR_INTERNAL_DISPLAY}
-              group={groupData}
-              groupID={groupID}
-              userIsMember={true}
-              isMobile={isMobile}
-              designOnly={true}
-            />
-          </ListItemContainer>
-          <ListItemContainer>
-            <div className="edit-group-display-selector-container">
-              <SecondaryButton>Select</SecondaryButton>
-            </div>
-            <GroupDetailsHeaderSection
-              displayType={NO_AVATAR_LEFT_TEXT_DISPLAY}
-              group={groupData}
-              groupID={groupID}
-              userIsMember={true}
-              isMobile={isMobile}
-              designOnly={true}
-            />
-          </ListItemContainer>
-          <ListItemContainer>
-            <div className="edit-group-display-selector-container">
-              <SecondaryButton>Select</SecondaryButton>
-            </div>
-            <GroupDetailsHeaderSection
-              displayType={NO_AVATAR_CENTER_TEXT_DISPLAY}
-              group={groupData}
-              groupID={groupID}
-              userIsMember={true}
-              isMobile={isMobile}
-              designOnly={true}
-            />
-          </ListItemContainer>
+        <EditGroupDisplayHeaderSection
+          groupData={groupData}
+          groupID={groupID}
+          isMobile={isMobile}
+          selectedHeaderType={selectedHeaderType}
+          setSelectedHeaderType={setSelectedHeaderType}
+          headerNameShade={headerNameShade}
+          setHeaderNameShade={setHeaderNameShade}
+        />
+        <EditGroupDisplayNavigationSection
+          selectedNavigationType={selectedNavigationType}
+          setSelectedNavigationType={setSelectedNavigationType}
+        />
+      </PaddedContent>
+
+      <EditGroupBackgroundDisplaySection
+        displayedBackgroundDesign={displayedBackgroundDesign}
+        setDisplayedBackgroundDesign={setDisplayedBackgroundDesign}
+        darkOrLightBackground={darkOrLightBackground}
+        setDarkOrLightBackground={setDarkOrLightBackground}
+      />
+      {/* {changesMade && (
+        <SaveOrCancelPopover
+          submitting={submitting}
+          onCancel={resetDisplayOptions}
+          onSave={submitChanges}
+        />
+      )} */}
+    </UnpaddedPageContainer>
+  );
+}
+
+function EditGroupDisplayNavigationSection({
+  selectedNavigationType,
+  setSelectedNavigationType,
+}) {
+  return (
+    <div className="edit-group-display-navigation-section">
+      <h2 className="edit-group-display-sub-title">Navigation</h2>
+      <div
+        className={`edit-group-display-tab-container${
+          selectedNavigationType === TAB_RECTANGLES_DISPLAY ? '-selected' : ''
+        }`}
+      >
+        <div className="edit-group-display-selector-container">
+          {selectedNavigationType === TAB_RECTANGLES_DISPLAY ? (
+            <span>Selected</span>
+          ) : (
+            <SecondaryButton
+              onClick={() => {
+                if (selectedNavigationType === TAB_RECTANGLES_DISPLAY) return;
+                setSelectedNavigationType(TAB_RECTANGLES_DISPLAY);
+              }}
+            >
+              Select
+            </SecondaryButton>
+          )}
         </div>
-        <div className="edit-group-display-navigation-section">
-          <h2 className="edit-group-display-sub-title">Navigation</h2>
-          <div className="edit-group-display-tab-container">
-            <div className="edit-group-display-selector-container">
-              <SecondaryButton>Select</SecondaryButton>
-            </div>
-            <TabsDisplay
-              noBorderOrMargin={true}
-              displayType={TAB_RECTANGLES_DISPLAY}
-              tabs={exampleTabs.map((tabName, i) => {
-                const tabClassName =
-                  i === 0 ? 'feed-tab-active' : 'feed-tab-inactive';
-                return (
-                  <div className={tabClassName} key={tabName}>
-                    {tabName}
-                  </div>
-                );
-              })}
-            />
-          </div>
-          <div className="edit-group-display-tab-container">
-            <div className="edit-group-display-selector-container">
-              <SecondaryButton>Select</SecondaryButton>
-            </div>
-            <TabsDisplay
-              noBorderOrMargin={true}
-              displayType={TAB_DOUBLE_LINE_DIVIDER_DISPLAY}
-              tabs={exampleTabs.map((tabName, i) => {
-                const tabClassName =
-                  i === 0 ? 'feed-tab-active' : 'feed-tab-inactive';
-                return (
-                  <div className={tabClassName} key={tabName}>
-                    {tabName}
-                  </div>
-                );
-              })}
-            />
-          </div>
-          <div className="edit-group-display-tab-container">
-            <div className="edit-group-display-selector-container">
-              <SecondaryButton>Select</SecondaryButton>
-            </div>
-            <TabsDisplay
-              noBorderOrMargin={true}
-              displayType={TAB_NO_DIVIDER_DISPLAY}
-              tabs={exampleTabs.map((tabName, i) => {
-                const tabClassName =
-                  i === 0 ? 'feed-tab-active' : 'feed-tab-inactive';
-                return (
-                  <div className={tabClassName} key={tabName}>
-                    {tabName}
-                  </div>
-                );
-              })}
-            />
-          </div>
-          <div className="edit-group-display-tab-container">
-            <div className="edit-group-display-selector-container">
-              <SecondaryButton>Select</SecondaryButton>
-            </div>
-            <TabsDisplay
-              noBorderOrMargin={true}
-              displayType={TAB_DROPDOWN_DISPLAY}
-              tabs={exampleTabs.map((tabName, i) => {
-                const tabClassName =
-                  i === 0 ? 'feed-tab-active' : 'feed-tab-inactive';
-                return (
-                  <div className={tabClassName} key={tabName}>
-                    {tabName}
-                  </div>
-                );
-              })}
-            />
-          </div>
+        <TabsDisplay
+          noBorderOrMargin={true}
+          displayType={TAB_RECTANGLES_DISPLAY}
+          tabNamesOnly={exampleTabs}
+        />
+      </div>
+      <div
+        className={`edit-group-display-tab-container${
+          selectedNavigationType === TAB_SINGLE_LINE_DIVIDER_DISPLAY
+            ? '-selected'
+            : ''
+        }`}
+      >
+        <div className="edit-group-display-selector-container">
+          {selectedNavigationType === TAB_SINGLE_LINE_DIVIDER_DISPLAY ? (
+            <span>Selected</span>
+          ) : (
+            <SecondaryButton
+              onClick={() => {
+                if (selectedNavigationType === TAB_SINGLE_LINE_DIVIDER_DISPLAY)
+                  return;
+                setSelectedNavigationType(TAB_SINGLE_LINE_DIVIDER_DISPLAY);
+              }}
+            >
+              Select
+            </SecondaryButton>
+          )}
         </div>
+        <TabsDisplay
+          noBorderOrMargin={true}
+          displayType={TAB_SINGLE_LINE_DIVIDER_DISPLAY}
+          tabNamesOnly={exampleTabs}
+        />
+      </div>
+      <div
+        className={`edit-group-display-tab-container${
+          selectedNavigationType === TAB_NO_DIVIDER_DISPLAY ? '-selected' : ''
+        }`}
+      >
+        <div className="edit-group-display-selector-container">
+          {selectedNavigationType === TAB_NO_DIVIDER_DISPLAY ? (
+            <span>Selected</span>
+          ) : (
+            <SecondaryButton
+              onClick={() => {
+                if (selectedNavigationType === TAB_NO_DIVIDER_DISPLAY) return;
+                setSelectedNavigationType(TAB_NO_DIVIDER_DISPLAY);
+              }}
+            >
+              Select
+            </SecondaryButton>
+          )}
+        </div>
+        <TabsDisplay
+          noBorderOrMargin={true}
+          displayType={TAB_NO_DIVIDER_DISPLAY}
+          tabNamesOnly={exampleTabs}
+        />
+      </div>
+      <div
+        className={`edit-group-display-tab-container${
+          selectedNavigationType === TAB_DROPDOWN_DISPLAY ? '-selected' : ''
+        }`}
+      >
+        <div className="edit-group-display-selector-container">
+          {selectedNavigationType === TAB_DROPDOWN_DISPLAY ? (
+            <span>Selected</span>
+          ) : (
+            <SecondaryButton
+              onClick={() => {
+                if (selectedNavigationType === TAB_DROPDOWN_DISPLAY) return;
+                setSelectedNavigationType(TAB_DROPDOWN_DISPLAY);
+              }}
+            >
+              Select
+            </SecondaryButton>
+          )}
+        </div>
+        <TabsDisplay
+          noBorderOrMargin={true}
+          displayType={TAB_DROPDOWN_DISPLAY}
+          tabNamesOnly={exampleTabs}
+        />
+      </div>
+    </div>
+  );
+}
+
+function EditGroupDisplayHeaderSection({
+  groupData,
+  groupID,
+  isMobile,
+  setSelectedHeaderType,
+  selectedHeaderType,
+  headerNameShade,
+  setHeaderNameShade,
+}) {
+  return (
+    <div className="edit-group-display-header-section">
+      <h2 className="edit-group-display-sub-title">Header</h2>
+      <div
+        className={`edit-group-display-option-container${
+          selectedHeaderType === AVATAR_EMBEDDED_HEADER_DISPLAY
+            ? '-selected'
+            : ''
+        }`}
+      >
+        <div className="edit-group-display-selector-container">
+          {selectedHeaderType === AVATAR_EMBEDDED_HEADER_DISPLAY ? (
+            <span>Selected</span>
+          ) : (
+            <SecondaryButton
+              onClick={() =>
+                setSelectedHeaderType(AVATAR_EMBEDDED_HEADER_DISPLAY)
+              }
+            >
+              Select
+            </SecondaryButton>
+          )}
+        </div>
+
+        <GroupDetailsHeaderSection
+          displayType={AVATAR_EMBEDDED_HEADER_DISPLAY}
+          group={groupData}
+          groupID={groupID}
+          userIsMember={true}
+          isMobile={isMobile}
+          designOnly={true}
+        />
+      </div>
+      <div
+        className={`edit-group-display-option-container${
+          selectedHeaderType === AVATAR_INTERNAL_HEADER_DISPLAY
+            ? '-selected'
+            : ''
+        }`}
+      >
+        <div className="edit-group-display-selector-and-shade-container">
+          <div className="edit-group-display-light-or-dark-container">
+            <button
+              onClick={() => {
+                if (headerNameShade === LIGHT_NAME_SHADE) return;
+                setHeaderNameShade(LIGHT_NAME_SHADE);
+              }}
+              className={`edit-group-display-light-or-dark-button${
+                headerNameShade === LIGHT_NAME_SHADE ? '-active' : '-inactive'
+              }`}
+            >
+              <h3>White Text</h3>
+            </button>
+            <button
+              onClick={() => {
+                if (headerNameShade === DARK_NAME_SHADE) return;
+                setHeaderNameShade(DARK_NAME_SHADE);
+              }}
+              className={`edit-group-display-light-or-dark-button${
+                headerNameShade === DARK_NAME_SHADE ? '-active' : '-inactive'
+              }`}
+            >
+              <h3>Dark Text</h3>
+            </button>
+          </div>
+          {selectedHeaderType === AVATAR_INTERNAL_HEADER_DISPLAY ? (
+            <span>Selected</span>
+          ) : (
+            <SecondaryButton
+              onClick={() =>
+                setSelectedHeaderType(AVATAR_INTERNAL_HEADER_DISPLAY)
+              }
+            >
+              Select
+            </SecondaryButton>
+          )}
+        </div>
+        <GroupDetailsHeaderSection
+          displayType={AVATAR_INTERNAL_HEADER_DISPLAY}
+          group={groupData}
+          groupID={groupID}
+          userIsMember={true}
+          isMobile={isMobile}
+          designOnly={true}
+          nameShade={headerNameShade}
+        />
+      </div>
+      <div
+        className={`edit-group-display-option-container${
+          selectedHeaderType === NO_AVATAR_LEFT_TEXT_HEADER_DISPLAY
+            ? '-selected'
+            : ''
+        }`}
+      >
+        <div className="edit-group-display-selector-container">
+          {selectedHeaderType === NO_AVATAR_LEFT_TEXT_HEADER_DISPLAY ? (
+            <span>Selected</span>
+          ) : (
+            <SecondaryButton
+              onClick={() =>
+                setSelectedHeaderType(NO_AVATAR_LEFT_TEXT_HEADER_DISPLAY)
+              }
+            >
+              Select
+            </SecondaryButton>
+          )}
+        </div>
+        <GroupDetailsHeaderSection
+          displayType={NO_AVATAR_LEFT_TEXT_HEADER_DISPLAY}
+          group={groupData}
+          groupID={groupID}
+          userIsMember={true}
+          isMobile={isMobile}
+          designOnly={true}
+        />
+      </div>
+      <div
+        className={`edit-group-display-option-container${
+          selectedHeaderType === NO_AVATAR_CENTER_TEXT_HEADER_DISPLAY
+            ? '-selected'
+            : ''
+        }`}
+      >
+        <div className="edit-group-display-selector-container">
+          {selectedHeaderType === NO_AVATAR_CENTER_TEXT_HEADER_DISPLAY ? (
+            <span>Selected</span>
+          ) : (
+            <SecondaryButton
+              onClick={() =>
+                setSelectedHeaderType(NO_AVATAR_CENTER_TEXT_HEADER_DISPLAY)
+              }
+            >
+              Select
+            </SecondaryButton>
+          )}
+        </div>
+        <GroupDetailsHeaderSection
+          displayType={NO_AVATAR_CENTER_TEXT_HEADER_DISPLAY}
+          group={groupData}
+          groupID={groupID}
+          userIsMember={true}
+          isMobile={isMobile}
+          designOnly={true}
+          nameShade={headerNameShade}
+        />
+      </div>
+    </div>
+  );
+}
+function EditGroupBackgroundDisplaySection({
+  displayedBackgroundDesign,
+  setDisplayedBackgroundDesign,
+  darkOrLightBackground,
+  setDarkOrLightBackground,
+}) {
+  const [
+    isDisplayingContentInPreview,
+    setIsDisplayingContentInPreview,
+  ] = useState(false);
+  const [containerWidth, setContainerWidth] = useState(500);
+  const contentWidthRef = useRef();
+
+  const reportWindowSize = () => {
+    if (!contentWidthRef.current) return;
+    setContainerWidth(contentWidthRef.current.scrollWidth);
+  };
+
+  useEffect(() => {
+    window.addEventListener('resize', reportWindowSize);
+    reportWindowSize();
+    return () => window.removeEventListener('resize', reportWindowSize);
+  }, [contentWidthRef]);
+  const relativePreviewHeight = containerWidth * 0.663;
+  return (
+    <UnpaddedPageContainer>
+      <PaddedContent>
+        <h2 className="edit-group-display-sub-title">Background</h2>
         <div className="edit-group-display-background-section">
           <Dropdown customToggleTextOnly={displayedBackgroundDesign}>
             {getDesignOptions(setDisplayedBackgroundDesign)}
@@ -367,23 +579,25 @@ function EditGroupDisplay({groupData, groupID, children, isMobile}) {
         </div>
       </PaddedContent>
 
-      {isDisplayingContentInPreview ? (
-        <div className="edit-group-display-preview-positioning-sizing">
-          <div
-            className={
-              darkOrLightBackground === 'dark'
-                ? 'edit-group-display-preview-background-dark'
-                : 'light'
-            }
-          >
-            <div className="background-container-preview">
-              {backgroundDesignIDToSVG(
-                backgroundColorBlindNameAndShadeToID(
-                  displayedBackgroundDesign,
-                  darkOrLightBackground
-                )
-              )}
-            </div>
+      <div
+        ref={contentWidthRef}
+        className="edit-group-display-preview-positioning-sizing"
+        style={{height: relativePreviewHeight + 'px'}}
+      >
+        <div
+          className={`edit-group-display-preview-background${
+            darkOrLightBackground === 'dark' ? '-dark' : '-light'
+          }`}
+        >
+          <div className="background-container-preview">
+            {backgroundDesignIDToSVG(
+              backgroundColorBlindNameAndShadeToID(
+                displayedBackgroundDesign,
+                darkOrLightBackground
+              )
+            )}
+          </div>
+          {isDisplayingContentInPreview && (
             <div className="edit-group-preview-layout">
               <div
                 className={`edit-group-preview-sider-left${
@@ -391,7 +605,11 @@ function EditGroupDisplay({groupData, groupID, children, isMobile}) {
                 }`}
               ></div>
               <div className="edit-group-preview-content">
-                <div className="edit-group-preview-group-header-section">
+                <div
+                  className={`edit-group-preview-group-header-section${
+                    darkOrLightBackground === 'dark' ? '-dark' : '-light'
+                  }`}
+                >
                   <div
                     className={`edit-group-preview-group-name${
                       darkOrLightBackground === 'dark' ? '-dark' : ''
@@ -425,6 +643,11 @@ function EditGroupDisplay({groupData, groupID, children, isMobile}) {
                     darkOrLightBackground === 'dark' ? '-dark' : ''
                   }`}
                 ></div>
+                <div
+                  className={`edit-group-preview-group-content-block-3${
+                    darkOrLightBackground === 'dark' ? '-dark' : ''
+                  }`}
+                ></div>
               </div>
               <div
                 className={`edit-group-preview-sider-right${
@@ -432,33 +655,12 @@ function EditGroupDisplay({groupData, groupID, children, isMobile}) {
                 }`}
               ></div>
             </div>
-          </div>
+          )}
         </div>
-      ) : (
-        <div style={{height: '900px'}}>
-          <div style={{position: 'relative'}}>
-            <div className="background-container-preview">
-              {backgroundDesignIDToSVG(
-                backgroundColorBlindNameAndShadeToID(
-                  displayedBackgroundDesign,
-                  darkOrLightBackground
-                )
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-      {/* {changesMade && (
-        <SaveOrCancelPopover
-          submitting={submitting}
-          onCancel={resetDisplayOptions}
-          onSave={submitChanges}
-        />
-      )} */}
+      </div>
     </UnpaddedPageContainer>
   );
 }
-
 function getDesignOptions(setDisplayedBackgroundDesign) {
   return colorBlindDesignOptions.map((colorBlindDesignOption) => (
     <DropdownOption

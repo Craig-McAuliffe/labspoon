@@ -24,6 +24,13 @@ import Popover, {
 } from '../../../components/Popovers/Popover';
 import PrimaryButton from '../../../components/Buttons/PrimaryButton';
 import NegativeButton from '../../../components/Buttons/NegativeButton';
+import {
+  AVATAR_EMBEDDED_HEADER_DISPLAY,
+  AVATAR_INTERNAL_HEADER_DISPLAY,
+  DARK_NAME_SHADE,
+  NO_AVATAR_CENTER_TEXT_HEADER_DISPLAY,
+  NO_AVATAR_LEFT_TEXT_HEADER_DISPLAY,
+} from './EditGroupDisplay';
 
 const mapGroupDetailsSizesToProps = ({width}) => ({
   // When the whole site has similar content, we will only switch to this view at 800
@@ -117,6 +124,72 @@ export function GroupDetailsHeaderSection({
   userIsMember,
   groupID,
   designOnly,
+  displayType,
+  nameShade,
+}) {
+  switch (displayType) {
+    case AVATAR_EMBEDDED_HEADER_DISPLAY:
+      return (
+        <AvatarEmbeddedHeader
+          isMobile={isMobile}
+          group={group}
+          userIsMember={userIsMember}
+          groupID={groupID}
+          designOnly={designOnly}
+          displayType={displayType}
+        />
+      );
+    case AVATAR_INTERNAL_HEADER_DISPLAY:
+      return (
+        <AvatarInternalHeader
+          group={group}
+          userIsMember={userIsMember}
+          groupID={groupID}
+          designOnly={designOnly}
+          displayType={displayType}
+          nameShade={nameShade}
+        />
+      );
+    case NO_AVATAR_LEFT_TEXT_HEADER_DISPLAY:
+      return (
+        <NoAvatarLeftTextHeader
+          group={group}
+          userIsMember={userIsMember}
+          groupID={groupID}
+          designOnly={designOnly}
+          displayType={displayType}
+        />
+      );
+    case NO_AVATAR_CENTER_TEXT_HEADER_DISPLAY:
+      return (
+        <NoAvatarCenterTextHeader
+          group={group}
+          userIsMember={userIsMember}
+          groupID={groupID}
+          designOnly={designOnly}
+          displayType={displayType}
+        />
+      );
+    default:
+      return (
+        <AvatarEmbeddedHeader
+          isMobile={isMobile}
+          group={group}
+          userIsMember={userIsMember}
+          groupID={groupID}
+          designOnly={designOnly}
+          displayType={displayType}
+        />
+      );
+  }
+}
+
+function AvatarEmbeddedHeader({
+  isMobile,
+  group,
+  userIsMember,
+  groupID,
+  designOnly,
 }) {
   const groupCoverDisplay = (
     <div className="group-cover-photo-container">
@@ -127,7 +200,9 @@ export function GroupDetailsHeaderSection({
       />
     </div>
   );
-  const groupWebsiteAndFollowOrEditDisplay = designOnly ? null : (
+  const groupWebsiteAndFollowOrEditDisplay = designOnly ? (
+    <div style={isMobile ? {height: '40px'} : {height: '0px'}}></div>
+  ) : (
     <div className="group-website-follow-container">
       <WebsiteLink link={group.website} />
       {userIsMember ? (
@@ -150,7 +225,7 @@ export function GroupDetailsHeaderSection({
         </div>
         {isMobile && groupWebsiteAndFollowOrEditDisplay}
         <div className="group-header-info">
-          <div className="group-header-name-insitution">
+          <div className="group-header-name-institution">
             <h2>{group.name}</h2>
             <h4>{group.institution}</h4>
           </div>
@@ -161,6 +236,117 @@ export function GroupDetailsHeaderSection({
     </>
   );
 }
+
+function AvatarInternalHeader({
+  group,
+  userIsMember,
+  groupID,
+  designOnly,
+  nameShade,
+}) {
+  const groupWebsiteAndFollowOrEditDisplay = designOnly ? null : (
+    <div className="group-website-follow-container">
+      <WebsiteLink link={group.website} />
+      {userIsMember ? (
+        <Link to={`/group/${groupID}/edit/info`}>
+          <EditButton editAction={() => {}}>Edit Group</EditButton>
+        </Link>
+      ) : (
+        <FollowGroupButton targetGroup={group} />
+      )}
+    </div>
+  );
+
+  return (
+    <>
+      <div className="group-details-internal-headline-section">
+        <UserCoverPhoto
+          src={group.coverPhoto}
+          alt={`group cover picture`}
+          isGroup={true}
+        />
+
+        <div className="group-details-internal-headline-avatar-text-container">
+          <div className="group-details-internal-headline-avatar-container">
+            <GroupAvatar src={group.avatar} />
+          </div>
+          <div
+            className={`group-details-internal-name-institution${
+              nameShade === DARK_NAME_SHADE ? '-dark' : '-light'
+            }`}
+          >
+            <h2>{group.name}</h2>
+            <h4>{group.institution}</h4>
+          </div>
+        </div>
+      </div>
+      {groupWebsiteAndFollowOrEditDisplay}
+    </>
+  );
+}
+
+function NoAvatarLeftTextHeader({group, userIsMember, groupID, designOnly}) {
+  return (
+    <>
+      <div className="group-details-no-avatar-name-institution-container">
+        <h2>{group.name}</h2>
+        <h4>{group.institution}</h4>
+      </div>
+      <div className="group-cover-photo-container">
+        <UserCoverPhoto
+          src={group.coverPhoto}
+          alt={`group cover picture`}
+          isGroup={true}
+        />
+        {designOnly ? null : (
+          <div className="group-website-follow-container">
+            <WebsiteLink link={group.website} />
+            {userIsMember ? (
+              <Link to={`/group/${groupID}/edit/info`}>
+                <EditButton editAction={() => {}}>Edit Group</EditButton>
+              </Link>
+            ) : (
+              <FollowGroupButton targetGroup={group} />
+            )}
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+function NoAvatarCenterTextHeader({group, userIsMember, groupID, designOnly}) {
+  return (
+    <>
+      <div className="group-details-no-avatar-center-name">
+        <h2>{group.name.toUpperCase()}</h2>
+        <h4 className="group-details-no-avatar-institution">
+          {group.institution}
+        </h4>
+      </div>
+      <div className="group-cover-photo-container">
+        <UserCoverPhoto
+          src={group.coverPhoto}
+          alt={`group cover picture`}
+          isGroup={true}
+        />
+        {designOnly ? null : (
+          <div className="group-website-follow-container">
+            <WebsiteLink link={group.website} />
+            {userIsMember ? (
+              <Link to={`/group/${groupID}/edit/info`}>
+                <EditButton editAction={() => {}}>Edit Group</EditButton>
+              </Link>
+            ) : (
+              <FollowGroupButton targetGroup={group} />
+            )}
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
 function WebsiteLink({link}) {
   if (!link) return <div></div>;
   if (link.length === 0) return <div></div>;

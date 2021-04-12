@@ -33,6 +33,7 @@ export default function SearchBar({
         <div className="big-search-container">
           <div></div>
           <SearchForm
+            bigSearchPrompt={bigSearchPrompt}
             placeholderText={placeholderText}
             formClassName={formClassName}
             inputClassName={inputClassName}
@@ -93,13 +94,16 @@ function SearchForm({
   inputClassName,
   buttonClassName,
   onFocus,
+  bigSearchPrompt,
 }) {
   const history = useHistory();
   const [query, setQuery] = useState('');
   function onSubmit(event) {
     event.preventDefault();
     if (!query) return;
-    document.getElementById('searchFormInput').blur();
+    if (bigSearchPrompt) document.getElementById('searchFormInputBig').blur();
+    else document.getElementById('searchFormInput').blur();
+
     history.push(searchStateToURL({pathname: '/search'}, {query: query}));
   }
   return (
@@ -111,7 +115,7 @@ function SearchForm({
         onChange={(event) => setQuery(event.target.value)}
         onFocus={onFocus}
         type="text"
-        id="searchFormInput"
+        id={`searchFormInput${bigSearchPrompt ? 'Big' : ''}`}
       />
       <button
         type="submit"

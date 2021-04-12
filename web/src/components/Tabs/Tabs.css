@@ -1,0 +1,126 @@
+.feed-tabs-container,
+.feed-tabs-container-no-border-or-padding {
+  grid-column: 2/3;
+  grid-row: 3/4;
+}
+
+.feed-tabs-container {
+  padding: 40px 0px 30px;
+  border-top: 1px solid #dcdce0;
+}
+
+.feed-tabs-layout {
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  margin: 0px -10px;
+  align-items: flex-start;
+}
+
+.feed-tab-rectangles-inactive,
+.feed-tab-rectangles-active,
+.feed-tab-single-divider-inactive,
+.feed-tab-single-divider-active,
+.feed-tab-no-divider-inactive,
+.feed-tab-no-divider-active {
+  color: #99999f;
+  flex-shrink: 0;
+  max-width: 220px;
+  display: flex;
+}
+
+.feed-tab-single-divider-inactive,
+.feed-tab-single-divider-active,
+.feed-tab-no-divider-inactive,
+.feed-tab-no-divider-active {
+  justify-content: start;
+  padding: 0px 10px;
+}
+
+.feed-tab-single-divider-inactive {
+  border-right: 1px solid #99999f;
+}
+
+.feed-tab-single-divider-active,
+.feed-tab-single-divider-inactive:hover,
+.feed-tab-no-divider-inactive:hover,
+.feed-tab-no-divider-active {
+  color: #343a3e;
+}
+
+.feed-tab-single-divider-active,
+.feed-tab-single-divider-inactive:hover {
+  border-right: 1px solid #343a3e;
+}
+
+.feed-tab-rectangles-inactive,
+.feed-tab-rectangles-active {
+  border: 1px solid #99999f;
+  margin: 0px 10px 10px;
+  padding: 10px;
+  justify-content: center;
+  justify-items: center;
+  flex-grow: 1;
+}
+
+.feed-tab-rectangles-active {
+  border: 1px solid #343a3e;
+  color: #343a3e;
+}
+
+.feed-tab-rectangles-inactive:hover {
+  border: 1px solid #5d5d65;
+  color: #5d5d65;
+}
+
+.feed-tab-rectangles-inactive:hover,
+.feed-tab-rectangles-active:hover {
+  text-decoration: none;
+}
+
+.feed-tab-rectangles-inactive h3,
+.feed-tab-rectangles-active h3,
+.feed-tab-single-divider-inactive h3,
+.feed-tab-single-divider-active h3,
+.feed-tab-no-divider-inactive h3,
+.feed-tab-no-divider-active h3,
+.feed-tab-dropdown-active h3,
+.feed-tab-dropdown-inactive h3 {
+  margin: 0px;
+}
+
+.feed-tab-dropdown-active,
+.feed-tab-dropdown-inactive {
+  display: block;
+  padding: 5px 5px;
+  width: 100%;
+  text-align: start;
+}
+
+.feed-tab-dropdown-active:hover,
+.feed-tab-dropdown-inactive:hover {
+  background: #00507c;
+  color: #ffffff;
+}
+
+.feed-tab-dropdown-active {
+  color: #00507c;
+}
+
+.feed-tab-dropdown-inactive {
+  color: #99999f;
+}
+
+.edit-group-display-tab-container .dropdown-relative-position,
+.edit-group-display-tab-container .dropdown-default-toggle {
+  width: 250px;
+}
+
+@media screen and (max-width: 800px) {
+  .feed-tab-single-divider-inactive,
+  .feed-tab-single-divider-active,
+  .feed-tab-no-divider-inactive,
+  .feed-tab-no-divider-active {
+    padding: 0px 8px;
+  }
+}

@@ -227,11 +227,6 @@
     width: 150%;
   }
 
-  .background-container-preview {
-    left: -20%;
-    width: 140%;
-  }
-
   .background-container svg,
   .background-container-preview svg {
     width: 100%;

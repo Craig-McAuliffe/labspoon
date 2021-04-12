@@ -48,12 +48,12 @@ const GeneratedPasswordPage = lazy(() =>
 const PasswordResetPage = lazy(() =>
   import('./pages/AuthenticationPages/PasswordResetPage')
 );
+const Groups = lazy(() => import('./pages/ResourcePages/GroupPage/Groups'));
 
 import {SkeletonUserPage} from './pages/ResourcePages/UserPage';
 import AboutPage from './pages/AboutPage';
 import {MAGPublicationRouter} from './pages/ResourcePages/PublicationPage/PublicationPage';
 import TopicPage, {MAGFieldRouter} from './pages/TopicPage';
-import Groups from './pages/ResourcePages/GroupPage/Groups';
 import Users from './pages/ResourcePages/UserPage/Users';
 import {LoadingSpinnerPage} from './components/LoadingSpinner/LoadingSpinner';
 import SearchPage from './pages/SearchPage';

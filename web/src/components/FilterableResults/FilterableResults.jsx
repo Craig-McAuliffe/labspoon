@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext, createContext} from 'react';
-import {Link, useLocation} from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 import SearchBar from '../SearchBar';
 import update from 'immutability-helper';
 import FilterMenu from '../Filter/Filter';
@@ -9,7 +9,7 @@ import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import './FilterableResults.css';
 import LatestPosts from '../Posts/LatestPosts/LatestPosts';
 import {getActiveTabID} from '../../helpers/filters';
-import {PaddedContent} from '../Layout/Content';
+import Tabs from '../Tabs/Tabs';
 
 export const FilterableResultsContext = createContext({});
 export const FilterManagerContext = createContext({});
@@ -401,75 +401,6 @@ function updateFilterOption(
     },
   });
   return updatedFilterOptions;
-}
-
-export function Tabs({
-  tabFilter,
-  setTabFilter,
-  affectsFilter,
-  routedTabBasePathname,
-  useRoutedTabs,
-}) {
-  const filterManager = useContext(FilterManagerContext);
-  const selectedTabID = getActiveTabIDFromTypeFilterCollection(tabFilter);
-
-  useEffect(() => {
-    if (!tabFilter) return;
-    if (selectedTabID === 'default') setTabFilter(tabFilter.options[0].data.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tabFilter]);
-  if (!tabFilter) return <div></div>;
-  const tabs = tabFilter.options.map((option) => {
-    return useRoutedTabs && option.data.id !== selectedTabID ? (
-      <Link
-        to={`/${routedTabBasePathname}/${option.data.id}`}
-        key={option.data.id}
-        className={
-          option.data.id === selectedTabID
-            ? 'feed-tab-active'
-            : 'feed-tab-inactive'
-        }
-      >
-        <h3>{option.data.name}</h3>
-      </Link>
-    ) : (
-      <button
-        onClick={() => {
-          if (option.data.id === selectedTabID) return;
-          // If the filter changes on tab change, we should not fetch results
-          // until the new filter is loaded
-          if (affectsFilter) {
-            filterManager.setSiderFilterLoading(true);
-          }
-          setTabFilter(option.data.id);
-        }}
-        key={option.data.id}
-        className={
-          option.data.id === selectedTabID
-            ? 'feed-tab-active'
-            : 'feed-tab-inactive'
-        }
-      >
-        <h3>{option.data.name}</h3>
-      </button>
-    );
-  });
-
-  return <TabsDisplay tabs={tabs} />;
-}
-
-export function TabsDisplay({tabs, noBorderOrMargin}) {
-  return (
-    <PaddedContent>
-      <div
-        className={`feed-tabs-container${
-          noBorderOrMargin ? '-no-border-or-padding' : ''
-        }`}
-      >
-        <div className="feed-tabs-layout">{tabs}</div>
-      </div>
-    </PaddedContent>
-  );
 }
 
 function Results({

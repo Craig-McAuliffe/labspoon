@@ -1,4 +1,5 @@
 Main text: #000000
+Main text ? : #343a3e;
 Secondary Text: #5D5D65
 Tertiary Text: #99999F
 Quaternary Text: #DCDCE0
