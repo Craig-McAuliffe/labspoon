@@ -26,7 +26,9 @@ import MandelbrotLight from '../../../assets/MandelbrotLight';
 import CyclesDark from '../../../assets/CyclesDark';
 import CyclesLight from '../../../assets/CyclesLight';
 import {BlankLight} from '../../../assets/BlankBackgrounds';
-// import { SaveOrCancelPopover } from '../../../components/Popovers/Popover';
+import {SaveOrCancelPopover} from '../../../components/Popovers/Popover';
+import {db} from '../../../firebase';
+import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 
 export const AVATAR_EMBEDDED_HEADER_DISPLAY = 'embeddedAvatarDisplay';
 export const AVATAR_INTERNAL_HEADER_DISPLAY = 'internalAvatarDisplay';
@@ -56,7 +58,7 @@ export const SINGULARITY_DARK_BACKGROUND = 'singularityDarkBackground';
 export const LIGHT_NAME_SHADE = 'light';
 export const DARK_NAME_SHADE = 'dark';
 function backgroundColorBlindNameAndShadeToID(colorBlindDesignName, shade) {
-  if (shade === 'dark') {
+  if (shade === DARK_NAME_SHADE) {
     switch (colorBlindDesignName) {
       case 'BLANK':
         return BLANK_DARK_BACKGROUND;
@@ -99,7 +101,7 @@ function backgroundColorBlindNameAndShadeToID(colorBlindDesignName, shade) {
 function backgroundDesignIDToSVG(backgroundDesignID) {
   switch (backgroundDesignID) {
     case BLANK_LIGHT_BACKGROUND:
-      return <BlankLight />;
+      return null;
     case SPHERICAL_LIGHT_BACKGROUND:
       return <SphericalLight />;
     case SQUARES_LIGHT_BACKGROUND:
@@ -131,14 +133,102 @@ function backgroundDesignIDToSVG(backgroundDesignID) {
   }
 }
 
+const COLOR_BLIND_DESIGN_BLANK = 'BLANK';
+const COLOR_BLIND_DESIGN_SPHERICAL = 'SPHERICAL';
+const COLOR_BLIND_DESIGN_SQUARES = 'SQUARES';
+const COLOR_BLIND_DESIGN_MANDELBROT = 'MANDELBROT';
+const COLOR_BLIND_DESIGN_TOWERS = 'TOWERS';
+const COLOR_BLIND_DESIGN_CYCLES = 'CYCLES';
+const COLOR_BLIND_DESIGN_SINGULARITY = 'SINGULARITY';
+
+function backgroundDesignIDToColorBlindDesignAndShade(id) {
+  switch (id) {
+    case BLANK_LIGHT_BACKGROUND:
+      return {
+        shade: LIGHT_NAME_SHADE,
+        colorBlindDesign: COLOR_BLIND_DESIGN_BLANK,
+      };
+    case SPHERICAL_LIGHT_BACKGROUND:
+      return {
+        shade: LIGHT_NAME_SHADE,
+        colorBlindDesign: COLOR_BLIND_DESIGN_SPHERICAL,
+      };
+    case SQUARES_LIGHT_BACKGROUND:
+      return {
+        shade: LIGHT_NAME_SHADE,
+        colorBlindDesign: COLOR_BLIND_DESIGN_SQUARES,
+      };
+    case MANDELBROT_LIGHT_BACKGROUND:
+      return {
+        shade: LIGHT_NAME_SHADE,
+        colorBlindDesign: COLOR_BLIND_DESIGN_MANDELBROT,
+      };
+    case TOWERS_LIGHT_BACKGROUND:
+      return {
+        shade: LIGHT_NAME_SHADE,
+        colorBlindDesign: COLOR_BLIND_DESIGN_TOWERS,
+      };
+    case CYCLES_LIGHT_BACKGROUND:
+      return {
+        shade: LIGHT_NAME_SHADE,
+        colorBlindDesign: COLOR_BLIND_DESIGN_CYCLES,
+      };
+    case SINGULARITY_LIGHT_BACKGROUND:
+      return {
+        shade: LIGHT_NAME_SHADE,
+        colorBlindDesign: COLOR_BLIND_DESIGN_SINGULARITY,
+      };
+    case BLANK_DARK_BACKGROUND:
+      return {
+        shade: DARK_NAME_SHADE,
+        colorBlindDesign: COLOR_BLIND_DESIGN_BLANK,
+      };
+    case SPHERICAL_DARK_BACKGROUND:
+      return {
+        shade: DARK_NAME_SHADE,
+        colorBlindDesign: COLOR_BLIND_DESIGN_SPHERICAL,
+      };
+    case SQUARES_DARK_BACKGROUND:
+      return {
+        shade: DARK_NAME_SHADE,
+        colorBlindDesign: COLOR_BLIND_DESIGN_SQUARES,
+      };
+    case MANDELBROT_DARK_BACKGROUND:
+      return {
+        shade: DARK_NAME_SHADE,
+        colorBlindDesign: COLOR_BLIND_DESIGN_MANDELBROT,
+      };
+    case TOWERS_DARK_BACKGROUND:
+      return {
+        shade: DARK_NAME_SHADE,
+        colorBlindDesign: COLOR_BLIND_DESIGN_TOWERS,
+      };
+    case CYCLES_DARK_BACKGROUND:
+      return {
+        shade: DARK_NAME_SHADE,
+        colorBlindDesign: COLOR_BLIND_DESIGN_CYCLES,
+      };
+    case SINGULARITY_DARK_BACKGROUND:
+      return {
+        shade: DARK_NAME_SHADE,
+        colorBlindDesign: COLOR_BLIND_DESIGN_SINGULARITY,
+      };
+    default:
+      return {
+        shade: LIGHT_NAME_SHADE,
+        colorBlindDesign: COLOR_BLIND_DESIGN_BLANK,
+      };
+  }
+}
+
 const colorBlindDesignOptions = [
-  'BLANK',
-  'SPHERICAL',
-  'SQUARES',
-  'MANDELBROT',
-  'TOWERS',
-  'CYCLES',
-  'SINGULARITY',
+  COLOR_BLIND_DESIGN_BLANK,
+  COLOR_BLIND_DESIGN_SPHERICAL,
+  COLOR_BLIND_DESIGN_SQUARES,
+  COLOR_BLIND_DESIGN_MANDELBROT,
+  COLOR_BLIND_DESIGN_TOWERS,
+  COLOR_BLIND_DESIGN_CYCLES,
+  COLOR_BLIND_DESIGN_SINGULARITY,
 ];
 
 const exampleTabs = [
@@ -152,18 +242,14 @@ const exampleTabs = [
   'Open Positions',
 ];
 const mapEditGroupDisplaySizesToProps = ({width}) => ({
-  // When the whole site has similar content, we will only switch to this view at 800
-  // isMobile: width && width <= 800,
   isMobile: width && width <= 400,
 });
-
-// TO DO - Selected Displays should have blue hover around them (including if current display for group)
-// TO DO - Can click anywhere on display to select or deselect them
 
 function EditGroupDisplay({groupData, groupID, children, isMobile}) {
   const [displayedBackgroundDesign, setDisplayedBackgroundDesign] = useState(
     groupData.backgroundDesign
-      ? groupData.backgroundDesign
+      ? backgroundDesignIDToColorBlindDesignAndShade(groupData.backgroundDesign)
+          .colorBlindDesign
       : colorBlindDesignOptions[0]
   );
   const [selectedNavigationType, setSelectedNavigationType] = useState(
@@ -177,35 +263,193 @@ function EditGroupDisplay({groupData, groupID, children, isMobile}) {
   const [successfulSubmit, setSuccessfulSubmit] = useState(false);
   const [submitError, setSubmitError] = useState(false);
   const [selectedHeaderType, setSelectedHeaderType] = useState(
-    groupData.selectedHeaderType
-      ? groupData.selectedHeaderType
+    groupData.headerDisplayType
+      ? groupData.headerDisplayType
       : AVATAR_EMBEDDED_HEADER_DISPLAY
   );
-  const [darkOrLightBackground, setDarkOrLightBackground] = useState(() => {
-    if (groupData.backgroundDesign) {
-      if (groupData.backgroundDesign.toLowerCase().includes('dark'))
-        return 'dark';
-      return 'light';
+  const [darkOrLightBackground, setDarkOrLightBackground] = useState(
+    groupData.backgroundDesign
+      ? backgroundDesignIDToColorBlindDesignAndShade(groupData.backgroundDesign)
+          .shade
+      : LIGHT_NAME_SHADE
+  );
+  const [changesMade, setChangesMade] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!successfulSubmit) return;
+    return setTimeout(() => setSuccessfulSubmit(false), 3000);
+  }, [successfulSubmit]);
+  const checkForBackgroundDisplayChange = () => {
+    if (
+      displayedBackgroundDesign !==
+        backgroundDesignIDToColorBlindDesignAndShade(groupData.backgroundDesign)
+          .colorBlindDesign ||
+      darkOrLightBackground !==
+        backgroundDesignIDToColorBlindDesignAndShade(groupData.backgroundDesign)
+          .shade
+    )
+      return true;
+    return false;
+  };
+
+  const checkForNavigationDisplayChange = () => {
+    if (
+      groupData.navigationDisplayType !== selectedNavigationType &&
+      !(
+        selectedNavigationType === TAB_RECTANGLES_DISPLAY &&
+        !groupData.navigationDisplayType
+      )
+    )
+      return true;
+    return false;
+  };
+
+  const checkForHeaderDisplayChange = () => {
+    if (
+      groupData.headerDisplayType !== selectedHeaderType &&
+      !(
+        selectedHeaderType === AVATAR_EMBEDDED_HEADER_DISPLAY &&
+        !groupData.headerDisplayType
+      )
+    )
+      return true;
+    return false;
+  };
+
+  const checkForHeaderNameShadeChange = () => {
+    if (
+      headerNameShade !== groupData.headerNameShade &&
+      !(!groupData.headerNameShade && headerNameShade === LIGHT_NAME_SHADE)
+    )
+      return true;
+    return false;
+  };
+  const modifyGroupDataWithNewOptions = () => {
+    if (checkForBackgroundDisplayChange())
+      groupData.backgroundDesign = displayedBackgroundDesign;
+    if (checkForNavigationDisplayChange())
+      groupData.navigationDisplayType = selectedNavigationType;
+    if (checkForHeaderDisplayChange())
+      groupData.headerDisplayType = selectedHeaderType;
+    if (checkForHeaderNameShadeChange())
+      groupData.headerNameShade = headerNameShade;
+  };
+
+  const submitChanges = async () => {
+    setSubmitting(true);
+
+    const batch = db.batch();
+    if (checkForBackgroundDisplayChange())
+      batch.update(db.doc(`groups/${groupID}`), {
+        backgroundDesign: backgroundColorBlindNameAndShadeToID(
+          displayedBackgroundDesign,
+          darkOrLightBackground
+        ),
+      });
+    if (checkForNavigationDisplayChange())
+      batch.update(db.doc(`groups/${groupID}`), {
+        navigationDisplayType: selectedNavigationType,
+      });
+
+    if (checkForHeaderDisplayChange())
+      batch.update(db.doc(`groups/${groupID}`), {
+        headerDisplayType: selectedHeaderType,
+      });
+
+    if (checkForHeaderNameShadeChange())
+      batch.update(db.doc(`groups/${groupID}`), {
+        headerNameShade: headerNameShade,
+      });
+    return batch
+      .commit()
+      .then(() => {
+        setSuccessfulSubmit(true);
+        setSubmitting(false);
+        modifyGroupDataWithNewOptions();
+        resetDisplayOptions();
+      })
+      .catch((err) => {
+        console.error(
+          `unable to commit display option changes for group with id ${groupID} ${err}`
+        );
+        setSubmitError(true);
+        setSubmitting(false);
+      });
+  };
+
+  const resetDisplayOptions = () => {
+    setSelectedHeaderType(
+      groupData.headerDisplayType
+        ? groupData.headerDisplayType
+        : AVATAR_EMBEDDED_HEADER_DISPLAY
+    );
+    setDisplayedBackgroundDesign(
+      groupData.backgroundDesign
+        ? backgroundDesignIDToColorBlindDesignAndShade(
+            groupData.backgroundDesign
+          ).colorBlindDesign
+        : colorBlindDesignOptions[0]
+    );
+    setSelectedNavigationType(
+      groupData.navigationDisplayType
+        ? groupData.navigationDisplayType
+        : TAB_RECTANGLES_DISPLAY
+    );
+    setDarkOrLightBackground(
+      groupData.backgroundDesign
+        ? backgroundDesignIDToColorBlindDesignAndShade(
+            groupData.backgroundDesign
+          ).shade
+        : LIGHT_NAME_SHADE
+    );
+    setHeaderNameShade(
+      groupData.headerNameShade ? groupData.headerNameShade : LIGHT_NAME_SHADE
+    );
+  };
+
+  // detect changes to display options
+  useEffect(() => {
+    if (
+      checkForBackgroundDisplayChange() ||
+      checkForNavigationDisplayChange() ||
+      checkForHeaderDisplayChange() ||
+      checkForHeaderNameShadeChange()
+    ) {
+      if (!changesMade) setChangesMade(true);
+      return;
     }
-    return 'light';
-  });
-  if (1 == 2) {
-    setSuccessfulSubmit(true);
-    setSubmitError(true);
-  }
+    if (changesMade) setChangesMade(false);
+  }, [
+    displayedBackgroundDesign,
+    headerNameShade,
+    selectedNavigationType,
+    selectedHeaderType,
+  ]);
+
+  if (submitting)
+    return (
+      <PaddedContent>
+        {children}
+        <LoadingSpinner />
+        <h3 className="edit-group-display-saving-changes-message">
+          Saving your changes, please do not leave or refresh the page.
+        </h3>
+      </PaddedContent>
+    );
   return (
     <UnpaddedPageContainer>
       <PaddedContent>
         {children}
         {submitError && (
-          <div className="edit-group-overview-page-success-error-container">
+          <div className="edit-group-display-page-success-error-container">
             <ErrorMessage>
               Something went wrong while saving those changes. Please try again.
             </ErrorMessage>
           </div>
         )}
         {successfulSubmit && (
-          <div className="edit-group-overview-page-success-error-container">
+          <div className="edit-group-display-page-success-error-container">
             <SuccessMessage>
               Your chosen options were successfully saved
             </SuccessMessage>
@@ -232,13 +476,13 @@ function EditGroupDisplay({groupData, groupID, children, isMobile}) {
         darkOrLightBackground={darkOrLightBackground}
         setDarkOrLightBackground={setDarkOrLightBackground}
       />
-      {/* {changesMade && (
+      {changesMade && (
         <SaveOrCancelPopover
           submitting={submitting}
           onCancel={resetDisplayOptions}
           onSave={submitChanges}
         />
-      )} */}
+      )}
     </UnpaddedPageContainer>
   );
 }
@@ -525,12 +769,12 @@ function EditGroupBackgroundDisplaySection({
     isDisplayingContentInPreview,
     setIsDisplayingContentInPreview,
   ] = useState(false);
-  const [containerWidth, setContainerWidth] = useState(500);
+  const [containerRelativeHeight, setContainerRelativeHeight] = useState(500);
   const contentWidthRef = useRef();
 
   const reportWindowSize = () => {
     if (!contentWidthRef.current) return;
-    setContainerWidth(contentWidthRef.current.scrollWidth);
+    setContainerRelativeHeight(contentWidthRef.current.scrollWidth * 0.65);
   };
 
   useEffect(() => {
@@ -538,7 +782,6 @@ function EditGroupBackgroundDisplaySection({
     reportWindowSize();
     return () => window.removeEventListener('resize', reportWindowSize);
   }, [contentWidthRef]);
-  const relativePreviewHeight = containerWidth * 0.663;
   return (
     <UnpaddedPageContainer>
       <PaddedContent>
@@ -582,7 +825,7 @@ function EditGroupBackgroundDisplaySection({
       <div
         ref={contentWidthRef}
         className="edit-group-display-preview-positioning-sizing"
-        style={{height: relativePreviewHeight + 'px'}}
+        style={{height: containerRelativeHeight + 'px'}}
       >
         <div
           className={`edit-group-display-preview-background${
@@ -658,6 +901,7 @@ function EditGroupBackgroundDisplaySection({
           )}
         </div>
       </div>
+      <div style={{height: '50px', background: '#ffffff'}}></div>
     </UnpaddedPageContainer>
   );
 }

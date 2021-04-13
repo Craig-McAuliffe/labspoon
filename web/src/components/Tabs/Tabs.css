@@ -111,9 +111,10 @@
   color: #99999f;
 }
 
-.edit-group-display-tab-container .dropdown-relative-position,
-.edit-group-display-tab-container .dropdown-default-toggle {
-  width: 250px;
+.tabs-dropdown-container .dropdown-relative-position,
+.tabs-dropdown-container .dropdown-default-toggle,
+.tabs-dropdown-container .dropdown-custom-toggle {
+  width: 300px;
 }
 
 @media screen and (max-width: 800px) {

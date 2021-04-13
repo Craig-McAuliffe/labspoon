@@ -7,6 +7,20 @@
   color: #5d5d65;
 }
 
+.edit-group-display-page-success-error-container {
+  z-index: 3;
+  position: fixed;
+  top: 20vh;
+  width: 400px;
+  left: 50%;
+  margin-left: -200px;
+}
+
+.edit-group-display-saving-changes-message {
+  color: #5d5d65;
+  text-align: center;
+}
+
 .edit-group-display-selector-container,
 .edit-group-display-show-content-button-container {
   display: flex;

@@ -147,28 +147,30 @@ export function TabsDisplay({
   if (displayType === TAB_DROPDOWN_DISPLAY)
     return (
       <PaddedContent>
-        <Dropdown
-          customToggleTextOnly={
-            tabNamesOnly
-              ? tabNamesOnly[0]
-              : tabOptions.filter(
-                  (tabOption) => tabOption.id === currentTabID
-                )[0].name
-          }
-        >
-          <TabDropdownOptions
-            onSelect={() => {}}
-            useRoutedTabs={useRoutedTabs}
-            tabNamesOnly={tabNamesOnly}
-            currentTabID={currentTabID}
-            affectsFilter={affectsFilter}
-            noBorderOrMargin={noBorderOrMargin}
-            displayType={displayType}
-            tabOptions={tabOptions}
-            routedTabBasePathname={routedTabBasePathname}
-            setSiderFilterLoading={setSiderFilterLoading}
-          />
-        </Dropdown>
+        <div className="tabs-dropdown-container">
+          <Dropdown
+            customToggleTextOnly={
+              tabNamesOnly
+                ? tabNamesOnly[0]
+                : tabOptions.filter(
+                    (tabOption) => tabOption.id === currentTabID
+                  )[0].name
+            }
+          >
+            <TabDropdownOptions
+              onSelect={() => {}}
+              useRoutedTabs={useRoutedTabs}
+              tabNamesOnly={tabNamesOnly}
+              currentTabID={currentTabID}
+              affectsFilter={affectsFilter}
+              noBorderOrMargin={noBorderOrMargin}
+              displayType={displayType}
+              tabOptions={tabOptions}
+              routedTabBasePathname={routedTabBasePathname}
+              setSiderFilterLoading={setSiderFilterLoading}
+            />
+          </Dropdown>
+        </div>
       </PaddedContent>
     );
   const tabsToBeMapped = tabNamesOnly ? tabNamesOnly : tabOptions;
@@ -187,6 +189,7 @@ export function TabsDisplay({
                 tabOption={option}
                 currentTabID={currentTabID}
                 displayType={displayType}
+                key={option.data.id}
               />
             ) : (
               <NonRoutedTabOption
@@ -199,6 +202,7 @@ export function TabsDisplay({
                 tabName={tabNamesOnly ? option : option.data.name}
                 tabID={tabNamesOnly ? null : option.data.id}
                 index={i}
+                key={tabNamesOnly ? i : option.data.id}
               />
             );
           })}
