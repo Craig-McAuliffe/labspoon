@@ -2,7 +2,13 @@ import React from 'react';
 
 export default function TowersLight() {
   return (
-    <svg viewBox="0 0 1440 930" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      width="1440"
+      height="930"
+      viewBox="0 0 1440 930"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <rect x="1040" y="148" width="192" height="542" fill="#D6F0FF" />
       <rect x="622" y="148" width="121" height="542" fill="#D6F0FF" />
       <rect x="748" y="148" width="41" height="542" fill="#C1E9FF" />
@@ -16,9 +22,9 @@ export default function TowersLight() {
         fill="url(#paint1_linear)"
       />
       <rect x="848" y="148" width="114" height="555" fill="#EFF9FF" />
-      <path d="M209 138L279 174V767H209V138Z" fill="url(#paint2_linear)" />
+      <path d="M160 116L230 152V745H160V116Z" fill="url(#paint2_linear)" />
       <path
-        d="M324.5 138L279 174L209 138L267 117L324.5 138ZM324.5 138V733"
+        d="M275.5 116L230 152L160 116L218 95L275.5 116ZM275.5 116V711"
         stroke="url(#paint3_linear)"
       />
       <path
@@ -53,6 +59,7 @@ export default function TowersLight() {
         d="M921.001 703C919.617 632.849 923.593 596.159 943.501 538C957.734 616.457 971.586 651.283 1003 703H921.001Z"
         fill="url(#paint7_linear)"
       />
+      <rect x="276" y="196" width="52" height="511" fill="#F4FBFF" />
       <mask
         id="mask0"
         mask-type="alpha"
@@ -115,25 +122,25 @@ export default function TowersLight() {
         </linearGradient>
         <linearGradient
           id="paint2_linear"
-          x1="355"
-          y1="36"
-          x2="490.824"
-          y2="646.114"
+          x1="276"
+          y1="18"
+          x2="341.922"
+          y2="650.334"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#00507C" />
+          <stop stopColor="#B8E6FF" />
           <stop offset="1" stopColor="#94D9FF" stopOpacity="0" />
         </linearGradient>
         <linearGradient
           id="paint3_linear"
-          x1="298.5"
-          y1="727.5"
-          x2="289.5"
-          y2="117"
+          x1="249.5"
+          y1="705.5"
+          x2="240.5"
+          y2="95"
           gradientUnits="userSpaceOnUse"
         >
           <stop stopColor="white" />
-          <stop offset="1" stopColor="#00507C" />
+          <stop offset="1" stopColor="#D7F1FF" />
         </linearGradient>
         <linearGradient
           id="paint4_linear"

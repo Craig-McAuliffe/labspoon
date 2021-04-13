@@ -55,18 +55,6 @@
   margin-bottom: 20px;
 }
 
-.user-message-follow a:hover {
-  color: #3099d3;
-}
-
-.user-message-follow h3:hover {
-  color: #3099d3;
-}
-
-.user-message-follow button:hover {
-  color: #3099d3;
-}
-
 .suggested-user {
   padding: 12px 0px;
 }

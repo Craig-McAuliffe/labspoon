@@ -148,6 +148,29 @@ function getClassNameFromDisplayType(displayType, isFinalTab) {
   return className;
 }
 
+function getTabsLayoutClassName(displayType) {
+  let tabsLayoutClassName = 'feed-tabs-layout';
+  switch (displayType) {
+    case TAB_RECTANGLES_DISPLAY: {
+      tabsLayoutClassName = tabsLayoutClassName + '-rectangles';
+      break;
+    }
+    case TAB_RECTANGLES_DISPLAY: {
+      tabsLayoutClassName = tabsLayoutClassName + '-single-divider';
+      break;
+    }
+    case TAB_RECTANGLES_DISPLAY: {
+      tabsLayoutClassName = tabsLayoutClassName + '-no-divider';
+      break;
+    }
+    default: {
+      tabsLayoutClassName = tabsLayoutClassName + '-rectangles';
+      break;
+    }
+  }
+  return tabsLayoutClassName;
+}
+
 export function TabsDisplay({
   useRoutedTabs,
   tabNamesOnly,
@@ -197,13 +220,7 @@ export function TabsDisplay({
       </PaddedContent>
     );
   const tabsToBeMapped = tabNamesOnly ? tabNamesOnly : tabOptions;
-  let tabsLayoutClassName = 'feed-tabs-layout';
-  if (displayType === TAB_RECTANGLES_DISPLAY)
-    tabsLayoutClassName = tabsLayoutClassName + '-rectangles';
-  if (displayType === TAB_SINGLE_LINE_DIVIDER_DISPLAY)
-    tabsLayoutClassName = tabsLayoutClassName + '-single-divider';
-  if (displayType === TAB_NO_DIVIDER_DISPLAY)
-    tabsLayoutClassName = tabsLayoutClassName + '-no-divider';
+  const tabsLayoutClassName = getTabsLayoutClassName(displayType);
 
   const tabsMappedToComponents = (
     <div className={tabsLayoutClassName}>

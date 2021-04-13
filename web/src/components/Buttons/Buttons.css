@@ -48,8 +48,8 @@
 
 .edit-button:hover {
   text-decoration: none;
-  background: #00507c;
   color: #ffffff;
+  background: #00507c;
 }
 
 .edit-button:hover path,
