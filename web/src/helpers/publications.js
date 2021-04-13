@@ -89,6 +89,7 @@ export function getUniqueAuthorsFromAuthors(authors) {
       if (seenLabspoonUserIDs.has(possiblyDuplicateAuthor.id)) return;
       uniqueAuthors.push(possiblyDuplicateAuthor);
       seenLabspoonUserIDs.add(possiblyDuplicateAuthor.id);
+      return;
     }
     if (seenMicrosoftIDs.has(possiblyDuplicateAuthor.microsoftID)) return;
     uniqueAuthors.push(possiblyDuplicateAuthor);

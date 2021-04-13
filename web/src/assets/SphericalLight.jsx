@@ -102,18 +102,18 @@ export default function SphericalLight() {
         fill="url(#paint11_linear)"
       />
       <path
-        d="M987 336.5C987 369.361 960.361 396 927.5 396C894.639 396 868 369.361 868 336.5C868 303.639 894.639 277 927.5 277C960.361 277 987 303.639 987 336.5Z"
+        d="M1051 295.5C1051 328.361 1024.36 355 991.5 355C958.639 355 932 328.361 932 295.5C932 262.639 958.639 236 991.5 236C1024.36 236 1051 262.639 1051 295.5Z"
         fill="url(#paint12_linear)"
       />
       <path
-        d="M927.5 396V336.5M868 336.5H897.75H927.5M927.5 277V336.5"
+        d="M991.5 355V295.5M932 295.5H961.75H991.5M991.5 236V295.5"
         stroke="#3099D3"
         strokeOpacity="0.24"
       />
       <path
         fillRule="evenodd"
         clipRule="evenodd"
-        d="M1032 387C1093.3 387 1143 335.289 1143 271.5C1143 207.711 1093.3 156 1032 156C987.626 156 949.334 183.094 931.568 222.251C950.203 196.645 980.408 180 1014.5 180C1071.11 180 1117 225.891 1117 282.5C1117 339.109 1071.11 385 1014.5 385C1013.34 385 1012.18 384.981 1011.03 384.942C1017.82 386.293 1024.83 387 1032 387Z"
+        d="M1096 346C1157.3 346 1207 294.289 1207 230.5C1207 166.711 1157.3 115 1096 115C1051.63 115 1013.33 142.094 995.568 181.251C1014.2 155.645 1044.41 139 1078.5 139C1135.11 139 1181 184.891 1181 241.5C1181 298.109 1135.11 344 1078.5 344C1077.34 344 1076.18 343.981 1075.03 343.942C1081.82 345.293 1088.83 346 1096 346Z"
         fill="url(#paint13_radial)"
       />
       <path
@@ -186,22 +186,22 @@ export default function SphericalLight() {
         id="mask0"
         mask-type="alpha"
         maskUnits="userSpaceOnUse"
-        x="912"
-        y="180"
+        x="976"
+        y="139"
         width="205"
         height="205"
       >
-        <circle cx="1014.5" cy="282.5" r="102.5" fill="url(#paint23_radial)" />
+        <circle cx="1078.5" cy="241.5" r="102.5" fill="url(#paint23_radial)" />
         <circle
-          cx="1014.5"
-          cy="282.5"
+          cx="1078.5"
+          cy="241.5"
           r="102"
           stroke="url(#paint24_linear)"
           strokeOpacity="0.41"
         />
       </mask>
       <g mask="url(#mask0)">
-        <circle cx="1014.5" cy="282.5" r="102.5" fill="url(#paint25_radial)" />
+        <circle cx="1078.5" cy="241.5" r="102.5" fill="url(#paint25_radial)" />
         <path d="M-1 938L1440 5" stroke="#00507C" />
       </g>
       <defs>
@@ -343,10 +343,10 @@ export default function SphericalLight() {
         </linearGradient>
         <linearGradient
           id="paint12_linear"
-          x1="987"
-          y1="288.5"
-          x2="864.5"
-          y2="385"
+          x1="1051"
+          y1="247.5"
+          x2="928.5"
+          y2="344"
           gradientUnits="userSpaceOnUse"
         >
           <stop stopColor="#3099D3" />
@@ -359,7 +359,7 @@ export default function SphericalLight() {
           cy="0"
           r="1"
           gradientUnits="userSpaceOnUse"
-          gradientTransform="translate(1037 271) rotate(-32.0574) scale(175.218 163.78)"
+          gradientTransform="translate(1101 230) rotate(-32.0574) scale(175.218 163.78)"
         >
           <stop offset="0.00171348" stopColor="#2C90C7" stopOpacity="0.43" />
           <stop offset="0.4841" stopColor="#60AEDA" stopOpacity="0.49" />
@@ -476,17 +476,17 @@ export default function SphericalLight() {
           cy="0"
           r="1"
           gradientUnits="userSpaceOnUse"
-          gradientTransform="translate(1171 180) rotate(147.001) scale(195.546)"
+          gradientTransform="translate(1235 139) rotate(147.001) scale(195.546)"
         >
           <stop stopColor="#00507C" />
           <stop offset="1" stopColor="#3099D3" stopOpacity="0.03" />
         </radialGradient>
         <linearGradient
           id="paint24_linear"
-          x1="1097"
-          y1="225.5"
-          x2="933.5"
-          y2="334"
+          x1="1161"
+          y1="184.5"
+          x2="997.5"
+          y2="293"
           gradientUnits="userSpaceOnUse"
         >
           <stop offset="0.351375" stopColor="white" stopOpacity="0" />
@@ -499,7 +499,7 @@ export default function SphericalLight() {
           cy="0"
           r="1"
           gradientUnits="userSpaceOnUse"
-          gradientTransform="translate(1124.5 208.5) rotate(148.892) scale(341.626)"
+          gradientTransform="translate(1188.5 167.5) rotate(148.892) scale(341.626)"
         >
           <stop stopColor="#00507C" />
           <stop offset="1" stopColor="#3099D3" stopOpacity="0.03" />

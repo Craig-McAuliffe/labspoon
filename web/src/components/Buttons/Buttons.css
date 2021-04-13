@@ -23,12 +23,17 @@
 
 .edit-button {
   color: #3099d3;
-  padding-top: 10px;
-  margin-left: 2px;
   display: flex;
   justify-content: flex-start;
-  padding: 0px;
   align-items: center;
+  background: #ffffff;
+  padding: 5px 6px 5px 3px;
+  border: 1px solid #3099d3;
+}
+
+.edit-button svg {
+  height: 20px;
+  margin-bottom: 1px;
 }
 
 .edit-button h3 {
@@ -41,13 +46,16 @@
   color: #00507c;
 }
 
-.edit-button-container {
-  display: flex;
-  align-items: center;
+.edit-button:hover {
+  text-decoration: none;
+  background: #00507c;
+  color: #ffffff;
 }
 
-.edit-button-container svg {
-  height: 20px;
+.edit-button:hover path,
+.edit-button:hover rect {
+  fill: #ffffff;
+  /* stroke: #ffffff; */
 }
 
 .action-button-text {

@@ -1,6 +1,7 @@
 import React, {useState, useRef, useEffect} from 'react';
 import {
   PaddedContent,
+  PaddedPageContainer,
   UnpaddedPageContainer,
 } from '../../../components/Layout/Content';
 import withSizes from 'react-sizes';
@@ -98,7 +99,7 @@ function backgroundColorBlindNameAndShadeToID(colorBlindDesignName, shade) {
   }
 }
 
-function backgroundDesignIDToSVG(backgroundDesignID) {
+export function backgroundDesignIDToSVG(backgroundDesignID) {
   switch (backgroundDesignID) {
     case BLANK_LIGHT_BACKGROUND:
       return null;
@@ -333,9 +334,13 @@ function EditGroupDisplay({groupData, groupID, children, isMobile}) {
       return true;
     return false;
   };
+
   const modifyGroupDataWithNewOptions = () => {
     if (checkForBackgroundDisplayChange())
-      groupData.backgroundDesign = displayedBackgroundDesign;
+      groupData.backgroundDesign = backgroundColorBlindNameAndShadeToID(
+        displayedBackgroundDesign,
+        darkOrLightBackground
+      );
     if (checkForNavigationDisplayChange())
       groupData.navigationDisplayType = selectedNavigationType;
     if (checkForHeaderDisplayChange())
@@ -438,13 +443,13 @@ function EditGroupDisplay({groupData, groupID, children, isMobile}) {
 
   if (submitting)
     return (
-      <PaddedContent>
+      <PaddedPageContainer>
         {children}
         <LoadingSpinner />
         <h3 className="edit-group-display-saving-changes-message">
           Saving your changes, please do not leave or refresh the page.
         </h3>
-      </PaddedContent>
+      </PaddedPageContainer>
     );
   return (
     <UnpaddedPageContainer>

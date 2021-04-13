@@ -47,9 +47,9 @@ export default function SquaresLight() {
         height="104"
         fill="url(#paint6_linear)"
       />
-      <rect x="731" y="344" width="104" height="104" fill="#AEE2FF" />
-      <rect x="606" y="470" width="104" height="104" fill="#AADDF9" />
-      <rect x="668" y="407" width="104" height="104" fill="#4A87A8" />
+      <rect x="731" y="344" width="104" height="104" fill="#DDF3FF" />
+      <rect x="606" y="470" width="104" height="104" fill="#DDF3FF" />
+      <rect x="668" y="407" width="104" height="104" fill="#CDE4F0" />
       <rect
         x="720"
         y="459"
@@ -114,8 +114,8 @@ export default function SquaresLight() {
           y2="625.418"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#1A98DD" stopOpacity="0.49" />
-          <stop offset="0.75" stopColor="#66C9FF" stopOpacity="0.0888497" />
+          <stop stopColor="#DDF3FF" stopOpacity="0.49" />
+          <stop offset="0.75" stopColor="#75C7F4" stopOpacity="0.0888497" />
           <stop offset="1" stopColor="#B7E5FF" stopOpacity="0" />
         </linearGradient>
         <linearGradient
@@ -138,8 +138,8 @@ export default function SquaresLight() {
           y2="444.5"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#00507C" />
-          <stop offset="1" stopColor="#00507C" stopOpacity="0" />
+          <stop stopColor="#CDE4F0" />
+          <stop offset="1" stopColor="#8DBAD3" stopOpacity="0" />
         </linearGradient>
         <linearGradient
           id="paint7_linear"
@@ -149,8 +149,8 @@ export default function SquaresLight() {
           y2="563"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#00507C" />
-          <stop offset="1" stopColor="#00507C" stopOpacity="0.1" />
+          <stop stopColor="#CDE4F0" />
+          <stop offset="1" stopColor="#8DBAD3" stopOpacity="0.5" />
         </linearGradient>
       </defs>
     </svg>

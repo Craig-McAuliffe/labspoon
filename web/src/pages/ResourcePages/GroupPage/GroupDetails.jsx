@@ -27,6 +27,7 @@ import NegativeButton from '../../../components/Buttons/NegativeButton';
 import {
   AVATAR_EMBEDDED_HEADER_DISPLAY,
   AVATAR_INTERNAL_HEADER_DISPLAY,
+  backgroundDesignIDToSVG,
   DARK_NAME_SHADE,
   NO_AVATAR_CENTER_TEXT_HEADER_DISPLAY,
   NO_AVATAR_LEFT_TEXT_HEADER_DISPLAY,
@@ -38,6 +39,7 @@ const mapGroupDetailsSizesToProps = ({width}) => ({
   isMobile: width && width <= 400,
 });
 
+// 144 is divisible by line height 24
 const GROUP_DESCRIPTION_HEIGHT = 144;
 
 const GroupDetails = ({group, userIsMember, verified, groupID, isMobile}) => {
@@ -98,14 +100,23 @@ const GroupDetails = ({group, userIsMember, verified, groupID, isMobile}) => {
 
   return (
     <>
+      <div className="background-container">
+        {backgroundDesignIDToSVG(group.backgroundDesign)}
+      </div>
       <GroupDetailsHeaderSection
         group={group}
         isMobile={isMobile}
         userIsMember={userIsMember}
         groupID={groupID}
+        displayType={group.headerDisplayType}
+        nameShade={group.headerNameShade}
       />
       <div className="group-description">
-        <SeeMore id={group.id} initialHeight={GROUP_DESCRIPTION_HEIGHT}>
+        <SeeMore
+          yPadding={5}
+          id={group.id}
+          initialHeight={GROUP_DESCRIPTION_HEIGHT}
+        >
           <RichTextBody body={group.about} shouldLinkify={true} />
         </SeeMore>
       </div>

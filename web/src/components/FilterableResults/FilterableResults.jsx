@@ -297,6 +297,7 @@ export function ResourceTabs({
   affectsFilter,
   routedTabBasePathname,
   useRoutedTabs,
+  tabsDesign,
 }) {
   const filterManager = useContext(FilterManagerContext);
   const setTabFilter = filterManager.setDisplayedTabFilter;
@@ -316,6 +317,7 @@ export function ResourceTabs({
 
   return (
     <Tabs
+      displayType={tabsDesign}
       routedTabBasePathname={routedTabBasePathname}
       useRoutedTabs={useRoutedTabs}
       tabFilter={tabFilter[0]}

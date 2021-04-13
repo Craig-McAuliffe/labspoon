@@ -376,6 +376,7 @@ export default function GroupPage() {
         // the route matched path is different if the url is extended changes
         routedTabBasePathname={`group/${groupID}`}
         useRoutedTabs={true}
+        tabsDesign={groupData.navigationDisplayType}
       >
         <PaddedContent>
           <GroupDetails

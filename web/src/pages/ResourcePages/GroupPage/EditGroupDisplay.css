@@ -88,6 +88,27 @@
   padding: 20px 0px 40px;
 }
 
+.edit-group-display-navigation-section .feed-tabs-background-light,
+.edit-group-display-navigation-section .feed-tabs-background-dark,
+.edit-group-display-navigation-section .feed-tab-no-divider-active,
+.edit-group-display-navigation-section .feed-tab-no-divider-inactive,
+.edit-group-display-navigation-section .feed-tab-single-divider-active,
+.edit-group-display-navigation-section .feed-tab-single-divider-inactive,
+.edit-group-display-navigation-section .feed-tab-single-divider-final-active,
+.edit-group-display-navigation-section .feed-tab-single-divider-final-inactive {
+  background: none;
+}
+.edit-group-display-navigation-section .feed-tabs-background-light,
+.edit-group-display-navigation-section .feed-tabs-background-dark {
+  border: none;
+}
+
+.edit-group-display-navigation-section .feed-tabs-layout-with-background-dark,
+.edit-group-display-navigation-section .feed-tabs-layout-with-background-light {
+  background: none;
+  border: none;
+}
+
 .edit-group-display-navigation-section .edit-group-display-sub-title {
   padding-bottom: 0px;
 }

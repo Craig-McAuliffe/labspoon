@@ -20,16 +20,19 @@ function SeeMore({
   id,
   initialHeight = 144,
   fullScreenInitialLineHeight = 24,
-  mobileScreenInitialLineHeight = 22,
+  mobileScreenInitialLineHeight = 21,
   isMobile,
   width,
   children,
+  yPadding,
 }) {
   const [displaySeeMore, setDisplaySeeMore] = useState(false);
-  const [unexpandedHeight, setUnexpandedHeight] = useState(initialHeight);
+  const [unexpandedHeight, setUnexpandedHeight] = useState(
+    yPadding ? initialHeight + yPadding + 1 : initialHeight + 1
+  );
   const [isUsingMobileVariation, setIsUsingMobileVariation] = useState(false);
   const [containerStateAndHeight, setContainerStateAndHeight] = useState({
-    height: initialHeight,
+    height: yPadding ? initialHeight + yPadding + 1 : initialHeight + 1,
     state: UNEXPANDED,
   });
 
@@ -37,14 +40,20 @@ function SeeMore({
 
   useEffect(() => {
     if (isMobile && !isUsingMobileVariation) {
-      setUnexpandedHeight(
-        (initialHeight / fullScreenInitialLineHeight) *
-          mobileScreenInitialLineHeight
-      );
+      setUnexpandedHeight(() => {
+        let newHeight =
+          (initialHeight / fullScreenInitialLineHeight) *
+            mobileScreenInitialLineHeight +
+          1;
+        if (yPadding) newHeight = newHeight + yPadding;
+        return newHeight;
+      });
       setIsUsingMobileVariation(true);
     }
     if (!isMobile && isUsingMobileVariation) {
-      setUnexpandedHeight(initialHeight);
+      setUnexpandedHeight(
+        yPadding ? initialHeight + yPadding + 1 : initialHeight + 1
+      );
       setIsUsingMobileVariation(false);
     }
   }, [isMobile]);

@@ -16,6 +16,9 @@
   grid-template-columns: 165px 1fr;
   grid-template-rows: none;
   min-width: 100%;
+  background: #ffffff;
+  padding-top: 8px;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
 }
 
 .group-icon-and-message {
@@ -39,7 +42,14 @@
 }
 
 .group-description {
-  margin-top: 10px;
+  margin: 10px 0px;
+}
+
+.group-description .see-more-container {
+  background: #ffffff;
+  border: 1px solid #dcdce0;
+  padding: 5px 5px 0px 5px;
+  margin-bottom: 5px;
 }
 
 .group-description-see-more {
@@ -64,6 +74,7 @@
 
 .donation-link-verified-container {
   width: 50%;
+  background: #ffffff;
 }
 
 .donation-link-donate-container {
@@ -94,6 +105,7 @@
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
   padding: 10px;
   margin: 10px 0px;
+  background: #ffffff;
 }
 
 .claim-group-button-container {
@@ -186,7 +198,8 @@
 }
 
 .group-details-no-avatar-name-institution-container {
-  padding-bottom: 10px;
+  background: #ffffff;
+  padding: 8px 4px 10px 5px;
 }
 
 .group-details-no-avatar-name-institution-container h2 {
@@ -202,11 +215,19 @@
   font-size: 0.9em;
   color: #343a3e;
   text-align: center;
+  background: #ffffff;
+  padding: 8px 4px 0px 5px;
 }
 
 .group-details-no-avatar-institution {
   padding-bottom: 10px;
   color: #5d5d65;
+}
+
+.group-website-link {
+  background: #ffffff;
+  padding: 5px 6px 5px 4px;
+  border: 1px solid #00507c;
 }
 
 .group-website-link svg {
@@ -229,8 +250,9 @@
 }
 
 .group-website-link:hover {
+  border: 2px solid #00507c;
+  padding: 4px 5px 4px 3px;
   text-decoration: none;
-  color: #3099d3;
 }
 
 .group-cover-photo-container {

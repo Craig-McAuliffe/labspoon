@@ -6,15 +6,13 @@ import './Buttons.css';
 
 export default function EditButton({editAction, children}) {
   return (
-    <div className="edit-button-container">
+    <button
+      className="edit-button"
+      type="button"
+      onClick={editAction ? () => editAction() : () => {}}
+    >
       <EditIcon />
-      <button
-        className="edit-button"
-        type="button"
-        onClick={editAction ? () => editAction() : () => {}}
-      >
-        <h3>{children}</h3>
-      </button>
-    </div>
+      <h3>{children}</h3>
+    </button>
   );
 }

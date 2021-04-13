@@ -3,7 +3,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 0px;
+  padding: 20px 10px;
+  background-color: rgba(255, 255, 255, 0.9);
 }
 
 .topic-list-item-container-with-follow-options {
@@ -40,6 +41,6 @@
 @media screen and (max-width: 800px) {
   .topic-list-item-container,
   .topic-list-item-container-no-divider {
-    padding: 20px 2px;
+    padding: 20px 5px;
   }
 }

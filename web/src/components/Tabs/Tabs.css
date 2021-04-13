@@ -2,6 +2,7 @@
 .feed-tabs-container-no-border-or-padding {
   grid-column: 2/3;
   grid-row: 3/4;
+  overflow-x: hidden;
 }
 
 .feed-tabs-container {
@@ -9,58 +10,112 @@
   border-top: 1px solid #dcdce0;
 }
 
-.feed-tabs-layout {
+.feed-tabs-background-light {
+  background-color: #ffffff;
+  position: relative;
+  border: 1px solid #dcdce0;
+}
+
+.feed-tabs-background-light::after {
+  content: '';
+  position: absolute;
+  top: 0px;
+  left: -1px;
+  width: 1px;
+  height: 100%;
+  background-color: #dcdce0;
+}
+
+.feed-tabs-background-dark {
+  background: #00507c;
+  border: 1px solid #343a3e;
+  border: 1px solid #dcdce0;
+}
+
+.feed-tabs-layout-rectangles,
+.feed-tabs-layout-single-divider,
+.feed-tabs-layout-no-divider {
   display: flex;
   justify-content: flex-start;
   flex-wrap: wrap;
-  margin: 0px -10px;
   align-items: flex-start;
+  align-items: center;
+}
+
+.feed-tabs-layout-no-divider {
+  margin: 0px -5px;
+}
+
+.feed-tabs-layout-rectangles {
+  margin: 0px -5px;
 }
 
 .feed-tab-rectangles-inactive,
 .feed-tab-rectangles-active,
 .feed-tab-single-divider-inactive,
 .feed-tab-single-divider-active,
+.feed-tab-single-divider-final-inactive,
+.feed-tab-single-divider-final-active,
 .feed-tab-no-divider-inactive,
 .feed-tab-no-divider-active {
   color: #99999f;
   flex-shrink: 0;
-  max-width: 220px;
-  display: flex;
 }
 
 .feed-tab-single-divider-inactive,
 .feed-tab-single-divider-active,
+.feed-tab-single-divider-final-inactive,
+.feed-tab-single-divider-final-active,
 .feed-tab-no-divider-inactive,
 .feed-tab-no-divider-active {
-  justify-content: start;
-  padding: 0px 10px;
-}
-
-.feed-tab-single-divider-inactive {
-  border-right: 1px solid #99999f;
+  padding: 10px 15px 10px 15px;
+  background: #ffffff;
 }
 
 .feed-tab-single-divider-active,
 .feed-tab-single-divider-inactive:hover,
 .feed-tab-no-divider-inactive:hover,
+.feed-tab-single-divider-final-inactive:hover,
 .feed-tab-no-divider-active {
   color: #343a3e;
 }
 
-.feed-tab-single-divider-active,
-.feed-tab-single-divider-inactive:hover {
+.feed-tab-single-divider-inactive {
+  border-right: 1px solid #dcdce0;
+  border-left: 1px solid #dcdce0;
+}
+
+.feed-tab-single-divider-active {
+  text-decoration: none;
+  color: #343a3e;
   border-right: 1px solid #343a3e;
+  border-left: 1px solid #343a3e;
+}
+
+.feed-tab-single-divider-final-active {
+  color: #343a3e;
+}
+
+.feed-tab-single-divider-inactive:hover {
+  text-decoration: none;
+  color: #00507c;
+}
+
+.feed-tab-single-divider-final-inactive:hover {
+  text-decoration: none;
+  color: #00507c;
 }
 
 .feed-tab-rectangles-inactive,
 .feed-tab-rectangles-active {
+  max-width: 220px;
   border: 1px solid #99999f;
-  margin: 0px 10px 10px;
+  margin: 0px 5px 10px;
   padding: 10px;
   justify-content: center;
   justify-items: center;
   flex-grow: 1;
+  background: #ffffff;
 }
 
 .feed-tab-rectangles-active {
@@ -84,6 +139,8 @@
 .feed-tab-single-divider-active h3,
 .feed-tab-no-divider-inactive h3,
 .feed-tab-no-divider-active h3,
+.feed-tab-single-divider-final-inactive h3,
+.feed-tab-single-divider-final-active h3,
 .feed-tab-dropdown-active h3,
 .feed-tab-dropdown-inactive h3 {
   margin: 0px;
@@ -101,6 +158,7 @@
 .feed-tab-dropdown-inactive:hover {
   background: #00507c;
   color: #ffffff;
+  text-decoration: none;
 }
 
 .feed-tab-dropdown-active {
@@ -115,6 +173,8 @@
 .tabs-dropdown-container .dropdown-default-toggle,
 .tabs-dropdown-container .dropdown-custom-toggle {
   width: 300px;
+  background: #ffffff;
+  margin: 10px 0px 20px;
 }
 
 @media screen and (max-width: 800px) {

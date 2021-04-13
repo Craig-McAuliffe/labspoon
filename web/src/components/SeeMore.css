@@ -15,6 +15,6 @@
 }
 
 .see-more-container {
-  overflow-x: none;
   overflow-y: hidden;
+  position: relative;
 }

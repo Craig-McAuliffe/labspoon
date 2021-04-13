@@ -369,7 +369,6 @@ function PublicationSources({sources}) {
 function PublicationAuthors({publicationAuthors}) {
   if (!publicationAuthors) return <></>;
   const uniqueAuthors = getUniqueAuthorsFromAuthors(publicationAuthors);
-
   return uniqueAuthors.map((author) => {
     const authorLink = getLinkForAuthor(
       author.id,

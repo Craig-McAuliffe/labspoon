@@ -17,6 +17,7 @@ export default function ResourcesFeed({
   routedTabBasePathname,
   useRoutedTabs,
   getCustomComponentAboveFeed,
+  tabsDesign,
 }) {
   return (
     <FilterableResults fetchResults={fetchResults} limit={limit}>
@@ -34,6 +35,7 @@ export default function ResourcesFeed({
                 tabs={tabs}
                 routedTabBasePathname={routedTabBasePathname}
                 useRoutedTabs={useRoutedTabs}
+                tabsDesign={tabsDesign}
               />
               {getCustomComponentAboveFeed && getCustomComponentAboveFeed()}
               <NewResultsWrapper />

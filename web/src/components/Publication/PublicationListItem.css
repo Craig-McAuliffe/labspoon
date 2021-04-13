@@ -2,11 +2,13 @@
   border: 1px solid #99999f;
   margin: 2px 0px 20px 0px;
   padding: 0px 14px 10px;
+  background: #ffffff;
 }
 
 .publication-list-item-container-noBorder {
   margin: 2px 2px 20px 2px;
   padding: 0px 14px 10px;
+  background: #ffffff;
 }
 
 .publication-list-item-header {
