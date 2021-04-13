@@ -257,7 +257,7 @@ function EditGroupDisplay({groupData, groupID, children, isMobile}) {
       ? groupData.navigationDisplayType
       : TAB_RECTANGLES_DISPLAY
   );
-  const [headerNameShade, setHeaderNameShade] = useState(
+  const [selectedHeaderNameShade, setSelectedHeaderNameShade] = useState(
     groupData.headerNameShade ? groupData.headerNameShade : LIGHT_NAME_SHADE
   );
   const [successfulSubmit, setSuccessfulSubmit] = useState(false);
@@ -278,8 +278,13 @@ function EditGroupDisplay({groupData, groupID, children, isMobile}) {
 
   useEffect(() => {
     if (!successfulSubmit) return;
-    return setTimeout(() => setSuccessfulSubmit(false), 3000);
+    const successResetTimeout = setTimeout(
+      () => setSuccessfulSubmit(false),
+      3000
+    );
+    return () => clearTimeout(successResetTimeout);
   }, [successfulSubmit]);
+
   const checkForBackgroundDisplayChange = () => {
     if (
       displayedBackgroundDesign !==
@@ -319,8 +324,11 @@ function EditGroupDisplay({groupData, groupID, children, isMobile}) {
 
   const checkForHeaderNameShadeChange = () => {
     if (
-      headerNameShade !== groupData.headerNameShade &&
-      !(!groupData.headerNameShade && headerNameShade === LIGHT_NAME_SHADE)
+      selectedHeaderNameShade !== groupData.headerNameShade &&
+      !(
+        !groupData.headerNameShade &&
+        selectedHeaderNameShade === LIGHT_NAME_SHADE
+      )
     )
       return true;
     return false;
@@ -333,12 +341,13 @@ function EditGroupDisplay({groupData, groupID, children, isMobile}) {
     if (checkForHeaderDisplayChange())
       groupData.headerDisplayType = selectedHeaderType;
     if (checkForHeaderNameShadeChange())
-      groupData.headerNameShade = headerNameShade;
+      groupData.headerNameShade = selectedHeaderNameShade;
   };
 
   const submitChanges = async () => {
     setSubmitting(true);
-
+    if (submitError) setSubmitError(false);
+    if (successfulSubmit) setSuccessfulSubmit(false);
     const batch = db.batch();
     if (checkForBackgroundDisplayChange())
       batch.update(db.doc(`groups/${groupID}`), {
@@ -359,15 +368,14 @@ function EditGroupDisplay({groupData, groupID, children, isMobile}) {
 
     if (checkForHeaderNameShadeChange())
       batch.update(db.doc(`groups/${groupID}`), {
-        headerNameShade: headerNameShade,
+        headerNameShade: selectedHeaderNameShade,
       });
     return batch
       .commit()
       .then(() => {
+        modifyGroupDataWithNewOptions();
         setSuccessfulSubmit(true);
         setSubmitting(false);
-        modifyGroupDataWithNewOptions();
-        resetDisplayOptions();
       })
       .catch((err) => {
         console.error(
@@ -403,7 +411,7 @@ function EditGroupDisplay({groupData, groupID, children, isMobile}) {
           ).shade
         : LIGHT_NAME_SHADE
     );
-    setHeaderNameShade(
+    setSelectedHeaderNameShade(
       groupData.headerNameShade ? groupData.headerNameShade : LIGHT_NAME_SHADE
     );
   };
@@ -422,9 +430,10 @@ function EditGroupDisplay({groupData, groupID, children, isMobile}) {
     if (changesMade) setChangesMade(false);
   }, [
     displayedBackgroundDesign,
-    headerNameShade,
+    selectedHeaderNameShade,
     selectedNavigationType,
     selectedHeaderType,
+    successfulSubmit,
   ]);
 
   if (submitting)
@@ -461,8 +470,8 @@ function EditGroupDisplay({groupData, groupID, children, isMobile}) {
           isMobile={isMobile}
           selectedHeaderType={selectedHeaderType}
           setSelectedHeaderType={setSelectedHeaderType}
-          headerNameShade={headerNameShade}
-          setHeaderNameShade={setHeaderNameShade}
+          selectedHeaderNameShade={selectedHeaderNameShade}
+          setSelectedHeaderNameShade={setSelectedHeaderNameShade}
         />
         <EditGroupDisplayNavigationSection
           selectedNavigationType={selectedNavigationType}
@@ -607,8 +616,8 @@ function EditGroupDisplayHeaderSection({
   isMobile,
   setSelectedHeaderType,
   selectedHeaderType,
-  headerNameShade,
-  setHeaderNameShade,
+  selectedHeaderNameShade,
+  setSelectedHeaderNameShade,
 }) {
   return (
     <div className="edit-group-display-header-section">
@@ -654,22 +663,26 @@ function EditGroupDisplayHeaderSection({
           <div className="edit-group-display-light-or-dark-container">
             <button
               onClick={() => {
-                if (headerNameShade === LIGHT_NAME_SHADE) return;
-                setHeaderNameShade(LIGHT_NAME_SHADE);
+                if (selectedHeaderNameShade === LIGHT_NAME_SHADE) return;
+                setSelectedHeaderNameShade(LIGHT_NAME_SHADE);
               }}
               className={`edit-group-display-light-or-dark-button${
-                headerNameShade === LIGHT_NAME_SHADE ? '-active' : '-inactive'
+                selectedHeaderNameShade === LIGHT_NAME_SHADE
+                  ? '-active'
+                  : '-inactive'
               }`}
             >
-              <h3>White Text</h3>
+              <h3>Light Text</h3>
             </button>
             <button
               onClick={() => {
-                if (headerNameShade === DARK_NAME_SHADE) return;
-                setHeaderNameShade(DARK_NAME_SHADE);
+                if (selectedHeaderNameShade === DARK_NAME_SHADE) return;
+                setSelectedHeaderNameShade(DARK_NAME_SHADE);
               }}
               className={`edit-group-display-light-or-dark-button${
-                headerNameShade === DARK_NAME_SHADE ? '-active' : '-inactive'
+                selectedHeaderNameShade === DARK_NAME_SHADE
+                  ? '-active'
+                  : '-inactive'
               }`}
             >
               <h3>Dark Text</h3>
@@ -694,7 +707,7 @@ function EditGroupDisplayHeaderSection({
           userIsMember={true}
           isMobile={isMobile}
           designOnly={true}
-          nameShade={headerNameShade}
+          nameShade={selectedHeaderNameShade}
         />
       </div>
       <div
@@ -753,7 +766,7 @@ function EditGroupDisplayHeaderSection({
           userIsMember={true}
           isMobile={isMobile}
           designOnly={true}
-          nameShade={headerNameShade}
+          nameShade={selectedHeaderNameShade}
         />
       </div>
     </div>
