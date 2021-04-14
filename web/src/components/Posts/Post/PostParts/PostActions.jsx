@@ -18,6 +18,7 @@ const PostActions = ({
   bookmarkedVariation,
   recommendedCount,
   setRecommendedCount,
+  backgroundShade,
 }) => {
   const featureFlags = useContext(FeatureFlags);
   const bookmarkedByCollection = db.collection(`posts/${post.id}/bookmarkedBy`);
@@ -48,6 +49,7 @@ const PostActions = ({
           recommendedResourceID={post.id}
           recommendedByCollection={recommendedByCollection}
           setRecommendedCount={setRecommendedCount}
+          backgroundShade={backgroundShade}
         />
       </div>
       <BookmarkButton
@@ -55,6 +57,7 @@ const PostActions = ({
         bookmarkedResourceType={POST}
         bookmarkedResourceID={post.id}
         bookmarkedByCollection={bookmarkedByCollection}
+        backgroundShade={backgroundShade}
       />
     </div>
   );

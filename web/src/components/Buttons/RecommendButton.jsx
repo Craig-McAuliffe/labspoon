@@ -1,8 +1,5 @@
 import React, {useState, useContext, useEffect} from 'react';
-import {
-  RecommendIconUnselected,
-  RecommendIconSelected,
-} from '../../assets/PostActionIcons';
+import {RecommendIconUnselected} from '../../assets/PostActionIcons';
 import {AuthContext} from '../../App';
 import {db} from '../../firebase';
 import firebase from 'firebase';
@@ -20,6 +17,7 @@ const RecommendButton = ({
   recommendedResourceID,
   recommendedByCollection,
   setRecommendedCount,
+  backgroundShade,
 }) => {
   const [isRecommended, setIsRecommended] = useState(undefined);
   const [loading, setLoading] = useState(true);
@@ -125,6 +123,7 @@ const RecommendButton = ({
           onRecommend={onClick}
           isRecommended={isRecommended}
           loading={loading}
+          backgroundShade={backgroundShade}
         />
       </SignUpPopoverOverride>
     );
@@ -133,19 +132,27 @@ const RecommendButton = ({
       onRecommend={onClick}
       isRecommended={isRecommended}
       loading={loading}
+      backgroundShade={backgroundShade}
     />
   );
 };
 
-const RecommendButtonContent = ({onRecommend, isRecommended, loading}) => (
+const RecommendButtonContent = ({
+  onRecommend,
+  isRecommended,
+  loading,
+  backgroundShade,
+}) => (
   <div className="button-container">
     <button
-      className="action-button"
+      className={`action-button-${backgroundShade ? backgroundShade : 'light'}${
+        isRecommended ? '-selected' : '-unselected'
+      }`}
       href="/"
       onClick={loading ? () => {} : onRecommend}
     >
-      {isRecommended ? <RecommendIconSelected /> : <RecommendIconUnselected />}
-      <span className="action-button-text">Recommend</span>
+      <RecommendIconUnselected />
+      <span>Recommend</span>
     </button>
   </div>
 );

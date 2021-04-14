@@ -21,44 +21,113 @@
   color: #000000;
 }
 
-.edit-button {
-  color: #3099d3;
+.edit-button-light {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  background: #ffffff;
   padding: 5px 6px 5px 3px;
+  background: #ffffff;
+  color: #3099d3;
   border: 1px solid #3099d3;
 }
 
-.edit-button svg {
+.edit-button-dark {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 5px 6px 5px 3px;
+  background: #064262;
+  color: #ccd6da;
+  border: 1px solid #ccd6da;
+}
+
+.edit-button-dark path,
+.edit-button-dark rect {
+  fill: #ffffff;
+}
+
+.edit-button-light svg,
+.edit-button-dark svg {
   height: 20px;
   margin-bottom: 1px;
 }
 
-.edit-button h3 {
+.edit-button-light h3,
+.edit-button-dark h3 {
   margin-left: -6px;
   padding: 0px;
   margin: 0px;
 }
 
-.edit-button:hover {
-  color: #00507c;
-}
-
-.edit-button:hover {
+.edit-button-light:hover {
   text-decoration: none;
   color: #ffffff;
   background: #00507c;
 }
 
-.edit-button:hover path,
-.edit-button:hover rect {
-  fill: #ffffff;
-  /* stroke: #ffffff; */
+.edit-button-dark:hover,
+.edit-button-dark:hover h3 {
+  text-decoration: none;
+  color: #064262;
+  background: #ffffff;
 }
 
-.action-button-text {
+.edit-button-light:hover path,
+.edit-button-light:hover rect {
+  fill: #ffffff;
+}
+
+.edit-button-dark:hover path,
+.edit-button-dark:hover rect {
+  fill: #064262;
+}
+
+.action-button-dark-selected,
+.action-button-dark-unselected {
+  display: flex;
+  align-items: center;
+  color: #ffffff;
+}
+
+.action-button-dark-unselected:hover,
+.action-button-dark-selected:hover {
+  color: #a1dcfc;
+}
+
+.action-button-light-unselected:hover,
+.action-button-light-selected:hover {
+  color: #031e2d;
+}
+
+.action-button-light-selected,
+.action-button-light-unselected {
+  display: flex;
+  align-items: center;
+  color: #00507c;
+}
+
+.action-button-dark-unselected path,
+.action-button-dark-selected path {
+  stroke: #ffffff;
+}
+
+.action-button-dark-selected path {
+  fill: #ffffff;
+}
+
+.action-button-light-unselected path,
+.action-button-light-selected path {
+  stroke: #00507c;
+}
+
+.action-button-light-selected path {
+  fill: #00507c;
+}
+
+.action-button-dark-selected span,
+.action-button-light-selected span,
+.action-button-dark-unselected span,
+.action-button-light-unselected span {
   display: inline-block;
   margin-left: 5px;
 }

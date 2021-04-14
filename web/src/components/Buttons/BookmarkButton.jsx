@@ -2,10 +2,7 @@ import React, {useState, useContext, useEffect} from 'react';
 import {AuthContext} from '../../App';
 import {db} from '../../firebase';
 import firebase from 'firebase';
-import {
-  BookmarkIconUnselected,
-  BookmarkIconSelected,
-} from '../../assets/PostActionIcons';
+import {BookmarkIconUnselected} from '../../assets/PostActionIcons';
 import {SignUpPopoverOverride} from '../Popovers/Popover';
 import {
   BOOKMARK,
@@ -20,6 +17,7 @@ function BookmarkButton({
   bookmarkedResourceType,
   bookmarkedResourceID,
   bookmarkedByCollection,
+  backgroundShade,
 }) {
   const [isBookmarked, setIsBookmarked] = useState(undefined);
   const [loading, setLoading] = useState(true);
@@ -121,6 +119,7 @@ function BookmarkButton({
           onBookmark={onClick}
           isBookmarked={isBookmarked}
           loading={loading}
+          backgroundShade={backgroundShade}
         />
       </SignUpPopoverOverride>
     );
@@ -129,18 +128,26 @@ function BookmarkButton({
       onBookmark={onClick}
       isBookmarked={isBookmarked}
       loading={loading}
+      backgroundShade={backgroundShade}
     />
   );
 }
 
-const BookmarkButtonContent = ({onBookmark, isBookmarked, loading}) => (
+const BookmarkButtonContent = ({
+  onBookmark,
+  isBookmarked,
+  loading,
+  backgroundShade,
+}) => (
   <div className="button-container">
     <button
-      className="action-button"
+      className={`action-button-${backgroundShade ? backgroundShade : 'light'}${
+        isBookmarked ? '-selected' : '-unselected'
+      }`}
       href="/"
       onClick={loading ? () => {} : onBookmark}
     >
-      {isBookmarked ? <BookmarkIconSelected /> : <BookmarkIconUnselected />}
+      <BookmarkIconUnselected />
       <span className="action-button-text">Bookmark</span>
     </button>
   </div>

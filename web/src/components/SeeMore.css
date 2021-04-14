@@ -1,20 +1,36 @@
-.see-more-button {
+.see-more-button-light,
+.see-more-button-dark {
   border: none;
   background: none;
   outline: none;
-  color: #00507c;
   margin-bottom: 10px;
 }
 
-.see-more-button:hover,
-.see-more-button:focus {
+.see-more-button-light {
+  color: #00507c;
+}
+.see-more-button-dark {
+  color: #ffffff;
+}
+
+.see-more-button-light:hover,
+.see-more-button-light:focus {
   border: none;
   background: none;
   outline: none;
-  color: #3099d3;
+  text-decoration: underline;
 }
 
-.see-more-container {
+.see-more-button-dark:hover,
+.see-more-button-dark:focus {
+  border: none;
+  background: none;
+  outline: none;
+  text-decoration: underline;
+}
+
+.see-more-container-light,
+.see-more-container-dark {
   overflow-y: hidden;
   position: relative;
 }

@@ -114,12 +114,22 @@
 .not-found-title {
   color: #5d5d65;
 }
-.secondary-link {
+.secondary-link,
+.secondary-link-light {
   color: #5d5d65;
 }
 
-.secondary-link:hover {
+.secondary-link:hover,
+.secondary-link-light:hover {
   color: #3f3f45;
+}
+
+.secondary-link-dark {
+  color: #ccd6da;
+}
+
+.secondary-link-dark:hover {
+  color: #ffffff;
 }
 
 .grecaptcha-badge {
@@ -172,6 +182,18 @@
   100% {
     background-color: rgba(243, 243, 243);
   }
+}
+
+.full-screen-background-dark {
+  background-color: #00507c;
+  width: 100vw;
+  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  z-index: -3;
+  left: 0px;
+  top: 0px;
+  position: fixed;
 }
 
 .background-container {

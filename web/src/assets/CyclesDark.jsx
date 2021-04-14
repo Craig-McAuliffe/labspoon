@@ -19,7 +19,7 @@ export default function CyclesDark() {
           rx="37.0814"
           ry="188.596"
           transform="rotate(-86.5 772.861 477.526)"
-          fill="#083F5E"
+          fill="#3F87AF"
         />
         <ellipse
           cx="674.153"
@@ -117,7 +117,7 @@ export default function CyclesDark() {
           y2="1295"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#113245" />
+          <stop stopColor="#035F93" />
           <stop offset="1" stopColor="#4995BF" />
         </linearGradient>
         <linearGradient
@@ -165,7 +165,7 @@ export default function CyclesDark() {
           <stop offset="1" stopColor="#00507C" stopOpacity="0" />
         </linearGradient>
         <clipPath id="clip0">
-          <rect width="1440" height="930" fill="white" />
+          <rect width="1440" height="100%" fill="white" />
         </clipPath>
       </defs>
     </svg>

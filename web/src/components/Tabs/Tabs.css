@@ -16,6 +16,10 @@
   border: 1px solid #dcdce0;
 }
 
+.feed-tabs-background-dark {
+  background: #00507c;
+}
+
 .feed-tabs-background-light::after {
   content: '';
   position: absolute;
@@ -26,15 +30,22 @@
   background-color: #dcdce0;
 }
 
-.feed-tabs-background-dark {
-  background: #00507c;
-  border: 1px solid #343a3e;
-  border: 1px solid #dcdce0;
+.feed-tabs-background-dark::after {
+  content: '';
+  position: absolute;
+  top: 0px;
+  left: -1px;
+  width: 1px;
+  height: 100%;
+  background-color: #343a3e;
 }
 
-.feed-tabs-layout-rectangles,
-.feed-tabs-layout-single-divider,
-.feed-tabs-layout-no-divider {
+.feed-tabs-layout-rectangles-light,
+.feed-tabs-layout-single-divider-light,
+.feed-tabs-layout-no-divider-light,
+.feed-tabs-layout-rectangles-dark,
+.feed-tabs-layout-single-divider-dark,
+.feed-tabs-layout-no-divider-dark {
   display: flex;
   justify-content: flex-start;
   flex-wrap: wrap;
@@ -42,146 +53,302 @@
   align-items: center;
 }
 
-.feed-tabs-layout-no-divider {
+.feed-tabs-layout-no-divider-light,
+.feed-tabs-layout-no-divider-dark {
   margin: 0px -5px;
 }
 
-.feed-tabs-layout-rectangles {
+.feed-tabs-layout-no-divider-dark {
+  border: 1px solid #053651;
+}
+
+.feed-tabs-layout-rectangles-light,
+.feed-tabs-layout-rectangles-dak {
   margin: 0px -5px;
 }
 
-.feed-tab-rectangles-inactive,
-.feed-tab-rectangles-active,
-.feed-tab-single-divider-inactive,
-.feed-tab-single-divider-active,
-.feed-tab-single-divider-final-inactive,
-.feed-tab-single-divider-final-active,
-.feed-tab-no-divider-inactive,
-.feed-tab-no-divider-active {
-  color: #99999f;
+.feed-tab-rectangles-light-inactive,
+.feed-tab-rectangles-light-active,
+.feed-tab-single-divider-light-inactive,
+.feed-tab-single-divider-light-active,
+.feed-tab-single-divider-light-final-inactive,
+.feed-tab-single-divider-light-final-active,
+.feed-tab-no-divider-light-inactive,
+.feed-tab-no-divider-light-active,
+.feed-tab-rectangles-dark-inactive,
+.feed-tab-rectangles-dark-active,
+.feed-tab-single-divider-dark-inactive,
+.feed-tab-single-divider-dark-active,
+.feed-tab-single-divider-dark-final-inactive,
+.feed-tab-single-divider-dark-final-active,
+.feed-tab-no-divider-dark-inactive,
+.feed-tab-no-divider-dark-active {
   flex-shrink: 0;
 }
 
-.feed-tab-single-divider-inactive,
-.feed-tab-single-divider-active,
-.feed-tab-single-divider-final-inactive,
-.feed-tab-single-divider-final-active,
-.feed-tab-no-divider-inactive,
-.feed-tab-no-divider-active {
+.feed-tab-rectangles-light-inactive,
+.feed-tab-single-divider-light-inactive,
+.feed-tab-single-divider-light-final-inactive,
+.feed-tab-no-divider-light-inactive {
+  color: #99999f;
+}
+
+.feed-tab-rectangles-dark-inactive,
+.feed-tab-single-divider-dark-inactive,
+.feed-tab-single-divider-dark-final-inactive,
+.feed-tab-no-divider-dark-inactive {
+  color: #9ebdd0;
+}
+
+.feed-tab-single-divider-light-inactive,
+.feed-tab-single-divider-light-active,
+.feed-tab-single-divider-dark-inactive,
+.feed-tab-single-divider-dark-active,
+.feed-tab-single-divider-light-final-inactive,
+.feed-tab-single-divider-light-final-active,
+.feed-tab-single-divider-dark-final-inactive,
+.feed-tab-single-divider-dark-final-active,
+.feed-tab-no-divider-light-inactive,
+.feed-tab-no-divider-light-active,
+.feed-tab-no-divider-dark-inactive,
+.feed-tab-no-divider-dark-active {
   padding: 10px 15px 10px 15px;
+}
+
+.feed-tab-single-divider-light-inactive,
+.feed-tab-single-divider-light-active,
+.feed-tab-single-divider-light-final-inactive,
+.feed-tab-single-divider-light-final-active,
+.feed-tab-no-divider-light-inactive,
+.feed-tab-no-divider-light-active {
   background: #ffffff;
 }
 
-.feed-tab-single-divider-active,
-.feed-tab-single-divider-inactive:hover,
-.feed-tab-no-divider-inactive:hover,
-.feed-tab-single-divider-final-inactive:hover,
-.feed-tab-no-divider-active {
+.feed-tab-single-divider-dark-inactive,
+.feed-tab-single-divider-dark-active,
+.feed-tab-single-divider-dark-final-inactive,
+.feed-tab-single-divider-dark-final-active,
+.feed-tab-no-divider-dark-inactive,
+.feed-tab-no-divider-dark-active {
+  background: #00507c;
+}
+
+.feed-tab-single-divider-light-active,
+.feed-tab-single-divider-light-inactive:hover,
+.feed-tab-no-divider-light-inactive:hover,
+.feed-tab-single-divider-light-final-inactive:hover,
+.feed-tab-no-divider-light-active {
   color: #343a3e;
 }
 
-.feed-tab-single-divider-inactive {
+.feed-tab-single-divider-dark-active,
+.feed-tab-single-divider-dark-inactive:hover,
+.feed-tab-no-divider-dark-inactive:hover,
+.feed-tab-single-divider-dark-final-inactive:hover,
+.feed-tab-no-divider-dark-active,
+.feed-tab-single-divider-dark-final-active {
+  color: #ffffff;
+  background: #053651;
+}
+
+.feed-tab-single-divider-light-inactive {
   border-right: 1px solid #dcdce0;
   border-left: 1px solid #dcdce0;
 }
 
-.feed-tab-single-divider-active {
+.feed-tab-single-divider-dark-inactive {
+  border-right: 1px solid #5d7f95;
+  border-left: 1px solid #5d7f95;
+}
+
+.feed-tab-single-divider-light-active {
   text-decoration: none;
   color: #343a3e;
   border-right: 1px solid #343a3e;
   border-left: 1px solid #343a3e;
 }
 
-.feed-tab-single-divider-final-active {
+.feed-tab-single-divider-dark-active {
+  text-decoration: none;
+  color: #ffffff;
+  border-right: 1px solid #ffffff;
+  border-left: 1px solid #ffffff;
+}
+
+.feed-tab-single-divider-light-final-active {
   color: #343a3e;
 }
 
-.feed-tab-single-divider-inactive:hover {
+.feed-tab-single-divider-light-inactive:hover,
+.feed-tab-single-divider-light-final-inactive:hover {
   text-decoration: none;
   color: #00507c;
 }
 
-.feed-tab-single-divider-final-inactive:hover {
+.feed-tab-single-divider-dark-inactive:hover,
+.feed-tab-single-divider-dark-final-inactive:hover {
+  color: #ffffff;
   text-decoration: none;
-  color: #00507c;
 }
 
-.feed-tab-rectangles-inactive,
-.feed-tab-rectangles-active {
+.feed-tab-rectangles-light-inactive,
+.feed-tab-rectangles-light-active,
+.feed-tab-rectangles-dark-inactive,
+.feed-tab-rectangles-dark-active {
   max-width: 220px;
-  border: 1px solid #99999f;
   margin: 0px 5px 10px;
   padding: 10px;
   justify-content: center;
   justify-items: center;
   flex-grow: 1;
+}
+.feed-tab-rectangles-light-inactive,
+.feed-tab-rectangles-light-active {
   background: #ffffff;
 }
 
-.feed-tab-rectangles-active {
+.feed-tab-rectangles-light-inactive {
+  border: 1px solid #99999f;
+}
+
+.feed-tab-rectangles-dark-inactive,
+.feed-tab-rectangles-dark-active {
+  background: #053651;
+}
+.feed-tab-rectangles-dark-inactive {
+  border: 1px solid #5d7f95;
+}
+
+.feed-tab-rectangles-light-active {
   border: 1px solid #343a3e;
   color: #343a3e;
 }
 
-.feed-tab-rectangles-inactive:hover {
+.feed-tab-rectangles-dark-active {
+  border: 2px solid #ffffff;
+  padding: 9px;
+  color: #ffffff;
+}
+
+.feed-tab-rectangles-light-inactive:hover {
   border: 1px solid #5d5d65;
   color: #5d5d65;
 }
 
-.feed-tab-rectangles-inactive:hover,
-.feed-tab-rectangles-active:hover {
+.feed-tab-rectangles-dark-inactive:hover {
+  color: #ffffff;
+  border: 1px solid #ffffff;
+}
+
+.feed-tab-rectangles-light-inactive:hover,
+.feed-tab-rectangles-light-active:hover,
+.feed-tab-rectangles-dark-inactive:hover,
+.feed-tab-rectangles-dark-active:hover {
   text-decoration: none;
 }
 
-.feed-tab-rectangles-inactive h3,
-.feed-tab-rectangles-active h3,
-.feed-tab-single-divider-inactive h3,
-.feed-tab-single-divider-active h3,
-.feed-tab-no-divider-inactive h3,
-.feed-tab-no-divider-active h3,
-.feed-tab-single-divider-final-inactive h3,
-.feed-tab-single-divider-final-active h3,
-.feed-tab-dropdown-active h3,
-.feed-tab-dropdown-inactive h3 {
+.feed-tabs-container h3,
+.feed-tabs-container-no-border-or-padding h3 {
   margin: 0px;
 }
 
-.feed-tab-dropdown-active,
-.feed-tab-dropdown-inactive {
-  display: block;
-  padding: 5px 5px;
+.feed-tab-dropdown-light-active,
+.feed-tab-dropdown-light-inactive,
+.feed-tab-dropdown-dark-active,
+.feed-tab-dropdown-dark-inactive {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px 5px;
   width: 100%;
   text-align: start;
 }
 
-.feed-tab-dropdown-active:hover,
-.feed-tab-dropdown-inactive:hover {
+.feed-tab-dropdown-light-active h3,
+.feed-tab-dropdown-light-inactive h3,
+.feed-tab-dropdown-dark-active h3,
+.feed-tab-dropdown-dark-inactive h3 {
+  margin: 0px;
+}
+
+.feed-tab-dropdown-light-active:hover,
+.feed-tab-dropdown-light-inactive:hover {
   background: #00507c;
   color: #ffffff;
   text-decoration: none;
 }
 
-.feed-tab-dropdown-active {
+.feed-tab-dropdown-dark-active:hover,
+.feed-tab-dropdown-dark-inactive:hover {
+  background: #053651;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.feed-tab-dropdown-light-active {
   color: #00507c;
 }
 
-.feed-tab-dropdown-inactive {
+.feed-tab-dropdown-dark-active {
+  color: #ffffff;
+}
+
+.feed-tab-dropdown-light-inactive {
   color: #99999f;
 }
 
-.tabs-dropdown-container .dropdown-relative-position,
-.tabs-dropdown-container .dropdown-default-toggle,
-.tabs-dropdown-container .dropdown-custom-toggle {
+.feed-tab-dropdown-dark-inactive {
+  color: #5c8bab;
+}
+
+.tabs-dropdown-container-light .dropdown-relative-position,
+.tabs-dropdown-container-light .dropdown-default-toggle,
+.tabs-dropdown-container-light .dropdown-custom-toggle {
   width: 300px;
   background: #ffffff;
   margin: 10px 0px 20px;
 }
 
+.tabs-dropdown-container-dark {
+  padding-top: 20px;
+  border-top: 1px solid #9ebdd0;
+}
+
+.tabs-dropdown-container-light {
+  padding-top: 20px;
+  border-top: 1px solid #99999f;
+}
+
+.tabs-dropdown-container-dark .dropdown-relative-position,
+.tabs-dropdown-container-dark .dropdown-default-toggle,
+.tabs-dropdown-container-dark .dropdown-custom-toggle,
+.tabs-dropdown-container-dark .dropdown-custom-toggle path {
+  width: 300px;
+  background: #00507c;
+  margin: 10px 0px 20px;
+  color: #ffffff;
+  fill: #ffffff;
+}
+
+.tabs-dropdown-container-dark .dropdown-default-toggle:hover,
+.tabs-dropdown-container-dark .dropdown-custom-toggle:hover {
+  background: #064262;
+}
+
+.tabs-dropdown-container-dark .dropdown-container {
+  background: #00507c;
+  border: 1px solid #053651;
+}
+
 @media screen and (max-width: 800px) {
-  .feed-tab-single-divider-inactive,
-  .feed-tab-single-divider-active,
-  .feed-tab-no-divider-inactive,
-  .feed-tab-no-divider-active {
+  .feed-tab-single-divider-light-inactive,
+  .feed-tab-single-divider-light-active,
+  .feed-tab-no-divider-light-inactive,
+  .feed-tab-no-divider-light-active,
+  .feed-tab-single-divider-dark-inactive,
+  .feed-tab-single-divider-dark-active,
+  .feed-tab-no-divider-dark-inactive,
+  .feed-tab-no-divider-dark-active {
     padding: 0px 8px;
   }
 }

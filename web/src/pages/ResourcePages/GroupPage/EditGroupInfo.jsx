@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {EditInfo} from '../../../components/Group/CreateGroupPage/GroupInfoForm';
 import {db} from '../../../firebase';
-import {useHistory} from 'react-router-dom';
 import {PaddedPageContainer} from '../../../components/Layout/Content';
 import {LoadingSpinnerPage} from '../../../components/LoadingSpinner/LoadingSpinner';
 import {Form, Formik} from 'formik';
@@ -11,14 +10,16 @@ import {
   initialValueNoTitle,
   yupRichBodyOnlyValidation,
 } from '../../../components/Forms/Articles/HeaderAndBodyArticleInput';
+import SuccessMessage from '../../../components/Forms/SuccessMessage';
+import {useHistory} from 'react-router';
 
 import './GroupPage.css';
 
 export default function EditingGroupInfo({groupData, children}) {
   const groupID = groupData.id;
-  const [verified, setVerified] = useState(undefined);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(false);
+  const [successfulSubmit, setSuccessfulSubmit] = useState(false);
   const history = useHistory();
 
   useEffect(() => {
@@ -31,11 +32,10 @@ export default function EditingGroupInfo({groupData, children}) {
   }, [error, setError]);
 
   useEffect(() => {
-    db.doc(`verifiedGroups/${groupID}`)
-      .get()
-      .then((ds) => setVerified(ds.exists))
-      .catch((err) => alert(err));
-  }, [groupID]);
+    if (!successfulSubmit) return;
+    const successTimeout = setTimeout(() => setSuccessfulSubmit(false), 3000);
+    return () => clearTimeout(successTimeout);
+  }, [successfulSubmit]);
 
   const initialValues = {
     name: groupData.name ? groupData.name : '',
@@ -74,7 +74,7 @@ export default function EditingGroupInfo({groupData, children}) {
       })
       .then(() => {
         setSubmitting(false);
-        history.push(`/group/${groupID}`);
+        setSuccessfulSubmit(true);
       });
   };
 
@@ -82,6 +82,9 @@ export default function EditingGroupInfo({groupData, children}) {
   return (
     <PaddedPageContainer>
       {children}
+      {successfulSubmit && (
+        <SuccessMessage isOverlay={true}>Successfully saved</SuccessMessage>
+      )}
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -90,13 +93,14 @@ export default function EditingGroupInfo({groupData, children}) {
         {(props) => (
           <Form>
             <EditInfo
-              verified={verified}
+              verified={groupData.isVerified}
               groupType={groupData.groupType}
               {...props}
             />
             <CreateResourceFormActions
               submitText="Submit"
               submitting={submitting}
+              cancelForm={() => history.push(`/group/${groupID}`)}
             />
           </Form>
         )}

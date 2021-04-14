@@ -8,6 +8,7 @@ import FilterableResults, {
   NewFilterMenuWrapper,
   ResourceTabs,
 } from '../FilterableResults/FilterableResults';
+import SuccessMessage from '../Forms/SuccessMessage';
 import {UnpaddedPageContainer} from '../Layout/Content';
 
 import './FilteredSelector.css';
@@ -29,12 +30,12 @@ export default function FilteredSelector({
   const [shouldFetchResults, setShouldFetchResults] = useState(true);
   // Deselect posts when successfully adding posts
   useEffect(() => {
-    if (success) {
-      setSelectedItems([]);
-      setTimeout(() => {
-        setSuccess(false);
-      }, 3000);
-    }
+    if (!success) return;
+    setSelectedItems([]);
+    const successTimeout = setTimeout(() => {
+      setSuccess(false);
+    }, 3000);
+    return () => clearTimeout(successTimeout);
   }, [success]);
 
   useEffect(() => {
@@ -76,7 +77,11 @@ export default function FilteredSelector({
               removeSelected(selectedItems, resetSelection, setSuccess)
             }
           />
-          {success ? <SuccessMessage /> : <></>}
+          {success ? (
+            <SuccessMessage isOverlay={true}>Success!</SuccessMessage>
+          ) : (
+            <></>
+          )}
           <FilteredSelectorManager
             selectedItems={selectedItems}
             setSelectedItems={setSelectedItems}
@@ -110,16 +115,6 @@ const tabs = [
     mutable: false,
   },
 ];
-
-function SuccessMessage() {
-  return (
-    <div className="onboarding-success-overlay-container">
-      <div className="success-overlay">
-        <h3>Success!</h3>
-      </div>
-    </div>
-  );
-}
 
 function SelectionConfirmation({
   resetSelection,

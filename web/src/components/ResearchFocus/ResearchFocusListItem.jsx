@@ -14,7 +14,7 @@ import './ResearchFocusListItem.css';
 
 export default function ResearchFocusListItem({researchFocus}) {
   return (
-    <ListItemContainer>
+    <ListItemContainer backgroundShade={researchFocus.backgroundShade}>
       <ArticleHeaderAndType
         title={researchFocus.title}
         resourceType={RESEARCHFOCUS}
@@ -22,6 +22,7 @@ export default function ResearchFocusListItem({researchFocus}) {
         resourceID={researchFocus.id}
         authorID={researchFocus.author.id}
         article={researchFocus}
+        backgroundShade={researchFocus.backgroundShade}
       />
       <ImagesSection
         images={formatTaggedImages(researchFocus.photoURLs)}
@@ -32,13 +33,18 @@ export default function ResearchFocusListItem({researchFocus}) {
           body={researchFocus.body}
           expandable={true}
           id={researchFocus.id}
+          backgroundShade={researchFocus.backgroundShade}
         />
       </ExpandableText>
       <ListItemTopics
+        backgroundShade={researchFocus.backgroundShade}
         dbTopics={researchFocus.topics}
         customTopics={researchFocus.customTopics}
       />
-      <GroupSignature group={researchFocus.group} />
+      <GroupSignature
+        backgroundShade={researchFocus.backgroundShade}
+        group={researchFocus.group}
+      />
     </ListItemContainer>
   );
 }

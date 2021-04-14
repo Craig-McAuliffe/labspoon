@@ -156,6 +156,9 @@ export function EditInfo({verified, groupType, ...props}) {
         <FormTextInput label="Institution" name="institution" sideLabel />
         <FormTextInput label="Website" name="website" sideLabel />
       </div>
+      {(props.values.groupType === CHARITY || groupType === CHARITY) && (
+        <VerificationFormOrDonationLinkField verified={verified} />
+      )}
       <div className="rich-text-input-area">
         <HeaderAndBodyArticleInput
           noTitle={true}
@@ -165,9 +168,6 @@ export function EditInfo({verified, groupType, ...props}) {
           shouldAutoFocus={false}
         />
       </div>
-      {(props.values.groupType === CHARITY || groupType === CHARITY) && (
-        <VerificationFormOrDonationLinkField verified={verified} />
-      )}
     </>
   );
 }
@@ -281,8 +281,11 @@ function GroupTypeSelect({...props}) {
 
 function VerificationFormOrDonationLinkField({verified}) {
   if (!verified) return <VerificationRequest />;
-
-  return <FormTextInput label="Donation Link" name="donationLink" sideLabel />;
+  return (
+    <div style={{marginTop: '40px'}}>
+      <FormTextInput label="Donation Link" name="donationLink" sideLabel />
+    </div>
+  );
 }
 
 function VerificationRequest() {

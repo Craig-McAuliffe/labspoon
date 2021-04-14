@@ -4,10 +4,20 @@ Secondary Text: #5D5D65
 Tertiary Text: #99999F
 Quaternary Text: #DCDCE0
 
-Primary Color: #00507C
+Primary Color: #00507C rgb(0,80,124)
 Secondary Color: #3099D3
 Background Blue: #EAF5FB
 Overlay Off Primary: #185E9C;
+
+Main text dark: #ffffff
+Secondary text dark: #ccd6da
+Tertiary text dark: #9ebdd0
+Quaternary text dark: #5d7f95
+dark outline: #0a3b5b
+darker-background: #053651;
+darker-background-secondary (list items backgrounds): #064262; rgb(6,66,98)
+darker-background-hover: #031e2d;
+dark-link-hover : #a1dcfc;
 
 Destructive color: #DA0000
 Warning color: #DF6B00

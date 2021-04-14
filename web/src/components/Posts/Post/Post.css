@@ -1,11 +1,18 @@
-.post-container {
+.post-container-light,
+.post-container-dark {
   margin: 2px 2px 30px 2px;
   padding: 20px 16px;
   max-width: 100%;
-  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.6);
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.7);
+}
+
+.post-container-light {
   background: #ffffff;
 }
 
+.post-container-dark {
+  background: #064262;
+}
 .post-container-dedicated-page {
   margin: 2px 2px 0px 2px;
   padding: 20px 16px 0px;
@@ -18,13 +25,22 @@
   margin-bottom: 30px;
 }
 
-.post-header {
+.post-header-light,
+.post-header-dark {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: nowrap;
   margin-bottom: 5px;
+}
+
+.post-header-light {
   border-bottom: 1px solid #dcdce0;
+}
+
+.post-header-light,
+.post-header-dark {
+  border-bottom: 1px solid #5d7f95;
 }
 
 .post-header-dedicated-page {
@@ -43,12 +59,20 @@
   text-decoration-color: black;
 }
 
-.post-header a {
+.post-header-light a {
   color: black;
 }
-.post-header a:hover {
+.post-header-light a:hover {
   text-decoration: underline;
   color: black;
+}
+
+.post-header-dark a {
+  color: #ffffff;
+}
+.post-header-dark a:hover {
+  text-decoration: underline;
+  color: #ffffff;
 }
 
 .post-text-content {
@@ -76,17 +100,24 @@
   color: #3099d3;
 }
 
-.post-header-profile {
+.post-header-profile-light,
+.post-header-profile-dark {
   display: flex;
   align-items: center;
 }
 
-.post-header-profile p {
+.post-header-profile-light p {
   color: #5d5d65;
   margin: 0px;
 }
 
-.post-header-profile h3 {
+.post-header-profile-dark p {
+  color: #ccd6da;
+  margin: 0px;
+}
+
+.post-header-profile-light h3,
+.post-header-profile-dark h3 {
   margin: 0px;
 }
 
@@ -138,48 +169,8 @@
   justify-content: flex-end;
 }
 
-.post-type-name {
-  text-transform: capitalize;
-  padding: 0px 8px 0px 5px;
-  align-self: flex-end;
-  color: #5d5d65;
-}
-
-.post-type-icon {
-  align-self: flex-start;
-}
-
 .post-header-avatar {
   margin: 10px;
-}
-
-.pinned-post {
-  display: flex;
-  flex-flow: column;
-  align-items: center;
-  border: 1px solid #3099d3;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0px 0px 4px #3099d3;
-}
-
-.pinned-post div {
-  display: flex;
-  justify-content: center;
-}
-
-.pinned-post h3 {
-  margin: 0px 0px 15px;
-  color: #00507c;
-}
-
-.pinned-post-topic {
-  margin: 0px 20px;
-}
-
-.pinned-post-more-info {
-  margin: 20px 0px 0px;
-  color: #99999f;
 }
 
 .post-selector-inactive-text {

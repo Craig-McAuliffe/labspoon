@@ -1,4 +1,5 @@
-.content-layout {
+.content-layout-light,
+.content-layout-dark {
   padding-top: 10px;
   grid-row: 1 / 2;
   grid-column: 2/3;
@@ -11,33 +12,44 @@
   grid-template-columns: minmax(5px, 1fr) minmax(408px, 1070px) minmax(5px, 1fr);
 }
 
-.feed-container {
+.content-layout-dark,
+.feed-container-dark,
+.padded-page-container-dark {
+  color: #ffffff;
+}
+
+.feed-container-light,
+.feed-container-dark {
   grid-column: 2/3;
   max-width: 100%;
 }
 
 /* TODO: remove once we have similar content sider */
 @media screen and (max-width: 1107px) {
-  .padded-page-container {
+  .padded-page-container-light,
+  .padded-page-container-dark {
     padding: 0px 5px;
     max-width: 100%;
   }
 }
 
 @media screen and (max-width: 800px) {
-  .content-layout {
+  .content-layout-light,
+  .content-layout-dark {
     padding: 10px 0px;
     margin: 10px 0px 20px;
     display: block;
   }
 
-  .padded-page-container {
+  .padded-page-container-light,
+  .padded-page-container-dark {
     padding: 0px 2px;
   }
 }
 
 @media screen and (max-width: 500px) {
-  .content-layout {
+  .content-layout-light,
+  .content-layout-dark {
     padding-top: 10px;
     margin: 5px 0px 15px;
   }

@@ -1,5 +1,11 @@
-.primary-button-text .spinner-border {
+.primary-button-light-spinner .spinner-border {
   color: white;
+  width: 30px;
+  height: 30px;
+}
+
+.primary-button-dark-spinner .spinner-border {
+  color: #00507c;
   width: 30px;
   height: 30px;
 }

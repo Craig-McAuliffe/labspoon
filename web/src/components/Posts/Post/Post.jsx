@@ -4,7 +4,6 @@ import PostTaggedContent from './PostParts/PostTaggedContent';
 import PostActions from './PostParts/PostActions';
 import DefaultUserIcon from '../../../assets/DefaultUserIcon.svg';
 import ListItemTopics from '../../ListItem/ListItemTopics';
-import PublicationListItem from '../../Publication/PublicationListItem';
 import UserAvatar from '../../Avatar/UserAvatar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {
@@ -46,29 +45,13 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
   if (post[OPENPOSITION])
     taggedContent.push({type: OPENPOSITION, content: post.openPosition});
 
-  if (post.generated)
-    return (
-      <div className="post-referenced-resource-container">
-        <PublicationListItem
-          publication={post.referencedResource}
-          removeBorder={true}
-        />
-        <div className="post-container">
-          <PostHeader
-            postAuthor={post.author}
-            postUnixTimestamp={post.unixTimeStamp}
-            postID={post.id}
-            post={post}
-          />
-          <PostTextContent post={post} />
-        </div>
-      </div>
-    );
-
   return (
     <div
       className={
-        dedicatedPage ? 'post-container-dedicated-page' : 'post-container'
+        dedicatedPage
+          ? 'post-container-dedicated-page'
+          : 'post-container-' +
+            (post.backgroundShade ? post.backgroundShade : 'light')
       }
     >
       <PostHeader
@@ -76,11 +59,24 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
         postUnixTimestamp={post.unixTimeStamp}
         dedicatedPage={dedicatedPage}
         post={post}
+        backgroundShade={post.backgroundShade}
       />
-      <PostTextContent post={post} dedicatedPage={dedicatedPage} />
-      <PostTaggedContent taggedContent={taggedContent} />
-      <ListItemTopics dbTopics={post.topics} customTopics={post.customTopics} />
+      <PostTextContent
+        backgroundShade={post.backgroundShade}
+        post={post}
+        dedicatedPage={dedicatedPage}
+      />
+      <PostTaggedContent
+        backgroundShade={post.backgroundShade}
+        taggedContent={taggedContent}
+      />
+      <ListItemTopics
+        backgroundShade={post.backgroundShade}
+        dbTopics={post.topics}
+        customTopics={post.customTopics}
+      />
       <PostActions
+        backgroundShade={post.backgroundShade}
         post={post}
         dedicatedPage={dedicatedPage}
         bookmarkedVariation={bookmarkedVariation}
@@ -115,12 +111,26 @@ const calculateHoursAndDaysSincePost = (postUnixTimestamp) => {
   return `${yearsSincePost} year${yearsSincePost === 1 ? '' : 's'} ago`;
 };
 
-function PostHeader({postAuthor, postUnixTimestamp, dedicatedPage, post}) {
+function PostHeader({
+  backgroundShade,
+  postAuthor,
+  postUnixTimestamp,
+  dedicatedPage,
+  post,
+}) {
   return (
     <div
-      className={dedicatedPage ? 'post-header-dedicated-page' : 'post-header'}
+      className={
+        dedicatedPage
+          ? 'post-header-dedicated-page'
+          : 'post-header-' + (backgroundShade ? backgroundShade : 'light')
+      }
     >
-      <div className="post-header-profile">
+      <div
+        className={`post-header-profile-${
+          backgroundShade ? backgroundShade : 'light'
+        }`}
+      >
         <div className="post-header-avatar">
           {postAuthor.avatar ? (
             <UserAvatar src={postAuthor.avatar} width="60px" height="60px" />
@@ -149,12 +159,16 @@ function PostHeader({postAuthor, postUnixTimestamp, dedicatedPage, post}) {
   );
 }
 
-function PostTextContent({post, dedicatedPage}) {
+function PostTextContent({backgroundShade, post, dedicatedPage}) {
   const history = useHistory();
   if (dedicatedPage)
     return (
       <div className="post-text-content">
-        <RichTextBody body={post.text} shouldLinkify={true} />
+        <RichTextBody
+          backgroundShade={backgroundShade}
+          body={post.text}
+          shouldLinkify={true}
+        />
       </div>
     );
 
@@ -162,7 +176,11 @@ function PostTextContent({post, dedicatedPage}) {
   return (
     <div className="post-text-content">
       <div className="post-text-as-link" onMouseDown={goToPost}>
-        <RichTextBody body={post.text} shouldLinkify={true} />
+        <RichTextBody
+          backgroundShade={backgroundShade}
+          body={post.text}
+          shouldLinkify={true}
+        />
       </div>
     </div>
   );

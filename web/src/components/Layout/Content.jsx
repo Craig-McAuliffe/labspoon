@@ -2,30 +2,58 @@ import React from 'react';
 
 import './Content.css';
 
-export default function Content({children}) {
-  return <div className="content-layout">{children}</div>;
+export default function Content({children, backgroundShade}) {
+  return (
+    <div
+      className={`content-layout-${
+        backgroundShade ? backgroundShade : 'light'
+      }`}
+    >
+      {children}
+    </div>
+  );
 }
 
-export function FeedContainer({children}) {
-  return <div className="feed-container">{children}</div>;
+export function FeedContainer({children, backgroundShade}) {
+  return (
+    <div
+      className={`feed-container-${
+        backgroundShade ? backgroundShade : 'light'
+      }`}
+    >
+      {children}
+    </div>
+  );
 }
 
-export function UnpaddedPageContainer({children}) {
+export function UnpaddedPageContainer({children, backgroundShade}) {
   return (
     <Content>
-      <FeedContainer>{children}</FeedContainer>
+      <FeedContainer backgroundShade={backgroundShade}>
+        {children}
+      </FeedContainer>
     </Content>
   );
 }
 
-export function PaddedPageContainer({children}) {
+export function PaddedPageContainer({children, backgroundShade}) {
   return (
     <UnpaddedPageContainer>
-      <PaddedContent>{children}</PaddedContent>
+      <PaddedContent backgroundShade={backgroundShade}>
+        {children}
+      </PaddedContent>
     </UnpaddedPageContainer>
   );
 }
 
-export function PaddedContent({children}) {
-  return <div className="padded-page-container">{children}</div>;
+export function PaddedContent({children, backgroundShade}) {
+  return (
+    <div
+      className={`padded-page-container-${
+        backgroundShade ? backgroundShade : 'light'
+      }`}
+    >
+      {children}
+    </div>
+  );
 }

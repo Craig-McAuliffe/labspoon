@@ -31,6 +31,7 @@ export function ArticleHeaderAndType({
   dedicatedPage,
   authorID,
   article,
+  backgroundShade,
 }) {
   const {userProfile} = useContext(AuthContext);
   const userID = userProfile ? userProfile.id : undefined;
@@ -77,32 +78,38 @@ export function ArticleHeaderAndType({
           pinProfileID={article ? article.pinProfileID : null}
           pinProfileCollection={article ? article.pinProfileCollection : null}
           options={[PIN, EDIT]}
+          backgroundShade={backgroundShade}
         />
       )}
       <div
-        className={`article${dedicatedPage ? '' : '-list-item'}-header-section`}
+        className={`article${
+          dedicatedPage ? '' : '-list-item'
+        }-header-section-${backgroundShade ? backgroundShade : 'light'}`}
       >
         {resourceID ? (
           <Link to={url}>{sizedHeaders().articleTitle}</Link>
         ) : (
           sizedHeaders().articleTitle
         )}
-        <div className="article-list-item-resource-type-svg-container">
-          {icon}
-        </div>
+        {icon}
         {resourceTypeName ? sizedHeaders().articleResourceType : null}
       </div>
     </>
   );
 }
 
-export function RichTextBody({body, shouldLinkify = true}) {
+export function RichTextBody({backgroundShade, body, shouldLinkify = true}) {
   if (!body) return null;
   const bodyDisplay = (
     <div className="rich-body-section">
       {body.map((bodySection, i) =>
         bodySection.type === 'paragraph' ? (
-          <p className="rich-body-paragraph" key={bodySection.type + i}>
+          <p
+            className={`rich-body-paragraph-${
+              backgroundShade ? backgroundShade : 'light'
+            }`}
+            key={bodySection.type + i}
+          >
             {bodySection.children[0].text}
           </p>
         ) : (
@@ -114,13 +121,15 @@ export function RichTextBody({body, shouldLinkify = true}) {
   if (shouldLinkify)
     return (
       <Linkify>
-        <SecureLinks>{bodyDisplay}</SecureLinks>
+        <SecureLinks backgroundShade={backgroundShade}>
+          {bodyDisplay}
+        </SecureLinks>
       </Linkify>
     );
   return bodyDisplay;
 }
 
-function SecureLinks({children}) {
+function SecureLinks({children, backgroundShade}) {
   const parsedTextAndLinks = [];
   children[0].props.children.forEach((paragraph, i) => {
     const textAndLinks = [];
@@ -137,7 +146,12 @@ function SecureLinks({children}) {
 
   return parsedTextAndLinks.map((paragraph, i) => {
     return (
-      <p key={'paragraph ' + i} className="rich-body-paragraph">
+      <p
+        key={'paragraph ' + i}
+        className={`rich-body-paragraph-${
+          backgroundShade ? backgroundShade : 'light'
+        }`}
+      >
         {paragraph.map((line, i) => {
           if (line.type === 'link')
             return (
@@ -146,7 +160,6 @@ function SecureLinks({children}) {
                 rel="noopener noreferrer"
                 href={line.content}
                 key={'line ' + line.content + i}
-                className="rich-body-link"
               >
                 {line.content}
               </a>

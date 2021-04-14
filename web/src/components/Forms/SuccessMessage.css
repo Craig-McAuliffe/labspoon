@@ -1,6 +1,61 @@
-.onboarding-success-overlay-container {
+.success-container {
   min-width: 100%;
   display: flex;
   justify-content: center;
   padding: 5px;
+}
+
+.success-container-overlay {
+  position: fixed;
+  z-index: 3;
+  top: 20vh;
+  margin: auto;
+  left: 0px;
+  width: 100%;
+  display: inline-block;
+  opacity: 1;
+}
+
+.success-overlay-positioning {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.success-container-overlay h3 {
+  background: #ffffff;
+  border: 2px solid #287fad;
+  box-shadow: 0px 0px 4px #287fad;
+  line-height: normal;
+  padding: 10px 20px;
+  max-width: 400px;
+  text-align: center;
+}
+
+@media screen and (max-width: 600px) {
+  .success-container-overlay h3 {
+    padding: 10px 15px;
+    max-width: 400px;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  .success-container-overlay h3 {
+    padding: 10px 10px;
+    max-width: 400px;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .success-container-overlay h3 {
+    padding: 10px 10px;
+    max-width: 300px;
+  }
+}
+
+@media screen and (max-width: 300px) {
+  .success-container-overlay h3 {
+    padding: 5px 5px;
+    max-width: 200px;
+  }
 }

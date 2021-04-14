@@ -1,9 +1,14 @@
 import React from 'react';
 
 import {Link} from 'react-router-dom';
+import {DARK_NAME_SHADE} from '../../pages/ResourcePages/GroupPage/EditGroupDisplay';
 import './ListItemTopics.css';
 
-export default function ListItemTopics({dbTopics, customTopics}) {
+export default function ListItemTopics({
+  dbTopics,
+  customTopics,
+  backgroundShade,
+}) {
   if (!dbTopics && !customTopics) return null;
   if (!dbTopics) dbTopics = [];
   if (!customTopics) customTopics = [];
@@ -14,7 +19,12 @@ export default function ListItemTopics({dbTopics, customTopics}) {
     return topics.map((topic) => {
       if (!topic.id && !topic.microsoftID)
         return (
-          <p className="tagged-topic-names" key={topic.name}>
+          <p
+            className={`tagged-topic-names${
+              backgroundShade === DARK_NAME_SHADE ? '-dark' : '-light'
+            }`}
+            key={topic.name}
+          >
             {topic.name}
           </p>
         );
@@ -24,7 +34,9 @@ export default function ListItemTopics({dbTopics, customTopics}) {
         <Link
           to={topic.id ? `/topic/${topicID}` : `/magField/${topicID}`}
           key={topicID}
-          className="tagged-topic-names"
+          className={`tagged-topic-names${
+            backgroundShade === DARK_NAME_SHADE ? '-dark' : '-light'
+          }`}
         >
           {topic.name}
         </Link>
@@ -34,7 +46,13 @@ export default function ListItemTopics({dbTopics, customTopics}) {
 
   return (
     <div className="post-topics-container">
-      <p className="topics-sub-title">Topics: </p>
+      <p
+        className={`topics-sub-title${
+          backgroundShade === DARK_NAME_SHADE ? '-dark' : '-light'
+        }`}
+      >
+        Topics:{' '}
+      </p>
       {topicLinks(dbTopics)}
       {topicLinks(customTopics)}
     </div>

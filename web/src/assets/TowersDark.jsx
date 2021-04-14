@@ -54,9 +54,12 @@ export default function TowersDark() {
         fill="url(#paint4_linear)"
       />
       <rect x="870" y="177" width="114" height="555" fill="#003552" />
-      <path d="M187 133L257 169V762H187V133Z" fill="url(#paint5_linear)" />
       <path
-        d="M302.5 133L257 169L187 133L239.5 101.5L302.5 133ZM302.5 133V728"
+        d="M130 103.5L200 139.5V732.5H130V103.5Z"
+        fill="url(#paint5_linear)"
+      />
+      <path
+        d="M245.5 103.5L200 139.5L130 103.5L182.5 72L245.5 103.5ZM245.5 103.5V698.5"
         stroke="url(#paint6_linear)"
       />
       <path
@@ -150,10 +153,10 @@ export default function TowersDark() {
         </linearGradient>
         <linearGradient
           id="paint5_linear"
-          x1="333"
-          y1="31"
-          x2="468.824"
-          y2="641.114"
+          x1="276"
+          y1="1.50002"
+          x2="411.824"
+          y2="611.614"
           gradientUnits="userSpaceOnUse"
         >
           <stop stopColor="#6EA9C9" />
@@ -161,14 +164,14 @@ export default function TowersDark() {
         </linearGradient>
         <linearGradient
           id="paint6_linear"
-          x1="276.5"
-          y1="722.5"
-          x2="267.5"
-          y2="112"
+          x1="219.5"
+          y1="693"
+          x2="210.5"
+          y2="82.5003"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="white" />
-          <stop offset="1" stopColor="#29A5EA" />
+          <stop stopColor="#00507C" stopOpacity="0.27" />
+          <stop offset="1" stopColor="#106A9B" />
         </linearGradient>
         <linearGradient
           id="paint7_linear"

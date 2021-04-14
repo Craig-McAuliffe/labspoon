@@ -4,8 +4,19 @@
   margin: 20px 0px 0px;
 }
 
-.group-signature-link:hover .group-signature-name {
-  color: #3099d3;
+.group-signature-link-light:hover .group-signature-name {
+  text-decoration: underline;
+  color: #00507c;
+}
+
+.group-signature-link-dark:hover .group-signature-name,
+.group-signature-link-dark:hover {
+  text-decoration: underline;
+  color: #ffffff;
+}
+
+.group-signature-link-dark {
+  color: #ffffff;
 }
 
 .group-signature-link:hover img {
@@ -17,6 +28,10 @@
   margin-left: 10px;
 }
 
-.group-signature-institution {
+.group-signature-institution-light {
   color: #99999f;
+}
+
+.group-signature-institution-dark {
+  color: #ccd6da;
 }

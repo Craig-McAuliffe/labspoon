@@ -8,18 +8,25 @@ import CreateResourceFormActions from '../../../components/Forms/CreateResourceF
 import {db} from '../../../firebase';
 import {AuthContext} from '../../../App';
 import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
-import {useHistory} from 'react-router-dom';
 
 import './EditGroupMembers.css';
+import SuccessMessage from '../../../components/Forms/SuccessMessage';
 
 export default function EditGroupMembers({groupData, children}) {
   const [groupMembers, setGroupMembers] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [membersAreModified, setMembersAreModified] = useState(false);
-  const history = useHistory();
+  const [success, setSuccess] = useState(false);
   const groupID = groupData.id;
   const {userProfile} = useContext(AuthContext);
+
+  useEffect(() => {
+    if (!success) return;
+    const successTimeout = setTimeout(() => setSuccess(false), 3000);
+    return () => clearTimeout(successTimeout);
+  }, [success]);
+
   useEffect(() => {
     async function fetchGroupMembers() {
       const members = [];
@@ -75,6 +82,8 @@ export default function EditGroupMembers({groupData, children}) {
     setSelectedUsers([groupMembers]);
   };
   const onSubmitMembers = async () => {
+    if (success) setSuccess(false);
+    if (submitting) return;
     setSubmitting(true);
     const memberIDsToBeRemoved = [];
     const invitationsToBeRemoved = [];
@@ -139,9 +148,21 @@ export default function EditGroupMembers({groupData, children}) {
           .doc(invitationToRemove.invitationID)
       );
     });
-    await batch.commit();
-    setSubmitting(false);
-    history.push(`/group/${groupID}`);
+    return batch
+      .commit()
+      .then(() => {
+        setSuccess(true);
+        setGroupMembers(selectedUsers);
+        setSelectedUsers([]);
+        setSubmitting(false);
+      })
+      .catch((err) => {
+        console.error(
+          `unable to add or remove members to group with id ${groupID} ${err}`
+        );
+        alert('Something went wrong. Sorry about that. Please try again.');
+        setSubmitting(false);
+      });
   };
 
   const chooseMembers = (
@@ -177,6 +198,9 @@ export default function EditGroupMembers({groupData, children}) {
   return (
     <PaddedPageContainer>
       {children}
+      {success && !submitting && (
+        <SuccessMessage isOverlay={true}>Success!</SuccessMessage>
+      )}
       {submitting ? loadingScreen : chooseMembers}
     </PaddedPageContainer>
   );

@@ -45,8 +45,8 @@
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
 
-.dropdown-option-button {
-  padding: 4px 12px;
+.dropdown-option-button-light {
+  padding: 4px 5px;
   width: 100%;
   border-bottom: 1px solid #5d5d65;
   color: #00507c;
@@ -56,18 +56,18 @@
   align-items: center;
 }
 
-.dropdown-option-button:hover,
-.dropdown-option-button:focus {
+.dropdown-option-button-light:hover,
+.dropdown-option-button-light:focus {
   background-color: #00507c;
   border-bottom: 1px solid #00507c;
   color: #ffffff;
 }
 
-.dropdown-option-button-loading,
-.dropdown-option-button-loading:hover,
-.dropdown-option-button-loading:focus {
+.dropdown-option-button-light-loading,
+.dropdown-option-button-light-loading:hover,
+.dropdown-option-button-light-loading:focus {
   color: #5d5d65;
-  padding: 4px 12px;
+  padding: 4px 5px;
   width: 100%;
   border-bottom: 1px solid #5d5d65;
   text-align: start;
@@ -77,45 +77,119 @@
   cursor: default;
 }
 
-.dropdown-option-button:hover h4,
-.dropdown-option-button:focus h4,
-.dropdown-option-button:hover h3,
-.dropdown-option-button:focus h3 {
+.dropdown-option-button-dark {
+  padding: 4px 5px;
+  width: 100%;
+  border-bottom: 1px solid #5d7f95;
   color: #ffffff;
+  text-align: start;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  background-color: #053651;
 }
 
-.dropdown-option-button h4,
-.dropdown-option-button h3 {
+.dropdown-option-button-dark:hover,
+.dropdown-option-button-dark:focus {
+  background-color: #ffffff;
+  border-bottom: 1px solid #ffffff;
+  color: #053651;
+}
+
+.dropdown-option-button-dark-loading,
+.dropdown-option-button-dark-loading:hover,
+.dropdown-option-button-dark-loading:focus {
+  color: #9ebdd0;
+  padding: 4px 5px;
+  width: 100%;
+  border-bottom: 1px solid #9ebdd0;
+  text-align: start;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  cursor: default;
+}
+
+.dropdown-option-button-light:hover h4,
+.dropdown-option-button-light:focus h4,
+.dropdown-option-button-light:hover h3,
+.dropdown-option-button-light:focus h3 {
+  color: #ffffff;
+}
+.dropdown-option-button-dark:hover h4,
+.dropdown-option-button-dark:focus h4,
+.dropdown-option-button-dark:hover h3,
+.dropdown-option-button-dark:focus h3 {
+  color: #053651;
+}
+
+.dropdown-option-button-light h4,
+.dropdown-option-button-light h3 {
   color: #00507c;
 }
 
-.dropdown-option-button:hover path,
-.dropdown-option-button:focus path {
+.dropdown-option-button-dark h4,
+.dropdown-option-button-dark h3 {
+  color: #ffffff;
+}
+
+.dropdown-option-button-light:hover path,
+.dropdown-option-button-light:focus path {
   fill: #ffffff;
 }
 
-.dropdown-option-button:hover svg,
-.dropdown-option-button:focus svg {
+.dropdown-option-button-dark:hover path,
+.dropdown-option-button-dark:focus path {
+  fill: #053651;
+}
+
+.dropdown-option-button-light:hover svg,
+.dropdown-option-button-light:focus svg {
   stroke: #ffffff;
 }
 
-.dropdown-option-button:hover .pin-icon path,
-.dropdown-option-button:focus .pin-icon path {
+.dropdown-option-button-dark:hover svg,
+.dropdown-option-button-dark:focus svg {
+  stroke: #053651;
+}
+
+.dropdown-option-button-light:hover .pin-icon path,
+.dropdown-option-button-light:focus .pin-icon path {
   stroke: #ffffff;
 }
 
-.dropdown-option-button:hover .pin-icon,
-.dropdown-option-button:focus .pin-icon {
+.dropdown-option-button-dark:hover .pin-icon path,
+.dropdown-option-button-dark:focus .pin-icon path {
+  stroke: #053651;
+}
+
+.dropdown-option-button-light:hover .pin-icon,
+.dropdown-option-button-light:focus .pin-icon {
   stroke: #00507c;
 }
 
-.dropdown-option-button:hover .pin-icon circle,
-.dropdown-option-button:focus .pin-icon circle {
+.dropdown-option-button-dark:hover .pin-icon,
+.dropdown-option-button-dark:focus .pin-icon {
+  stroke: #ffffff;
+}
+
+.dropdown-option-button-light:hover .pin-icon circle,
+.dropdown-option-button-light:focus .pin-icon circle {
   stroke: #ffffff;
   fill: #00507c;
 }
 
-.dropdown-option-button svg {
+.dropdown-option-button-dark:hover .pin-icon circle,
+.dropdown-option-button-dark:focus .pin-icon circle {
+  stroke: #053651;
+  fill: #ffffff;
+}
+
+.dropdown-option-button-light svg {
+  width: 50px;
+}
+
+.dropdown-option-button-dark svg {
   width: 50px;
 }
 

@@ -18,12 +18,13 @@ export default function ResourcesFeed({
   useRoutedTabs,
   getCustomComponentAboveFeed,
   tabsDesign,
+  backgroundShade,
 }) {
   return (
     <FilterableResults fetchResults={fetchResults} limit={limit}>
       <FilterManager>
         <NewFilterMenuWrapper />
-        <UnpaddedPageContainer>
+        <UnpaddedPageContainer backgroundShade={backgroundShade}>
           {children}
           {tabsLoading ? (
             <div style={{marginTop: '20px'}}>
@@ -36,6 +37,7 @@ export default function ResourcesFeed({
                 routedTabBasePathname={routedTabBasePathname}
                 useRoutedTabs={useRoutedTabs}
                 tabsDesign={tabsDesign}
+                backgroundShade={backgroundShade}
               />
               {getCustomComponentAboveFeed && getCustomComponentAboveFeed()}
               <NewResultsWrapper />

@@ -13,26 +13,6 @@
   flex-wrap: wrap;
 }
 
-.action-button {
-  border: none;
-  /* color: #00507c; */
-  color: #5d5d65;
-  background: none;
-}
-
-.action-button:hover,
-.action-button:focus {
-  border: none;
-  outline: none;
-  color: #3099d3;
-}
-.action-button:active {
-  background: none;
-  border: none;
-  outline: none;
-  color: #3099d3;
-}
-
 .button-container {
   padding: 10px 30px 10px 0px;
   border-radius: 4px;
@@ -51,8 +31,4 @@
 .post-actions-button-container {
   display: flex;
   align-items: center;
-}
-
-.post-actions-button-container span {
-  color: #5d5d65;
 }

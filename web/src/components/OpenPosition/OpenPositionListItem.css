@@ -1,21 +1,5 @@
-.resource-list-item-inline-subtitle {
-  color: #99999f;
-  margin-bottom: 5px;
-}
-
-.resource-list-item-inline-subtitle span {
-  color: #000000;
-  display: inline-block;
-  margin-left: 10px;
-}
-
 .open-position-description {
   overflow-y: hidden;
-}
-
-.resource-list-item-subtitle {
-  color: #99999f;
-  margin-top: 10px;
 }
 
 .article-list-item-small-description {

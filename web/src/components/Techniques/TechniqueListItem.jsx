@@ -12,7 +12,7 @@ import {TECHNIQUE} from '../../helpers/resourceTypeDefinitions';
 
 export default function TechniqueListItem({technique}) {
   return (
-    <ListItemContainer>
+    <ListItemContainer backgroundShade={technique.backgroundShade}>
       <ArticleHeaderAndType
         title={technique.title}
         resourceType={TECHNIQUE}
@@ -20,19 +20,27 @@ export default function TechniqueListItem({technique}) {
         resourceID={technique.id}
         authorID={technique.author.id}
         article={technique}
+        backgroundShade={technique.backgroundShade}
       />
       <ImagesSection
         images={formatTaggedImages(technique.photoURLs)}
         customMargin="20px"
       />
       <ExpandableText resourceID={technique.id}>
-        <RichTextBody body={technique.body} />
+        <RichTextBody
+          backgroundShade={technique.backgroundShade}
+          body={technique.body}
+        />
       </ExpandableText>
       <ListItemTopics
+        backgroundShade={technique.backgroundShade}
         dbTopics={technique.topics}
         customTopics={technique.customTopics}
       />
-      <GroupSignature group={technique.group} />
+      <GroupSignature
+        group={technique.group}
+        backgroundShade={technique.backgroundShade}
+      />
     </ListItemContainer>
   );
 }

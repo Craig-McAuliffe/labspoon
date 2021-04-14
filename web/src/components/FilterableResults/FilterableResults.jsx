@@ -290,6 +290,10 @@ function handleResultParameters(results, parameters) {
       result.pinProfileCollection = parameters.pinProfileCollection;
       result.pinProfileID = parameters.pinProfileID;
     });
+  if (parameters.backgroundShade)
+    results.forEach((result) => {
+      result.backgroundShade = parameters.backgroundShade;
+    });
 }
 
 export function ResourceTabs({
@@ -298,6 +302,7 @@ export function ResourceTabs({
   routedTabBasePathname,
   useRoutedTabs,
   tabsDesign,
+  backgroundShade,
 }) {
   const filterManager = useContext(FilterManagerContext);
   const setTabFilter = filterManager.setDisplayedTabFilter;
@@ -317,6 +322,7 @@ export function ResourceTabs({
 
   return (
     <Tabs
+      backgroundShade={backgroundShade}
       displayType={tabsDesign}
       routedTabBasePathname={routedTabBasePathname}
       useRoutedTabs={useRoutedTabs}

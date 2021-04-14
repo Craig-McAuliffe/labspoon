@@ -139,7 +139,10 @@ export function GenericListItem({
           key={result.id + 'user'}
           isFollowsPageResults={isFollowsPageResults}
         >
-          <FollowUserButton targetUser={result} />
+          <FollowUserButton
+            backgroundShade={result.backgroundShade}
+            targetUser={result}
+          />
         </UserListItem>
       );
     case 'group':
@@ -149,7 +152,10 @@ export function GenericListItem({
           group={result}
           isFollowsPageResults={isFollowsPageResults}
         >
-          <FollowGroupButton targetGroup={result} />
+          <FollowGroupButton
+            backgroundShade={result.backgroundShade}
+            targetGroup={result}
+          />
         </GroupListItem>
       );
     case 'topic':
@@ -163,7 +169,10 @@ export function GenericListItem({
           noDivider={noDivider}
           isFollowsPageResults={isFollowsPageResults}
         >
-          <FollowTopicButton targetTopic={result} />
+          <FollowTopicButton
+            backgroundShade={result.backgroundShade}
+            targetTopic={result}
+          />
         </TopicListItem>
       );
     case 'image':

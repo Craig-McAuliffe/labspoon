@@ -23,6 +23,7 @@ export default function Tabs({
   routedTabBasePathname,
   useRoutedTabs,
   displayType,
+  backgroundShade,
 }) {
   const filterManager = useContext(FilterManagerContext);
   const selectedTabID = getActiveTabIDFromTypeFilterCollection(tabFilter);
@@ -44,6 +45,7 @@ export default function Tabs({
       tabOptions={tabOptions}
       displayType={displayType}
       setTabFilter={setTabFilter}
+      shade={backgroundShade}
     />
   );
 }
@@ -56,10 +58,12 @@ function RoutedTabOption({
   finalTabIndex,
   index,
   onSelect,
+  shade,
 }) {
   const className = getClassNameFromDisplayType(
     displayType,
-    finalTabIndex === index
+    finalTabIndex === index,
+    shade
   );
   const history = useHistory();
   return (
@@ -89,10 +93,12 @@ function NonRoutedTabOption({
   index,
   setTabFilter,
   finalTabIndex,
+  shade,
 }) {
   const className = getClassNameFromDisplayType(
     displayType,
-    finalTabIndex === index
+    finalTabIndex === index,
+    shade
   );
   const onTabSelect = () => {
     if (!tabID) return;
@@ -120,51 +126,54 @@ function NonRoutedTabOption({
   );
 }
 
-function getClassNameFromDisplayType(displayType, isFinalTab) {
+function getClassNameFromDisplayType(displayType, isFinalTab, shade) {
+  const definedShade = shade ? shade : 'light';
   let className = 'feed-tab';
   switch (displayType) {
     case TAB_RECTANGLES_DISPLAY: {
-      className = className + '-rectangles';
+      className = className + '-rectangles-' + definedShade;
       break;
     }
     case TAB_SINGLE_LINE_DIVIDER_DISPLAY: {
-      className = className + '-single-divider';
+      className = className + '-single-divider-' + definedShade;
       if (isFinalTab) className = className + '-final';
       break;
     }
     case TAB_NO_DIVIDER_DISPLAY: {
-      className = className + '-no-divider';
+      className = className + '-no-divider-' + definedShade;
       break;
     }
     case TAB_DROPDOWN_DISPLAY: {
-      className = className + '-dropdown';
+      className = className + '-dropdown-' + definedShade;
       break;
     }
     default: {
-      className = className + '-rectangles';
+      className = className + '-rectangles-' + definedShade;
       break;
     }
   }
   return className;
 }
 
-function getTabsLayoutClassName(displayType) {
+function getTabsLayoutClassName(displayType, shade) {
+  const definedShade = shade ? shade : 'light';
   let tabsLayoutClassName = 'feed-tabs-layout';
   switch (displayType) {
     case TAB_RECTANGLES_DISPLAY: {
-      tabsLayoutClassName = tabsLayoutClassName + '-rectangles';
+      tabsLayoutClassName = tabsLayoutClassName + '-rectangles-' + definedShade;
       break;
     }
     case TAB_RECTANGLES_DISPLAY: {
-      tabsLayoutClassName = tabsLayoutClassName + '-single-divider';
+      tabsLayoutClassName =
+        tabsLayoutClassName + '-single-divider-' + definedShade;
       break;
     }
     case TAB_RECTANGLES_DISPLAY: {
-      tabsLayoutClassName = tabsLayoutClassName + '-no-divider';
+      tabsLayoutClassName = tabsLayoutClassName + '-no-divider-' + definedShade;
       break;
     }
     default: {
-      tabsLayoutClassName = tabsLayoutClassName + '-rectangles';
+      tabsLayoutClassName = tabsLayoutClassName + '-rectangles-' + definedShade;
       break;
     }
   }
@@ -196,7 +205,11 @@ export function TabsDisplay({
   if (displayType === TAB_DROPDOWN_DISPLAY)
     return (
       <PaddedContent>
-        <div className="tabs-dropdown-container">
+        <div
+          className={`tabs-dropdown-container${
+            shade === DARK_NAME_SHADE ? '-dark' : '-light'
+          }`}
+        >
           <Dropdown
             customToggleTextOnly={
               tabNamesOnly ? tabNamesOnly[0] : getCurrentTabNameFromID()
@@ -220,7 +233,7 @@ export function TabsDisplay({
       </PaddedContent>
     );
   const tabsToBeMapped = tabNamesOnly ? tabNamesOnly : tabOptions;
-  const tabsLayoutClassName = getTabsLayoutClassName(displayType);
+  const tabsLayoutClassName = getTabsLayoutClassName(displayType, shade);
 
   const tabsMappedToComponents = (
     <div className={tabsLayoutClassName}>
@@ -234,6 +247,7 @@ export function TabsDisplay({
             key={option.data.id}
             index={i}
             finalTabIndex={tabsToBeMapped.length - 1}
+            shade={shade}
           />
         ) : (
           <NonRoutedTabOption
@@ -248,6 +262,7 @@ export function TabsDisplay({
             index={i}
             key={tabNamesOnly ? i : option.data.id}
             finalTabIndex={tabsToBeMapped.length - 1}
+            shade={shade}
           />
         );
       })}
@@ -286,6 +301,7 @@ function TabDropdownOptions({
   tabNamesOnly,
   routedTabBasePathname,
   setSiderFilterLoading,
+  shade,
 }) {
   const tabsToBeMapped = tabNamesOnly ? tabNamesOnly : tabOptions;
   if (useRoutedTabs && !tabNamesOnly)
@@ -300,12 +316,12 @@ function TabDropdownOptions({
         currentTabID={currentTabID}
         index={i}
         finalTabIndex={tabsToBeMapped.length - 1}
+        shade={shade}
       />
     ));
   return tabsToBeMapped.map((tabOption, i) => (
     <NonRoutedTabOption
       displayType={TAB_DROPDOWN_DISPLAY}
-      variant="dropdown"
       key={tabNamesOnly ? i : tabOption.data.id}
       onSelect={onSelect}
       affectsFilter={affectsFilter}
@@ -315,6 +331,7 @@ function TabDropdownOptions({
       tabID={tabNamesOnly ? null : tabOption.data.id}
       index={i}
       finalTabIndex={tabsToBeMapped.length - 1}
+      shade={shade}
     />
   ));
 }

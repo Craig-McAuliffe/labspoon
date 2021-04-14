@@ -145,12 +145,15 @@ export function DropdownOption({
   height,
   onSomethingElse,
   loading,
+  backgroundShade,
 }) {
   if (onSomethingElse) onSomethingElse();
   return (
     <button
       onClick={onSelect}
-      className={`dropdown-option-button${loading ? '-loading' : ''}`}
+      className={`dropdown-option-button-${
+        backgroundShade ? backgroundShade : 'light'
+      }${loading ? '-loading' : ''}`}
       type="button"
       style={{height: height}}
     >

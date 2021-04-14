@@ -1,11 +1,20 @@
-.publication-list-item-container {
-  border: 1px solid #99999f;
+.publication-list-item-container-light,
+.publication-list-item-container-dark {
   margin: 2px 0px 20px 0px;
   padding: 0px 14px 10px;
+}
+
+.publication-list-item-container-light {
+  border: 1px solid #99999f;
   background: #ffffff;
 }
 
-.publication-list-item-container-noBorder {
+.publication-list-item-container-dark {
+  background: #064262;
+  border: 1px solid #0a3b5b;
+}
+
+.publication-list-item-container-noBorder-light {
   margin: 2px 2px 20px 2px;
   padding: 0px 14px 10px;
   background: #ffffff;
@@ -30,16 +39,18 @@
   object-fit: cover;
 }
 
-.publication-list-item-date {
+.publication-list-item-date-light {
   color: #5d5d65;
   margin-bottom: 0px;
 }
 
-.publication-list-item-content a:hover {
-  text-decoration-color: black;
+.publication-list-item-date-dark {
+  color: #ccd6da;
+  margin-bottom: 0px;
 }
 
-.publication-list-item-content-authors {
+.publication-list-item-content-authors-light,
+.publication-list-item-content-authors-dark {
   margin: 0px 5px 5px;
   display: flex;
   flex-wrap: wrap;
@@ -49,44 +60,29 @@
   margin-right: 15px;
 }
 
-.publication-list-item-title {
-  color: #000000;
-  background: #ececec;
+.publication-list-item-title-light,
+.publication-list-item-title-dark {
   padding: 10px 5px;
   margin-bottom: 10px;
   margin-top: 20px;
+  display: block;
 }
 
-.publication-list-item-expand-button {
-  background: none;
-  border: none;
-  color: none;
+.publication-list-item-title-light h3,
+.publication-list-item-title-dark h3 {
+  margin-bottom: 0px;
 }
 
-.publication-list-item-expand-button:hover div {
+.publication-list-item-title-light,
+.publication-list-item-title-light:hover {
+  background: #ececec;
   color: #000000;
-  text-decoration: underline;
-  text-decoration-color: #000000;
 }
 
-.publication-list-item-expand-button:hover path {
-  stroke: #000000;
-}
-
-.publication-list-item-expand-button:focus {
-  outline: none;
-}
-
-.publication-list-item-expand {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  margin: 10px 0px;
-}
-
-.publication-list-item-expand div {
-  margin-left: 10px;
-  color: #5d5d65;
+.publication-list-item-title-dark,
+.publication-list-item-title-dark:hover {
+  background: #053651;
+  color: #ffffff;
 }
 
 .publication-list-item-topics-container {

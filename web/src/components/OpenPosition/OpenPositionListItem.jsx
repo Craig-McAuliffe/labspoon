@@ -18,7 +18,7 @@ export default function OpenPositionListItem({openPosition}) {
 
   if (!openPosition) return null;
   return (
-    <ListItemContainer>
+    <ListItemContainer backgroundShade={openPosition.backgroundShade}>
       {openPosition.showPinOption && (
         <ListItemOptionsDropdown
           resourceType={OPENPOSITION}
@@ -27,25 +27,49 @@ export default function OpenPositionListItem({openPosition}) {
           pinProfileID={openPosition.pinProfileID}
           pinProfileCollection={openPosition.pinProfileCollection}
           options={[PIN]}
+          backgroundShade={openPosition.backgroundShade}
         />
       )}
-      <Link to={`/openPosition/${openPosition.id}`}>
+      <Link
+        className={`list-item-title-${
+          openPosition.backgroundShade ? openPosition.backgroundShade : 'light'
+        }`}
+        to={`/openPosition/${openPosition.id}`}
+      >
         <h3>{content.title}</h3>
       </Link>
       {content.position && content.position.length > 0 && (
-        <h4 className="resource-list-item-inline-subtitle">
+        <h4
+          className={`list-item-inline-subtitle-${
+            openPosition.backgroundShade
+              ? openPosition.backgroundShade
+              : 'light'
+          }`}
+        >
           Position
           <span>{content.position}</span>
         </h4>
       )}
       {content.salary.length > 0 ? (
-        <h4 className="resource-list-item-inline-subtitle">
+        <h4
+          className={`list-item-inline-subtitle-${
+            openPosition.backgroundShade
+              ? openPosition.backgroundShade
+              : 'light'
+          }`}
+        >
           Salary
           <span>{content.salary}</span>
         </h4>
       ) : null}
       {content.startDate.length > 0 ? (
-        <h4 className="resource-list-item-inline-subtitle">
+        <h4
+          className={`list-item-inline-subtitle-${
+            openPosition.backgroundShade
+              ? openPosition.backgroundShade
+              : 'light'
+          }`}
+        >
           Start date
           <span>{content.startDate}</span>
         </h4>
@@ -55,18 +79,29 @@ export default function OpenPositionListItem({openPosition}) {
         <ListItemTopics
           dbTopics={openPosition.topics}
           customTopics={openPosition.customTopics}
+          backgroundShade={openPosition.backgroundShade}
         />
       ) : null}
-      <h4 className="resource-list-item-subtitle">Description of Role</h4>
+      <h4
+        className={`list-item-inline-subtitle-${
+          openPosition.backgroundShade ? openPosition.backgroundShade : 'light'
+        }`}
+      >
+        Description of Role
+      </h4>
       <ExpandableText resourceID={openPosition.id}>
         <RichTextBody
+          backgroundShade={openPosition.backgroundShade}
           body={content.description}
           expandable={true}
           id={openPosition.id}
         />
       </ExpandableText>
 
-      <GroupSignature group={openPosition.group} />
+      <GroupSignature
+        backgroundShade={openPosition.backgroundShade}
+        group={openPosition.group}
+      />
     </ListItemContainer>
   );
 }
@@ -92,9 +127,13 @@ export function ReducedOpenPositionListItem({
   return (
     <ListItemContainer>
       {titleDisplay}
-      <h4 className="resource-list-item-subtitle">Description of Role</h4>
+      <h4 className="list-item-subtitle">Description of Role</h4>
       <div className="article-list-item-small-description">
-        <p>{content.description}</p>
+        <RichTextBody
+          body={content.description}
+          expandable={false}
+          id={openPosition.id}
+        />
       </div>
     </ListItemContainer>
   );

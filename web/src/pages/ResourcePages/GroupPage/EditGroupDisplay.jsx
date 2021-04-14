@@ -439,6 +439,7 @@ function EditGroupDisplay({groupData, groupID, children, isMobile}) {
     selectedNavigationType,
     selectedHeaderType,
     successfulSubmit,
+    darkOrLightBackground,
   ]);
 
   if (submitting)
@@ -463,11 +464,9 @@ function EditGroupDisplay({groupData, groupID, children, isMobile}) {
           </div>
         )}
         {successfulSubmit && (
-          <div className="edit-group-display-page-success-error-container">
-            <SuccessMessage>
-              Your chosen options were successfully saved
-            </SuccessMessage>
-          </div>
+          <SuccessMessage isOverlay={true}>
+            Your chosen options were successfully saved
+          </SuccessMessage>
         )}
         <EditGroupDisplayHeaderSection
           groupData={groupData}

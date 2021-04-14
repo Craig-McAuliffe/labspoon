@@ -2,13 +2,7 @@ import React from 'react';
 
 export default function TowersLight() {
   return (
-    <svg
-      width="1440"
-      height="930"
-      viewBox="0 0 1440 930"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg viewBox="0 0 1440 930" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect x="1040" y="148" width="192" height="542" fill="#D6F0FF" />
       <rect x="622" y="148" width="121" height="542" fill="#D6F0FF" />
       <rect x="748" y="148" width="41" height="542" fill="#C1E9FF" />

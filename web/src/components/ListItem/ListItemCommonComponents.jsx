@@ -8,8 +8,16 @@ import SeeMore from '../SeeMore';
 
 import './ListItemCommonComponents.css';
 
-export function ListItemContainer({children}) {
-  return <div className="general-list-item-container">{children}</div>;
+export function ListItemContainer({children, backgroundShade}) {
+  return (
+    <div
+      className={`general-list-item-container-${
+        backgroundShade ? backgroundShade : 'light'
+      }`}
+    >
+      {children}
+    </div>
+  );
 }
 
 export function ExpandableText({children, resourceID, initialHeight = 144}) {
@@ -28,6 +36,7 @@ export function ListItemOptionsDropdown({
   pinProfileID,
   pinProfileCollection,
   options,
+  backgroundShade,
 }) {
   const [isPinned, setIsPinned] = useState(false);
   const [submittingPin, setSubmittingPin] = useState(false);
@@ -36,7 +45,9 @@ export function ListItemOptionsDropdown({
   if (!options || options.length === 0) return null;
   const listItemOptionsDropDownToggle = (setOpen, toggleRef) => (
     <button
-      className="list-item-dropdown-toggle"
+      className={`list-item-dropdown-toggle-${
+        backgroundShade ? backgroundShade : 'light'
+      }`}
       onClick={() => setOpen((isOpen) => !isOpen)}
       ref={toggleRef}
     >
@@ -45,7 +56,11 @@ export function ListItemOptionsDropdown({
   );
   return (
     // <BrowserRouter basename="">
-    <div className="list-options-container">
+    <div
+      className={`list-options-container-${
+        backgroundShade ? backgroundShade : 'light'
+      }`}
+    >
       <Dropdown
         customToggle={listItemOptionsDropDownToggle}
         loadOnExpand={() =>
@@ -72,6 +87,7 @@ export function ListItemOptionsDropdown({
           loadingPinState={loadingPinState}
           submittingPin={submittingPin}
           setSubmittingPin={setSubmittingPin}
+          backgroundShade={backgroundShade}
         />
       </Dropdown>
     </div>
@@ -91,6 +107,7 @@ function ListItemOptionsDropDownOptions({
   loadingPinState,
   submittingPin,
   setSubmittingPin,
+  backgroundShade,
 }) {
   const history = useHistory();
   const optionsDisplayed = [];
@@ -102,6 +119,7 @@ function ListItemOptionsDropDownOptions({
           optionsDisplayed.push(
             <DropdownOption
               loading={loadingPinState}
+              backgroundShade={backgroundShade}
               onSelect={() => {
                 if (loadingPinState || submittingPin) return;
                 onSelect();
@@ -129,6 +147,7 @@ function ListItemOptionsDropDownOptions({
       case EDIT:
         optionsDisplayed.push(
           <DropdownOption
+            backgroundShade={backgroundShade}
             onSelect={() => {
               onSelect();
               history.replace(`/${resourceType}/${resourceID}/edit`, {

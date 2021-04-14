@@ -31,6 +31,7 @@ import {PaddedContent} from '../../../components/Layout/Content';
 import GroupDetails from './GroupDetails';
 
 import './GroupPage.css';
+import {DARK_NAME_SHADE, LIGHT_NAME_SHADE} from './EditGroupDisplay';
 
 function fetchGroupPageFeedFromDB(
   groupID,
@@ -38,7 +39,8 @@ function fetchGroupPageFeedFromDB(
   limit,
   filterOptions,
   skip,
-  userIsMember
+  userIsMember,
+  backgroundShade
 ) {
   const activeTab = filterOptions ? getActiveTabID(filterOptions) : null;
   let results;
@@ -150,14 +152,15 @@ function fetchGroupPageFeedFromDB(
       results = [];
       break;
   }
-  const pinOption = userIsMember
+  const resultParameters = userIsMember
     ? {
         showPinOption: true,
         pinProfileCollection: GROUPS,
         pinProfileID: groupID,
+        backgroundShade: backgroundShade,
       }
     : null;
-  return [results, null, pinOption];
+  return [results, null, resultParameters];
 }
 
 const checkIfTabsAreUsed = async (setUsedTabs, groupID) => {
@@ -225,7 +228,6 @@ export default function GroupPage() {
   const featureFlags = useContext(FeatureFlags);
   const [groupID, setGroupID] = useState(false);
   const [groupData, setGroupData] = useState(false);
-  const [verified, setVerified] = useState(false);
   const [userIsMember, setUserIsMember] = useState(false);
   const [tabsLoading, setTabsLoading] = useState(true);
   const [usedTabs, setUsedTabs] = useState({checked: false, tabs: []});
@@ -252,12 +254,6 @@ export default function GroupPage() {
 
   useEffect(async () => {
     if (!groupID) return;
-    await db
-      .doc(`verifiedGroups/${groupID}`)
-      .get()
-      .then((ds) => setVerified(ds.exists))
-      .catch((err) => console.error(err));
-
     await checkIfTabsAreUsed(setUsedTabs, groupID);
     if (tabsLoading) setTabsLoading(false);
   }, [groupID]);
@@ -339,15 +335,21 @@ export default function GroupPage() {
     return tabOptions;
   };
 
-  const fetchFeedData = (skip, limit, filterOptions, last) =>
-    fetchGroupPageFeedFromDB(
+  const backgroundShade = getGroupBackgroundShadeFromBackgroundID(
+    groupData.backgroundDesign
+  );
+
+  const fetchFeedData = (skip, limit, filterOptions, last) => {
+    return fetchGroupPageFeedFromDB(
       groupID,
       last,
       limit,
       filterOptions,
       skip,
-      userIsMember
+      userIsMember,
+      backgroundShade
     );
+  };
 
   if (user) {
     db.collection(`groups/${groupID}/members`)
@@ -370,6 +372,7 @@ export default function GroupPage() {
       )}
       <ResourcesFeed
         fetchResults={fetchFeedData}
+        backgroundShade={backgroundShade}
         limit={9}
         tabs={fetchTabs()}
         tabsLoading={tabsLoading}
@@ -378,13 +381,14 @@ export default function GroupPage() {
         useRoutedTabs={true}
         tabsDesign={groupData.navigationDisplayType}
       >
-        <PaddedContent>
+        <PaddedContent backgroundShade={backgroundShade}>
           <GroupDetails
             group={groupData}
             userIsMember={userIsMember}
-            verified={verified}
+            verified={groupData.isVerified}
             groupID={groupID}
             routedTabID={routedTabID}
+            backgroundShade={backgroundShade}
           />
         </PaddedContent>
       </ResourcesFeed>
@@ -392,6 +396,14 @@ export default function GroupPage() {
   );
 }
 
+export function getGroupBackgroundShadeFromBackgroundID(backgroundDesign) {
+  if (backgroundDesign) {
+    return backgroundDesign.toLowerCase().includes(DARK_NAME_SHADE)
+      ? DARK_NAME_SHADE
+      : LIGHT_NAME_SHADE;
+  }
+  return LIGHT_NAME_SHADE;
+}
 function SuggestedGroups({groupData}) {
   return (
     <div className="sider-layout">

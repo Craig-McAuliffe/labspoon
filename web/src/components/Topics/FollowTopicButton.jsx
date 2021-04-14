@@ -7,7 +7,7 @@ import FollowButton from '../Buttons/FollowButton';
 import FollowOptionsPopover from '../Popovers/FollowOptionsPopover';
 import Popover from '../Popovers/Popover';
 
-export default function FollowTopicButton({targetTopic}) {
+export default function FollowTopicButton({targetTopic, backgroundShade}) {
   const [following, setFollowing] = useState(null);
   const [topicID, setTopicID] = useState();
   const {user: authUser, userProfile, authLoaded} = useContext(AuthContext);
@@ -94,6 +94,7 @@ export default function FollowTopicButton({targetTopic}) {
       following={following}
       setFollowing={setFollowingAndUpdateDB}
       actionAndTriggerPopUp={() => {}}
+      backgroundShade={backgroundShade}
     />
   );
   if (!userProfile) return followButtonComponent;

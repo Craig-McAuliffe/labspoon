@@ -20,6 +20,9 @@ const GROUPS = 'groups';
 export default function OnboardingPage() {
   const history = useHistory();
   const {user, userProfile} = useContext(AuthContext);
+  const [creatingGroup, setCreatingGroup] = useState(false);
+  const [createdGroupID, setCreatedGroupID] = useState(false);
+
   const location = useLocation();
   const onboardingStage = useParams().onboardingStage;
   const locationState = location.state;
@@ -41,6 +44,10 @@ export default function OnboardingPage() {
             userDetails={userProfile}
             claimGroupID={claimGroupID}
             returnLocation={returnLocation}
+            creatingGroup={creatingGroup}
+            setCreatingGroup={setCreatingGroup}
+            createdGroupID={createdGroupID}
+            setCreatedGroupID={setCreatedGroupID}
           />
         );
       default:
@@ -102,9 +109,11 @@ export default function OnboardingPage() {
           <div></div>
         )}
         <div className="onboarding-next-back-container">
-          <SecondaryButton onClick={() => nextOnboardingStage()}>
-            {onboardingStage === GROUPS ? 'Finish' : 'Next'}
-          </SecondaryButton>
+          {creatingGroup && onboardingStage === GROUPS ? null : (
+            <SecondaryButton onClick={() => nextOnboardingStage()}>
+              {onboardingStage === GROUPS ? 'Finish' : 'Next'}
+            </SecondaryButton>
+          )}
         </div>
       </div>
     </PaddedPageContainer>
@@ -181,10 +190,16 @@ function Popover({children, open, setClosed, content}) {
   );
 }
 
-function OnboardingGroup({userDetails, claimGroupID, returnLocation}) {
+function OnboardingGroup({
+  userDetails,
+  claimGroupID,
+  returnLocation,
+  creatingGroup,
+  setCreatingGroup,
+  createdGroupID,
+  setCreatedGroupID,
+}) {
   const [displayedGroups, setDisplayedGroups] = useState([]);
-  const [creatingGroup, setCreatingGroup] = useState(false);
-  const [createdGroupID, setCreatedGroupID] = useState(false);
   const history = useHistory();
   const groupSearchRef = useRef();
 

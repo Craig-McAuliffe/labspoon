@@ -12,7 +12,7 @@ import UserListItem from '../../../User/UserListItem';
 
 import './PostTaggedContent.css';
 
-export default function PostOptionalTags({taggedContent}) {
+export default function PostOptionalTags({backgroundShade, taggedContent}) {
   if (!taggedContent || taggedContent.length === 0) return null;
   const locationPathname = useLocation().pathname;
   const taggedContentItems = taggedContent.map((taggedItem, i) => {
@@ -20,23 +20,30 @@ export default function PostOptionalTags({taggedContent}) {
       case USER:
         return (
           <UserListItem user={taggedItem.content} key={(taggedItem.id, i)}>
-            <FollowUserButton targetUser={taggedItem.content} />
+            <FollowUserButton
+              backgroundShade={backgroundShade}
+              targetUser={taggedItem.content}
+            />
           </UserListItem>
         );
       case PUBLICATION:
         if (locationPathname.includes(PUBLICATION)) return null;
+        const taggedPublication = taggedItem.content;
+        taggedPublication.backgroundShade = backgroundShade;
         return (
           <PublicationListItem
-            publication={taggedItem.content}
+            publication={taggedPublication}
             key={(taggedItem.id, i)}
             onPost={true}
           />
         );
       case OPENPOSITION:
         if (locationPathname.includes(OPENPOSITION)) return null;
+        const taggedOpenPosition = taggedItem.content;
+        taggedOpenPosition.backgroundShade = backgroundShade;
         return (
           <ReducedOpenPositionListItem
-            openPosition={taggedItem.content}
+            openPosition={taggedOpenPosition}
             key={(taggedItem.id, i)}
           />
         );

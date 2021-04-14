@@ -8,7 +8,7 @@ import Popover from '../Popovers/Popover';
 import FollowOptionsPopover from '../Popovers/FollowOptionsPopover';
 import {GROUP} from '../../helpers/resourceTypeDefinitions';
 
-export default function FollowGroupButton({targetGroup}) {
+export default function FollowGroupButton({backgroundShade, targetGroup}) {
   const [following, setFollowing] = useState();
   const {user, userProfile, authLoaded} = useContext(AuthContext);
 
@@ -67,6 +67,7 @@ export default function FollowGroupButton({targetGroup}) {
 
   const followButtonComponent = (
     <FollowButton
+      backgroundShade={backgroundShade}
       following={following}
       setFollowing={setFollowingAndUpdateDB}
       actionAndTriggerPopUp={() => {}}

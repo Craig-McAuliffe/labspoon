@@ -90,14 +90,21 @@
 
 .edit-group-display-navigation-section .feed-tabs-background-light,
 .edit-group-display-navigation-section .feed-tabs-background-dark,
-.edit-group-display-navigation-section .feed-tab-no-divider-active,
-.edit-group-display-navigation-section .feed-tab-no-divider-inactive,
-.edit-group-display-navigation-section .feed-tab-single-divider-active,
-.edit-group-display-navigation-section .feed-tab-single-divider-inactive,
-.edit-group-display-navigation-section .feed-tab-single-divider-final-active,
-.edit-group-display-navigation-section .feed-tab-single-divider-final-inactive {
+.edit-group-display-navigation-section .feed-tab-no-divider-light-active,
+.edit-group-display-navigation-section .feed-tab-no-divider-light-inactive,
+.edit-group-display-navigation-section .feed-tab-single-divider-light-active,
+.edit-group-display-navigation-section .feed-tab-single-divider-light-inactive,
+.edit-group-display-navigation-section
+  .feed-tab-single-divider-light-final-active,
+.edit-group-display-navigation-section
+  .feed-tab-single-divider-light-final-inactive {
   background: none;
 }
+
+.edit-group-display-navigation-section .tabs-dropdown-container-light {
+  border-top: none;
+}
+
 .edit-group-display-navigation-section .feed-tabs-background-light,
 .edit-group-display-navigation-section .feed-tabs-background-dark {
   border: none;

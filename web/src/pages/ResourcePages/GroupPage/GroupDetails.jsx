@@ -42,10 +42,16 @@ const mapGroupDetailsSizesToProps = ({width}) => ({
 // 144 is divisible by line height 24
 const GROUP_DESCRIPTION_HEIGHT = 144;
 
-const GroupDetails = ({group, userIsMember, verified, groupID, isMobile}) => {
+const GroupDetails = ({
+  group,
+  userIsMember,
+  verified,
+  groupID,
+  isMobile,
+  backgroundShade,
+}) => {
   const [isSlowLoad, setIsSlowLoad] = useState(false);
   const [pinnedItem, setPinnedItem] = useState(null);
-
   useEffect(() => {
     if (!groupID) return;
     const groupDocObserver = db
@@ -97,9 +103,11 @@ const GroupDetails = ({group, userIsMember, verified, groupID, isMobile}) => {
         </div>
       </div>
     );
-
   return (
     <>
+      {backgroundShade === DARK_NAME_SHADE && (
+        <div className="full-screen-background-dark"></div>
+      )}
       <div className="background-container">
         {backgroundDesignIDToSVG(group.backgroundDesign)}
       </div>
@@ -110,21 +118,30 @@ const GroupDetails = ({group, userIsMember, verified, groupID, isMobile}) => {
         groupID={groupID}
         displayType={group.headerDisplayType}
         nameShade={group.headerNameShade}
+        backgroundShade={backgroundShade}
       />
       <div className="group-description">
+        <h3>About</h3>
         <SeeMore
           yPadding={5}
           id={group.id}
           initialHeight={GROUP_DESCRIPTION_HEIGHT}
+          backgroundShade={backgroundShade}
         >
           <RichTextBody body={group.about} shouldLinkify={true} />
         </SeeMore>
       </div>
-      <DonationLink verified={verified} donationLink={group.donationLink} />
+      <DonationLink
+        backgroundShade={backgroundShade}
+        verified={verified}
+        donationLink={group.donationLink}
+      />
       {group.isGeneratedFromTwitter && (
         <ClaimGroup isMobile={isMobile} groupID={groupID} group={group} />
       )}
-      {pinnedItem ? <PinnedItem pinnedItem={pinnedItem} /> : null}
+      {pinnedItem ? (
+        <PinnedItem backgroundShade={backgroundShade} pinnedItem={pinnedItem} />
+      ) : null}
     </>
   );
 };
@@ -137,6 +154,7 @@ export function GroupDetailsHeaderSection({
   designOnly,
   displayType,
   nameShade,
+  backgroundShade,
 }) {
   switch (displayType) {
     case AVATAR_EMBEDDED_HEADER_DISPLAY:
@@ -148,6 +166,7 @@ export function GroupDetailsHeaderSection({
           groupID={groupID}
           designOnly={designOnly}
           displayType={displayType}
+          backgroundShade={backgroundShade}
         />
       );
     case AVATAR_INTERNAL_HEADER_DISPLAY:
@@ -159,6 +178,7 @@ export function GroupDetailsHeaderSection({
           designOnly={designOnly}
           displayType={displayType}
           nameShade={nameShade}
+          backgroundShade={backgroundShade}
         />
       );
     case NO_AVATAR_LEFT_TEXT_HEADER_DISPLAY:
@@ -169,6 +189,7 @@ export function GroupDetailsHeaderSection({
           groupID={groupID}
           designOnly={designOnly}
           displayType={displayType}
+          backgroundShade={backgroundShade}
         />
       );
     case NO_AVATAR_CENTER_TEXT_HEADER_DISPLAY:
@@ -179,6 +200,7 @@ export function GroupDetailsHeaderSection({
           groupID={groupID}
           designOnly={designOnly}
           displayType={displayType}
+          backgroundShade={backgroundShade}
         />
       );
     default:
@@ -190,6 +212,7 @@ export function GroupDetailsHeaderSection({
           groupID={groupID}
           designOnly={designOnly}
           displayType={displayType}
+          backgroundShade={backgroundShade}
         />
       );
   }
@@ -201,6 +224,7 @@ function AvatarEmbeddedHeader({
   userIsMember,
   groupID,
   designOnly,
+  backgroundShade,
 }) {
   const groupCoverDisplay = (
     <div className="group-cover-photo-container">
@@ -215,27 +239,40 @@ function AvatarEmbeddedHeader({
     <div style={isMobile ? {height: '40px'} : {height: '0px'}}></div>
   ) : (
     <div className="group-website-follow-container">
-      <WebsiteLink link={group.website} />
+      <WebsiteLink backgroundShade={backgroundShade} link={group.website} />
       {userIsMember ? (
-        <Link to={`/group/${groupID}/edit/info`}>
-          <EditButton editAction={() => {}}>Edit Group</EditButton>
+        <Link className="edit-group-link" to={`/group/${groupID}/edit/info`}>
+          <EditButton backgroundShade={backgroundShade} editAction={() => {}}>
+            Edit Group
+          </EditButton>
         </Link>
       ) : (
-        <FollowGroupButton targetGroup={group} />
+        <FollowGroupButton
+          backgroundShade={backgroundShade}
+          targetGroup={group}
+        />
       )}
     </div>
   );
   return (
     <>
       {isMobile && groupCoverDisplay}
-      <div className="group-header">
+      <div
+        className={`group-header-${
+          backgroundShade ? backgroundShade : 'light'
+        }`}
+      >
         <div className="group-icon-and-message">
           <div className="group-avatar-positioning">
             <GroupAvatar src={group.avatar} height="160" width="160" />
           </div>
         </div>
         {isMobile && groupWebsiteAndFollowOrEditDisplay}
-        <div className="group-header-info">
+        <div
+          className={`group-header-info-${
+            backgroundShade ? backgroundShade : 'light'
+          }`}
+        >
           <div className="group-header-name-institution">
             <h2>{group.name}</h2>
             <h4>{group.institution}</h4>
@@ -254,16 +291,22 @@ function AvatarInternalHeader({
   groupID,
   designOnly,
   nameShade,
+  backgroundShade,
 }) {
   const groupWebsiteAndFollowOrEditDisplay = designOnly ? null : (
     <div className="group-website-follow-container">
-      <WebsiteLink link={group.website} />
+      <WebsiteLink backgroundShade={backgroundShade} link={group.website} />
       {userIsMember ? (
-        <Link to={`/group/${groupID}/edit/info`}>
-          <EditButton editAction={() => {}}>Edit Group</EditButton>
+        <Link className="edit-group-link" to={`/group/${groupID}/edit/info`}>
+          <EditButton backgroundShade={backgroundShade} editAction={() => {}}>
+            Edit Group
+          </EditButton>
         </Link>
       ) : (
-        <FollowGroupButton targetGroup={group} />
+        <FollowGroupButton
+          backgroundShade={backgroundShade}
+          targetGroup={group}
+        />
       )}
     </div>
   );
@@ -296,10 +339,20 @@ function AvatarInternalHeader({
   );
 }
 
-function NoAvatarLeftTextHeader({group, userIsMember, groupID, designOnly}) {
+function NoAvatarLeftTextHeader({
+  group,
+  userIsMember,
+  groupID,
+  designOnly,
+  backgroundShade,
+}) {
   return (
     <>
-      <div className="group-details-no-avatar-name-institution-container">
+      <div
+        className={`group-details-no-avatar-name-institution-container-${
+          backgroundShade ? backgroundShade : 'light'
+        }`}
+      >
         <h2>{group.name}</h2>
         <h4>{group.institution}</h4>
       </div>
@@ -311,13 +364,27 @@ function NoAvatarLeftTextHeader({group, userIsMember, groupID, designOnly}) {
         />
         {designOnly ? null : (
           <div className="group-website-follow-container">
-            <WebsiteLink link={group.website} />
+            <WebsiteLink
+              backgroundShade={backgroundShade}
+              link={group.website}
+            />
             {userIsMember ? (
-              <Link to={`/group/${groupID}/edit/info`}>
-                <EditButton editAction={() => {}}>Edit Group</EditButton>
+              <Link
+                className="edit-group-link"
+                to={`/group/${groupID}/edit/info`}
+              >
+                <EditButton
+                  backgroundShade={backgroundShade}
+                  editAction={() => {}}
+                >
+                  Edit Group
+                </EditButton>
               </Link>
             ) : (
-              <FollowGroupButton targetGroup={group} />
+              <FollowGroupButton
+                backgroundShade={backgroundShade}
+                targetGroup={group}
+              />
             )}
           </div>
         )}
@@ -326,12 +393,26 @@ function NoAvatarLeftTextHeader({group, userIsMember, groupID, designOnly}) {
   );
 }
 
-function NoAvatarCenterTextHeader({group, userIsMember, groupID, designOnly}) {
+function NoAvatarCenterTextHeader({
+  group,
+  userIsMember,
+  groupID,
+  designOnly,
+  backgroundShade,
+}) {
   return (
     <>
-      <div className="group-details-no-avatar-center-name">
+      <div
+        className={`group-details-no-avatar-center-name-${
+          backgroundShade ? backgroundShade : 'light'
+        }`}
+      >
         <h2>{group.name.toUpperCase()}</h2>
-        <h4 className="group-details-no-avatar-institution">
+        <h4
+          className={`group-details-no-avatar-institution-${
+            backgroundShade ? backgroundShade : 'light'
+          }`}
+        >
           {group.institution}
         </h4>
       </div>
@@ -343,13 +424,27 @@ function NoAvatarCenterTextHeader({group, userIsMember, groupID, designOnly}) {
         />
         {designOnly ? null : (
           <div className="group-website-follow-container">
-            <WebsiteLink link={group.website} />
+            <WebsiteLink
+              backgroundShade={backgroundShade}
+              link={group.website}
+            />
             {userIsMember ? (
-              <Link to={`/group/${groupID}/edit/info`}>
-                <EditButton editAction={() => {}}>Edit Group</EditButton>
+              <Link
+                className="edit-group-link"
+                to={`/group/${groupID}/edit/info`}
+              >
+                <EditButton
+                  backgroundShade={backgroundShade}
+                  editAction={() => {}}
+                >
+                  Edit Group
+                </EditButton>
               </Link>
             ) : (
-              <FollowGroupButton targetGroup={group} />
+              <FollowGroupButton
+                backgroundShade={backgroundShade}
+                targetGroup={group}
+              />
             )}
           </div>
         )}
@@ -358,12 +453,14 @@ function NoAvatarCenterTextHeader({group, userIsMember, groupID, designOnly}) {
   );
 }
 
-function WebsiteLink({link}) {
+function WebsiteLink({link, backgroundShade}) {
   if (!link) return <div></div>;
   if (link.length === 0) return <div></div>;
   return (
     <a
-      className="group-website-link"
+      className={`group-website-link-${
+        backgroundShade ? backgroundShade : 'light'
+      }`}
       href={link}
       target="_blank"
       rel="noopener noreferrer"
@@ -373,11 +470,15 @@ function WebsiteLink({link}) {
   );
 }
 
-function DonationLink({verified, donationLink}) {
+function DonationLink({verified, donationLink, backgroundShade}) {
   if (!verified || !donationLink) return <></>;
 
   return (
-    <div className="donation-link-container">
+    <div
+      className={`donation-link-container-${
+        backgroundShade ? backgroundShade : 'light'
+      }`}
+    >
       <div className="donation-link-verified-container">
         <h4 className="registered-charity-text">
           Registered Charity{' '}
@@ -391,7 +492,7 @@ function DonationLink({verified, donationLink}) {
       </div>
       <div className="donation-link-donate-container">
         <a target="_blank" href={donationLink} rel="noopener noreferrer">
-          <DonateButton />
+          <DonateButton backgroundShade={backgroundShade} />
         </a>
         <p>This will take you to an external site.</p>
       </div>
@@ -492,15 +593,19 @@ function ClaimGeneratedGroupButtonIntermediate({
     </button>
   );
 }
-function DonateButton() {
+function DonateButton({backgroundShade}) {
   return (
-    <button type="button" className="donate-button">
+    <button
+      type="button"
+      className={`donate-button-${backgroundShade ? backgroundShade : 'light'}`}
+    >
       <h3>Donate</h3>
     </button>
   );
 }
 
-function PinnedItem({pinnedItem}) {
+function PinnedItem({pinnedItem, backgroundShade}) {
+  pinnedItem.backgroundShade = backgroundShade;
   return (
     <div className="pinned-item-container">
       <GenericListItem result={pinnedItem} />

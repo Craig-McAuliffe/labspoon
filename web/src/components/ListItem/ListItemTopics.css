@@ -7,15 +7,36 @@
   margin-bottom: 0px;
 }
 
-.topics-sub-title {
-  color: #99999f;
+.topics-sub-title-light,
+.topics-sub-title-dark {
   grid-column: 1 /2;
   margin-right: 5px;
   margin-bottom: 0px;
 }
+.topics-sub-title-light {
+  color: #99999f;
+}
 
-.tagged-topic-names {
+.topics-sub-title-dark {
+  color: #ccd6da;
+}
+
+.tagged-topic-names-light,
+.tagged-topic-names-dark {
   display: inline-block;
   margin-right: 30px;
   padding-top: 1px;
+}
+
+.tagged-topic-names-dark {
+  color: #ffffff;
+}
+
+.tagged-topic-names-dark:hover {
+  color: #a1dcfc;
+  text-decoration: none;
+}
+
+.tagged-topic-names-light:hover {
+  color: #00507c;
 }

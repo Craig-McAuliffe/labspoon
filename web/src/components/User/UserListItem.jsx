@@ -25,7 +25,11 @@ export default function UserListItem({
   }
 
   const details = (
-    <div className="user-listItem-link">
+    <div
+      className={`user-list-item-link-${
+        user.backgroundShade ? user.backgroundShade : 'light'
+      }`}
+    >
       <WrapWithLinkOrOverride>
         <div className="Avatar">
           {user.avatar ? (
@@ -60,16 +64,21 @@ export default function UserListItem({
     </div>
   );
 
+  let containerClassName = `user-listItem-container-${
+    user.backgroundShade ? user.backgroundShade : 'light'
+  }`;
+  if (noBorder) containerClassName = containerClassName + '-no-border';
+  if (isFollowsPageResults)
+    containerClassName = 'user-listItem-container-follows-options';
+
   return (
-    <div
-      className={
-        isFollowsPageResults
-          ? 'user-listItem-container-follows-options'
-          : `user-listItem-container${noBorder ? '-no-border' : ''}`
-      }
-    >
+    <div className={containerClassName}>
       {details}
-      <div className="user-listItem-institution">
+      <div
+        className={`user-listItem-institution-${
+          user.backgroundShade ? user.backgroundShade : 'light'
+        }`}
+      >
         {isFollowsPageResults ? (
           <FollowsPageListItemOptions
             targetResourceData={user}

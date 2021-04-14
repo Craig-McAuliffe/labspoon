@@ -31,7 +31,7 @@
 
 .group-list-item-name-follow {
   display: grid;
-  grid-template-columns: 1fr 80px;
+  grid-template-columns: 1fr 85px;
   justify-content: space-between;
   flex-wrap: wrap;
   padding-bottom: 10px;
@@ -138,6 +138,10 @@
   .group-list-item-icon img {
     width: 80px;
     height: 80px;
+  }
+
+  .group-list-item-name-follow {
+    grid-template-columns: 1fr minmax(60px, auto);
   }
 
   .group-dropdown-item .group-list-item-icon {

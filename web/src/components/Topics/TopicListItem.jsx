@@ -67,7 +67,9 @@ export default function TopicListItem({
     );
   return (
     <div
-      className={`topic-list-item-container${noDivider ? '-no-divider' : ''}`}
+      className={`topic-list-item-container-${
+        topic.backgroundShade ? topic.backgroundShade : 'light'
+      }${noDivider ? '-no-divider' : ''}`}
     >
       {displayType()}
       {!nameOnly && children}

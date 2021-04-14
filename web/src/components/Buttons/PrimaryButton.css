@@ -2,6 +2,10 @@
 .primary-button-smallVersion,
 .primary-button-inactive,
 .primary-button-spinner,
+.primary-button-light,
+.primary-button-light-spinner,
+.primary-button-dark,
+.primary-button-dark-spinner,
 .negative-button,
 .negative-button-smallVersion,
 .primary-button-smallVersion-inactive,
@@ -15,7 +19,28 @@
   -moz-appearance: none;
 }
 
+.primary-button-light h2,
+.primary-button-light-spinner h2,
+.primary-button-dark h2,
+.primary-button-dark-spinner h2 {
+  margin: 0px;
+}
+
+.primary-button-light,
+.primary-button-light-spinner {
+  color: #ffffff;
+  background-color: #00507c;
+}
+
+.primary-button-dark,
+.primary-button-dark-spinner {
+  color: #ffffff;
+  background-color: #053651;
+}
+
 .primary-button,
+.primary-button-light,
+.primary-button-dark,
 .primary-button-smallVersion,
 .negative-button,
 .negative-button-smallVersion {
@@ -47,11 +72,15 @@
   color: #5d5d65;
 }
 
-.primary-button-spinner {
+.primary-button-spinner,
+.primary-button-dark-spinner,
+.primary-button-light-spinner {
   padding: 10px 10px 10px 10px;
 }
 
 .primary-button,
+.primary-button-dark,
+.primary-button-light,
 .primary-button-inactive,
 .negative-button {
   padding: 10px 10px;
@@ -66,11 +95,18 @@
 
 .primary-button:hover,
 .primary-button:focus,
+.primary-button-light:hover,
+.primary-button-light:focus,
 .primary-button-inactive:hover,
 .primary-button-inactive:focus,
 .primary-button-smallVersion:hover,
 .primary-button-smallVersion:focus {
-  background: #023b5a;
+  background: #031e2d;
+}
+
+.primary-button-dark:hover,
+.primary-button-dark:focus {
+  background-color: #031e2d;
 }
 
 .negative-button:hover,
@@ -92,7 +128,8 @@
   margin-bottom: 0px;
 }
 
-.primary-button-clicked {
+.primary-button-clicked,
+.primary-button-light-clicked {
   padding: 0px 0px;
   border-radius: 4%;
   text-decoration: none;
@@ -105,9 +142,30 @@
   outline: none;
 }
 
+.primary-button-dark-clicked {
+  padding: 0px 0px;
+  border-radius: 4%;
+  text-decoration: none;
+  background: #00507c;
+  color: #9ebdd0;
+  cursor: pointer;
+  text-align: center;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  outline: none;
+}
+
 .primary-button-clicked:hover,
-.primary-button-clicked:focus {
+.primary-button-clicked:focus,
+.primary-button-light-clicked:hover,
+.primary-button-light-clicked:focus {
   color: #00507c;
+  cursor: pointer;
+}
+
+.primary-button-dark-clicked:hover,
+.primary-button-dark-clicked:focus {
+  color: #ffffff;
   cursor: pointer;
 }
 
@@ -123,11 +181,13 @@
 }
 
 .primary-button-smallVersion-light h4:hover {
-  color: #001f30;
+  color: #031e2d;
 }
 
 @media screen and (max-width: 800px) {
   .primary-button,
+  .primary-button-dark,
+  .primary-button-light,
   .primary-button-inactive,
   .negative-button,
   .negative-button-smallVersion {
@@ -142,6 +202,8 @@
   }
 
   .primary-button,
+  .primary-button-dark,
+  .primary-button-light,
   .primary-button-inactive,
   .FollowButton:hover h2,
   .negative-button,

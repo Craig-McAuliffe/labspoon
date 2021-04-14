@@ -1,9 +1,21 @@
-.user-listItem-container,
-.user-listItem-container-no-border {
+.user-listItem-container-light,
+.user-listItem-container-light-no-border,
+.user-listItem-container-dark,
+.user-listItem-container-dark-no-border {
   display: grid;
   grid-template-columns: 3fr 2.5fr 1fr;
   align-items: center;
+  padding-right: 10px;
+}
+
+.user-listItem-container-light,
+.user-listItem-container-light-no-border {
   background-color: rgba(255, 255, 255, 0.9);
+}
+
+.user-listItem-container-dark,
+.user-listItem-container-dark-no-border {
+  background-color: rgb(0, 80, 124, 0.95);
 }
 
 .user-listItem-container-follows-options {
@@ -13,14 +25,25 @@
   border-bottom: 1px solid #dcdce0;
 }
 
-.user-listItem-container {
+.user-listItem-container-light {
   border-bottom: 1px solid #dcdce0;
 }
 
-.user-listItem-link {
+.user-listItem-container-dark {
+  border-bottom: 1px solid #5d7f95;
+}
+
+.user-list-item-link-light,
+.user-list-item-link-dark {
   display: grid;
   grid-template-columns: minmax(90px, 100px) 2fr;
   align-items: center;
+  cursor: pointer;
+}
+
+.user-list-item-link-light:hover h2,
+.user-list-item-link-dark:hover h2 {
+  text-decoration: underline;
 }
 
 .tag-container {
@@ -46,17 +69,25 @@
   display: none;
 }
 
-.user-listItem-link h2:hover,
-.user-listItem-link h4:hover {
-  text-decoration: underline;
-}
 .user-listItem-name h2 {
   display: inline-block;
   grid-column: 1/2;
 }
 
-.user-listItem-institution {
+.user-list-item-link-light h2 {
+}
+
+.user-list-item-link-dark h2 {
+  color: #ffffff;
+}
+
+.user-listItem-institution-light {
   color: #5d5d65;
+  grid-column: 2/3;
+}
+
+.user-listItem-institution-dark {
+  color: #ccd6da;
   grid-column: 2/3;
 }
 
@@ -93,6 +124,16 @@
   .user-listItem-institution {
     color: #5d5d65;
     font-size: 14px;
+  }
+
+  .user-listItem-container-light,
+  .user-listItem-container-light-no-border,
+  .user-listItem-container-dark,
+  .user-listItem-container-dark-no-border {
+    display: grid;
+    grid-template-columns: 3fr 2.5fr 1fr;
+    align-items: center;
+    padding-right: 5px;
   }
 
   .user-listItem-link {

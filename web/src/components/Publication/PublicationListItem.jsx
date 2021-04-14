@@ -16,6 +16,10 @@ import {
   PIN,
 } from '../ListItem/ListItemCommonComponents';
 import {PUBLICATION} from '../../helpers/resourceTypeDefinitions';
+import {
+  LIGHT_NAME_SHADE,
+  DARK_NAME_SHADE,
+} from '../../pages/ResourcePages/GroupPage/EditGroupDisplay';
 
 export default function PublicationListItem({
   publication,
@@ -25,14 +29,21 @@ export default function PublicationListItem({
   noLink,
   onPost,
 }) {
+  const backgroundShade = publication.backgroundShade
+    ? publication.backgroundShade
+    : LIGHT_NAME_SHADE;
   const featureFlags = useContext(FeatureFlags);
   const publicationPathName = getPublicationPathName(publication);
   return (
     <div
       className={
         removeBorder
-          ? 'publication-list-item-container-noBorder'
-          : 'publication-list-item-container'
+          ? `publication-list-item-container-noBorder${
+              backgroundShade === DARK_NAME_SHADE ? '-dark' : '-light'
+            }`
+          : `publication-list-item-container${
+              backgroundShade === DARK_NAME_SHADE ? '-dark' : '-light'
+            }`
       }
     >
       <PublicationListItemHeader publication={publication} />
@@ -41,11 +52,18 @@ export default function PublicationListItem({
           pathName={publicationPathName}
           title={publication.title}
           noLink={noLink}
+          backgroundShade={backgroundShade}
         />
-        <PublicationListItemAuthors authors={publication.authors} />
+        <PublicationListItemAuthors
+          backgroundShade={backgroundShade}
+          authors={publication.authors}
+        />
         {mixedResults || onPost ? null : (
           <div className="publication-list-item-topics-container">
-            <ListItemTopics dbTopics={publication.topics} />
+            <ListItemTopics
+              backgroundShade={backgroundShade}
+              dbTopics={publication.topics}
+            />
           </div>
         )}
       </div>
@@ -104,7 +122,13 @@ function PublicationListItemHeader({publication}) {
           <div className="publication-list-item-journal-container">
             {journal}
           </div>
-          <p className="publication-list-item-date">
+          <p
+            className={`publication-list-item-date-${
+              publication.backgroundShade
+                ? publication.backgroundShade
+                : 'light'
+            }`}
+          >
             {publicationDateDisplay(publication.date)}
           </p>
         </div>
@@ -117,6 +141,7 @@ function PublicationListItemHeader({publication}) {
               pinProfileID={publication.pinProfileID}
               pinProfileCollection={publication.pinProfileCollection}
               options={[PIN]}
+              backgroundShade={publication.backgroundShade}
             />
           )}
         </div>
@@ -130,24 +155,34 @@ export function publicationDateDisplay(date) {
   if (date.length > 10) return date.slice(0, 10);
   return date;
 }
-function PublicationListItemTitle({pathName, title, noLink}) {
-  const titleHeader = <h3 className="publication-list-item-title">{title}</h3>;
+function PublicationListItemTitle({pathName, title, noLink, backgroundShade}) {
+  const titleHeader = <h3>{title}</h3>;
   if (!pathName || noLink) return titleHeader;
-  return <Link to={pathName}>{titleHeader}</Link>;
+  return (
+    <Link
+      to={pathName}
+      className={`publication-list-item-title${
+        backgroundShade === LIGHT_NAME_SHADE ? '-light' : '-dark'
+      }`}
+    >
+      {titleHeader}
+    </Link>
+  );
 }
 
 // the max number of authors to display at a time
 const AUTHORS_DISPLAY_LIMIT = 3;
 
-function PublicationListItemAuthors({authors}) {
+function PublicationListItemAuthors({authors, backgroundShade}) {
   if (!authors) return <></>;
   const uniqueAuthors = getUniqueAuthorsFromAuthors(authors);
   let authorsList;
   if (uniqueAuthors.length <= AUTHORS_DISPLAY_LIMIT) {
-    authorsList = authorsToAuthorList(uniqueAuthors);
+    authorsList = authorsToAuthorList(uniqueAuthors, backgroundShade);
   } else {
     authorsList = authorsToAuthorList(
-      uniqueAuthors.slice(0, AUTHORS_DISPLAY_LIMIT)
+      uniqueAuthors.slice(0, AUTHORS_DISPLAY_LIMIT),
+      backgroundShade
     );
     const remainingCount = uniqueAuthors.length - AUTHORS_DISPLAY_LIMIT;
     authorsList.push(
@@ -157,11 +192,17 @@ function PublicationListItemAuthors({authors}) {
     );
   }
   return (
-    <div className="publication-list-item-content-authors">{authorsList}</div>
+    <div
+      className={`publication-list-item-content-authors-${
+        backgroundShade ? backgroundShade : 'light'
+      }`}
+    >
+      {authorsList}
+    </div>
   );
 }
 
-function authorsToAuthorList(authors) {
+function authorsToAuthorList(authors, backgroundShade) {
   return authors.map((author, idx) => (
     <PublicationListItemAuthor
       ID={author.id}
@@ -170,11 +211,19 @@ function authorsToAuthorList(authors) {
       key={(author.id || author.microsoftID) + idx}
       first={idx === 0}
       last={idx === authors.length - 1}
+      backgroundShade={backgroundShade}
     />
   ));
 }
 
-function PublicationListItemAuthor({id, microsoftID, name, first, last}) {
+function PublicationListItemAuthor({
+  id,
+  microsoftID,
+  name,
+  first,
+  last,
+  backgroundShade,
+}) {
   let nameStr;
   if (first && !last) {
     nameStr = `${name},`;
@@ -183,7 +232,12 @@ function PublicationListItemAuthor({id, microsoftID, name, first, last}) {
   } else {
     nameStr = `and ${name}`;
   }
-  const authorLink = getLinkForAuthor(id, microsoftID, nameStr);
+  const authorLink = getLinkForAuthor(
+    id,
+    microsoftID,
+    nameStr,
+    backgroundShade
+  );
   return (
     <h4 className="publication-list-item-content-author" key={id + ' ' + name}>
       {authorLink}&nbsp;
