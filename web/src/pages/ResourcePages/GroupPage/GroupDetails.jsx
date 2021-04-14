@@ -104,7 +104,7 @@ const GroupDetails = ({
       </div>
     );
   return (
-    <>
+    <div style={{marginBottom: '20px'}}>
       {backgroundShade === DARK_NAME_SHADE && (
         <div className="full-screen-background-dark"></div>
       )}
@@ -139,10 +139,15 @@ const GroupDetails = ({
       {group.isGeneratedFromTwitter && (
         <ClaimGroup isMobile={isMobile} groupID={groupID} group={group} />
       )}
-      {pinnedItem ? (
-        <PinnedItem backgroundShade={backgroundShade} pinnedItem={pinnedItem} />
-      ) : null}
-    </>
+      {pinnedItem && (
+        <>
+          <PinnedItem
+            backgroundShade={backgroundShade}
+            pinnedItem={pinnedItem}
+          />
+        </>
+      )}
+    </div>
   );
 };
 
