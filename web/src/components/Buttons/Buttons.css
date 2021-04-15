@@ -64,6 +64,7 @@
   color: #ffffff;
   background: #00507c;
   border: none;
+  padding: 6px 7px 6px 4px;
 }
 
 .edit-button-dark:hover,
@@ -71,6 +72,10 @@
   text-decoration: none;
   color: #064262;
   background: #ffffff;
+}
+
+.edit-button-dark:hover {
+  padding: 6px 7px 6px 4px;
 }
 
 .edit-button-light:hover path,

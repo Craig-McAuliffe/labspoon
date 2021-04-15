@@ -46,6 +46,7 @@ export default function GroupListItem({
           formattedName={name}
           institution={group.institution}
           isFollowsPageResults={isFollowsPageResults}
+          group={group}
         >
           {children}
         </GroupListItemHeadline>

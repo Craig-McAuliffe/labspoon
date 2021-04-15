@@ -202,6 +202,13 @@
   justify-items: center;
   flex-grow: 1;
 }
+.feed-tab-rectangles-light-inactive h3,
+.feed-tab-rectangles-light-active h3,
+.feed-tab-rectangles-dark-inactive h3,
+.feed-tab-rectangles-dark-active h3 {
+  margin-bottom: 0px;
+}
+
 .feed-tab-rectangles-light-inactive,
 .feed-tab-rectangles-light-active {
   background: #ffffff;

@@ -208,13 +208,15 @@ function SearchTabs({searchQuery, history, tab}) {
   return (
     <PaddedContent>
       <div className="search-page-tabs-container">
-        <div className="feed-tabs-layout">
+        <div className="feed-tabs-layout-rectangles-light">
           {tabOptions.map((tabName) => (
             <button
               onClick={() => updateTab(tabName, searchQuery, history)}
               key={tabName}
               className={
-                tabName === tab ? 'feed-tab-active' : 'feed-tab-inactive'
+                tabName === tab
+                  ? 'feed-tab-rectangles-light-active'
+                  : 'feed-tab-rectangles-light-inactive'
               }
             >
               <h3>{tabName}</h3>

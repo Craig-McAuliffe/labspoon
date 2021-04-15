@@ -118,7 +118,9 @@ function NonRoutedTabOption({
       }}
       key={tabID ? tabID : index}
       className={`${className}${
-        tabID === currentTabID || index === 0 ? '-active' : '-inactive'
+        tabID === currentTabID || (!tabID && index === 0)
+          ? '-active'
+          : '-inactive'
       }`}
     >
       <h3>{tabName}</h3>
@@ -195,11 +197,11 @@ export function TabsDisplay({
 }) {
   const getCurrentTabNameFromID = () => {
     if (currentTabID === 'default') return tabOptions[0].data.name;
-    const activeTab = tabOptions.filter(
-      (tabOption) => tabOption.id === currentTabID
-    )[0];
-    if (activeTab) return activeTabName.data.name;
-    return tabOptions[0].data.name;
+    if (tabNamesOnly) return tabOptions[0].data.name;
+    return tabOptions.filter((tabOption) => {
+      if (!tabOption.data) return false;
+      return tabOption.data.id === currentTabID;
+    })[0].data.name;
   };
 
   if (displayType === TAB_DROPDOWN_DISPLAY)

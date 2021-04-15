@@ -11,6 +11,7 @@ import FilterableResults, {
 } from '../../components/FilterableResults/FilterableResults';
 import {BOOKMARK} from '../../helpers/resourceTypeDefinitions';
 import {LoadingSpinnerPage} from '../../components/LoadingSpinner/LoadingSpinner';
+import Content, {UnpaddedPageContainer} from '../../components/Layout/Content';
 
 function fetchBookmarks(uuid, skip, limit, filter, last) {
   let results = db
@@ -46,17 +47,17 @@ const BookmarksPage = () => {
     fetchBookmarks(user.uid, skip, limit, filter, last);
 
   return (
-    <div className="content-layout">
+    <Content>
       <FilterableResults fetchResults={fetchResults} limit={10}>
-        <div className="feed-container">
-          <FilterManager>
+        <FilterManager>
+          <NewFilterMenuWrapper />
+          <UnpaddedPageContainer>
             <ResourceTabs />
-            <NewFilterMenuWrapper />
-          </FilterManager>
-          <NewResultsWrapper />
-        </div>
+            <NewResultsWrapper />
+          </UnpaddedPageContainer>
+        </FilterManager>
       </FilterableResults>
-    </div>
+    </Content>
   );
 };
 

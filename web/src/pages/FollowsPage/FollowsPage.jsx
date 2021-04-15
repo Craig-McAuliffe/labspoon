@@ -59,7 +59,7 @@ const FollowsPage = () => {
   return (
     <UnpaddedPageContainer>
       <PaddedContent>
-        <h2>Manage the things you follow here.</h2>
+        <h2>Manage things you follow</h2>
       </PaddedContent>
       <FilterableResults fetchResults={fetchFeedData} limit={10}>
         <div className="feed-container">

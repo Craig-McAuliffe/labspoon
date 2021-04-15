@@ -47,11 +47,11 @@ function BookmarkButton({
       const batch = db.batch();
 
       let resourceData;
-      switch (recommendedResourceType) {
+      switch (bookmarkedResourceType) {
         case POST:
-          resourceData = getPostListItemFromPost(recommendedResource);
+          resourceData = getPostListItemFromPost(bookmarkedResource);
         default:
-          resourceData = getPostListItemFromPost(recommendedResource);
+          resourceData = getPostListItemFromPost(bookmarkedResource);
       }
 
       batch.set(userBookmarkCollection.doc(bookmarkedResourceID), {

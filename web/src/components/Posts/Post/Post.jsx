@@ -22,7 +22,6 @@ import './Post.css';
 
 export default function Post({post, dedicatedPage, bookmarkedVariation}) {
   const [recommendedCount, setRecommendedCount] = useState(false);
-
   useEffect(async () => {
     if (post.recommendedCount)
       return setRecommendedCount(post.recommendedCount);

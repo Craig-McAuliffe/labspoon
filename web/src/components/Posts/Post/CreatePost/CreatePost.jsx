@@ -30,9 +30,14 @@ export default function CreatePost({
   preTaggedResourceDetails,
   onSuccess,
   preTaggedResourceID,
+  cancelAction,
+  startExpanded,
 }) {
   const {user, userProfile} = useContext(AuthContext);
-  const [creatingPost, setCreatingPost] = useState(keepExpanded);
+  const [creatingPost, setCreatingPost] = useState(() => {
+    if (startExpanded || keepExpanded) return true;
+    return false;
+  });
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [postSuccess, setPostSuccess] = useState(false);
   const [taggedResourceType, setTaggedResourceType] = useState(DEFAULT_POST);
@@ -45,6 +50,7 @@ export default function CreatePost({
 
   const cancelPost = () => {
     if (submittingPost) return;
+    if (cancelAction) return cancelAction();
     if (!keepExpanded) setCreatingPostIfNotExpanded(false);
   };
 

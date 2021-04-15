@@ -16,6 +16,7 @@ function GroupListItemHeadline({
   formattedName,
   isFollowsPageResults,
   isMobile,
+  group,
 }) {
   return (
     <>
