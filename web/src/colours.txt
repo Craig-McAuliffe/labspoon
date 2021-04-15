@@ -5,6 +5,7 @@ Tertiary Text: #99999F
 Quaternary Text: #DCDCE0
 
 Primary Color: #00507C rgb(0,80,124)
+Primary Color Hover: #063854
 Secondary Color: #3099D3
 Background Blue: #EAF5FB
 Overlay Off Primary: #185E9C;

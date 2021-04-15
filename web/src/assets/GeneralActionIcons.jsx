@@ -34,7 +34,7 @@ export function WriteIcon() {
   );
 }
 
-export function EditIcon() {
+export function EditIcon({light}) {
   return (
     <svg
       width="23"
@@ -49,7 +49,7 @@ export function EditIcon() {
         width="6.18627"
         height="4.84143"
         transform="rotate(45 16.2656 0.00390625)"
-        fill="#00507C"
+        fill={light ? '#ffffff' : '#00507C'}
       />
       <rect
         x="12.4688"
@@ -57,11 +57,11 @@ export function EditIcon() {
         width="6.18627"
         height="13.4484"
         transform="rotate(45 12.4688 3.80469)"
-        fill="#00507C"
+        fill={light ? '#ffffff' : '#00507C'}
       />
       <path
         d="M2.18718 18.4489L7.32229 17.6881L2.94793 13.3138L2.18718 18.4489Z"
-        fill="#3099D3"
+        fill={light ? '#ffffff' : '#00507C'}
       />
     </svg>
   );

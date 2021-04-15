@@ -25,9 +25,6 @@
   height: 5px;
 }
 
-.list-item-dropdown-option-container {
-}
-
 .list-item-options-dropdown-text,
 .list-item-options-dropdown-text-loading {
   display: grid;
@@ -99,6 +96,15 @@
   margin-bottom: 5px;
 }
 
+.list-item-type-light {
+  color: #99999f;
+  margin-bottom: 0px;
+}
+
+.list-item-type-dark {
+  color: #9ebdd0;
+  margin-bottom: 0px;
+}
 .list-item-inline-subtitle-light span {
   color: #000000;
   display: inline-block;

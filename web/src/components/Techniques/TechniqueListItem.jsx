@@ -26,7 +26,10 @@ export default function TechniqueListItem({technique}) {
         images={formatTaggedImages(technique.photoURLs)}
         customMargin="20px"
       />
-      <ExpandableText resourceID={technique.id}>
+      <ExpandableText
+        backgroundShade={technique.backgroundShade}
+        resourceID={technique.id}
+      >
         <RichTextBody
           backgroundShade={technique.backgroundShade}
           body={technique.body}

@@ -4,11 +4,13 @@ import {AuthContext} from '../../App';
 import {db} from '../../firebase';
 import firebase from 'firebase';
 import {
+  POST,
   RECOMMENDATION,
   resourceTypeToCollection,
 } from '../../helpers/resourceTypeDefinitions';
 import {SignUpPopoverOverride} from '../Popovers/Popover';
 import {userToUserRef} from '../../helpers/users';
+import {getPostListItemFromPost} from '../../helpers/posts';
 import './Buttons.css';
 
 const RecommendButton = ({
@@ -43,11 +45,18 @@ const RecommendButton = ({
       )}/${recommendedResourceID}`
     );
     if (isRecommended === false) {
+      let resourceData;
+      switch (recommendedResourceType) {
+        case POST:
+          resourceData = getPostListItemFromPost(recommendedResource);
+        default:
+          resourceData = getPostListItemFromPost(recommendedResource);
+      }
       const batch = db.batch();
       batch.set(userRecommendationsCollection.doc(recommendedResourceID), {
         recommendedResourceType: recommendedResourceType,
         recommendedResourceID: recommendedResourceID,
-        recommendedResourceData: recommendedResource,
+        recommendedResourceData: resourceData,
         timestamp: new Date(),
       });
       batch.set(

@@ -6,10 +6,12 @@ import {BookmarkIconUnselected} from '../../assets/PostActionIcons';
 import {SignUpPopoverOverride} from '../Popovers/Popover';
 import {
   BOOKMARK,
+  POST,
   resourceTypeToCollection,
 } from '../../helpers/resourceTypeDefinitions';
 import NegativeButton from './NegativeButton';
 import {LoadingSpinnerPage} from '../LoadingSpinner/LoadingSpinner';
+import {getPostListItemFromPost} from '../../helpers/posts';
 import './Buttons.css';
 
 function BookmarkButton({
@@ -43,10 +45,19 @@ function BookmarkButton({
     );
     if (isBookmarked === false) {
       const batch = db.batch();
+
+      let resourceData;
+      switch (recommendedResourceType) {
+        case POST:
+          resourceData = getPostListItemFromPost(recommendedResource);
+        default:
+          resourceData = getPostListItemFromPost(recommendedResource);
+      }
+
       batch.set(userBookmarkCollection.doc(bookmarkedResourceID), {
         bookmarkedResourceType: bookmarkedResourceType,
         bookmarkedResourceID: bookmarkedResourceID,
-        bookmarkedResourceData: bookmarkedResource,
+        bookmarkedResourceData: resourceData,
         timestamp: new Date(),
       });
       batch.set(bookmarkedByCollection.doc(user.uid), {

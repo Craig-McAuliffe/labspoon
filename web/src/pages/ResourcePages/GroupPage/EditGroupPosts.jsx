@@ -4,7 +4,10 @@ import FilteredSelector, {
   REMOVE,
 } from '../../../components/FilteredSelector/FilteredSelector';
 import {getPaginatedUserReferencesFromCollectionRef} from '../../../helpers/users';
-import {getPaginatedPostsFromCollectionRef} from '../../../helpers/posts';
+import {
+  getPaginatedPostsFromCollectionRef,
+  getPostListItemFromPost,
+} from '../../../helpers/posts';
 import {
   getActiveTabID,
   getEnabledIDsFromFilter,
@@ -40,11 +43,10 @@ export default function EditGroupPosts({children, groupID, group}) {
 
   function addPostsToGroup(selectedItems, resetSelection, setSuccess) {
     selectedItems.forEach((selectedPost) => {
-      delete selectedPost._alreadyPresent;
       const batch = db.batch();
       batch.set(
         db.doc(`groups/${groupID}/posts/${selectedPost.id}`),
-        selectedPost
+        getPostListItemFromPost(selectedPost)
       );
       batch.set(
         db.doc(`posts/${selectedPost.id}/groups/${groupID}`),

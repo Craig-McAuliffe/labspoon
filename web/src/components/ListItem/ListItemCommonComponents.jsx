@@ -20,9 +20,18 @@ export function ListItemContainer({children, backgroundShade}) {
   );
 }
 
-export function ExpandableText({children, resourceID, initialHeight = 144}) {
+export function ExpandableText({
+  backgroundShade,
+  children,
+  resourceID,
+  initialHeight = 144,
+}) {
   return (
-    <SeeMore id={resourceID} initialHeight={initialHeight}>
+    <SeeMore
+      backgroundShade={backgroundShade}
+      id={resourceID}
+      initialHeight={initialHeight}
+    >
       {children}
     </SeeMore>
   );
@@ -156,7 +165,7 @@ function ListItemOptionsDropDownOptions({
             }}
           >
             <h4 className="list-item-options-dropdown-text">
-              <EditIcon />
+              <EditIcon light={true} />
               Edit
             </h4>
           </DropdownOption>

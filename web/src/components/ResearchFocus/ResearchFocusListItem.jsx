@@ -28,7 +28,10 @@ export default function ResearchFocusListItem({researchFocus}) {
         images={formatTaggedImages(researchFocus.photoURLs)}
         customMargin="20px"
       />
-      <ExpandableText resourceID={researchFocus.id}>
+      <ExpandableText
+        backgroundShade={researchFocus.backgroundShade}
+        resourceID={researchFocus.id}
+      >
         <RichTextBody
           body={researchFocus.body}
           expandable={true}

@@ -16,10 +16,7 @@ import {
   PIN,
 } from '../ListItem/ListItemCommonComponents';
 import {PUBLICATION} from '../../helpers/resourceTypeDefinitions';
-import {
-  LIGHT_NAME_SHADE,
-  DARK_NAME_SHADE,
-} from '../../pages/ResourcePages/GroupPage/EditGroupDisplay';
+import {LIGHT_NAME_SHADE} from '../../pages/ResourcePages/GroupPage/EditGroupDisplay';
 
 export default function PublicationListItem({
   publication,
@@ -36,15 +33,9 @@ export default function PublicationListItem({
   const publicationPathName = getPublicationPathName(publication);
   return (
     <div
-      className={
-        removeBorder
-          ? `publication-list-item-container-noBorder${
-              backgroundShade === DARK_NAME_SHADE ? '-dark' : '-light'
-            }`
-          : `publication-list-item-container${
-              backgroundShade === DARK_NAME_SHADE ? '-dark' : '-light'
-            }`
-      }
+      className={`publication-list-item-container${
+        removeBorder ? '-noBorder' : ''
+      }-${backgroundShade}`}
     >
       <PublicationListItemHeader publication={publication} />
       <div className="publication-list-item-content">
@@ -79,12 +70,22 @@ export default function PublicationListItem({
 export function SmallPublicationListItem({publication, children}) {
   const publicationPathName = getPublicationPathName(publication);
   return (
-    <div className="publication-list-item-container">
+    <div
+      className={`publication-list-item-container-${
+        publication.backgroundShade
+          ? publication.backgroundShade
+          : LIGHT_NAME_SHADE
+      }`}
+    >
       <PublicationListItemTitle
         pathName={publicationPathName}
         title={publication.title}
+        backgroundShade={publication.backgroundShade}
       />
-      <PublicationListItemAuthors authors={publication.authors} />
+      <PublicationListItemAuthors
+        backgroundShade={publication.backgroundShade}
+        authors={publication.authors}
+      />
       {children}
     </div>
   );
@@ -157,12 +158,21 @@ export function publicationDateDisplay(date) {
 }
 function PublicationListItemTitle({pathName, title, noLink, backgroundShade}) {
   const titleHeader = <h3>{title}</h3>;
-  if (!pathName || noLink) return titleHeader;
+  if (!pathName || noLink)
+    return (
+      <div
+        className={`publication-list-item-title-${
+          backgroundShade ? backgroundShade : 'light'
+        }`}
+      >
+        {titleHeader}
+      </div>
+    );
   return (
     <Link
       to={pathName}
-      className={`publication-list-item-title${
-        backgroundShade === LIGHT_NAME_SHADE ? '-light' : '-dark'
+      className={`publication-list-item-title-${
+        backgroundShade ? backgroundShade : 'light'
       }`}
     >
       {titleHeader}
@@ -194,7 +204,7 @@ function PublicationListItemAuthors({authors, backgroundShade}) {
   return (
     <div
       className={`publication-list-item-content-authors-${
-        backgroundShade ? backgroundShade : 'light'
+        backgroundShade ? backgroundShade : LIGHT_NAME_SHADE
       }`}
     >
       {authorsList}

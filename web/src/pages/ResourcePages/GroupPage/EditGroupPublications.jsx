@@ -171,6 +171,7 @@ async function addPublicationsToGroup(
   setErrorCount(0);
   const writePromises = selectedPublications.map((publication) => {
     delete publication._alreadyPresent;
+    delete publication.backgroundShade;
     const publicationAuthorWithIDs = publication.authors.filter(
       (author) => author.id
     );

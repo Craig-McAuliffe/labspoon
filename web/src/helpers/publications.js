@@ -14,6 +14,7 @@ export function jsPublicationToDBPublication(jsPublication) {
   delete dbPublication.resourceType;
   delete dbPublication.content;
   delete dbPublication.id;
+  delete dbPublication.backgroundShade;
   return dbPublication;
 }
 
@@ -101,4 +102,21 @@ export function getUniqueAuthorsFromAuthors(authors) {
     seenMicrosoftIDs.add(possiblyDuplicateAuthor.microsoftID);
   });
   return uniqueAuthors;
+}
+
+export function publicationToPublicationListItem(publication, publicationID) {
+  const publicationListItem = {
+    date: publication.date,
+    title: publication.title,
+    authors: publication.authors,
+    topics: publication.topics,
+    id: publicationID,
+  };
+  if (publication.microsoftID)
+    publicationListItem.microsoftID = publication.microsoftID;
+  if (publication.filterTopicIDs)
+    publicationListItem.filterTopicIDs = publication.filterTopicIDs;
+  if (publication.filterAuthorIDs)
+    publicationListItem.filterAuthorIDs = publication.filterAuthorIDs;
+  return publicationListItem;
 }

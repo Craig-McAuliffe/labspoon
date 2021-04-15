@@ -63,6 +63,7 @@
   text-decoration: none;
   color: #ffffff;
   background: #00507c;
+  border: none;
 }
 
 .edit-button-dark:hover,

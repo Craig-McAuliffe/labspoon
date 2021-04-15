@@ -53,7 +53,7 @@ export default function CyclesDark() {
           strokeWidth="2"
         />
         <circle cx="308" cy="244" r="50" fill="#81CDF6" />
-        <circle cx="357.5" cy="244.5" r="64.5" fill="#C0E9FF" />
+        <circle cx="357.5" cy="244.5" r="64.5" fill="#478EB6" />
         <circle
           cx="542"
           cy="464"

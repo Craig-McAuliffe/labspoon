@@ -246,6 +246,7 @@ export async function createCustomPublication(
     },
   ];
   delete res.url;
+  console.log(res);
   const customPublicationRef = db.collection(`publications`).doc();
   return customPublicationRef
     .set(res)

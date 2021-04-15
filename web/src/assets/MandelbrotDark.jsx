@@ -2,13 +2,7 @@ import React from 'react';
 
 export default function MandelbrotDark() {
   return (
-    <svg
-      width="1440"
-      height="933"
-      viewBox="0 0 1440 933"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg viewBox="0 0 1440 933" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g clipPath="url(#clip0)">
         <rect width="1440" height="933" fill="#00507C" />
         <path

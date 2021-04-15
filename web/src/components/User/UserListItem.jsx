@@ -55,7 +55,7 @@ export default function UserListItem({
         </div>
       </WrapWithLinkOrOverride>
 
-      <div className="user-listItem-name">
+      <div className="user-list-item-name">
         <WrapWithLinkOrOverride>
           <h2>{user.name}</h2>
           <h4>{user.name}</h4>
@@ -64,18 +64,18 @@ export default function UserListItem({
     </div>
   );
 
-  let containerClassName = `user-listItem-container-${
+  let containerClassName = `user-list-item-container-${
     user.backgroundShade ? user.backgroundShade : 'light'
   }`;
   if (noBorder) containerClassName = containerClassName + '-no-border';
   if (isFollowsPageResults)
-    containerClassName = 'user-listItem-container-follows-options';
+    containerClassName = 'user-list-item-container-follows-options';
 
   return (
     <div className={containerClassName}>
       {details}
       <div
-        className={`user-listItem-institution-${
+        className={`user-list-item-institution-${
           user.backgroundShade ? user.backgroundShade : 'light'
         }`}
       >
@@ -97,10 +97,10 @@ export default function UserListItem({
 
 export function UserListItemEmailOnly({user, children}) {
   return (
-    <div className="user-listItem-container">
-      <div className="user-listItem-link">
+    <div className="user-list-item-container">
+      <div className="user-list-item-link">
         <AvatarSection />
-        <div className="user-listItem-email">
+        <div className="user-list-item-email">
           <h2>{user.email}</h2>
         </div>
       </div>
@@ -141,8 +141,16 @@ function AvatarSection({avatar}) {
 export function UserSmallResultItem({user, selectUser}) {
   const select = () => selectUser(user);
   return (
-    <div className="user-listItem-container">
-      <div className="user-listItem-link">
+    <div
+      className={`user-list-item-container-${
+        user.backgroundShade ? user.backgroundShade : 'light'
+      }`}
+    >
+      <div
+        className={`user-list-item-link-${
+          user.backgroundShade ? user.backgroundShade : 'light'
+        }`}
+      >
         {user.avatar ? (
           <UserAvatar src={user.avatar} width="40px" height="40px" />
         ) : (
@@ -154,7 +162,11 @@ export function UserSmallResultItem({user, selectUser}) {
         )}
         <h4>{user.name}</h4>
       </div>
-      <div className="user-listItem-institution">
+      <div
+        className={`user-list-item-institution-${
+          user.backgroundShade ? user.backgroundShade : 'light'
+        }`}
+      >
         <h4>{user.institution}</h4>
       </div>
       <div className="Follow">

@@ -11,3 +11,7 @@
   display: flex;
   justify-content: flex-end;
 }
+
+.open-position-list-item-description-section {
+  margin-top: 20px;
+}

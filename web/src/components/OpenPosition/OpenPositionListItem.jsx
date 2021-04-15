@@ -38,6 +38,7 @@ export default function OpenPositionListItem({openPosition}) {
       >
         <h3>{content.title}</h3>
       </Link>
+
       {content.position && content.position.length > 0 && (
         <h4
           className={`list-item-inline-subtitle-${
@@ -74,6 +75,28 @@ export default function OpenPositionListItem({openPosition}) {
           <span>{content.startDate}</span>
         </h4>
       ) : null}
+      <div className="open-position-list-item-description-section">
+        <h4
+          className={`list-item-inline-subtitle-${
+            openPosition.backgroundShade
+              ? openPosition.backgroundShade
+              : 'light'
+          }`}
+        >
+          Description of Role
+        </h4>
+        <ExpandableText
+          backgroundShade={openPosition.backgroundShade}
+          resourceID={openPosition.id}
+        >
+          <RichTextBody
+            backgroundShade={openPosition.backgroundShade}
+            body={content.description}
+            expandable={true}
+            id={openPosition.id}
+          />
+        </ExpandableText>
+      </div>
       {openPosition.topics.length > 0 ||
       (openPosition.customTopics && openPosition.customTopics.length > 0) ? (
         <ListItemTopics
@@ -82,21 +105,6 @@ export default function OpenPositionListItem({openPosition}) {
           backgroundShade={openPosition.backgroundShade}
         />
       ) : null}
-      <h4
-        className={`list-item-inline-subtitle-${
-          openPosition.backgroundShade ? openPosition.backgroundShade : 'light'
-        }`}
-      >
-        Description of Role
-      </h4>
-      <ExpandableText resourceID={openPosition.id}>
-        <RichTextBody
-          backgroundShade={openPosition.backgroundShade}
-          body={content.description}
-          expandable={true}
-          id={openPosition.id}
-        />
-      </ExpandableText>
 
       <GroupSignature
         backgroundShade={openPosition.backgroundShade}
@@ -114,26 +122,47 @@ export function ReducedOpenPositionListItem({
   const content = openPosition.content;
   if (!openPosition) return null;
   const titleDisplay = noLink ? (
-    <h3 style={decreasedEmphasis ? {color: '#5d5d65'} : null}>
+    <h3
+      style={decreasedEmphasis ? {color: '#5d5d65'} : null}
+      className={`list-item-title-${
+        openPosition.backgroundShade ? openPosition.backgroundShade : 'light'
+      }`}
+    >
       {content.title}
     </h3>
   ) : (
-    <Link to={`/openPosition/${openPosition.id}`}>
+    <Link
+      to={`/openPosition/${openPosition.id}`}
+      className={`list-item-title-${
+        openPosition.backgroundShade ? openPosition.backgroundShade : 'light'
+      }`}
+    >
       <h3 style={decreasedEmphasis ? {color: '#5d5d65'} : null}>
         {content.title}
       </h3>
     </Link>
   );
   return (
-    <ListItemContainer>
+    <ListItemContainer backgroundShade={openPosition.backgroundShade}>
       {titleDisplay}
-      <h4 className="list-item-subtitle">Description of Role</h4>
-      <div className="article-list-item-small-description">
-        <RichTextBody
-          body={content.description}
-          expandable={false}
-          id={openPosition.id}
-        />
+      <div className="open-position-list-item-description-section">
+        <h4
+          className={`list-item-subtitle-${
+            openPosition.backgroundShade
+              ? openPosition.backgroundShade
+              : 'light'
+          }`}
+        >
+          Description of Role
+        </h4>
+        <div className="article-list-item-small-description">
+          <RichTextBody
+            body={content.description}
+            expandable={false}
+            id={openPosition.id}
+            backgroundShade={openPosition.backgroundShade}
+          />
+        </div>
       </div>
     </ListItemContainer>
   );
