@@ -14,12 +14,13 @@ export default function ImageListItem({
   deselectAction,
   deselectText,
   loading,
+  timestamp,
 }) {
   const imageContainerRef = useRef();
   useEffect(() => {
     if (!imageContainerRef.current) return;
     imageContainerRef.current.style.backgroundImage = `url(${src})`;
-  }, [imageContainerRef.current]);
+  }, [src, loading, imageContainerRef.current]);
 
   const isSelected = selectedIDs ? selectedIDs.includes(id) : false;
   let isGreyedOut = false;
@@ -30,8 +31,8 @@ export default function ImageListItem({
     if (isSelected) selectorText = deselectText ? deselectText : 'Deselect';
     const selectOrDeselectAction = () =>
       isSelected
-        ? deselectAction({src: src, id: id})
-        : selectAction({src: src, id: id});
+        ? deselectAction({src: src, id: id, timestamp: timestamp})
+        : selectAction({src: src, id: id, timestamp: timestamp});
 
     return (
       <button
@@ -117,6 +118,7 @@ export function ImagesSection({
               deselectAction={deselectAction}
               deselectText={deselectText}
               loading={loading}
+              timestamp={image.timestamp}
             />
           ))
         : children}

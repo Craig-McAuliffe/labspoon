@@ -46,7 +46,7 @@
 }
 
 .dropdown-option-button-light {
-  padding: 4px 5px;
+  padding: 6px 5px;
   width: 100%;
   border-bottom: 1px solid #5d5d65;
   color: #00507c;
@@ -67,7 +67,7 @@
 .dropdown-option-button-light-loading:hover,
 .dropdown-option-button-light-loading:focus {
   color: #5d5d65;
-  padding: 4px 5px;
+  padding: 6px 5px;
   width: 100%;
   border-bottom: 1px solid #5d5d65;
   text-align: start;
@@ -78,7 +78,7 @@
 }
 
 .dropdown-option-button-dark {
-  padding: 4px 5px;
+  padding: 6px 5px;
   width: 100%;
   border-bottom: 1px solid #5d7f95;
   color: #ffffff;
@@ -91,8 +91,8 @@
 
 .dropdown-option-button-dark:hover,
 .dropdown-option-button-dark:focus {
-  background-color: #ffffff;
-  border-bottom: 1px solid #ffffff;
+  background-color: #3099d3;
+  border-bottom: 1px solid #3099d3;
   color: #053651;
 }
 
@@ -100,7 +100,7 @@
 .dropdown-option-button-dark-loading:hover,
 .dropdown-option-button-dark-loading:focus {
   color: #9ebdd0;
-  padding: 4px 5px;
+  padding: 6px 5px;
   width: 100%;
   border-bottom: 1px solid #9ebdd0;
   text-align: start;
@@ -185,12 +185,15 @@
   fill: #ffffff;
 }
 
-.dropdown-option-button-light svg {
-  width: 50px;
+.dropdown-option-button-light path,
+.dropdown-option-button-light rect {
+  fill: #00507c;
 }
 
+.dropdown-option-button-light svg,
 .dropdown-option-button-dark svg {
-  width: 50px;
+  width: 25px;
+  height: 25px;
 }
 
 .small-dropdown-toggle {

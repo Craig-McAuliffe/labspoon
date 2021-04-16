@@ -7,6 +7,7 @@ import FilterableResults, {
 } from '../../components/FilterableResults/FilterableResults';
 import {UnpaddedPageContainer} from '../../components/Layout/Content';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
+import {GroupOverviewPage} from './GroupPage/GroupPage';
 
 export default function ResourcesFeed({
   children,
@@ -19,6 +20,9 @@ export default function ResourcesFeed({
   getCustomComponentAboveFeed,
   tabsDesign,
   backgroundShade,
+  displayOverviewPage,
+  resourceID,
+  resourceData,
 }) {
   return (
     <FilterableResults fetchResults={fetchResults} limit={limit}>
@@ -40,6 +44,13 @@ export default function ResourcesFeed({
                 backgroundShade={backgroundShade}
               />
               {getCustomComponentAboveFeed && getCustomComponentAboveFeed()}
+              {displayOverviewPage && (
+                <GroupOverviewPage
+                  groupID={resourceID}
+                  groupData={resourceData}
+                  backgroundShade={backgroundShade}
+                />
+              )}
               <NewResultsWrapper />
             </>
           )}

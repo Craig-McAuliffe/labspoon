@@ -136,18 +136,6 @@
   z-index: 99999;
 }
 
-@keyframes pulse {
-  0% {
-    background-color: rgba(243, 243, 243);
-  }
-  50% {
-    background-color: rgba(210, 210, 210);
-  }
-  100% {
-    background-color: rgba(243, 243, 243);
-  }
-}
-
 @-webkit-keyframes pulse {
   0% {
     background-color: rgba(243, 243, 243);
@@ -181,6 +169,54 @@
   }
   100% {
     background-color: rgba(243, 243, 243);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    background-color: rgba(243, 243, 243);
+  }
+  50% {
+    background-color: rgba(210, 210, 210);
+  }
+  100% {
+    background-color: rgba(243, 243, 243);
+  }
+}
+
+@-webkit-keyframes slide {
+  0% {
+    left: 1000px;
+  }
+  50% {
+    left: 20px;
+  }
+  100% {
+    left: 0px;
+  }
+}
+
+@keyframes slide {
+  0% {
+    left: 1000px;
+  }
+  50% {
+    left: 20px;
+  }
+  100% {
+    left: 0px;
+  }
+}
+
+@keyframes slide {
+  0% {
+    left: 1000px;
+  }
+  50% {
+    left: 20px;
+  }
+  100% {
+    left: 0px;
   }
 }
 

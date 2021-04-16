@@ -21,9 +21,9 @@ import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 
 const PHOTO_LIMIT = 6;
 const GROUP_NEWS_LIMIT = 15;
-const PAGE_DISPLAY_TOGGLE = 'pageDisplayToggle';
-const MEMBER_REEL_TOGGLE = 'memberReelToggle';
-const TOP_TOPICS_TOGGLE = 'topTopicsToggle';
+const PAGE_DISPLAY_TOGGLE = 'isDisplayingOverviewPage';
+const MEMBER_REEL_TOGGLE = 'isDisplayingMemberReel';
+const TOP_TOPICS_TOGGLE = 'isDisplayingTopTopics';
 const PHOTO_HIGHLIGHTS_LIMIT = 6;
 
 const photoHighlightReducerInitialState = {
@@ -43,6 +43,7 @@ export default function EditGroupOverviewPage({groupData, groupID, children}) {
     photoHighlightReducer,
     photoHighlightReducerInitialState
   );
+
   const initialToggleOptions = {
     [PAGE_DISPLAY_TOGGLE]: groupData.isDisplayingOverviewPage ? true : false,
     [MEMBER_REEL_TOGGLE]: groupData.isDisplayingMemberReel ? true : false,
@@ -262,14 +263,14 @@ function EditOverviewPageNewsSection({groupID}) {
     ).catch((err) => {
       console.error('unable to fetch group news ' + err);
       setHasFetchingError(true);
-      setLoadingGroupNews(false);
     });
-    if (!fetchedGroupNews) return;
+    if (!fetchedGroupNews) {
+      setLoadingGroupNews(false);
+      return;
+    }
+    setHasNoNewsItems(false);
     fetchedGroupNews.forEach((fetchedNewsItem) => {
-      fetchedNewsItem.showPinOption = true;
-      fetchedNewsItem.showHighlightOption = true;
-      fetchedNewsItem.pinProfileCollection = GROUPS;
-      fetchedNewsItem.pinProfileID = groupID;
+      addListItemDropdownOptions(fetchedNewsItem);
     });
     if (fetchedGroupNews.length > GROUP_NEWS_LIMIT) {
       setGroupNews((currentNews) => [
@@ -282,11 +283,19 @@ function EditOverviewPageNewsSection({groupID}) {
       setGroupNews((currentNews) => [...currentNews, ...fetchedGroupNews]);
       if (hasMoreGroupNews) setHasMoreGroupNews(false);
       setLastLastNewsItem(fetchedGroupNews[fetchedGroupNews.length - 1]);
-      if (fetchGroupNews.length === 0) setHasNoNewsItems(true);
+      if (fetchedGroupNews.length === 0) setHasNoNewsItems(true);
     }
     setLoadingGroupNews(false);
   };
 
+  const addListItemDropdownOptions = (post) => {
+    post.showPinOption = true;
+    post.showHighlightOption = true;
+    post.pinProfileCollection = GROUPS;
+    post.pinProfileID = groupID;
+    post.showNews = true;
+    post.newsCollection = `groups/${groupID}/news`;
+  };
   useEffect(async () => fetchGroupNews(), []);
 
   // fetch recent posts if no current news items
@@ -301,6 +310,9 @@ function EditOverviewPageNewsSection({groupID}) {
       console.error('unable to fetch recent group posts ' + err)
     );
     if (!fetchedRecentPosts || fetchedRecentPosts.length === 0) return;
+    fetchedRecentPosts.forEach((fetchedRecentPost) => {
+      addListItemDropdownOptions(fetchedRecentPost);
+    });
     setRecentPosts(fetchedRecentPosts);
   }, [hasNoNewsItems]);
 
@@ -321,11 +333,14 @@ function EditOverviewPageNewsSection({groupID}) {
         customLoading={loadingGroupNews}
         hasMore={hasMoreGroupNews}
         results={groupNews}
-        customEndMessage={<NoHighlightsText />}
+        customEndMessage={<p></p>}
         fetchMore={fetchGroupNews}
       />
       {hasNoNewsItems && (
-        <RecentGroupPosts posts={recentPosts} groupID={groupID} />
+        <>
+          <NoHighlightsText />
+          <RecentGroupPosts posts={recentPosts} groupID={groupID} />
+        </>
       )}
     </>
   );
@@ -416,7 +431,6 @@ function EditOverviewPagePhotosSection({
     false
   );
   const [isLoadingMorePhotos, setIsLoadingMorePhotos] = useState(false);
-
   // check if max photo highlights is reached
   useEffect(() => {
     if (newPhotoHighlights.length >= PHOTO_HIGHLIGHTS_LIMIT)
@@ -438,11 +452,12 @@ function EditOverviewPagePhotosSection({
         setHasPhotoFetchError(true);
         setLoadingPhotos(false);
       });
-      if (!fetchedPhotoHighlights) return;
-      dispatchPhotoHighlight({
-        type: 'fetchedPhotoHighlights',
-        photoData: fetchedPhotoHighlights,
-      });
+      if (fetchedPhotoHighlights && fetchedPhotoHighlights.length > 0) {
+        dispatchPhotoHighlight({
+          type: 'fetchedPhotoHighlights',
+          photoData: fetchedPhotoHighlights,
+        });
+      }
     }
 
     const fetchedGroupPhotos = await getPaginatedResourcesFromCollectionRef(

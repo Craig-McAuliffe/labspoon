@@ -8,6 +8,7 @@ export default function ListItemTopics({
   dbTopics,
   customTopics,
   backgroundShade,
+  isTopTopics,
 }) {
   if (!dbTopics && !customTopics) return null;
   if (!dbTopics) dbTopics = [];
@@ -30,6 +31,7 @@ export default function ListItemTopics({
         );
 
       const topicID = topic.id ? topic.id : topic.microsoftID;
+      const topicName = isTopTopics ? <h3>{topic.name}</h3> : topic.name;
       return (
         <Link
           to={topic.id ? `/topic/${topicID}` : `/magField/${topicID}`}
@@ -38,12 +40,13 @@ export default function ListItemTopics({
             backgroundShade === DARK_NAME_SHADE ? '-dark' : '-light'
           }`}
         >
-          {topic.name}
+          {topicName}
         </Link>
       );
     });
   };
 
+  if (isTopTopics) return topicLinks(dbTopics);
   return (
     <div className="post-topics-container">
       <p

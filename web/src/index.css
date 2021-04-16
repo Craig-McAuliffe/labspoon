@@ -44,6 +44,9 @@ a {
   color: #00507c;
 }
 
+a:hover {
+  text-decoration: underline;
+}
 button,
 input[type='file']::-webkit-file-upload-button,
 input {

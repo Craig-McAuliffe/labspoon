@@ -51,6 +51,7 @@
   min-width: 250px;
   max-width: 400px;
   -webkit-transition: 0.4s;
+  transition: 0.4s;
 }
 
 .follow-options-toggle-container-expanded {
@@ -58,6 +59,7 @@
   min-width: 250px;
   max-width: 400px;
   -webkit-transition: 0.4s;
+  transition: 0.4s;
 }
 
 .follow-options-toggle-container-minimised {

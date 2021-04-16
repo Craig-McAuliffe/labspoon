@@ -290,6 +290,11 @@ function handleResultParameters(results, parameters) {
       result.pinProfileCollection = parameters.pinProfileCollection;
       result.pinProfileID = parameters.pinProfileID;
     });
+  if (parameters.showNews)
+    results.forEach((result) => {
+      result.showNews = true;
+      result.newsCollection = parameters.newsCollection;
+    });
   if (parameters.backgroundShade)
     results.forEach((result) => {
       result.backgroundShade = parameters.backgroundShade;

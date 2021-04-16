@@ -5,7 +5,7 @@ import {PubSub} from '@google-cloud/pubsub';
 import {DocumentSnapshot} from 'firebase-functions/lib/providers/firestore';
 import {UserRecord} from 'firebase-functions/lib/providers/auth';
 import {TaggedTopic} from './topics';
-import {toUserRef} from './users';
+import {toUserRef, User} from './users';
 import {GroupRef, toGroupRef} from './groups';
 import {Invitation} from './invitations';
 import {PostRef} from './posts';
@@ -222,7 +222,7 @@ export async function sendGroupInvitationEmail(
 
   const invitingUserID = invitation.invitingUserID;
   const invitingUserDS = await db.doc(`users/${invitingUserID}`).get();
-  const invitingUser = invitingUserDS.data();
+  const invitingUser = invitingUserDS.data() as User;
   const invitingUserRef = toUserRef(invitingUserID, invitingUser);
 
   let authUser;
@@ -242,7 +242,7 @@ export async function sendGroupInvitationEmail(
     const batch = db.batch();
     batch.set(
       groupRef.collection('members').doc(authUserID),
-      toUserRef(authUserID, authUserDS.data())
+      toUserRef(authUserID, authUserDS.data() as User)
     );
     batch.delete(groupRef.collection('invitations').doc(invitationID));
     await batch.commit();

@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useContext} from 'react';
-import {useParams, Redirect} from 'react-router-dom';
+import {useParams, Redirect, Link, useHistory} from 'react-router-dom';
 import {FeatureFlags, AuthContext} from '../../../App';
 import {db} from '../../../firebase';
 import {getActiveTabID} from '../../../helpers/filters';
@@ -25,14 +25,22 @@ import {
   POSTS,
   TOPICS,
   GROUPS,
+  POST,
 } from '../../../helpers/resourceTypeDefinitions';
 import ResourcesFeed from '../ResourcesFeeds';
 import {PaddedContent} from '../../../components/Layout/Content';
 import GroupDetails from './GroupDetails';
-
-import './GroupPage.css';
 import {DARK_NAME_SHADE, LIGHT_NAME_SHADE} from './EditGroupDisplay';
 
+import './GroupPage.css';
+import {getActiveTabIDFromTypeFilterCollection} from '../../../components/FilterableResults/FilterableResults';
+import {ImagesSection} from '../../../components/Images/ImageListItem';
+import ListItemTopics from '../../../components/ListItem/ListItemTopics';
+import UserAvatar from '../../../components/Avatar/UserAvatar';
+import {RichTextBody} from '../../../components/Article/Article';
+import {NextPreviousInReelIcon} from '../../../assets/GeneralActionIcons';
+
+const OVERVIEW = 'overview';
 function fetchGroupPageFeedFromDB(
   groupID,
   last,
@@ -46,7 +54,13 @@ function fetchGroupPageFeedFromDB(
   let results;
   switch (activeTab) {
     case 'overview':
-      results = [];
+      const newsCollection = db.collection(`groups/${groupID}/news`);
+      results = getPaginatedResourcesFromCollectionRef(
+        newsCollection,
+        limit,
+        last,
+        POST
+      );
       break;
     case 'posts':
       const postsCollection = db
@@ -152,19 +166,27 @@ function fetchGroupPageFeedFromDB(
       results = [];
       break;
   }
-  const resultParameters = userIsMember
-    ? {
-        showPinOption: true,
-        pinProfileCollection: GROUPS,
-        pinProfileID: groupID,
-        backgroundShade: backgroundShade,
-      }
-    : null;
+  const resultParameters = {
+    backgroundShade: backgroundShade,
+  };
+  if (userIsMember) {
+    resultParameters.showPinOption = true;
+    resultParameters.pinProfileCollection = GROUPS;
+    resultParameters.pinProfileID = groupID;
+    resultParameters.showNews = true;
+    resultParameters.newsCollection = `groups/${groupID}/news`;
+  }
+
   return [results, null, resultParameters];
 }
 
-const checkIfTabsAreUsed = async (setUsedTabs, groupID) => {
+const checkIfTabsAreUsed = async (
+  setUsedTabs,
+  groupID,
+  overviewPageIsDisplayed
+) => {
   const confirmedUsedTabs = [];
+  if (overviewPageIsDisplayed) confirmedUsedTabs.push(OVERVIEW);
   await db
     .collection(`groups/${groupID}/techniques`)
     .limit(1)
@@ -254,9 +276,14 @@ export default function GroupPage() {
 
   useEffect(async () => {
     if (!groupID) return;
-    await checkIfTabsAreUsed(setUsedTabs, groupID);
+    if (!groupData) return;
+    await checkIfTabsAreUsed(
+      setUsedTabs,
+      groupID,
+      groupData.isDisplayingOverviewPage
+    );
     if (tabsLoading) setTabsLoading(false);
-  }, [groupID]);
+  }, [groupID, groupData]);
 
   const fetchTabs = () => {
     if (usedTabs.checked !== true) return;
@@ -301,6 +328,9 @@ export default function GroupPage() {
     usedTabs.tabs.forEach((usedTabID) => {
       let tabName;
       switch (usedTabID) {
+        case OVERVIEW:
+          tabName = 'Overview';
+          break;
         case TECHNIQUES:
           tabName = 'Techniques';
           break;
@@ -323,14 +353,18 @@ export default function GroupPage() {
           tabName = null;
       }
       if (!tabName) return;
-
-      tabOptions[0].options.push({
-        enabled: routedTabID === usedTabID ? true : false,
-        data: {
-          id: usedTabID,
-          name: tabName,
-        },
-      });
+      const getTabFilterObject = () => {
+        return {
+          enabled: routedTabID === usedTabID ? true : false,
+          data: {
+            id: usedTabID,
+            name: tabName,
+          },
+        };
+      };
+      if (usedTabID === OVERVIEW)
+        tabOptions[0].options.unshift(getTabFilterObject());
+      else tabOptions[0].options.push(getTabFilterObject());
     });
     return tabOptions;
   };
@@ -350,7 +384,6 @@ export default function GroupPage() {
       backgroundShade
     );
   };
-
   if (user) {
     db.collection(`groups/${groupID}/members`)
       .where('id', '==', user.uid)
@@ -363,6 +396,13 @@ export default function GroupPage() {
       .catch((err) => console.error(err));
   }
   if (groupData === null) return <Redirect to="/notfound" />;
+  let displayOverviewPage = false;
+  if (fetchTabs()) {
+    displayOverviewPage =
+      (getActiveTabIDFromTypeFilterCollection(fetchTabs()[0]) === 'default' &&
+        groupData.isDisplayingOverviewPage) ||
+      getActiveTabIDFromTypeFilterCollection(fetchTabs()[0]) === OVERVIEW;
+  }
   return (
     <>
       {featureFlags.has('related-resources') ? (
@@ -380,6 +420,9 @@ export default function GroupPage() {
         routedTabBasePathname={`group/${groupID}`}
         useRoutedTabs={true}
         tabsDesign={groupData.navigationDisplayType}
+        displayOverviewPage={displayOverviewPage}
+        resourceID={groupID}
+        resourceData={groupData}
       >
         <PaddedContent backgroundShade={backgroundShade}>
           <GroupDetails
@@ -393,6 +436,255 @@ export default function GroupPage() {
         </PaddedContent>
       </ResourcesFeed>
     </>
+  );
+}
+
+export function GroupOverviewPage({groupData, groupID, backgroundShade}) {
+  const [photoHighlights, setPhotoHighlights] = useState([]);
+  const [loadingPhotoHighlights, setLoadingPhotoHighlights] = useState(true);
+
+  const topTopics = [];
+  let topicsSkipped = 0;
+  if (groupData.isDisplayingTopTopics) {
+    if (groupData.recentPostTopics)
+      groupData.recentPostTopics.forEach((topic, i) => {
+        if (i === 0) topicsSkipped = 0;
+        if (i > 10 + topicsSkipped) return;
+        if (topTopics.some((topTopic) => topTopic.id === topic.id)) {
+          topicsSkipped = topicsSkipped + 1;
+          return;
+        }
+        topTopics.push(topic);
+      });
+    if (groupData.recentPublicationTopics)
+      groupData.recentPublicationTopics.forEach((topic, i) => {
+        if (i === 0) topicsSkipped = 0;
+        if (i > 10 + topicsSkipped) return;
+        if (topTopics.some((topTopic) => topTopic.id === topic.id)) {
+          topicsSkipped = topicsSkipped + 1;
+          return;
+        }
+        topTopics.push(topic);
+      });
+    if (groupData.recentArticleTopics)
+      groupData.recentArticleTopics.forEach((topic, i) => {
+        if (i === 0) topicsSkipped = 0;
+        if (i > 10 + topicsSkipped) return;
+        if (topTopics.some((topTopic) => topTopic.id === topic.id)) {
+          topicsSkipped = topicsSkipped + 1;
+          return;
+        }
+        topTopics.push(topic);
+      });
+  }
+
+  useEffect(async () => {
+    if (!loadingPhotoHighlights) setLoadingPhotoHighlights(true);
+    const fetchedPhotoHighlightsQS = await db
+      .collection(`groups/${groupID}/photoHighlights`)
+      .get()
+      .catch((err) =>
+        console.error(
+          `unable to fetch photo highlights for group with id ${groupID} ${err}`
+        )
+      );
+    if (!fetchedPhotoHighlightsQS || fetchedPhotoHighlightsQS.empty) {
+      setLoadingPhotoHighlights(false);
+      return;
+    }
+    fetchedPhotoHighlightsQS.forEach((ds) => {
+      const photo = ds.data();
+      setPhotoHighlights((currentPhotos) => [...currentPhotos, photo]);
+    });
+    setLoadingPhotoHighlights(false);
+  }, [groupID]);
+
+  return (
+    <>
+      {groupData.isDisplayingMemberReel && (
+        <>
+          <h3
+            className={`group-page-overview-section-title-${
+              backgroundShade ? backgroundShade : 'light'
+            }`}
+          >
+            Member Reel
+          </h3>
+          <GroupMemberReel
+            backgroundShade={backgroundShade}
+            groupID={groupID}
+          />
+        </>
+      )}
+      {loadingPhotoHighlights && (
+        <ImagesSection
+          images={[{src: 'loading'}, {src: 'loading'}, {src: 'loading'}]}
+          loading={true}
+        />
+      )}
+      {photoHighlights.length > 0 && !loadingPhotoHighlights && (
+        <>
+          <h3
+            className={`group-page-overview-section-title-${
+              backgroundShade ? backgroundShade : 'light'
+            }`}
+          >
+            Highlights
+          </h3>
+          <div
+            className={`group-page-overview-section-container-${
+              backgroundShade ? backgroundShade : 'light'
+            }`}
+          >
+            <ImagesSection images={photoHighlights} />
+          </div>
+        </>
+      )}
+      {groupData.isDisplayingTopTopics && (
+        <>
+          <h3
+            className={`group-page-overview-section-title-${
+              backgroundShade ? backgroundShade : 'light'
+            }`}
+          >
+            Top Topics
+          </h3>
+          <div
+            className={`group-page-overview-section-container-${
+              backgroundShade ? backgroundShade : 'light'
+            }`}
+          >
+            <ListItemTopics
+              backgroundShade={backgroundShade}
+              dbTopics={topTopics}
+              isTopTopics={true}
+            />
+          </div>
+        </>
+      )}
+      <h3
+        className={`group-page-overview-section-title-${
+          backgroundShade ? backgroundShade : 'light'
+        }`}
+      >
+        News
+      </h3>
+    </>
+  );
+}
+
+function GroupMemberReel({groupID, backgroundShade}) {
+  const [members, setMembers] = useState([]);
+  const [loadingMembers, setLoadingMembers] = useState(true);
+  const [currentShownMember, setCurrentShownMember] = useState(false);
+  const history = useHistory();
+  useEffect(async () => {
+    const membersQS = await db
+      .collection(`groups/${groupID}/members`)
+      .limit(40)
+      .get()
+      .catch((err) =>
+        console.error(
+          `unable to fetch members for group with id ${groupID} ${err}`
+        )
+      );
+    if (!membersQS || membersQS.empty) {
+      setLoadingMembers(false);
+      return;
+    }
+    membersQS.forEach((fetchedMember) => {
+      const fetchedMemberData = fetchedMember.data();
+      fetchedMemberData.id = fetchedMember.id;
+      setMembers((currentMembers) => [...currentMembers, fetchedMemberData]);
+    });
+    setLoadingMembers(false);
+  }, [groupID]);
+
+  useEffect(() => {
+    if (!members) return;
+    setCurrentShownMember(members[0]);
+  }, [members]);
+
+  const changeCurrentShownMember = (nextOrPrevious) => {
+    const currentMemberIndex = members.indexOf(currentShownMember);
+    if (nextOrPrevious === 'next') {
+      const isFinal = currentMemberIndex === members.length - 1 ? true : false;
+      if (isFinal) return setCurrentShownMember(members[0]);
+      return setCurrentShownMember(members[currentMemberIndex + 1]);
+    }
+    if (nextOrPrevious === 'previous') {
+      const isFirst = currentMemberIndex === 0 ? true : false;
+      if (isFirst) return setCurrentShownMember(members[members.length - 1]);
+      return setCurrentShownMember(members[currentMemberIndex - 1]);
+    }
+  };
+  return (
+    <div
+      className={`group-page-overview-section-container-${
+        backgroundShade ? backgroundShade : 'light'
+      }`}
+    >
+      <div className="group-page-member-reel-avatar-container">
+        <button
+          className={`next-previous-member-reel-button-${
+            backgroundShade ? backgroundShade : 'light'
+          }`}
+          onClick={() => changeCurrentShownMember('previous')}
+        >
+          <NextPreviousInReelIcon />
+        </button>
+        <button
+          className="next-previous-member-reel-avatar-button"
+          onClick={() => history.push(`/user/${currentShownMember.id}`)}
+        >
+          <div className="match-avatar-height-width">
+            <UserAvatar
+              src={currentShownMember ? currentShownMember.avatar : undefined}
+              loading={loadingMembers}
+              key={currentShownMember ? currentShownMember.avatar : undefined}
+            />
+          </div>
+        </button>
+        <button
+          className={`next-previous-member-reel-button-${
+            backgroundShade ? backgroundShade : 'light'
+          }`}
+          onClick={() => changeCurrentShownMember('next')}
+        >
+          <NextPreviousInReelIcon isNext={true} />
+        </button>
+      </div>
+      {currentShownMember && (
+        <>
+          <Link
+            className={`group-page-overview-members-reel-name-${
+              backgroundShade ? backgroundShade : 'light'
+            }`}
+            to={`user/${currentShownMember.id}`}
+          >
+            <h2>{currentShownMember.name}</h2>
+          </Link>
+          <h3
+            className={`group-page-overview-members-reel-position-${
+              backgroundShade ? backgroundShade : 'light'
+            }`}
+          >
+            {currentShownMember.position}
+          </h3>
+          {currentShownMember.bio && (
+            <>
+              <h4 className={`group-page-overview-members-reel-sub-title`}>
+                Member Bio
+              </h4>
+              <RichTextBody
+                body={currentShownMember.bio}
+                backgroundShade={backgroundShade}
+              />
+            </>
+          )}
+        </>
+      )}
+    </div>
   );
 }
 

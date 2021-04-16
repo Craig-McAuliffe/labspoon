@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
 import {useHistory} from 'react-router-dom';
-import {EditIcon, PinIcon} from '../../assets/GeneralActionIcons';
+import {EditIcon, NewsIcon, PinIcon} from '../../assets/GeneralActionIcons';
 import {DottedBurgerMenuIcon} from '../../assets/MenuIcons';
 import {db} from '../../firebase';
+import {getPostListItemFromPost} from '../../helpers/posts';
 import Dropdown, {DropdownOption} from '../Dropdown';
 import SeeMore from '../SeeMore';
 
@@ -38,6 +39,7 @@ export function ExpandableText({
 }
 export const PIN = 'pin';
 export const EDIT = 'edit';
+export const NEWS = 'news';
 export function ListItemOptionsDropdown({
   resourceType,
   resourceID,
@@ -46,11 +48,15 @@ export function ListItemOptionsDropdown({
   pinProfileCollection,
   options,
   backgroundShade,
+  showNews,
+  newsCollection,
 }) {
   const [isPinned, setIsPinned] = useState(false);
   const [submittingPin, setSubmittingPin] = useState(false);
   const [loadingPinState, setLoadingPinState] = useState(true);
-
+  const [submittingNews, setSubmittingNews] = useState(false);
+  const [loadingNewsState, setLoadingNewsState] = useState(false);
+  const [isNews, setIsNews] = useState(false);
   if (!options || options.length === 0) return null;
   const listItemOptionsDropDownToggle = (setOpen, toggleRef) => (
     <button
@@ -72,17 +78,24 @@ export function ListItemOptionsDropdown({
     >
       <Dropdown
         customToggle={listItemOptionsDropDownToggle}
-        loadOnExpand={() =>
-          options.includes(PIN)
-            ? testIfItemIsPinned(
-                setIsPinned,
-                setLoadingPinState,
-                item,
-                pinProfileCollection,
-                pinProfileID
-              )
-            : null
-        }
+        loadOnExpand={async () => {
+          if (options.includes(PIN))
+            await testIfItemIsPinned(
+              setIsPinned,
+              setLoadingPinState,
+              item,
+              pinProfileCollection,
+              pinProfileID
+            );
+
+          if (options.includes(NEWS))
+            await testIfItemIsOnNewsPage(
+              setIsNews,
+              setLoadingNewsState,
+              item,
+              newsCollection
+            );
+        }}
       >
         <ListItemOptionsDropDownOptions
           onSelect={() => {}}
@@ -97,6 +110,12 @@ export function ListItemOptionsDropdown({
           submittingPin={submittingPin}
           setSubmittingPin={setSubmittingPin}
           backgroundShade={backgroundShade}
+          showNews={showNews}
+          submittingNews={submittingNews}
+          loadingNewsState={loadingNewsState}
+          isNews={isNews}
+          newsCollection={newsCollection}
+          setSubmittingNews={setSubmittingNews}
         />
       </Dropdown>
     </div>
@@ -116,7 +135,13 @@ function ListItemOptionsDropDownOptions({
   loadingPinState,
   submittingPin,
   setSubmittingPin,
+  submittingNews,
   backgroundShade,
+  showNews,
+  loadingNewsState,
+  isNews,
+  newsCollection,
+  setSubmittingNews,
 }) {
   const history = useHistory();
   const optionsDisplayed = [];
@@ -144,7 +169,7 @@ function ListItemOptionsDropDownOptions({
               <h4
                 className={`list-item-options-dropdown-text${
                   loadingPinState ? '-loading' : ''
-                }`}
+                }-${backgroundShade ? backgroundShade : 'light'}`}
               >
                 <PinIcon />
                 {isPinned ? 'Unpin' : 'Pin'}
@@ -153,6 +178,30 @@ function ListItemOptionsDropDownOptions({
           );
 
         break;
+      case NEWS: {
+        if (showNews)
+          optionsDisplayed.push(
+            <DropdownOption
+              loading={loadingNewsState}
+              backgroundShade={backgroundShade}
+              onSelect={() => {
+                if (loadingNewsState || submittingNews) return;
+                onSelect();
+                addPostToNews(setSubmittingNews, item, isNews, newsCollection);
+              }}
+            >
+              <h4
+                className={`list-item-options-dropdown-text${
+                  loadingPinState ? '-loading' : ''
+                }-${backgroundShade ? backgroundShade : 'light'}`}
+              >
+                <NewsIcon />
+                {isNews ? 'Remove' : 'Add News'}
+              </h4>
+            </DropdownOption>
+          );
+        break;
+      }
       case EDIT:
         optionsDisplayed.push(
           <DropdownOption
@@ -164,7 +213,11 @@ function ListItemOptionsDropDownOptions({
               });
             }}
           >
-            <h4 className="list-item-options-dropdown-text">
+            <h4
+              className={`list-item-options-dropdown-text-${
+                backgroundShade ? backgroundShade : 'light'
+              }`}
+            >
               <EditIcon light={true} />
               Edit
             </h4>
@@ -204,6 +257,67 @@ async function testIfItemIsPinned(
   setLoadingPinState(false);
 }
 
+async function testIfItemIsOnNewsPage(
+  setIsNews,
+  setLoadingNewsState,
+  item,
+  newsCollection
+) {
+  setLoadingNewsState(true);
+  const newsDoc = await db
+    .doc(`${newsCollection}/${item.id}`)
+    .get()
+    .catch((err) => console.error(err));
+
+  const handleFetch = () => {
+    if (!newsDoc || !newsDoc.exists) return setIsNews(false);
+    return setIsNews(true);
+  };
+  handleFetch();
+  setLoadingNewsState(false);
+}
+
+async function addPostToNews(
+  setSubmittingNews,
+  item,
+  isOnNewsPage,
+  newsCollection
+) {
+  setSubmittingNews(true);
+  const newsItemRef = db.doc(`${newsCollection}/${item.id}`);
+  if (isOnNewsPage) {
+    return newsItemRef
+      .delete()
+      .then(() => setSubmittingNews(false))
+      .catch((err) => {
+        console.error('unable to add item to news' + err);
+        alert(
+          'Something went wrong while removing that item from the news feed. Please try again.'
+        );
+        setSubmittingNews(false);
+      });
+  }
+
+  const newsItem = {...item};
+  delete newsItem.showPinOption;
+  delete newsItem.pinProfileID;
+  delete newsItem.pinProfileCollection;
+  delete newsItem.backgroundShade;
+  if (newsItem.showNews) {
+    delete newsItem.showNews;
+    delete newsItem.newsCollection;
+  }
+  return newsItemRef
+    .set(getPostListItemFromPost(newsItem))
+    .then(() => setSubmittingNews(false))
+    .catch((err) => {
+      console.error(err);
+      alert(
+        'Something went wrong while adding that item to the news feed. Please try again.'
+      );
+    });
+}
+
 async function pinItemToProfile(
   setSubmittingPin,
   item,
@@ -221,9 +335,10 @@ async function pinItemToProfile(
       .then(() => {
         setSubmittingPin(false);
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error('unable to add item to news' + err);
         alert(
-          'Something went wrong while pinning that item. Please try again.'
+          'Something went wrong while unpinning that item. Please try again.'
         );
         setSubmittingPin(false);
       });
@@ -232,6 +347,11 @@ async function pinItemToProfile(
   delete pinnedItem.showPinOption;
   delete pinnedItem.pinProfileID;
   delete pinnedItem.pinProfileCollection;
+  delete pinnedItem.backgroundShade;
+  if (pinnedItem.showNews) {
+    delete pinnedItem.showNews;
+    delete pinnedItem.newsCollection;
+  }
   return db
     .doc(`${pinProfileCollection}/${pinProfileID}`)
     .update({pinnedItem: pinnedItem})

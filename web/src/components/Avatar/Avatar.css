@@ -1,8 +1,16 @@
-.avatar {
+.avatar,
+.avatar-loading {
   box-shadow: 0px 1px 4px rgba(29, 89, 255, 0.2);
   margin-left: none;
   margin-right: none;
   padding: none;
   border: 2px solid white;
   background: white;
+}
+
+.avatar-loading {
+  animation: pulse 2s infinite;
+  -webkit-animation: pulse 2s infinite;
+  -moz-animation: pulse 2s infinite;
+  -o-animation: pulse 2s infinite;
 }

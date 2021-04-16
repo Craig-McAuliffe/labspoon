@@ -136,6 +136,8 @@ export default function EditGroupMembers({groupData, children}) {
         name: newMember.name,
       };
       if (newMember.avatar) memberRef.avatar = newMember.avatar;
+      if (newMember.position) memberRef.position = newMember.position;
+      if (newMember.institution) memberRef.institution = newMember.institution;
       batch.set(groupDocRef.collection('members').doc(newMember.id), memberRef);
     });
     memberIDsToBeRemoved.forEach((memberIDToBeRemoved) => {

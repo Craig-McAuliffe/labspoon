@@ -16,6 +16,7 @@ import {db} from '../../../firebase';
 import {
   ListItemOptionsDropdown,
   PIN,
+  NEWS,
 } from '../../ListItem/ListItemCommonComponents';
 
 import './Post.css';
@@ -151,7 +152,10 @@ function PostHeader({
           item={post}
           pinProfileID={post.pinProfileID}
           pinProfileCollection={post.pinProfileCollection}
-          options={[PIN]}
+          options={[PIN, NEWS]}
+          showNews={post.showNews}
+          backgroundShade={post.backgroundShade}
+          newsCollection={post.newsCollection}
         />
       )}
     </div>

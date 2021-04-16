@@ -67,6 +67,8 @@ const GroupDetails = ({
           fetchedPinnedItem.showPinOption = true;
           fetchedPinnedItem.pinProfileCollection = GROUPS;
           fetchedPinnedItem.pinProfileID = groupID;
+          fetchedPinnedItem.showNews = true;
+          fetchedPinnedItem.newsCollection = `groups/${groupID}/news`;
         }
         return setPinnedItem(fetchedPinnedItem);
       });

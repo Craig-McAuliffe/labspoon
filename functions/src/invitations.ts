@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import {admin} from './config';
-import {toUserRef, UserRef} from './users';
+import {toUserRef, User, UserRef} from './users';
 import {firestore} from 'firebase-admin';
 import {sendGroupInvitationEmail} from './email';
 
@@ -49,7 +49,7 @@ export const fulfillInvitationsOnEmailSignUp = functions.firestore
     }
     const email = authUser.email;
 
-    const userRef = toUserRef(userID, change.data());
+    const userRef = toUserRef(userID, change.data() as User);
 
     const invitationsQS = await db
       .collection('invitations/group/newMemberInvites')

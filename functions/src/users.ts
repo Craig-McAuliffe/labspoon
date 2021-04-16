@@ -380,8 +380,8 @@ export const updateUserRefOnResearchFocuses = functions.firestore
     const oldUserData = change.before.data() as User;
     const userID = context.params.userID;
     if (
-      JSON.stringify(toUserRef(userID, newUserData)) ===
-      JSON.stringify(toUserRef(userID, oldUserData))
+      JSON.stringify(toUserSignature(userID, newUserData)) ===
+      JSON.stringify(toUserSignature(userID, oldUserData))
     )
       return;
     const researchFocusesQS = await db
@@ -403,7 +403,7 @@ export const updateUserRefOnResearchFocuses = functions.firestore
       async (researchFocusID) => {
         return db
           .doc(`researchFocuses/${researchFocusID}`)
-          .update({author: toUserRef(userID, newUserData)})
+          .update({author: toUserSignature(userID, newUserData)})
           .catch((err) =>
             console.error(
               'unable to update user ref on research focus with id ' +
@@ -425,8 +425,8 @@ export const updateUserRefOnOpenPositions = functions.firestore
     const oldUserData = change.before.data() as User;
     const userID = context.params.userID;
     if (
-      JSON.stringify(toUserRef(userID, newUserData)) ===
-      JSON.stringify(toUserRef(userID, oldUserData))
+      JSON.stringify(toUserSignature(userID, newUserData)) ===
+      JSON.stringify(toUserSignature(userID, oldUserData))
     )
       return;
     const openPositionsQS = await db
@@ -448,7 +448,7 @@ export const updateUserRefOnOpenPositions = functions.firestore
       async (openPositionID) =>
         db
           .doc(`openPositions/${openPositionID}`)
-          .update({author: toUserRef(userID, newUserData)})
+          .update({author: toUserSignature(userID, newUserData)})
           .catch((err) =>
             console.error(
               'unable to update user ref on open position with id ' +
@@ -469,8 +469,8 @@ export const updateUserRefOnTechniques = functions.firestore
     const oldUserData = change.before.data() as User;
     const userID = context.params.userID;
     if (
-      JSON.stringify(toUserRef(userID, newUserData)) ===
-      JSON.stringify(toUserRef(userID, oldUserData))
+      JSON.stringify(toUserSignature(userID, newUserData)) ===
+      JSON.stringify(toUserSignature(userID, oldUserData))
     )
       return;
     const techniquesQS = await db
@@ -491,7 +491,7 @@ export const updateUserRefOnTechniques = functions.firestore
     const techniquesUpdatePromise = techniquesIDs.map(async (techniqueID) => {
       return db
         .doc(`techniques/${techniqueID}`)
-        .update({author: toUserRef(userID, newUserData)})
+        .update({author: toUserSignature(userID, newUserData)})
         .catch((err) =>
           console.error(
             'unable to update user ref on technique with id ' +
@@ -735,8 +735,8 @@ export const updateUserRefOnPosts = functions.firestore
     const oldUserData = change.before.data() as User;
     const userID = context.params.userID;
     if (
-      JSON.stringify(toUserRef(userID, newUserData)) ===
-      JSON.stringify(toUserRef(userID, oldUserData))
+      JSON.stringify(toUserSignature(userID, newUserData)) ===
+      JSON.stringify(toUserSignature(userID, oldUserData))
     )
       return;
     const postsQS = await db
@@ -754,7 +754,7 @@ export const updateUserRefOnPosts = functions.firestore
     const postsUpdatePromise = postsIDs.map(async (postID) => {
       return db
         .doc(`posts/${postID}`)
-        .update({author: toUserRef(userID, newUserData)})
+        .update({author: toUserSignature(userID, newUserData)})
         .catch((err) =>
           console.error(
             'unable to update user ref on post with id ' +
@@ -1265,6 +1265,7 @@ export interface UserRef {
   microsoftID?: string;
   reputation?: number;
   position?: string;
+  institution?: string;
 }
 
 export interface UserAlgoliaRef {
@@ -1274,18 +1275,30 @@ export interface UserAlgoliaRef {
   microsoftID?: string;
   reputation?: number;
   position?: string;
+  institution?: string;
   recentPublicationTopics?: Topic[];
   recentPostTopics?: Topic[];
 }
 
-export function toUserRef(userID: string, user: any) {
+export function toUserRef(userID: string, user: User) {
+  const userRef: UserRef = {
+    id: userID,
+    name: user.name,
+  };
+  if (user.avatar) userRef.avatar = user.avatar;
+  if (user.position) userRef.position = user.position;
+  if (user.institution) userRef.institution = user.institution;
+  if (user.rank) userRef.rank = user.rank;
+  if (user.reputation) userRef.reputation = user.reputation;
+  return userRef;
+}
+
+export function toUserSignature(userID: string, user: any) {
   const userRef: UserRef = {
     id: userID,
     name: user.name,
     avatar: user.avatar ? user.avatar : null,
   };
-  if (user.rank) userRef.rank = user.rank;
-  if (user.reputation) userRef.reputation = user.reputation;
   return userRef;
 }
 
@@ -1295,6 +1308,8 @@ export function toUserAlgoliaFilterRef(user: User, userID: string) {
     name: user.name,
   };
   if (user.microsoftID) userAlgoliaRef.microsoftID = user.microsoftID;
+  if (user.position) userAlgoliaRef.position = user.position;
+  if (user.institution) userAlgoliaRef.institution = user.institution;
   if (user.reputation) userAlgoliaRef.reputation = user.reputation;
   if (user.avatar) userAlgoliaRef.avatar = user.avatar;
   if (user.recentPublicationTopics)
@@ -1341,6 +1356,8 @@ export interface User {
   microsoftID?: string;
   rank?: number;
   reputation?: number;
+  position?: string;
+  institution?: string;
   lastPostTimeStamp?: number;
   recentPublicationTopics?: Topic[];
   recentPostTopics?: Topic[];
