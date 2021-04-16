@@ -3,6 +3,7 @@
   padding: 0px 2%;
   height: 100%;
   grid-column: 3/4;
+  width: 100%;
 }
 
 .suggested-content-sider-container p {
@@ -10,7 +11,7 @@
 }
 
 .suggested-content-sider-title {
-  margin: 10% 0px 4% 2%;
+  margin: 30px 0px 4% 2%;
   color: #5d5d65;
 }
 
