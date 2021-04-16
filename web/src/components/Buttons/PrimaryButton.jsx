@@ -23,9 +23,12 @@ export default function PrimaryButton({
     <button
       type={submit ? 'submit' : 'button'}
       className={className}
-      onClick={onClick ? onClick : null}
+      onClick={() => {
+        if (disabled || !onClick) return;
+        onClick();
+      }}
       form={formID ? formID : null}
-      disabled={disabled}
+      disabled={disabled ? true : false}
       {...props}
     >
       {smallVersion ? (

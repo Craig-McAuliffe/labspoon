@@ -536,7 +536,7 @@ export const updateUserRefOnMemberGroups = functions.firestore
     const groupsUpdatePromise = groupsIDs.map(async (groupID) => {
       return db
         .doc(`groups/${groupID}/members/${userID}`)
-        .set(toUserRef(userID, newUserData))
+        .set(toUserRef(userID, newUserData), {merge: true})
         .catch((err) =>
           console.error(
             'unable to update user ref on group with id ' +

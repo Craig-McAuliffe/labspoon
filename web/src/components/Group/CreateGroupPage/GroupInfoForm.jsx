@@ -191,6 +191,7 @@ export function SelectUsers({
   selectedUsers,
   addSelectedUsers,
   setSelectedUsers,
+  groupID,
 }) {
   const [selectingUser, setSelectingUser] = useState(false);
   return (
@@ -199,6 +200,7 @@ export function SelectUsers({
       <SelectedMembers
         selectedUsers={selectedUsers}
         setSelectedUsers={setSelectedUsers}
+        groupID={groupID}
       />
       {selectingUser ? (
         <AddMemberContainer
@@ -212,7 +214,7 @@ export function SelectUsers({
   );
 }
 
-function SelectedMembers({selectedUsers, setSelectedUsers}) {
+function SelectedMembers({selectedUsers, setSelectedUsers, groupID}) {
   const removeSelectedUser = (user) => {
     let indexToBeRemoved;
     if (user.id) {
@@ -234,7 +236,12 @@ function SelectedMembers({selectedUsers, setSelectedUsers}) {
   const userListItems = selectedUsers.map((user, i) => {
     if (user.id) {
       return (
-        <UserListItem user={user} key={user.id}>
+        <UserListItem
+          user={user}
+          key={user.id}
+          hasEditBioOption={true}
+          memberOfGroupID={groupID}
+        >
           <NegativeButton onClick={() => removeSelectedUser(user)}>
             Remove
           </NegativeButton>

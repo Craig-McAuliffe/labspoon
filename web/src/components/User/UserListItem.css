@@ -120,6 +120,22 @@
   width: 65px;
 }
 
+.user-list-item-edit-bio button {
+  display: flex;
+  align-items: center;
+}
+
+.user-list-item-edit-bio button:hover {
+  color: #00507c;
+}
+
+.user-list-item-edit-bio svg {
+  margin-right: 5px;
+}
+
+.user-list-item-edit-bio-expanded-container {
+  margin: 20px 0px 40px;
+}
 @media screen and (max-width: 560px) {
   .user-list-item-institution {
     color: #5d5d65;

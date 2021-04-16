@@ -170,6 +170,7 @@ export default function EditGroupMembers({groupData, children}) {
   const chooseMembers = (
     <>
       <SelectUsers
+        groupID={groupID}
         selectedUsers={selectedUsers}
         addSelectedUsers={(chosenUser) =>
           addSelectedUsers(

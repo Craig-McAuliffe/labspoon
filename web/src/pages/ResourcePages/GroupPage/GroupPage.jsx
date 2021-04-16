@@ -573,10 +573,15 @@ export function GroupOverviewPage({groupData, groupID, backgroundShade}) {
   );
 }
 
+const FORWARDS_CLICK_DIRECTION = 'forwards';
+const BACKWARDS_CLICK_DIRECTION = 'backwards';
 function GroupMemberReel({groupID, backgroundShade}) {
   const [members, setMembers] = useState([]);
   const [loadingMembers, setLoadingMembers] = useState(true);
   const [currentShownMember, setCurrentShownMember] = useState(false);
+  const [clickDirection, setClickDirection] = useState(
+    FORWARDS_CLICK_DIRECTION
+  );
   const history = useHistory();
   useEffect(async () => {
     const membersQS = await db
@@ -629,7 +634,11 @@ function GroupMemberReel({groupID, backgroundShade}) {
           className={`next-previous-member-reel-button-${
             backgroundShade ? backgroundShade : 'light'
           }`}
-          onClick={() => changeCurrentShownMember('previous')}
+          onClick={() => {
+            if (clickDirection !== BACKWARDS_CLICK_DIRECTION)
+              setClickDirection(BACKWARDS_CLICK_DIRECTION);
+            changeCurrentShownMember('previous');
+          }}
         >
           <NextPreviousInReelIcon />
         </button>
@@ -637,7 +646,7 @@ function GroupMemberReel({groupID, backgroundShade}) {
           className="next-previous-member-reel-avatar-button"
           onClick={() => history.push(`/user/${currentShownMember.id}`)}
         >
-          <div className="match-avatar-height-width">
+          <div className={`match-avatar-height-width-${clickDirection}`}>
             <UserAvatar
               src={currentShownMember ? currentShownMember.avatar : undefined}
               loading={loadingMembers}
@@ -649,7 +658,11 @@ function GroupMemberReel({groupID, backgroundShade}) {
           className={`next-previous-member-reel-button-${
             backgroundShade ? backgroundShade : 'light'
           }`}
-          onClick={() => changeCurrentShownMember('next')}
+          onClick={() => {
+            if (clickDirection !== FORWARDS_CLICK_DIRECTION)
+              setClickDirection(FORWARDS_CLICK_DIRECTION);
+            changeCurrentShownMember('next');
+          }}
         >
           <NextPreviousInReelIcon isNext={true} />
         </button>

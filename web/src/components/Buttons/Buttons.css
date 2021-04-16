@@ -76,6 +76,7 @@
 
 .edit-button-dark:hover {
   padding: 6px 7px 6px 4px;
+  border: none;
 }
 
 .edit-button-light:hover path,
