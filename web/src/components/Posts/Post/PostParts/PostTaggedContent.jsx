@@ -27,7 +27,7 @@ export default function PostOptionalTags({backgroundShade, taggedContent}) {
           </UserListItem>
         );
       case PUBLICATION:
-        if (locationPathname.includes(PUBLICATION)) return null;
+        if (locationPathname.startsWith(`/${PUBLICATION}`)) return null;
         const taggedPublication = taggedItem.content;
         taggedPublication.backgroundShade = backgroundShade;
         return (
@@ -38,7 +38,7 @@ export default function PostOptionalTags({backgroundShade, taggedContent}) {
           />
         );
       case OPENPOSITION:
-        if (locationPathname.includes(OPENPOSITION)) return null;
+        if (locationPathname.startsWith(`/${OPENPOSITION}`)) return null;
         const taggedOpenPosition = taggedItem.content;
         taggedOpenPosition.backgroundShade = backgroundShade;
         return (

@@ -614,9 +614,12 @@ function DonateButton({backgroundShade}) {
 function PinnedItem({pinnedItem, backgroundShade}) {
   pinnedItem.backgroundShade = backgroundShade;
   return (
-    <div className="pinned-item-container">
-      <GenericListItem result={pinnedItem} />
-    </div>
+    <>
+      <h3 style={{marginTop: '30px'}}>Pinned Item</h3>
+      <div className="pinned-item-container">
+        <GenericListItem result={pinnedItem} />
+      </div>
+    </>
   );
 }
 
