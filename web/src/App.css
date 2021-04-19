@@ -58,11 +58,12 @@
   color: #da0000;
 }
 .not-a-bot-button {
-  color: #287fad;
+  color: #00507c;
 }
 
 .not-a-bot-button:hover {
   color: #00507c;
+  text-decoration: underline;
 }
 
 .success-overlay {
