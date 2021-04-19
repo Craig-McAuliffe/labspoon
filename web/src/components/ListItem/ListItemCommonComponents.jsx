@@ -195,7 +195,7 @@ function ListItemOptionsDropDownOptions({
                   loadingPinState ? '-loading' : ''
                 }-${backgroundShade ? backgroundShade : 'light'}`}
               >
-                <NewsIcon />
+                <NewsIcon backgroundShade={backgroundShade} />
                 {isNews ? 'Remove' : 'Add News'}
               </h4>
             </DropdownOption>

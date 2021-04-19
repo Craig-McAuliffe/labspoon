@@ -203,6 +203,9 @@
   color: #00507c;
 }
 
+.small-dropdown-toggle:hover p {
+  text-decoration: underline;
+}
 .small-dropdown-toggle p {
   display: inline-block;
   margin-right: 10px;
