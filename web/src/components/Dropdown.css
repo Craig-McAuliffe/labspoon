@@ -81,7 +81,10 @@
 }
 .dropdown-option-button-light-loading circle,
 .dropdown-option-button-light-loading:hover circle,
-.dropdown-option-button-light-loading:focus circle {
+.dropdown-option-button-light-loading:focus circle,
+.dropdown-option-button-light-loading rect,
+.dropdown-option-button-light-loading:hover rect,
+.dropdown-option-button-light-loading:focus rect {
   stroke: #5d5d65;
 }
 
@@ -93,7 +96,10 @@
 
 .dropdown-option-button-dark-loading circle,
 .dropdown-option-button-dark-loading:hover circle,
-.dropdown-option-button-dark-loading:focus circle {
+.dropdown-option-button-dark-loading:focus circle,
+.dropdown-option-button-dark-loading rect,
+.dropdown-option-button-dark-loading:hover rect,
+.dropdown-option-button-dark-loading:focus rect {
   stroke: #053651;
   fill: #9ebdd0;
 }
