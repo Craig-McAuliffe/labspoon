@@ -17,9 +17,7 @@
   grid-template-columns: 165px 1fr;
   grid-template-rows: none;
   min-width: 100%;
-
   padding-top: 8px;
-  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
 }
 
 .group-header-light {

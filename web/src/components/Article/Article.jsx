@@ -99,7 +99,7 @@ export function ArticleHeaderAndType({
 }
 
 export function RichTextBody({backgroundShade, body, shouldLinkify = true}) {
-  if (!body) return null;
+  if (!body || !Array.isArray(body)) return null;
   const bodyDisplay = (
     <div className="rich-body-section">
       {body.map((bodySection, i) =>

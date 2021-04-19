@@ -3,9 +3,10 @@ import {admin} from './config';
 import {GroupRef, groupRefToGroupSignature, GroupSignature} from './groups';
 import {checkUserIsMemberOfGroup} from './helpers';
 import {ArticleBodyChild} from './researchFocuses';
-
+import {firestore} from 'firebase-admin';
 import {TaggedTopic} from './topics';
 import {UserRef, checkAuthAndGetUserFromContext} from './users';
+import {PublicationRef} from './publications';
 
 const db = admin.firestore();
 
@@ -108,6 +109,88 @@ export const addOpenPosToTopics = functions.firestore
     );
     return await Promise.all(topicsPromises);
   });
+
+export const updateOpenPosOnPosts = functions
+  .runWith({
+    timeoutSeconds: 300,
+    memory: '2GB',
+  })
+  .firestore.document(`openPositions/{openPositionID}`)
+  .onUpdate(async (openPositionDS, context) => {
+    const openPositionID = context.params.openPositionID;
+    const newOpenPositionData = openPositionDS.after.data() as OpenPosition;
+    const oldOpenPositionData = openPositionDS.before.data() as OpenPosition;
+    if (
+      JSON.stringify(
+        openPosToOpenPosListItem(newOpenPositionData, openPositionID)
+      ) ===
+      JSON.stringify(
+        openPosToOpenPosListItem(oldOpenPositionData, openPositionID)
+      )
+    )
+      return;
+    return updatePostsTaggedResource(
+      fetchPostsForTaggedResourceUpdate(openPositionID, 'openPositions'),
+      openPosToOpenPosListItem(newOpenPositionData, openPositionID),
+      openPositionID,
+      'openPositions',
+      'openPosition'
+    );
+  });
+
+export async function updatePostsTaggedResource(
+  query: firestore.DocumentData,
+  listItem: OpenPositionListItem | PublicationRef,
+  resourceID: string,
+  resourceCollection: string,
+  resourceType: string
+) {
+  const snapshot = await query
+    .get()
+    .catch((err: any) =>
+      console.error(
+        `unable to fetch posts for ${resourceType} with id ${resourceID} ${err}`
+      )
+    );
+  if (!snapshot || snapshot.empty) return;
+  let lastDoc: firestore.DocumentSnapshot;
+  const batch = db.batch();
+  snapshot.forEach((post: firestore.DocumentSnapshot) => {
+    if (!post.exists) return;
+    const postID = post.id;
+    batch.update(db.doc(`posts/${postID}`), {[resourceType]: listItem});
+    lastDoc = post;
+  });
+  await batch.commit();
+  if (snapshot.size < 400) return;
+  // Recurse on the next process tick, to avoid
+  // exploding the stack.
+  process.nextTick(async () => {
+    await updatePostsTaggedResource(
+      fetchPostsForTaggedResourceUpdate(
+        resourceID,
+        resourceCollection,
+        lastDoc
+      ),
+      listItem,
+      resourceID,
+      resourceCollection,
+      resourceType
+    );
+  });
+}
+
+export function fetchPostsForTaggedResourceUpdate(
+  resourceID: string,
+  resourceCollection: string,
+  last?: firestore.DocumentSnapshot
+) {
+  const collectionRef = db
+    .collection(`${resourceCollection}/${resourceID}/posts`)
+    .limit(400);
+  if (last) return collectionRef.startAfter(last);
+  return collectionRef;
+}
 
 export const updateOpenPosOnGroup = functions.firestore
   .document(`openPositions/{openPositionID}`)

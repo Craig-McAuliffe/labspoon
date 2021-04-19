@@ -16,6 +16,10 @@ import {
   UserPublicationRef,
   UserCustomPublicationRef,
 } from './users';
+import {
+  updatePostsTaggedResource,
+  fetchPostsForTaggedResourceUpdate,
+} from './openPositions';
 import * as adminNS from 'firebase-admin';
 const pubSubClient = new PubSub();
 const db = admin.firestore();
@@ -443,6 +447,34 @@ export const updateAuthorsPublication = functions.firestore
           )
     );
     return await Promise.all(promises);
+  });
+
+export const updatePublicationOnPosts = functions
+  .runWith({
+    timeoutSeconds: 300,
+    memory: '2GB',
+  })
+  .firestore.document(`publications/{publicationID}`)
+  .onUpdate(async (publicationDS, context) => {
+    const publicationID = context.params.publicationID;
+    const newPublicationData = publicationDS.after.data() as Publication;
+    const oldPublicationData = publicationDS.before.data() as Publication;
+    if (
+      JSON.stringify(
+        publicationToPublicationRef(newPublicationData, publicationID)
+      ) ===
+      JSON.stringify(
+        publicationToPublicationRef(oldPublicationData, publicationID)
+      )
+    )
+      return;
+    return updatePostsTaggedResource(
+      fetchPostsForTaggedResourceUpdate(publicationID, 'publications'),
+      publicationToPublicationRef(newPublicationData, publicationID),
+      publicationID,
+      'publications',
+      'publication'
+    );
   });
 
 export const updatePubRefOnTopics = functions.firestore

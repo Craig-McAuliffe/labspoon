@@ -293,9 +293,7 @@ export async function sendGroupInvitationEmail(
     url: encodeURI(`${url}signup?referrer=groupInvite`),
   };
 
-  const subject = `${invitingUser!.name} is inviting you to join ${
-    group.name
-  } on Labspoon!`;
+  const subject = `${invitingUser.name} is inviting you to join ${group.name} on Labspoon!`;
   mailgun.messages().send(
     {
       from: 'Labspoon <invites-noreply@mail.labspoon.com>',
