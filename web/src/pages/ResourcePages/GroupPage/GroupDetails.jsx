@@ -245,7 +245,7 @@ function AvatarEmbeddedHeader({
   const groupWebsiteAndFollowOrEditDisplay = designOnly ? (
     <div style={isMobile ? {height: '40px'} : {height: '0px'}}></div>
   ) : (
-    <div className="group-website-follow-container">
+    <div className="group-website-follow-container-embedded">
       <WebsiteLink backgroundShade={backgroundShade} link={group.website} />
       {userIsMember ? (
         <Link className="edit-group-link" to={`/group/${groupID}/edit/info`}>
@@ -274,7 +274,6 @@ function AvatarEmbeddedHeader({
             <GroupAvatar src={group.avatar} height="160" width="160" />
           </div>
         </div>
-        {isMobile && groupWebsiteAndFollowOrEditDisplay}
         <div
           className={`group-header-info-${
             backgroundShade ? backgroundShade : 'light'
@@ -287,7 +286,7 @@ function AvatarEmbeddedHeader({
         </div>
       </div>
       {!isMobile && groupCoverDisplay}
-      {!isMobile && groupWebsiteAndFollowOrEditDisplay}
+      {groupWebsiteAndFollowOrEditDisplay}
     </>
   );
 }

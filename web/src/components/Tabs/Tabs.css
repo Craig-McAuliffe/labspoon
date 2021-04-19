@@ -314,6 +314,7 @@
   width: 300px;
   background: #ffffff;
   margin: 10px 0px 20px;
+  max-width: 98%;
 }
 
 .tabs-dropdown-container-dark {
@@ -328,12 +329,14 @@
 
 .tabs-dropdown-container-dark .dropdown-relative-position,
 .tabs-dropdown-container-dark .dropdown-default-toggle,
-.tabs-dropdown-container-dark .dropdown-custom-toggle,
-.tabs-dropdown-container-dark .dropdown-custom-toggle path {
+.tabs-dropdown-container-dark .dropdown-custom-toggle {
   width: 300px;
+  max-width: 98%;
   background: #00507c;
   margin: 10px 0px 20px;
   color: #ffffff;
+}
+.tabs-dropdown-container-dark .dropdown-custom-toggle path {
   fill: #ffffff;
 }
 
@@ -357,5 +360,44 @@
   .feed-tab-no-divider-dark-inactive,
   .feed-tab-no-divider-dark-active {
     padding: 0px 8px;
+  }
+
+  .feed-tab-single-divider-light-inactive,
+  .feed-tab-single-divider-light-active,
+  .feed-tab-single-divider-dark-inactive,
+  .feed-tab-single-divider-dark-active,
+  .feed-tab-single-divider-light-final-inactive,
+  .feed-tab-single-divider-light-final-active,
+  .feed-tab-single-divider-dark-final-inactive,
+  .feed-tab-single-divider-dark-final-active,
+  .feed-tab-no-divider-light-inactive,
+  .feed-tab-no-divider-light-active,
+  .feed-tab-no-divider-dark-inactive,
+  .feed-tab-no-divider-dark-active {
+    padding: 5px 15px 5px;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .feed-tab-single-divider-light-inactive,
+  .feed-tab-single-divider-light-active,
+  .feed-tab-single-divider-dark-inactive,
+  .feed-tab-single-divider-dark-active,
+  .feed-tab-single-divider-light-final-inactive,
+  .feed-tab-single-divider-light-final-active,
+  .feed-tab-single-divider-dark-final-inactive,
+  .feed-tab-single-divider-dark-final-active,
+  .feed-tab-no-divider-light-inactive,
+  .feed-tab-no-divider-light-active,
+  .feed-tab-no-divider-dark-inactive,
+  .feed-tab-no-divider-dark-active {
+    padding: 2px 10px 2px;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .tabs-dropdown-container-dark .dropdown-relative-position,
+  .tabs-dropdown-container-light .dropdown-relative-position {
+    margin: 0px;
   }
 }
