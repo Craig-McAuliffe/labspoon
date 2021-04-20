@@ -1250,6 +1250,35 @@ export const updatePinnedTechnique = functions.firestore
     );
   });
 
+export const updateNewsPost = functions.firestore
+  .document('groups/{groupID}/posts/{postID}')
+  .onUpdate(async (change, context) => {
+    const groupID = context.params.groupID;
+    const postID = context.params.postID;
+    const postData = change.after.data() as PostRef;
+    const newsRef = db.doc(`groups/${groupID}/news/${postID}`);
+    const isNews = await newsRef
+      .get()
+      .then((ds) => {
+        if (!ds.exists) return false;
+        return ds.data();
+      })
+      .catch((err) => {
+        console.error(
+          `unable to fetch news for group with id ${groupID} ${err}`
+        );
+        return false;
+      });
+    if (!isNews) return;
+    return newsRef
+      .set(postData)
+      .catch((err) =>
+        console.error(
+          `unable to update news with id ${postID} on group with id ${groupID} ${err}`
+        )
+      );
+  });
+
 async function addRecentResourceTopicsToGroupDoc(
   groupID: string,
   newTopics: TaggedTopic[],
