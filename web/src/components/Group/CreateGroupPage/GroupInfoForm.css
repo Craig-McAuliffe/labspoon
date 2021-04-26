@@ -40,8 +40,17 @@
   float: right;
 }
 .add-member-button svg {
-  height: 80px;
-  width: 80px;
+  height: 60px;
+  width: 60px;
+}
+
+.add-member-button {
+  padding: 8px;
+}
+
+.add-member-button:hover circle,
+.add-member-button:hover path {
+  stroke: #00507c;
 }
 
 @media screen and (max-width: 1500px) {
@@ -68,17 +77,16 @@
   }
 
   .add-member-button svg {
-    height: 60px;
-    width: 60px;
+    height: 40px;
+    width: 40px;
+  }
+
+  .add-member-button {
+    padding: 5px;
   }
 }
 
 @media screen and (max-width: 500px) {
-  .add-member-button {
-    display: flex;
-    margin: auto;
-  }
-
   .fileContainer p {
     display: none;
   }

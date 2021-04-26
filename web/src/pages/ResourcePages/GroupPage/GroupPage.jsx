@@ -369,10 +369,6 @@ export default function GroupPage() {
     return tabOptions;
   };
 
-  const backgroundShade = getGroupBackgroundShadeFromBackgroundID(
-    groupData.backgroundDesign
-  );
-
   const fetchFeedData = (skip, limit, filterOptions, last) => {
     return fetchGroupPageFeedFromDB(
       groupID,
@@ -396,6 +392,9 @@ export default function GroupPage() {
       .catch((err) => console.error(err));
   }
   if (groupData === null) return <Redirect to="/notfound" />;
+  const backgroundShade = getGroupBackgroundShadeFromBackgroundID(
+    groupData.backgroundDesign
+  );
   let displayOverviewPage = false;
   if (fetchTabs()) {
     displayOverviewPage =

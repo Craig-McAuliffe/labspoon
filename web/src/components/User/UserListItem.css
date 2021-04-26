@@ -74,9 +74,6 @@
   grid-column: 1/2;
 }
 
-.user-list-item-link-light h2 {
-}
-
 .user-list-item-link-dark h2 {
   color: #ffffff;
 }
@@ -147,13 +144,14 @@
   .user-list-item-container-dark,
   .user-list-item-container-dark-no-border {
     display: grid;
-    grid-template-columns: 3fr 2.5fr 1fr;
+    grid-template-columns: 60px 2.5fr 1fr;
     align-items: center;
     padding-right: 5px;
   }
 
-  .user-list-item-link {
-    grid-template-columns: minmax(50px, 70px) 2fr;
+  .user-list-item-link-light,
+  .user-list-item-link-dark {
+    grid-template-columns: minmax(60px, 70px) 2fr;
   }
 
   .user-list-item-name h4 {

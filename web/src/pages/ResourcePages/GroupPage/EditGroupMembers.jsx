@@ -180,6 +180,7 @@ export default function EditGroupMembers({groupData, children}) {
             userProfile.id
           )
         }
+        hasEditBioOption={true}
         setSelectedUsers={setSelectedUsers}
       />
       {membersAreModified ? (
