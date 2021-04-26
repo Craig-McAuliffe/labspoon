@@ -32,6 +32,7 @@ export default function OnboardingPage() {
           <OnboardingAuthorLink
             previousOnboardingStage={previousOnboardingStage}
             nextOnboardingStage={nextOnboardingStage}
+            onboardingStage={onboardingStage}
           />
         );
       case GROUPS:
@@ -76,7 +77,7 @@ export default function OnboardingPage() {
         history.push(`/onboarding/${LINKAUTHOR}`);
         break;
       default:
-        throw new Error('invalid stage');
+        return;
     }
   };
   if (onboardingStage !== LINKAUTHOR && onboardingStage !== GROUPS)
@@ -248,7 +249,7 @@ function OnboardingGroup({
   if (isInGroup) content = createOrClaimGroup;
   if (isInGroup === false) content = null;
   return (
-    <div className="onboarding-page-container">
+    <div>
       {content}
       <NextOrBackOnboardingActions
         onboardingStage={onboardingStage}
