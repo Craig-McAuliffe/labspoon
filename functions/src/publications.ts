@@ -204,14 +204,14 @@ async function resolveUserIDs(
   users: UserPublicationRef[]
 ): Promise<UserPublicationRef[]> {
   const setUserPromises = users.map(async (user) => {
-    if (!user.microsoftIDs) {
+    if (!user.microsoftID) {
       console.error('Cannot resolve user without microsoft ID:', user);
       return user;
     }
     // check whether there is a labspoon user associated with the microsoft ID
     const userQS = await db
       .collection('users')
-      .where('microsoftIDs', 'array-contains', user.microsoftIDs[0])
+      .where('microsoftIDs', 'array-contains', user.microsoftID)
       .limit(1)
       .get();
     // if there is not a labspoon user, just return the unresolved user
@@ -225,11 +225,7 @@ async function resolveUserIDs(
     });
     if (!labspoonUser[0]) return user;
     // if there is labspoon user, return the user pub ref
-    return toUserPublicationRef(
-      labspoonUser[0].name,
-      user.microsoftIDs,
-      userQS.docs[0].id
-    );
+    return toUserPublicationRef(labspoonUser[0].name, userQS.docs[0].id);
   });
   return await Promise.all(setUserPromises);
 }

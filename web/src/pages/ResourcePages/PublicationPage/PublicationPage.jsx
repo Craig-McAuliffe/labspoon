@@ -371,7 +371,7 @@ function PublicationAuthors({publicationAuthors}) {
   return orderedAuthors.map((author) => {
     const authorLink = getLinkForAuthor(
       author.id,
-      author.microsoftIDs[0],
+      author.microsoftID,
       author.name
     );
 

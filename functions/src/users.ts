@@ -771,8 +771,8 @@ export const updateUserRefOnPosts = functions.firestore
 export const updateUserRefOnPublications = functions.firestore
   .document('users/{userID}')
   .onUpdate(async (change, context) => {
-    const newUserData = change.after.data() as UserPublicationRef;
-    const oldUserData = change.before.data() as UserPublicationRef;
+    const newUserData = change.after.data() as User;
+    const oldUserData = change.before.data() as User;
     const userID = context.params.userID;
     // we don't want to update pubs when the user first gets the ms ID.
     // this is handled by addMSUserPubsToNewLinkedUser
@@ -782,16 +782,8 @@ export const updateUserRefOnPublications = functions.firestore
       !oldUserData.microsoftIDs
     )
       return;
-    const oldPublicationUser = toUserPublicationRef(
-      oldUserData.name,
-      oldUserData.microsoftIDs,
-      userID
-    );
-    const newPublicationUser = toUserPublicationRef(
-      newUserData.name,
-      newUserData.microsoftIDs,
-      userID
-    );
+    const oldPublicationUser = toUserPublicationRef(oldUserData.name, userID);
+    const newPublicationUser = toUserPublicationRef(newUserData.name, userID);
     const publicationsQS = await db
       .collection(`users/${userID}/publications`)
       .get()
@@ -1083,7 +1075,10 @@ export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall
             'not-found',
             `No user found with ID ${userID}`
           );
-        if (user.microsoftIDs && user.microsoftIDs.length >= 3)
+        if (
+          user.microsoftIDs &&
+          user.microsoftIDs.length + data.microsoftAcademicAuthorIDs.length >= 3
+        )
           throw new functions.https.HttpsError(
             'already-exists',
             `User with id ${userID} is already linked to at least 3 microsoft ids`
@@ -1331,11 +1326,7 @@ export const updateNewUserIDsArrayToPublications = functions.firestore
       microsoftID: oldUserData.microsoftID,
     };
 
-    const newPublicationUser = toUserPublicationRef(
-      newUserData.name,
-      newUserData.microsoftIDs,
-      userID
-    );
+    const newPublicationUser = toUserPublicationRef(newUserData.name, userID);
     const publicationsQS = await db
       .collection(`users/${userID}/publications`)
       .get()
@@ -1468,15 +1459,10 @@ export function toUserAlgoliaFilterRef(user: User, userID: string) {
   return userAlgoliaRef;
 }
 
-export function toUserPublicationRef(
-  userName: string,
-  microsoftIDs: string[],
-  userID: string
-) {
+export function toUserPublicationRef(userName: string, userID: string) {
   const publicationUserRef: UserPublicationRef = {
-    id: userID,
     name: userName,
-    microsoftIDs: microsoftIDs,
+    id: userID,
   };
   return publicationUserRef;
 }
@@ -1528,7 +1514,6 @@ export interface UserPublicationRef {
   name: string;
   microsoftID?: string;
   normalisedName?: string;
-  microsoftIDs: string[];
 }
 
 export interface UserCustomPublicationRef {

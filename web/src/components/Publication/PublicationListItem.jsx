@@ -216,9 +216,9 @@ function authorsToAuthorList(authors, backgroundShade) {
   return authors.map((author, idx) => (
     <PublicationListItemAuthor
       ID={author.id}
-      microsoftID={author.microsoftIDs[0]}
+      microsoftID={author.microsoftID}
       name={author.name}
-      key={author.microsoftIDs[0] + idx}
+      key={author.microsoftID + idx}
       first={idx === 0}
       last={idx === authors.length - 1}
       backgroundShade={backgroundShade}

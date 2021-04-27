@@ -115,11 +115,10 @@ export function userToUserRef(user, userID) {
   return userRef;
 }
 
-export function userToCustomPubUserRef(user, userID, microsoftIDs) {
+export function userToCustomPubUserRef(user, userID) {
   const customPubUserRef = {
     id: userID,
     name: user.name,
   };
-  if (microsoftIDs) customPubUserRef.microsoftIDs = microsoftIDs;
   return customPubUserRef;
 }

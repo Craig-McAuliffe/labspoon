@@ -190,9 +190,9 @@ export const msExecuteAuthorExpressions = (
           const matchingAuthor = authors.find(
             (author) => author.normalisedName === normalisedAuthorName
           )!;
-          if (!matchingAuthor || !matchingAuthor.microsoftIDs) return;
+          if (!matchingAuthor || !matchingAuthor.microsoftID) return;
           const publicationSuggestion: PublicationSuggestion = {
-            microsoftAcademicAuthorID: matchingAuthor.microsoftIDs[0],
+            microsoftAcademicAuthorID: matchingAuthor.microsoftID,
             publicationInfo: publication,
           };
           publicationsWithAuthor.push(publicationSuggestion);
@@ -365,7 +365,7 @@ export interface Source {
 
 export function makAuthorToAuthor(makAuthor: MAKAuthor): UserPublicationRef {
   const author: UserPublicationRef = {
-    microsoftIDs: [makAuthor.AuId.toString()],
+    microsoftID: makAuthor.AuId.toString(),
     name: makAuthor.DAuN,
   };
   if (makAuthor.DAuN) author.normalisedName = makAuthor.AuN;

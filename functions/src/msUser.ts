@@ -89,7 +89,7 @@ export const addMSUserPubsToNewLinkedUser = functions.firestore
         const correspondingPublication = correspondingPublicationDS.data()! as Publication;
         const batch = db.batch();
         const authorItem = correspondingPublication.authors!.filter(
-          (author: any) => author.microsoftIDs.includes(msUserID)
+          (author: any) => author.microsoftID === msUserID
         )[0];
         // updating the publication will automatically set it on the associated user
         if (correspondingPublication.filterAuthorIDs) {
@@ -109,11 +109,7 @@ export const addMSUserPubsToNewLinkedUser = functions.firestore
           });
           batch.update(correspondingPublicationRef, {
             authors: firestore.FieldValue.arrayUnion(
-              toUserPublicationRef(
-                correspondingUser.name,
-                correspondingUser.microsoftIDs!,
-                correspondingUserID
-              )
+              toUserPublicationRef(correspondingUser.name, correspondingUserID)
             ),
           });
         }
