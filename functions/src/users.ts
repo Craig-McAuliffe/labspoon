@@ -1289,9 +1289,9 @@ export const convertExistingUserMSIDsToArray = functions.https.onRequest(
     usersQS.forEach((userDS) => {
       const user = userDS.data() as User;
       if (!user.microsoftID) return;
-      const newUser = {...user} as User;
-      newUser.microsoftIDs = [user.microsoftID];
-      batch.set(db.doc(`users/${userDS.id}`), newUser);
+      batch.update(db.doc(`users/${userDS.id}`), {
+        microsoftIDs: [user.microsoftID],
+      });
     });
     await batch.commit().catch((err) => {
       console.error(err);
