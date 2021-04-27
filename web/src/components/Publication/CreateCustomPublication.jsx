@@ -231,7 +231,7 @@ export async function createCustomPublication(
   }
   if (setSubmitting) setSubmitting(true);
   const authorRefs = authors.map((author) =>
-    userToCustomPubUserRef(author, author.id, author.microsoftID)
+    userToCustomPubUserRef(author, author.id, author.microsoftIDs)
   );
   res.authors = authorRefs;
   res.isCustomPublication = true;
