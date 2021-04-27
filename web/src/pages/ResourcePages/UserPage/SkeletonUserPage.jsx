@@ -173,7 +173,7 @@ function FetchPublicationsForSkeletonProfile({authorID}) {
         </h4>
       )}
       <FetchMorePubsForAuthorButtonAndResults
-        authorID={authorID}
+        authorIDs={[authorID]}
         fetchedPubs={fetchedPubs}
         setFetchedPubs={setFetchedPubs}
         CustomSearchButton={SkeletonProfileFetchMorePubsCustomButton}
@@ -183,7 +183,7 @@ function FetchPublicationsForSkeletonProfile({authorID}) {
 }
 
 function SkeletonProfileFetchMorePubsCustomButton({
-  authorID,
+  authorIDs,
   setFetchingMorePubs,
   setError,
   error,
@@ -194,17 +194,20 @@ function SkeletonProfileFetchMorePubsCustomButton({
   return (
     <div className="skeleton-profile-missing-pubs-action">
       <TertiaryButton
-        onClick={() =>
-          fetchRecentPublications(
-            authorID,
-            setFetchingMorePubs,
-            setError,
-            error,
-            setFetchedPubs,
-            pubSearchOffset,
-            setPubSearchOffset
-          )
-        }
+        onClick={async () => {
+          const fetchingPromises = authorIDs.map((authorID) =>
+            fetchRecentPublications(
+              authorID,
+              setFetchingMorePubs,
+              setError,
+              error,
+              setFetchedPubs,
+              pubSearchOffset,
+              setPubSearchOffset
+            )
+          );
+          await Promise.all(fetchingPromises);
+        }}
       >
         Fetch more
       </TertiaryButton>

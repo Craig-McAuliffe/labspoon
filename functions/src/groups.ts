@@ -818,10 +818,9 @@ export function toGroupRef(groupID: string, group: any) {
 export const verifyGroup = functions.https.onRequest(async (req, res) => {
   const groupID = req.body.data.groupID;
   if (!groupID) {
-    throw new functions.https.HttpsError(
-      'invalid-argument',
-      `A group ID must be provided.`
-    );
+    res.status(400).send('Request should have groupID.');
+    res.end();
+    return;
   }
   const verification: VerifiedGroup = {
     timestamp: new Date(),
@@ -831,10 +830,9 @@ export const verifyGroup = functions.https.onRequest(async (req, res) => {
     .set(verification)
     .catch((err) => {
       console.error(`Unable to verify group ${groupID}:`, err);
-      throw new functions.https.HttpsError(
-        'internal',
-        `Unable to verify group with ID ${groupID}.`
-      );
+      res.status(500).send('Unable verify group.');
+      res.end();
+      return;
     });
   res.status(200).send();
   res.end();

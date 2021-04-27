@@ -1,15 +1,13 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import SecondaryButton from '../../../components/Buttons/SecondaryButton';
 import LinkAuthorIDForm from '../../../components/Publication/ConnectToPublications/ConnectToPublications';
 import {PaddedPageContainer} from '../../../components/Layout/Content';
 import {AuthContext} from '../../../App';
 import {LoadingSpinnerPage} from '../../../components/LoadingSpinner/LoadingSpinner';
-import {Link} from 'react-router-dom';
 import {SmallPublicationListItem} from '../../../components/Publication/PublicationListItem';
 import firebase from '../../../firebase';
 import ErrorMessage from '../../../components/Forms/ErrorMessage';
 import CreateCustomPublication from '../../../components/Publication/CreateCustomPublication';
-import {Alert} from 'react-bootstrap';
 
 import './UserPage.css';
 import './EditUserPage.css';
@@ -23,19 +21,12 @@ export default function EditUserPublications({children}) {
   const {userProfile, user, authLoaded} = useContext(AuthContext);
   if (!authLoaded) return <LoadingSpinnerPage />;
   if (user && !userProfile) return null;
-  if (userProfile.microsoftID)
+  if (userProfile.microsoftIDs && userProfile.microsoftIDs.length !== 0)
     return (
       <PaddedPageContainer>
         {children}
-
-        <FetchPublicationsForAuthor authorID={userProfile.microsoftID} />
+        <FetchPublicationsForAuthor authorIDs={userProfile.microsoftIDs} />
         <CreateCustomPublication />
-        <div className="link-to-pubs-already-linked-note">
-          <Alert variant="warning">
-            If you have incorrectly linked your account, please let us know
-            through the <Link to="/contact">contact page.</Link>
-          </Alert>
-        </div>
       </PaddedPageContainer>
     );
 
@@ -46,6 +37,10 @@ export default function EditUserPublications({children}) {
         <LinkUserToPublications setLinkingAuthor={setLinkingAuthor} />
       ) : (
         <>
+          <p>
+            We can automatically populate your profile with publications to save
+            you time.
+          </p>
           <div className="link-user-to-publications-button-container">
             <SecondaryButton onClick={() => setLinkingAuthor(true)}>
               Connect publications to profile
@@ -73,7 +68,7 @@ function LinkUserToPublications({setLinkingAuthor}) {
   );
 }
 
-function FetchPublicationsForAuthor({authorID}) {
+function FetchPublicationsForAuthor({authorIDs}) {
   const [fetchedPubs, setFetchedPubs] = useState([]);
 
   return (
@@ -85,15 +80,12 @@ function FetchPublicationsForAuthor({authorID}) {
           <h3 className="edit-user-pubs-already-linked-title">
             Your publications are linked.
           </h3>
-          <p>
-            Are we missing some publications on your profile? Try fetching them:
-          </p>
         </>
       )}
       <FetchMorePubsForAuthorButtonAndResults
         fetchedPubs={fetchedPubs}
         setFetchedPubs={setFetchedPubs}
-        authorID={authorID}
+        authorIDs={authorIDs}
       />
     </div>
   );
@@ -103,16 +95,27 @@ export function FetchMorePubsForAuthorButtonAndResults({
   fetchedPubs,
   setFetchedPubs,
   CustomSearchButton,
-  authorID,
+  authorIDs,
 }) {
   const [error, setError] = useState(false);
-  const [pubSearchOffset, setPubSearchOffset] = useState(0);
+  const [pubSearchOffset, setPubSearchOffset] = useState({});
   const [fetchingMorePubs, setFetchingMorePubs] = useState(false);
+  if (!authorIDs) return;
 
-  const pubResultsList = fetchedPubs.map((fetchedPub) => (
+  useEffect(() => {
+    const newOffset = {};
+    authorIDs.forEach((authorID) => {
+      newOffset[authorID] = 1;
+    });
+    setPubSearchOffset(() => newOffset);
+  }, []);
+
+  const pubResultsList = fetchedPubs.map((fetchedPub, i) => (
     <SmallPublicationListItem
       publication={fetchedPub}
-      key={fetchedPub.microsoftID}
+      key={
+        fetchedPub.microsoftID ? fetchedPub.microsoftID : fetchedPub.name + i
+      }
     />
   ));
 
@@ -130,7 +133,7 @@ export function FetchMorePubsForAuthorButtonAndResults({
     fetchingOrFetchButton =
       CustomSearchButton && fetchedPubs.length === 0 ? (
         <CustomSearchButton
-          authorID={authorID}
+          authorIDs={authorIDs}
           setFetchingMorePubs={setFetchingMorePubs}
           setError={setError}
           error={error}
@@ -141,17 +144,20 @@ export function FetchMorePubsForAuthorButtonAndResults({
       ) : (
         <div className="edit-user-pubs-fetch-more-button-container">
           <SecondaryButton
-            onClick={() =>
-              fetchRecentPublications(
-                authorID,
-                setFetchingMorePubs,
-                setError,
-                error,
-                setFetchedPubs,
-                pubSearchOffset,
-                setPubSearchOffset
-              )
-            }
+            onClick={async () => {
+              const fetchingPromises = authorIDs.map((authorID) =>
+                fetchRecentPublications(
+                  authorID,
+                  setFetchingMorePubs,
+                  setError,
+                  error,
+                  setFetchedPubs,
+                  pubSearchOffset,
+                  setPubSearchOffset
+                )
+              );
+              await Promise.all(fetchingPromises);
+            }}
           >
             Fetch {fetchedPubs.length > 0 ? 'More' : 'Recent'} Publications
           </SecondaryButton>
@@ -161,9 +167,7 @@ export function FetchMorePubsForAuthorButtonAndResults({
   return (
     <>
       {pubResultsList}
-
       {fetchingOrFetchButton}
-
       {error && (
         <ErrorMessage noBorder={true}>
           Something went wrong. Please try again.
@@ -185,9 +189,8 @@ export async function fetchRecentPublications(
   if (error) setError(false);
   const convertedAuthorID = Number(authorID);
   const expression = `Composite(AA.AuId=${convertedAuthorID})`;
-
   const count = 10;
-  const offset = pubSearchOffset;
+  const offset = pubSearchOffset[authorID];
   setFetchingMorePubs(true);
   await getPublicationsByAuthorIDExpression({
     expression: expression,
@@ -195,8 +198,21 @@ export async function fetchRecentPublications(
     offset: offset,
   })
     .then((resp) => {
-      setPubSearchOffset((currentOffset) => currentOffset + count);
-      setFetchedPubs((currentPubs) => [...currentPubs, ...resp.data]);
+      setPubSearchOffset((currentOffset) => {
+        const newOffset = {...currentOffset};
+        newOffset[authorID] = currentOffset[authorID] + count;
+        return newOffset;
+      });
+      setFetchedPubs((currentPubs) => {
+        // in case msAcademic has an author down twice for the same publication with different IDs
+        const uniqueNewPubs = resp.data.filter(
+          (publication) =>
+            !currentPubs.some(
+              (currentPub) => currentPub.microsoftID === publication.microsoftID
+            )
+        );
+        return [...currentPubs, ...uniqueNewPubs];
+      });
     })
     .catch((err) => {
       console.error(

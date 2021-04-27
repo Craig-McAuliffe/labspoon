@@ -72,9 +72,7 @@ export const recaptchaVerify = functions.https.onRequest(
       // Send the score back
       return res.status(200).send({score: data.score});
     }
-    throw new functions.https.HttpsError(
-      'permission-denied',
-      'Sign up attempt failed recaptcha.'
-    );
+    res.status(500).send('Sign up attempt failed recaptcha.');
+    res.end();
   }
 );

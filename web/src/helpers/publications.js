@@ -89,17 +89,17 @@ export function getUniqueAuthorsFromAuthors(authors) {
   const seenLabspoonUserIDs = new Set();
   const uniqueAuthors = [];
   authors.forEach((possiblyDuplicateAuthor) => {
-    if (!possiblyDuplicateAuthor.microsoftID && !possiblyDuplicateAuthor.id)
+    if (!possiblyDuplicateAuthor.microsoftIDs && !possiblyDuplicateAuthor.id)
       return;
-    if (!possiblyDuplicateAuthor.microsoftID) {
+    if (!possiblyDuplicateAuthor.microsoftIDs) {
       if (seenLabspoonUserIDs.has(possiblyDuplicateAuthor.id)) return;
       uniqueAuthors.push(possiblyDuplicateAuthor);
       seenLabspoonUserIDs.add(possiblyDuplicateAuthor.id);
       return;
     }
-    if (seenMicrosoftIDs.has(possiblyDuplicateAuthor.microsoftID)) return;
+    if (seenMicrosoftIDs.has(possiblyDuplicateAuthor.microsoftIDs[0])) return;
     uniqueAuthors.push(possiblyDuplicateAuthor);
-    seenMicrosoftIDs.add(possiblyDuplicateAuthor.microsoftID);
+    seenMicrosoftIDs.add(possiblyDuplicateAuthor.microsoftIDs[0]);
   });
   return uniqueAuthors;
 }

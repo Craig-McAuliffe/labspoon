@@ -183,9 +183,6 @@ export const msExecuteAuthorExpressions = (
       .then(async (resp) => {
         const makPublications: MAKPublication[] = resp.data.entities;
         await publishAddPublicationRequests(makPublications);
-        return makPublications;
-      })
-      .then((makPublications) => {
         const publicationsWithAuthor: PublicationSuggestion[] = [];
         makPublications.forEach((entity: MAKPublication) => {
           const publication = makPublicationToPublication(entity);
@@ -193,14 +190,15 @@ export const msExecuteAuthorExpressions = (
           const matchingAuthor = authors.find(
             (author) => author.normalisedName === normalisedAuthorName
           )!;
-          if (!matchingAuthor || !matchingAuthor.microsoftID) return;
+          if (!matchingAuthor || !matchingAuthor.microsoftIDs) return;
           const publicationSuggestion: PublicationSuggestion = {
-            microsoftAcademicAuthorID: matchingAuthor.microsoftID,
+            microsoftAcademicAuthorID: matchingAuthor.microsoftIDs[0],
             publicationInfo: publication,
           };
           publicationsWithAuthor.push(publicationSuggestion);
         });
         // want to return a maximum of two papers per author
+
         const seenAuthorIDs = new Map();
         return publicationsWithAuthor.filter((publicationSuggestion) => {
           const matchingAuthorID =
@@ -367,7 +365,7 @@ export interface Source {
 
 export function makAuthorToAuthor(makAuthor: MAKAuthor): UserPublicationRef {
   const author: UserPublicationRef = {
-    microsoftID: makAuthor.AuId.toString(),
+    microsoftIDs: [makAuthor.AuId.toString()],
     name: makAuthor.DAuN,
   };
   if (makAuthor.DAuN) author.normalisedName = makAuthor.AuN;

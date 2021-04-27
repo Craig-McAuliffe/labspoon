@@ -275,9 +275,9 @@ const PublicationDetails = ({publicationDetails}) => {
       <h2 className="publication-page-title">{publicationDetails.title}</h2>
       <PublicationSources sources={publicationDetails.sources} />
       <div>
-        {publicationDetails.authors ? (
+        {publicationDetails.authors && (
           <PublicationAuthors publicationAuthors={publicationDetails.authors} />
-        ) : null}
+        )}
       </div>
       <PublicationBodyAbstract abstract={publicationDetails.abstract} />
       <ListItemTopics dbTopics={publicationDetails.topics} />
@@ -361,14 +361,20 @@ function PublicationSources({sources}) {
 }
 
 function PublicationAuthors({publicationAuthors}) {
-  if (!publicationAuthors) return <></>;
+  if (!publicationAuthors) return null;
   const uniqueAuthors = getUniqueAuthorsFromAuthors(publicationAuthors);
-  return uniqueAuthors.map((author) => {
+  const orderedAuthors = uniqueAuthors.sort((first, second) => {
+    if (first.id) return -1;
+    if (second.id) return 1;
+    return -1;
+  });
+  return orderedAuthors.map((author) => {
     const authorLink = getLinkForAuthor(
       author.id,
-      author.microsoftID,
+      author.microsoftIDs[0],
       author.name
     );
+
     return (
       <h3 className="publication-body-authors" key={author.name}>
         {authorLink}

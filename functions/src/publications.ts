@@ -204,14 +204,14 @@ async function resolveUserIDs(
   users: UserPublicationRef[]
 ): Promise<UserPublicationRef[]> {
   const setUserPromises = users.map(async (user) => {
-    if (!user.microsoftID) {
+    if (!user.microsoftIDs) {
       console.error('Cannot resolve user without microsoft ID:', user);
       return user;
     }
     // check whether there is a labspoon user associated with the microsoft ID
     const userQS = await db
       .collection('users')
-      .where('microsoftID', '==', user.microsoftID)
+      .where('microsoftIDs', 'array-contains', user.microsoftIDs[0])
       .limit(1)
       .get();
     // if there is not a labspoon user, just return the unresolved user
@@ -227,7 +227,7 @@ async function resolveUserIDs(
     // if there is labspoon user, return the user pub ref
     return toUserPublicationRef(
       labspoonUser[0].name,
-      user.microsoftID,
+      user.microsoftIDs,
       userQS.docs[0].id
     );
   });
@@ -721,7 +721,8 @@ export const triggerFulfillReferencesOnLabspoon = functions.https.onRequest(
 
     const publicationsQS = await paginatedPublications.limit(limit).get();
     if (publicationsQS.empty) {
-      res.status(200).send();
+      res.status(200).send('No publications to be fetched');
+      res.end();
       return;
     }
     const promises: Promise<any>[] = [];
@@ -730,11 +731,12 @@ export const triggerFulfillReferencesOnLabspoon = functions.https.onRequest(
       lastDate = ds.data().date;
       promises.push(fulfillOutgoingReferencesOnLabspoon(ds.id, ds));
     });
-    await Promise.all(promises).catch((err) =>
+    await Promise.all(promises).catch((err) => {
       res
         .status(500)
-        .send('An error occurred whilst fulfilling references: ' + err)
-    );
+        .send('An error occurred whilst fulfilling references: ' + err);
+      res.end();
+    });
     res.status(200).send(lastDate);
     res.end();
   }
@@ -877,8 +879,13 @@ export const addMicrosoftPublicationByID = functions.https.onRequest(
     }).catch((err) => {
       // If the error is well defined re-throw it.
       if (err.code) throw err;
-      throw new functions.https.HttpsError('internal', 'An error occured.');
+      res
+        .status(500)
+        .send({message: 'add microsoft publication by id failed', error: err});
+      res.end();
+      return;
     });
+    if (!executeResponse) return;
     const publications = executeResponse.data.entities;
     await publishAddPublicationRequests(publications);
     res.status(200).send();

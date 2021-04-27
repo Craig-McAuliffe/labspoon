@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import firebase from '../../../firebase';
 import PrimaryButton from '../../../components/Buttons/PrimaryButton';
 import {SearchIconGrey} from '../../../assets/HeaderIcons';
@@ -8,6 +8,7 @@ import LoadingSpinner from '../../LoadingSpinner/LoadingSpinner';
 import GeneralError from '../../GeneralError';
 import {Alert} from 'react-bootstrap';
 import './ConnectToPublications.css';
+import {Link} from 'react-router-dom';
 
 const getSuggestedPublicationsForAuthorName = firebase
   .functions()
@@ -40,7 +41,7 @@ export default function LinkAuthorIDForm({submitBehaviour, cancel}) {
     ) => {
       getSuggestedPublicationsForAuthorName({
         expressionsAndNames: expressionsAndNamesToEvaluate,
-        offset: parentSearchOffset,
+        offset: firstTime ? 0 : parentSearchOffset,
       })
         .then((fetchedSuggestedPublications) => {
           setLoadingState(LOADED);
@@ -100,10 +101,12 @@ export default function LinkAuthorIDForm({submitBehaviour, cancel}) {
 
   return (
     <div>
-      <h3>Connect your Labspoon account to your publications</h3>
-      <Alert variant="warning">
-        Note: This will permanently link your profile to the author.
-      </Alert>
+      <h3>
+        Connect your Labspoon account to your publications on Microsoft Academic
+      </h3>
+      <p className="connect-publications-note">
+        Note: This will permanently link your profile.
+      </p>
       <form
         className="onboarding-author-link-form"
         onSubmit={(e) => {
@@ -159,7 +162,7 @@ export default function LinkAuthorIDForm({submitBehaviour, cancel}) {
     </div>
   );
 }
-
+const MAX_AUTHOR_IDS = 3;
 function SuggestedPublications({
   suggestedPublications,
   submitBehaviour,
@@ -170,13 +173,27 @@ function SuggestedPublications({
   loadingState,
 }) {
   const [
-    selectedPublicationsAuthorID,
-    setSelectedPublicationsAuthorID,
-  ] = useState();
+    selectedPublicationsAuthorIDs,
+    setSelectedPublicationsAuthorIDs,
+  ] = useState([]);
   const [submitting, setSubmitting] = useState(false);
-
+  const [maxIDsSelected, setMaxIDsSelected] = useState(false);
+  useEffect(() => {
+    if (selectedPublicationsAuthorIDs.length < MAX_AUTHOR_IDS) {
+      if (maxIDsSelected) setMaxIDsSelected(false);
+      return;
+    }
+    setMaxIDsSelected(true);
+  }, [selectedPublicationsAuthorIDs]);
   return (
     <>
+      {maxIDsSelected && (
+        <Alert variant="warning">
+          You can link to a maximum of {MAX_AUTHOR_IDS} author IDs. If any of
+          your publications remain unselected,{' '}
+          <Link to="/contact/help">please let us know.</Link>
+        </Alert>
+      )}
       {submitting ? (
         <>
           <LoadingSpinner />
@@ -187,8 +204,10 @@ function SuggestedPublications({
           <div className="onboarding-suggested-publications-container">
             <SuggestedPublicationItems
               suggestedPublications={suggestedPublications}
-              selectedPublicationsAuthorID={selectedPublicationsAuthorID}
-              setSelectedPublicationsAuthorID={setSelectedPublicationsAuthorID}
+              selectedPublicationsAuthorIDs={selectedPublicationsAuthorIDs}
+              setSelectedPublicationsAuthorIDs={
+                setSelectedPublicationsAuthorIDs
+              }
             />
           </div>
           <div className="link-pub-author-fetch-more-container">
@@ -209,9 +228,9 @@ function SuggestedPublications({
           type="button"
           onClick={() => {
             setSubmitting(true);
-            if (selectedPublicationsAuthorID === undefined) return;
+            if (selectedPublicationsAuthorIDs.length === 0) return;
             setMicrosoftAcademicIDByPublicationMatches({
-              microsoftAcademicAuthorID: selectedPublicationsAuthorID,
+              microsoftAcademicAuthorIDs: selectedPublicationsAuthorIDs,
             })
               .then(() => {
                 submitBehaviour();
@@ -261,7 +280,11 @@ function SuggestedPublications({
                 return;
               });
           }}
-          disabled={!selectedPublicationsAuthorID || submitting ? true : false}
+          disabled={
+            selectedPublicationsAuthorIDs.length === 0 || submitting
+              ? true
+              : false
+          }
         >
           Link Papers to Profile
         </PrimaryButton>
@@ -272,8 +295,8 @@ function SuggestedPublications({
 
 function SuggestedPublicationItems({
   suggestedPublications,
-  selectedPublicationsAuthorID,
-  setSelectedPublicationsAuthorID,
+  selectedPublicationsAuthorIDs,
+  setSelectedPublicationsAuthorIDs,
 }) {
   return suggestedPublications.map((suggestedPublication, i) => {
     if (!suggestedPublication) return null;
@@ -290,22 +313,41 @@ function SuggestedPublicationItems({
         <div className="post-selector-container">
           <button
             className={
-              selectedPublicationsAuthorID ===
-              suggestedPublication.microsoftAcademicAuthorID
+              selectedPublicationsAuthorIDs.includes(
+                suggestedPublication.microsoftAcademicAuthorID
+              )
                 ? 'onboarding-publication-selector-button-selected'
                 : 'onboarding-publication-selector-button'
             }
             type="button"
             onClick={() => {
               if (
-                suggestedPublication.microsoftAcademicAuthorID ===
-                selectedPublicationsAuthorID
-              )
-                setSelectedPublicationsAuthorID(undefined);
-              else
-                setSelectedPublicationsAuthorID(
+                selectedPublicationsAuthorIDs.includes(
                   suggestedPublication.microsoftAcademicAuthorID
+                )
+              )
+                setSelectedPublicationsAuthorIDs((selectedIDs) =>
+                  selectedIDs.filter(
+                    (selectedID) =>
+                      selectedID !==
+                      suggestedPublication.microsoftAcademicAuthorID
+                  )
                 );
+              else
+                setSelectedPublicationsAuthorIDs((selectedIDs) => {
+                  if (selectedPublicationsAuthorIDs.length >= MAX_AUTHOR_IDS)
+                    return selectedIDs;
+                  if (
+                    selectedPublicationsAuthorIDs.includes(
+                      suggestedPublication.microsoftAcademicAuthorID
+                    )
+                  )
+                    return selectedIDs;
+                  return [
+                    ...selectedIDs,
+                    suggestedPublication.microsoftAcademicAuthorID,
+                  ];
+                });
             }}
           />
         </div>

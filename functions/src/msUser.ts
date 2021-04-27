@@ -1,13 +1,9 @@
 import {firestore} from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import {admin, environment} from './config';
-import {
-  fetchAndHandlePublicationsForAuthor,
-  MAKAuthor,
-  User,
-} from './microsoft';
+import {fetchAndHandlePublicationsForAuthor, MAKAuthor} from './microsoft';
 import {Publication} from './publications';
-import {toUserPublicationRef} from './users';
+import {toUserPublicationRef, User} from './users';
 
 const db = admin.firestore();
 
@@ -42,9 +38,12 @@ export const addMSUserPubsToNewLinkedUser = functions.firestore
         );
       if (!correspondingUser) return;
       // this should never happen as it is batched with processed field
-      if (!correspondingUser.microsoftID) {
+      if (
+        !correspondingUser.microsoftIDs ||
+        !correspondingUser.microsoftIDs.includes(msUserID)
+      ) {
         console.error(
-          `MSUser with ID ${msUserID} is linked to user with id ${correspondingUserID} yet the user has no microsoftID`
+          `MSUser with ID ${msUserID} is linked to user with id ${correspondingUserID} yet the user has no corresponding microsoftID`
         );
         return;
       }
@@ -89,9 +88,8 @@ export const addMSUserPubsToNewLinkedUser = functions.firestore
         }
         const correspondingPublication = correspondingPublicationDS.data()! as Publication;
         const batch = db.batch();
-
         const authorItem = correspondingPublication.authors!.filter(
-          (author: any) => author.microsoftID === msUserID
+          (author: any) => author.microsoftIDs.includes(msUserID)
         )[0];
         // updating the publication will automatically set it on the associated user
         if (correspondingPublication.filterAuthorIDs) {
@@ -113,7 +111,7 @@ export const addMSUserPubsToNewLinkedUser = functions.firestore
             authors: firestore.FieldValue.arrayUnion(
               toUserPublicationRef(
                 correspondingUser.name,
-                correspondingUser.microsoftID!,
+                correspondingUser.microsoftIDs!,
                 correspondingUserID
               )
             ),

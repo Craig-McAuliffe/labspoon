@@ -774,20 +774,22 @@ export const updateUserRefOnPublications = functions.firestore
     const newUserData = change.after.data() as UserPublicationRef;
     const oldUserData = change.before.data() as UserPublicationRef;
     const userID = context.params.userID;
+    // we don't want to update pubs when the user first gets the ms ID.
+    // this is handled by addMSUserPubsToNewLinkedUser
     if (
       newUserData.name === oldUserData.name ||
-      !newUserData.microsoftID ||
-      !oldUserData.microsoftID
+      !newUserData.microsoftIDs ||
+      !oldUserData.microsoftIDs
     )
       return;
     const oldPublicationUser = toUserPublicationRef(
       oldUserData.name,
-      oldUserData.microsoftID,
+      oldUserData.microsoftIDs,
       userID
     );
     const newPublicationUser = toUserPublicationRef(
       newUserData.name,
-      newUserData.microsoftID,
+      newUserData.microsoftIDs,
       userID
     );
     const publicationsQS = await db
@@ -828,7 +830,7 @@ export const updateUserRefOnPublications = functions.firestore
           );
       }
     );
-    return await Promise.all(publicationsUpdatePromise);
+    await Promise.all(publicationsUpdatePromise);
   });
 
 export const updateUserRefForRecommendations = functions.firestore
@@ -1052,75 +1054,87 @@ export const setMicrosoftAcademicIDByPublicationMatches = functions.https.onCall
     }
     const userID = context.auth.uid;
 
-    const microsoftAcademicAuthorID = data.microsoftAcademicAuthorID.toString();
-    if (microsoftAcademicAuthorID === undefined)
+    if (
+      !data.microsoftAcademicAuthorIDs ||
+      data.microsoftAcademicAuthorIDs.length === 0
+    )
       throw new functions.https.HttpsError(
         'invalid-argument',
-        'Must provide selected publication suggestions'
-      );
-
-    const userToBeLinkedDBRef = db.doc(`users/${userID}`);
-    const user = await userToBeLinkedDBRef
-      .get()
-      .then((ds) => {
-        if (!ds.exists) return;
-        return ds.data() as User;
-      })
-      .catch((err) => console.log(err, 'could not fetch user to be linked'));
-    if (!user)
-      throw new functions.https.HttpsError(
-        'not-found',
-        `No user found with ID ${userID}`
-      );
-    if (user.microsoftID !== undefined)
-      throw new functions.https.HttpsError(
-        'already-exists',
-        `User with id ${userID} is already linked to a microsoft id`
-      );
-    const fetchMSUser = () =>
-      db
-        .doc(`MSUsers/${microsoftAcademicAuthorID}`)
-        .get()
-        .then((ds) => {
-          if (!ds.exists) return;
-          return ds.data() as MAKAuthor;
-        })
-        .catch((err) =>
-          console.log(
-            err,
-            'unable to verify if MSUser with id ' +
-              microsoftAcademicAuthorID +
-              'is already linked',
-            err
-          )
-        );
-    let MSUser = await fetchMSUser();
-    if (!MSUser) {
-      await new Promise((resolve) => {
-        setTimeout(() => resolve(true), 3000);
-      });
-      MSUser = await fetchMSUser();
-      if (!MSUser) {
-        throw new functions.https.HttpsError(
-          'not-found',
-          `No MSUser found with ID ${microsoftAcademicAuthorID}`
-        );
-      }
-    }
-    if (MSUser.processed)
-      throw new functions.https.HttpsError(
-        'already-exists',
-        `MSUser with id ${microsoftAcademicAuthorID} is already linked to a labspoon user`
+        'Must provide microsoft author IDs'
       );
 
     const batch = db.batch();
-    batch.update(userToBeLinkedDBRef, {
-      microsoftID: microsoftAcademicAuthorID,
-    });
-    batch.update(db.doc(`MSUsers/${microsoftAcademicAuthorID}`), {
-      processed: userID,
-    });
+    const userToBeLinkedDBRef = db.doc(`users/${userID}`);
+    const microsoftIDsToBeLinked: string[] = [];
+    const handleAuthorIDsPromises = data.microsoftAcademicAuthorIDs.map(
+      async (microsoftAcademicAuthorIDUnformatted: number) => {
+        const microsoftAcademicAuthorID = microsoftAcademicAuthorIDUnformatted.toString();
+        const user = await userToBeLinkedDBRef
+          .get()
+          .then((ds) => {
+            if (!ds.exists) return;
+            return ds.data() as User;
+          })
+          .catch((err) =>
+            console.log(err, 'could not fetch user to be linked')
+          );
+        if (!user)
+          throw new functions.https.HttpsError(
+            'not-found',
+            `No user found with ID ${userID}`
+          );
+        if (user.microsoftIDs && user.microsoftIDs.length >= 3)
+          throw new functions.https.HttpsError(
+            'already-exists',
+            `User with id ${userID} is already linked to at least 3 microsoft ids`
+          );
+        const fetchMSUser = () =>
+          db
+            .doc(`MSUsers/${microsoftAcademicAuthorID}`)
+            .get()
+            .then((ds) => {
+              if (!ds.exists) return;
+              return ds.data() as MAKAuthor;
+            })
+            .catch((err) =>
+              console.log(
+                err,
+                'unable to verify if MSUser with id ' +
+                  microsoftAcademicAuthorID +
+                  'is already linked',
+                err
+              )
+            );
+        let MSUser = await fetchMSUser();
+        if (!MSUser) {
+          await new Promise((resolve) => {
+            setTimeout(() => resolve(true), 3000);
+          });
+          MSUser = await fetchMSUser();
+          if (!MSUser) {
+            throw new functions.https.HttpsError(
+              'not-found',
+              `No MSUser found with ID ${microsoftAcademicAuthorID}`
+            );
+          }
+        }
+        if (MSUser.processed)
+          throw new functions.https.HttpsError(
+            'already-exists',
+            `MSUser with id ${microsoftAcademicAuthorID} is already linked to a labspoon user`
+          );
 
+        microsoftIDsToBeLinked.push(microsoftAcademicAuthorID);
+        batch.update(db.doc(`MSUsers/${microsoftAcademicAuthorID}`), {
+          processed: userID,
+        });
+      }
+    );
+    await Promise.all(handleAuthorIDsPromises);
+    if (microsoftIDsToBeLinked.length === 0) return;
+    batch.update(userToBeLinkedDBRef, {
+      microsoftIDs: microsoftIDsToBeLinked,
+    });
     return batch.commit().catch((err) => {
       console.error(err);
       throw new functions.https.HttpsError(
@@ -1256,6 +1270,140 @@ export const updateUserRefOnFollowFeedFilters = functions.firestore
     return Promise.all(followersUpdatePromise);
   });
 
+export const convertExistingUserMSIDsToArray = functions.https.onRequest(
+  async (req, resp) => {
+    const usersQS = await db
+      .collection('users')
+      .get()
+      .catch((err) => {
+        console.error(err);
+        resp.status(500).send('Unable to fetch users.');
+        resp.end();
+        return;
+      });
+    if (!usersQS || usersQS.empty) {
+      resp.end();
+      return;
+    }
+    const batch = db.batch();
+    usersQS.forEach((userDS) => {
+      const user = userDS.data() as User;
+      if (!user.microsoftID) return;
+      const newUser = {...user} as User;
+      newUser.microsoftIDs = [user.microsoftID];
+      batch.set(db.doc(`users/${userDS.id}`), newUser);
+    });
+    await batch.commit().catch((err) => {
+      console.error(err);
+      resp.end();
+      throw new functions.https.HttpsError(
+        'internal',
+        'Unable to commit changes'
+      );
+    });
+    resp.json({result: `changed microsoftID to array of ids`});
+    resp.end();
+  }
+);
+
+export const updateNewUserIDsArrayToPublications = functions.firestore
+  .document('users/{userID}')
+  .onUpdate(async (change, context) => {
+    const userID = context.params.userID;
+    const newUserData = change.after.data() as User;
+    const oldUserData = change.before.data() as User;
+    if (
+      !(
+        newUserData.microsoftIDs &&
+        !oldUserData.microsoftIDs &&
+        oldUserData.microsoftID
+      )
+    ) {
+      console.log(
+        'early exit as previous old user data had no microsoft id, new data has no microsoftIDs, or old data had microsoftIDs'
+      );
+      return;
+    }
+
+    const oldPublicationUser = {
+      id: userID,
+      name: oldUserData.name,
+      microsoftID: oldUserData.microsoftID,
+    };
+
+    const newPublicationUser = toUserPublicationRef(
+      newUserData.name,
+      newUserData.microsoftIDs,
+      userID
+    );
+    const publicationsQS = await db
+      .collection(`users/${userID}/publications`)
+      .get()
+      .catch((err) =>
+        console.error(
+          'unable to fetch publications for user with id ' + userID,
+          err
+        )
+      );
+    if (!publicationsQS || publicationsQS.empty) return;
+    const publicationsIDs: string[] = [];
+    publicationsQS.forEach((ds) => {
+      const publicationID = ds.id;
+      publicationsIDs.push(publicationID);
+    });
+    const publicationsUpdatePromise = publicationsIDs.map(
+      async (publicationID) => {
+        const publicationRef = db.doc(`publications/${publicationID}`);
+        const batch = db.batch();
+        batch.update(publicationRef, {
+          authors: firestore.FieldValue.arrayRemove(oldPublicationUser),
+        });
+        batch.update(publicationRef, {
+          authors: firestore.FieldValue.arrayUnion(newPublicationUser),
+        });
+        return batch
+          .commit()
+          .catch((err) =>
+            console.error(
+              'unable to update user ref on publication with id ' +
+                publicationID +
+                ' for user with id ' +
+                userID,
+              err
+            )
+          );
+      }
+    );
+    await Promise.all(publicationsUpdatePromise);
+  });
+
+export const addExtraMSIDToUser = functions.https.onRequest(
+  async (req, resp) => {
+    const userID = req.body.userID;
+    const microsoftID = req.body.microsoftID;
+    if (!userID || !microsoftID)
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        'Must provide microsoft ID and userID'
+      );
+    const batch = db.batch();
+    batch.update(db.doc(`users/${userID}`), {
+      microsoftIDs: firestore.FieldValue.arrayUnion(microsoftID),
+    });
+    batch.update(db.doc(`MSUsers/${microsoftID}`), {
+      processed: userID,
+    });
+    await batch.commit().catch((err) => {
+      console.error(err);
+      resp.status(500).send('Unable to commit changes.');
+      resp.end();
+      return;
+    });
+    resp.json({result: `added microsoft ID to user and userID to MAKAuthor`});
+    resp.end();
+  }
+);
+
 // Rank relates to how often the user posts in this topic
 export interface UserRef {
   id: string;
@@ -1273,6 +1421,7 @@ export interface UserAlgoliaRef {
   name: string;
   avatar?: string;
   microsoftID?: string;
+  microsoftIDs?: string[];
   reputation?: number;
   position?: string;
   institution?: string;
@@ -1307,7 +1456,7 @@ export function toUserAlgoliaFilterRef(user: User, userID: string) {
     id: userID,
     name: user.name,
   };
-  if (user.microsoftID) userAlgoliaRef.microsoftID = user.microsoftID;
+  if (user.microsoftIDs) userAlgoliaRef.microsoftIDs = user.microsoftIDs;
   if (user.position) userAlgoliaRef.position = user.position;
   if (user.institution) userAlgoliaRef.institution = user.institution;
   if (user.reputation) userAlgoliaRef.reputation = user.reputation;
@@ -1321,13 +1470,13 @@ export function toUserAlgoliaFilterRef(user: User, userID: string) {
 
 export function toUserPublicationRef(
   userName: string,
-  microsoftID: string,
+  microsoftIDs: string[],
   userID: string
 ) {
   const publicationUserRef: UserPublicationRef = {
     id: userID,
     name: userName,
-    microsoftID: microsoftID,
+    microsoftIDs: microsoftIDs,
   };
   return publicationUserRef;
 }
@@ -1354,6 +1503,7 @@ export interface User {
   coverPhotoCloudID?: string;
   checkedCreateOnboardingTip?: boolean;
   microsoftID?: string;
+  microsoftIDs?: string[];
   rank?: number;
   reputation?: number;
   position?: string;
@@ -1376,14 +1526,16 @@ export interface UserStatsRef {
 export interface UserPublicationRef {
   id?: string;
   name: string;
-  microsoftID: string;
+  microsoftID?: string;
   normalisedName?: string;
+  microsoftIDs: string[];
 }
 
 export interface UserCustomPublicationRef {
   id: string;
   name: string;
   microsoftID?: string;
+  microsoftIDs?: string[];
 }
 
 export interface ExpressionAndName {

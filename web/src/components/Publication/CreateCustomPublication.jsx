@@ -29,7 +29,7 @@ export default function CreateCustomPublication() {
     return (
       <div className="create-custom-publication-container">
         <p className="create-custom-publication-text">
-          Can&#39;t find what you are looking?
+          Are we missing a publication?
         </p>
         <div className="create-custom-publication-button-container">
           <TertiaryButton onClick={() => setIsAdding(true)}>

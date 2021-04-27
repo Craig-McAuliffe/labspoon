@@ -22,8 +22,8 @@ import LoadingSpinner from '../../../components/LoadingSpinner/LoadingSpinner';
 
 export default function UserPage() {
   const featureFlags = useContext(FeatureFlags);
-  const [userID, setUserID] = useState(undefined);
-  const [userDetails, setUserDetails] = useState(undefined);
+  const [userID, setUserID] = useState(false);
+  const [userDetails, setUserDetails] = useState(false);
   const [usedTabs, setUsedTabs] = useState({checked: false, tabs: []});
   const [tabsLoading, setTabsLoading] = useState(true);
   const history = useHistory();
