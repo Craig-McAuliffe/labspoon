@@ -718,7 +718,6 @@ export const triggerFulfillReferencesOnLabspoon = functions.https.onRequest(
     const publicationsQS = await paginatedPublications.limit(limit).get();
     if (publicationsQS.empty) {
       res.status(200).send('No publications to be fetched');
-      res.end();
       return;
     }
     const promises: Promise<any>[] = [];
@@ -731,10 +730,8 @@ export const triggerFulfillReferencesOnLabspoon = functions.https.onRequest(
       res
         .status(500)
         .send('An error occurred whilst fulfilling references: ' + err);
-      res.end();
     });
     res.status(200).send(lastDate);
-    res.end();
   }
 );
 
@@ -878,14 +875,12 @@ export const addMicrosoftPublicationByID = functions.https.onRequest(
       res
         .status(500)
         .send({message: 'add microsoft publication by id failed', error: err});
-      res.end();
       return;
     });
     if (!executeResponse) return;
     const publications = executeResponse.data.entities;
     await publishAddPublicationRequests(publications);
     res.status(200).send();
-    res.end();
   }
 );
 

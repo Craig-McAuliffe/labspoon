@@ -73,6 +73,5 @@ export const recaptchaVerify = functions.https.onRequest(
       return res.status(200).send({score: data.score});
     }
     res.status(500).send('Sign up attempt failed recaptcha.');
-    res.end();
   }
 );

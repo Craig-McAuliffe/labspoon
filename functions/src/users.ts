@@ -1273,7 +1273,6 @@ export const convertExistingUserMSIDsToArray = functions.https.onRequest(
       .catch((err) => {
         console.error(err);
         resp.status(500).send('Unable to fetch users.');
-        resp.end();
         return;
       });
     if (!usersQS || usersQS.empty) {
@@ -1387,7 +1386,6 @@ export const addExtraMSIDToUser = functions.https.onRequest(
     await batch.commit().catch((err) => {
       console.error(err);
       resp.status(500).send('Unable to commit changes.');
-      resp.end();
       return;
     });
     resp.json({result: `added microsoft ID to user and userID to MAKAuthor`});

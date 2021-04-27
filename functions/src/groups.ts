@@ -819,7 +819,6 @@ export const verifyGroup = functions.https.onRequest(async (req, res) => {
   const groupID = req.body.data.groupID;
   if (!groupID) {
     res.status(400).send('Request should have groupID.');
-    res.end();
     return;
   }
   const verification: VerifiedGroup = {
@@ -831,11 +830,9 @@ export const verifyGroup = functions.https.onRequest(async (req, res) => {
     .catch((err) => {
       console.error(`Unable to verify group ${groupID}:`, err);
       res.status(500).send('Unable verify group.');
-      res.end();
       return;
     });
   res.status(200).send();
-  res.end();
 });
 
 export const addOpenPositionTopicsToGroup = functions.firestore
