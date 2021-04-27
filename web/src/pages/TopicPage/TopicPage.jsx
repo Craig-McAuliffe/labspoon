@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {useParams, useHistory} from 'react-router-dom';
+import {useParams} from 'react-router-dom';
 import {FeatureFlags} from '../../App';
 import {db} from '../../firebase';
 
@@ -26,6 +26,8 @@ import ResourcesFeed from '../ResourcePages/ResourcesFeeds';
 import {PaddedContent} from '../../components/Layout/Content';
 
 import './TopicPage.css';
+import {LoadingSpinnerPage} from '../../components/LoadingSpinner/LoadingSpinner';
+import NotFoundPage from '../NotFoundPage/NotFoundPage';
 
 async function fetchTopicDetailsFromDB(topicID) {
   return db
@@ -170,7 +172,7 @@ export default function TopicPage() {
   const [topicDetails, setTopicDetails] = useState(undefined);
   const [usedTabs, setUsedTabs] = useState({checked: false, tabs: []});
   const [tabsLoading, setTabsLoading] = useState(true);
-  const history = useHistory();
+  const [pageLoading, setPageLoading] = useState(true);
 
   const topicIDParam = useParams().topicID;
   if (topicID !== topicIDParam) {
@@ -182,12 +184,13 @@ export default function TopicPage() {
   useEffect(() => {
     Promise.resolve(fetchTopicDetails())
       .then((topicDetails) => {
-        if (!topicDetails) {
-          history.push('/notfound');
-        }
-        setTopicDetails(topicDetails);
+        if (topicDetails) setTopicDetails(topicDetails);
+        setPageLoading(false);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        setPageLoading(false);
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [topicID]);
 
@@ -268,6 +271,8 @@ export default function TopicPage() {
     return tabOptions;
   };
 
+  if (pageLoading) return <LoadingSpinnerPage />;
+  if (!topicDetails) return <NotFoundPage />;
   return (
     <>
       {featureFlags.has('related-resources') ? (
