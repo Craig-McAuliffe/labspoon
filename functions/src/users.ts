@@ -1265,41 +1265,6 @@ export const updateUserRefOnFollowFeedFilters = functions.firestore
     return Promise.all(followersUpdatePromise);
   });
 
-export const convertExistingUserMSIDsToArray = functions.https.onRequest(
-  async (req, resp) => {
-    const usersQS = await db
-      .collection('users')
-      .get()
-      .catch((err) => {
-        console.error(err);
-        resp.status(500).send('Unable to fetch users.');
-        return;
-      });
-    if (!usersQS || usersQS.empty) {
-      resp.end();
-      return;
-    }
-    const batch = db.batch();
-    usersQS.forEach((userDS) => {
-      const user = userDS.data() as User;
-      if (!user.microsoftID) return;
-      batch.update(db.doc(`users/${userDS.id}`), {
-        microsoftIDs: [user.microsoftID],
-      });
-    });
-    await batch.commit().catch((err) => {
-      console.error(err);
-      resp.end();
-      throw new functions.https.HttpsError(
-        'internal',
-        'Unable to commit changes'
-      );
-    });
-    resp.json({result: `changed microsoftID to array of ids`});
-    resp.end();
-  }
-);
-
 export const updateNewUserIDsArrayToPublications = functions.firestore
   .document('users/{userID}')
   .onUpdate(async (change, context) => {
