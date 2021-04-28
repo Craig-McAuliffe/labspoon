@@ -185,16 +185,19 @@ export function SuggestedPublicationListItem({publication}) {
         <p className="suggested-publication-title">{publication.title}</p>
         {publication.authors ? (
           <div className="suggested-publication-authors-container">
-            {publication.authors.slice(0, 4).map((author) => (
-              <>
-                <p
-                  key={author.id}
-                  className="suggested-publications-author-name"
-                >
-                  {author.name},
-                </p>
-              </>
-            ))}
+            {publication.authors.slice(0, 4).map((author) => {
+              const authorID = author.id ? author.id : author.microsoftID;
+              return (
+                <>
+                  <p
+                    key={authorID}
+                    className="suggested-publications-author-name"
+                  >
+                    {author.name},
+                  </p>
+                </>
+              );
+            })}
           </div>
         ) : (
           <></>

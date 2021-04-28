@@ -255,6 +255,7 @@ function OnboardingGroup({
         onboardingStage={onboardingStage}
         previousOnboardingStage={previousOnboardingStage}
         nextOnboardingStage={nextOnboardingStage}
+        creatingGroup={creatingGroup}
       />
     </div>
   );
