@@ -1383,13 +1383,19 @@ export const addExtraMSIDToUser = functions.https.onRequest(
     batch.update(db.doc(`MSUsers/${microsoftID}`), {
       processed: userID,
     });
-    await batch.commit().catch((err) => {
-      console.error(err);
-      resp.status(500).send('Unable to commit changes.');
-      return;
-    });
-    resp.json({result: `added microsoft ID to user and userID to MAKAuthor`});
-    resp.end();
+    return batch
+      .commit()
+      .then(() => {
+        resp.json({
+          result: `added microsoft ID to user and userID to MAKAuthor`,
+        });
+        resp.end();
+      })
+      .catch((err) => {
+        console.error(err);
+        resp.status(500).send('Unable to commit changes.');
+        return;
+      });
   }
 );
 
