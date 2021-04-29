@@ -16,8 +16,6 @@ import {
   PostRef,
 } from './posts';
 import {PublicationRef} from './publications';
-import {ResearchFocus} from './researchFocuses';
-import {Technique} from './techniques';
 import {
   addTopicsToResource,
   removeTopicsFromResource,
@@ -231,30 +229,6 @@ export const addOpenPositionTopicsToUser = functions.firestore
     return null;
   });
 
-export const addResearchFocusTopicsToUser = functions.firestore
-  .document(`users/{userID}/researchFocuses/{researchFocusID}`)
-  .onCreate(async (change, context) => {
-    const researchFocus = change.data() as ResearchFocus;
-    const researchFocusTopics = researchFocus.topics;
-    const userID = context.params.userID;
-    if (researchFocusTopics && researchFocusTopics.length > 0) {
-      return await addTopicsToResource(researchFocusTopics, userID, 'user');
-    }
-    return null;
-  });
-
-export const addTechniqueTopicsToUser = functions.firestore
-  .document(`users/{userID}/techniques/{techniqueID}`)
-  .onCreate(async (change, context) => {
-    const technique = change.data() as Technique;
-    const techniqueTopics = technique.topics;
-    const userID = context.params.userID;
-    if (techniqueTopics && techniqueTopics.length > 0) {
-      return await addTopicsToResource(techniqueTopics, userID, 'user');
-    }
-    return null;
-  });
-
 export const updateUserRankOnTopic = functions.firestore
   .document('users/{userID}/topics/{topicID}')
   .onUpdate(async (change, context) => {
@@ -373,51 +347,6 @@ export const updateUserRefOnTopics = functions.firestore
     return Promise.all(topicsUpdatePromise);
   });
 
-export const updateUserRefOnResearchFocuses = functions.firestore
-  .document('users/{userID}')
-  .onUpdate(async (change, context) => {
-    const newUserData = change.after.data() as User;
-    const oldUserData = change.before.data() as User;
-    const userID = context.params.userID;
-    if (
-      JSON.stringify(toUserSignature(userID, newUserData)) ===
-      JSON.stringify(toUserSignature(userID, oldUserData))
-    )
-      return;
-    const researchFocusesQS = await db
-      .collection(`users/${userID}/researchFocuses`)
-      .get()
-      .catch((err) =>
-        console.error(
-          'unable to fetch research focuses of user with id ' + userID,
-          err
-        )
-      );
-    if (!researchFocusesQS || researchFocusesQS.empty) return;
-    const researchFocusesIDs: string[] = [];
-    researchFocusesQS.forEach((ds) => {
-      const researchFocusID = ds.id;
-      researchFocusesIDs.push(researchFocusID);
-    });
-    const researchFocusesUpdatePromise = researchFocusesIDs.map(
-      async (researchFocusID) => {
-        return db
-          .doc(`researchFocuses/${researchFocusID}`)
-          .update({author: toUserSignature(userID, newUserData)})
-          .catch((err) =>
-            console.error(
-              'unable to update user ref on research focus with id ' +
-                researchFocusID +
-                ' for user with id ' +
-                userID,
-              err
-            )
-          );
-      }
-    );
-    return Promise.all(researchFocusesUpdatePromise);
-  });
-
 export const updateUserRefOnOpenPositions = functions.firestore
   .document('users/{userID}')
   .onUpdate(async (change, context) => {
@@ -460,49 +389,6 @@ export const updateUserRefOnOpenPositions = functions.firestore
           )
     );
     return Promise.all(openPositionsUpdatePromise);
-  });
-
-export const updateUserRefOnTechniques = functions.firestore
-  .document('users/{userID}')
-  .onUpdate(async (change, context) => {
-    const newUserData = change.after.data() as User;
-    const oldUserData = change.before.data() as User;
-    const userID = context.params.userID;
-    if (
-      JSON.stringify(toUserSignature(userID, newUserData)) ===
-      JSON.stringify(toUserSignature(userID, oldUserData))
-    )
-      return;
-    const techniquesQS = await db
-      .collection(`users/${userID}/techniques`)
-      .get()
-      .catch((err) =>
-        console.error(
-          'unable to fetch techniques of user with id ' + userID,
-          err
-        )
-      );
-    if (!techniquesQS || techniquesQS.empty) return;
-    const techniquesIDs: string[] = [];
-    techniquesQS.forEach((ds) => {
-      const techniqueID = ds.id;
-      techniquesIDs.push(techniqueID);
-    });
-    const techniquesUpdatePromise = techniquesIDs.map(async (techniqueID) => {
-      return db
-        .doc(`techniques/${techniqueID}`)
-        .update({author: toUserSignature(userID, newUserData)})
-        .catch((err) =>
-          console.error(
-            'unable to update user ref on technique with id ' +
-              techniqueID +
-              ' for user with id ' +
-              userID,
-            err
-          )
-        );
-    });
-    return Promise.all(techniquesUpdatePromise);
   });
 
 export const updateUserRefOnMemberGroups = functions.firestore

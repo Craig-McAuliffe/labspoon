@@ -6,7 +6,6 @@ import {LoadingSpinnerPage} from '../../../components/LoadingSpinner/LoadingSpin
 import {PaddedPageContainer} from '../../../components/Layout/Content';
 import ListItemTopics from '../../../components/ListItem/ListItemTopics';
 import {
-  Author,
   RichTextBody,
   ArticleHeaderAndType,
   ArticlePageGroupSection,
@@ -75,10 +74,6 @@ export default function ResearchFocusPage() {
         customMargin="30px"
       />
       <RichTextBody body={researchFocus.body} />
-      <Author
-        authorID={researchFocus.author.id}
-        name={researchFocus.author.name}
-      />
     </PaddedPageContainer>
   );
 }

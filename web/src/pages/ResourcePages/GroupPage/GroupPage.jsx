@@ -175,6 +175,7 @@ function fetchGroupPageFeedFromDB(
     resultParameters.pinProfileID = groupID;
     resultParameters.showNews = true;
     resultParameters.newsCollection = `groups/${groupID}/news`;
+    resultParameters.userCanEdit = true;
   }
 
   return [results, null, resultParameters];

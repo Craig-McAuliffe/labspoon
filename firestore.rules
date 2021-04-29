@@ -44,7 +44,6 @@ service cloud.firestore {
         allow write: if (
           request.auth != null
         && exists(/databases/$(database)/documents/groups/$(request.resource.data.group.id)/members/$(request.auth.uid))
-        && request.auth.uid == request.resource.data.author.id
         );
       }
 
@@ -53,7 +52,6 @@ service cloud.firestore {
       allow write: if (
         request.auth != null
         && exists(/databases/$(database)/documents/groups/$(request.resource.data.group.id)/members/$(request.auth.uid))
-        && request.auth.uid == request.resource.data.author.id
       );
     }
 

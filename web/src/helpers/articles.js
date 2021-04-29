@@ -17,10 +17,10 @@ export default async function addArticleToDB(
   articleDBRef,
   articleOnGroupRef,
   setSubmitting,
-  history,
   resourceTypePlural,
   countFieldName,
-  failFunction
+  failFunction,
+  successFunction
 ) {
   const fullGroupDoc = await db
     .doc(`groupsStats/${selectedGroup.id}`)
@@ -59,13 +59,11 @@ export default async function addArticleToDB(
   article.unixTimeStamp = Math.floor(new Date().getTime() / 1000);
   const articleListItem = {...article};
   article.group = convertGroupToGroupRef(selectedGroup);
-  article.author = userToUserRef(userProfile, userProfile.id);
+  if (userProfile) article.author = userToUserRef(userProfile, userProfile.id);
   articleListItem.group = convertGroupToGroupSignatureRef(selectedGroup);
-  articleListItem.author = {id: userProfile.id, name: userProfile.name};
   const batch = db.batch();
   batch.set(articleDBRef, article);
   batch.set(articleOnGroupRef, articleListItem);
-
   return batch
     .commit()
     .then(async () => {
@@ -82,7 +80,8 @@ export default async function addArticleToDB(
             `unable to add article count to group with id ${selectedGroup.id} ${err}`
           )
         );
-      history.push(`/group/${selectedGroup.id}/${resourceTypePlural}`);
+      if (successFunction) successFunction(article);
+      setSubmitting(false);
     })
     .catch((err) => {
       console.error(err);

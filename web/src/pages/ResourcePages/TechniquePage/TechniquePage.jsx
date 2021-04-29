@@ -6,7 +6,6 @@ import {LoadingSpinnerPage} from '../../../components/LoadingSpinner/LoadingSpin
 import {PaddedPageContainer} from '../../../components/Layout/Content';
 import ListItemTopics from '../../../components/ListItem/ListItemTopics';
 import {
-  Author,
   RichTextBody,
   ArticleHeaderAndType,
   ArticlePageGroupSection,
@@ -74,7 +73,6 @@ export default function TechniquePage() {
         customMargin="30px"
       />
       <RichTextBody body={technique.body} />
-      <Author authorID={technique.author.id} name={technique.author.name} />
     </PaddedPageContainer>
   );
 }

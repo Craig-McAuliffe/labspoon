@@ -23,9 +23,14 @@ export default function ResourcesFeed({
   displayOverviewPage,
   resourceID,
   resourceData,
+  refreshFeed,
 }) {
   return (
-    <FilterableResults fetchResults={fetchResults} limit={limit}>
+    <FilterableResults
+      fetchResults={fetchResults}
+      limit={limit}
+      refreshFeed={refreshFeed}
+    >
       <FilterManager>
         <NewFilterMenuWrapper />
         <UnpaddedPageContainer backgroundShade={backgroundShade}>

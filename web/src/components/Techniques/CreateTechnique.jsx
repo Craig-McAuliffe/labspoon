@@ -1,18 +1,10 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {useHistory, useParams} from 'react-router-dom';
 import {Form, Formik} from 'formik';
 import * as Yup from 'yup';
 import {AuthContext} from '../../App';
-import SelectGroup from '../Group/SelectGroup';
-import {
-  MustSelectGroup,
-  SelectedGroup,
-  SelectGroupLabel,
-} from '../Forms/Groups/SelectGroup';
 import LoadingSpinner, {
   LoadingSpinnerPage,
 } from '../LoadingSpinner/LoadingSpinner';
-import {getUserGroups} from '../../helpers/users';
 import HeaderAndBodyArticleInput, {
   CreateRichTextCharacterCount,
   initialValueNoTitle,
@@ -27,71 +19,54 @@ import {TECHNIQUES} from '../../helpers/resourceTypeDefinitions';
 import {uploadImagesAndGetURLs} from '../../helpers/images';
 import FormTextInput from '../Forms/FormTextInput';
 import {
-  AboutArticles,
   articleTitleValidation,
   MAX_ARTICLE_CHARACTERS,
 } from '../Article/Article';
+import GeneralError from '../GeneralError';
 
-export default function CreateTechnique() {
-  const preSelectedGroupID = useParams().groupID;
+export default function CreateTechnique({
+  groupID,
+  cancelAction,
+  successFunction,
+}) {
   const [selectedGroup, setSelectedGroup] = useState(undefined);
-  const [memberOfGroups, setMemberOfGroups] = useState([]);
-  const [loadingMemberOfGroups, setLoadingMemberOfGroups] = useState(false);
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [loadingGroup, setLoadingGroup] = useState(true);
+  const [pageError, setPageError] = useState(false);
   const [savedInitialValues, setSavedInitialValues] = useState({
     body: initialValueNoTitle,
     title: '',
     photos: [],
   });
-  const {userProfile, authLoaded, user} = useContext(AuthContext);
-  const history = useHistory();
+  const {authLoaded, user} = useContext(AuthContext);
   if (!authLoaded) return <LoadingSpinnerPage />;
   const userID = user.uid;
 
   useEffect(() => {
-    setLoadingMemberOfGroups(true);
-    if (!userID) return;
-    getUserGroups(userID)
-      .then((groups) => {
-        setMemberOfGroups(groups);
-        setLoadingMemberOfGroups(false);
-        if (preSelectedGroupID)
-          setSelectedGroup(
-            groups.filter(
-              (fetchedGroup) => fetchedGroup.id === preSelectedGroupID
-            )[0]
-          );
+    db.doc(`groups/${groupID}`)
+      .get()
+      .then((groupDS) => {
+        if (!groupDS.exists) setPageError(true);
+        else {
+          const groupData = groupDS.data();
+          groupData.id = groupDS.id;
+          setSelectedGroup(groupData);
+        }
+        setLoadingGroup(false);
       })
       .catch((err) => {
         console.error(
           `could not fetch groups for user ID ${userID} from db`,
           err
         );
-        setMemberOfGroups([
-          "We cannot fetch your groups at the moment. We'll look into it. Please try again later.",
-        ]);
+        setLoadingGroup(false);
+        setPageError(true);
       });
-  }, [userID, preSelectedGroupID]);
+  }, [groupID]);
 
-  if (loadingMemberOfGroups || submitting) return <LoadingSpinner />;
-
-  if (selectedGroup === undefined)
-    return (
-      <>
-        <SelectGroupLabel fieldName="Research Group">
-          <SelectGroup
-            groups={memberOfGroups}
-            setSelectedGroup={setSelectedGroup}
-            toggleText="Select from your groups"
-          />
-        </SelectGroupLabel>
-        <MustSelectGroup
-          userHasGroups={memberOfGroups.length > 0}
-          explanation="Techniques can only be created for groups."
-        />
-      </>
-    );
+  if (pageError) return <GeneralError />;
+  if (loadingGroup || submitting) return <LoadingSpinner />;
 
   async function onSubmit(res) {
     setSubmitting(true);
@@ -101,7 +76,11 @@ export default function CreateTechnique() {
       `groups/${selectedGroup.id}/techniques/${techniqueID}`
     );
     const failFunction = () =>
-      setSavedInitialValues({technique: res.technique, photos: res.photos});
+      setSavedInitialValues({
+        title: res.title,
+        body: res.body,
+        photos: res.photos,
+      });
     if (res.photos.length === 0) {
       return addArticleToDB(
         res.title,
@@ -109,14 +88,14 @@ export default function CreateTechnique() {
         [],
         selectedTopics,
         selectedGroup,
-        userProfile,
+        undefined,
         techniqueDBRef,
         techniqueOnGroupRef,
         setSubmitting,
-        history,
         TECHNIQUES,
         'techniquesCount',
-        failFunction
+        failFunction,
+        successFunction
       );
     }
     const publicImageURLs = await uploadImagesAndGetURLs(
@@ -138,14 +117,14 @@ export default function CreateTechnique() {
       filteredPhotoURLs,
       selectedTopics,
       selectedGroup,
-      userProfile,
+      undefined,
       techniqueDBRef,
       techniqueOnGroupRef,
       setSubmitting,
-      history,
       TECHNIQUES,
       'techniquesCount',
-      failFunction
+      failFunction,
+      successFunction
     );
   }
   return (
@@ -158,12 +137,6 @@ export default function CreateTechnique() {
       onSubmit={onSubmit}
     >
       <Form>
-        <SelectedGroup
-          groups={memberOfGroups}
-          selectedGroup={selectedGroup}
-          setSelectedGroup={setSelectedGroup}
-        />
-        <AboutArticles articleType="technique" />
         <FormTextInput name="title" label="Title" />
         <HeaderAndBodyArticleInput
           name="body"
@@ -185,6 +158,7 @@ export default function CreateTechnique() {
         <CreateResourceFormActions
           submitting={submitting}
           submitText="Create"
+          cancelForm={cancelAction}
         />
       </Form>
     </Formik>

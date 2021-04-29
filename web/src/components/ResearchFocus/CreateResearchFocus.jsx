@@ -1,19 +1,13 @@
 import React, {useState, useEffect, useContext} from 'react';
-import {useHistory, useParams} from 'react-router-dom';
 import {db} from '../../firebase';
 import {Formik, Form} from 'formik';
 import * as Yup from 'yup';
 import {AuthContext} from '../../App';
 import SelectGroup from '../Group/SelectGroup';
-import {
-  MustSelectGroup,
-  SelectedGroup,
-  SelectGroupLabel,
-} from '../Forms/Groups/SelectGroup';
+import {MustSelectGroup, SelectGroupLabel} from '../Forms/Groups/SelectGroup';
 import LoadingSpinner, {
   LoadingSpinnerPage,
 } from '../LoadingSpinner/LoadingSpinner';
-import {getUserGroups} from '../../helpers/users';
 import HeaderAndBodyArticleInput, {
   CreateRichTextCharacterCount,
   initialValueNoTitle,
@@ -27,57 +21,56 @@ import {RESEARCHFOCUSES} from '../../helpers/resourceTypeDefinitions';
 import {uploadImagesAndGetURLs} from '../../helpers/images';
 import FormTextInput from '../Forms/FormTextInput';
 import {
-  AboutArticles,
   articleTitleValidation,
   MAX_ARTICLE_CHARACTERS,
 } from '../Article/Article';
 
 import './CreateResearchFocus.css';
+import GeneralError from '../GeneralError';
 
-export default function CreateResearchFocus() {
-  const preSelectedGroupID = useParams().groupID;
+export default function CreateResearchFocus({
+  groupID,
+  cancelAction,
+  successFunction,
+}) {
   const [selectedGroup, setSelectedGroup] = useState(undefined);
-  const [memberOfGroups, setMemberOfGroups] = useState([]);
-  const [loadingMemberOfGroups, setLoadingMemberOfGroups] = useState(false);
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [loadingGroup, setLoadingGroup] = useState(true);
+  const [pageError, setPageError] = useState(false);
   const [savedInitialValues, setSavedInitialValues] = useState({
     title: '',
     body: initialValueNoTitle,
     photos: [],
   });
-  const {userProfile, authLoaded, user} = useContext(AuthContext);
-  const history = useHistory();
+  const {authLoaded, user} = useContext(AuthContext);
   if (!authLoaded) return <LoadingSpinnerPage />;
   const userID = user.uid;
 
   useEffect(() => {
-    setLoadingMemberOfGroups(true);
-    if (!userID) return;
-    getUserGroups(userID)
-      .then((groups) => {
-        setMemberOfGroups(groups);
-        setLoadingMemberOfGroups(false);
-        if (preSelectedGroupID)
-          setSelectedGroup(
-            groups.filter(
-              (fetchedGroup) => fetchedGroup.id === preSelectedGroupID
-            )[0]
-          );
+    db.doc(`groups/${groupID}`)
+      .get()
+      .then((groupDS) => {
+        if (!groupDS.exists) setPageError(true);
+        else {
+          const groupData = groupDS.data();
+          groupData.id = groupDS.id;
+          setSelectedGroup(groupData);
+        }
+        setLoadingGroup(false);
       })
       .catch((err) => {
         console.error(
           `could not fetch groups for user ID ${userID} from db`,
           err
         );
-        setMemberOfGroups([
-          "We cannot fetch your groups at the moment. We'll look into it. Please try again later.",
-        ]);
+        setLoadingGroup(false);
+        setPageError(true);
       });
-  }, [userID, preSelectedGroupID]);
+  }, [groupID]);
 
-  if (submitting) return <LoadingSpinner />;
-
+  if (loadingGroup || submitting) return <LoadingSpinner />;
+  if (pageError) return <GeneralError />;
   if (selectedGroup === undefined)
     return (
       <>
@@ -105,7 +98,8 @@ export default function CreateResearchFocus() {
     );
     const failFunction = () =>
       setSavedInitialValues({
-        researchFocus: res.researchFocus,
+        title: res.title,
+        body: res.body,
         photos: res.photos,
       });
     if (res.photos.length === 0) {
@@ -115,20 +109,21 @@ export default function CreateResearchFocus() {
         [],
         selectedTopics,
         selectedGroup,
-        userProfile,
+        undefined,
         researchFocusDBRef,
         researchFocusOnGroupRef,
         setSubmitting,
-        history,
         RESEARCHFOCUSES,
         'researchFocusesCount',
-        failFunction
+        failFunction,
+        successFunction
       );
     }
+
     const publicImageURLs = await uploadImagesAndGetURLs(
       Array.from(res.photos),
-      `groups/${selectedGroup.id}/researchFocuses/${researchFocusID}`,
-      selectedGroup.id
+      `groups/${groupID}/researchFocuses/${researchFocusID}`,
+      groupID
     );
 
     if (!publicImageURLs) {
@@ -144,14 +139,14 @@ export default function CreateResearchFocus() {
       filteredPhotoURLs,
       selectedTopics,
       selectedGroup,
-      userProfile,
+      undefined,
       researchFocusDBRef,
       researchFocusOnGroupRef,
       setSubmitting,
-      history,
       RESEARCHFOCUSES,
       'researchFocusesCount',
-      failFunction
+      failFunction,
+      successFunction
     );
   }
   return (
@@ -164,12 +159,6 @@ export default function CreateResearchFocus() {
       onSubmit={onSubmit}
     >
       <Form>
-        <SelectedGroup
-          groups={memberOfGroups}
-          selectedGroup={selectedGroup}
-          setSelectedGroup={setSelectedGroup}
-        />
-        <AboutArticles articleType="research focus" />
         <FormTextInput name="title" label="Title" />
         <HeaderAndBodyArticleInput
           name="body"
@@ -192,6 +181,7 @@ export default function CreateResearchFocus() {
         <CreateResourceFormActions
           submitting={submitting}
           submitText="Create"
+          cancelForm={cancelAction}
         />
       </Form>
     </Formik>

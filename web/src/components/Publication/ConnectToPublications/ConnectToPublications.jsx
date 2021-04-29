@@ -104,6 +104,7 @@ export default function LinkAuthorIDForm({submitBehaviour, cancel}) {
       <h3>
         Connect your Labspoon account to your publications on Microsoft Academic
       </h3>
+      <p>This is a quick way to populate your profile with publications</p>
       <p className="connect-publications-note">
         Note: This will permanently link your profile.
       </p>

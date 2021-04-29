@@ -23,3 +23,13 @@ export default function GeneralError({children}) {
     </UnpaddedPageContainer>
   );
 }
+
+export function AuthError() {
+  return (
+    <UnpaddedPageContainer>
+      <div className="error-container">
+        <h3>You do not have permission to view this page.</h3>
+      </div>
+    </UnpaddedPageContainer>
+  );
+}

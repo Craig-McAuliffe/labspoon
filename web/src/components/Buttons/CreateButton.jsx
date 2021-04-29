@@ -23,8 +23,7 @@ export function HeaderCreateButton({hoverControl}) {
   );
 }
 
-const OnboardingCreateTipText =
-  'Create posts, groups, and articles. Share to your Twitter page.';
+const OnboardingCreateTipText = 'Got something to say? Create posts here.';
 
 function HeaderCreateButtonContent({createAction, user, hoverControl}) {
   if (!user)

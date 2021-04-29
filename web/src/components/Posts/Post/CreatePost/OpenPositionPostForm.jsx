@@ -23,11 +23,7 @@ import {POST} from '../../../../helpers/resourceTypeDefinitions';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
-export default function OpenPositionPostForm({
-  setCreatingPost,
-  postType,
-  setPostType,
-}) {
+export default function OpenPositionPostForm({postType, setPostType}) {
   const {
     selectedTopics,
     setPostSuccess,
@@ -70,7 +66,6 @@ export default function OpenPositionPostForm({
       .then((response) => {
         if (isTweeting)
           openTwitterWithPopulatedTweet(res.title, selectedTopics);
-        setCreatingPost(false);
         setSubmittingPost(false);
         setPostSuccess(true);
         if (setResults) {

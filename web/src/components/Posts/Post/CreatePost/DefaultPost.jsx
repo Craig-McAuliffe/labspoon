@@ -17,7 +17,7 @@ import './CreatePost.css';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
-export default function DefaultPost({setCreatingPost, postType, setPostType}) {
+export default function DefaultPost({postType, setPostType}) {
   const {
     selectedTopics,
     setPostSuccess,
@@ -32,7 +32,6 @@ export default function DefaultPost({setCreatingPost, postType, setPostType}) {
       .then((response) => {
         if (isTweeting)
           openTwitterWithPopulatedTweet(res.title, selectedTopics);
-        setCreatingPost(false);
         setPostSuccess(true);
         setSubmittingPost(false);
         if (setResults) {

@@ -41,11 +41,7 @@ import {POST} from '../../../../helpers/resourceTypeDefinitions';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
-export default function PublicationPostForm({
-  setCreatingPost,
-  postType,
-  setPostType,
-}) {
+export default function PublicationPostForm({postType, setPostType}) {
   const {userProfile} = useContext(AuthContext);
   const {
     selectedTopics,
@@ -106,7 +102,6 @@ export default function PublicationPostForm({
       setCustomPubSuccessfullyCreated,
       isQuickCreatingPub,
       setSubmittingPost,
-      setCreatingPost,
       setPostSuccess,
       setResults,
       setIsQuickCreatingPub,
@@ -460,7 +455,6 @@ export async function submitPublicationPost(
   setCustomPubSuccessfullyCreated,
   isQuickCreatingPub,
   setSubmittingPost,
-  setCreatingPost,
   setPostSuccess,
   setResults,
   setIsQuickCreatingPub,
@@ -517,7 +511,6 @@ export async function submitPublicationPost(
   return submitCreatePostWithPublication(
     res,
     isTweeting,
-    setCreatingPost,
     setPostSuccess,
     setSubmittingPost,
     setIsQuickCreatingPub,
@@ -531,7 +524,6 @@ export async function submitPublicationPost(
 export function submitCreatePostWithPublication(
   res,
   isTweeting,
-  setCreatingPost,
   setPostSuccess,
   setSubmittingPost,
   setIsQuickCreatingPub,
@@ -545,7 +537,6 @@ export function submitCreatePostWithPublication(
   createPost(res)
     .then((response) => {
       if (isTweeting) openTwitterWithPopulatedTweet(res.title, selectedTopics);
-      if (setCreatingPost) setCreatingPost(false);
       setPostSuccess(true);
       setSubmittingPost(false);
       if (setResults) {

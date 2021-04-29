@@ -2,20 +2,9 @@ import * as functions from 'firebase-functions';
 import {admin} from './config';
 import {GroupRef, GroupSignature} from './groups';
 import {TaggedTopic} from './topics';
-import {UserFilterRef, UserRef} from './users';
 import {ArticleBodyChild, articleToArticleListItem} from './researchFocuses';
 
 const db = admin.firestore();
-
-export const addTechniqueToAuthor = functions.firestore
-  .document(`techniques/{techniqueID}`)
-  .onCreate((techniqueDS) => {
-    const technique = techniqueDS.data() as Technique;
-    const authorID = technique.author.id;
-    return db
-      .doc(`users/${authorID}/techniques/${techniqueDS.id}`)
-      .set(articleToArticleListItem(technique));
-  });
 
 export const addTechniqueToTopics = functions.firestore
   .document(`techniques/{techniqueID}`)
@@ -63,22 +52,6 @@ export const updateTechniqueOnGroup = functions.firestore
       .set(articleToArticleListItem(technique));
   });
 
-export const updateTechniqueOnAuthor = functions.firestore
-  .document(`techniques/{techniqueID}`)
-  .onUpdate((techniqueDS) => {
-    const technique = techniqueDS.after.data() as Technique;
-    const oldTechniqueData = techniqueDS.before.data() as Technique;
-    if (
-      JSON.stringify(articleToArticleListItem(technique)) ===
-      JSON.stringify(articleToArticleListItem(oldTechniqueData))
-    )
-      return;
-    const authorID = technique.author.id;
-    return db
-      .doc(`users/${authorID}/techniques/${techniqueDS.after.id}`)
-      .set(articleToArticleListItem(technique));
-  });
-
 export const updateTechniqueOnTopics = functions.firestore
   .document(`techniques/{techniqueID}`)
   .onUpdate(async (techniqueDS, context) => {
@@ -112,7 +85,6 @@ export const updateTechniqueOnTopics = functions.firestore
 
 export interface Technique {
   title: string;
-  author: UserRef;
   topics?: TaggedTopic[];
   customTopics?: string[];
   timestamp: Date;
@@ -125,7 +97,6 @@ export interface Technique {
 
 export interface TechniqueListItem {
   title: string;
-  author: UserFilterRef;
   topics?: TaggedTopic[];
   customTopics?: string[];
   timestamp: Date;

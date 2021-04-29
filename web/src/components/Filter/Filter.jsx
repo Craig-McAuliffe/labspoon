@@ -38,6 +38,7 @@ function FilterMenu({
     <div className="sider-layout">
       <div className="filter-container">
         <FilterSearch />
+        <h3 className="filter-title">Filter</h3>
         {filterCollections}
       </div>
     </div>

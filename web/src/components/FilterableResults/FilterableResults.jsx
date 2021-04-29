@@ -25,7 +25,12 @@ export const FilterManagerContext = createContext({});
 // FilterableResultsContext, and uses its results values for rendering.
 //
 // limit is the number of results to return on each page
-export default function FilterableResults({children, fetchResults, limit}) {
+export default function FilterableResults({
+  children,
+  fetchResults,
+  limit,
+  refreshFeed,
+}) {
   const [filter, setFilter] = useState([]);
   const [loadingFilter, setLoadingFilter] = useState(true);
   const [results, setResults] = useState([]);
@@ -120,7 +125,7 @@ export default function FilterableResults({children, fetchResults, limit}) {
     setLast(undefined);
     setSkip(0);
     setResults([]);
-  }, [filter, fetchResultsFunction]);
+  }, [filter, fetchResultsFunction, refreshFeed]);
 
   return (
     <FilterableResultsContext.Provider
@@ -284,11 +289,12 @@ export function NewFilterMenuWrapper({
 }
 
 function handleResultParameters(results, parameters) {
-  if (parameters.showPinOption)
+  if (parameters.userCanEdit)
     results.forEach((result) => {
       result.showPinOption = true;
       result.pinProfileCollection = parameters.pinProfileCollection;
       result.pinProfileID = parameters.pinProfileID;
+      result.userCanEdit = true;
     });
   if (parameters.showNews)
     results.forEach((result) => {

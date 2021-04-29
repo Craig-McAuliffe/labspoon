@@ -4,13 +4,11 @@ import {AuthContext} from '../../App';
 import {db} from '../../firebase';
 import SecondaryButton from '../../components/Buttons/SecondaryButton';
 import CreateGroupPage from '../../components/Group/CreateGroupPage/CreateGroupPage';
-import LinkAuthorIDForm from '../../components/Publication/ConnectToPublications/ConnectToPublications';
 import {PaddedPageContainer} from '../../components/Layout/Content';
 import TertiaryButton from '../../components/Buttons/TertiaryButton';
 
 import './OnboardingPage.css';
 
-const LINKAUTHOR = 'link-author';
 const GROUPS = 'groups';
 
 export default function OnboardingPage() {
@@ -27,14 +25,6 @@ export default function OnboardingPage() {
 
   const OnboardingStageDisplay = () => {
     switch (onboardingStage) {
-      case LINKAUTHOR:
-        return (
-          <OnboardingAuthorLink
-            previousOnboardingStage={previousOnboardingStage}
-            nextOnboardingStage={nextOnboardingStage}
-            onboardingStage={onboardingStage}
-          />
-        );
       case GROUPS:
         return (
           <OnboardingGroup
@@ -42,7 +32,6 @@ export default function OnboardingPage() {
             claimGroupID={claimGroupID}
             returnLocation={returnLocation}
             onboardingStage={onboardingStage}
-            previousOnboardingStage={previousOnboardingStage}
             nextOnboardingStage={nextOnboardingStage}
           />
         );
@@ -53,8 +42,6 @@ export default function OnboardingPage() {
 
   const nextOnboardingStage = () => {
     switch (onboardingStage) {
-      case LINKAUTHOR:
-        return history.push(`/onboarding/${GROUPS}`, locationState);
       case GROUPS:
         return completeOnboardingThenRedirect(
           history,
@@ -71,20 +58,11 @@ export default function OnboardingPage() {
     }
   };
 
-  const previousOnboardingStage = () => {
-    switch (onboardingStage) {
-      case GROUPS:
-        history.push(`/onboarding/${LINKAUTHOR}`);
-        break;
-      default:
-        return;
-    }
-  };
-  if (onboardingStage !== LINKAUTHOR && onboardingStage !== GROUPS)
+  if (onboardingStage !== GROUPS)
     return (
       <Redirect
         to={{
-          pathname: '/onboarding/link-author',
+          pathname: '/onboarding/groups',
           state: locationState,
         }}
       />
@@ -98,23 +76,13 @@ export default function OnboardingPage() {
 }
 
 function NextOrBackOnboardingActions({
-  previousOnboardingStage,
   nextOnboardingStage,
   creatingGroup,
   onboardingStage,
 }) {
   return (
     <div className="onboarding-skip-next-container">
-      {onboardingStage !== LINKAUTHOR ? (
-        <button
-          className="onboarding-back-button"
-          onClick={() => previousOnboardingStage()}
-        >
-          Back
-        </button>
-      ) : (
-        <div></div>
-      )}
+      <div></div>
       <div className="onboarding-next-back-container">
         {creatingGroup && onboardingStage === GROUPS ? null : (
           <SecondaryButton onClick={() => nextOnboardingStage()}>
@@ -150,7 +118,6 @@ function OnboardingGroup({
   claimGroupID,
   returnLocation,
   onboardingStage,
-  previousOnboardingStage,
   nextOnboardingStage,
 }) {
   const [creatingGroup, setCreatingGroup] = useState(false);
@@ -166,9 +133,7 @@ function OnboardingGroup({
     />
   ) : (
     <>
-      <h4 className="onboarding-page-instructions">
-        {`Group pages are a great place to share updates from the lab. Create yours now:`}
-      </h4>
+      <h4>{`Group pages are a great place to share updates from the lab.`}</h4>
       <div className="onboarding-create-group-button-container">
         <SecondaryButton onClick={() => setCreatingGroup(true)}>
           Create a group
@@ -253,56 +218,8 @@ function OnboardingGroup({
       {content}
       <NextOrBackOnboardingActions
         onboardingStage={onboardingStage}
-        previousOnboardingStage={previousOnboardingStage}
         nextOnboardingStage={nextOnboardingStage}
         creatingGroup={creatingGroup}
-      />
-    </div>
-  );
-}
-
-function OnboardingAuthorLink({
-  onboardingStage,
-  previousOnboardingStage,
-  nextOnboardingStage,
-}) {
-  const [linkingAuthor, setLinkingAuthor] = useState(false);
-  const history = useHistory();
-  return (
-    <div>
-      {!linkingAuthor ? (
-        <>
-          <h3>Have you authored any journal publications?</h3>
-          <div className="onboarding-author-papers-choice-container">
-            <div className="onboarding-author-papers-choice-button-container">
-              <SecondaryButton
-                onClick={() => setLinkingAuthor(true)}
-                width="100px"
-                height="60px"
-              >
-                Yes
-              </SecondaryButton>
-            </div>
-            <div className="onboarding-author-papers-choice-button-container">
-              <SecondaryButton
-                onClick={() => nextOnboardingStage()}
-                width="100px"
-                height="60px"
-              >
-                No
-              </SecondaryButton>
-            </div>
-          </div>
-        </>
-      ) : (
-        <LinkAuthorIDForm
-          submitBehaviour={() => history.push(`/onboarding/${GROUPS}`)}
-        />
-      )}
-      <NextOrBackOnboardingActions
-        onboardingStage={onboardingStage}
-        previousOnboardingStage={previousOnboardingStage}
-        nextOnboardingStage={nextOnboardingStage}
       />
     </div>
   );

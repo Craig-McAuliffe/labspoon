@@ -38,6 +38,11 @@ export async function uploadImagesAndGetURLs(images, storageDir, groupID) {
     '-extent',
     '400x400',
   ];
+  if (!groupID) {
+    console.error('image resize needs groupID');
+    if (setLoading) setLoading(false);
+    return undefined;
+  }
   const promises = images.map(async (image) => {
     const filePath = `${storageDir}/${uuid()}_fullSize`;
     const imageStorageRef = storage.ref(filePath);
@@ -51,6 +56,9 @@ export async function uploadImagesAndGetURLs(images, storageDir, groupID) {
     })
       .then(async (publicURL) => {
         if (!publicURL || !publicURL.data) {
+          console.error(
+            'photo upload did not return public URL ' + filePath + err
+          );
           await deleteUploadedFileOnError(imageStorageRef);
           return undefined;
         }

@@ -20,7 +20,6 @@ export default function ResearchFocusListItem({researchFocus}) {
         resourceType={RESEARCHFOCUS}
         icon={<ResearchFocusIcon />}
         resourceID={researchFocus.id}
-        authorID={researchFocus.author.id}
         article={researchFocus}
         backgroundShade={researchFocus.backgroundShade}
       />

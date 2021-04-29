@@ -5,7 +5,7 @@ import HeaderAndBodyArticleInput, {
   CreateRichTextCharacterCount,
   yupRichBodyOnlyValidation,
 } from '../Forms/Articles/HeaderAndBodyArticleInput';
-import GeneralError from '../GeneralError';
+import GeneralError, {AuthError} from '../GeneralError';
 import {LoadingSpinnerPage} from '../LoadingSpinner/LoadingSpinner';
 import {db} from '../../firebase';
 import * as Yup from 'yup';
@@ -27,6 +27,7 @@ export default function EditArticle({
   const [notFound, setNotFound] = useState(false);
   const [articleDetails, setArticleDetails] = useState();
   const [submitting, setSubmitting] = useState();
+  const [authError, setAuthError] = useState(false);
   const [savedInitialValues, setSavedInitialValues] = useState();
   const [uploadError, setUploadError] = useState(false);
   const history = useHistory();
@@ -37,8 +38,9 @@ export default function EditArticle({
         `groups/${articleDetails.group.id}/${articleCollectionName}/${articleID}`
       )
     : undefined;
-  const {userProfile} = useContext(AuthContext);
+  const {userProfile, authLoaded} = useContext(AuthContext);
   useEffect(async () => {
+    if (!userProfile) return;
     const articleDS = await articleDBRef
       .get()
       .catch((err) =>
@@ -57,8 +59,20 @@ export default function EditArticle({
       return;
     }
     setArticleDetails(articleDS.data());
+    const userIsMemberOfGroup = await db
+      .doc(`groups/${articleDS.data().group.id}/members/${userProfile.id}`)
+      .get()
+      .then((ds) => {
+        if (ds.exists) return true;
+        return false;
+      })
+      .catch((err) => {
+        console.error(err);
+        return fale;
+      });
+    if (!userIsMemberOfGroup) setAuthError(true);
     setLoadingPage(false);
-  }, [articleID]);
+  }, [articleID, userProfile]);
 
   useEffect(() => {
     if (!articleDetails || savedInitialValues) return;
@@ -68,11 +82,11 @@ export default function EditArticle({
     });
   }, [articleDetails]);
 
-  if (loadingPage) return <LoadingSpinnerPage />;
+  if (loadingPage || !authLoaded) return <LoadingSpinnerPage />;
   if (loadingError) return <GeneralError />;
+  if (authError) return <AuthError />;
   if (notFound) return <NotFoundPage />;
   if (!savedInitialValues) return <LoadingSpinnerPage />;
-  if (userProfile.id !== articleDetails.author.id) history.replace('/');
   const onSubmit = async (res) => {
     setSubmitting(true);
     if (

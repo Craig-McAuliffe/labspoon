@@ -9,7 +9,6 @@ import FilterableResults, {
   ResourceTabs,
   FilterManager,
 } from '../../components/FilterableResults/FilterableResults';
-import CreatePost from '../../components/Posts/Post/CreatePost/CreatePost';
 import {LoadingSpinnerPage} from '../../components/LoadingSpinner/LoadingSpinner';
 import {UnpaddedPageContainer} from '../../components/Layout/Content';
 
@@ -216,7 +215,6 @@ export default function FollowingFeedPage() {
         <ResourceTabs />
       </FilterManager>
       <UnpaddedPageContainer>
-        <CreatePost />
         <NewResultsWrapper />
       </UnpaddedPageContainer>
     </FilterableResults>

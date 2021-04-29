@@ -1,7 +1,6 @@
 import Linkify from 'linkifyjs/react';
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
-import {AuthContext} from '../../App';
 import {RESEARCHFOCUS, TECHNIQUE} from '../../helpers/resourceTypeDefinitions';
 import {
   EDIT,
@@ -29,12 +28,10 @@ export function ArticleHeaderAndType({
   icon,
   resourceID,
   dedicatedPage,
-  authorID,
   article,
   backgroundShade,
+  userCanEdit,
 }) {
-  const {userProfile} = useContext(AuthContext);
-  const userID = userProfile ? userProfile.id : undefined;
   let url;
   let resourceTypeName;
   switch (resourceType) {
@@ -69,8 +66,7 @@ export function ArticleHeaderAndType({
 
   return (
     <>
-      {((userID && userID === authorID) ||
-        (article && article.showPinOption)) && (
+      {(userCanEdit || (article && article.showPinOption)) && (
         <ListItemOptionsDropdown
           resourceType={resourceType}
           resourceID={resourceID}

@@ -3,19 +3,8 @@ import {admin} from './config';
 import {GroupRef, groupRefToGroupSignature, GroupSignature} from './groups';
 import {Technique} from './techniques';
 import {TaggedTopic} from './topics';
-import {toUserFilterRef, UserFilterRef, UserRef} from './users';
 
 const db = admin.firestore();
-
-export const addResearchFocusToAuthor = functions.firestore
-  .document(`researchFocuses/{researchFocusID}`)
-  .onCreate((researchFocusDS) => {
-    const researchFocus = researchFocusDS.data() as ResearchFocus;
-    const authorID = researchFocus.author.id;
-    return db
-      .doc(`users/${authorID}/researchFocuses/${researchFocusDS.id}`)
-      .set(articleToArticleListItem(researchFocus));
-  });
 
 export const addResearchFocusToTopics = functions.firestore
   .document(`researchFocuses/{researchFocusID}`)
@@ -66,23 +55,6 @@ export const updateResearchFocusOnGroup = functions.firestore
       .set(articleToArticleListItem(researchFocus));
   });
 
-export const updateResearchFocusOnAuthor = functions.firestore
-  .document(`researchFocuses/{researchFocusID}`)
-  .onUpdate((researchFocusDS) => {
-    const researchFocus = researchFocusDS.after.data() as ResearchFocus;
-    const oldResearchFocusData = researchFocusDS.before.data() as ResearchFocus;
-    if (
-      JSON.stringify(articleToArticleListItem(researchFocus)) ===
-      JSON.stringify(articleToArticleListItem(oldResearchFocusData))
-    )
-      return;
-    const authorID = researchFocus.author.id;
-
-    return db
-      .doc(`users/${authorID}/researchFocuses/${researchFocusDS.after.id}`)
-      .set(articleToArticleListItem(researchFocus));
-  });
-
 export const updateResearchFocusOnTopics = functions.firestore
   .document(`researchFocuses/{researchFocusID}`)
   .onUpdate(async (researchFocusDS, context) => {
@@ -121,7 +93,6 @@ export function articleToArticleListItem(
 ): ResearchFocusListItem {
   const researchFocusListItem: ResearchFocusListItem = {
     title: article.title,
-    author: toUserFilterRef(article.author.name, article.author.id),
     timestamp: article.timestamp,
     group: groupRefToGroupSignature(article.group, article.group.id),
     body: article.body,
@@ -137,7 +108,6 @@ export function articleToArticleListItem(
 
 export interface ResearchFocus {
   title: string;
-  author: UserRef;
   topics?: TaggedTopic[];
   customTopics?: string[];
   timestamp: Date;
@@ -150,7 +120,6 @@ export interface ResearchFocus {
 
 export interface ResearchFocusListItem {
   title: string;
-  author: UserFilterRef;
   topics?: TaggedTopic[];
   customTopics?: string[];
   timestamp: Date;

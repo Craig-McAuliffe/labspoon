@@ -18,7 +18,6 @@ export default function TechniqueListItem({technique}) {
         resourceType={TECHNIQUE}
         icon={<TechniqueIcon />}
         resourceID={technique.id}
-        authorID={technique.author.id}
         article={technique}
         backgroundShade={technique.backgroundShade}
       />
