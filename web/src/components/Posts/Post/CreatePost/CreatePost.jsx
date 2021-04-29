@@ -14,6 +14,10 @@ import {PUBLICATION} from '../../../../helpers/resourceTypeDefinitions';
 import {FilterableResultsContext} from '../../../FilterableResults/FilterableResults';
 
 import './CreatePost.css';
+import {
+  DropDownTriangle,
+  InvertedDropDownTriangle,
+} from '../../../../assets/GeneralActionIcons';
 
 export const DEFAULT_POST = 'Default';
 export const PUBLICATION_POST = 'Publication';
@@ -203,5 +207,36 @@ export function QuickCreatePostFromResource({
         <CreatePostTextArea name="title" />
       </div>
     </PostForm>
+  );
+}
+
+export function SwitchTagMethod({isCreating, setIsCreating}) {
+  return (
+    <div className="create-post-alt-tagging-method-container">
+      <button
+        className="create-publication-search-publications-button"
+        type="button"
+      ></button>
+      <p>{isCreating ? '' : "Can't find what you're looking for?"}</p>
+      <button
+        onClick={() => {
+          setIsCreating((currentState) => !currentState);
+        }}
+        className="create-pub-post-quick-create-toggle"
+        type="button"
+      >
+        {isCreating ? (
+          <>
+            <h4>Switch Back</h4>
+            <InvertedDropDownTriangle />
+          </>
+        ) : (
+          <>
+            <h4>Quick Add</h4>
+            <DropDownTriangle />
+          </>
+        )}
+      </button>
+    </div>
   );
 }

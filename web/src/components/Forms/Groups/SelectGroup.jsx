@@ -43,6 +43,7 @@ function Explanation({children}) {
 }
 
 export function SelectedGroup({selectedGroup, setSelectedGroup, groups}) {
+  if (!selectedGroup) return null;
   return (
     <div className="change-group-section">
       {groups.length > 1 ? (

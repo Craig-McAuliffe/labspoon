@@ -8,6 +8,7 @@ import {
   CreatingPostContext,
   sortThrownCreatePostErrors,
   openTwitterWithPopulatedTweet,
+  SwitchTagMethod,
 } from './CreatePost';
 import TypeOfTaggedResourceDropDown from './TypeOfTaggedResourceDropDown';
 import PublicationListItem, {
@@ -25,10 +26,6 @@ import {
   PublicationIcon,
   TagResourceIcon,
 } from '../../../../assets/ResourceTypeIcons';
-import {
-  DropDownTriangle,
-  InvertedDropDownTriangle,
-} from '../../../../assets/GeneralActionIcons';
 import InputError from '../../../Forms/InputError';
 import ErrorMessage from '../../../Forms/ErrorMessage';
 import FormDatabaseSearch from '../../../Forms/FormDatabaseSearch';
@@ -109,7 +106,8 @@ export default function PublicationPostForm({postType, setPostType}) {
       selectedTopics,
       customPublicationAuthors,
       publication,
-      hasHitMaxDailyPublications
+      hasHitMaxDailyPublications,
+      customPubSuccessfullyCreated
     );
   return (
     <>
@@ -252,36 +250,10 @@ function SelectPublication({
           />
         )}
       {userIsVerified && (
-        <div className="create-post-alt-tagging-method-container">
-          <button
-            className="create-publication-search-publications-button"
-            type="button"
-          ></button>
-          <p>
-            {isQuickCreatingPub
-              ? ''
-              : "Can't find the publication you're looking for?"}
-          </p>
-          <button
-            onClick={() => {
-              setIsQuickCreatingPub(!isQuickCreatingPub);
-            }}
-            className="create-pub-post-quick-create-toggle"
-            type="button"
-          >
-            {isQuickCreatingPub ? (
-              <>
-                <h4>Switch Back</h4>
-                <InvertedDropDownTriangle />
-              </>
-            ) : (
-              <>
-                <h4>Quick Add</h4>
-                <DropDownTriangle />
-              </>
-            )}
-          </button>
-        </div>
+        <SwitchTagMethod
+          isCreating={isQuickCreatingPub}
+          setIsCreating={setIsQuickCreatingPub}
+        />
       )}
     </div>
   );
@@ -462,11 +434,12 @@ export async function submitPublicationPost(
   selectedTopics,
   customPublicationAuthors,
   publication,
-  hasHitMaxDailyPublications
+  hasHitMaxDailyPublications,
+  customPubSuccessfullyCreated
 ) {
   if (customPublicationErrors) setCustomPublicationErrors();
   if (pubSubmissionError) setPubSubmissionError(false);
-  if (customPublication) setCustomPubSuccessfullyCreated(false);
+  if (customPubSuccessfullyCreated) setCustomPubSuccessfullyCreated(false);
   const submitCustomPublication = async () => {
     if (!isQuickCreatingPub) return false;
     const pubValidationErrors = await validateCustomPublication(
@@ -495,11 +468,6 @@ export async function submitPublicationPost(
   const customPublicationSubmissionResult = await submitCustomPublication();
   if (isQuickCreatingPub && !customPublicationSubmissionResult) return;
 
-  if (!isQuickCreatingPub && !publication) {
-    alert('You must select a publication or create one');
-    setSubmittingPost(false);
-    return false;
-  }
   if (isQuickCreatingPub) {
     const customPublicationWithID =
       customPublicationSubmissionResult.createdCustomPublication;

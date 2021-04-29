@@ -2,11 +2,11 @@ import React, {useContext, useEffect, useState} from 'react';
 import {Form, Formik} from 'formik';
 import firebase from '../../firebase';
 import * as Yup from 'yup';
-import FormTextInput, {FormTextArea} from '../Forms/FormTextInput';
+import FormTextInput, {FormTextArea, TextInput} from '../Forms/FormTextInput';
 import FormDateInput from '../Forms/FormDateInput';
 import TagTopics from '../Topics/TagTopics';
 import CreateResourceFormActions from '../Forms/CreateResourceFormActions';
-import {DropdownOption} from '../Dropdown';
+import Dropdown, {DropdownOption} from '../Dropdown';
 import {AuthContext} from '../../App';
 import {WebsiteIcon, EmailIcon} from '../../assets/PostOptionalTagsIcons';
 import TabbedContainer from '../TabbedContainer/TabbedContainer';
@@ -165,10 +165,12 @@ export default function CreateOpenPosition() {
             loading={loading}
           />
         </SelectGroupLabel>
-        <MustSelectGroup
-          userHasGroups={memberOfGroups.length > 0}
-          explanation="Open positions can only be created for groups."
-        />
+        <div className="create-open-pos-must-select-group-section">
+          <MustSelectGroup
+            userHasGroups={memberOfGroups.length > 0}
+            explanation="Open positions can only be created for groups."
+          />
+        </div>
       </>
     );
   return (
@@ -222,7 +224,8 @@ export default function CreateOpenPosition() {
   );
 }
 
-function SelectPosition({...props}) {
+export function SelectPosition({nonForm, onSelect, ...props}) {
+  if (nonForm) return <Dropdown>{getPositionTypes(onSelect)}</Dropdown>;
   return (
     <LabelledDropdownContainer label="Position">
       <Select {...props}>{getPositionTypes()}</Select>
@@ -230,25 +233,38 @@ function SelectPosition({...props}) {
   );
 }
 
-function getPositionTypes() {
+function getPositionTypes(onSelect) {
   return POSITIONS.map((position) => (
-    <DropdownOption key={position} value={position} text={position}>
+    <DropdownOption
+      onSelect={onSelect}
+      key={position}
+      value={position}
+      text={position}
+    >
       <h4 className="create-open-position-types-dropdown-option">{position}</h4>
     </DropdownOption>
   ));
 }
 
-function HowToApply() {
+export function HowToApply({nonForm, nonFormAction}) {
   const tabDetails = [
     {
       name: 'Apply through link',
       icon: <WebsiteIcon />,
-      contents: <FormTextInput placeholder="Website url" name="applyLink" />,
+      contents: nonForm ? (
+        <TextInput name="applyLink" onChange={(e) => nonFormAction(e)} />
+      ) : (
+        <FormTextInput placeholder="Website url" name="applyLink" />
+      ),
     },
     {
       name: 'Apply By Email',
       icon: <EmailIcon />,
-      contents: (
+      contents: nonForm ? (
+        <div>
+          <TextInput name="applyEmail" onChange={(e) => nonFormAction(e)} />{' '}
+        </div>
+      ) : (
         <div>
           <FormTextInput placeholder="Email Address" name="applyEmail" />
         </div>
