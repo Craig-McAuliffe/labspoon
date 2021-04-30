@@ -203,3 +203,13 @@
     font-size: 0.6em;
   }
 }
+
+@media only screen and (max-width: 280px) {
+  .minimised-search-bar-input {
+    width: 50px;
+    color: #ffffff;
+  }
+  .search-icon-container {
+    background-image: none;
+  }
+}

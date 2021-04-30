@@ -36,3 +36,120 @@
   padding-bottom: 20px;
   border-bottom: 1px solid #99999f;
 }
+
+.create-button-center-container svg {
+  height: 45px;
+}
+
+.header-create-button-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #00507c;
+  height: 45px;
+  width: 110px;
+  border-radius: 3px;
+  color: #ffffff;
+  padding: 2px 10px;
+  line-height: 0px;
+}
+
+.header-create-button-link:hover {
+  background: #063854;
+  text-decoration: none;
+  color: #ffffff;
+}
+
+.header-create-button-link:hover path,
+.header-create-button-link:hover circle {
+  stroke: 063854;
+}
+
+.header-create-button-link h3 {
+  margin-top: 2px;
+  margin-bottom: 0px;
+  margin-left: 6px;
+  display: inline-block;
+}
+
+.header-create-button-link circle {
+  fill: #ffffff;
+  color: #ffffff;
+}
+
+.header-create-button-link path {
+  stroke: #00507c;
+}
+
+.header-create-button-link svg {
+  height: 30px;
+  width: 30px;
+}
+
+@media screen and (max-width: 1500px) {
+  .header-create-button-link {
+    padding: 2px 5px;
+    width: 100px;
+  }
+}
+@media screen and (max-width: 850px) {
+  .header-create-button-link {
+    background: none;
+    border-radius: 0px;
+    width: 55px;
+    height: 55px;
+    padding: 0px;
+  }
+
+  .header-create-button-link:hover {
+    background: none;
+  }
+
+  .header-create-button-link:hover circle {
+    fill: #00507c;
+  }
+
+  .header-create-button-link:hover path {
+    stroke: #ffffff;
+  }
+
+  .header-create-button-link h3 {
+    display: none;
+  }
+
+  .header-create-button-link svg {
+    height: 55px;
+    width: 55px;
+  }
+
+  .header-create-button-link circle {
+    fill: #ffffff;
+    color: #ffffff;
+    stroke: #00507c;
+    stroke-width: 2px;
+    r: 22px;
+  }
+
+  .header-create-button-link path {
+    stroke: #00507c;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .header-create-button-link {
+    width: 55px;
+    height: 55px;
+  }
+
+  .header-create-button-link svg {
+    height: 50px;
+    width: 50px;
+  }
+}
+
+@media screen and (max-width: 300px) {
+  .header-create-button-link svg {
+    height: 42px;
+    width: 42px;
+  }
+}

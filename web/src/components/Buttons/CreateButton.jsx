@@ -6,12 +6,12 @@ import OnboardingTip from '../OnboardingTips/OnboardingTip';
 import {CREATE, SignUpPopoverOverride} from '../Popovers/Popover';
 import './CreateButton.css';
 
-export function HeaderCreateButton({hoverControl}) {
+export function HeaderCreateButton() {
   const {user} = useContext(AuthContext);
   return (
     <>
       <SignUpPopoverOverride text="Sign up to create." actionTaken={CREATE}>
-        <HeaderCreateButtonContent user={user} hoverControl={hoverControl} />
+        <HeaderCreateButtonContent user={user} />
       </SignUpPopoverOverride>
       {user ? (
         <OnboardingTip
@@ -25,16 +25,18 @@ export function HeaderCreateButton({hoverControl}) {
 
 const OnboardingCreateTipText = 'Got something to say? Create posts here.';
 
-function HeaderCreateButtonContent({createAction, user, hoverControl}) {
+function HeaderCreateButtonContent({createAction, user}) {
   if (!user)
     return (
-      <button onClick={createAction}>
-        <CreateIcon hoverControl={hoverControl} />
+      <button className="header-create-button-link" onClick={createAction}>
+        <CreateIcon hoverControl={true} />
+        <h3>Create</h3>
       </button>
     );
   return (
-    <Link to={'/create'}>
-      <CreateIcon hoverControl={hoverControl} />
+    <Link className="header-create-button-link" to={'/create'}>
+      <CreateIcon hoverControl={true} />
+      <h3>Create</h3>
     </Link>
   );
 }

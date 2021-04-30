@@ -4,7 +4,7 @@
   cursor: pointer;
   align-content: center;
   justify-content: center;
-  padding-right: 20px;
+  padding: 0px 20px;
   font-size: inherit;
 }
 
@@ -93,6 +93,18 @@
   grid-template-columns: 15px 1fr;
   align-items: center;
 }
+
+@media screen and (max-width: 1500px) {
+  .dropdown-header {
+    padding: 0px 15px 0px 15px;
+  }
+}
+
+@media screen and (max-width: 1250px) {
+  .dropdown-header {
+    padding: 0px 10px 0px 5px;
+  }
+}
 @media screen and (max-width: 850px) {
   .dropdown-name {
     display: none;
@@ -100,6 +112,14 @@
   }
   .avatar-dropdown-sign-in {
     padding-right: 5px;
+  }
+  .dropdown-header {
+    padding: 0px 5px 0px 0px;
+  }
+
+  .dropdown-header img {
+    height: 55px;
+    width: 55px;
   }
 }
 
@@ -112,15 +132,24 @@
   .avatar-dropdown-sign-in {
     padding-right: 2px;
   }
-
   .dropdown-header img {
-    height: 40px;
-    width: 40px;
+    height: 50px;
+    width: 50px;
   }
   .dropdown {
     margin-right: 0px;
     display: flex;
     align-items: center;
     max-width: 100%;
+  }
+}
+
+@media screen and (max-width: 300px) {
+  .dropdown-header img {
+    height: 42px;
+    width: 42px;
+  }
+  .dropdown button {
+    padding: 0px;
   }
 }
