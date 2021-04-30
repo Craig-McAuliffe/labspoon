@@ -108,3 +108,9 @@ export function getArticleLengthFromBody(body) {
     return accumulator + current.children[0].text.length + 1;
   }, 0);
 }
+
+export function getTextFromRichText(body) {
+  return body.reduce((accumulator, current) => {
+    return accumulator + current.children[0].text;
+  }, '');
+}

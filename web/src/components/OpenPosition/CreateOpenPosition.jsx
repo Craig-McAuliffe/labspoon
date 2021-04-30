@@ -31,7 +31,7 @@ import HeaderAndBodyArticleInput, {
 } from '../Forms/Articles/HeaderAndBodyArticleInput';
 import {MAX_ARTICLE_CHARACTERS} from '../Article/Article';
 
-const POSITIONS = ['Masters', 'Phd', 'Post Doc', 'Technician'];
+export const POSITIONS = ['Masters', 'Phd', 'Post Doc', 'Technician'];
 
 const createOpenPosition = firebase
   .functions()
@@ -224,8 +224,13 @@ export default function CreateOpenPosition() {
   );
 }
 
-export function SelectPosition({nonForm, onSelect, ...props}) {
-  if (nonForm) return <Dropdown>{getPositionTypes(onSelect)}</Dropdown>;
+export function SelectPosition({nonForm, onSelect, toggleText, ...props}) {
+  if (nonForm)
+    return (
+      <Dropdown customToggleTextOnly={toggleText}>
+        {getPositionTypes(onSelect)}
+      </Dropdown>
+    );
   return (
     <LabelledDropdownContainer label="Position">
       <Select {...props}>{getPositionTypes()}</Select>

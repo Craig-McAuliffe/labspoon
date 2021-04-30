@@ -14,9 +14,8 @@ import './OpenPositionListItem.css';
 import {RichTextBody} from '../Article/Article';
 
 export default function OpenPositionListItem({openPosition}) {
-  const content = openPosition.content;
-
   if (!openPosition) return null;
+  const content = openPosition.content;
   return (
     <ListItemContainer backgroundShade={openPosition.backgroundShade}>
       {openPosition.showPinOption && (
@@ -119,8 +118,8 @@ export function ReducedOpenPositionListItem({
   decreasedEmphasis,
   noLink,
 }) {
-  const content = openPosition.content;
   if (!openPosition) return null;
+  const content = openPosition.content;
   const titleDisplay = noLink ? (
     <h3
       style={decreasedEmphasis ? {color: '#5d5d65'} : null}

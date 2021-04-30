@@ -85,7 +85,9 @@
 
 .filter-title {
   color: #99999f;
-  margin: 0px;
+  margin: 0px 0px 10px;
+  text-align: center;
+  letter-spacing: 0.1em;
 }
 
 .filter-collection-reset:hover,

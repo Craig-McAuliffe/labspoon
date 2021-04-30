@@ -309,43 +309,41 @@ function PostQuickCreatePub({
         </ErrorMessage>
       )}
 
-      <div className="create-post-quick-create-pub-container">
-        <div className="create-custom-publication-icon-container">
-          <PublicationIcon />
-          <h3>Custom Publication</h3>
-        </div>
-        <TextInput
-          error={handlePubTitleError(customPublicationErrors)}
-          value={customPublication.title}
-          onChange={(e) =>
-            setCustomPublication((existingCustomPublication) => {
-              return {...existingCustomPublication, title: e.target.value};
-            })
-          }
-          label="Title of the publication"
-        />
-        <TextInput
-          error={handlePubUrlError(customPublicationErrors)}
-          value={customPublication.url}
-          onChange={(e) =>
-            setCustomPublication((existingCustomPublication) => {
-              return {...existingCustomPublication, url: e.target.value};
-            })
-          }
-          label="Url of the publication"
-        />
-        {isDuplicateAuthor && (
-          <Alert variant="warning">Author already added</Alert>
-        )}
-        <FindAndAddUsersToForm
-          onUserSelect={(user) => checkForDuplicateAndAddUser(user)}
-          searchBarLabel="Add authors on Labspoon"
-        />
-        <SelectedAuthors
-          authors={customPublicationAuthors}
-          removeAuthor={removeAuthor}
-        />
+      <div className="create-custom-publication-icon-container">
+        <PublicationIcon />
+        <h3>Custom Publication</h3>
       </div>
+      <TextInput
+        error={handlePubTitleError(customPublicationErrors)}
+        value={customPublication.title}
+        onChange={(e) =>
+          setCustomPublication((existingCustomPublication) => {
+            return {...existingCustomPublication, title: e.target.value};
+          })
+        }
+        label="Title of the publication"
+      />
+      <TextInput
+        error={handlePubUrlError(customPublicationErrors)}
+        value={customPublication.url}
+        onChange={(e) =>
+          setCustomPublication((existingCustomPublication) => {
+            return {...existingCustomPublication, url: e.target.value};
+          })
+        }
+        label="Url of the publication"
+      />
+      {isDuplicateAuthor && (
+        <Alert variant="warning">Author already added</Alert>
+      )}
+      <FindAndAddUsersToForm
+        onUserSelect={(user) => checkForDuplicateAndAddUser(user)}
+        searchBarLabel="Add authors on Labspoon"
+      />
+      <SelectedAuthors
+        authors={customPublicationAuthors}
+        removeAuthor={removeAuthor}
+      />
     </div>
   );
 }

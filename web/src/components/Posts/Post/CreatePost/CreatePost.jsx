@@ -14,10 +14,7 @@ import {PUBLICATION} from '../../../../helpers/resourceTypeDefinitions';
 import {FilterableResultsContext} from '../../../FilterableResults/FilterableResults';
 
 import './CreatePost.css';
-import {
-  DropDownTriangle,
-  InvertedDropDownTriangle,
-} from '../../../../assets/GeneralActionIcons';
+import {CreateIcon, SearchIconGrey} from '../../../../assets/HeaderIcons';
 
 export const DEFAULT_POST = 'Default';
 export const PUBLICATION_POST = 'Publication';
@@ -73,7 +70,7 @@ export default function CreatePost({
         setPostSuccess: setPostSuccess,
         submittingPost: submittingPost,
         setSubmittingPost: setSubmittingPost,
-        cancelPost: cancelPost,
+        cancelPost: cancelAction ? cancelPost : null,
         savedTitleText: savedTitleText,
         setSavedTitleText: setSavedTitleText,
       }}
@@ -212,28 +209,31 @@ export function QuickCreatePostFromResource({
 
 export function SwitchTagMethod({isCreating, setIsCreating}) {
   return (
-    <div className="create-post-alt-tagging-method-container">
+    <div className="create-post-switch-tagging-method-container">
       <button
-        className="create-publication-search-publications-button"
+        className="create-post-resource-search-button"
         type="button"
       ></button>
-      <p>{isCreating ? '' : "Can't find what you're looking for?"}</p>
+      <p>
+        {isCreating ? 'Switch back' : "Can't find what you're looking for?"}
+      </p>
       <button
         onClick={() => {
           setIsCreating((currentState) => !currentState);
         }}
-        className="create-pub-post-quick-create-toggle"
+        className={`create-post-quick-create-toggle${
+          isCreating ? '-search' : '-create'
+        }`}
         type="button"
       >
         {isCreating ? (
           <>
-            <h4>Switch Back</h4>
-            <InvertedDropDownTriangle />
+            Search <SearchIconGrey />
           </>
         ) : (
           <>
-            <h4>Quick Add</h4>
-            <DropDownTriangle />
+            Quick Create
+            <CreateIcon hoverControl={true} />
           </>
         )}
       </button>

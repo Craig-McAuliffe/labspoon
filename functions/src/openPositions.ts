@@ -80,6 +80,7 @@ export const createOpenPosition = functions.https.onCall(
         'An error occurred while creating the open position.'
       );
     });
+    return {id: openPositionRef.id};
   }
 );
 

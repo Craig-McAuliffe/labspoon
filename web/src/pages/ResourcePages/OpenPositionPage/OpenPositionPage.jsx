@@ -51,7 +51,7 @@ export default function OpenPositionPage() {
       <h3 className="open-position-headline-section-institution">
         {openPosition.group.institution}
       </h3>
-      {openPosition.content.salary.length > 0 ? (
+      {openPosition.content.salary && openPosition.content.salary.length > 0 ? (
         <div className="open-position-headline-sub-title-container">
           <h4 className="open-position-headline-sub-title">Salary</h4>
           <h4 className="open-position-headline-sub-title-value">
@@ -59,7 +59,8 @@ export default function OpenPositionPage() {
           </h4>
         </div>
       ) : null}
-      {openPosition.content.startDate.length > 0 ? (
+      {openPosition.content.startDate &&
+      openPosition.content.startDate.length > 0 ? (
         <div className="open-position-headline-sub-title-container">
           <h4 className="open-position-headline-sub-title">Start Date</h4>
           <h4 className="open-position-headline-sub-title-value">
@@ -67,7 +68,7 @@ export default function OpenPositionPage() {
           </h4>
         </div>
       ) : null}
-      {openPosition.topics.length > 0 ? (
+      {openPosition.topics && openPosition.topics.length > 0 ? (
         <>
           <ListItemTopics
             dbTopics={openPosition.topics}
@@ -76,14 +77,15 @@ export default function OpenPositionPage() {
         </>
       ) : null}
       <div>
-        {openPosition.content.address.length > 0 && (
-          <div style={{marginTop: '20px'}}>
-            <h4 className="open-position-headline-sub-title">Address</h4>
-            <h4 className="open-position-headline-address">
-              {openPosition.content.address}
-            </h4>
-          </div>
-        )}
+        {openPosition.content.address &&
+          openPosition.content.address.length > 0 && (
+            <div style={{marginTop: '20px'}}>
+              <h4 className="open-position-headline-sub-title">Address</h4>
+              <h4 className="open-position-headline-address">
+                {openPosition.content.address}
+              </h4>
+            </div>
+          )}
       </div>
       <h4 className="open-position-section-title">Affiliated Research Group</h4>
       <GroupListItem group={openPosition.group} noBorder={true}>
@@ -100,7 +102,8 @@ export default function OpenPositionPage() {
       <h3 className="open-position-apply-title">
         Apply
         <span>
-          {openPosition.content.applyEmail.length > 0 ? (
+          {openPosition.content.applyEmail &&
+          openPosition.content.applyEmail.length > 0 ? (
             <a href={`mailto:${openPosition.content.applyEmail}`}>
               {openPosition.content.applyEmail}
             </a>

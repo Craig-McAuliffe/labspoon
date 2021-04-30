@@ -41,8 +41,8 @@ export default function Dropdown({
   const menuChildren = React.Children.map(children, (child) => {
     if (React.isValidElement(child)) {
       return cloneElement(child, {
-        onSelect: () => {
-          child.props.onSelect();
+        onSelect: (selection) => {
+          child.props.onSelect(selection);
           setOpen(false);
         },
       });
@@ -150,7 +150,7 @@ export function DropdownOption({
   if (onSomethingElse) onSomethingElse();
   return (
     <button
-      onClick={onSelect}
+      onClick={(e) => onSelect(e.target.innerText)}
       className={`dropdown-option-button-${
         backgroundShade ? backgroundShade : 'light'
       }${loading ? '-loading' : ''}`}

@@ -2,6 +2,10 @@ import React from 'react';
 
 import './InputError.css';
 
-const InputError = ({error}) => <p className="error-input-message">{error}</p>;
+const InputError = ({error, noMargin}) => (
+  <p className={`error-input-message${noMargin ? '-no-margin' : ''}`}>
+    {error}
+  </p>
+);
 
 export default InputError;

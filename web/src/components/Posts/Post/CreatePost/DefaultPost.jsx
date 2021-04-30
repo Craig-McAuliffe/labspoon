@@ -14,6 +14,7 @@ import {POST} from '../../../../helpers/resourceTypeDefinitions';
 import {initialValueNoTitle} from '../../../Forms/Articles/HeaderAndBodyArticleInput';
 
 import './CreatePost.css';
+import {checkRichTextForOpenPosLinkAndFetch} from './OpenPositionPostForm';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
@@ -25,9 +26,16 @@ export default function DefaultPost({postType, setPostType}) {
     savedTitleText,
   } = useContext(CreatingPostContext);
   const {setResults} = useContext(FilterableResultsContext);
-  const submitChanges = (res, isTweeting) => {
+  const submitChanges = async (res, isTweeting) => {
     res.postType = {id: 'defaultPost', name: 'Default'};
     res.topics = selectedTopics;
+    const openPositionInText = await checkRichTextForOpenPosLinkAndFetch(
+      res.title
+    );
+    if (openPositionInText) {
+      res.postType = {id: 'openPositionPost', name: 'Open Position'};
+      res.openPosition = openPositionInText;
+    }
     createPost(res)
       .then((response) => {
         if (isTweeting)

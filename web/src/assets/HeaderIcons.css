@@ -1,7 +1,7 @@
-.create-icon-svg .create-button-circle {
+.create-icon-svg .create-button-circle,
+.create-icon-svg .create-button-circle-controlled {
   fill: #3099d3;
   fill-opacity: 0;
-  transition: 0.3s;
 }
 
 .create-icon-svg:hover .create-button-circle,

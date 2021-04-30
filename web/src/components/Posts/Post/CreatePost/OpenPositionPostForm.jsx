@@ -3,6 +3,7 @@ import firebase, {db} from '../../../../firebase';
 import {CreatePostTextArea, TextInput} from '../../../Forms/FormTextInput';
 import PostForm from './PostForm';
 import TypeOfTaggedResourceDropDown from './TypeOfTaggedResourceDropDown';
+import * as Yup from 'yup';
 import {
   CreatingPostContext,
   sortThrownCreatePostErrors,
@@ -17,23 +18,30 @@ import FormDatabaseSearch from '../../../Forms/FormDatabaseSearch';
 import InputError from '../../../Forms/InputError';
 import SecondaryButton from '../../../Buttons/SecondaryButton';
 import {TagResourceIcon} from '../../../../assets/ResourceTypeIcons';
-import {algoliaOpenPosToDBOpenPosListItem} from '../../../../helpers/openPositions';
 import {
-  MustSelectGroup,
-  SelectedGroup,
-  SelectGroupLabel,
-} from '../../../Forms/Groups/SelectGroup';
+  algoliaOpenPosToDBOpenPosListItem,
+  openPosToOpenPosListItem,
+} from '../../../../helpers/openPositions';
+import {SelectedGroup} from '../../../Forms/Groups/SelectGroup';
 import {
   SelectPosition,
   HowToApply,
+  POSITIONS,
 } from '../../../OpenPosition/CreateOpenPosition';
 import {AuthContext} from '../../../../App';
 import LoadingSpinner from '../../../LoadingSpinner/LoadingSpinner';
 import {convertGroupToGroupRef} from '../../../../helpers/groups';
 import {Alert} from 'react-bootstrap';
-import {MAX_ARTICLE_CHARACTERS} from '../../../Article/Article';
-import {initialValueNoTitle} from '../../../Forms/Articles/HeaderAndBodyArticleInput';
+import {
+  getTweetTextFromRichText,
+  MAX_ARTICLE_CHARACTERS,
+} from '../../../Article/Article';
+import {
+  initialValueNoTitle,
+  yupRichBodyOnlyValidation,
+} from '../../../Forms/Articles/HeaderAndBodyArticleInput';
 import SelectGroup from '../../../Group/SelectGroup';
+import {env} from '../../../../config';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 const createOpenPosition = firebase
@@ -63,6 +71,7 @@ export default function OpenPositionPostForm({postType, setPostType}) {
   });
   const [generalError, setGeneralError] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState(null);
+  const [postSubmissionError, setPostSubmissionError] = useState(false);
 
   useEffect(() => {
     if (!generalError) return;
@@ -93,7 +102,10 @@ export default function OpenPositionPostForm({postType, setPostType}) {
       setIsQuickCreatingOpenPos,
       openPosFormatErrors,
       setOpenPosFormatErrors,
-      selectedGroup
+      selectedGroup,
+      postSubmissionError,
+      setPostSubmissionError,
+      taggedOpenPosition
     );
 
   return (
@@ -113,6 +125,7 @@ export default function OpenPositionPostForm({postType, setPostType}) {
           setQuickOpenPosition={setQuickOpenPosition}
           selectedGroup={selectedGroup}
           setSelectedGroup={setSelectedGroup}
+          postSubmissionError={postSubmissionError}
         />
       }
     >
@@ -138,6 +151,7 @@ function SelectOpenPosition({
   setQuickOpenPosition,
   selectedGroup,
   setSelectedGroup,
+  postSubmissionError,
 }) {
   const [displayedOpenPositions, setDisplayedOpenPositions] = useState([]);
   const {userProfile} = useContext(AuthContext);
@@ -166,19 +180,17 @@ function SelectOpenPosition({
   // if the user clicks enter
   let searchOrCreateDisplay = (
     <>
-      <div className="tagged-resource-section">
-        <h4>Search Open Positions</h4>
-        <div className="resource-search-input-container">
-          <FormDatabaseSearch
-            setDisplayedItems={setDisplayedOpenPositions}
-            indexName="_OPENPOSITIONS"
-            placeholderText=""
-            displayedItems={displayedOpenPositions}
-            clearListOnNoResults={true}
-            hasCustomContainer={true}
-            hideSearchIcon={true}
-          />
-        </div>
+      <h4>Search Open Positions</h4>
+      <div className="resource-search-input-container">
+        <FormDatabaseSearch
+          setDisplayedItems={setDisplayedOpenPositions}
+          indexName="_OPENPOSITIONS"
+          placeholderText=""
+          displayedItems={displayedOpenPositions}
+          clearListOnNoResults={true}
+          hasCustomContainer={true}
+          hideSearchIcon={true}
+        />
       </div>
       {displayedOpenPositions && displayedOpenPositions.length > 0 && (
         <OpenPositionsSearchResults
@@ -190,35 +202,32 @@ function SelectOpenPosition({
   );
   if (isQuickCreatingOpenPos)
     searchOrCreateDisplay = (
-      <div className="tagged-resource-section">
-        <h4>Create Open Positions</h4>
-        <QuickCreateOpenPosition
-          openPosFormatErrors={openPosFormatErrors}
-          userID={userProfile.id}
-          quickOpenPosition={quickOpenPosition}
-          setQuickOpenPosition={setQuickOpenPosition}
-          selectedGroup={selectedGroup}
-          setSelectedGroup={setSelectedGroup}
-        />
-      </div>
+      <QuickCreateOpenPosition
+        openPosFormatErrors={openPosFormatErrors}
+        userID={userProfile.id}
+        quickOpenPosition={quickOpenPosition}
+        setQuickOpenPosition={setQuickOpenPosition}
+        selectedGroup={selectedGroup}
+        setSelectedGroup={setSelectedGroup}
+      />
     );
 
   return (
-    <>
-      {searchOrCreateDisplay}
+    <div className="tagged-resource-section">
       <SwitchTagMethod
         setIsCreating={setIsQuickCreatingOpenPos}
         isCreating={isQuickCreatingOpenPos}
       />
+      {searchOrCreateDisplay}
       <div className="create-pub-post-alert-container">
-        {openPosSuccessfullyCreated && (
+        {openPosSuccessfullyCreated && postSubmissionError && (
           <Alert variant="primary">
             Your open position was successfully created. Only the post failed.
             You should be able to find that open position by searching.
           </Alert>
         )}
       </div>
-    </>
+    </div>
   );
 }
 
@@ -265,7 +274,6 @@ export function QuickCreateOpenPosition({
 }) {
   const [memberOfGroups, setMemberOfGroups] = useState([]);
   const [loadingMemberOfGroups, setLoadingMemberOfGroups] = useState(true);
-
   useEffect(async () => {
     if (!loadingMemberOfGroups) setLoadingMemberOfGroups(true);
     const groupsQS = await db
@@ -290,17 +298,14 @@ export function QuickCreateOpenPosition({
   if (!selectedGroup)
     return (
       <>
-        <SelectGroupLabel fieldName="Group">
-          <SelectGroup
-            groups={memberOfGroups}
-            setSelectedGroup={setSelectedGroup}
-            toggleText="Select from your groups"
-            loadingMemberOfGroups={loadingMemberOfGroups}
-          />
-        </SelectGroupLabel>
-        <MustSelectGroup
-          userHasGroups={memberOfGroups.length > 0}
-          explanation="Open positions can only be created for groups."
+        <h4 className="quick-create-open-position-group-note">
+          Which group is this for?
+        </h4>
+        <SelectGroup
+          groups={memberOfGroups}
+          setSelectedGroup={setSelectedGroup}
+          toggleText="Select from your groups"
+          loadingMemberOfGroups={loadingMemberOfGroups}
         />
       </>
     );
@@ -322,8 +327,11 @@ export function QuickCreateOpenPosition({
           })
         }
       />
-      {handleOpenPosPositionError(openPosFormatErrors)}
+      <h4 style={{marginTop: '40px'}}>Position</h4>
       <SelectPosition
+        toggleText={
+          quickOpenPosition.position ? quickOpenPosition.position : 'Select'
+        }
         nonForm={true}
         onSelect={(selection) =>
           setQuickOpenPosition((existingOpenPos) => {
@@ -331,13 +339,12 @@ export function QuickCreateOpenPosition({
           })
         }
       />
-      {handleOpenPosDescriptionError(openPosFormatErrors)}
-      <h4>How to Apply</h4>
-      {handleApplyError(openPosFormatErrors)}
+      {handleOpenPosPositionError(openPosFormatErrors)}
+      <h4 style={{marginTop: '40px'}}>How to Apply</h4>
       <HowToApply
         nonForm={true}
         nonFormAction={(e) => {
-          if (e.target.value === 'applyLink')
+          if (e.target.name === 'applyLink')
             setQuickOpenPosition((existingOpenPos) => {
               return {
                 ...existingOpenPos,
@@ -345,7 +352,7 @@ export function QuickCreateOpenPosition({
                 applyEmail: '',
               };
             });
-          if (e.target.value === 'applyEmail')
+          if (e.target.name === 'applyEmail')
             setQuickOpenPosition((existingOpenPos) => {
               return {
                 ...existingOpenPos,
@@ -355,6 +362,7 @@ export function QuickCreateOpenPosition({
             });
         }}
       />
+      {handleApplyError(openPosFormatErrors)}
     </div>
   );
 }
@@ -411,35 +419,23 @@ function handleOpenPosTitleError(quickOpenPosErrors) {
 
 function handleOpenPosPositionError(quickOpenPosErrors) {
   if (!quickOpenPosErrors || quickOpenPosErrors.length === 0) return null;
-  if (!quickOpenPosErrors.some((error) => error.includes('position')))
-    return null;
-  const indexOfError = quickOpenPosErrors.indexOf((error) => {
-    error.includes('position');
-  });
-  return <InputError error={quickOpenPosErrors[indexOfError]} />;
-}
-
-function handleOpenPosDescriptionError(quickOpenPosErrors) {
-  if (!quickOpenPosErrors || quickOpenPosErrors.length === 0) return null;
-  if (!quickOpenPosErrors.some((error) => error.includes('description')))
-    return null;
-  const indexOfError = quickOpenPosErrors.indexOf((error) => {
-    error.includes('description');
-  });
-  return <InputError error={quickOpenPosErrors[indexOfError]} />;
+  if (quickOpenPosErrors.some((error) => error.includes('position')))
+    return (
+      <InputError noMargin={true} error="You need to provide a position" />
+    );
+  return null;
 }
 
 function handleApplyError(quickOpenPosErrors) {
   if (!quickOpenPosErrors || quickOpenPosErrors.length === 0) return null;
   if (
-    !(
-      quickOpenPosErrors.length === 1 &&
-      (quickOpenPosErrors[0].includes('applyLink') ||
-        quickOpenPosErrors[0].includes('applyEmail'))
-    )
+    quickOpenPosErrors.some((error) => error.includes('link')) ||
+    quickOpenPosErrors.some((error) => error.includes('email'))
   )
-    return null;
-  return <InputError error={'You need to add an email or link'} />;
+    return (
+      <InputError noMargin={true} error={'You need to add an email or link'} />
+    );
+  return null;
 }
 
 async function submitOpenPosPost(
@@ -458,29 +454,35 @@ async function submitOpenPosPost(
   setIsQuickCreatingOpenPos,
   openPosFormatErrors,
   setOpenPosFormatErrors,
-  selectedGroup
+  selectedGroup,
+  postSubmissionError,
+  setPostSubmissionError,
+  taggedOpenPosition
 ) {
   setSubmittingPost(true);
   if (openPosFormatErrors) setOpenPosFormatErrors([]);
   if (openPosSubmissionError) setPubSubmissionError(false);
   if (openPosSuccessfullyCreated) setOpenPosSuccessfullyCreated(null);
+  if (postSubmissionError) setPostSubmissionError(false);
   const submitQuickOpenPos = async () => {
     if (!isQuickCreatingOpenPos) return false;
+    const openPositionToBeCreated = {...quickOpenPosition};
+    openPositionToBeCreated.description = res.title;
     const openPosValidationErrors = await validateQuickOpenPosition(
-      quickOpenPosition
+      openPositionToBeCreated
     );
     if (openPosValidationErrors.length > 0) {
       setOpenPosFormatErrors(openPosValidationErrors);
       setSubmittingPost(false);
       return false;
     }
-    const newOpenPosition = {...quickOpenPosition};
-    newOpenPosition.group = convertGroupToGroupRef(selectedGroup);
-    newOpenPosition.topics = selectedTopics;
-    return createOpenPosition(newOpenPosition)
-      .then(() => {
+    openPositionToBeCreated.group = convertGroupToGroupRef(selectedGroup);
+    openPositionToBeCreated.topics = selectedTopics;
+    return createOpenPosition(openPositionToBeCreated)
+      .then((openPositionID) => {
+        const newOpenPosID = openPositionID.data.id;
         setOpenPosSuccessfullyCreated(true);
-        return true;
+        return newOpenPosID;
       })
       .catch((err) => {
         console.error(`unable to create open position ${err}`);
@@ -488,7 +490,8 @@ async function submitOpenPosPost(
         return false;
       });
   };
-  if (isQuickCreatingOpenPos && !submitQuickOpenPos) {
+  const openPositionCreationID = await submitQuickOpenPos();
+  if (isQuickCreatingOpenPos && !openPositionCreationID) {
     setSubmittingPost(false);
     return;
   }
@@ -496,10 +499,14 @@ async function submitOpenPosPost(
   res.postType = {id: 'openPositionPost', name: 'Open Position'};
   res.topics = selectedTopics;
   if (isQuickCreatingOpenPos) {
-    const newOpenPosition = {...quickOpenPosition};
-    newOpenPosition.group = convertGroupToGroupRef(selectedGroup);
-    newOpenPosition.topics = selectedTopics;
-    res.openPosition = newOpenPosition;
+    const formattedOpenPosition = {
+      topics: selectedTopics,
+      group: selectedGroup,
+      content: {...quickOpenPosition, description: res.title},
+      id: openPositionCreationID,
+    };
+    console.log(formattedOpenPosition);
+    res.openPosition = formattedOpenPosition;
   } else {
     if (taggedOpenPosition) {
       const dbOpenPosition = algoliaOpenPosToDBOpenPosListItem(
@@ -509,6 +516,12 @@ async function submitOpenPosPost(
       res.openPosition = dbOpenPosition;
     }
   }
+  if (!res.openPosition) {
+    const openPositionInPost = await checkRichTextForOpenPosLinkAndFetch(
+      res.title
+    );
+    if (openPositionInPost) res.openPosition = openPositionInPost;
+  }
   createPost(res)
     .then(() => {
       if (isTweeting) openTwitterWithPopulatedTweet(res.title, selectedTopics);
@@ -517,8 +530,26 @@ async function submitOpenPosPost(
     })
     .catch((err) => {
       sortThrownCreatePostErrors(err);
+      setPostSubmissionError(true);
       setQuickOpenPosition({});
       setIsQuickCreatingOpenPos(false);
       setSubmittingPost(false);
     });
+}
+
+export async function checkRichTextForOpenPosLinkAndFetch(postTitle) {
+  const postPlainText = getTweetTextFromRichText(postTitle);
+  const openPositionSearchRegex =
+    env === 'local'
+      ? /localhost:3000\/openPosition\/[a-z,A-Z,0-9]*/g
+      : /www.labspoon.com\/openPosition\/[a-z,A-Z,0-9]*/g;
+  const matchedOpenPosURL = openPositionSearchRegex.exec(postPlainText);
+  if (!matchedOpenPosURL) return null;
+  const openPosIDFromText = matchedOpenPosURL[0].split('/')[2];
+  const openPositionDS = await db
+    .doc(`openPositions/${openPosIDFromText}`)
+    .get()
+    .catch((err) => console.error(err));
+  if (!openPositionDS || !openPositionDS.exists) return;
+  return openPosToOpenPosListItem(openPositionDS.data(), openPositionDS.id);
 }

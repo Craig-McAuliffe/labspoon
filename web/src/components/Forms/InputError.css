@@ -2,3 +2,7 @@
   color: #da0000;
   margin-bottom: -20px;
 }
+
+.error-input-message-no-margin {
+  color: #da0000;
+}

@@ -51,6 +51,12 @@
   margin-top: 40px;
 }
 
+.tagged-resource-modal {
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.4);
+  margin-top: 5px;
+  padding: 10px;
+}
+
 .tagged-resource-section h4 {
   color: #5d5d65;
 }
@@ -107,25 +113,16 @@
   align-items: center;
 }
 
-.create-post-alt-tagging-method-container {
+.create-post-switch-tagging-method-container {
   display: flex;
   justify-content: flex-end;
 }
 
-.create-post-alt-tagging-method-container p {
+.create-post-switch-tagging-method-container p {
   color: #5d5d65;
   display: inline-block;
   padding: 0px;
   margin: 0px;
-}
-
-.create-post-alt-tagging-method-container button {
-  color: #00507c;
-}
-
-.create-publication-search-publications-button {
-  display: hidden;
-  position: absolute;
 }
 
 .create-publication-post-list-item-container {
@@ -339,31 +336,48 @@
   display: inline-block;
 }
 
-.create-post-quick-create-pub-container {
-  padding: 5px;
-  margin: 20px 0px;
-  padding-top: 20px;
-  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.6);
+.quick-create-open-position-group-note {
+  margin-bottom: 2px;
 }
-
-.create-pub-post-quick-create-toggle {
+.create-post-quick-create-toggle-search,
+.create-post-quick-create-toggle-create {
+  color: #00507c;
+  padding: 0px;
+  margin-left: 5px;
   display: flex;
+  align-items: center;
 }
 
-.create-pub-post-quick-create-toggle:hover h4 {
+.create-post-quick-create-toggle-search:hover,
+.create-post-quick-create-toggle-create:hover {
   text-decoration: underline;
-  align-self: flex-start;
 }
 
-.create-pub-post-quick-create-toggle svg {
-  align-self: center;
+.create-post-quick-create-toggle-search:hover .create-button-circle-controlled,
+.create-post-quick-create-toggle-create:hover .create-button-circle-controlled,
+.create-post-quick-create-toggle-search:focus .create-button-circle-controlled,
+.create-post-quick-create-toggle-create:focus .create-button-circle-controlled {
+  fill-opacity: 0.21;
 }
-.create-pub-post-quick-create-toggle path {
+
+.create-post-quick-create-toggle-search svg {
+  height: 15px;
+  width: 15px;
+  margin-left: 5px;
+}
+
+.create-post-quick-create-toggle-create svg {
+  height: 20px;
+  width: 20px;
+}
+
+.create-post-resource-search-button {
+  display: hidden;
+  position: absolute;
+}
+
+.create-post-quick-create-toggle-search path {
   fill: #00507c;
-}
-
-.create-pub-post-quick-create-toggle h4 {
-  margin-right: 5px;
 }
 
 .create-post-twitter-toggle-container {
