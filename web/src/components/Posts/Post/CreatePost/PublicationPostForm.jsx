@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import NegativeButton from '../../../Buttons/NegativeButton';
 import * as Yup from 'yup';
 import firebase, {db} from '../../../../firebase';
-import {CreatePostTextArea, TextInput} from '../../../Forms/FormTextInput';
+import {TextInput} from '../../../Forms/FormTextInput';
 import PostForm from './PostForm';
 import {
   CreatingPostContext,
@@ -10,7 +10,6 @@ import {
   openTwitterWithPopulatedTweet,
   SwitchTagMethod,
 } from './CreatePost';
-import TypeOfTaggedResourceDropDown from './TypeOfTaggedResourceDropDown';
 import PublicationListItem, {
   SmallPublicationListItem,
 } from '../../../Publication/PublicationListItem';
@@ -38,7 +37,7 @@ import {POST} from '../../../../helpers/resourceTypeDefinitions';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
-export default function PublicationPostForm({postType, setPostType}) {
+export default function PublicationPostForm() {
   const {userProfile} = useContext(AuthContext);
   const {
     selectedTopics,
@@ -115,33 +114,23 @@ export default function PublicationPostForm({postType, setPostType}) {
         onSubmit={submitChanges}
         initialValues={initialValues}
         formID="create-publication-post-form"
-        outsideFormComponents={
-          <SelectAndCreatePublication
-            publication={publication}
-            setPublication={setPublication}
-            isQuickCreatingPub={isQuickCreatingPub}
-            setIsQuickCreatingPub={setIsQuickCreatingPub}
-            customPubSuccessfullyCreated={customPubSuccessfullyCreated}
-            userIsVerified={userProfile.isVerified}
-            customPublicationAuthors={customPublicationAuthors}
-            setCustomPublicationAuthors={setCustomPublicationAuthors}
-            customPublication={customPublication}
-            setCustomPublication={setCustomPublication}
-            userID={userID}
-            customPublicationErrors={customPublicationErrors}
-            pubSubmissionError={pubSubmissionError}
-            hasHitMaxDailyPublications={hasHitMaxDailyPublications}
-          />
-        }
-      >
-        <div className="creating-post-main-text-container">
-          <CreatePostTextArea name="title" />
-        </div>
-        <TypeOfTaggedResourceDropDown
-          setTaggedResourceType={setPostType}
-          taggedResourceType={postType}
-        />
-      </PostForm>
+      />
+      <SelectAndCreatePublication
+        publication={publication}
+        setPublication={setPublication}
+        isQuickCreatingPub={isQuickCreatingPub}
+        setIsQuickCreatingPub={setIsQuickCreatingPub}
+        customPubSuccessfullyCreated={customPubSuccessfullyCreated}
+        userIsVerified={userProfile.isVerified}
+        customPublicationAuthors={customPublicationAuthors}
+        setCustomPublicationAuthors={setCustomPublicationAuthors}
+        customPublication={customPublication}
+        setCustomPublication={setCustomPublication}
+        userID={userID}
+        customPublicationErrors={customPublicationErrors}
+        pubSubmissionError={pubSubmissionError}
+        hasHitMaxDailyPublications={hasHitMaxDailyPublications}
+      />
     </>
   );
 }

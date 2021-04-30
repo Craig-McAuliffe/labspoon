@@ -8,6 +8,19 @@
   flex-grow: 1;
 }
 
+.ms-fields-search-container-large {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.ms-fields-search-container-large input {
+  border: 1px solid #99999f;
+  height: 40px;
+  width: 100%;
+  padding: 10px;
+}
+
 .ms-fields-search-container input {
   flex-grow: 1;
 }

@@ -9,10 +9,10 @@ const topicSearch = firebase.functions().httpsCallable('topics-topicSearch');
 export default function SearchMSFields({
   setFetchedTopics,
   placeholder,
-  setCurrentInputValue,
   searchIcon,
   setLoading,
   limit,
+  largeDesign,
 }) {
   const [typedTopic, setTypedTopic] = useState('');
 
@@ -33,13 +33,14 @@ export default function SearchMSFields({
 
   return (
     <>
-      <div className="ms-fields-search-container">
+      <div
+        className={`ms-fields-search-container${largeDesign ? '-large' : ''}`}
+      >
         {searchIcon ? <SearchIconGrey /> : null}
         <input
           type="text"
           onChange={(e) => {
             setTypedTopic(e.target.value);
-            if (setCurrentInputValue) setCurrentInputValue(e.target.value);
           }}
           placeholder={placeholder}
         />

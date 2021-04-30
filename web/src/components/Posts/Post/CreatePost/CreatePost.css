@@ -7,6 +7,16 @@
   border: 2px solid #00507c;
 }
 
+.create-post-section-title,
+.create-post-section-title-2 {
+  text-align: center;
+  margin: 20px 0px 10px;
+}
+
+.create-post-section-title-2 {
+  margin: 120px 0px 10px;
+}
+
 .not-creating-post-button:hover {
   border: 3px solid #00507c;
   padding: 12px;
@@ -154,78 +164,41 @@
   top: 200px;
 }
 
-.create-post-post-resource-type-dropdown-section {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  align-items: center;
-  margin: 20px 0px;
-  max-width: 100%;
-}
-
-.create-post-post-resource-type-dropdown-tag {
-  height: 50px;
-  display: flex;
-  align-items: center;
-}
-
-.create-post-post-resource-type-dropdown-section svg {
-  height: 25px;
-}
-
 .create-post-tag-a {
   display: inline-block;
   color: #5d5d65;
   margin: 0px 8px;
 }
 
-.create-post-post-resource-suggested-tags-container {
+.create-post-background-swirl-container {
+  margin: 30px 15% 20px 0px;
+}
+.create-post-background-swirl-container svg {
+  width: 100%;
+}
+
+.create-post-types-container {
   display: flex;
   justify-content: flex-start;
+  align-items: flex-start;
   flex-wrap: wrap;
+  margin: 10px 0px 40px;
 }
 
-.create-post-post-resource-type-suggestion {
-  color: #00507c;
-  margin: 0px 10px;
-}
-
-.create-post-post-resource-type-suggestion h4 {
-  margin: 0px;
-}
-
-.create-post-post-resource-type-suggestion:hover,
-.create-post-post-resource-type-suggestion:focus {
-  color: #3099d3;
-}
-
-.create-post-post-resource-dropdown-toggle-container {
-  display: flex;
-}
-
-.create-post-post-resource-dropdown-toggle {
-  /* border: 1px solid #00507c; */
-  width: 200px;
-  color: #5d5d65;
-  text-align: start;
-  padding: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.create-post-post-resource-dropdown-toggle path {
-  fill: #00507c;
-}
-
-.create-post-resource-tag-dropdown-option-name {
-  display: inline-block;
-  padding-left: 12px;
+.create-post-type-button {
+  padding: 10px 20px;
+  flex-shrink: 0;
   color: #00507c;
 }
 
-.create-post-post-resource-type-dropdown-section-active {
-  margin-top: 20px;
+.create-post-type-button h3 {
+  margin-bottom: 0px;
+}
+
+.create-post-type-button:hover {
+  border: 1px solid #dcdce0;
+  padding: 9px 19px;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
 }
 
 .create-post-post-tagged-resource-type-button {

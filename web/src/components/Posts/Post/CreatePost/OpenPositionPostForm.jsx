@@ -1,8 +1,7 @@
 import React, {useContext, useEffect, useState} from 'react';
 import firebase, {db} from '../../../../firebase';
-import {CreatePostTextArea, TextInput} from '../../../Forms/FormTextInput';
+import {TextInput} from '../../../Forms/FormTextInput';
 import PostForm from './PostForm';
-import TypeOfTaggedResourceDropDown from './TypeOfTaggedResourceDropDown';
 import * as Yup from 'yup';
 import {
   CreatingPostContext,
@@ -48,7 +47,7 @@ const createOpenPosition = firebase
   .functions()
   .httpsCallable('openPositions-createOpenPosition');
 
-export default function OpenPositionPostForm({postType, setPostType}) {
+export default function OpenPositionPostForm() {
   const {
     selectedTopics,
     setPostSuccess,
@@ -109,34 +108,26 @@ export default function OpenPositionPostForm({postType, setPostType}) {
     );
 
   return (
-    <PostForm
-      onSubmit={submitChanges}
-      initialValues={initialValues}
-      formID="create-openPosition-post-form"
-      algoliaFormSearch={
-        <SelectOpenPosition
-          setTaggedOpenPosition={setTaggedOpenPosition}
-          taggedOpenPosition={taggedOpenPosition}
-          isQuickCreatingOpenPos={isQuickCreatingOpenPos}
-          setIsQuickCreatingOpenPos={setIsQuickCreatingOpenPos}
-          openPosSuccessfullyCreated={openPosSuccessfullyCreated}
-          openPosFormatErrors={openPosFormatErrors}
-          quickOpenPosition={quickOpenPosition}
-          setQuickOpenPosition={setQuickOpenPosition}
-          selectedGroup={selectedGroup}
-          setSelectedGroup={setSelectedGroup}
-          postSubmissionError={postSubmissionError}
-        />
-      }
-    >
-      <div className="creating-post-main-text-container">
-        <CreatePostTextArea name="title" />
-      </div>
-      <TypeOfTaggedResourceDropDown
-        setTaggedResourceType={setPostType}
-        taggedResourceType={postType}
+    <>
+      <PostForm
+        onSubmit={submitChanges}
+        initialValues={initialValues}
+        formID="create-openPosition-post-form"
       />
-    </PostForm>
+      <SelectOpenPosition
+        setTaggedOpenPosition={setTaggedOpenPosition}
+        taggedOpenPosition={taggedOpenPosition}
+        isQuickCreatingOpenPos={isQuickCreatingOpenPos}
+        setIsQuickCreatingOpenPos={setIsQuickCreatingOpenPos}
+        openPosSuccessfullyCreated={openPosSuccessfullyCreated}
+        openPosFormatErrors={openPosFormatErrors}
+        quickOpenPosition={quickOpenPosition}
+        setQuickOpenPosition={setQuickOpenPosition}
+        selectedGroup={selectedGroup}
+        setSelectedGroup={setSelectedGroup}
+        postSubmissionError={postSubmissionError}
+      />
+    </>
   );
 }
 

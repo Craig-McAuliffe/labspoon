@@ -13,11 +13,10 @@ export default function TagTopics({
   submittingForm,
   selectedTopics,
   setSelectedTopics,
-  noCustomTopics,
+  largeDesign,
 }) {
   const [displayedTopics, setDisplayedTopics] = useState([]);
   const [duplicateTopic, setDuplicateTopic] = useState(false);
-  const [typedTopic, setTypedTopic] = useState('');
   const [loadingTopics, setLoadingTopics] = useState(false);
   // Tells user that they are trying to input a duplicate topic
   useEffect(() => {
@@ -33,6 +32,24 @@ export default function TagTopics({
     }
   }, [submittingForm]);
 
+  if (largeDesign)
+    return (
+      <div>
+        <SearchMSFields
+          placeholder="Search topics"
+          setFetchedTopics={setDisplayedTopics}
+          setLoading={setLoadingTopics}
+          limit={15}
+          largeDesign={true}
+        />
+        <TopicsList
+          topics={displayedTopics}
+          setSelectedTopics={setSelectedTopics}
+          setDuplicateTopic={setDuplicateTopic}
+          displayedTopics={displayedTopics}
+        />
+      </div>
+    );
   return (
     <div className="create-post-topic-section-container">
       <SelectedTopics
@@ -46,7 +63,6 @@ export default function TagTopics({
           <SearchMSFields
             placeholder="this post is about..."
             setFetchedTopics={setDisplayedTopics}
-            setCurrentInputValue={setTypedTopic}
             setLoading={setLoadingTopics}
             limit={15}
           />
@@ -75,14 +91,6 @@ export default function TagTopics({
           setDuplicateTopic={setDuplicateTopic}
           displayedTopics={displayedTopics}
         />
-        {!noCustomTopics && (
-          <TypedTopic
-            typedTopic={typedTopic}
-            setSelectedTopics={setSelectedTopics}
-            setDuplicateTopic={setDuplicateTopic}
-            displayedTopics={displayedTopics}
-          />
-        )}
       </div>
     </div>
   );
@@ -168,36 +176,6 @@ function SelectedTopics({selectedTopics, setSelectedTopics}) {
     </div>
   );
 }
-
-// Displays the topic that has been typed
-const TypedTopic = ({
-  typedTopic,
-  setSelectedTopics,
-  setDuplicateTopic,
-  displayedTopics,
-}) => {
-  return typedTopic.length === 0 ? null : (
-    <div className="create-post-typed-topic-container">
-      <h4>{typedTopic}</h4>
-      <button
-        type="button"
-        onClick={() =>
-          addTopicToPost(
-            setSelectedTopics,
-            typedTopic,
-            setDuplicateTopic,
-            undefined,
-            undefined,
-            displayedTopics
-          )
-        }
-        small
-      >
-        Select
-      </button>
-    </div>
-  );
-};
 
 // Checks if the user already added the topic
 // Checks if the user is adding a topic name that already exists

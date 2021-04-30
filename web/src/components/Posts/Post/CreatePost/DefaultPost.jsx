@@ -2,13 +2,11 @@ import React, {useContext} from 'react';
 import firebase from '../../../../firebase';
 
 import PostForm from './PostForm';
-import {CreatePostTextArea} from '../../../Forms/FormTextInput';
 import {
   CreatingPostContext,
   openTwitterWithPopulatedTweet,
   sortThrownCreatePostErrors,
 } from './CreatePost';
-import TypeOfTaggedResourceDropDown from './TypeOfTaggedResourceDropDown';
 import {FilterableResultsContext} from '../../../FilterableResults/FilterableResults';
 import {POST} from '../../../../helpers/resourceTypeDefinitions';
 import {initialValueNoTitle} from '../../../Forms/Articles/HeaderAndBodyArticleInput';
@@ -58,18 +56,12 @@ export default function DefaultPost({postType, setPostType}) {
   };
 
   return (
-    <PostForm
-      onSubmit={submitChanges}
-      initialValues={initialValues}
-      formID="create-default-post-form"
-    >
-      <div className="creating-post-main-text-container">
-        <CreatePostTextArea name="title" />
-      </div>
-      <TypeOfTaggedResourceDropDown
-        setTaggedResourceType={setPostType}
-        taggedResourceType={postType}
+    <>
+      <PostForm
+        onSubmit={submitChanges}
+        initialValues={initialValues}
+        formID="create-default-post-form"
       />
-    </PostForm>
+    </>
   );
 }

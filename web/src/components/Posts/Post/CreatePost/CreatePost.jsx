@@ -16,9 +16,14 @@ import {FilterableResultsContext} from '../../../FilterableResults/FilterableRes
 import './CreatePost.css';
 import {CreateIcon, SearchIconGrey} from '../../../../assets/HeaderIcons';
 
-export const DEFAULT_POST = 'Default';
+export const DEFAULT_POST = 'Other';
 export const PUBLICATION_POST = 'Publication';
 export const OPEN_POSITION_POST = 'Open Position';
+export const EVENT_POST = 'Event';
+export const PROJECT_GRANT_POST = 'Project / Grant';
+export const QUESTION_POST = 'Question';
+export const IDEA_POST = 'Idea';
+export const MICRO_TOPIC_POST = 'Micro Topic';
 
 export const CreatingPostContext = createContext();
 export const MAX_POST_CHARACTERS = 800;
@@ -34,7 +39,7 @@ export default function CreatePost({
   const {user, userProfile} = useContext(AuthContext);
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [postSuccess, setPostSuccess] = useState(false);
-  const [taggedResourceType, setTaggedResourceType] = useState(DEFAULT_POST);
+  const [postType, setPostType] = useState(null);
   const [submittingPost, setSubmittingPost] = useState(false);
   const [savedTitleText, setSavedTitleText] = useState();
   const locationPathname = useLocation().pathname;
@@ -48,7 +53,7 @@ export default function CreatePost({
     if (!postSuccess) return;
     if (onSuccess) onSuccess();
     setSavedTitleText();
-    setTaggedResourceType(DEFAULT_POST);
+    setPostType(DEFAULT_POST);
     setTimeout(() => setPostSuccess(false), 3000);
   }, [postSuccess]);
 
@@ -73,21 +78,20 @@ export default function CreatePost({
         cancelPost: cancelAction ? cancelPost : null,
         savedTitleText: savedTitleText,
         setSavedTitleText: setSavedTitleText,
+        postType: postType,
+        setPostType: setPostType,
       }}
     >
       <div className={locationPathname === '/' ? 'create-post-margin-top' : ''}>
         {preTaggedResourceType ? (
           <QuickCreatePostFromResource
-            taggedResourceType={preTaggedResourceType}
+            postType={preTaggedResourceType}
             taggedResourceDetails={preTaggedResourceDetails}
             onSuccess={onSuccess}
             preTaggedResourceID={preTaggedResourceID}
           />
         ) : (
-          <PostTypeSpecificForm
-            postType={taggedResourceType}
-            setPostType={setTaggedResourceType}
-          />
+          <PostTypeSpecificForm postType={postType} setPostType={setPostType} />
         )}
       </div>
     </CreatingPostContext.Provider>
@@ -97,17 +101,13 @@ export default function CreatePost({
 function PostTypeSpecificForm({postType, setPostType}) {
   switch (postType) {
     case DEFAULT_POST:
-      return <DefaultPost setPostType={setPostType} postType={postType} />;
+      return <DefaultPost />;
     case PUBLICATION_POST:
-      return (
-        <PublicationPostForm setPostType={setPostType} postType={postType} />
-      );
+      return <PublicationPostForm />;
     case OPEN_POSITION_POST:
-      return (
-        <OpenPositionPostForm setPostType={setPostType} postType={postType} />
-      );
+      return <OpenPositionPostForm />;
     default:
-      return <DefaultPost setPostType={setPostType} postType={postType} />;
+      return <PostForm />;
   }
 }
 
@@ -158,7 +158,7 @@ export function openTwitterWithPopulatedTweet(richText, topics) {
 }
 
 export function QuickCreatePostFromResource({
-  taggedResourceType,
+  postType,
   taggedResourceDetails,
   preTaggedResourceID,
 }) {
@@ -168,7 +168,7 @@ export function QuickCreatePostFromResource({
 
   const {setResults} = useContext(FilterableResultsContext);
   const submitChanges = async (res, isTweeting) => {
-    switch (taggedResourceType) {
+    switch (postType) {
       case PUBLICATION:
         res[PUBLICATION] = taggedResourceDetails;
         res[PUBLICATION].id = preTaggedResourceID;
