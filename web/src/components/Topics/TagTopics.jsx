@@ -9,6 +9,7 @@ import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import '../Posts/Post/CreatePost/CreatePost.css';
 import './TagTopics.css';
 
+const TAG_TOPICS_SEARCH_LIMIT = 10;
 export default function TagTopics({
   submittingForm,
   selectedTopics,
@@ -35,19 +36,25 @@ export default function TagTopics({
   if (largeDesign)
     return (
       <div>
+        <SelectedTopics
+          selectedTopics={selectedTopics}
+          setSelectedTopics={setSelectedTopics}
+        />
         <SearchMSFields
           placeholder="Search topics"
           setFetchedTopics={setDisplayedTopics}
           setLoading={setLoadingTopics}
-          limit={15}
+          limit={TAG_TOPICS_SEARCH_LIMIT}
           largeDesign={true}
-        />
-        <TopicsList
-          topics={displayedTopics}
-          setSelectedTopics={setSelectedTopics}
-          setDuplicateTopic={setDuplicateTopic}
-          displayedTopics={displayedTopics}
-        />
+        >
+          <TopicsList
+            topics={displayedTopics}
+            setSelectedTopics={setSelectedTopics}
+            setDuplicateTopic={setDuplicateTopic}
+            displayedTopics={displayedTopics}
+            loadingTopics={loadingTopics}
+          />
+        </SearchMSFields>
       </div>
     );
   return (
@@ -64,7 +71,7 @@ export default function TagTopics({
             placeholder="this post is about..."
             setFetchedTopics={setDisplayedTopics}
             setLoading={setLoadingTopics}
-            limit={15}
+            limit={TAG_TOPICS_SEARCH_LIMIT}
           />
           <Popover
             getPopUpComponent={() => (
@@ -79,17 +86,14 @@ export default function TagTopics({
           </Popover>
         </div>
       </div>
-      {loadingTopics && (
-        <div className="tag-topics-loading-topics-spinner-container">
-          <LoadingSpinner />
-        </div>
-      )}
+
       <div>
         <TopicsList
           topics={displayedTopics}
           setSelectedTopics={setSelectedTopics}
           setDuplicateTopic={setDuplicateTopic}
           displayedTopics={displayedTopics}
+          loadingTopics={loadingTopics}
         />
       </div>
     </div>
@@ -117,8 +121,15 @@ const TopicsList = ({
   setSelectedTopics,
   setDuplicateTopic,
   displayedTopics,
-}) =>
-  topics.map((displayedTopic) => (
+  loadingTopics,
+}) => {
+  if (loadingTopics)
+    return (
+      <div className="tag-topics-loading-topics-spinner-container">
+        <LoadingSpinner />
+      </div>
+    );
+  return topics.map((displayedTopic) => (
     <TopicListItem
       key={displayedTopic.microsoftID}
       topic={displayedTopic}
@@ -142,6 +153,7 @@ const TopicsList = ({
       </PrimaryButton>
     </TopicListItem>
   ));
+};
 
 function DuplicateTopicWarning() {
   return (

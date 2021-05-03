@@ -32,19 +32,17 @@
   margin-bottom: 0px;
 }
 
-.creating-post-container {
-  padding-bottom: 20px;
-  margin-bottom: 40px;
-  border-bottom: 4px solid #dcdce0;
+.create-post-form-section {
+  animation: fadeIn 0.5s linear;
+  opacity: 1;
   min-width: 100%;
   max-width: 100%;
   padding-left: 0px;
-  margin-right: 0px;
 }
 
 .creating-post-main-text-container {
   border-left: 2px solid #00507c;
-  padding: 0px 0px 10px 10px;
+  padding-left: 10px;
   max-width: 100%;
   word-break: break-all;
 }
@@ -358,6 +356,61 @@
   display: flex;
   justify-content: flex-end;
 }
+
+.create-post-tag-more-topics-button-container {
+  display: flex;
+  justify-content: center;
+}
+
+.create-post-hidden-overlap {
+  overflow-y: hidden;
+  overflow-x: hidden;
+  position: relative;
+}
+
+.create-post-topic-section {
+  margin-bottom: 30px;
+}
+
+.create-post-type-section {
+  position: absolute;
+  width: 100%;
+  top: 0px;
+  -webkit-animation: slideDownwardsFadeIn 1s cubic-bezier(0.01, 0.9, 1, 1);
+  animation: slideDownwardsFadeIn 1s cubic-bezier(0.01, 0.9, 1, 1);
+  opacity: 1;
+}
+
+.create-post-primary-selected-topic-type {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.create-post-primary-selected-topic-type-button {
+  border: 1px solid #00507c;
+  padding: 10px;
+  color: #00507c;
+  border-radius: 2px;
+}
+
+.create-post-primary-selected-topic-type-button svg {
+  height: 15px;
+  margin-left: 5px;
+}
+
+.create-post-primary-selected-topic-type-button:hover path {
+  stroke: #00507c;
+}
+
+.create-post-primary-selected-topic-type-button:hover {
+  padding: 9px;
+  border: 2px solid #00507c;
+}
+
+.create-post-type-section-height-match {
+  height: 60px;
+}
 @media screen and (max-width: 1197px) {
   .not-creating-post-button {
     margin-top: 65px;
@@ -369,7 +422,7 @@
     margin-top: 60px;
   }
 
-  .creating-post-container {
+  .create-post-form-section {
     padding-left: 5px;
     padding-right: 5px;
   }

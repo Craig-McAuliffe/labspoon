@@ -1,20 +1,25 @@
 import React, {useState, useContext, createContext, useEffect} from 'react';
 import {AuthContext} from '../../../../App';
-import DefaultPost from './DefaultPost';
 import PublicationPostForm, {
   submitCreatePostWithPublication,
 } from './PublicationPostForm';
 import {Redirect, useLocation} from 'react-router-dom';
-import OpenPositionPostForm from './OpenPositionPostForm';
 import {getTweetTextFromRichText} from '../../../Article/Article';
 import PostForm from './PostForm';
-import {CreatePostTextArea} from '../../../Forms/FormTextInput';
 import {initialValueNoTitle} from '../../../Forms/Articles/HeaderAndBodyArticleInput';
 import {PUBLICATION} from '../../../../helpers/resourceTypeDefinitions';
 import {FilterableResultsContext} from '../../../FilterableResults/FilterableResults';
+import {CreateIcon, SearchIconGrey} from '../../../../assets/HeaderIcons';
+import TagTopics from '../../../Topics/TagTopics';
+import LoadingSpinner from '../../../LoadingSpinner/LoadingSpinner';
+import TypeOfTaggedResourceDropDown from './TypeOfTaggedResourceDropDown';
+import {CreatePostBackgroundSwirl} from '../../../../assets/Designs';
+import TertiaryButton from '../../../Buttons/TertiaryButton';
+import {RemoveIcon} from '../../../../assets/GeneralActionIcons';
+import OpenPositionPostForm from './OpenPositionPostForm';
+import DefaultPost from './DefaultPost';
 
 import './CreatePost.css';
-import {CreateIcon, SearchIconGrey} from '../../../../assets/HeaderIcons';
 
 export const DEFAULT_POST = 'Other';
 export const PUBLICATION_POST = 'Publication';
@@ -91,24 +96,11 @@ export default function CreatePost({
             preTaggedResourceID={preTaggedResourceID}
           />
         ) : (
-          <PostTypeSpecificForm postType={postType} setPostType={setPostType} />
+          <GenericCreatePost postType={postType} setPostType={setPostType} />
         )}
       </div>
     </CreatingPostContext.Provider>
   );
-}
-
-function PostTypeSpecificForm({postType, setPostType}) {
-  switch (postType) {
-    case DEFAULT_POST:
-      return <DefaultPost />;
-    case PUBLICATION_POST:
-      return <PublicationPostForm />;
-    case OPEN_POSITION_POST:
-      return <OpenPositionPostForm />;
-    default:
-      return <PostForm />;
-  }
 }
 
 export function sortThrownCreatePostErrors(err) {
@@ -199,11 +191,7 @@ export function QuickCreatePostFromResource({
       onSubmit={submitChanges}
       initialValues={initialValues}
       formID="create-default-post-form"
-    >
-      <div className="creating-post-main-text-container">
-        <CreatePostTextArea name="title" />
-      </div>
-    </PostForm>
+    ></PostForm>
   );
 }
 
@@ -239,4 +227,129 @@ export function SwitchTagMethod({isCreating, setIsCreating}) {
       </button>
     </div>
   );
+}
+
+function GenericCreatePost() {
+  const {
+    submittingPost,
+    setSelectedTopics,
+    selectedTopics,
+    postType,
+    setPostType,
+  } = useContext(CreatingPostContext);
+  const [minimiseTagTopics, setMinimiseTagTopics] = useState(true);
+
+  return (
+    <>
+      <div className="create-post-topic-section">
+        {selectedTopics.length === 0 && (
+          <h2 className="create-post-section-title">
+            What topic are you posting about?
+          </h2>
+        )}
+
+        {minimiseTagTopics && selectedTopics.length > 0 ? (
+          <MainTopicAndTagMoreTopics
+            selectedTopics={selectedTopics}
+            setMinimiseTagTopics={setMinimiseTagTopics}
+            setSelectedTopics={setSelectedTopics}
+          />
+        ) : (
+          <TagTopics
+            submittingForm={submittingPost}
+            setSelectedTopics={setSelectedTopics}
+            selectedTopics={selectedTopics}
+            largeDesign={true}
+          />
+        )}
+      </div>
+      <div className="create-post-hidden-overlap">
+        {selectedTopics.length > 0 && (
+          <>
+            <div className="create-post-type-section">
+              {!postType && (
+                <h2 className="create-post-section-title-2">
+                  What type of post is this?
+                </h2>
+              )}
+              <TypeOfTaggedResourceDropDown
+                setTaggedResourceType={setPostType}
+                taggedResourceType={postType}
+              />
+            </div>
+            <div className="create-post-type-section-height-match"></div>
+          </>
+        )}
+        {postType ? (
+          <div className="create-post-form-section">
+            {submittingPost ? (
+              <div className="create-post-loading-spinner">
+                <LoadingSpinner />
+              </div>
+            ) : null}
+            <div
+              className={
+                submittingPost ? 'create-post-loading-greyed-out' : null
+              }
+            >
+              <PostTypeSpecificForm postType={postType} />
+            </div>
+          </div>
+        ) : (
+          <div className="create-post-background-swirl-container">
+            <CreatePostBackgroundSwirl
+              disappearEffect={selectedTopics.length > 0}
+            />
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+function MainTopicAndTagMoreTopics({
+  selectedTopics,
+  setSelectedTopics,
+  setMinimiseTagTopics,
+}) {
+  return (
+    <>
+      <PostSectionSelectedTypeTopic
+        removeAction={() => setSelectedTopics([])}
+        title={selectedTopics[0].name}
+      />
+      <div className="create-post-tag-more-topics-button-container">
+        <TertiaryButton onClick={() => setMinimiseTagTopics(false)}>
+          Tag additional topics
+        </TertiaryButton>
+      </div>
+    </>
+  );
+}
+
+export function PostSectionSelectedTypeTopic({title, removeAction}) {
+  return (
+    <h2 className="create-post-primary-selected-topic-type">
+      <button
+        className="create-post-primary-selected-topic-type-button"
+        onClick={removeAction}
+      >
+        {title}
+        <RemoveIcon />
+      </button>
+    </h2>
+  );
+}
+function PostTypeSpecificForm({postType}) {
+  switch (postType) {
+    case PUBLICATION_POST: {
+      return <PublicationPostForm />;
+    }
+    case OPEN_POSITION_POST: {
+      return <OpenPositionPostForm />;
+    }
+    default: {
+      return <DefaultPost />;
+    }
+  }
 }

@@ -81,7 +81,7 @@ export default function OpenPositionPostForm() {
   }, [generalError]);
 
   const initialValues = {
-    title: savedTitleText ? savedTitleText : '',
+    title: savedTitleText ? savedTitleText : initialValueNoTitle,
   };
 
   const submitChanges = (res, isTweeting) =>
@@ -109,11 +109,6 @@ export default function OpenPositionPostForm() {
 
   return (
     <>
-      <PostForm
-        onSubmit={submitChanges}
-        initialValues={initialValues}
-        formID="create-openPosition-post-form"
-      />
       <SelectOpenPosition
         setTaggedOpenPosition={setTaggedOpenPosition}
         taggedOpenPosition={taggedOpenPosition}
@@ -126,6 +121,11 @@ export default function OpenPositionPostForm() {
         selectedGroup={selectedGroup}
         setSelectedGroup={setSelectedGroup}
         postSubmissionError={postSubmissionError}
+      />
+      <PostForm
+        onSubmit={submitChanges}
+        initialValues={initialValues}
+        formID="create-openPosition-post-form"
       />
     </>
   );

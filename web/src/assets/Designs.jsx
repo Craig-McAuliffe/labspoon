@@ -1,16 +1,27 @@
 import React from 'react';
-export function CreatePostBackgroundSwirl() {
+
+import './Designs.css';
+export function CreatePostBackgroundSwirl({disappearEffect}) {
   return (
     <svg viewBox="0 0 750 270" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
+        className={
+          disappearEffect ? 'create-post-background-swirl-fadeOut' : ''
+        }
         d="M748.5 5.31947C573.172 -6.07871 510.5 -8.18056 341 175.319C171.5 358.819 214.5 64.3195 152.5 139.819"
         stroke="url(#paint0_linear)"
       />
       <path
+        className={
+          disappearEffect ? 'create-post-background-swirl-fadeOut' : ''
+        }
         d="M290.052 111.953C344.695 216.65 452.51 294.522 539 261.819C639.5 223.819 685.333 119.486 748.5 45.8193L748 4.81934C684.833 78.486 639 182.819 538.5 220.819C452.52 253.329 345.099 206.939 290.052 111.953Z"
         fill="url(#paint1_linear)"
       />
       <path
+        className={
+          disappearEffect ? 'create-post-background-swirl-fadeOut' : ''
+        }
         d="M1 198.819L268 59.3193C273.744 77.3303 281.2 94.9934 290.052 111.953M267 59.8193C272.953 78.4857 280.756 95.9121 290.052 111.953M290.052 111.953C344.695 216.65 452.51 294.522 539 261.819C639.5 223.819 685.333 119.486 748.5 45.8193L748 4.81934C684.833 78.486 639 182.819 538.5 220.819C452.52 253.329 345.099 206.939 290.052 111.953Z"
         stroke="url(#paint2_linear)"
       />

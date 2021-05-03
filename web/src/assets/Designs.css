@@ -1,0 +1,4 @@
+.create-post-background-swirl-fadeOut {
+  animation: fadeOut 0.5s linear;
+  opacity: 0;
+}

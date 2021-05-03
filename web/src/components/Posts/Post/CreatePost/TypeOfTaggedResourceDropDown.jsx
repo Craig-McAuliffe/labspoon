@@ -8,6 +8,7 @@ import {
   QUESTION_POST,
   IDEA_POST,
   MICRO_TOPIC_POST,
+  PostSectionSelectedTypeTopic,
 } from './CreatePost';
 
 import './CreatePost.css';
@@ -26,7 +27,13 @@ export default function TypeOfTaggedResourceDropDown({
     MICRO_TOPIC_POST,
     DEFAULT_POST,
   ];
-
+  if (taggedResourceType)
+    return (
+      <PostSectionSelectedTypeTopic
+        removeAction={() => setTaggedResourceType('')}
+        title={taggedResourceType}
+      />
+    );
   return (
     <div className="create-post-types-container">
       <button

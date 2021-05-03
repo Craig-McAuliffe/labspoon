@@ -1,6 +1,8 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
+import {RemoveIcon} from '../../assets/GeneralActionIcons';
 import {SearchIconGrey} from '../../assets/HeaderIcons';
 import firebase from '../../firebase';
+import TertiaryButton from '../Buttons/TertiaryButton';
 
 import './SearchMSFields.css';
 
@@ -13,21 +15,63 @@ export default function SearchMSFields({
   setLoading,
   limit,
   largeDesign,
+  children,
 }) {
   const [typedTopic, setTypedTopic] = useState('');
+  const [skip, setSkip] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [cachedTopics, setCachedTopics] = useState([]);
+  const searchInputRef = useRef();
+  const handleFetchedTopics = (fetchedTopics) => {
+    if (fetchedTopics.length <= limit) {
+      setHasMore(false);
+      setSkip((currentSkip) => currentSkip + fetchedTopics.length);
+      setFetchedTopics(fetchedTopics);
+      setCachedTopics((currentCachedTopics) => [
+        ...currentCachedTopics,
+        ...fetchedTopics,
+      ]);
+    } else {
+      setHasMore(true);
+      setSkip((currentSkip) => currentSkip + limit);
+      setFetchedTopics(fetchedTopics.slice(0, limit));
+      setCachedTopics((currentCachedTopics) => [
+        ...currentCachedTopics,
+        ...fetchedTopics.slice(0, limit),
+      ]);
+    }
+  };
+
+  const fetchTopics = () =>
+    searchMicrosoftTopics(
+      typedTopic,
+      setLoading,
+      handleFetchedTopics,
+      limit + 1,
+      900,
+      skip
+    );
+  const handleNextPageClick = () => {
+    if (cachedTopics.length > skip) {
+      setFetchedTopics(() => cachedTopics.slice(skip, skip + limit));
+      setSkip(skip + limit);
+    } else fetchTopics();
+  };
+
+  const handlePreviousPageClick = () => {
+    setFetchedTopics(() => cachedTopics.slice(skip - 2 * limit, skip - limit));
+    setSkip(skip - limit);
+  };
 
   useEffect(() => {
     if (typedTopic.length === 0) {
       setFetchedTopics([]);
       setLoading(false);
+      setHasMore(false);
+      setSkip(0);
       return;
     }
-    return searchMicrosoftTopics(
-      typedTopic,
-      setLoading,
-      setFetchedTopics,
-      limit
-    );
+    return fetchTopics();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [typedTopic]);
 
@@ -43,7 +87,31 @@ export default function SearchMSFields({
             setTypedTopic(e.target.value);
           }}
           placeholder={placeholder}
+          ref={searchInputRef}
         />
+        {typedTopic.length > 0 && (
+          <button
+            className="search-ms-fields-clear-search"
+            onClick={() => clearSearchInput(searchInputRef, setTypedTopic)}
+          >
+            <RemoveIcon />
+          </button>
+        )}
+      </div>
+      {children}
+      <div className="search-ms-fields-next-previous-container">
+        {skip > limit ? (
+          <TertiaryButton onClick={handlePreviousPageClick}>
+            Previous Page
+          </TertiaryButton>
+        ) : (
+          <div></div>
+        )}
+        {(hasMore || cachedTopics.length > skip) && (
+          <TertiaryButton onClick={handleNextPageClick}>
+            Next Page
+          </TertiaryButton>
+        )}
       </div>
     </>
   );
@@ -69,9 +137,15 @@ export const searchMicrosoftTopics = (
         .catch((err) => {
           setLoading(false);
           setFetchedTopics([]);
-          console.log(err, 'could not search topics');
+          console.error(err, 'could not search topics');
         }),
     timeBeforeSearch
   );
   return () => clearTimeout(apiCallTimeout);
 };
+
+function clearSearchInput(searchInputRef, setTypedTopic) {
+  if (!searchInputRef || !searchInputRef.current) return;
+  searchInputRef.current.value = '';
+  setTypedTopic('');
+}

@@ -93,13 +93,15 @@ export function CreatePostTextArea({...props}) {
 
   return (
     <>
-      <HeaderAndBodyArticleInput
-        noTitle={true}
-        className="create-post-main-text"
-        {...props}
-        customPlaceholderText="...what's happening?"
-        shouldAutoFocus={true}
-      />
+      <div className="creating-post-main-text-container">
+        <HeaderAndBodyArticleInput
+          noTitle={true}
+          className="create-post-main-text"
+          {...props}
+          customPlaceholderText="...what's happening?"
+          shouldAutoFocus={true}
+        />
+      </div>
       <CreateRichTextCharacterCount maxCount={MAX_POST_CHARACTERS} {...props} />
     </>
   );

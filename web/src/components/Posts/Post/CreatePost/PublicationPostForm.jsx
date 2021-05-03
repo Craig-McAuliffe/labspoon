@@ -34,6 +34,7 @@ import {algoliaPublicationToDBPublicationListItem} from '../../../../helpers/pub
 import {Alert} from 'react-bootstrap';
 import {FilterableResultsContext} from '../../../FilterableResults/FilterableResults';
 import {POST} from '../../../../helpers/resourceTypeDefinitions';
+import {initialValueNoTitle} from '../../../Forms/Articles/HeaderAndBodyArticleInput';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
@@ -83,7 +84,7 @@ export default function PublicationPostForm() {
   const {setResults} = useContext(FilterableResultsContext);
 
   const initialValues = {
-    title: savedTitleText ? savedTitleText : '',
+    title: savedTitleText ? savedTitleText : initialValueNoTitle,
   };
 
   const submitChanges = (res, isTweeting) =>
@@ -110,11 +111,6 @@ export default function PublicationPostForm() {
     );
   return (
     <>
-      <PostForm
-        onSubmit={submitChanges}
-        initialValues={initialValues}
-        formID="create-publication-post-form"
-      />
       <SelectAndCreatePublication
         publication={publication}
         setPublication={setPublication}
@@ -130,6 +126,11 @@ export default function PublicationPostForm() {
         customPublicationErrors={customPublicationErrors}
         pubSubmissionError={pubSubmissionError}
         hasHitMaxDailyPublications={hasHitMaxDailyPublications}
+      />
+      <PostForm
+        onSubmit={submitChanges}
+        initialValues={initialValues}
+        formID="create-publication-post-form"
       />
     </>
   );

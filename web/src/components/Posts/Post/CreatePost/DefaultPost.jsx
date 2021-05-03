@@ -1,6 +1,5 @@
 import React, {useContext} from 'react';
 import firebase from '../../../../firebase';
-
 import PostForm from './PostForm';
 import {
   CreatingPostContext,
@@ -16,7 +15,7 @@ import {checkRichTextForOpenPosLinkAndFetch} from './OpenPositionPostForm';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
-export default function DefaultPost({postType, setPostType}) {
+export default function DefaultPost() {
   const {
     selectedTopics,
     setPostSuccess,
