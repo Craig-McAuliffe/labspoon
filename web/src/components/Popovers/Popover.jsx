@@ -84,7 +84,12 @@ export function SignUpPopoverOverride({children, text, actionTaken}) {
   return popOverChild;
 }
 
-export default function Popover({getPopUpComponent, shouldNotOpen, children}) {
+export default function Popover({
+  getPopUpComponent,
+  shouldNotOpen,
+  children,
+  hasOwnRelativeContainer,
+}) {
   const [open, setOpen] = useState(false);
   const popOverRef = useRef();
 
@@ -108,13 +113,21 @@ export default function Popover({getPopUpComponent, shouldNotOpen, children}) {
     }
     return child;
   });
-  if (open)
+  if (open) {
+    if (hasOwnRelativeContainer)
+      return (
+        <>
+          {popOverChild}
+          <div ref={popOverRef}>{getPopUpComponent(setOpen)}</div>
+        </>
+      );
     return (
       <div className="pop-up-relative-container">
         {popOverChild}
         <div ref={popOverRef}>{getPopUpComponent(setOpen)}</div>
       </div>
     );
+  }
   return popOverChild;
 }
 

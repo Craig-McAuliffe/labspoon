@@ -1,12 +1,13 @@
 import React, {useContext} from 'react';
 
-import {FeatureFlags} from '../../../../App';
+import {AuthContext, FeatureFlags} from '../../../../App';
 import {db} from '../../../../firebase';
 import {POST} from '../../../../helpers/resourceTypeDefinitions';
 
 import BookmarkButton, {
   RemoveBookmarkFromPage,
 } from '../../../Buttons/BookmarkButton';
+import GroupBookmarkButton from '../../../Buttons/GroupBookmarkButton';
 import RecommendButton from '../../../Buttons/RecommendButton';
 import RepostToGroupButton from '../../../Buttons/RepostToGroupButton';
 import ShareButton from '../../../Buttons/ShareButton';
@@ -16,8 +17,8 @@ const PostActions = ({
   post,
   dedicatedPage,
   bookmarkedVariation,
-  recommendedCount,
-  setRecommendedCount,
+  setQualityScore,
+  qualityScore,
   backgroundShade,
 }) => {
   const featureFlags = useContext(FeatureFlags);
@@ -25,6 +26,7 @@ const PostActions = ({
   const recommendedByCollection = db.collection(
     `posts/${post.id}/recommendedBy`
   );
+  const {userProfile} = useContext(AuthContext);
 
   if (bookmarkedVariation)
     return (
@@ -39,19 +41,13 @@ const PostActions = ({
     >
       {featureFlags.has('repost-to-group') ? <RepostToGroupButton /> : <></>}
       {featureFlags.has('share-post') ? <ShareButton /> : <></>}
-      <div className="post-actions-button-container">
-        <span>
-          {recommendedCount && recommendedCount > 0 ? recommendedCount : null}
-        </span>
-        <RecommendButton
-          recommendedResource={post}
-          recommendedResourceType={POST}
-          recommendedResourceID={post.id}
-          recommendedByCollection={recommendedByCollection}
-          setRecommendedCount={setRecommendedCount}
-          backgroundShade={backgroundShade}
-        />
-      </div>
+      <RecommendButton
+        recommendedResource={post}
+        recommendedResourceType={POST}
+        recommendedResourceID={post.id}
+        recommendedByCollection={recommendedByCollection}
+        backgroundShade={backgroundShade}
+      />
       <BookmarkButton
         bookmarkedResource={post}
         bookmarkedResourceType={POST}
@@ -59,6 +55,15 @@ const PostActions = ({
         bookmarkedByCollection={bookmarkedByCollection}
         backgroundShade={backgroundShade}
       />
+      {userProfile.isMemberOfAnyGroups && userProfile && (
+        <GroupBookmarkButton
+          bookmarkedResource={post}
+          bookmarkedResourceType={POST}
+          bookmarkedResourceID={post.id}
+          bookmarkedByCollection={bookmarkedByCollection}
+          backgroundShade={backgroundShade}
+        />
+      )}
     </div>
   );
 };

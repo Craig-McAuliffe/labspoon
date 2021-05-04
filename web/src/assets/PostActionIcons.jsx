@@ -46,40 +46,7 @@ export const ToGroupIconUnselected = () => (
     <circle cx="3.5" cy="12.5" r="2.5" stroke="#00507C" strokeWidth="2" />
   </svg>
 );
-export const BookmarkIconSelected = () => (
-  <svg
-    width="16"
-    height="20"
-    viewBox="0 0 16 20"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M15.5557 0L0 0.000440734L0.000138169 20L7.77792 16.6667L15.5557 20V0Z"
-      fill="#3099d3"
-    />
-  </svg>
-);
-export const RecommendIconSelected = () => (
-  <svg
-    width="14"
-    height="23"
-    viewBox="0 0 14 23"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M14 8.57288V0H0V8.57288C0 8.92881 0.252 9.26441 0.686 9.44746L6.538 12H7.476L13.328 9.44746C13.748 9.26441 14 8.93898 14 8.57288ZM7 11.0136L8.4 10.4034V1.01695H5.6V10.4034L7 11.0136Z"
-      fill="#3099d3"
-    />
-    <path
-      d="M7 20.6442L10.708 23L9.724 18.56L13 15.5726L8.686 15.1874L7 11L5.314 15.1874L1 15.5726L4.276 18.56L3.292 23L7 20.6442Z"
-      fill="#3099d3"
-    />
-  </svg>
-);
+
 export const ToGroupIconSelected = () => (
   <svg
     width="16"
@@ -146,3 +113,28 @@ export const HideIcon = () => (
     <path d="M1 12L12 2L23 12" stroke="#5D5D65" strokeWidth="2" />
   </svg>
 );
+
+export function GroupBookmarkIcon() {
+  return (
+    <svg
+      width="16"
+      height="17"
+      viewBox="0 0 16 17"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M5.44957 9.91419L5.05565 9.74537L4.66173 9.91419L1.00008 11.4835L1.00001 1.00026L9.11121 1.00003V11.4835L5.44957 9.91419Z"
+        fill="#F5F6F6"
+        stroke="#00507C"
+        strokeWidth="2"
+      />
+      <path
+        d="M10.4496 13.9142L10.0556 13.7454L9.66173 13.9142L6.00008 15.4835L6.00001 5.00026L14.1112 5.00003V15.4835L10.4496 13.9142Z"
+        fill="#F5F6F6"
+        stroke="#00507C"
+        strokeWidth="2"
+      />
+    </svg>
+  );
+}

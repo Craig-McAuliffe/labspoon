@@ -1183,6 +1183,80 @@ export const addExtraMSIDToUser = functions.https.onRequest(
   }
 );
 
+export const DeclareUserIsMemberOfAnyGroup = functions.firestore
+  .document('users/{userID}/groups/{groupID}')
+  .onCreate(async (data, context) => {
+    const userID = context.params.userID;
+    const userRef = db.doc(`users/${userID}`);
+    const userDoc = await userRef
+      .get()
+      .catch((err) => console.error(`unable to fetch user doc ${err}`));
+    if (!userDoc || !userDoc.exists) return;
+    const userDocData = userDoc.data() as User;
+    if (userDocData.isMemberOfAnyGroups) return;
+    return userRef
+      .update({isMemberOfAnyGroups: true})
+      .catch((err) => console.error(err));
+  });
+
+export const DeclareUserIsNotMemberOfAnyGroup = functions.firestore
+  .document('users/{userID}/groups/{groupID}')
+  .onDelete(async (data, context) => {
+    const userID = context.params.userID;
+    const userGroupsQS = await db
+      .collection(`users/${userID}/groups`)
+      .get()
+      .catch((err) =>
+        console.error(`unable to check if user is member of any groups ${err}`)
+      );
+    if (!userGroupsQS || !userGroupsQS.empty) return;
+    return db
+      .doc(`users/${userID}`)
+      .update({isMemberOfAnyGroups: false})
+      .catch((err) => console.error(err));
+  });
+
+export const DeclareExistingUsersMembersOfGroups = functions.https.onRequest(
+  async (req, resp) => {
+    const usersQS = await db
+      .collection(`users`)
+      .get()
+      .catch((err) => {
+        console.error(err);
+        resp.status(500).send('Unable to fetch users collection.');
+      });
+    if (!usersQS) return;
+    const userIDs: string[] = [];
+    usersQS.forEach(async (userDS) => {
+      userIDs.push(userDS.id);
+    });
+    const batch = db.batch();
+    const usersPromises = userIDs.map((userID) =>
+      db
+        .collection(`users/${userID}/groups`)
+        .get()
+        .then((groupsQS) => {
+          if (groupsQS.empty) return;
+          batch.update(db.doc(`users/${userID}`), {isMemberOfAnyGroups: true});
+        })
+        .catch((err) => console.error(err))
+    );
+    await Promise.all(usersPromises);
+    await batch
+      .commit()
+      .then(() => {
+        resp.json({
+          result: `users declared if part of groups`,
+        });
+        resp.end();
+      })
+      .catch((err) => {
+        console.error(err);
+        resp.status(500).send('Unable to fetch users collection.');
+      });
+  }
+);
+
 // Rank relates to how often the user posts in this topic
 export interface UserRef {
   id: string;
@@ -1285,6 +1359,7 @@ export interface User {
   lastPostTimeStamp?: number;
   recentPublicationTopics?: Topic[];
   recentPostTopics?: Topic[];
+  isMemberOfAnyGroups?: boolean;
 }
 
 export interface UserFilterRef {

@@ -22,21 +22,20 @@ import {
 import './Post.css';
 
 export default function Post({post, dedicatedPage, bookmarkedVariation}) {
-  const [recommendedCount, setRecommendedCount] = useState(false);
+  const [qualityScore, setQualityScore] = useState(null);
   useEffect(async () => {
-    if (post.recommendedCount)
-      return setRecommendedCount(post.recommendedCount);
-    const fetchedRecommendedCount = await db
+    if (post.qualityScore) return setQualityScore(post.qualityScore);
+    const fetchedQualityScore = await db
       .doc(`posts/${post.id}`)
       .get()
-      .then((ds) => ds.data().recommendedCount)
+      .then((ds) => ds.data().qualityScore)
       .catch((err) =>
         console.error(
-          `unable to fetch recommended count for post ${post.id} ${err}`
+          `unable to fetch quality score for post ${post.id} ${err}`
         )
       );
-    if (!fetchedRecommendedCount) return;
-    setRecommendedCount(fetchedRecommendedCount);
+    if (!fetchedQualityScore) return;
+    setRecommendedCount(fetchedQualityScore);
   }, [post.id]);
 
   const taggedContent = [];
@@ -80,8 +79,8 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
         post={post}
         dedicatedPage={dedicatedPage}
         bookmarkedVariation={bookmarkedVariation}
-        recommendedCount={recommendedCount}
-        setRecommendedCount={setRecommendedCount}
+        qualityScore={qualityScore}
+        setQualityScore={setQualityScore}
       />
     </div>
   );

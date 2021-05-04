@@ -80,11 +80,12 @@ function GroupAvatarSection({
   return <WrapWithLinkOrOverride>{avatarDisplay}</WrapWithLinkOrOverride>;
 }
 
-export function GroupDropdownItem({group}) {
+export function GroupDropdownItem({group, children}) {
   return (
     <div className="group-dropdown-item">
       <GroupAvatarSection groupAvatar={group.avatar} height={80} width={80} />
       <GroupNameInstitution name={group.name} institution={group.institution} />
+      {children}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 .post-actions {
   display: flex;
-  justify-content: space-evenly;
+  justify-content: flex-start;
   margin-top: 20px;
   flex-wrap: wrap;
   border-top: 1px solid #dcdce0;
@@ -26,9 +26,4 @@
 .post-actions-actioned-page-container {
   display: flex;
   justify-content: flex-end;
-}
-
-.post-actions-button-container {
-  display: flex;
-  align-items: center;
 }

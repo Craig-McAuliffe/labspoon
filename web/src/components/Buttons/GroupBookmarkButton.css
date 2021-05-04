@@ -1,0 +1,47 @@
+.group-bookmark-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+}
+
+.group-bookmark-button-groups-popover,
+.group-bookmark-button-groups-popover-loading {
+  position: absolute;
+  right: -15vw;
+  background: #ffffff;
+  top: 40px;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.7);
+  width: 40vw;
+  z-index: 1;
+}
+
+.group-bookmark-button-groups-popover-loading {
+  opacity: 0.5;
+}
+
+.group-bookmark-button-groups-popover-title {
+  color: #99999f;
+  padding: 20px 5px;
+  margin-bottom: 0px;
+  text-align: center;
+}
+
+.group-bookmark-button-group-selector {
+  border-top: 1px solid #5d5d65;
+  width: 100%;
+}
+
+.group-bookmark-button-group-selector:hover {
+  background: #00507c;
+  border-top: 1px solid #00507c;
+}
+
+.group-bookmark-button-group-selector:focus {
+  background: #035e90;
+  border-top: 1px solid #3099d3;
+}
+
+.group-bookmark-button-group-selector:hover h3 {
+  color: #ffffff;
+}
