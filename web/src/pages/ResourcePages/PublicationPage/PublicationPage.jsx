@@ -32,6 +32,7 @@ import './PublicationPage.css';
 import CreatePost from '../../../components/Posts/Post/CreatePost/CreatePost';
 import {PUBLICATION} from '../../../helpers/resourceTypeDefinitions';
 import {publicationDateDisplay} from '../../../components/Publication/PublicationListItem';
+import SuccessMessage from '../../../components/Forms/SuccessMessage';
 
 const REFERENCES_TAB = 'references';
 
@@ -74,6 +75,7 @@ export default function PublicationPage() {
   const [publicationDetails, setPublicationDetails] = useState(undefined);
   const [notFound, setNotFound] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [refreshFeedToggle, setRefreshFeedToggle] = useState(false);
   const publicationIDParam = useParams().publicationID;
   if (publicationID !== publicationIDParam) {
     setPublicationID(publicationIDParam);
@@ -154,10 +156,12 @@ export default function PublicationPage() {
         fetchResults={fetchFeedData}
         limit={10}
         tabs={relationshipFilter}
+        refreshFeed={refreshFeedToggle}
         getCustomComponentAboveFeed={() => (
           <QuickCreatePublicationPost
             publication={publicationDetails}
             publicationID={publicationID}
+            setRefreshFeedToggle={setRefreshFeedToggle}
           />
         )}
       >
@@ -239,13 +243,29 @@ function RetrieveMoreReferences({publicationID, publication}) {
   );
 }
 
-function QuickCreatePublicationPost({publication, publicationID}) {
+function QuickCreatePublicationPost({
+  publication,
+  publicationID,
+  setRefreshFeedToggle,
+}) {
   const [isCreating, setIsCreating] = useState(false);
+  const [postSuccess, setPostSuccess] = useState(false);
   const {userProfile} = useContext(AuthContext);
+
+  useEffect(() => {
+    if (!postSuccess) return;
+    const successTimeout = setTimeout(() => setPostSuccess(false), 2000);
+    return () => clearTimeout(successTimeout);
+  }, [postSuccess]);
   if (!userProfile) return null;
   if (!isCreating)
     return (
       <div className="publication-page-quick-post-button-container">
+        {postSuccess && (
+          <SuccessMessage isOverlay={true}>
+            Post successfully created!
+          </SuccessMessage>
+        )}
         <CreateButton
           text="Create a post about this publication"
           buttonAction={() => setIsCreating(true)}
@@ -258,9 +278,16 @@ function QuickCreatePublicationPost({publication, publicationID}) {
       preTaggedResourceType={PUBLICATION}
       preTaggedResourceID={publicationID}
       preTaggedResourceDetails={publication}
-      onSuccess={() => setIsCreating(false)}
+      onSuccess={() => {
+        setIsCreating(false);
+        setPostSuccess(true);
+      }}
       cancelAction={() => setIsCreating(false)}
       startExpanded={true}
+      refreshFeed={async () => {
+        setPostSuccess(true);
+        setRefreshFeedToggle((currentState) => !currentState);
+      }}
     />
   );
 }
@@ -387,9 +414,9 @@ function fetchFeedDataFromDB(limit, filterOptions, last, publicationID) {
   const activeTab = getActiveTabID(filterOptions);
   switch (activeTab) {
     case 'relatedPosts':
-      const relatedPostsDBRef = db.collection(
-        `publications/${publicationID}/posts`
-      );
+      const relatedPostsDBRef = db
+        .collection(`publications/${publicationID}/posts`)
+        .orderBy('timestamp', 'desc');
       return [
         getPaginatedPostsFromCollectionRef(relatedPostsDBRef, limit, last),
         null,

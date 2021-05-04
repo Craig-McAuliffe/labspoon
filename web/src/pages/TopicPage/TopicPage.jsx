@@ -1,8 +1,7 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {useParams} from 'react-router-dom';
+import {useLocation, useParams} from 'react-router-dom';
 import {FeatureFlags} from '../../App';
 import {db} from '../../firebase';
-
 import {getActiveTabID} from '../../helpers/filters';
 import {getPaginatedPostsFromCollectionRef} from '../../helpers/posts';
 import {getPaginatedPublicationsFromCollectionRef} from '../../helpers/publications';
@@ -24,10 +23,10 @@ import {
 import {getPaginatedResourcesFromCollectionRef} from '../../helpers/resources';
 import ResourcesFeed from '../ResourcePages/ResourcesFeeds';
 import {PaddedContent} from '../../components/Layout/Content';
-
-import './TopicPage.css';
 import {LoadingSpinnerPage} from '../../components/LoadingSpinner/LoadingSpinner';
 import NotFoundPage from '../NotFoundPage/NotFoundPage';
+
+import './TopicPage.css';
 
 async function fetchTopicDetailsFromDB(topicID) {
   return db
@@ -38,7 +37,7 @@ async function fetchTopicDetailsFromDB(topicID) {
       data.id = topicID;
       return data;
     })
-    .catch((err) => console.log(err));
+    .catch((err) => console.error(err));
 }
 
 function topicPageFeedDataFromDB(skip, limit, filterOptions, topicID, last) {
@@ -173,13 +172,30 @@ export default function TopicPage() {
   const [usedTabs, setUsedTabs] = useState({checked: false, tabs: []});
   const [tabsLoading, setTabsLoading] = useState(true);
   const [pageLoading, setPageLoading] = useState(true);
-
+  const [refreshFeedToggle, setRefreshFeedToggle] = useState(false);
   const topicIDParam = useParams().topicID;
   if (topicID !== topicIDParam) {
     setTopicID(topicIDParam);
   }
+  const locationState = useLocation().state;
+  const createdPost = locationState ? locationState.createdPost : null;
+  const [createdPostFulfilled, setCreatedPostFulfilled] = useState(false);
 
   const fetchTopicDetails = () => fetchTopicDetailsFromDB(topicID);
+
+  // listen for just created post
+  useEffect(() => {
+    if (!createdPost || !topicID || createdPostFulfilled) return;
+    const topicPostDocObserver = db
+      .doc(`topics/${topicID}/posts/${createdPost.postID}`)
+      .onSnapshot((docSnapshot) => {
+        if (docSnapshot.exists) {
+          setCreatedPostFulfilled(true);
+          setRefreshFeedToggle((currentState) => !currentState);
+        }
+      });
+    return () => topicPostDocObserver();
+  }, [topicID, createdPost, createdPostFulfilled]);
 
   useEffect(() => {
     Promise.resolve(fetchTopicDetails())
@@ -188,7 +204,7 @@ export default function TopicPage() {
         setPageLoading(false);
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
         setPageLoading(false);
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -285,6 +301,7 @@ export default function TopicPage() {
         limit={10}
         tabs={fetchTabs()}
         tabsLoading={tabsLoading}
+        refreshFeed={refreshFeedToggle}
       >
         <PaddedContent>
           <TopicListItem topic={topicDetails} dedicatedPage={true}>

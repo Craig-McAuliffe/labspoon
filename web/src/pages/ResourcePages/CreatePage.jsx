@@ -16,7 +16,6 @@ export default function CreatePage() {
   if (!authLoaded) return <LoadingSpinner />;
   if (!user) return <Redirect to="/signup" />;
   if (userProfile && !userProfile.name) return <Redirect to="/userName" />;
-  const userID = userProfile ? userProfile.id : undefined;
 
   return (
     <PaddedPageContainer>
@@ -29,10 +28,7 @@ export default function CreatePage() {
       <div>
         <Switch>
           <Route path="/create/post">
-            <CreatePost
-              keepExpanded
-              redirect={<Redirect to={`/user/${userID}`} />}
-            />
+            <CreatePost keepExpanded shouldRedirect={true} />
           </Route>
           <Route path="/create/group">
             <CreateGroupPage />

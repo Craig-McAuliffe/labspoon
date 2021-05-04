@@ -87,8 +87,20 @@ export const createPost = functions.https.onCall(async (data, context) => {
   }
   if (data.openPosition && data.openPosition.id)
     post.openPosition = data.openPosition;
-  await postDocRef
-    .set(post)
+  const batch = db.batch();
+  batch.set(postDocRef, post);
+  if (post.openPosition)
+    batch.set(
+      db.doc(`openPositions/${post.openPosition.id}/posts/${postID}`),
+      postToPostRef(post)
+    );
+  if (post.publication)
+    batch.set(
+      db.doc(`publications/${post.publication.id}/posts/${postID}`),
+      postToPostRef(post)
+    );
+  await batch
+    .commit()
     .then(() =>
       db
         .doc(`usersStats/${post.author.id}`)
@@ -108,7 +120,7 @@ export const createPost = functions.https.onCall(async (data, context) => {
         'An error occured while creating the post.'
       );
     });
-  return post;
+  return {postData: post, postID: postID};
 });
 
 async function authorLastPostTimeCheck(
@@ -522,48 +534,6 @@ export const addPostToTopic = functions.firestore
       }
     );
     return Promise.all(topicsToTopicsPromisesArray);
-  });
-
-export const addPublicationPostToPublication = functions.firestore
-  .document(`posts/{postID}`)
-  .onCreate(async (change) => {
-    const postID = change.id;
-    const post = change.data() as Post;
-    const publication = post.publication;
-    if (!publication) return;
-    return db
-      .doc(`publications/${publication.id}/posts/${postID}`)
-      .set(postToPostRef(post))
-      .catch((err) =>
-        console.error(
-          'unable to set post with id ' +
-            postID +
-            ' on publication with id ' +
-            publication.id,
-          err
-        )
-      );
-  });
-
-export const addPostToOpenPosition = functions.firestore
-  .document(`posts/{postID}`)
-  .onCreate(async (change) => {
-    const postID = change.id;
-    const post = change.data() as Post;
-    const openPosition = post.openPosition;
-    if (!openPosition) return;
-    return db
-      .doc(`openPositions/${openPosition.id}/posts/${postID}`)
-      .set(postToPostRef(post))
-      .catch((err) =>
-        console.error(
-          'unable to set post with id ' +
-            postID +
-            ' on open position with id ' +
-            openPosition.id,
-          err
-        )
-      );
   });
 
 export async function updateFiltersByPost(

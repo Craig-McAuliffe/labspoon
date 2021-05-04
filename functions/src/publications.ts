@@ -1046,7 +1046,8 @@ async function extractSuggestionFromTopics(
       if (!Array.isArray(accumulator)) return [];
       if (!Array.isArray(current)) return [...accumulator, current];
       return [...accumulator, ...current];
-    }
+    },
+    []
   );
   // deduplicate the publications in the array
   const seenIDs = new Set();

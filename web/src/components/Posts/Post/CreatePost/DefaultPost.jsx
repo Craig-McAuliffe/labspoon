@@ -6,8 +6,6 @@ import {
   openTwitterWithPopulatedTweet,
   sortThrownCreatePostErrors,
 } from './CreatePost';
-import {FilterableResultsContext} from '../../../FilterableResults/FilterableResults';
-import {POST} from '../../../../helpers/resourceTypeDefinitions';
 import {initialValueNoTitle} from '../../../Forms/Articles/HeaderAndBodyArticleInput';
 
 import './CreatePost.css';
@@ -15,16 +13,18 @@ import {checkRichTextForOpenPosLinkAndFetch} from './OpenPositionPostForm';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
-export default function DefaultPost() {
+export default function DefaultPost({postTypeNameAndID}) {
   const {
     selectedTopics,
     setPostSuccess,
     setSubmittingPost,
     savedTitleText,
+    setPostCreateDataResp,
   } = useContext(CreatingPostContext);
-  const {setResults} = useContext(FilterableResultsContext);
   const submitChanges = async (res, isTweeting) => {
-    res.postType = {id: 'defaultPost', name: 'Default'};
+    res.postType = postTypeNameAndID
+      ? postTypeNameAndID
+      : {id: 'defaultPost', name: 'Default'};
     res.topics = selectedTopics;
     const openPositionInText = await checkRichTextForOpenPosLinkAndFetch(
       res.title
@@ -37,13 +37,9 @@ export default function DefaultPost() {
       .then((response) => {
         if (isTweeting)
           openTwitterWithPopulatedTweet(res.title, selectedTopics);
+        setPostCreateDataResp(response.data);
         setPostSuccess(true);
         setSubmittingPost(false);
-        if (setResults) {
-          const newPost = response.data;
-          newPost.resourceType = POST;
-          setResults((currentResults) => [newPost, ...currentResults]);
-        }
       })
       .catch((err) => {
         sortThrownCreatePostErrors(err);

@@ -16,6 +16,10 @@
   padding-bottom: 40px;
 }
 
+.publication-page-quick-post-button-container svg {
+  height: 40px;
+}
+
 .publication-journal-logo {
   min-width: 150px;
   max-height: 50px;

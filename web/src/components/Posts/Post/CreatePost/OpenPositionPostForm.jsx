@@ -8,6 +8,8 @@ import {
   sortThrownCreatePostErrors,
   openTwitterWithPopulatedTweet,
   SwitchTagMethod,
+  OptionalTagResource,
+  OPEN_POSITION_POST,
 } from './CreatePost';
 
 import './CreatePost.css';
@@ -53,6 +55,7 @@ export default function OpenPositionPostForm() {
     setPostSuccess,
     setSubmittingPost,
     savedTitleText,
+    setPostCreateDataResp,
   } = useContext(CreatingPostContext);
   const [taggedOpenPosition, setTaggedOpenPosition] = useState();
   const [isQuickCreatingOpenPos, setIsQuickCreatingOpenPos] = useState(false);
@@ -71,6 +74,7 @@ export default function OpenPositionPostForm() {
   const [generalError, setGeneralError] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [postSubmissionError, setPostSubmissionError] = useState(false);
+  const [isTaggingOpenPosition, setIsTaggingOpenPosition] = useState(false);
 
   useEffect(() => {
     if (!generalError) return;
@@ -104,29 +108,40 @@ export default function OpenPositionPostForm() {
       selectedGroup,
       postSubmissionError,
       setPostSubmissionError,
-      taggedOpenPosition
+      taggedOpenPosition,
+      isTaggingOpenPosition,
+      setPostCreateDataResp
     );
 
   return (
     <>
-      <SelectOpenPosition
-        setTaggedOpenPosition={setTaggedOpenPosition}
-        taggedOpenPosition={taggedOpenPosition}
-        isQuickCreatingOpenPos={isQuickCreatingOpenPos}
-        setIsQuickCreatingOpenPos={setIsQuickCreatingOpenPos}
-        openPosSuccessfullyCreated={openPosSuccessfullyCreated}
-        openPosFormatErrors={openPosFormatErrors}
-        quickOpenPosition={quickOpenPosition}
-        setQuickOpenPosition={setQuickOpenPosition}
-        selectedGroup={selectedGroup}
-        setSelectedGroup={setSelectedGroup}
-        postSubmissionError={postSubmissionError}
-      />
       <PostForm
         onSubmit={submitChanges}
         initialValues={initialValues}
         formID="create-openPosition-post-form"
-      />
+      >
+        {isTaggingOpenPosition ? (
+          <SelectOpenPosition
+            setTaggedOpenPosition={setTaggedOpenPosition}
+            taggedOpenPosition={taggedOpenPosition}
+            isQuickCreatingOpenPos={isQuickCreatingOpenPos}
+            setIsQuickCreatingOpenPos={setIsQuickCreatingOpenPos}
+            openPosSuccessfullyCreated={openPosSuccessfullyCreated}
+            openPosFormatErrors={openPosFormatErrors}
+            quickOpenPosition={quickOpenPosition}
+            setQuickOpenPosition={setQuickOpenPosition}
+            selectedGroup={selectedGroup}
+            setSelectedGroup={setSelectedGroup}
+            postSubmissionError={postSubmissionError}
+            cancelTagging={() => setIsTaggingOpenPosition(false)}
+          />
+        ) : (
+          <OptionalTagResource
+            onTag={() => setIsTaggingOpenPosition(true)}
+            resourceType={OPEN_POSITION_POST}
+          />
+        )}
+      </PostForm>
     </>
   );
 }
@@ -143,6 +158,7 @@ function SelectOpenPosition({
   selectedGroup,
   setSelectedGroup,
   postSubmissionError,
+  cancelTagging,
 }) {
   const [displayedOpenPositions, setDisplayedOpenPositions] = useState([]);
   const {userProfile} = useContext(AuthContext);
@@ -164,6 +180,12 @@ function SelectOpenPosition({
             Deselect
           </NegativeButton>
         </div>
+        <button
+          className="create-post-cancel-tagging-button"
+          onClick={cancelTagging}
+        >
+          <h3>Cancel tag</h3>
+        </button>
       </div>
     );
   }
@@ -448,7 +470,9 @@ async function submitOpenPosPost(
   selectedGroup,
   postSubmissionError,
   setPostSubmissionError,
-  taggedOpenPosition
+  taggedOpenPosition,
+  isTaggingOpenPosition,
+  setPostCreateDataResp
 ) {
   setSubmittingPost(true);
   if (openPosFormatErrors) setOpenPosFormatErrors([]);
@@ -456,7 +480,7 @@ async function submitOpenPosPost(
   if (openPosSuccessfullyCreated) setOpenPosSuccessfullyCreated(null);
   if (postSubmissionError) setPostSubmissionError(false);
   const submitQuickOpenPos = async () => {
-    if (!isQuickCreatingOpenPos) return false;
+    if (!isQuickCreatingOpenPos || !isTaggingOpenPosition) return false;
     const openPositionToBeCreated = {...quickOpenPosition};
     openPositionToBeCreated.description = res.title;
     const openPosValidationErrors = await validateQuickOpenPosition(
@@ -489,17 +513,17 @@ async function submitOpenPosPost(
 
   res.postType = {id: 'openPositionPost', name: 'Open Position'};
   res.topics = selectedTopics;
-  if (isQuickCreatingOpenPos) {
-    const formattedOpenPosition = {
-      topics: selectedTopics,
-      group: selectedGroup,
-      content: {...quickOpenPosition, description: res.title},
-      id: openPositionCreationID,
-    };
-    console.log(formattedOpenPosition);
-    res.openPosition = formattedOpenPosition;
-  } else {
-    if (taggedOpenPosition) {
+  if (isTaggingOpenPosition) {
+    if (isQuickCreatingOpenPos) {
+      const formattedOpenPosition = {
+        topics: selectedTopics,
+        group: selectedGroup,
+        content: {...quickOpenPosition, description: res.title},
+        id: openPositionCreationID,
+      };
+      console.log(formattedOpenPosition);
+      res.openPosition = formattedOpenPosition;
+    } else if (taggedOpenPosition) {
       const dbOpenPosition = algoliaOpenPosToDBOpenPosListItem(
         taggedOpenPosition
       );
@@ -514,8 +538,9 @@ async function submitOpenPosPost(
     if (openPositionInPost) res.openPosition = openPositionInPost;
   }
   createPost(res)
-    .then(() => {
+    .then((response) => {
       if (isTweeting) openTwitterWithPopulatedTweet(res.title, selectedTopics);
+      if (setPostCreateDataResp) setPostCreateDataResp(response.data);
       setSubmittingPost(false);
       setPostSuccess(true);
     })

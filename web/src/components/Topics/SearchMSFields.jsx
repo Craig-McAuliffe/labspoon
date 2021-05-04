@@ -16,11 +16,34 @@ export default function SearchMSFields({
   limit,
   largeDesign,
   children,
+  superCachedSearchAndResults,
+  setSuperCachedSearchAndResults,
 }) {
-  const [typedTopic, setTypedTopic] = useState('');
-  const [skip, setSkip] = useState(0);
-  const [hasMore, setHasMore] = useState(false);
-  const [cachedTopics, setCachedTopics] = useState([]);
+  const [typedTopic, setTypedTopic] = useState(
+    superCachedSearchAndResults ? superCachedSearchAndResults.search : ''
+  );
+  const [skip, setSkip] = useState(
+    superCachedSearchAndResults ? superCachedSearchAndResults.skip : 0
+  );
+  const [hasMore, setHasMore] = useState(
+    superCachedSearchAndResults ? superCachedSearchAndResults.hasMore : false
+  );
+  const [cachedTopics, setCachedTopics] = useState(
+    superCachedSearchAndResults ? superCachedSearchAndResults.results : []
+  );
+
+  // populate results with previous search cached results
+  useEffect(() => {
+    if (
+      !superCachedSearchAndResults ||
+      superCachedSearchAndResults.results.length === 0
+    )
+      return;
+
+    if (superCachedSearchAndResults.results.length > limit)
+      setFetchedTopics(superCachedSearchAndResults.results.slice(0, limit));
+    else setFetchedTopics(superCachedSearchAndResults.results);
+  }, []);
   const searchInputRef = useRef();
   const handleFetchedTopics = (fetchedTopics) => {
     if (fetchedTopics.length <= limit) {
@@ -31,6 +54,12 @@ export default function SearchMSFields({
         ...currentCachedTopics,
         ...fetchedTopics,
       ]);
+      setSuperCachedSearchAndResults({
+        hasMore: false,
+        results: [...cachedTopics, ...fetchedTopics],
+        search: typedTopic,
+        skip: skip + fetchedTopics.length,
+      });
     } else {
       setHasMore(true);
       setSkip((currentSkip) => currentSkip + limit);
@@ -39,6 +68,12 @@ export default function SearchMSFields({
         ...currentCachedTopics,
         ...fetchedTopics.slice(0, limit),
       ]);
+      setSuperCachedSearchAndResults({
+        hasMore: true,
+        results: [...cachedTopics, ...fetchedTopics.slice(0, limit)],
+        search: typedTopic,
+        skip: skip + limit,
+      });
     }
   };
 
@@ -66,12 +101,16 @@ export default function SearchMSFields({
   useEffect(() => {
     if (typedTopic.length === 0) {
       setFetchedTopics([]);
+      setCachedTopics([]);
+      setSuperCachedSearchAndResults({search: '', results: []});
       setLoading(false);
       setHasMore(false);
       setSkip(0);
       return;
     }
-    return fetchTopics();
+    if (cachedTopics.length === 0) {
+      return fetchTopics();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [typedTopic]);
 
@@ -88,6 +127,7 @@ export default function SearchMSFields({
           }}
           placeholder={placeholder}
           ref={searchInputRef}
+          value={typedTopic}
         />
         {typedTopic.length > 0 && (
           <button

@@ -7,7 +7,7 @@ import {
   PROJECT_GRANT_POST,
   QUESTION_POST,
   IDEA_POST,
-  MICRO_TOPIC_POST,
+  SUB_TOPIC_POST,
   PostSectionSelectedTypeTopic,
 } from './CreatePost';
 
@@ -24,13 +24,13 @@ export default function TypeOfTaggedResourceDropDown({
     EVENT_POST,
     QUESTION_POST,
     IDEA_POST,
-    MICRO_TOPIC_POST,
+    SUB_TOPIC_POST,
     DEFAULT_POST,
   ];
   if (taggedResourceType)
     return (
       <PostSectionSelectedTypeTopic
-        removeAction={() => setTaggedResourceType('')}
+        removeAction={() => setTaggedResourceType(null)}
         title={taggedResourceType}
       />
     );

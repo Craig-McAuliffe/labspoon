@@ -14,7 +14,7 @@ const postValidationSchema = Yup.object({
 
 export const CreatePostTitleContext = React.createContext();
 
-export default function PostForm({onSubmit, initialValues, formID}) {
+export default function PostForm({onSubmit, initialValues, formID, children}) {
   const {
     setSubmittingPost,
     submittingPost,
@@ -60,6 +60,7 @@ export default function PostForm({onSubmit, initialValues, formID}) {
           tweet
         </Alert>
       )}
+      {children}
       <CreatePostActions
         postType={postType}
         setPostType={setPostType}

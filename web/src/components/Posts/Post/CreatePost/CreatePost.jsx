@@ -3,12 +3,11 @@ import {AuthContext} from '../../../../App';
 import PublicationPostForm, {
   submitCreatePostWithPublication,
 } from './PublicationPostForm';
-import {Redirect, useLocation} from 'react-router-dom';
+import {Redirect, useHistory} from 'react-router-dom';
 import {getTweetTextFromRichText} from '../../../Article/Article';
 import PostForm from './PostForm';
 import {initialValueNoTitle} from '../../../Forms/Articles/HeaderAndBodyArticleInput';
 import {PUBLICATION} from '../../../../helpers/resourceTypeDefinitions';
-import {FilterableResultsContext} from '../../../FilterableResults/FilterableResults';
 import {CreateIcon, SearchIconGrey} from '../../../../assets/HeaderIcons';
 import TagTopics from '../../../Topics/TagTopics';
 import LoadingSpinner from '../../../LoadingSpinner/LoadingSpinner';
@@ -18,6 +17,8 @@ import TertiaryButton from '../../../Buttons/TertiaryButton';
 import {RemoveIcon} from '../../../../assets/GeneralActionIcons';
 import OpenPositionPostForm from './OpenPositionPostForm';
 import DefaultPost from './DefaultPost';
+import {TagResourceIcon} from '../../../../assets/ResourceTypeIcons';
+import SecondaryButton from '../../../Buttons/SecondaryButton';
 
 import './CreatePost.css';
 
@@ -28,47 +29,64 @@ export const EVENT_POST = 'Event';
 export const PROJECT_GRANT_POST = 'Project / Grant';
 export const QUESTION_POST = 'Question';
 export const IDEA_POST = 'Idea';
-export const MICRO_TOPIC_POST = 'Micro Topic';
+export const SUB_TOPIC_POST = 'Sub Topic';
 
 export const CreatingPostContext = createContext();
 export const MAX_POST_CHARACTERS = 800;
 export default function CreatePost({
-  pinnedPost,
-  redirect = undefined,
+  shouldRedirect = false,
   preTaggedResourceType,
   preTaggedResourceDetails,
   onSuccess,
   preTaggedResourceID,
   cancelAction,
+  refreshFeed,
 }) {
   const {user, userProfile} = useContext(AuthContext);
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [postSuccess, setPostSuccess] = useState(false);
   const [postType, setPostType] = useState(null);
   const [submittingPost, setSubmittingPost] = useState(false);
-  const [savedTitleText, setSavedTitleText] = useState();
-  const locationPathname = useLocation().pathname;
-
+  const [savedTitleText, setSavedTitleText] = useState(null);
+  const [
+    superCachedSearchAndResults,
+    setSuperCachedSearchAndResults,
+  ] = useState({
+    search: '',
+    results: [],
+    skip: 0,
+    hasMore: false,
+  });
+  const [postCreateDataResp, setPostCreateDataResp] = useState(null);
+  const history = useHistory();
   const cancelPost = () => {
     if (submittingPost) return;
     if (cancelAction) return cancelAction();
   };
 
+  const resetPost = () => {
+    setSelectedTopics([]);
+    setSavedTitleText(null);
+    setPostType(null);
+    setSuperCachedSearchAndResults([]);
+    setPostCreateDataResp(null);
+  };
+
   useEffect(() => {
     if (!postSuccess) return;
     if (onSuccess) onSuccess();
-    setSavedTitleText();
-    setPostType(DEFAULT_POST);
-    setTimeout(() => setPostSuccess(false), 3000);
+    if (shouldRedirect) {
+      if (selectedTopics.length > 0)
+        return history.push({
+          pathname: `/topic/${selectedTopics[0].id}`,
+          state: {createdPost: postCreateDataResp},
+        });
+      return history.push(`/user/${userProfile.id}`);
+    }
+    resetPost();
+    const successTimeout = setTimeout(() => setPostSuccess(false), 3000);
+    return () => clearTimeout(successTimeout);
   }, [postSuccess]);
-
-  useEffect(() => {
-    setSelectedTopics([]);
-  }, []);
-
-  if (postSuccess && redirect) {
-    return redirect;
-  }
 
   if (!user) return null;
   if (userProfile && !userProfile.name) return <Redirect to="/userName" />;
@@ -85,20 +103,22 @@ export default function CreatePost({
         setSavedTitleText: setSavedTitleText,
         postType: postType,
         setPostType: setPostType,
+        superCachedSearchAndResults: superCachedSearchAndResults,
+        setSuperCachedSearchAndResults: setSuperCachedSearchAndResults,
+        setPostCreateDataResp: setPostCreateDataResp,
       }}
     >
-      <div className={locationPathname === '/' ? 'create-post-margin-top' : ''}>
-        {preTaggedResourceType ? (
-          <QuickCreatePostFromResource
-            postType={preTaggedResourceType}
-            taggedResourceDetails={preTaggedResourceDetails}
-            onSuccess={onSuccess}
-            preTaggedResourceID={preTaggedResourceID}
-          />
-        ) : (
-          <GenericCreatePost postType={postType} setPostType={setPostType} />
-        )}
-      </div>
+      {preTaggedResourceType ? (
+        <QuickCreatePostFromResource
+          taggedResourceType={preTaggedResourceType}
+          taggedResourceDetails={preTaggedResourceDetails}
+          onSuccess={onSuccess}
+          preTaggedResourceID={preTaggedResourceID}
+          refreshFeed={refreshFeed}
+        />
+      ) : (
+        <GenericCreatePost postType={postType} setPostType={setPostType} />
+      )}
     </CreatingPostContext.Provider>
   );
 }
@@ -150,31 +170,30 @@ export function openTwitterWithPopulatedTweet(richText, topics) {
 }
 
 export function QuickCreatePostFromResource({
-  postType,
+  taggedResourceType,
   taggedResourceDetails,
   preTaggedResourceID,
+  refreshFeed,
 }) {
   const {selectedTopics, setPostSuccess, setSubmittingPost} = useContext(
     CreatingPostContext
   );
 
-  const {setResults} = useContext(FilterableResultsContext);
   const submitChanges = async (res, isTweeting) => {
-    switch (postType) {
+    switch (taggedResourceType) {
       case PUBLICATION:
         res[PUBLICATION] = taggedResourceDetails;
         res[PUBLICATION].id = preTaggedResourceID;
         return submitCreatePostWithPublication(
           res,
           isTweeting,
-          undefined,
           setPostSuccess,
           setSubmittingPost,
-          undefined,
-          undefined,
+          false,
+          null,
           undefined,
           selectedTopics,
-          setResults
+          refreshFeed
         );
       default: {
         setSubmittingPost(false);
@@ -236,6 +255,8 @@ function GenericCreatePost() {
     selectedTopics,
     postType,
     setPostType,
+    superCachedSearchAndResults,
+    setSuperCachedSearchAndResults,
   } = useContext(CreatingPostContext);
   const [minimiseTagTopics, setMinimiseTagTopics] = useState(true);
 
@@ -260,6 +281,8 @@ function GenericCreatePost() {
             setSelectedTopics={setSelectedTopics}
             selectedTopics={selectedTopics}
             largeDesign={true}
+            superCachedSearchAndResults={superCachedSearchAndResults}
+            setSuperCachedSearchAndResults={setSuperCachedSearchAndResults}
           />
         )}
       </div>
@@ -341,6 +364,45 @@ export function PostSectionSelectedTypeTopic({title, removeAction}) {
   );
 }
 function PostTypeSpecificForm({postType}) {
+  const postTypeNameToNameAndID = (postTypeName) => {
+    switch (postTypeName) {
+      case DEFAULT_POST:
+        return {
+          name: 'Default',
+          id: 'defaultPost',
+        };
+      case EVENT_POST:
+        return {
+          name: 'Event',
+          id: 'eventPost',
+        };
+      case PROJECT_GRANT_POST:
+        return {
+          name: 'Project / Grant',
+          id: 'projectGrantPost',
+        };
+      case QUESTION_POST:
+        return {
+          name: 'Question',
+          id: 'questionPost',
+        };
+      case IDEA_POST:
+        return {
+          name: 'Idea',
+          id: 'ideaPost',
+        };
+      case SUB_TOPIC_POST:
+        return {
+          name: 'Sub Topic',
+          id: 'subTopicPost',
+        };
+      default:
+        return {
+          name: 'Default',
+          id: 'defaultPost',
+        };
+    }
+  };
   switch (postType) {
     case PUBLICATION_POST: {
       return <PublicationPostForm />;
@@ -349,7 +411,26 @@ function PostTypeSpecificForm({postType}) {
       return <OpenPositionPostForm />;
     }
     default: {
-      return <DefaultPost />;
+      return (
+        <DefaultPost postTypeNameAndID={postTypeNameToNameAndID(postType)} />
+      );
     }
   }
+}
+
+export function OptionalTagResource({onTag, resourceType}) {
+  return (
+    <div className="create-post-optional-tag-section">
+      <div className="create-post-optional-tag-button-container">
+        <SecondaryButton onClick={onTag}>
+          <TagResourceIcon />
+          Tag {resourceType}
+        </SecondaryButton>
+      </div>
+      <p>
+        Conduct conversations about this {resourceType.toLowerCase()} in one
+        place.
+      </p>
+    </div>
+  );
 }

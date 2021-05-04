@@ -23,7 +23,8 @@ export function HeaderCreateButton() {
   );
 }
 
-const OnboardingCreateTipText = 'Got something to say? Create posts here.';
+const OnboardingCreateTipText =
+  'Got something to say? Create posts and more here.';
 
 function HeaderCreateButtonContent({createAction, user}) {
   if (!user)

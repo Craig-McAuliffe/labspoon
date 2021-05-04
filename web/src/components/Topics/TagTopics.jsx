@@ -15,6 +15,8 @@ export default function TagTopics({
   selectedTopics,
   setSelectedTopics,
   largeDesign,
+  superCachedSearchAndResults,
+  setSuperCachedSearchAndResults,
 }) {
   const [displayedTopics, setDisplayedTopics] = useState([]);
   const [duplicateTopic, setDuplicateTopic] = useState(false);
@@ -36,17 +38,19 @@ export default function TagTopics({
   if (largeDesign)
     return (
       <div>
-        <SelectedTopics
-          selectedTopics={selectedTopics}
-          setSelectedTopics={setSelectedTopics}
-        />
         <SearchMSFields
           placeholder="Search topics"
           setFetchedTopics={setDisplayedTopics}
           setLoading={setLoadingTopics}
           limit={TAG_TOPICS_SEARCH_LIMIT}
           largeDesign={true}
+          superCachedSearchAndResults={superCachedSearchAndResults}
+          setSuperCachedSearchAndResults={setSuperCachedSearchAndResults}
         >
+          <SelectedTopics
+            selectedTopics={selectedTopics}
+            setSelectedTopics={setSelectedTopics}
+          />
           <TopicsList
             topics={displayedTopics}
             setSelectedTopics={setSelectedTopics}

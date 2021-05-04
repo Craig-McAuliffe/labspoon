@@ -9,6 +9,8 @@ import {
   sortThrownCreatePostErrors,
   openTwitterWithPopulatedTweet,
   SwitchTagMethod,
+  OptionalTagResource,
+  PUBLICATION_POST,
 } from './CreatePost';
 import PublicationListItem, {
   SmallPublicationListItem,
@@ -21,10 +23,7 @@ import {
   MaxDailyPublicationLimitReached,
 } from '../../../Publication/CreateCustomPublication';
 import {AuthContext} from '../../../../App';
-import {
-  PublicationIcon,
-  TagResourceIcon,
-} from '../../../../assets/ResourceTypeIcons';
+import {TagResourceIcon} from '../../../../assets/ResourceTypeIcons';
 import InputError from '../../../Forms/InputError';
 import ErrorMessage from '../../../Forms/ErrorMessage';
 import FormDatabaseSearch from '../../../Forms/FormDatabaseSearch';
@@ -32,8 +31,6 @@ import SecondaryButton from '../../../Buttons/SecondaryButton';
 import './CreatePost.css';
 import {algoliaPublicationToDBPublicationListItem} from '../../../../helpers/publications';
 import {Alert} from 'react-bootstrap';
-import {FilterableResultsContext} from '../../../FilterableResults/FilterableResults';
-import {POST} from '../../../../helpers/resourceTypeDefinitions';
 import {initialValueNoTitle} from '../../../Forms/Articles/HeaderAndBodyArticleInput';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
@@ -45,8 +42,10 @@ export default function PublicationPostForm() {
     setSubmittingPost,
     setPostSuccess,
     savedTitleText,
+    setPostCreateDataResp,
   } = useContext(CreatingPostContext);
-  const [publication, setPublication] = useState();
+  const [taggedPublication, setTaggedPublication] = useState(null);
+  const [isTaggingPublication, setIsTaggingPublication] = useState(false);
   const [isQuickCreatingPub, setIsQuickCreatingPub] = useState(false);
   const [customPublicationAuthors, setCustomPublicationAuthors] = useState([
     userProfile,
@@ -81,8 +80,6 @@ export default function PublicationPostForm() {
       setHasHitMaxDailyPublications(true);
   }, [userID, isQuickCreatingPub]);
 
-  const {setResults} = useContext(FilterableResultsContext);
-
   const initialValues = {
     title: savedTitleText ? savedTitleText : initialValueNoTitle,
   };
@@ -100,45 +97,55 @@ export default function PublicationPostForm() {
       isQuickCreatingPub,
       setSubmittingPost,
       setPostSuccess,
-      setResults,
       setIsQuickCreatingPub,
       setCustomPublication,
       selectedTopics,
       customPublicationAuthors,
-      publication,
+      taggedPublication,
       hasHitMaxDailyPublications,
-      customPubSuccessfullyCreated
+      customPubSuccessfullyCreated,
+      isTaggingPublication,
+      setPostCreateDataResp
     );
   return (
     <>
-      <SelectAndCreatePublication
-        publication={publication}
-        setPublication={setPublication}
-        isQuickCreatingPub={isQuickCreatingPub}
-        setIsQuickCreatingPub={setIsQuickCreatingPub}
-        customPubSuccessfullyCreated={customPubSuccessfullyCreated}
-        userIsVerified={userProfile.isVerified}
-        customPublicationAuthors={customPublicationAuthors}
-        setCustomPublicationAuthors={setCustomPublicationAuthors}
-        customPublication={customPublication}
-        setCustomPublication={setCustomPublication}
-        userID={userID}
-        customPublicationErrors={customPublicationErrors}
-        pubSubmissionError={pubSubmissionError}
-        hasHitMaxDailyPublications={hasHitMaxDailyPublications}
-      />
       <PostForm
         onSubmit={submitChanges}
         initialValues={initialValues}
         formID="create-publication-post-form"
-      />
+      >
+        {isTaggingPublication ? (
+          <SelectAndCreatePublication
+            taggedPublication={taggedPublication}
+            setTaggedPublication={setTaggedPublication}
+            isQuickCreatingPub={isQuickCreatingPub}
+            setIsQuickCreatingPub={setIsQuickCreatingPub}
+            customPubSuccessfullyCreated={customPubSuccessfullyCreated}
+            userIsVerified={userProfile.isVerified}
+            customPublicationAuthors={customPublicationAuthors}
+            setCustomPublicationAuthors={setCustomPublicationAuthors}
+            customPublication={customPublication}
+            setCustomPublication={setCustomPublication}
+            userID={userID}
+            customPublicationErrors={customPublicationErrors}
+            pubSubmissionError={pubSubmissionError}
+            hasHitMaxDailyPublications={hasHitMaxDailyPublications}
+            cancelTagging={() => setIsTaggingPublication(false)}
+          />
+        ) : (
+          <OptionalTagResource
+            onTag={() => setIsTaggingPublication(true)}
+            resourceType={PUBLICATION_POST}
+          />
+        )}
+      </PostForm>
     </>
   );
 }
 
 function SelectAndCreatePublication({
-  publication,
-  setPublication,
+  taggedPublication,
+  setTaggedPublication,
   isQuickCreatingPub,
   setIsQuickCreatingPub,
   customPubSuccessfullyCreated,
@@ -151,12 +158,13 @@ function SelectAndCreatePublication({
   customPublicationErrors,
   pubSubmissionError,
   hasHitMaxDailyPublications,
+  cancelTagging,
 }) {
   return (
     <>
       <SelectPublication
-        publication={publication}
-        setPublication={setPublication}
+        taggedPublication={taggedPublication}
+        setTaggedPublication={setTaggedPublication}
         isQuickCreatingPub={isQuickCreatingPub}
         setIsQuickCreatingPub={setIsQuickCreatingPub}
         customPubSuccessfullyCreated={customPubSuccessfullyCreated}
@@ -174,26 +182,32 @@ function SelectAndCreatePublication({
           hasHitMaxDailyPublications={hasHitMaxDailyPublications}
         />
       )}
+      <button
+        className="create-post-cancel-tagging-button"
+        onClick={cancelTagging}
+      >
+        <h3>Cancel tag</h3>
+      </button>
     </>
   );
 }
 function SelectPublication({
-  publication,
-  setPublication,
+  taggedPublication,
+  setTaggedPublication,
   setIsQuickCreatingPub,
   isQuickCreatingPub,
   customPubSuccessfullyCreated,
   userIsVerified,
 }) {
   const [displayedPublications, setDisplayedPublications] = useState([]);
-  if (publication) {
+  if (taggedPublication) {
     return (
       <div className="create-publication-post-list-item-container">
-        <SmallPublicationListItem publication={publication} />
+        <SmallPublicationListItem publication={taggedPublication} />
         <div className="create-publication-post-list-item-select-container">
           <NegativeButton
             onClick={() => {
-              setPublication(undefined);
+              setTaggedPublication(undefined);
             }}
             smallVersion
           >
@@ -207,22 +221,27 @@ function SelectPublication({
   // if the user clicks enter
   return (
     <div className="publication-post-search-section">
-      <h4>Search Publications</h4>
-      <div
-        className={`resource-search-input-container${
-          isQuickCreatingPub ? '-disabled' : ''
-        }`}
-      >
-        <FormDatabaseSearch
-          setDisplayedItems={setDisplayedPublications}
-          indexName="_PUBLICATIONS"
-          placeholderText=""
-          displayedItems={displayedPublications}
-          clearListOnNoResults={true}
-          hasCustomContainer={true}
-          hideSearchIcon={true}
+      {userIsVerified && (
+        <SwitchTagMethod
+          isCreating={isQuickCreatingPub}
+          setIsCreating={setIsQuickCreatingPub}
         />
-      </div>
+      )}
+      {!isQuickCreatingPub && (
+        <>
+          <div className="resource-search-input-container">
+            <FormDatabaseSearch
+              setDisplayedItems={setDisplayedPublications}
+              indexName="_PUBLICATIONS"
+              placeholderText="Search publications"
+              displayedItems={displayedPublications}
+              clearListOnNoResults={true}
+              hasCustomContainer={true}
+              hideSearchIcon={true}
+            />
+          </div>
+        </>
+      )}
       <div className="create-pub-post-alert-container">
         {customPubSuccessfullyCreated && (
           <Alert variant="primary">
@@ -236,15 +255,9 @@ function SelectPublication({
         displayedPublications.length > 0 && (
           <PublicationSearchResults
             publications={displayedPublications}
-            setTaggedPublication={setPublication}
+            setTaggedPublication={setTaggedPublication}
           />
         )}
-      {userIsVerified && (
-        <SwitchTagMethod
-          isCreating={isQuickCreatingPub}
-          setIsCreating={setIsQuickCreatingPub}
-        />
-      )}
     </div>
   );
 }
@@ -298,11 +311,6 @@ function PostQuickCreatePub({
           again.
         </ErrorMessage>
       )}
-
-      <div className="create-custom-publication-icon-container">
-        <PublicationIcon />
-        <h3>Custom Publication</h3>
-      </div>
       <TextInput
         error={handlePubTitleError(customPublicationErrors)}
         value={customPublication.title}
@@ -404,7 +412,7 @@ function PublicationSearchResults({publications, setTaggedPublication}) {
   });
 }
 
-export async function submitPublicationPost(
+async function submitPublicationPost(
   res,
   isTweeting,
   customPublicationErrors,
@@ -416,14 +424,15 @@ export async function submitPublicationPost(
   isQuickCreatingPub,
   setSubmittingPost,
   setPostSuccess,
-  setResults,
   setIsQuickCreatingPub,
   setCustomPublication,
   selectedTopics,
   customPublicationAuthors,
-  publication,
+  taggedPublication,
   hasHitMaxDailyPublications,
-  customPubSuccessfullyCreated
+  customPubSuccessfullyCreated,
+  isTaggingPublication,
+  setPostCreateDataResp
 ) {
   if (customPublicationErrors) setCustomPublicationErrors();
   if (pubSubmissionError) setPubSubmissionError(false);
@@ -456,13 +465,18 @@ export async function submitPublicationPost(
   const customPublicationSubmissionResult = await submitCustomPublication();
   if (isQuickCreatingPub && !customPublicationSubmissionResult) return;
 
-  if (isQuickCreatingPub) {
-    const customPublicationWithID =
-      customPublicationSubmissionResult.createdCustomPublication;
-    customPublicationWithID.id = customPublicationSubmissionResult.id;
-    res.publication = customPublicationWithID;
-  } else
-    res.publication = algoliaPublicationToDBPublicationListItem(publication);
+  if (isTaggingPublication) {
+    if (isQuickCreatingPub) {
+      const customPublicationWithID =
+        customPublicationSubmissionResult.createdCustomPublication;
+      customPublicationWithID.id = customPublicationSubmissionResult.id;
+      res.publication = customPublicationWithID;
+    } else if (taggedPublication) {
+      res.publication = algoliaPublicationToDBPublicationListItem(
+        taggedPublication
+      );
+    }
+  }
 
   return submitCreatePostWithPublication(
     res,
@@ -473,7 +487,8 @@ export async function submitPublicationPost(
     setCustomPublication,
     setCustomPubSuccessfullyCreated,
     selectedTopics,
-    setResults
+    null,
+    setPostCreateDataResp
   );
 }
 
@@ -486,20 +501,20 @@ export function submitCreatePostWithPublication(
   setCustomPublication,
   setCustomPubSuccessfullyCreated,
   selectedTopics,
-  setResults
+  refreshFeed,
+  setPostCreateDataResp
 ) {
   res.postType = {id: 'publicationPost', name: 'Publication'};
   res.topics = selectedTopics;
   createPost(res)
     .then((response) => {
       if (isTweeting) openTwitterWithPopulatedTweet(res.title, selectedTopics);
-      setPostSuccess(true);
-      setSubmittingPost(false);
-      if (setResults) {
-        const newPost = response.data;
-        newPost.resourceType = POST;
-        setResults((currentResults) => [newPost, ...currentResults]);
+      if (setPostCreateDataResp) setPostCreateDataResp(response.data);
+      if (refreshFeed) {
+        refreshFeed();
       }
+      setSubmittingPost(false);
+      setPostSuccess(true);
     })
     .catch((err) => {
       if (setIsQuickCreatingPub) setIsQuickCreatingPub(false);
