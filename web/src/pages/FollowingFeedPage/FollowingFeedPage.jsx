@@ -126,6 +126,7 @@ function getFiltersFromFilterCollection(filterCollectionsQS) {
         };
         qs.forEach((doc) => {
           const filterOptionData = doc.data();
+          if (filterOptionData.id === 'defaultPost') return;
           filterCollection.options.push({
             data: {
               id: filterOptionData.id,
