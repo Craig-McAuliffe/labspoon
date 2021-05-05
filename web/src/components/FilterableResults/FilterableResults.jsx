@@ -157,11 +157,7 @@ export default function FilterableResults({
   );
 }
 // combine tab filtering with sider filtering
-export function FilterManager({
-  children,
-  fetchMoreSiderFilter,
-  siderFilterOptionsLimit,
-}) {
+export function FilterManager({children, fetchMoreSiderFilter}) {
   const filterableResults = useContext(FilterableResultsContext);
   const [displayedTabFilter, setDisplayedTabFilter] = useState([]);
   const [displayedSiderFilter, setDisplayedSiderFilter] = useState([]);
@@ -221,7 +217,6 @@ export function FilterManager({
         setSiderFilterLoading,
         setTabsFilterLoading,
         fetchMoreSiderFilter: fetchMoreSiderFilterOptions,
-        siderFilterOptionsLimit: siderFilterOptionsLimit,
       }}
     >
       {children}

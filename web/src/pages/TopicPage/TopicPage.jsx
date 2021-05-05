@@ -3,11 +3,9 @@ import {useLocation, useParams} from 'react-router-dom';
 import {FeatureFlags} from '../../App';
 import {db} from '../../firebase';
 import {getActiveTabID} from '../../helpers/filters';
-import {getPaginatedPostsFromCollectionRef} from '../../helpers/posts';
 import {getPaginatedPublicationsFromCollectionRef} from '../../helpers/publications';
 import {getPaginatedUserReferencesFromCollectionRef} from '../../helpers/users';
 import {getPaginatedGroupReferencesFromCollectionRef} from '../../helpers/groups';
-
 import TopicListItem from '../../components/Topics/TopicListItem';
 import FollowTopicButton from '../../components/Topics/FollowTopicButton';
 import TopicPageSider from './TopicPageSider';
@@ -27,6 +25,10 @@ import {LoadingSpinnerPage} from '../../components/LoadingSpinner/LoadingSpinner
 import NotFoundPage from '../NotFoundPage/NotFoundPage';
 
 import './TopicPage.css';
+import {
+  filterFeedData,
+  getFiltersFromFilterCollection,
+} from '../../components/Filter/Filter';
 
 async function fetchTopicDetailsFromDB(topicID) {
   return db
@@ -45,13 +47,8 @@ function topicPageFeedDataFromDB(skip, limit, filterOptions, topicID, last) {
   let results = [];
   switch (activeTab) {
     case 'posts':
-      const postsCollection = db
-        .collection(`topics/${topicID}/posts`)
-        .orderBy('timestamp', 'desc');
-      return [
-        getPaginatedPostsFromCollectionRef(postsCollection, limit, last),
-        null,
-      ];
+      const postsCollection = db.collection(`topics/${topicID}/posts`);
+      return filterFeedData(postsCollection, skip, limit, filterOptions, last);
     case 'publications':
       const publicationsCollection = db.collection(
         `topics/${topicID}/publications`
@@ -165,6 +162,15 @@ const checkIfTabsAreUsed = async (setUsedTabs, topicID) => {
   setUsedTabs({checked: true, tabs: confirmedUsedTabs});
 };
 
+function initialFetchTopicFilters(topicID) {
+  const results = db
+    .collection(`topics/${topicID}/feeds/postsFeed/filterCollections`)
+    .get()
+    .then((fcqs) => getFiltersFromFilterCollection(fcqs))
+    .catch((err) => console.log(err));
+  return results;
+}
+
 export default function TopicPage() {
   const featureFlags = useContext(FeatureFlags);
   const [topicID, setTopicID] = useState(undefined);
@@ -215,6 +221,10 @@ export default function TopicPage() {
     await checkIfTabsAreUsed(setUsedTabs, topicID);
     if (tabsLoading) setTabsLoading(false);
   }, [topicID]);
+
+  const getDefaultFilter = () => {
+    return initialFetchTopicFilters(topicID);
+  };
 
   const fetchFeedData = (skip, limit, filterOptions, last) =>
     topicPageFeedDataFromDB(skip, limit, filterOptions, topicID, last);
@@ -302,6 +312,7 @@ export default function TopicPage() {
         tabs={fetchTabs()}
         tabsLoading={tabsLoading}
         refreshFeed={refreshFeedToggle}
+        getDefaultFilter={getDefaultFilter}
       >
         <PaddedContent>
           <TopicListItem topic={topicDetails} dedicatedPage={true}>

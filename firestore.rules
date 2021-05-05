@@ -243,6 +243,9 @@ service cloud.firestore {
       match /researchFocuses/{researchFocusID} {
         allow read;
       }
+      match /feeds/postsFeed/{doc=**} {
+        allow read;
+      }
     }
 function userIsVerified(userID){
    return get(/databases/$(database)/documents/users/$(userID)).data.keys().hasAny(["isVerified"])

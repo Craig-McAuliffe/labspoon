@@ -6,6 +6,12 @@ import './Filter.css';
 import {RemoveIcon} from '../../assets/GeneralActionIcons';
 import {FilterManagerContext} from '../FilterableResults/FilterableResults';
 import OnHoverPopover from '../Popovers/OnHoverPopover';
+import {getEnabledIDsFromFilter} from '../../helpers/filters';
+import {POST} from '../../helpers/resourceTypeDefinitions';
+import {getPaginatedResourcesFromCollectionRef} from '../../helpers/resources';
+
+export const FILTER_OPTIONS_LIMIT = 10;
+export const FETCH_MORE_FILTER_OPTIONS_LIMIT = 30;
 
 function FilterMenu({
   filterCollectionsWithOptions,
@@ -61,7 +67,6 @@ function FilterCollection({
   resetFilterCollection,
   radio,
 }) {
-  const {siderFilterOptionsLimit} = useContext(FilterManagerContext);
   const [isExpanded, setIsExpanded] = useState(false);
   const [showMoreOptionNoFetch, setShowMoreOptionNoFetch] = useState(false);
   const [displayedOptions, setDisplayedOptions] = useState([]);
@@ -71,12 +76,12 @@ function FilterCollection({
   }
   // this is required in case of resize and therefore filter component change
   useEffect(() => {
-    if (options.length > siderFilterOptionsLimit && !showMoreOptionNoFetch)
+    if (options.length > FILTER_OPTIONS_LIMIT && !showMoreOptionNoFetch)
       setShowMoreOptionNoFetch(true);
   }, []);
   useEffect(() => {
     if (isExpanded) return setDisplayedOptions(options);
-    return setDisplayedOptions(options.slice(0, siderFilterOptionsLimit));
+    return setDisplayedOptions(options.slice(0, FILTER_OPTIONS_LIMIT));
   }, [isExpanded, options]);
   return (
     <div className="filter-collection">
@@ -277,4 +282,139 @@ function MobileFilter({filterCollections}) {
       <h4>Filters</h4>
     </button>
   );
+}
+
+export async function fetchMoreOptionsFromFilterCollection(
+  filterOptionsCollectionRef,
+  last
+) {
+  const newOptionsFetchPromise = await filterOptionsCollectionRef
+    .orderBy('rank', 'desc')
+    .orderBy('name')
+    .orderBy('id')
+    .startAfter(last.data.rank, last.data.name, last.data.id)
+    .limit(FETCH_MORE_FILTER_OPTIONS_LIMIT + 1)
+    .get()
+    .catch((err) =>
+      console.error(`unable to fetch more filter options ${err}`)
+    );
+  if (!newOptionsFetchPromise) return [];
+  const newFilterOptions = [];
+  newOptionsFetchPromise.forEach((optionDS) => {
+    const optionData = optionDS.data();
+
+    newFilterOptions.push({
+      data: {
+        id: optionDS.id,
+        name: optionData.name,
+        rank: optionData.rank,
+      },
+      enabled: false,
+    });
+  });
+  return {
+    newOptions: newFilterOptions,
+    hasMore: newOptionsFetchPromise.size > FETCH_MORE_FILTER_OPTIONS_LIMIT,
+  };
+}
+
+export function getFiltersFromFilterCollection(filterCollectionsQS) {
+  if (!filterCollectionsQS) return [];
+  const filterCollections = [];
+  filterCollectionsQS.forEach((filterCollectionDoc) => {
+    const filterCollectionData = filterCollectionDoc.data();
+    const filterOptionsPromise = filterCollectionDoc.ref
+      .collection('filterOptions')
+      .orderBy('rank', 'desc')
+      .orderBy('name')
+      .orderBy('id')
+      .limit(FILTER_OPTIONS_LIMIT + 1)
+      .get()
+      .then((qs) => {
+        const filterCollection = {
+          collectionName: filterCollectionData.resourceName,
+          collectionType: filterCollectionData.resourceType,
+          options: [],
+          mutable: true,
+          hasMore: qs.size > FILTER_OPTIONS_LIMIT,
+        };
+        qs.forEach((doc) => {
+          const filterOptionData = doc.data();
+          if (filterOptionData.id === 'defaultPost') return;
+          filterCollection.options.push({
+            data: {
+              id: filterOptionData.id,
+              name: filterOptionData.name,
+              rank: filterOptionData.rank,
+            },
+            enabled: false,
+          });
+        });
+        if (filterCollection.hasMore) filterCollection.options.pop();
+        return filterCollection;
+      })
+      .catch((err) => console.log('filter err', err));
+    filterCollections.push(filterOptionsPromise);
+  });
+  return Promise.all(filterCollections);
+}
+
+// Due to the limitations in firestore filters described in
+// https://firebase.google.com/docs/firestore/query-data/queries it is not
+// possible to use multiple many-to-many filters (ie. `array-contains-any` and
+// `in`).
+const arrayContainsAnyErrorMessage =
+  'You cannot select multiple filters in separate sections. Try deselecting the last option.';
+
+export function filterFeedData(collection, skip, limit, filter, last) {
+  const enabledIDs = getEnabledIDsFromFilter(filter);
+  if (enabledIDs.size !== 0) {
+    // No more than one array-contains-any condition may be used in a single compound query.
+    let arrayContainsAnyCount = 0;
+    const enabledAuthorIDs = enabledIDs.get('Author');
+    const enabledPostTypeIDs = enabledIDs.get('Post Type');
+    if (enabledPostTypeIDs && enabledPostTypeIDs.length === 1) {
+      collection = collection.where('postType.id', '==', enabledPostTypeIDs[0]);
+    }
+    if (enabledPostTypeIDs && enabledPostTypeIDs.length > 1) {
+      arrayContainsAnyCount++;
+      collection = collection.where('postType.id', 'in', enabledPostTypeIDs);
+    }
+
+    if (enabledAuthorIDs && enabledAuthorIDs.length === 1) {
+      collection = collection.where('author.id', '==', enabledAuthorIDs[0]);
+    }
+    if (enabledAuthorIDs && enabledAuthorIDs.length > 1) {
+      arrayContainsAnyCount++;
+      if (arrayContainsAnyCount > 1)
+        return [undefined, arrayContainsAnyErrorMessage];
+      collection = collection.where('author.id', 'in', enabledAuthorIDs);
+    }
+
+    const enabledTopicIDs = enabledIDs.get('Topics');
+    if (enabledTopicIDs !== undefined) {
+      if (enabledTopicIDs.length === 1) {
+        collection = collection.where(
+          'filterTopicIDs',
+          'array-contains',
+          enabledTopicIDs[0]
+        );
+      }
+      if (enabledTopicIDs.length > 1) {
+        arrayContainsAnyCount++;
+        if (arrayContainsAnyCount > 1)
+          return [undefined, arrayContainsAnyErrorMessage];
+        collection = collection.where(
+          'filterTopicIDs',
+          'array-contains-any',
+          enabledTopicIDs
+        );
+      }
+    }
+  }
+
+  return [
+    getPaginatedResourcesFromCollectionRef(collection, limit, last, POST),
+    undefined,
+  ];
 }

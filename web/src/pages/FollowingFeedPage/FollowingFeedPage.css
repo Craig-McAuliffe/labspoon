@@ -1,0 +1,22 @@
+.follow-feed-page-create-section {
+  display: flex;
+  margin-bottom: 15px;
+  padding: 5px 0px;
+  justify-content: center;
+  border-bottom: 1px solid #00507c;
+}
+
+.follow-feed-page-create-section:hover {
+  background: #f5f6f6;
+}
+
+.follow-feed-page-create-section a {
+  width: 100%;
+}
+
+.follow-feed-page-create-section a div {
+  display: flex;
+  padding: 0px;
+  width: 100%;
+  justify-content: center;
+}

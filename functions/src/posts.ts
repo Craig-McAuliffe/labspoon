@@ -539,7 +539,8 @@ export const addPostToTopic = functions.firestore
 
 export async function updateFiltersByPost(
   feedRef: firestore.DocumentReference<firestore.DocumentData>,
-  post: Post
+  post: Post,
+  postTypeOnly?: boolean
 ) {
   await updateFilterCollection(
     feedRef,
@@ -553,6 +554,7 @@ export async function updateFiltersByPost(
     },
     false
   );
+  if (postTypeOnly) return;
   await updateFilterCollection(
     feedRef,
     {

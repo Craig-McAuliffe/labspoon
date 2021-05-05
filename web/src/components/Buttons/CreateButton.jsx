@@ -50,10 +50,18 @@ export default function CreateButton({link, buttonAction, text}) {
         {text ? <h3>{text}</h3> : null}
       </button>
     );
-  return (
-    <Link to={link} className="create-button">
-      <CreateIcon hoverControl={true} />
-      {text ? <h3>{text}</h3> : null}
-    </Link>
-  );
+  if (link)
+    return (
+      <Link to={link} className="create-button">
+        <CreateIcon hoverControl={true} />
+        {text ? <h3>{text}</h3> : null}
+      </Link>
+    );
+  if (!buttonAction && !link)
+    return (
+      <div className="create-button">
+        <CreateIcon hoverControl={true} />
+        {text ? <h3>{text}</h3> : null}
+      </div>
+    );
 }

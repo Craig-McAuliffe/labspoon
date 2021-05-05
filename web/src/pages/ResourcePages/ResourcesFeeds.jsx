@@ -24,6 +24,7 @@ export default function ResourcesFeed({
   resourceID,
   resourceData,
   refreshFeed,
+  getDefaultFilter,
 }) {
   return (
     <FilterableResults
@@ -32,7 +33,7 @@ export default function ResourcesFeed({
       refreshFeed={refreshFeed}
     >
       <FilterManager>
-        <NewFilterMenuWrapper />
+        <NewFilterMenuWrapper getDefaultFilter={getDefaultFilter} />
         <UnpaddedPageContainer backgroundShade={backgroundShade}>
           {children}
           {tabsLoading ? (

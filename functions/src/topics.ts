@@ -1,7 +1,12 @@
 import * as functions from 'firebase-functions';
 import {MAKField, makFieldToTopic, TopicToMAKField} from './microsoft';
-import {addRecentPostsToFollowingFeed, Post} from './posts';
-import {admin, config} from './config';
+import {
+  addRecentPostsToFollowingFeed,
+  Post,
+  updateFilterCollection,
+  updateFiltersByPost,
+} from './posts';
+import {admin, config, ResourceTypes} from './config';
 import {firestore} from 'firebase-admin';
 import {
   doFollowPreferencesBlockPost,
@@ -488,6 +493,69 @@ export const addTopicPostsToFollowingFeeds = functions.firestore
     };
     return updateFollowersOfTopic();
   });
+
+export const updateTopicFilterOnNewPost = functions.firestore
+  .document('topics/{topicID}/posts/{postID}')
+  .onCreate((postDS, context) => {
+    const post = postDS.data() as Post;
+    const topicID = context.params.topicID;
+    return updateFiltersByPost(
+      db.doc(`topics/${topicID}/feeds/postsFeed`),
+      post,
+      true
+    );
+  });
+
+export const updateTopicFilterOnDeletedPost = functions.firestore
+  .document('topics/{topicID}/posts/{postID}')
+  .onDelete((postDS, context) => {
+    const post = postDS.data() as Post;
+    const topicID = context.params.topicID;
+    return updateFilterCollection(
+      db.doc(`topics/${topicID}/feeds/postsFeed`),
+      {resourceName: 'Post Type', resourceType: ResourceTypes.POST_TYPE},
+      {
+        name: post.postType.name,
+        id: post.postType.id,
+      },
+      true
+    );
+  });
+
+export const addExistingTopicPostsToFilter = functions.https.onRequest(
+  async (req, res) => {
+    const postsQS = await db
+      .collection('posts')
+      .get()
+      .catch((err) => {
+        console.error(err);
+        res.status(500).send('Unable to fetch posts.');
+      });
+    if (!postsQS) return;
+    const postTopicCombination: {post: Post; topicID: string}[] = [];
+    postsQS.forEach((ds) => {
+      const post = ds.data() as Post;
+      if (!post.topics || post.topics.length === 0) return;
+      const topicIDs = post.topics.map((topic) => topic.id);
+      topicIDs.forEach((topicID) =>
+        postTopicCombination.push({
+          post: post,
+          topicID: topicID,
+        })
+      );
+    });
+    const filterUpdatePromises = postTopicCombination.map((combo) =>
+      updateFiltersByPost(
+        db.doc(`topics/${combo.topicID}/feeds/postsFeed`),
+        combo.post,
+        true
+      )
+    );
+    await Promise.all(filterUpdatePromises);
+    res.json({result: `Updated topic filters with posts in those topics`});
+    res.end();
+  }
+);
 
 export function azureTopicToTopicNoID(azureTopic: AzureTopicResult): Topic {
   const capitaliseFirstLetter = (string: string) =>
