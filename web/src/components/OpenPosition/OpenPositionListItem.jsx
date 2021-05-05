@@ -50,7 +50,7 @@ export default function OpenPositionListItem({openPosition}) {
           <span>{content.position}</span>
         </h4>
       )}
-      {content.salary.length > 0 ? (
+      {content.salary && content.salary.length > 0 ? (
         <h4
           className={`list-item-inline-subtitle-${
             openPosition.backgroundShade
@@ -62,7 +62,7 @@ export default function OpenPositionListItem({openPosition}) {
           <span>{content.salary}</span>
         </h4>
       ) : null}
-      {content.startDate.length > 0 ? (
+      {content.startDate && content.startDate.length > 0 ? (
         <h4
           className={`list-item-inline-subtitle-${
             openPosition.backgroundShade
