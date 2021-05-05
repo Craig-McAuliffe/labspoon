@@ -5,43 +5,135 @@
   position: relative;
 }
 
-.group-bookmark-button-groups-popover,
-.group-bookmark-button-groups-popover-loading {
+.group-bookmark-button-groups-popover-light,
+.group-bookmark-button-groups-popover-dark,
+.group-bookmark-button-groups-popover-light-loading,
+.group-bookmark-button-groups-popover-dark-loading {
   position: absolute;
   right: -15vw;
-  background: #ffffff;
   top: 40px;
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.7);
   width: 40vw;
   z-index: 1;
 }
 
-.group-bookmark-button-groups-popover-loading {
+.group-bookmark-button-groups-popover-light,
+.group-bookmark-button-groups-popover-light-loading {
+  background: #ffffff;
+}
+.group-bookmark-button-groups-popover-dark,
+.group-bookmark-button-groups-popover-dark-loading {
+  background: #053651;
+}
+
+.group-bookmark-button-groups-popover-light-loading,
+.group-bookmark-button-groups-popover-dark-loading {
   opacity: 0.5;
 }
 
-.group-bookmark-button-groups-popover-title {
-  color: #99999f;
+.group-bookmark-button-groups-popover-title-light,
+.group-bookmark-button-groups-popover-title-dark {
   padding: 20px 5px;
   margin-bottom: 0px;
   text-align: center;
 }
 
-.group-bookmark-button-group-selector {
+.group-bookmark-button-groups-popover-title-light {
+  color: #99999f;
+}
+
+.group-bookmark-button-groups-popover-title-dark {
+  color: #9ebdd0;
+}
+
+.group-bookmark-button-group-selector-light {
   border-top: 1px solid #5d5d65;
   width: 100%;
 }
 
-.group-bookmark-button-group-selector:hover {
+.group-bookmark-button-group-selector-light-bookmarked {
   background: #00507c;
-  border-top: 1px solid #00507c;
+  border-top: 1px solid #5d7f95;
+  width: 100%;
 }
 
-.group-bookmark-button-group-selector:focus {
+.group-bookmark-button-group-selector-light-bookmarked h3,
+.group-bookmark-button-group-selector-light-bookmarked p {
+  color: #00507c;
+}
+
+.group-bookmark-button-group-selector-light-bookmarked {
+  background: #d2e3ef;
+}
+
+.group-bookmark-button-group-selector-light-bookmarked p {
+  margin-bottom: 0px;
+}
+
+.group-bookmark-button-group-selector-light-bookmarked:hover,
+.group-bookmark-button-group-selector-light:hover {
+  background: #00507c;
+}
+
+.group-bookmark-button-group-selector-light-bookmarked:focus,
+.group-bookmark-button-group-selector-light:focus {
+  background: #063854;
+  border-top: 1px solid #3099d3;
+}
+
+.group-bookmark-button-group-selector-light:hover {
+  background: #00507c;
+}
+
+.group-bookmark-button-group-selector-light:hover h3,
+.group-bookmark-button-group-selector-light:hover p,
+.group-bookmark-button-group-selector-light-bookmarked:hover h3,
+.group-bookmark-button-group-selector-light-bookmarked:hover p {
+  color: #ffffff;
+}
+
+.group-bookmark-button-group-selector-light p {
+  margin-bottom: 0px;
+  color: #00507c;
+}
+
+.group-bookmark-button-group-selector-dark-bookmarked,
+.group-bookmark-button-group-selector-dark {
+  border-top: 1px solid #ccd6da;
+  width: 100%;
+}
+
+.group-bookmark-button-group-selector-dark-bookmarked h3,
+.group-bookmark-button-group-selector-dark-bookmarked p {
+  color: #ccd6da;
+}
+
+.group-bookmark-button-group-selector-dark h3,
+.group-bookmark-button-group-selector-dark p {
+  color: #ffffff;
+}
+
+.group-bookmark-button-group-selector-dark-bookmarked p {
+  margin-bottom: 0px;
+}
+
+.group-bookmark-button-group-selector-dark-bookmarked:hover {
+  background: #031e2d;
+}
+
+.group-bookmark-button-group-selector-dark-bookmarked:focus {
+  background: #021621;
+}
+
+.group-bookmark-button-group-selector-dark:hover {
+  background: #08416a;
+}
+
+.group-bookmark-button-group-selector-dark:focus {
   background: #035e90;
   border-top: 1px solid #3099d3;
 }
 
-.group-bookmark-button-group-selector:hover h3 {
-  color: #ffffff;
+.group-bookmark-button-group-selector-dark p {
+  margin-bottom: 0px;
 }

@@ -101,9 +101,20 @@
   color: #a1dcfc;
 }
 
+.action-button-light-unselected path,
+.action-button-light-selected path {
+  fill: #ffffff;
+}
+
 .action-button-light-unselected:hover,
 .action-button-light-selected:hover {
-  color: #031e2d;
+  color: #063854;
+}
+
+.action-button-light-unselected:hover,
+.action-button-light-selected:hover {
+  background: #d2e3ef;
+  border-radius: 5px;
 }
 
 .action-button-light-selected,

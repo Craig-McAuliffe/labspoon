@@ -5,7 +5,8 @@ Tertiary Text: #99999F
 Quaternary Text: #DCDCE0
 
 Primary Color: #00507C rgb(0,80,124)
-Primary Color Hover: #063854
+Primary Color Hover (darker hover): #063854
+Primary Color Hover (lighter hover): #d2e3ef;
 Secondary Color: #3099D3
 Background Blue: #EAF5FB
 Overlay Off Primary: #185E9C;
@@ -17,7 +18,8 @@ Quaternary text dark: #5d7f95
 dark outline: #0a3b5b
 darker-background: #053651;
 darker-background-secondary (list items backgrounds): #064262; rgb(6,66,98)
-darker-background-hover: #031e2d;
+darker-background-hover (darker): #031e2d;
+darker-background-hover (lighter): #08416a;
 dark-link-hover : #a1dcfc;
 
 Destructive color: #DA0000

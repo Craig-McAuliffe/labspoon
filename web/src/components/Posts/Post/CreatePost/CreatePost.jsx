@@ -427,10 +427,7 @@ export function OptionalTagResource({onTag, resourceType}) {
           Tag {resourceType}
         </SecondaryButton>
       </div>
-      <p>
-        Conduct conversations about this {resourceType.toLowerCase()} in one
-        place.
-      </p>
+      <p>Tagged posts appear on the {resourceType.toLowerCase()} page.</p>
     </div>
   );
 }

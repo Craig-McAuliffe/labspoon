@@ -43,7 +43,7 @@ export default function GroupBookmarkButton({
     setLoadingGroups(false);
   }, [userProfile]);
 
-  const onBookmark = async (groupID, addOrRemove) => {
+  const onBookmark = async (groupID, bookmarkOrRemove) => {
     if (submitting) return;
     setSubmitting(true);
     const bookmarkListItem = getListItemFromGenericResource(
@@ -61,7 +61,7 @@ export default function GroupBookmarkButton({
       )}/${bookmarkedResourceID}/bookmarkedByGroups/${groupID}`
     );
 
-    if (addOrRemove === 'add') {
+    if (bookmarkOrRemove === 'bookmark') {
       batch.set(groupBookmarkRef, bookmarkListItem);
       batch.set(bookmarkedResourceRef, {id: groupID});
     } else {
@@ -88,6 +88,7 @@ export default function GroupBookmarkButton({
             groups={userGroups}
             setOpen={setOpen}
             bookmarkedResourceID={bookmarkedResourceID}
+            backgroundShade={backgroundShade}
           />
         )}
         hasOwnRelativeContainer={true}
@@ -107,12 +108,12 @@ function GetAndDisplayGroupsForUser({
   groups,
   setOpen,
   bookmarkedResourceID,
+  backgroundShade,
 }) {
   const [loadingGroupBookmarkState, setLoadingGroupBookmarkState] = useState(
     true
   );
   const [bookmarkedGroupsIDs, setBookmarkedGroupsIDs] = useState([]);
-  console.log(bookmarkedGroupsIDs);
   useEffect(async () => {
     const groupsBookmarksPromises = groups.map((group) =>
       db
@@ -138,34 +139,40 @@ function GetAndDisplayGroupsForUser({
 
   return (
     <div
-      className={`group-bookmark-button-groups-popover${
-        loadingGroupBookmarkState ? '-loading' : ''
-      }`}
+      className={`group-bookmark-button-groups-popover-${
+        backgroundShade ? backgroundShade : 'light'
+      }${loadingGroupBookmarkState ? '-loading' : ''}`}
     >
-      <h3 className="group-bookmark-button-groups-popover-title">
+      <h3
+        className={`group-bookmark-button-groups-popover-title-${
+          backgroundShade ? backgroundShade : 'light'
+        }`}
+      >
         Choose group
       </h3>
-      {groups.map((group) => (
-        <button
-          className="group-bookmark-button-group-selector"
-          onClick={() => {
-            if (loadingGroupBookmarkState) return;
-            setOpen(false);
-            if (bookmarkedGroupsIDs.some((groupID) => groupID === group.id))
-              return onSelect(group.id, 'remove');
-            return onSelect(group.id, 'bookmark');
-          }}
-          key={group.id}
-        >
-          <GroupDropdownItem group={group}>
-            <p>
-              {bookmarkedGroupsIDs.some((groupID) => groupID === group.id)
-                ? 'Remove'
-                : 'Bookmark'}
-            </p>
-          </GroupDropdownItem>
-        </button>
-      ))}
+      {groups.map((group) => {
+        const groupIsBookmarked = bookmarkedGroupsIDs.some(
+          (groupID) => groupID === group.id
+        );
+        return (
+          <button
+            className={`group-bookmark-button-group-selector-${
+              backgroundShade ? backgroundShade : 'light'
+            }${groupIsBookmarked ? '-bookmarked' : ''}`}
+            onClick={() => {
+              if (loadingGroupBookmarkState) return;
+              setOpen(false);
+              if (groupIsBookmarked) return onSelect(group.id, 'remove');
+              return onSelect(group.id, 'bookmark');
+            }}
+            key={group.id}
+          >
+            <GroupDropdownItem group={group}>
+              <p>{groupIsBookmarked ? 'Remove' : 'Bookmark'}</p>
+            </GroupDropdownItem>
+          </button>
+        );
+      })}
     </div>
   );
 }

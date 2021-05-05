@@ -84,7 +84,7 @@ export function GroupDropdownItem({group, children}) {
   return (
     <div className="group-dropdown-item">
       <GroupAvatarSection groupAvatar={group.avatar} height={80} width={80} />
-      <GroupNameInstitution name={group.name} institution={group.institution} />
+      <h3 className="group-dropdown-item-name">{group.name}</h3>
       {children}
     </div>
   );
