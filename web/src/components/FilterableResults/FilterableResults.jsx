@@ -50,6 +50,9 @@ export default function FilterableResults({
   const [fetchResultsFunction, setFetchResultsFunction] = useState(
     () => fetchResults
   );
+  const [childrenRefreshFeedToggle, setChildrenRefreshFeedToggle] = useState(
+    false
+  );
 
   useEffect(() => {
     if (fetchResultsFunction !== fetchResults) {
@@ -87,7 +90,13 @@ export default function FilterableResults({
         setLoadingResults(false);
       }
     });
-  }, [fetchResultsFunction, filter, limit, loadingFilter]);
+  }, [
+    fetchResultsFunction,
+    filter,
+    limit,
+    loadingFilter,
+    childrenRefreshFeedToggle,
+  ]);
 
   // fetches results by triggering an effect
   function fetchMore() {
@@ -140,6 +149,7 @@ export default function FilterableResults({
         loadingResults,
         resultsError,
         setResults,
+        setChildrenRefreshFeedToggle,
       }}
     >
       {children}

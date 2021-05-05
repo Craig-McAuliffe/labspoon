@@ -55,6 +55,7 @@ function fetchGroupPageFeedFromDB(
   switch (activeTab) {
     case 'overview':
       const newsCollection = db.collection(`groups/${groupID}/news`);
+
       results = getPaginatedResourcesFromCollectionRef(
         newsCollection,
         limit,
@@ -413,7 +414,7 @@ export default function GroupPage() {
       <ResourcesFeed
         fetchResults={fetchFeedData}
         backgroundShade={backgroundShade}
-        limit={9}
+        limit={15}
         tabs={fetchTabs()}
         tabsLoading={tabsLoading}
         // the route matched path is different if the url is extended changes

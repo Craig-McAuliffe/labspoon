@@ -5,6 +5,7 @@ import NotFoundPage from '../../NotFoundPage/NotFoundPage';
 import GroupPage from '.';
 import CreateGroupPage from '../../../components/Group/CreateGroupPage/CreateGroupPage';
 import EditGroupPage from './EditGroupPage';
+import GroupMemberZone from './GroupMemberZone';
 
 export default function Groups() {
   const {path} = useRouteMatch();
@@ -29,6 +30,9 @@ function GroupPages() {
     <Switch>
       <AuthRoute path={`${path}/edit`}>
         <EditGroupPage />
+      </AuthRoute>
+      <AuthRoute path={`${path}/memberZone`}>
+        <GroupMemberZone />
       </AuthRoute>
       <Route path={`${path}/:routedTabID`}>
         <GroupPage />

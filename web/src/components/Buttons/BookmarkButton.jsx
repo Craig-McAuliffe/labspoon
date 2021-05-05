@@ -25,7 +25,7 @@ function BookmarkButton({
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const {user, authLoaded} = useContext(AuthContext);
-
+  bookmarkedResource.bookmarkTimestamp = new Date();
   const onClick = async () => {
     if (submitting) return;
     setSubmitting(true);

@@ -1,4 +1,5 @@
 import React, {useState, useContext, useEffect} from 'react';
+import {useLocation} from 'react-router';
 import {AuthContext} from '../../App';
 import {GroupBookmarkIcon} from '../../assets/PostActionIcons';
 import {db} from '../../firebase';
@@ -7,6 +8,7 @@ import {
   POST,
   resourceTypeToCollection,
 } from '../../helpers/resourceTypeDefinitions';
+import {FilterableResultsContext} from '../FilterableResults/FilterableResults';
 import {GroupDropdownItem} from '../Group/GroupListItem';
 import Popover from '../Popovers/Popover';
 import './GroupBookmarkButton.css';
@@ -21,7 +23,9 @@ export default function GroupBookmarkButton({
   const {userProfile} = useContext(AuthContext);
   const [loadingGroups, setLoadingGroups] = useState(true);
   const [userGroups, setUserGroups] = useState([]);
-
+  const pathname = useLocation().pathname;
+  const filterableResultsContext = useContext(FilterableResultsContext);
+  bookmarkedResource.bookmarkTimestamp = new Date();
   useEffect(async () => {
     if (!userProfile) return;
     const groupsForUserQS = await db
@@ -76,6 +80,13 @@ export default function GroupBookmarkButton({
         )
       );
     setSubmitting(false);
+    // refreshes feed on memberZone bookmarks upon bookmark change
+    if (pathname.includes('memberZone')) {
+      if (filterableResultsContext)
+        filterableResultsContext.setChildrenRefreshFeedToggle(
+          (toggleState) => !toggleState
+        );
+    }
   };
   if (loadingGroups) return null;
   return (

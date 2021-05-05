@@ -1,0 +1,17 @@
+.member-zone-back-to-public-button-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.member-zone-back-to-public-button-container h3 {
+  color: #00507c;
+}
+
+.member-zone-back-to-public-button-container h3:hover {
+  text-decoration: underline;
+}
+
+.member-zone-back-title {
+  color: #5d5d65;
+}

@@ -133,6 +133,10 @@
   fill: #ffffff;
 }
 
+.action-button-dark-unselected path {
+  fill: #064262;
+}
+
 .action-button-light-unselected path,
 .action-button-light-selected path {
   stroke: #00507c;

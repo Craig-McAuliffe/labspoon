@@ -24,6 +24,7 @@ const RecommendButton = ({
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const {user, authLoaded, userProfile} = useContext(AuthContext);
+  recommendedResource.recommendationTimestamp = new Date();
   const onClick = async () => {
     if (submitting) return;
     setSubmitting(true);

@@ -52,6 +52,7 @@ const GroupDetails = ({
 }) => {
   const [isSlowLoad, setIsSlowLoad] = useState(false);
   const [pinnedItem, setPinnedItem] = useState(null);
+  const history = useHistory();
   useEffect(() => {
     if (!groupID) return;
     const groupDocObserver = db
@@ -113,6 +114,17 @@ const GroupDetails = ({
       <div className="background-container">
         {backgroundDesignIDToSVG(group.backgroundDesign)}
       </div>
+      {userIsMember && (
+        <div
+          className={`group-page-member-zone-button-container-${
+            backgroundShade ? backgroundShade : 'light'
+          }`}
+        >
+          <button onClick={() => history.push(`/group/${groupID}/memberZone`)}>
+            <h3>Member Zone</h3>
+          </button>
+        </div>
+      )}
       <GroupDetailsHeaderSection
         group={group}
         isMobile={isMobile}
