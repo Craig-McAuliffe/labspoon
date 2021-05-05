@@ -123,6 +123,7 @@ function PostHeader({
   const handleQualityScoreClick = async (downOrUp) => {
     if ((downOrUp !== 'down' && downOrUp !== 'up') || !user) return;
     const userID = user.uid;
+    if (userID === post.author.id) return;
     if (submittingQualityScore) return;
     if (
       (downOrUp === 'up' && downUpVoteState === 'up') ||
