@@ -1,7 +1,6 @@
 .follow-feed-page-create-section {
   display: flex;
   margin-bottom: 15px;
-  padding: 5px 0px;
   justify-content: center;
   border-bottom: 1px solid #00507c;
 }
@@ -14,9 +13,9 @@
   width: 100%;
 }
 
-.follow-feed-page-create-section a div {
+.follow-feed-page-create-section .create-button {
   display: flex;
-  padding: 0px;
   width: 100%;
   justify-content: center;
+  padding: 5px 0px;
 }
