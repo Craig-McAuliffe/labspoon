@@ -4,6 +4,8 @@
   margin-top: 20px;
   flex-wrap: wrap;
   border-top: 1px solid #dcdce0;
+  background: #f5f6f6;
+  padding: 0px 10px;
 }
 
 .post-actions-dedicated-page {

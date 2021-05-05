@@ -46,6 +46,7 @@ export default function TagTopics({
           largeDesign={true}
           superCachedSearchAndResults={superCachedSearchAndResults}
           setSuperCachedSearchAndResults={setSuperCachedSearchAndResults}
+          loadingTopics={loadingTopics}
         >
           <SelectedTopics
             selectedTopics={selectedTopics}

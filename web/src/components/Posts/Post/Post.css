@@ -1,11 +1,13 @@
 .post-container-light,
 .post-container-dark {
   margin: 2px 2px 30px 2px;
-  padding: 20px 16px;
   max-width: 100%;
   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.7);
 }
 
+.post-content-container {
+  padding: 20px 16px 0px;
+}
 .post-container-light {
   background: #ffffff;
 }
@@ -15,8 +17,12 @@
 }
 .post-container-dedicated-page {
   margin: 2px 2px 0px 2px;
-  padding: 20px 16px 0px;
   max-width: 100%;
+}
+
+.post-container-dedicated-page .post-text-content,
+.post-container-dedicated-page .post-topics-container {
+  padding: 0px 10px;
 }
 
 .post-referenced-resource-container {
@@ -40,6 +46,67 @@
 
 .post-header-dark {
   border-bottom: 1px solid #5d7f95;
+}
+
+.post-header-top-right-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.post-quality-score-container-light,
+.post-quality-score-container-dark {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.post-quality-score-container-light {
+  color: #5d5d65;
+}
+
+.post-quality-score-container-dark {
+  color: #ccd6da;
+}
+
+.post-quality-score-symbol-container {
+  padding: 0px 10px;
+}
+.post-quality-score-symbol-container button {
+  display: block;
+  padding: 0px;
+}
+
+.post-quality-score-button-light-selected path {
+  fill: #00507c;
+}
+
+.post-quality-score-button-light-selected:hover path {
+  fill: #063854;
+}
+
+.post-quality-score-button-dark-selected path {
+  fill: #ffffff;
+}
+
+.post-quality-score-button-dark-selected:hover path {
+  fill: #ccd6da;
+}
+
+.post-quality-score-button-light-deselected path {
+  fill: #dcdce0;
+}
+
+.post-quality-score-button-light-deselected:hover path {
+  fill: #99999f;
+}
+
+.post-quality-score-button-dark-deselected path {
+  fill: #5d7f95;
+}
+
+.post-quality-score-button-dark-deselected:hover path {
+  fill: #9ebdd0;
 }
 
 .post-header-dedicated-page {

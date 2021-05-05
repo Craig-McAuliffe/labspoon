@@ -18,6 +18,7 @@ export default function SearchMSFields({
   children,
   superCachedSearchAndResults,
   setSuperCachedSearchAndResults,
+  loadingTopics,
 }) {
   const [typedTopic, setTypedTopic] = useState(
     superCachedSearchAndResults ? superCachedSearchAndResults.search : ''
@@ -99,15 +100,17 @@ export default function SearchMSFields({
   };
 
   useEffect(() => {
-    if (typedTopic.length === 0) {
-      setFetchedTopics([]);
-      setCachedTopics([]);
-      setSuperCachedSearchAndResults({search: '', results: []});
-      setLoading(false);
-      setHasMore(false);
-      setSkip(0);
+    if (
+      superCachedSearchAndResults &&
+      typedTopic === superCachedSearchAndResults.search
+    )
       return;
-    }
+    setFetchedTopics([]);
+    setCachedTopics([]);
+    setSuperCachedSearchAndResults({search: '', results: []});
+    setLoading(false);
+    setHasMore(false);
+    setSkip(0);
     if (cachedTopics.length === 0) {
       return fetchTopics();
     }
@@ -140,14 +143,14 @@ export default function SearchMSFields({
       </div>
       {children}
       <div className="search-ms-fields-next-previous-container">
-        {skip > limit ? (
+        {skip > limit && !loadingTopics ? (
           <TertiaryButton onClick={handlePreviousPageClick}>
             Previous Page
           </TertiaryButton>
         ) : (
           <div></div>
         )}
-        {(hasMore || cachedTopics.length > skip) && (
+        {(hasMore || cachedTopics.length > skip) && !loadingTopics && (
           <TertiaryButton onClick={handleNextPageClick}>
             Next Page
           </TertiaryButton>

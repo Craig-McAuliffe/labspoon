@@ -55,7 +55,7 @@ const PostActions = ({
         bookmarkedByCollection={bookmarkedByCollection}
         backgroundShade={backgroundShade}
       />
-      {userProfile.isMemberOfAnyGroups && userProfile && (
+      {userProfile && userProfile.isMemberOfAnyGroups && (
         <GroupBookmarkButton
           bookmarkedResource={post}
           bookmarkedResourceType={POST}

@@ -1,5 +1,12 @@
-import React, {useRef, useState, useEffect, cloneElement} from 'react';
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  cloneElement,
+  useContext,
+} from 'react';
 import {Link, useLocation} from 'react-router-dom';
+import {AuthContext} from '../../App';
 import {BOOKMARK, RECOMMENDATION} from '../../helpers/resourceTypeDefinitions';
 import NegativeButton from '../Buttons/NegativeButton';
 import PrimaryButton from '../Buttons/PrimaryButton';
@@ -16,7 +23,7 @@ export function SignUpPopoverOverride({children, text, actionTaken}) {
   const locationPathName = location.pathname;
   const search = location.search;
   const signUpPromptRef = useRef();
-
+  const {user} = useContext(AuthContext);
   useEffect(() => {
     const handleDocumentClick = (e) => {
       if (signUpPromptRef.current) {
@@ -33,31 +40,33 @@ export function SignUpPopoverOverride({children, text, actionTaken}) {
           return cloneElement(child, {
             actionAndTriggerPopUp: () => {
               child.props.actionAndTriggerPopUp();
-              setOpen(true);
+              if (!user) setOpen(true);
             },
           });
         case CREATE:
           return cloneElement(child, {
             createAction: () => {
-              setOpen(true);
+              if (!user) setOpen(true);
             },
           });
         case BOOKMARK:
           return cloneElement(child, {
             onBookmark: () => {
-              setOpen(true);
+              if (!user) setOpen(true);
             },
           });
         case RECOMMENDATION:
           return cloneElement(child, {
             onRecommend: () => {
-              setOpen(true);
+              if (!user) setOpen(true);
             },
           });
         default:
           return cloneElement(child, {
-            followAction: () => {
-              setOpen(true);
+            actionAndTriggerPopUp: () => {
+              if (child.props.actionAndTriggerPopUp)
+                child.props.actionAndTriggerPopUp();
+              if (!user) setOpen(true);
             },
           });
       }

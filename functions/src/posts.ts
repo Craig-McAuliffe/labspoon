@@ -70,6 +70,7 @@ export const createPost = functions.https.onCall(async (data, context) => {
     filterTopicIDs: data.topics.map(
       (taggedTopic: TaggedTopic) => taggedTopic.id
     ),
+    qualityScore: 0,
     id: postID,
   };
   await authorLastPostTimeCheck(author.id, post.unixTimeStamp);
@@ -751,6 +752,7 @@ export interface Post {
   bookmarkedCount?: number;
   recommendedCount?: number;
   unixTimeStamp: number;
+  qualityScore: number;
 }
 
 export interface PostRef {
