@@ -19,6 +19,7 @@ Quaternary text dark: #5d7f95
 dark outline: #0a3b5b
 darker-background: #053651;
 darker-background-secondary (list items backgrounds): #064262; rgb(6,66,98)
+darker-background-tertiary (list items actions): #053b57;
 darker-background-hover (darker): #031e2d;
 darker-background-hover (lighter): #08416a;
 dark-link-hover : #a1dcfc;

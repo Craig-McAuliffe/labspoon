@@ -1,11 +1,20 @@
-.post-actions {
+.post-actions-light,
+.post-actions-dark {
   display: flex;
   justify-content: flex-start;
   margin-top: 20px;
   flex-wrap: wrap;
+  padding: 0px 10px;
+}
+
+.post-actions-light {
   border-top: 1px solid #dcdce0;
   background: #f5f6f6;
-  padding: 0px 10px;
+}
+
+.post-actions-dark {
+  border-top: 2px solid #0a3b5b;
+  background: #053b57;
 }
 
 .post-actions-dedicated-page {

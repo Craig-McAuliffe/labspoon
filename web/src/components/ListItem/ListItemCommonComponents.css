@@ -45,11 +45,17 @@
 
 .list-item-dropdown-toggle-light,
 .list-item-dropdown-toggle-dark {
-  width: 140px;
   display: flex;
   justify-content: flex-end;
   padding: 0px;
   margin-bottom: 10px;
+  margin-left: 10px;
+}
+
+.list-options-container-dark .dropdown-container,
+.list-options-container-dark .dropdown-container {
+  width: 140px;
+  right: 0px;
 }
 
 .list-item-dropdown-toggle-dark circle {

@@ -37,7 +37,11 @@ const PostActions = ({
     );
   return (
     <div
-      className={dedicatedPage ? 'post-actions-dedicated-page' : 'post-actions'}
+      className={
+        dedicatedPage
+          ? 'post-actions-dedicated-page'
+          : `post-actions-${backgroundShade ? backgroundShade : 'light'}`
+      }
     >
       {featureFlags.has('repost-to-group') ? <RepostToGroupButton /> : <></>}
       {featureFlags.has('share-post') ? <ShareButton /> : <></>}
