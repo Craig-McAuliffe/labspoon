@@ -8,26 +8,31 @@ import {yupRichBodyOnlyValidation} from '../../../Forms/Articles/HeaderAndBodyAr
 import * as Yup from 'yup';
 import {CreatePostTextArea} from '../../../Forms/FormTextInput';
 
-const postValidationSchema = Yup.object({
-  title: yupRichBodyOnlyValidation(),
-});
+const postValidationSchema = (characterLimit, paragraphLimit) =>
+  Yup.object({
+    title: yupRichBodyOnlyValidation(characterLimit, paragraphLimit),
+  });
 
 export const CreatePostTitleContext = React.createContext();
 
-export default function PostForm({onSubmit, initialValues, formID, children}) {
-  const {
-    setSubmittingPost,
-    submittingPost,
-    selectedTopics,
-    postType,
-    setPostType,
-  } = useContext(CreatingPostContext);
+export default function PostForm({
+  onSubmit,
+  initialValues,
+  formID,
+  children,
+  characterLimit,
+  paragraphLimit,
+  hasTweetOption = true,
+}) {
+  const {setSubmittingPost, submittingPost, selectedTopics} = useContext(
+    CreatingPostContext
+  );
   const [isTweeting, setIsTweeting] = useState(false);
   const [titleLength, setTitleLength] = useState(0);
   const [isTweetTooLong, setIsTweetTooLong] = useState();
 
   useEffect(() => {
-    if (isTweeting)
+    if (isTweeting && selectedTopics)
       setIsTweetTooLong(!validateTweetPostLength(titleLength, selectedTopics));
   }, [selectedTopics, titleLength]);
 
@@ -40,7 +45,9 @@ export default function PostForm({onSubmit, initialValues, formID, children}) {
     <>
       <Formik
         initialValues={initialValues}
-        validationSchema={postValidationSchema}
+        validationSchema={() =>
+          postValidationSchema(characterLimit, paragraphLimit)
+        }
         onSubmit={createPost}
       >
         <Form id={formID ? formID : 'create-post-form'}>
@@ -62,12 +69,10 @@ export default function PostForm({onSubmit, initialValues, formID, children}) {
       )}
       {children}
       <CreatePostActions
-        postType={postType}
-        setPostType={setPostType}
         formID={formID}
         setIsTweeting={setIsTweeting}
         isTweeting={isTweeting}
-        hasTweetOption={true}
+        hasTweetOption={hasTweetOption}
       />
     </>
   );

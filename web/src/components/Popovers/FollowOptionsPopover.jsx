@@ -14,7 +14,7 @@ import PrimaryButton from '../Buttons/PrimaryButton';
 import SelectCheckBox, {setItemSelectedState} from '../Buttons/SelectCheckBox';
 import {SimpleErrorText} from '../Forms/ErrorMessage';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
-import PaginatedResourceFetchAndResults from '../PaginatedResourceFetch/PaginatedResourceFetchAndResults';
+import {SelectablePaginatedResourceFetchAndResults} from '../PaginatedResourceFetch/PaginatedResourceFetchAndResults';
 
 import './FollowOptionsPopover.css';
 import Popover from './Popover';
@@ -345,7 +345,7 @@ function ResourceFollowTopicsOptions({
       id={INFINITE_SCROLL_TARGET_ID}
     >
       <h4 className="follow-options-topics-note">I&#39;m interested in...</h4>
-      <PaginatedResourceFetchAndResults
+      <SelectablePaginatedResourceFetchAndResults
         isSelectable={true}
         collectionRef={targetResourceTopicsRef}
         setSelectedItems={setSelectedTopics}

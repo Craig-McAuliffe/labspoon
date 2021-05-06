@@ -233,7 +233,6 @@ export const updatePostOnGroups = functions.firestore
       JSON.stringify(postToPostRef(oldPostData))
     )
       return;
-
     const groupsQS = await db
       .collection(`posts/${postID}/groups`)
       .get()
@@ -746,6 +745,8 @@ export interface Post {
   topics: TaggedTopic[];
   customTopics?: string[];
   timestamp: Date;
+  qualityScore?: number;
+  numberOfComments?: number;
   id: string;
   publication?: PublicationRef | CustomPublicationRef;
   openPosition?: OpenPosition;
@@ -754,7 +755,6 @@ export interface Post {
   bookmarkedCount?: number;
   recommendedCount?: number;
   unixTimeStamp: number;
-  qualityScore: number;
 }
 
 export interface PostRef {
@@ -765,6 +765,8 @@ export interface PostRef {
   customTopics?: string[];
   timestamp: Date;
   id: string;
+  qualityScore?: number;
+  numberOfComments?: number;
   publication?: PublicationRef | CustomPublicationRef;
   openPosition?: OpenPosition;
   // filterable arrays must be array of strings
@@ -804,11 +806,8 @@ export function postToPostRef(post: Post, isAlgolia?: boolean): PostRef {
   if (post.customTopics) postRef.customTopics = post.customTopics;
   if (post.publication) postRef.publication = post.publication;
   if (post.openPosition) postRef.openPosition = post.openPosition;
-  if (isAlgolia)
-    postRef.unformattedText = post.text.reduce(
-      (accumulator, current) => accumulator + current.children[0].text + ' ',
-      ''
-    );
+  if (post.qualityScore) postRef.qualityScore = post.qualityScore;
+  if (post.numberOfComments) postRef.numberOfComments = post.numberOfComments;
   return postRef;
 }
 

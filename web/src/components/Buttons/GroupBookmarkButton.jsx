@@ -190,17 +190,19 @@ function GetAndDisplayGroupsForUser({
 
 function GroupBookmarkButtonContent({actionAndTriggerPopUp, backgroundShade}) {
   return (
-    <button
-      className={`action-button-${
-        backgroundShade ? backgroundShade : 'light'
-      }-unselected
+    <div className="post-actions-button-container">
+      <button
+        className={`action-button-${
+          backgroundShade ? backgroundShade : 'light'
+        }-unselected
       }`}
-      href="/"
-      onClick={actionAndTriggerPopUp}
-    >
-      <GroupBookmarkIcon />
-      <span className="action-button-text">Group Bookmark</span>
-    </button>
+        href="/"
+        onClick={actionAndTriggerPopUp}
+      >
+        <GroupBookmarkIcon />
+        <span className="action-button-text">Group Bookmark</span>
+      </button>
+    </div>
   );
 }
 export function getListItemFromGenericResource(

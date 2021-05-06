@@ -3,7 +3,7 @@ import algoliasearch, {SearchClient} from 'algoliasearch';
 import {config, environment, ResourceTypes} from './config';
 import {toUserAlgoliaFilterRef, User} from './users';
 import {Group, groupToAlgoliaGroupRef} from './groups';
-import {Post, postToPostRef} from './posts';
+import {Post, postToAlgoliaPostRef} from './posts';
 import {OpenPosition, openPosToOpenPosListItem} from './openPositions';
 import {Publication, publicationToPublicationRef} from './publications';
 
@@ -167,9 +167,10 @@ export const addPostToSearchIndex = functions.firestore
   .document(`posts/{postID}`)
   .onCreate((change, context): boolean => {
     const post = change.data() as Post;
+    const postID = context.params.postID;
     return addToIndex(
       context.params.postID,
-      postToPostRef(post, true),
+      postToAlgoliaPostRef(post, postID),
       ResourceTypes.POST,
       POSTS_INDEX
     );
@@ -180,14 +181,15 @@ export const updatePostToSearchIndex = functions.firestore
   .onUpdate((change, context): boolean => {
     const newPostData = change.after.data() as Post;
     const oldPostData = change.before.data() as Post;
+    const postID = context.params.postID;
     if (
-      JSON.stringify(postToPostRef(newPostData, true)) ===
-      JSON.stringify(postToPostRef(oldPostData, true))
+      JSON.stringify(postToAlgoliaPostRef(newPostData, postID)) ===
+      JSON.stringify(postToAlgoliaPostRef(oldPostData, postID))
     )
       return false;
     return addToIndex(
       context.params.postID,
-      postToPostRef(newPostData, true),
+      postToAlgoliaPostRef(newPostData, postID),
       ResourceTypes.POST,
       POSTS_INDEX
     );

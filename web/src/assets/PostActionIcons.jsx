@@ -138,3 +138,22 @@ export function GroupBookmarkIcon() {
     </svg>
   );
 }
+
+export function CommentIcon() {
+  return (
+    <svg
+      width="24"
+      height="20"
+      viewBox="0 0 24 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M20 14.6552H13.1726L6.96552 19H2L4.4829 14.6552H3.24152C2.00014 14.6552 2.00014 14.6552 2.00014 13.4138C2.00014 12.1724 2.00025 3.48276 2.00013 2.24138C2 1 2 1 3.24138 1H19.9999C21.2412 1 21.2412 1 21.2412 2.24138L21.2414 13.4138C21.2414 14.6552 21.2414 14.6552 20 14.6552Z"
+        fill="white"
+        stroke="#00507C"
+        strokeWidth="2"
+      />
+    </svg>
+  );
+}

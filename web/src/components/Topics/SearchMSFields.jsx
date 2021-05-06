@@ -2,7 +2,11 @@ import React, {useState, useEffect, useRef} from 'react';
 import {RemoveIcon} from '../../assets/GeneralActionIcons';
 import {SearchIconGrey} from '../../assets/HeaderIcons';
 import firebase from '../../firebase';
-import TertiaryButton from '../Buttons/TertiaryButton';
+import {
+  handleFetchedResultsWithPagination,
+  populateResultsWithSuperCachedResults,
+  PaginatedPreviousNextSection,
+} from '../PaginatedResourceFetch/PaginatedResourceFetchAndResults';
 
 import './SearchMSFields.css';
 
@@ -32,50 +36,31 @@ export default function SearchMSFields({
   const [cachedTopics, setCachedTopics] = useState(
     superCachedSearchAndResults ? superCachedSearchAndResults.results : []
   );
-
   // populate results with previous search cached results
   useEffect(() => {
-    if (
-      !superCachedSearchAndResults ||
-      superCachedSearchAndResults.results.length === 0
-    )
-      return;
-
-    if (superCachedSearchAndResults.results.length > limit)
-      setFetchedTopics(superCachedSearchAndResults.results.slice(0, limit));
-    else setFetchedTopics(superCachedSearchAndResults.results);
+    populateResultsWithSuperCachedResults(
+      superCachedSearchAndResults,
+      setFetchedTopics,
+      limit
+    );
   }, []);
+
   const searchInputRef = useRef();
-  const handleFetchedTopics = (fetchedTopics) => {
-    if (fetchedTopics.length <= limit) {
-      setHasMore(false);
-      setSkip((currentSkip) => currentSkip + fetchedTopics.length);
-      setFetchedTopics(fetchedTopics);
-      setCachedTopics((currentCachedTopics) => [
-        ...currentCachedTopics,
-        ...fetchedTopics,
-      ]);
-      setSuperCachedSearchAndResults({
-        hasMore: false,
-        results: [...cachedTopics, ...fetchedTopics],
-        search: typedTopic,
-        skip: skip + fetchedTopics.length,
-      });
-    } else {
-      setHasMore(true);
-      setSkip((currentSkip) => currentSkip + limit);
-      setFetchedTopics(fetchedTopics.slice(0, limit));
-      setCachedTopics((currentCachedTopics) => [
-        ...currentCachedTopics,
-        ...fetchedTopics.slice(0, limit),
-      ]);
-      setSuperCachedSearchAndResults({
-        hasMore: true,
-        results: [...cachedTopics, ...fetchedTopics.slice(0, limit)],
-        search: typedTopic,
-        skip: skip + limit,
-      });
-    }
+
+  const handleFetchedTopics = (newTopics) => {
+    handleFetchedResultsWithPagination(
+      newTopics,
+      setFetchedTopics,
+      setHasMore,
+      setCachedTopics,
+      setSuperCachedSearchAndResults,
+      cachedTopics,
+      limit,
+      setSkip,
+      undefined,
+      skip,
+      typedTopic
+    );
   };
 
   const fetchTopics = () =>
@@ -87,17 +72,6 @@ export default function SearchMSFields({
       900,
       skip
     );
-  const handleNextPageClick = () => {
-    if (cachedTopics.length > skip) {
-      setFetchedTopics(() => cachedTopics.slice(skip, skip + limit));
-      setSkip(skip + limit);
-    } else fetchTopics();
-  };
-
-  const handlePreviousPageClick = () => {
-    setFetchedTopics(() => cachedTopics.slice(skip - 2 * limit, skip - limit));
-    setSkip(skip - limit);
-  };
 
   useEffect(() => {
     if (
@@ -107,11 +81,16 @@ export default function SearchMSFields({
       return;
     setFetchedTopics([]);
     setCachedTopics([]);
-    setSuperCachedSearchAndResults({search: '', results: []});
+    setSuperCachedSearchAndResults({
+      search: '',
+      results: [],
+      skip: 0,
+      hasMore: false,
+    });
     setLoading(false);
     setHasMore(false);
     setSkip(0);
-    if (cachedTopics.length === 0) {
+    if (cachedTopics.length === 0 && typedTopic.length > 0) {
       return fetchTopics();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -142,20 +121,17 @@ export default function SearchMSFields({
         )}
       </div>
       {children}
-      <div className="search-ms-fields-next-previous-container">
-        {skip > limit && !loadingTopics ? (
-          <TertiaryButton onClick={handlePreviousPageClick}>
-            Previous Page
-          </TertiaryButton>
-        ) : (
-          <div></div>
-        )}
-        {(hasMore || cachedTopics.length > skip) && !loadingTopics && (
-          <TertiaryButton onClick={handleNextPageClick}>
-            Next Page
-          </TertiaryButton>
-        )}
-      </div>
+      <PaginatedPreviousNextSection
+        setFetchedResults={setFetchedTopics}
+        cachedResults={cachedTopics}
+        skip={skip}
+        limit={limit}
+        setSkip={setSkip}
+        fetchMore={fetchTopics}
+        loadingResults={loadingTopics}
+        hasMore={hasMore}
+        setSuperCachedResults={setSuperCachedSearchAndResults}
+      />
     </>
   );
 }

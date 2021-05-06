@@ -87,8 +87,9 @@ export function CreatePostTextArea({...props}) {
   const {setTitleLength} = useContext(CreatePostTitleContext);
   const {setSavedTitleText} = useContext(CreatingPostContext);
   useEffect(() => {
-    setTitleLength(getArticleLengthFromBody(field.value));
-    setSavedTitleText(field.value);
+    if (setSavedTitleText)
+      setTitleLength(getArticleLengthFromBody(field.value));
+    if (setSavedTitleText) setSavedTitleText(field.value);
   }, [field.value]);
 
   return (

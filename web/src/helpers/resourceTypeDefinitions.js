@@ -16,6 +16,7 @@ export const TECHNIQUE = 'technique';
 export const POST = 'post';
 export const BOOKMARK = 'bookmark';
 export const PUBLICATION = 'publication';
+export const COMMENT = 'comment';
 export const USER = 'user';
 export const GROUP = 'group';
 export const TOPIC = 'topic';

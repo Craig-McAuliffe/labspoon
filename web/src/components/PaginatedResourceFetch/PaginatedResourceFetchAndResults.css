@@ -1,0 +1,4 @@
+.paginated-previous-next-container {
+  display: flex;
+  justify-content: space-between;
+}

@@ -150,7 +150,7 @@ const BookmarkButtonContent = ({
   loading,
   backgroundShade,
 }) => (
-  <div className="button-container">
+  <div className="post-actions-button-container">
     <button
       className={`action-button-${backgroundShade ? backgroundShade : 'light'}${
         isBookmarked ? '-selected' : '-unselected'

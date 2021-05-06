@@ -15,7 +15,7 @@ service cloud.firestore {
       allow read;
       // only relevant when create post from client
       // allow create: if request.auth != null && request.auth.uid == request.resource.data.author.id && request.resource.data.timestamp == request.time && (checkForPreviousPost(request.auth.uid) || checkPostingFrequency(request.auth.uid, request.time));
-      allow update: if request.auth != null && (request.auth.uid == request.resource.data.author.id || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['recommendedCount', 'bookmarkedCount']));
+      allow update: if request.auth != null && (request.auth.uid == request.resource.data.author.id || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['recommendedCount', 'bookmarkedCount', 'qualityScore', 'numberOfComments']));
 
       match /groups/{groupID} {
         allow read;
@@ -40,6 +40,11 @@ service cloud.firestore {
 
       match /downVotedByUsers/{userID} {
         allow read, write: if request.auth != null && request.auth.uid == userID;
+      }
+
+      match /comments/{commentID} {
+        allow read;
+        allow write: if request.auth != null && request.auth.uid == request.resource.data.author.id;
       }
     }
 
@@ -127,6 +132,11 @@ service cloud.firestore {
 
       match /downVotesPosts/{postID} {
         allow read, write: if request.auth != null && request.auth.uid == userID;
+      }
+
+      match /comments/{commentID} {
+        allow read;
+        allow write: if request.auth != null && request.auth.uid == userID;
       }
     }
 
@@ -278,6 +288,16 @@ function userIsVerified(userID){
 
     match /activity/publicationsActivity/creators/{userID} {
       allow read;
+    }
+
+    match /activity/postActivity/creators/{authorID} {
+      allow read;
+      allow write: if request.auth != null && request.auth.uid == authorID
+    }
+
+    match /usersStats/{userID} {
+      allow read;
+      allow write: if request.auth != null && request.auth.uid == userID
     }
 
     match /verifiedGroups/{groupID} {

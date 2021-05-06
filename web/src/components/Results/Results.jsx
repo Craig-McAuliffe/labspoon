@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import {useLocation} from 'react-router-dom';
 import SearchBar from '../SearchBar';
-import Post from '../Posts/Post/Post';
+import Post, {Comment} from '../Posts/Post/Post';
 import BookmarkListItem from '../Bookmarks/BookmarkListItem/BookmarkListItem';
 import PublicationListItem from '../Publication/PublicationListItem';
 import UserListItem from '../User/UserListItem';
@@ -20,6 +20,7 @@ import OpenPositionListItem from '../OpenPosition/OpenPositionListItem';
 import ResearchFocusListItem from '../ResearchFocus/ResearchFocusListItem';
 import TechniqueListItem from '../Techniques/TechniqueListItem';
 import {
+  COMMENT,
   OPENPOSITION,
   POST,
   RESEARCHFOCUS,
@@ -120,6 +121,8 @@ export function GenericListItem({
           bookmarkedVariation={onBookmarkPage}
         />
       );
+    case COMMENT:
+      return <Comment comment={result} key={result.id + COMMENT} />;
     case 'bookmark':
       return (
         <BookmarkListItem bookmark={result} key={result.id + 'bookmark'} />

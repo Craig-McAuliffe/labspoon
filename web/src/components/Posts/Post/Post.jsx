@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {Link, useHistory} from 'react-router-dom';
+import {Link, useHistory, useLocation} from 'react-router-dom';
 import PostTaggedContent from './PostParts/PostTaggedContent';
 import PostActions from './PostParts/PostActions';
 import DefaultUserIcon from '../../../assets/DefaultUserIcon.svg';
@@ -7,27 +7,109 @@ import ListItemTopics from '../../ListItem/ListItemTopics';
 import UserAvatar from '../../Avatar/UserAvatar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {
+  COMMENT,
   OPENPOSITION,
   POST,
   PUBLICATION,
 } from '../../../helpers/resourceTypeDefinitions';
 import {RichTextBody} from '../../Article/Article';
-import {db} from '../../../firebase';
 import {
   ListItemOptionsDropdown,
   PIN,
   NEWS,
 } from '../../ListItem/ListItemCommonComponents';
-import firebase from 'firebase';
+import QualityScoreButton from '../../Buttons/QualityScoreButton';
 import './Post.css';
-import {
-  DropDownTriangle,
-  InvertedDropDownTriangle,
-} from '../../../assets/GeneralActionIcons';
+import {PaginatedFetchAndResults} from '../../PaginatedResourceFetch/PaginatedResourceFetchAndResults';
+import {db} from '../../../firebase';
 import {AuthContext} from '../../../App';
-import {SignUpPopoverOverride} from '../../Popovers/Popover';
 
 export default function Post({post, dedicatedPage, bookmarkedVariation}) {
+  const [isShowingComments, setIsShowingComments] = useState(false);
+  const [postCommentCount, setPostCommentCount] = useState(
+    post.numberOfComments ? post.numberOfComments : 0
+  );
+  const [downUpVoteState, setDownUpVoteState] = useState(null);
+  const [votingLoadingError, setVotingLoadingError] = useState(false);
+  const [loadingError, setLoadingError] = useState(false);
+  const pathname = useLocation().pathname;
+  const {user} = useContext(AuthContext);
+  const isOnSearchPage = pathname.includes('search');
+  const [loadingQualityScore, setLoadingQualityScore] = useState(
+    isOnSearchPage ? true : false
+  );
+  const [loadingUserUpVoteState, setLoadingUserUpVoteState] = useState(true);
+  const [qualityScore, setQualityScore] = useState(
+    post.qualityScore ? post.qualityScore : null
+  );
+  const postID = post.id;
+  // we are not updating quality score or number of comments on algolia to save on costs
+  useEffect(async () => {
+    if (!isOnSearchPage) return;
+    if (!user) return;
+    await db
+      .doc(`posts/${postID}`)
+      .get()
+      .then((postDS) => {
+        if (!postDS.exists) {
+          setLoadingError(true);
+          return;
+        }
+        const mainPostData = postDS.data();
+        if (mainPostData.numberOfComments)
+          setPostCommentCount(mainPostData.numberOfComments);
+        if (mainPostData.qualityScore)
+          setQualityScore(mainPostData.qualityScore);
+      })
+      .catch((err) => {
+        console.error(`unable to load post with id ${postID} ${err}`);
+        setLoadingError(true);
+      });
+
+    setLoadingQualityScore(false);
+  }, [user, pathname]);
+
+  useEffect(async () => {
+    if (!user) return;
+    const hasUserUpVotedDS = await db
+      .doc(`posts/${postID}/upVotedByUsers/${user.uid}`)
+      .get()
+      .catch((err) => {
+        setVotingLoadingError(true);
+        console.error(
+          `unable to load upVote state for post with id ${postID} ${err}`
+        );
+      });
+
+    if (!hasUserUpVotedDS) {
+      setVotingLoadingError(true);
+      setLoadingUserUpVoteState(false);
+      return;
+    }
+
+    if (hasUserUpVotedDS && hasUserUpVotedDS.exists) {
+      setDownUpVoteState('up');
+      setLoadingUserUpVoteState(false);
+      return;
+    }
+
+    const hasUserDownVotedDS = await db
+      .doc(`posts/${postID}/downVotedByUsers/${user.uid}`)
+      .get()
+      .catch((err) =>
+        console.error(
+          `unable to load downVote state for post with id ${postID} ${err}`
+        )
+      );
+    if (!hasUserDownVotedDS) {
+      setVotingLoadingError(true);
+      setLoadingUserUpVoteState(false);
+      return;
+    }
+    setDownUpVoteState('down');
+    setLoadingUserUpVoteState(false);
+  }, [user]);
+
   const taggedContent = [];
   if (post[PUBLICATION])
     taggedContent.push({type: PUBLICATION, content: post.publication});
@@ -43,35 +125,60 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
             (post.backgroundShade ? post.backgroundShade : 'light')
       }
     >
-      <div className={dedicatedPage ? '' : 'post-content-container'}>
-        <PostHeader
-          postAuthor={post.author}
-          postUnixTimestamp={post.unixTimeStamp}
-          dedicatedPage={dedicatedPage}
-          post={post}
+      {loadingError ? (
+        <h3>Something went wrong</h3>
+      ) : (
+        <>
+          <div className={dedicatedPage ? '' : 'post-content-container'}>
+            <PostHeader
+              postAuthor={post.author}
+              postUnixTimestamp={post.unixTimeStamp}
+              dedicatedPage={dedicatedPage}
+              post={post}
+              backgroundShade={post.backgroundShade}
+              qualityScore={qualityScore}
+              setQualityScore={setQualityScore}
+              loadingQualityScore={loadingQualityScore}
+              votingLoadingError={votingLoadingError}
+              downUpVoteState={downUpVoteState}
+              setDownUpVoteState={setDownUpVoteState}
+              loadingUserUpVoteState={loadingUserUpVoteState}
+            />
+            <PostTextContent
+              backgroundShade={post.backgroundShade}
+              post={post}
+              dedicatedPage={dedicatedPage}
+            />
+            <PostTaggedContent
+              backgroundShade={post.backgroundShade}
+              taggedContent={taggedContent}
+            />
+            <ListItemTopics
+              backgroundShade={post.backgroundShade}
+              dbTopics={post.topics}
+              customTopics={post.customTopics}
+            />
+          </div>
+          <PostActions
+            backgroundShade={post.backgroundShade}
+            post={post}
+            dedicatedPage={dedicatedPage}
+            bookmarkedVariation={bookmarkedVariation}
+            setIsShowingComments={setIsShowingComments}
+            setPostCommentCount={setPostCommentCount}
+          />
+        </>
+      )}
+      {postCommentCount > 0 && (
+        <PostCommentsSection
           backgroundShade={post.backgroundShade}
+          isShowingComments={isShowingComments}
+          postCommentCount={postCommentCount}
+          setIsShowingComments={setIsShowingComments}
+          postID={post.id}
         />
-        <PostTextContent
-          backgroundShade={post.backgroundShade}
-          post={post}
-          dedicatedPage={dedicatedPage}
-        />
-        <PostTaggedContent
-          backgroundShade={post.backgroundShade}
-          taggedContent={taggedContent}
-        />
-        <ListItemTopics
-          backgroundShade={post.backgroundShade}
-          dbTopics={post.topics}
-          customTopics={post.customTopics}
-        />
-      </div>
-      <PostActions
-        backgroundShade={post.backgroundShade}
-        post={post}
-        dedicatedPage={dedicatedPage}
-        bookmarkedVariation={bookmarkedVariation}
-      />
+      )}
+      {/* TO DO: Track number of comments on post doc. Only display if more than 0 */}
     </div>
   );
 }
@@ -106,150 +213,14 @@ function PostHeader({
   postUnixTimestamp,
   dedicatedPage,
   post,
-  userHasUpVoted,
-  userHasDownVoted,
+  qualityScore,
+  setQualityScore,
+  loadingQualityScore,
+  votingLoadingError,
+  downUpVoteState,
+  setDownUpVoteState,
+  loadingUserUpVoteState,
 }) {
-  const {user} = useContext(AuthContext);
-  const [qualityScore, setQualityScore] = useState(null);
-  const [downUpVoteState, setDownUpVoteState] = useState(() => {
-    if (userHasUpVoted) return 'up';
-    if (userHasDownVoted) return 'down';
-    return null;
-  });
-  const [submittingQualityScore, setSubmittingQualityScore] = useState(false);
-  const [loadingQualityScore, setLoadingQualityScore] = useState(true);
-  const [votingLoadingError, setVotingLoadingError] = useState(false);
-
-  const handleQualityScoreClick = async (downOrUp) => {
-    if ((downOrUp !== 'down' && downOrUp !== 'up') || !user) return;
-    const userID = user.uid;
-    if (userID === post.author.id) return;
-    if (submittingQualityScore) return;
-    if (
-      (downOrUp === 'up' && downUpVoteState === 'up') ||
-      (downOrUp === 'down' && downUpVoteState === 'down')
-    )
-      return;
-    setSubmittingQualityScore(true);
-    const batch = db.batch();
-    if (downOrUp === 'up') {
-      batch.set(db.doc(`posts/${post.id}/upVotedByUsers/${userID}`), {
-        id: userID,
-      });
-      if (downUpVoteState === 'down') {
-        batch.delete(db.doc(`posts/${post.id}/downVotedByUsers/${userID}`));
-        batch.delete(db.doc(`users/${userID}/downVotesPosts/${post.id}`));
-        // if user has downVoted, then an upVote will add upVote (+1) and remove downVote (+1)
-        batch.update(db.doc(`posts/${post.id}`), {
-          qualityScore: qualityScore
-            ? firebase.firestore.FieldValue.increment(2)
-            : 1,
-        });
-      } else
-        batch.update(db.doc(`posts/${post.id}`), {
-          qualityScore: qualityScore
-            ? firebase.firestore.FieldValue.increment(1)
-            : 1,
-        });
-      batch.set(db.doc(`users/${userID}/upVotesPosts/${post.id}`), {
-        id: post.id,
-      });
-    }
-    if (downOrUp === 'down') {
-      batch.set(db.doc(`posts/${post.id}/downVotedByUsers/${userID}`), {
-        id: userID,
-      });
-      if (downUpVoteState === 'up') {
-        batch.delete(db.doc(`posts/${post.id}/upVotedByUsers/${userID}`));
-        batch.delete(db.doc(`users/${userID}/upVotesPosts/${post.id}`));
-        // if user has upVoted, then a downVote will remove upVote (-1) and downVote (-1)
-        batch.update(db.doc(`posts/${post.id}`), {
-          qualityScore: qualityScore
-            ? firebase.firestore.FieldValue.increment(-2)
-            : -1,
-        });
-      } else
-        batch.update(db.doc(`posts/${post.id}`), {
-          qualityScore: qualityScore
-            ? firebase.firestore.FieldValue.increment(-1)
-            : -1,
-        });
-      batch.set(db.doc(`users/${userID}/downVotesPosts/${post.id}`), {
-        id: post.id,
-      });
-    }
-    await batch
-      .commit()
-      .catch((err) => console.error(`unable to commit quality score ${err}`));
-    setQualityScore((currentScore) => {
-      const additionOrSubtractionAmount = downUpVoteState ? 2 : 1;
-
-      return downOrUp === 'up'
-        ? currentScore + additionOrSubtractionAmount
-        : currentScore - additionOrSubtractionAmount;
-    });
-    setDownUpVoteState(downOrUp);
-    setSubmittingQualityScore(false);
-  };
-
-  useEffect(async () => {
-    if (!user) return;
-    const checkUserUpVoteDownVote = async () => {
-      const userHasUpVotedVotedDS = await db
-        .doc(`posts/${post.id}/upVotedByUsers/${user.uid}`)
-        .get()
-        .catch((err) =>
-          console.error(
-            `unable to load upVote state for post with id ${post.id} ${err}`
-          )
-        );
-      if (!userHasUpVotedVotedDS) {
-        setVotingLoadingError(true);
-        return;
-      }
-      if (userHasUpVotedVotedDS.exists) {
-        return setDownUpVoteState('up');
-      }
-      const userHasDownVotedVotedDS = await db
-        .doc(`posts/${post.id}/downVotedByUsers/${user.uid}`)
-        .get()
-        .catch((err) =>
-          console.error(
-            `unable to load downVote state for post with id ${post.id} ${err}`
-          )
-        );
-      if (!userHasDownVotedVotedDS) {
-        setVotingLoadingError(true);
-        return;
-      }
-      if (userHasDownVotedVotedDS.exists) {
-        setDownUpVoteState('down');
-      }
-    };
-    await checkUserUpVoteDownVote();
-
-    if (post.qualityScore) setQualityScore(post.qualityScore);
-    else {
-      const fetchedFullPost = await db
-        .doc(`posts/${post.id}`)
-        .get()
-        .then((ds) => ds.data())
-        .catch((err) =>
-          console.error(
-            `unable to fetch quality score for post ${post.id} ${err}`
-          )
-        );
-      if (!fetchedFullPost) {
-        setVotingLoadingError(true);
-        setQualityScore(null);
-      } else {
-        const fetchedQualityScore = fetchedFullPost.qualityScore;
-        setQualityScore(fetchedQualityScore ? fetchedQualityScore : null);
-      }
-    }
-    setLoadingQualityScore(false);
-  }, [user]);
-
   return (
     <div
       className={
@@ -258,39 +229,27 @@ function PostHeader({
           : 'post-header-' + (backgroundShade ? backgroundShade : 'light')
       }
     >
-      <div
-        className={`post-header-profile-${
-          backgroundShade ? backgroundShade : 'light'
-        }`}
-      >
-        <div className="post-header-avatar">
-          {postAuthor.avatar ? (
-            <UserAvatar src={postAuthor.avatar} width="60px" height="60px" />
-          ) : (
-            <img src={DefaultUserIcon} alt="user icon" />
-          )}
-        </div>
-        <div>
-          <h3>
-            <Link to={`/user/${postAuthor.id}`}>{postAuthor.name}</Link>
-          </h3>
-          <p>{calculateHoursAndDaysSincePost(postUnixTimestamp)}</p>
-        </div>
-      </div>
+      <PostAvatarSection
+        backgroundShade={backgroundShade}
+        avatar={postAuthor.avatar}
+        name={postAuthor.name}
+        postUnixTimestamp={postUnixTimestamp}
+        authorID={postAuthor.id}
+      />
+
       <div className="post-header-top-right-container">
-        {!votingLoadingError && !loadingQualityScore && (
-          <SignUpPopoverOverride
-            text="Sign up to vote on this."
-            active={!!user}
-          >
-            <PostQualityScore
-              backgroundShade={backgroundShade}
-              displayedQualityScore={qualityScore ? qualityScore : 0}
-              downUpVoteState={downUpVoteState}
-              handleQualityScoreClick={handleQualityScoreClick}
-            />
-          </SignUpPopoverOverride>
-        )}
+        <QualityScoreButton
+          postID={post.id}
+          backgroundShade={backgroundShade}
+          postAuthorID={post.author.id}
+          qualityScore={qualityScore}
+          setQualityScore={setQualityScore}
+          loadingQualityScore={loadingQualityScore}
+          votingLoadingError={votingLoadingError}
+          downUpVoteState={downUpVoteState}
+          setDownUpVoteState={setDownUpVoteState}
+          loadingUserUpVoteState={loadingUserUpVoteState}
+        />
 
         {post.showPinOption && (
           <ListItemOptionsDropdown
@@ -310,47 +269,6 @@ function PostHeader({
   );
 }
 
-function PostQualityScore({
-  displayedQualityScore,
-  downUpVoteState,
-  handleQualityScoreClick,
-  backgroundShade,
-  actionAndTriggerPopUp,
-}) {
-  return (
-    <div
-      className={`post-quality-score-container-${
-        backgroundShade ? backgroundShade : 'light'
-      }`}
-    >
-      {displayedQualityScore}
-      <div className="post-quality-score-symbol-container">
-        <button
-          className={`post-quality-score-button-${
-            backgroundShade ? backgroundShade : 'light'
-          }-${downUpVoteState === 'up' ? 'selected' : 'deselected'}`}
-          onClick={() => {
-            actionAndTriggerPopUp();
-            handleQualityScoreClick('up');
-          }}
-        >
-          <InvertedDropDownTriangle />
-        </button>
-        <button
-          className={`post-quality-score-button-${
-            backgroundShade ? backgroundShade : 'light'
-          }-${downUpVoteState === 'down' ? 'selected' : 'deselected'}`}
-          onClick={() => {
-            actionAndTriggerPopUp();
-            handleQualityScoreClick('down');
-          }}
-        >
-          <DropDownTriangle />
-        </button>
-      </div>
-    </div>
-  );
-}
 function PostTextContent({backgroundShade, post, dedicatedPage}) {
   const history = useHistory();
   if (dedicatedPage)
@@ -395,6 +313,99 @@ export function PinnedPost({post}) {
           .slice(0, 3)}
       </div>
       <p className="pinned-post-more-info">Click for more info</p>
+    </div>
+  );
+}
+
+function PostAvatarSection({
+  backgroundShade,
+  avatar,
+  name,
+  postUnixTimestamp,
+  authorID,
+}) {
+  return (
+    <div
+      className={`post-header-profile-${
+        backgroundShade ? backgroundShade : 'light'
+      }`}
+    >
+      <div className="post-header-avatar">
+        {avatar ? (
+          <UserAvatar src={avatar} width="60px" height="60px" />
+        ) : (
+          <img src={DefaultUserIcon} alt="user icon" />
+        )}
+      </div>
+      <div>
+        <h3>
+          <Link to={`/user/${authorID}`}>{name}</Link>
+        </h3>
+        <p>{calculateHoursAndDaysSincePost(postUnixTimestamp)}</p>
+      </div>
+    </div>
+  );
+}
+
+function PostCommentsSection({
+  backgroundShade,
+  setIsShowingComments,
+  isShowingComments,
+  postCommentCount,
+  postID,
+}) {
+  const [cachedComments, setCachedComments] = useState({
+    results: [],
+    skip: 0,
+    hasMore: false,
+    last: null,
+  });
+
+  return (
+    <div
+      className={`post-comment-section-${
+        backgroundShade ? backgroundShade : 'light'
+      }`}
+    >
+      <div className="post-comment-toggle-container">
+        <button
+          onClick={() => setIsShowingComments((currentState) => !currentState)}
+        >
+          {isShowingComments ? 'Hide' : 'Show'} {postCommentCount} comments
+        </button>
+      </div>
+      {isShowingComments && (
+        <PaginatedFetchAndResults
+          collectionRef={db.collection(`posts/${postID}/comments`)}
+          limit={10}
+          resourceType={COMMENT}
+          superCachedResults={cachedComments}
+          setSuperCachedResults={setCachedComments}
+          backgroundShade={backgroundShade}
+        />
+      )}
+    </div>
+  );
+}
+
+export function Comment({comment}) {
+  if (!comment) return null;
+  return (
+    <div
+      className={`comment-container-${
+        comment.backgroundShade ? comment.backgroundShade : 'light'
+      }`}
+    >
+      <PostAvatarSection
+        name={comment.author.name}
+        avatar={comment.author.avatar}
+        postUnixTimestamp={comment.unixTimeStamp}
+        backgroundShade={comment.backgroundShade}
+      />
+      <PostTextContent
+        backgroundShade={comment.backgroundShade}
+        post={comment}
+      />
     </div>
   );
 }

@@ -150,7 +150,7 @@ const RecommendButtonContent = ({
   loading,
   backgroundShade,
 }) => (
-  <div className="button-container">
+  <div className="post-actions-button-container">
     <button
       className={`action-button-${backgroundShade ? backgroundShade : 'light'}${
         isRecommended ? '-selected' : '-unselected'

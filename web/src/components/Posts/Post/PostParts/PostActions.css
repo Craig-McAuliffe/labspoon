@@ -24,7 +24,7 @@
   flex-wrap: wrap;
 }
 
-.button-container {
+.post-actions-button-container {
   padding: 10px 30px 10px 0px;
   border-radius: 4px;
 }
@@ -37,4 +37,44 @@
 .post-actions-actioned-page-container {
   display: flex;
   justify-content: flex-end;
+}
+
+.create-comment-container-light,
+.create-comment-container-dark,
+.create-comment-container-light-submitting,
+.create-comment-container-dark-submitting {
+  padding: 10px 5px;
+  background: #f5f6f6;
+  position: relative;
+}
+
+.create-comment-container-light-submitting,
+.create-comment-container-dark-submitting {
+  opacity: 0.5;
+}
+
+.create-comment-container-light span {
+  color: #000000;
+}
+
+.create-comment-container-dark {
+  background: #053651;
+}
+.create-comment-container-dark .editor-container-no-title {
+  background: #064262;
+  border: 1px solid #5d7f95;
+}
+
+.create-comment-container-dark .editor-container-no-title span {
+  color: #ffffff;
+}
+
+.create-comment-container-dark .creating-post-main-text-container {
+  border-left: 1px solid #ccd6da;
+}
+
+.create-comment-success-container {
+  position: absolute;
+  top: 15%;
+  left: 50%;
 }
