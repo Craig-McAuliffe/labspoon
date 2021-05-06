@@ -106,7 +106,9 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
       setLoadingUserUpVoteState(false);
       return;
     }
-    setDownUpVoteState('down');
+    if (hasUserDownVotedDS && hasUserDownVotedDS.exists) {
+      setDownUpVoteState('down');
+    }
     setLoadingUserUpVoteState(false);
   }, [user]);
 
