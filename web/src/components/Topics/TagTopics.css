@@ -4,7 +4,7 @@
 }
 
 .create-post-topic-section-container {
-  margin: 10px 0px 50px;
+  margin: 30px 0px 50px;
 }
 
 .create-post-tagged-topic {
@@ -13,13 +13,6 @@
   color: #00507c;
   font-size: 1.2em;
   border: 1px solid #00507c;
-}
-
-.create-post-topic-search-container {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  align-content: flex-end;
 }
 
 .tag-topics-attention-icon-button {
@@ -47,8 +40,8 @@
 
 .create-post-topic-tag-title {
   color: #00507c;
-  margin-top: 28px;
-  margin-right: 2vw;
+  margin-right: 10px;
+  margin-bottom: 0px;
 }
 
 .create-post-topic-search-tool-container {
@@ -58,7 +51,7 @@
 .create-post-topic-search-container input {
   border-bottom: 1px solid #00507c;
   margin-top: 7px;
-  padding-top: 20px;
+  padding-top: 10px;
 }
 
 .create-post-topic-search-container input::placeholder {
@@ -105,14 +98,5 @@
 .search-input-and-attention-symbol-container {
   display: flex;
   flex-grow: 1;
-}
-
-@media screen and (max-width: 390px) {
-  .create-post-topic-search-container {
-    display: block;
-  }
-  .create-post-topic-search-container input {
-    border-bottom: 1px solid #00507c;
-    padding-top: 0px;
-  }
+  align-items: center;
 }

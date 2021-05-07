@@ -1257,6 +1257,51 @@ export const DeclareExistingUsersMembersOfGroups = functions.https.onRequest(
   }
 );
 
+export const updateUserRefOnComments = functions.firestore
+  .document('users/{userID}')
+  .onUpdate(async (change, context) => {
+    const newUserData = change.after.data() as User;
+    const oldUserData = change.before.data() as User;
+    const userID = context.params.userID;
+    if (
+      JSON.stringify(toUserSignature(userID, newUserData)) ===
+      JSON.stringify(toUserSignature(userID, oldUserData))
+    )
+      return;
+    const userCommentsQS = await db
+      .collection(`users/${userID}/comments`)
+      .get()
+      .catch((err) =>
+        console.error(
+          `unable to fetch user comments in order to update user signature ${err}`
+        )
+      );
+    if (!userCommentsQS || userCommentsQS.empty) return;
+    const commentPostIDs: {commentID: string; postID: string}[] = [];
+    userCommentsQS.forEach((ds) => {
+      const commentData = ds.data();
+      const postID = commentData.postID;
+      const commentID = ds.id;
+      commentPostIDs.push({
+        postID: postID,
+        commentID: commentID,
+      });
+    });
+    const batch = db.batch();
+    commentPostIDs.forEach((ids) =>
+      batch.update(db.doc(`posts/${ids.postID}/comments/${ids.commentID}`), {
+        author: toUserSignature(userID, newUserData),
+      })
+    );
+    await batch
+      .commit()
+      .catch((err) =>
+        console.error(
+          `unable to batch update user signature for user ${userID} on comments ${err}`
+        )
+      );
+  });
+
 // Rank relates to how often the user posts in this topic
 export interface UserRef {
   id: string;

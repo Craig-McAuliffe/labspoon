@@ -113,9 +113,10 @@ export default function Popover({
   const popOverChild = React.Children.map(children, (child) => {
     if (React.isValidElement(child)) {
       return cloneElement(child, {
-        actionAndTriggerPopUp: () => {
+        actionAndTriggerPopUp: (e, close) => {
           if (child.props.actionAndTriggerPopUp)
             child.props.actionAndTriggerPopUp();
+          if (close) return setOpen(false);
           if (!shouldNotOpen) setOpen(true);
         },
       });

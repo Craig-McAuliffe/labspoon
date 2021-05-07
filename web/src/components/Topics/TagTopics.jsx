@@ -21,6 +21,12 @@ export default function TagTopics({
   const [displayedTopics, setDisplayedTopics] = useState([]);
   const [duplicateTopic, setDuplicateTopic] = useState(false);
   const [loadingTopics, setLoadingTopics] = useState(false);
+  const [cachedSearchAndResults, setCachedSearchAndResults] = useState({
+    search: '',
+    results: [],
+    skip: 0,
+    hasMore: false,
+  });
   // Tells user that they are trying to input a duplicate topic
   useEffect(() => {
     if (duplicateTopic) {
@@ -41,12 +47,21 @@ export default function TagTopics({
         <SearchMSFields
           placeholder="Search topics"
           setFetchedTopics={setDisplayedTopics}
+          fetchedTopics={displayedTopics}
           setLoading={setLoadingTopics}
           limit={TAG_TOPICS_SEARCH_LIMIT}
           largeDesign={true}
-          superCachedSearchAndResults={superCachedSearchAndResults}
-          setSuperCachedSearchAndResults={setSuperCachedSearchAndResults}
-          loadingTopics={loadingTopics}
+          cachedSearchAndResults={
+            superCachedSearchAndResults
+              ? superCachedSearchAndResults
+              : cachedSearchAndResults
+          }
+          setCachedSearchAndResults={
+            setSuperCachedSearchAndResults
+              ? setSuperCachedSearchAndResults
+              : setCachedSearchAndResults
+          }
+          loading={loadingTopics}
         >
           <SelectedTopics
             selectedTopics={selectedTopics}
@@ -69,15 +84,9 @@ export default function TagTopics({
         setSelectedTopics={setSelectedTopics}
       />
       {duplicateTopic ? <DuplicateTopicWarning /> : null}
-      <div className="create-post-topic-search-container">
-        <h4 className="create-post-topic-tag-title">Add related topics</h4>
+      {selectedTopics.length === 0 && (
         <div className="search-input-and-attention-symbol-container">
-          <SearchMSFields
-            placeholder="this post is about..."
-            setFetchedTopics={setDisplayedTopics}
-            setLoading={setLoadingTopics}
-            limit={TAG_TOPICS_SEARCH_LIMIT}
-          />
+          <h3 className="create-post-topic-tag-title">Add related topics</h3>
           <Popover
             getPopUpComponent={() => (
               <StandardPopoverDisplay
@@ -90,16 +99,36 @@ export default function TagTopics({
             <TagTopicsAttention actionAndTriggerPopUp={() => {}} />
           </Popover>
         </div>
-      </div>
-
-      <div>
-        <TopicsList
-          topics={displayedTopics}
-          setSelectedTopics={setSelectedTopics}
-          setDuplicateTopic={setDuplicateTopic}
-          displayedTopics={displayedTopics}
-          loadingTopics={loadingTopics}
-        />
+      )}
+      <div className="create-post-topic-search-container">
+        <SearchMSFields
+          placeholder="search for topics..."
+          setFetchedTopics={setDisplayedTopics}
+          fetchedTopics={displayedTopics}
+          setLoading={setLoadingTopics}
+          loading={loadingTopics}
+          limit={TAG_TOPICS_SEARCH_LIMIT}
+          cachedSearchAndResults={
+            superCachedSearchAndResults
+              ? superCachedSearchAndResults
+              : cachedSearchAndResults
+          }
+          setCachedSearchAndResults={
+            setSuperCachedSearchAndResults
+              ? setSuperCachedSearchAndResults
+              : setCachedSearchAndResults
+          }
+        >
+          <div>
+            <TopicsList
+              topics={displayedTopics}
+              setSelectedTopics={setSelectedTopics}
+              setDuplicateTopic={setDuplicateTopic}
+              displayedTopics={displayedTopics}
+              loadingTopics={loadingTopics}
+            />
+          </div>
+        </SearchMSFields>
       </div>
     </div>
   );
@@ -111,8 +140,11 @@ function TagTopicsAttention({actionAndTriggerPopUp}) {
   return (
     <div className="tag-topics-attention-icon-button-container">
       <button
+        type="button"
         className="tag-topics-attention-icon-button"
         onClick={actionAndTriggerPopUp}
+        onMouseEnter={actionAndTriggerPopUp}
+        onMouseLeave={(e) => actionAndTriggerPopUp(e, true)}
         style={{cursor: 'default'}}
       >
         <AttentionIcon />

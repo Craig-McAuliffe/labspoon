@@ -20,26 +20,24 @@ export default function SearchMSFields({
   limit,
   largeDesign,
   children,
-  superCachedSearchAndResults,
-  setSuperCachedSearchAndResults,
-  loadingTopics,
+  cachedSearchAndResults,
+  setCachedSearchAndResults,
+  loading,
+  fetchedTopics,
 }) {
   const [typedTopic, setTypedTopic] = useState(
-    superCachedSearchAndResults ? superCachedSearchAndResults.search : ''
+    cachedSearchAndResults ? cachedSearchAndResults.search : ''
   );
   const [skip, setSkip] = useState(
-    superCachedSearchAndResults ? superCachedSearchAndResults.skip : 0
+    cachedSearchAndResults ? cachedSearchAndResults.skip : 0
   );
   const [hasMore, setHasMore] = useState(
-    superCachedSearchAndResults ? superCachedSearchAndResults.hasMore : false
-  );
-  const [cachedTopics, setCachedTopics] = useState(
-    superCachedSearchAndResults ? superCachedSearchAndResults.results : []
+    cachedSearchAndResults ? cachedSearchAndResults.hasMore : false
   );
   // populate results with previous search cached results
   useEffect(() => {
     populateResultsWithSuperCachedResults(
-      superCachedSearchAndResults,
+      cachedSearchAndResults,
       setFetchedTopics,
       limit
     );
@@ -52,9 +50,8 @@ export default function SearchMSFields({
       newTopics,
       setFetchedTopics,
       setHasMore,
-      setCachedTopics,
-      setSuperCachedSearchAndResults,
-      cachedTopics,
+      setCachedSearchAndResults,
+      cachedSearchAndResults.results,
       limit,
       setSkip,
       undefined,
@@ -75,22 +72,28 @@ export default function SearchMSFields({
 
   useEffect(() => {
     if (
-      superCachedSearchAndResults &&
-      typedTopic === superCachedSearchAndResults.search
-    )
+      cachedSearchAndResults &&
+      typedTopic === cachedSearchAndResults.search
+    ) {
+      setLoading(false);
       return;
+    }
     setFetchedTopics([]);
-    setCachedTopics([]);
-    setSuperCachedSearchAndResults({
-      search: '',
-      results: [],
-      skip: 0,
-      hasMore: false,
-    });
+    if (setCachedSearchAndResults)
+      setCachedSearchAndResults({
+        search: '',
+        results: [],
+        skip: 0,
+        hasMore: false,
+      });
     setLoading(false);
     setHasMore(false);
     setSkip(0);
-    if (cachedTopics.length === 0 && typedTopic.length > 0) {
+    if (
+      cachedSearchAndResults &&
+      cachedSearchAndResults.results.length === 0 &&
+      typedTopic.length > 0
+    ) {
       return fetchTopics();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -122,15 +125,18 @@ export default function SearchMSFields({
       </div>
       {children}
       <PaginatedPreviousNextSection
-        setFetchedResults={setFetchedTopics}
-        cachedResults={cachedTopics}
+        setDisplayedResults={setFetchedTopics}
+        cachedResults={
+          cachedSearchAndResults ? cachedSearchAndResults.results : []
+        }
         skip={skip}
         limit={limit}
         setSkip={setSkip}
         fetchMore={fetchTopics}
-        loadingResults={loadingTopics}
+        loadingResults={loading}
         hasMore={hasMore}
-        setSuperCachedResults={setSuperCachedSearchAndResults}
+        setCachedResults={setCachedSearchAndResults}
+        displayedResults={fetchedTopics}
       />
     </>
   );

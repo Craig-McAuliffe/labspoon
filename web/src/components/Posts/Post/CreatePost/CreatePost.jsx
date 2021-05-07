@@ -49,8 +49,8 @@ export default function CreatePost({
   const [submittingPost, setSubmittingPost] = useState(false);
   const [savedTitleText, setSavedTitleText] = useState(null);
   const [
-    superCachedSearchAndResults,
-    setSuperCachedSearchAndResults,
+    superCachedTopicSearchAndResults,
+    setSuperCachedTopicSearchAndResults,
   ] = useState({
     search: '',
     results: [],
@@ -68,7 +68,7 @@ export default function CreatePost({
     setSelectedTopics([]);
     setSavedTitleText(null);
     setPostType(null);
-    setSuperCachedSearchAndResults([]);
+    setSuperCachedTopicSearchAndResults([]);
     setPostCreateDataResp(null);
   };
 
@@ -103,8 +103,8 @@ export default function CreatePost({
         setSavedTitleText: setSavedTitleText,
         postType: postType,
         setPostType: setPostType,
-        superCachedSearchAndResults: superCachedSearchAndResults,
-        setSuperCachedSearchAndResults: setSuperCachedSearchAndResults,
+        superCachedTopicSearchAndResults: superCachedTopicSearchAndResults,
+        setSuperCachedTopicSearchAndResults: setSuperCachedTopicSearchAndResults,
         setPostCreateDataResp: setPostCreateDataResp,
       }}
     >
@@ -255,8 +255,8 @@ function GenericCreatePost() {
     selectedTopics,
     postType,
     setPostType,
-    superCachedSearchAndResults,
-    setSuperCachedSearchAndResults,
+    superCachedTopicSearchAndResults,
+    setSuperCachedTopicSearchAndResults,
   } = useContext(CreatingPostContext);
   const [minimiseTagTopics, setMinimiseTagTopics] = useState(true);
 
@@ -281,8 +281,8 @@ function GenericCreatePost() {
             setSelectedTopics={setSelectedTopics}
             selectedTopics={selectedTopics}
             largeDesign={true}
-            superCachedSearchAndResults={superCachedSearchAndResults}
-            setSuperCachedSearchAndResults={setSuperCachedSearchAndResults}
+            superCachedSearchAndResults={superCachedTopicSearchAndResults}
+            setSuperCachedSearchAndResults={setSuperCachedTopicSearchAndResults}
           />
         )}
       </div>

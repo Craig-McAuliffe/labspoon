@@ -100,7 +100,14 @@ export function PaginatedFetchAndResults({
   superCachedResults,
   setSuperCachedResults,
   backgroundShade,
+  resetResults,
 }) {
+  const cachedResultsAndSearchResetObject = {
+    results: [],
+    skip: 0,
+    hasMore: false,
+    last: null,
+  };
   const [lastFetchedResource, setLastFetchedResource] = useState(null);
   const [hasMore, setHasMore] = useState(
     superCachedResults ? superCachedResults.results : false
@@ -114,14 +121,13 @@ export function PaginatedFetchAndResults({
     superCachedResults ? superCachedResults.results : 0
   );
   const [cachedResults, setCachedResults] = useState(
-    superCachedResults ? superCachedResults.results : []
+    cachedResultsAndSearchResetObject
   );
-
-  const fetchResults = () =>
+  const fetchResults = (isReset) =>
     getPaginatedResourcesFromCollectionRef(
       collectionRef,
-      limit,
-      lastFetchedResource,
+      limit + 1,
+      isReset ? null : lastFetchedResource,
       resourceType,
       rankByName
     ).catch((err) => {
@@ -130,29 +136,46 @@ export function PaginatedFetchAndResults({
       setLoading(false);
     });
 
+  const getNewResults = async (isReset) => {
+    const newResults = await fetchResults(isReset);
+    if (!newResults) return;
+    const activeCachedResults = superCachedResults
+      ? superCachedResults.results
+      : cachedResults.results;
+    const activeSetCachedResults = setSuperCachedResults
+      ? setSuperCachedResults
+      : setCachedResults;
+    handleFetchedResultsWithPagination(
+      newResults,
+      setResults,
+      setHasMore,
+      activeSetCachedResults,
+      isReset ? cachedResultsAndSearchResetObject.results : activeCachedResults,
+      limit,
+      setSkip,
+      setLastFetchedResource,
+      isReset ? 0 : skip,
+      undefined,
+      backgroundShade
+    );
+    setLoading(false);
+  };
+
+  useEffect(async () => {
+    if (!resetResults) return;
+    if (setSuperCachedResults)
+      setSuperCachedResults(cachedResultsAndSearchResetObject);
+    setCachedResults(cachedResultsAndSearchResetObject);
+
+    return getNewResults(true);
+  }, [resetResults]);
+
   useEffect(async () => {
     if (results.length > 0) {
       setLoading(false);
       return;
     }
-    const newResults = await fetchResults();
-
-    if (!newResults) return;
-    handleFetchedResultsWithPagination(
-      newResults,
-      setResults,
-      setHasMore,
-      setCachedResults,
-      setSuperCachedResults,
-      cachedResults,
-      limit,
-      setSkip,
-      setLastFetchedResource,
-      skip,
-      undefined,
-      backgroundShade
-    );
-    setLoading(false);
+    return getNewResults();
   }, []);
 
   if (loading) return <LoadingSpinner />;
@@ -168,15 +191,22 @@ export function PaginatedFetchAndResults({
         <GenericListItem result={result} key={result.id} />
       ))}
       <PaginatedPreviousNextSection
-        setFetchedResults={setResults}
-        cachedResults={cachedResults}
+        setDisplayedResults={setResults}
+        cachedResults={
+          superCachedResults
+            ? superCachedResults.results
+            : cachedResults.results
+        }
         skip={skip}
         limit={limit}
         setSkip={setSkip}
-        fetchMore={fetchResults}
+        fetchMore={getNewResults}
         loadingResults={loading}
         hasMore={hasMore}
-        setSuperCachedResults={setSuperCachedResults}
+        setCachedResults={
+          setSuperCachedResults ? setSuperCachedResults : setCachedResults
+        }
+        displayedResults={results}
       />
     </>
   );
@@ -186,7 +216,6 @@ export function handleFetchedResultsWithPagination(
   newResults,
   setFetchedResults,
   setHasMore,
-  setCachedResults,
   setSuperCachedSearchAndResults,
   cachedResults,
   limit,
@@ -198,16 +227,12 @@ export function handleFetchedResultsWithPagination(
 ) {
   if (newResults.length <= limit) {
     setHasMore(false);
-    if (setSkip) setSkip((currentSkip) => currentSkip + newResults.length);
+    if (setSkip) setSkip(() => skip + newResults.length);
     setFetchedResults(newResults);
     if (backgroundShade)
       newResults.forEach((newResult) => {
         newResult.backgroundShade = backgroundShade;
       });
-    setCachedResults((currentCachedResults) => [
-      ...currentCachedResults,
-      ...newResults,
-    ]);
     setSuperCachedSearchAndResults(() => {
       const newSuperCacheResults = {
         hasMore: false,
@@ -215,18 +240,15 @@ export function handleFetchedResultsWithPagination(
         search: search,
       };
       if (setSkip) newSuperCacheResults.skip = skip + newResults.length;
-      if (setLast) newSuperCacheResults.last = newResults[newResults.length];
+      if (setLast)
+        newSuperCacheResults.last = newResults[newResults.length - 1];
       return newSuperCacheResults;
     });
     if (setLast) setLast(newResults[newResults.length]);
   } else {
     setHasMore(true);
-    if (setSkip) setSkip((currentSkip) => currentSkip + limit);
+    if (setSkip) setSkip(() => skip + limit);
     setFetchedResults(newResults.slice(0, limit));
-    setCachedResults((currentCachedResults) => [
-      ...currentCachedResults,
-      ...newResults.slice(0, limit),
-    ]);
     if (setLast) setLast(newResults[limit]);
     setSuperCachedSearchAndResults(() => {
       const newSuperCacheResults = {
@@ -235,14 +257,14 @@ export function handleFetchedResultsWithPagination(
         search: search,
       };
       if (setSkip) newSuperCacheResults.skip = skip + limit;
-      if (setLast) newSuperCacheResults.last = newResults[limit];
+      if (setLast) newSuperCacheResults.last = newResults[limit - 1];
       return newSuperCacheResults;
     });
   }
 }
-
+// only fetch more function should change last
 export function PaginatedPreviousNextSection({
-  setFetchedResults,
+  setDisplayedResults,
   cachedResults,
   skip,
   limit,
@@ -250,30 +272,39 @@ export function PaginatedPreviousNextSection({
   fetchMore,
   loadingResults,
   hasMore,
-  setSuperCachedResults,
+  setCachedResults,
+  displayedResults,
 }) {
+  const pageLength = displayedResults.length;
   const handleNextPageClick = () => {
     if (cachedResults.length > skip) {
-      setFetchedResults(() => cachedResults.slice(skip, skip + limit));
-      setSkip(skip + limit);
-      if (setSuperCachedResults)
-        setSuperCachedResults((currentCachedResults) => {
+      const numberOfSurplusCachedResults = cachedResults.length - skip;
+      const nextPageLength =
+        numberOfSurplusCachedResults > limit
+          ? limit
+          : numberOfSurplusCachedResults;
+      setDisplayedResults(() =>
+        cachedResults.slice(skip, skip + nextPageLength)
+      );
+      setSkip(skip + nextPageLength);
+      if (setCachedResults)
+        setCachedResults((currentCachedResults) => {
           const newSuperCacheResults = {...currentCachedResults};
-          newSuperCacheResults.skip = skip + limit;
+          newSuperCacheResults.skip = skip + nextPageLength;
           return newSuperCacheResults;
         });
     } else fetchMore();
   };
 
   const handlePreviousPageClick = () => {
-    setFetchedResults(() =>
-      cachedResults.slice(skip - 2 * limit, skip - limit)
+    setDisplayedResults(() =>
+      cachedResults.slice(skip - (pageLength + limit), skip - pageLength)
     );
-    setSkip(skip - limit);
-    if (setSuperCachedResults)
-      setSuperCachedResults((currentCachedResults) => {
+    setSkip(skip - pageLength);
+    if (setCachedResults)
+      setCachedResults((currentCachedResults) => {
         const newSuperCacheResults = {...currentCachedResults};
-        newSuperCacheResults.skip = skip - limit;
+        newSuperCacheResults.skip = skip - pageLength;
         return newSuperCacheResults;
       });
   };

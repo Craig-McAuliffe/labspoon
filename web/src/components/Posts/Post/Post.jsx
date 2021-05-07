@@ -32,6 +32,7 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
   const [downUpVoteState, setDownUpVoteState] = useState(null);
   const [votingLoadingError, setVotingLoadingError] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
+  const [resetCommentCache, setResetCommentCache] = useState(null);
   const pathname = useLocation().pathname;
   const {user} = useContext(AuthContext);
   const isOnSearchPage = pathname.includes('search');
@@ -168,18 +169,20 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
             bookmarkedVariation={bookmarkedVariation}
             setIsShowingComments={setIsShowingComments}
             setPostCommentCount={setPostCommentCount}
+            setResetCommentCache={setResetCommentCache}
           />
         </>
       )}
-      {postCommentCount > 0 && (
-        <PostCommentsSection
-          backgroundShade={post.backgroundShade}
-          isShowingComments={isShowingComments}
-          postCommentCount={postCommentCount}
-          setIsShowingComments={setIsShowingComments}
-          postID={post.id}
-        />
-      )}
+
+      <PostCommentsSection
+        backgroundShade={post.backgroundShade}
+        isShowingComments={isShowingComments}
+        postCommentCount={postCommentCount}
+        setIsShowingComments={setIsShowingComments}
+        postID={post.id}
+        resetCommentCache={resetCommentCache}
+        setResetCommentCache={setResetCommentCache}
+      />
       {/* TO DO: Track number of comments on post doc. Only display if more than 0 */}
     </div>
   );
@@ -222,6 +225,7 @@ function PostHeader({
   downUpVoteState,
   setDownUpVoteState,
   loadingUserUpVoteState,
+  resetCommentCache,
 }) {
   return (
     <div
@@ -355,6 +359,8 @@ function PostCommentsSection({
   isShowingComments,
   postCommentCount,
   postID,
+  resetCommentCache,
+  setResetCommentCache,
 }) {
   const [cachedComments, setCachedComments] = useState({
     results: [],
@@ -363,6 +369,12 @@ function PostCommentsSection({
     last: null,
   });
 
+  useEffect(() => {
+    if (!resetCommentCache) return;
+    setResetCommentCache(false);
+  }, [resetCommentCache]);
+
+  if (!postCommentCount > 0) return null;
   return (
     <div
       className={`post-comment-section-${
@@ -384,6 +396,7 @@ function PostCommentsSection({
           superCachedResults={cachedComments}
           setSuperCachedResults={setCachedComments}
           backgroundShade={backgroundShade}
+          resetResults={resetCommentCache}
         />
       )}
     </div>

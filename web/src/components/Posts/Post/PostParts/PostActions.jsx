@@ -27,6 +27,7 @@ export default function PostActions({
   backgroundShade,
   setIsShowingComments,
   setPostCommentCount,
+  setResetCommentCache,
 }) {
   const featureFlags = useContext(FeatureFlags);
   const [isCommenting, setIsCommenting] = useState(false);
@@ -90,6 +91,7 @@ export default function PostActions({
             postUnixTimeStamp={post.unixTimeStamp}
             setIsShowingComments={setIsShowingComments}
             setPostCommentCount={setPostCommentCount}
+            setResetCommentCache={setResetCommentCache}
           />
         </div>
       )}
@@ -107,6 +109,7 @@ function CreateComment({
   postUnixTimeStamp,
   setIsShowingComments,
   setPostCommentCount,
+  setResetCommentCache,
 }) {
   const {userProfile} = useContext(AuthContext);
   const [submitting, setSubmitting] = useState(false);
@@ -172,6 +175,7 @@ function CreateComment({
     if (!successOrFail) return;
     setIsCommenting(false);
     setIsShowingComments(true);
+    setResetCommentCache(true);
     setPostCommentCount((count) => count + 1);
   };
   return (
