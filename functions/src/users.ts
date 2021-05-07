@@ -1216,47 +1216,6 @@ export const DeclareUserIsNotMemberOfAnyGroup = functions.firestore
       .catch((err) => console.error(err));
   });
 
-export const DeclareExistingUsersMembersOfGroups = functions.https.onRequest(
-  async (req, resp) => {
-    const usersQS = await db
-      .collection(`users`)
-      .get()
-      .catch((err) => {
-        console.error(err);
-        resp.status(500).send('Unable to fetch users collection.');
-      });
-    if (!usersQS) return;
-    const userIDs: string[] = [];
-    usersQS.forEach(async (userDS) => {
-      userIDs.push(userDS.id);
-    });
-    const batch = db.batch();
-    const usersPromises = userIDs.map((userID) =>
-      db
-        .collection(`users/${userID}/groups`)
-        .get()
-        .then((groupsQS) => {
-          if (groupsQS.empty) return;
-          batch.update(db.doc(`users/${userID}`), {isMemberOfAnyGroups: true});
-        })
-        .catch((err) => console.error(err))
-    );
-    await Promise.all(usersPromises);
-    await batch
-      .commit()
-      .then(() => {
-        resp.json({
-          result: `users declared if part of groups`,
-        });
-        resp.end();
-      })
-      .catch((err) => {
-        console.error(err);
-        resp.status(500).send('Unable to fetch users collection.');
-      });
-  }
-);
-
 export const updateUserRefOnComments = functions.firestore
   .document('users/{userID}')
   .onUpdate(async (change, context) => {

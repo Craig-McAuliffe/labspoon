@@ -522,41 +522,6 @@ export const updateTopicFilterOnDeletedPost = functions.firestore
     );
   });
 
-export const addExistingTopicPostsToFilter = functions.https.onRequest(
-  async (req, res) => {
-    const postsQS = await db
-      .collection('posts')
-      .get()
-      .catch((err) => {
-        console.error(err);
-        res.status(500).send('Unable to fetch posts.');
-      });
-    if (!postsQS) return;
-    const postTopicCombination: {post: Post; topicID: string}[] = [];
-    postsQS.forEach((ds) => {
-      const post = ds.data() as Post;
-      if (!post.topics || post.topics.length === 0) return;
-      const topicIDs = post.topics.map((topic) => topic.id);
-      topicIDs.forEach((topicID) =>
-        postTopicCombination.push({
-          post: post,
-          topicID: topicID,
-        })
-      );
-    });
-    const filterUpdatePromises = postTopicCombination.map((combo) =>
-      updateFiltersByPost(
-        db.doc(`topics/${combo.topicID}/feeds/postsFeed`),
-        combo.post,
-        true
-      )
-    );
-    await Promise.all(filterUpdatePromises);
-    res.json({result: `Updated topic filters with posts in those topics`});
-    res.end();
-  }
-);
-
 export function azureTopicToTopicNoID(azureTopic: AzureTopicResult): Topic {
   const capitaliseFirstLetter = (string: string) =>
     string[0].toUpperCase() + string.slice(1);
