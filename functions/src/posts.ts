@@ -361,6 +361,51 @@ export const updatePostOnBookmarks = functions.firestore
     return Promise.all(bookmarkersUpdatePromise);
   });
 
+export const updatePostOnGroupBookmarks = functions.firestore
+  .document('posts/{postID}')
+  .onUpdate(async (change, context) => {
+    const newPostData = change.after.data() as Post;
+    const oldPostData = change.before.data() as Post;
+    const postID = context.params.postID;
+    if (
+      JSON.stringify(postToPostRef(newPostData)) ===
+      JSON.stringify(postToPostRef(oldPostData))
+    )
+      return;
+    const bookmarkersQS = await db
+      .collection(`posts/${postID}/bookmarkedByGroups`)
+      .get()
+      .catch((err) =>
+        console.error(
+          'unable to fetch bookmarker groups of post with id ' + postID,
+          err
+        )
+      );
+    if (!bookmarkersQS || bookmarkersQS.empty) return;
+    const bookmarkersIDs: string[] = [];
+    bookmarkersQS.forEach((ds) => {
+      const bookmarkerID = ds.id;
+      bookmarkersIDs.push(bookmarkerID);
+    });
+    const bookmarkersUpdatePromise = bookmarkersIDs.map(
+      async (bookmarkerID) => {
+        return db
+          .doc(`groups/${bookmarkerID}/bookmarks/${postID}`)
+          .update({bookmarkedResourceData: newPostData})
+          .catch((err) =>
+            console.error(
+              'unable to update post on group bookmarker with id ' +
+                bookmarkerID +
+                ' for post with id ' +
+                postID,
+              err
+            )
+          );
+      }
+    );
+    return Promise.all(bookmarkersUpdatePromise);
+  });
+
 export const updatePostOnRecommenders = functions.firestore
   .document('posts/{postID}')
   .onUpdate(async (change, context) => {
