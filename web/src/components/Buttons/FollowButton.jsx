@@ -33,6 +33,7 @@ const FollowButton = ({
       text="Sign up to follow this."
       actionTaken={FOLLOW}
       active={!!user}
+      backgroundShade={backgroundShade}
     >
       {buttonContent}
     </SignUpPopoverOverride>

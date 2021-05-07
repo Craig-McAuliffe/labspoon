@@ -62,7 +62,11 @@ export default function FollowUserButton({backgroundShade, targetUser}) {
   }
 
   const getFollowOptionsPopover = () => (
-    <FollowOptionsPopover targetResourceData={targetUser} resourceType={USER} />
+    <FollowOptionsPopover
+      backgroundShade={backgroundShade}
+      targetResourceData={targetUser}
+      resourceType={USER}
+    />
   );
 
   const followButtonComponent = (

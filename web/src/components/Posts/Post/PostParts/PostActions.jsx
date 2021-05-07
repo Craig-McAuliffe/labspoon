@@ -118,7 +118,6 @@ function CreateComment({
   const submitComment = async (res) => {
     if (!userProfile) {
       setSubmitting(false);
-
       return;
     }
     const userID = userProfile.id;

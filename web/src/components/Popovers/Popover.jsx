@@ -17,7 +17,12 @@ import './Popover.css';
 export const FOLLOW = 'follow';
 export const CREATE = 'create';
 
-export function SignUpPopoverOverride({children, text, actionTaken}) {
+export function SignUpPopoverOverride({
+  children,
+  text,
+  actionTaken,
+  backgroundShade,
+}) {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const locationPathName = location.pathname;
@@ -78,7 +83,12 @@ export function SignUpPopoverOverride({children, text, actionTaken}) {
     return (
       <div className="pop-up-relative-container">
         {popOverChild}
-        <div className="sign-up-prompt" ref={signUpPromptRef}>
+        <div
+          className={`sign-up-prompt-${
+            backgroundShade ? backgroundShade : 'light'
+          }`}
+          ref={signUpPromptRef}
+        >
           <Link
             to={{
               pathname: '/signup',

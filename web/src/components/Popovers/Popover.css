@@ -1,21 +1,34 @@
 .pop-up-relative-container {
   position: relative;
 }
-.sign-up-prompt {
+.sign-up-prompt-light,
+.sign-up-prompt-dark {
   position: absolute;
   right: 50px;
   padding: 20px 16px;
   box-shadow: 0px 0px 4px rgba(0, 7, 12, 0.6);
-  border: 1px solid #00507c;
   width: 200px;
   top: 10px;
-  background: white;
   display: flex;
   justify-content: center;
   z-index: 10;
 }
 
-.sign-up-prompt a:hover span {
+.sign-up-prompt-light {
+  border: 1px solid #00507c;
+  background: white;
+}
+
+.sign-up-prompt-dark {
+  border: 1px solid #9ebdd0;
+  background: #064262;
+}
+
+.sign-up-prompt-dark a {
+  color: #ffffff;
+}
+
+.sign-up-prompt-light a:hover span {
   color: #00507c;
   text-decoration: underline;
 }

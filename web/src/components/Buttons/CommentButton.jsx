@@ -8,9 +8,14 @@ import './CommentButton.css';
 export default function CommentButton({setIsCommenting, backgroundShade}) {
   const {user} = useContext(AuthContext);
   return (
-    <SignUpPopoverOverride text="Sign up to comment." active={!!user}>
+    <SignUpPopoverOverride
+      backgroundShade={backgroundShade}
+      text="Sign up to comment."
+      active={!!user}
+    >
       <CommentButtonContent
         actionAndTriggerPopUp={() => {
+          if (!user) return;
           setIsCommenting((currentState) => !currentState);
         }}
         backgroundShade={backgroundShade}

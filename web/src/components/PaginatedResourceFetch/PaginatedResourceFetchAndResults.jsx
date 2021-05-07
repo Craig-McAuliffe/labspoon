@@ -23,6 +23,7 @@ export function SelectablePaginatedResourceFetchAndResults({
   results,
   setResults,
   selectedByDefault,
+  backgroundShade,
 }) {
   const [lastFetchedResource, setLastFetchedResource] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -40,6 +41,10 @@ export function SelectablePaginatedResourceFetchAndResults({
       rankByName
     )
       .then((fetchedResults) => {
+        if (backgroundShade)
+          fetchedResults.forEach(
+            (res) => (res.backgroundShade = backgroundShade)
+          );
         if (!fetchedResults || fetchedResults.length === 0) {
           setHasMore(false);
           return;

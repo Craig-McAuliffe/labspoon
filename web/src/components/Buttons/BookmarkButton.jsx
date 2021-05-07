@@ -125,6 +125,7 @@ function BookmarkButton({
         text="Sign up to bookmark this."
         actionTaken={BOOKMARK}
         active={!!user}
+        backgroundShade={backgroundShade}
       >
         <BookmarkButtonContent
           onBookmark={onClick}

@@ -125,6 +125,7 @@ const RecommendButton = ({
         text="Sign up to recommend this."
         actionTaken={RECOMMENDATION}
         active={!!user}
+        backgroundShade={backgroundShade}
       >
         <RecommendButtonContent
           onRecommend={onClick}

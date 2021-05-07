@@ -62,6 +62,7 @@ export default function FollowGroupButton({backgroundShade, targetGroup}) {
     <FollowOptionsPopover
       targetResourceData={targetGroup}
       resourceType={GROUP}
+      backgroundShade={backgroundShade}
     />
   );
 

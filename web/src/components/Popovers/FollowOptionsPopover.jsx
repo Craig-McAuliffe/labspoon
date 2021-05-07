@@ -27,16 +27,18 @@ const postTypesOptions = [
   {id: OPENPOSITIONS, name: 'Open position posts'},
 ];
 
-const initialTopicResults = [
+const initialTopicResults = (backgroundShade) => [
   {
     name: 'All topics',
     id: 'allTopics',
     resourceType: TOPIC,
+    backgroundShade: backgroundShade,
   },
   {
     name: 'Content without topics',
     id: 'noTopics',
     resourceType: TOPIC,
+    backgroundShade: backgroundShade,
   },
 ];
 
@@ -49,10 +51,11 @@ export default function FollowOptionsPopover({
   left,
   right,
   bottom,
+  backgroundShade,
 }) {
   const [expanded, setExpanded] = useState(isPreSelected ? true : false);
   const [selectedTopics, setSelectedTopics] = useState([
-    initialTopicResults[0].id,
+    initialTopicResults(backgroundShade)[0].id,
   ]);
   const [selectedPostTypes, setSelectedPostTypes] = useState([
     postTypesOptions[0].id,
@@ -61,7 +64,9 @@ export default function FollowOptionsPopover({
   const [noPostOptionsSelectedError, setNoPostOptionsSelectedError] = useState(
     false
   );
-  const [topicResults, setTopicResults] = useState(initialTopicResults);
+  const [topicResults, setTopicResults] = useState(
+    initialTopicResults(backgroundShade)
+  );
   const [success, setSuccess] = useState(false);
   const [submittingError, setSubmittingError] = useState(false);
   const [isNewlyPreselected, setIsNewlyPreselected] = useState(false);
@@ -138,7 +143,8 @@ export default function FollowOptionsPopover({
       );
     if (
       !selectedTopics.some(
-        (selectedTopic) => selectedTopic.id === initialTopicResults[0].id
+        (selectedTopic) =>
+          selectedTopic.id === initialTopicResults(backgroundShade)[0].id
       )
     )
       findUnselectedItems(
@@ -205,12 +211,19 @@ export default function FollowOptionsPopover({
   };
   const optionsForm = (
     <>
-      <h4 className="follow-options-title">I want to hear about...</h4>
+      <h4
+        className={`follow-options-title-${
+          backgroundShade ? backgroundShade : 'light'
+        }`}
+      >
+        I want to hear about...
+      </h4>
       <ResourceFollowPostTypesOptions
         selectedPostTypes={selectedPostTypes}
         setSelectedPostTypes={setSelectedPostTypes}
         noPostOptionsSelectedError={noPostOptionsSelectedError}
         isSubmittingOptions={isSubmittingOptions}
+        backgroundShade={backgroundShade}
       />
       {!noTopicOptions && (
         <ResourceFollowTopicsOptions
@@ -222,9 +235,14 @@ export default function FollowOptionsPopover({
           topicResults={topicResults}
           setTopicResults={setTopicResults}
           isSubmittingOptions={isSubmittingOptions}
+          backgroundShade={backgroundShade}
         />
       )}
-      <div className="follow-options-actions-container">
+      <div
+        className={`follow-options-actions-container-${
+          backgroundShade ? backgroundShade : 'light'
+        }`}
+      >
         <CancelButton
           cancelAction={() => setExpanded(false)}
           isDisabled={isSubmittingOptions}
@@ -250,12 +268,14 @@ export default function FollowOptionsPopover({
     <div
       className={`follow-options-toggle-container${
         expanded ? '-expanded' : '-minimised'
-      }`}
+      }-${backgroundShade ? backgroundShade : 'light'}`}
       style={{top: top, left: left, right: right, bottom: bottom}}
     >
       <button
         onClick={() => setExpanded(true)}
-        className="follow-options-toggle"
+        className={`follow-options-toggle-${
+          backgroundShade ? backgroundShade : 'light'
+        }`}
       >
         {minimisedOptionsText()}
       </button>
@@ -269,6 +289,7 @@ function ResourceFollowPostTypesOptions({
   setSelectedPostTypes,
   noPostOptionsSelectedError,
   isSubmittingOptions,
+  backgroundShade,
 }) {
   const isPostTypeSelected = (postType) =>
     selectedPostTypes.some(
@@ -297,7 +318,12 @@ function ResourceFollowPostTypesOptions({
         </SimpleErrorText>
       )}
       {postTypesOptions.map((postType) => (
-        <div className="follow-options-option-container" key={postType.id}>
+        <div
+          className={`follow-options-option-container-${
+            backgroundShade ? backgroundShade : 'light'
+          }`}
+          key={postType.id}
+        >
           <div>{postType.name}</div>
           <SelectCheckBox
             selected={isPostTypeSelected(postType)}
@@ -328,6 +354,7 @@ function ResourceFollowTopicsOptions({
   topicResults,
   setTopicResults,
   isSubmittingOptions,
+  backgroundShade,
 }) {
   const targetResourceTopicsRef = db.collection(
     `${resourceCollectionName}/${targetResourceData.id}/topics`
@@ -344,7 +371,13 @@ function ResourceFollowTopicsOptions({
       className="follow-options-topics-container"
       id={INFINITE_SCROLL_TARGET_ID}
     >
-      <h4 className="follow-options-topics-note">I&#39;m interested in...</h4>
+      <h4
+        className={`follow-options-topics-note-${
+          backgroundShade ? backgroundShade : 'light'
+        }`}
+      >
+        I&#39;m interested in...
+      </h4>
       <SelectablePaginatedResourceFetchAndResults
         isSelectable={true}
         collectionRef={targetResourceTopicsRef}
@@ -359,10 +392,11 @@ function ResourceFollowTopicsOptions({
         noDivider={true}
         rankByName={true}
         scrollableTarget={INFINITE_SCROLL_TARGET_ID}
-        selectAllOption={initialTopicResults[0]}
+        selectAllOption={initialTopicResults(backgroundShade)[0]}
         results={topicResults}
         setResults={setTopicResults}
         selectedByDefault={true}
+        backgroundShade={backgroundShade}
       />
     </div>
   );

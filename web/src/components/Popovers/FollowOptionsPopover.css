@@ -13,17 +13,30 @@
 .follow-options-post-types-container {
   padding: 10px 10px 20px;
 }
-.follow-options-toggle {
+.follow-options-toggle-light,
+.follow-options-toggle-dark {
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0px;
+  padding: 10px;
+}
+.follow-options-toggle-light {
   color: #00507c;
 }
 
-.follow-options-title {
+.follow-options-toggle-dark {
+  color: #ffffff;
+}
+
+.follow-options-title-light {
   color: #5d5d65;
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
+.follow-options-title-dark {
+  color: #ccd6da;
   margin-top: 10px;
   margin-left: 10px;
 }
@@ -32,21 +45,51 @@
   text-decoration: underline;
 }
 
-.follow-options-toggle-container-expanded,
-.follow-options-toggle-container-minimised {
+.follow-options-toggle-container-expanded-light,
+.follow-options-toggle-container-expanded-dark,
+.follow-options-toggle-container-minimised-light,
+.follow-options-toggle-container-minimised-dark {
   position: absolute;
-  padding: 10px 0px 0px;
-  border: 1px solid #00507c;
-  box-shadow: 0px 0px 4px rgba(48, 153, 211, 0.8);
   top: 40px;
   right: 0px;
-  background: #ffffff;
   border-radius: 10px;
   overflow-y: hidden;
   z-index: 1;
 }
 
-.follow-options-toggle-container-minimised {
+.follow-options-toggle-container-expanded-light,
+.follow-options-toggle-container-minimised-light {
+  border: 1px solid #00507c;
+  background: #ffffff;
+  box-shadow: 0px 0px 4px rgba(48, 153, 211, 0.8);
+}
+
+.follow-options-toggle-container-minimised-light:hover {
+  box-shadow: 0px 0px 4px rgba(48, 153, 211, 1);
+}
+
+.follow-options-toggle-container-expanded-dark,
+.follow-options-toggle-container-minimised-dark {
+  border: 1px solid #9ebdd0;
+  background: #064262;
+}
+
+.follow-options-toggle-container-expanded-dark {
+  box-shadow: 0px 0px 4px rgba(48, 153, 211, 0.8);
+}
+
+.follow-options-toggle-container-expanded-dark,
+.follow-options-toggle-container-minimised-dark:hover {
+  box-shadow: 0px 0px 4px rgba(48, 153, 211, 0.8);
+}
+
+.follow-options-toggle-container-minimised-dark:hover,
+.follow-options-toggle-container-minimised-light:hover {
+  text-decoration: underline;
+}
+
+.follow-options-toggle-container-minimised-light,
+.follow-options-toggle-container-minimised-dark {
   width: 20vw;
   min-width: 250px;
   max-width: 400px;
@@ -54,7 +97,29 @@
   transition: 0.4s;
 }
 
-.follow-options-toggle-container-expanded {
+.follow-options-toggle-container-expanded-dark
+  .select-checkbox-button-active-small {
+  background-color: #ffffff;
+}
+
+.follow-options-toggle-container-expanded-dark
+  .select-checkbox-button-inactive-small {
+  background-color: #064262;
+  border: 1px solid #ffffff;
+}
+
+.follow-options-toggle-container-expanded-dark
+  .topic-list-item-container-dark-no-divider {
+  background-color: #064262;
+  color: #ffffff;
+}
+
+.follow-options-toggle-container-expanded-dark .end-result {
+  color: #9ebdd0;
+}
+
+.follow-options-toggle-container-expanded-light,
+.follow-options-toggle-container-expanded-dark {
   width: 30vw;
   min-width: 250px;
   max-width: 400px;
@@ -62,35 +127,52 @@
   transition: 0.4s;
 }
 
-.follow-options-toggle-container-minimised {
-  padding: 10px;
-}
-
-.follow-options-expanded-section {
-}
-
-.follow-options-option-container {
+.follow-options-option-container-light,
+.follow-options-option-container-dark {
   display: grid;
   grid-template-columns: 1fr 20px;
   margin: 5px 0px;
+}
+.follow-options-option-container-light {
   color: #00507c;
 }
 
-.follow-options-topics-note {
+.follow-options-option-container-dark {
+  color: #ffffff;
+}
+.follow-options-topics-note-light {
   color: #5d5d65;
 }
 
-.follow-options-actions-container {
+.follow-options-topics-note-dark {
+  color: #ccd6da;
+}
+
+.follow-options-actions-container-light,
+.follow-options-actions-container-dark {
   position: sticky;
   bottom: 0px;
   height: 45px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  padding: 5px 5px;
+}
+
+.follow-options-actions-container-light {
   background: #ffffff;
   border-top: 1px solid #dcdce0;
-  align-items: center;
   box-shadow: 0px -10px 6px rgba(255, 255, 255, 0.9);
-  padding: 5px 5px;
+}
+
+.follow-options-actions-container-dark {
+  background: #064262;
+  border-top: 1px solid #5d7f95;
+  box-shadow: 0px -10px 6px rgba(0, 0, 0, 0.2);
+}
+
+.follow-options-actions-container-dark .cancel-button {
+  color: #ccd6da;
 }
 
 .follow-options-popover-loading-spinner-container {

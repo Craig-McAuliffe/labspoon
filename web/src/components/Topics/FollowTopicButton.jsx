@@ -86,6 +86,7 @@ export default function FollowTopicButton({targetTopic, backgroundShade}) {
       targetResourceData={targetTopic}
       resourceType={TOPIC}
       noTopicOptions={true}
+      backgroundShade={backgroundShade}
     />
   );
 
@@ -102,6 +103,7 @@ export default function FollowTopicButton({targetTopic, backgroundShade}) {
     <Popover
       getPopUpComponent={getFollowOptionsPopover}
       shouldNotOpen={following}
+      backgroundShade={backgroundShade}
     >
       {followButtonComponent}
     </Popover>

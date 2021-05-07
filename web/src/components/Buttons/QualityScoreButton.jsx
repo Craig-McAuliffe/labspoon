@@ -104,7 +104,11 @@ export default function QualityScoreButton({
   };
 
   return (
-    <SignUpPopoverOverride text="Sign up to vote on this." active={!!user}>
+    <SignUpPopoverOverride
+      backgroundShade={backgroundShade}
+      text="Sign up to vote on this."
+      active={!!user}
+    >
       <PostQualityScore
         backgroundShade={backgroundShade}
         displayedQualityScore={qualityScore ? qualityScore : 0}
