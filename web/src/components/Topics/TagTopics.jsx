@@ -8,6 +8,7 @@ import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 
 import '../Posts/Post/CreatePost/CreatePost.css';
 import './TagTopics.css';
+import {MAX_TOPICS_PER_POST} from '../Posts/Post/CreatePost/CreatePost';
 
 const TAG_TOPICS_SEARCH_LIMIT = 10;
 export default function TagTopics({
@@ -73,6 +74,7 @@ export default function TagTopics({
             setDuplicateTopic={setDuplicateTopic}
             displayedTopics={displayedTopics}
             loadingTopics={loadingTopics}
+            selectedTopics={selectedTopics}
           />
         </SearchMSFields>
       </div>
@@ -126,6 +128,7 @@ export default function TagTopics({
               setDuplicateTopic={setDuplicateTopic}
               displayedTopics={displayedTopics}
               loadingTopics={loadingTopics}
+              selectedTopics={selectedTopics}
             />
           </div>
         </SearchMSFields>
@@ -159,37 +162,54 @@ const TopicsList = ({
   setDuplicateTopic,
   displayedTopics,
   loadingTopics,
+  selectedTopics,
 }) => {
+  const topicWarning =
+    selectedTopics.length >= MAX_TOPICS_PER_POST ? (
+      <p className="tag-topics-max-topic-warning">
+        You cannot tag anymore topics (max 10).
+      </p>
+    ) : null;
+
   if (loadingTopics)
     return (
-      <div className="tag-topics-loading-topics-spinner-container">
-        <LoadingSpinner />
-      </div>
+      <>
+        {topicWarning}
+        <div className="tag-topics-loading-topics-spinner-container">
+          <LoadingSpinner />
+        </div>
+      </>
     );
-  return topics.map((displayedTopic) => (
-    <TopicListItem
-      key={displayedTopic.microsoftID}
-      topic={displayedTopic}
-      noLink
-    >
-      <PrimaryButton
-        onClick={() =>
-          addTopicToPost(
-            setSelectedTopics,
-            displayedTopic.name,
-            setDuplicateTopic,
-            displayedTopic.microsoftID,
-            displayedTopic.normalisedName,
-            displayedTopics,
-            displayedTopic.id
-          )
-        }
-        smallVersion
-      >
-        Select
-      </PrimaryButton>
-    </TopicListItem>
-  ));
+  return (
+    <>
+      {topicWarning}
+      {topics.map((displayedTopic) => (
+        <TopicListItem
+          key={displayedTopic.microsoftID}
+          topic={displayedTopic}
+          noLink
+        >
+          <PrimaryButton
+            onClick={() =>
+              addTopicToPost(
+                setSelectedTopics,
+                displayedTopic.name,
+                setDuplicateTopic,
+                displayedTopic.microsoftID,
+                displayedTopic.normalisedName,
+                displayedTopics,
+                displayedTopic.id,
+                selectedTopics
+              )
+            }
+            smallVersion
+          >
+            Select
+          </PrimaryButton>
+        </TopicListItem>
+      ))}
+    </>
+  );
 };
 
 function DuplicateTopicWarning() {
@@ -235,8 +255,10 @@ const addTopicToPost = (
   microsoftID,
   normalisedTopicName,
   displayedTopics,
-  topicID
+  topicID,
+  selectedTopics
 ) => {
+  if (selectedTopics.length >= MAX_TOPICS_PER_POST) return;
   let preExistingTopic = undefined;
   if (microsoftID === undefined) {
     displayedTopics.forEach((displayedTopic) => {

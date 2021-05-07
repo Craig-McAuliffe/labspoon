@@ -44,6 +44,10 @@
   margin-bottom: 0px;
 }
 
+.tag-topics-max-topic-warning {
+  color: #5d5d65;
+}
+
 .create-post-topic-search-tool-container {
   min-width: 100%;
 }

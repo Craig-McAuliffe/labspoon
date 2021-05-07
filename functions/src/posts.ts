@@ -100,6 +100,15 @@ export const createPost = functions.https.onCall(async (data, context) => {
       db.doc(`publications/${post.publication.id}/posts/${postID}`),
       postToPostRef(post)
     );
+  if (post.topics) {
+    post.topics.forEach((postTopic: TaggedTopic) =>
+      batch.set(
+        db.doc(`topics/${postTopic.id}/posts/${postID}`),
+        postToPostRef(post)
+      )
+    );
+  }
+
   await batch
     .commit()
     .then(() =>
@@ -564,22 +573,6 @@ export async function addRecentPostsToFollowingFeed(
   });
   return Promise.all(postAddedPromises);
 }
-
-export const addPostToTopic = functions.firestore
-  .document(`posts/{postID}`)
-  .onCreate(async (change, context) => {
-    const post = change.data() as Post;
-    const postID = context.params.postID;
-    const postTopics = post.topics;
-    const topicsToTopicsPromisesArray = postTopics.map(
-      (postTopic: TaggedTopic) => {
-        db.doc(`topics/${postTopic.id}/posts/${postID}`)
-          .set(postToPostRef(post))
-          .catch((err) => console.log(err, 'could not add post to topic'));
-      }
-    );
-    return Promise.all(topicsToTopicsPromisesArray);
-  });
 
 export async function updateFiltersByPost(
   feedRef: firestore.DocumentReference<firestore.DocumentData>,

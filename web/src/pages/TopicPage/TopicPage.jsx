@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {useLocation, useParams} from 'react-router-dom';
+import {useParams} from 'react-router-dom';
 import {FeatureFlags} from '../../App';
 import {db} from '../../firebase';
 import {getActiveTabID} from '../../helpers/filters';
@@ -185,42 +185,8 @@ export default function TopicPage() {
   if (topicID !== topicIDParam) {
     setTopicID(topicIDParam);
   }
-  const locationState = useLocation().state;
-  const [createdPostIDAndFulfilled, setCreatedPostIDAndFulfilled] = useState(
-    locationState
-      ? {
-          createdPost: locationState.createdPost,
-          createdPostFulfilled: false,
-        }
-      : null
-  );
 
   const fetchTopicDetails = () => fetchTopicDetailsFromDB(topicID);
-
-  // listen for just created post
-  useEffect(() => {
-    if (
-      !topicID ||
-      !createdPostIDAndFulfilled ||
-      !createdPostIDAndFulfilled.createdPost ||
-      createdPostIDAndFulfilled.createdPostFulfilled
-    )
-      return;
-    const topicPostDocObserver = db
-      .doc(
-        `topics/${topicID}/posts/${createdPostIDAndFulfilled.createdPost.postID}`
-      )
-      .onSnapshot((docSnapshot) => {
-        if (docSnapshot.exists) {
-          setCreatedPostIDAndFulfilled({
-            createdPost: null,
-            createdPostFulfilled: true,
-          });
-          setRefreshFeedToggle((currentState) => !currentState);
-        }
-      });
-    return () => topicPostDocObserver();
-  }, [topicID, locationState, createdPostIDAndFulfilled]);
 
   useEffect(() => {
     Promise.resolve(fetchTopicDetails())
@@ -337,10 +303,7 @@ export default function TopicPage() {
             preSelectedTopic={topicDetails}
             createPostAbout={TOPIC}
             onSuccess={(postDataAndID) =>
-              setCreatedPostIDAndFulfilled({
-                createdPost: postDataAndID,
-                createdPostFulfilled: false,
-              })
+              setRefreshFeedToggle((currentState) => !currentState)
             }
           />
         )}

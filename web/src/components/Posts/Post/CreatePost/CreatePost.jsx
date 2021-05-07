@@ -33,6 +33,7 @@ export const SUB_TOPIC_POST = 'Sub Topic';
 
 export const CreatingPostContext = createContext();
 export const MAX_POST_CHARACTERS = 800;
+export const MAX_TOPICS_PER_POST = 10;
 export default function CreatePost({
   shouldRedirect = false,
   preTaggedResourceType,
@@ -177,10 +178,10 @@ export function QuickCreatePostFromResource({
   preTaggedResourceID,
   refreshFeed,
 }) {
-  const {selectedTopics, setPostSuccess, setSubmittingPost} = useContext(
-    CreatingPostContext
-  );
-
+  const {setPostSuccess, setSubmittingPost} = useContext(CreatingPostContext);
+  const postTopicsFromResource = taggedResourceDetails.topics
+    ? taggedResourceDetails.topics.slice(0, MAX_TOPICS_PER_POST)
+    : [];
   const submitChanges = async (res, isTweeting) => {
     switch (taggedResourceType) {
       case PUBLICATION:
@@ -194,7 +195,7 @@ export function QuickCreatePostFromResource({
           false,
           null,
           undefined,
-          selectedTopics,
+          postTopicsFromResource,
           refreshFeed
         );
       default: {
