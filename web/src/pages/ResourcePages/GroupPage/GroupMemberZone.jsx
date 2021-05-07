@@ -6,7 +6,7 @@ import {LoadingSpinnerPage} from '../../../components/LoadingSpinner/LoadingSpin
 import {db} from '../../../firebase';
 import {getActiveTabID} from '../../../helpers/filters';
 import {getPaginatedResourcesFromCollectionRef} from '../../../helpers/resources';
-import {POST} from '../../../helpers/resourceTypeDefinitions';
+import {BOOKMARK} from '../../../helpers/resourceTypeDefinitions';
 import NotFoundPage from '../../NotFoundPage/NotFoundPage';
 import ResourcesFeed from '../ResourcesFeeds';
 
@@ -63,7 +63,7 @@ export default function GroupMemberZone({}) {
           groupBookmarksCollectionRef,
           limit,
           last,
-          POST
+          BOOKMARK
         );
         break;
     }

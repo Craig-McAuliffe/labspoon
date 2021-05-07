@@ -66,7 +66,16 @@ export default function GroupBookmarkButton({
     );
 
     if (bookmarkOrRemove === 'bookmark') {
-      batch.set(groupBookmarkRef, bookmarkListItem);
+      batch.set(
+        groupBookmarkRef,
+
+        {
+          bookmarkedResourceType: bookmarkedResourceType,
+          bookmarkedResourceID: bookmarkedResourceID,
+          bookmarkedResourceData: bookmarkListItem,
+          timestamp: new Date(),
+        }
+      );
       batch.set(bookmarkedResourceRef, {id: groupID});
     } else {
       batch.delete(groupBookmarkRef);
