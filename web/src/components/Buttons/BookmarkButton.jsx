@@ -9,10 +9,10 @@ import {
   POST,
   resourceTypeToCollection,
 } from '../../helpers/resourceTypeDefinitions';
-import NegativeButton from './NegativeButton';
-import {LoadingSpinnerPage} from '../LoadingSpinner/LoadingSpinner';
 import {getPostListItemFromPost} from '../../helpers/posts';
 import './Buttons.css';
+import {useLocation} from 'react-router';
+import {FilterableResultsContext} from '../FilterableResults/FilterableResults';
 
 function BookmarkButton({
   bookmarkedResource,
@@ -25,6 +25,8 @@ function BookmarkButton({
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const {user, authLoaded} = useContext(AuthContext);
+  const pathname = useLocation().pathname;
+  const {setChildrenRefreshFeedToggle} = useContext(FilterableResultsContext);
   bookmarkedResource.bookmarkTimestamp = new Date();
   const onClick = async () => {
     if (submitting) return;
@@ -86,6 +88,8 @@ function BookmarkButton({
         setSubmitting,
         setIsBookmarked
       );
+      if (pathname.includes('bookmarks') && setChildrenRefreshFeedToggle)
+        setChildrenRefreshFeedToggle();
     }
   };
 
@@ -190,36 +194,6 @@ export async function removeBookmark(
       console.log(err);
       if (setSubmitting) setSubmitting(false);
     });
-}
-
-export function RemoveBookmarkFromPage({postID, bookmarkedByCollection}) {
-  const {user} = useContext(AuthContext);
-  const [submitting, setSubmitting] = useState(false);
-  const userBookmarkCollection = db.collection(`users/${user.uid}/bookmarks`);
-  const bookmarkedResourceDoc = db.doc(`posts/${postID}`);
-  if (!user) return <LoadingSpinnerPage />;
-
-  return (
-    <div className="post-actions-actioned-page-container">
-      <NegativeButton
-        onClick={async () => {
-          if (submitting) return;
-          await removeBookmark(
-            userBookmarkCollection,
-            postID,
-            bookmarkedByCollection,
-            bookmarkedResourceDoc,
-            user.uid,
-            setSubmitting
-          );
-          window.location.reload();
-        }}
-        smallVersion={true}
-      >
-        Remove Bookmark
-      </NegativeButton>
-    </div>
-  );
 }
 
 export default BookmarkButton;
