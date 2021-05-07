@@ -105,7 +105,6 @@ Results.propTypes = {
 
 export function GenericListItem({
   result,
-  onBookmarkPage,
   noLink,
   nameOnly,
   useSmallListItem,
@@ -114,13 +113,7 @@ export function GenericListItem({
 }) {
   switch (result.resourceType) {
     case POST:
-      return (
-        <Post
-          post={result}
-          key={result.id + POST}
-          bookmarkedVariation={onBookmarkPage}
-        />
-      );
+      return <Post post={result} key={result.id + POST} />;
     case COMMENT:
       return <Comment comment={result} key={result.id + COMMENT} />;
     case 'bookmark':
@@ -132,7 +125,6 @@ export function GenericListItem({
         <PublicationListItem
           publication={result}
           key={result.id || result.microsoftID + 'publication'}
-          bookmarkedVariation={onBookmarkPage}
         />
       );
     case 'user':

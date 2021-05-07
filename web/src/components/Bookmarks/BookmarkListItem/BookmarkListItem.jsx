@@ -7,7 +7,7 @@ export default function BookmarkListItem({bookmark}) {
   bookmarkedResource.resourceType = bookmark.bookmarkedResourceType;
   return (
     <div className="bookmark-list-item">
-      <GenericListItem result={bookmarkedResource} onBookmarkPage={true} />
+      <GenericListItem result={bookmarkedResource} />
     </div>
   );
 }

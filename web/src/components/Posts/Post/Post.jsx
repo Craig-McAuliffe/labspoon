@@ -24,7 +24,7 @@ import {PaginatedFetchAndResults} from '../../PaginatedResourceFetch/PaginatedRe
 import {db} from '../../../firebase';
 import {AuthContext} from '../../../App';
 
-export default function Post({post, dedicatedPage, bookmarkedVariation}) {
+export default function Post({post, dedicatedPage}) {
   const [isShowingComments, setIsShowingComments] = useState(false);
   const [postCommentCount, setPostCommentCount] = useState(
     post.numberOfComments ? post.numberOfComments : 0
@@ -166,7 +166,6 @@ export default function Post({post, dedicatedPage, bookmarkedVariation}) {
             backgroundShade={post.backgroundShade}
             post={post}
             dedicatedPage={dedicatedPage}
-            bookmarkedVariation={bookmarkedVariation}
             setIsShowingComments={setIsShowingComments}
             setPostCommentCount={setPostCommentCount}
             setResetCommentCache={setResetCommentCache}
@@ -225,7 +224,6 @@ function PostHeader({
   downUpVoteState,
   setDownUpVoteState,
   loadingUserUpVoteState,
-  resetCommentCache,
 }) {
   return (
     <div

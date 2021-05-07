@@ -3,9 +3,7 @@ import {AuthContext, FeatureFlags} from '../../../../App';
 import {db} from '../../../../firebase';
 import firebase from 'firebase';
 import {POST} from '../../../../helpers/resourceTypeDefinitions';
-import BookmarkButton, {
-  RemoveBookmarkFromPage,
-} from '../../../Buttons/BookmarkButton';
+import BookmarkButton from '../../../Buttons/BookmarkButton';
 import CommentButton from '../../../Buttons/CommentButton';
 import GroupBookmarkButton from '../../../Buttons/GroupBookmarkButton';
 import RecommendButton from '../../../Buttons/RecommendButton';
@@ -23,7 +21,6 @@ import {userToUserRef} from '../../../../helpers/users';
 export default function PostActions({
   post,
   dedicatedPage,
-  bookmarkedVariation,
   backgroundShade,
   setIsShowingComments,
   setPostCommentCount,
@@ -37,13 +34,6 @@ export default function PostActions({
   );
   const {userProfile} = useContext(AuthContext);
 
-  if (bookmarkedVariation)
-    return (
-      <RemoveBookmarkFromPage
-        postID={post.id}
-        bookmarkedByCollection={bookmarkedByCollection}
-      />
-    );
   return (
     <>
       <div
