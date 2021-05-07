@@ -22,7 +22,8 @@ function FilterMenu({
 }) {
   const filterCollections = filterCollectionsWithOptions.map(
     (optionCollection, index) => {
-      if (!optionCollection.mutable) return null;
+      if (!optionCollection.mutable || optionCollection.options.length === 0)
+        return null;
       return (
         <FilterCollection
           key={optionCollection.collectionName}
