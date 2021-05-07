@@ -305,6 +305,7 @@ function handleResultParameters(results, parameters) {
     results.forEach((result) => {
       result.showNews = true;
       result.newsCollection = parameters.newsCollection;
+      result.shouldRefreshNewsFeed = parameters.shouldRefreshNewsFeed;
     });
   if (parameters.backgroundShade)
     results.forEach((result) => {

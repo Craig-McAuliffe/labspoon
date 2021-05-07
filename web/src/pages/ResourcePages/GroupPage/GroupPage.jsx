@@ -177,6 +177,7 @@ function fetchGroupPageFeedFromDB(
     resultParameters.showNews = true;
     resultParameters.newsCollection = `groups/${groupID}/news`;
     resultParameters.userCanEdit = true;
+    if (activeTab === 'overview') resultParameters.shouldRefreshNewsFeed = true;
   }
 
   return [results, null, resultParameters];

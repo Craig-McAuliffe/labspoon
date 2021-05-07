@@ -1,10 +1,11 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {useHistory} from 'react-router-dom';
 import {EditIcon, NewsIcon, PinIcon} from '../../assets/GeneralActionIcons';
 import {DottedBurgerMenuIcon} from '../../assets/MenuIcons';
 import {db} from '../../firebase';
 import {getPostListItemFromPost} from '../../helpers/posts';
 import Dropdown, {DropdownOption} from '../Dropdown';
+import {FilterableResultsContext} from '../FilterableResults/FilterableResults';
 import SeeMore from '../SeeMore';
 
 import './ListItemCommonComponents.css';
@@ -145,7 +146,7 @@ function ListItemOptionsDropDownOptions({
 }) {
   const history = useHistory();
   const optionsDisplayed = [];
-
+  const {setChildrenRefreshFeedToggle} = useContext(FilterableResultsContext);
   options.forEach((option) => {
     switch (option) {
       case PIN:
@@ -179,6 +180,9 @@ function ListItemOptionsDropDownOptions({
 
         break;
       case NEWS: {
+        const refreshNewsFeed = item.shouldRefreshNewsFeed
+          ? () => setChildrenRefreshFeedToggle((currentState) => !currentState)
+          : null;
         if (showNews)
           optionsDisplayed.push(
             <DropdownOption
@@ -187,7 +191,13 @@ function ListItemOptionsDropDownOptions({
               onSelect={() => {
                 if (loadingNewsState || submittingNews) return;
                 onSelect();
-                addPostToNews(setSubmittingNews, item, isNews, newsCollection);
+                addPostToNews(
+                  setSubmittingNews,
+                  item,
+                  isNews,
+                  newsCollection,
+                  refreshNewsFeed
+                );
               }}
             >
               <h4
@@ -281,14 +291,18 @@ async function addPostToNews(
   setSubmittingNews,
   item,
   isOnNewsPage,
-  newsCollection
+  newsCollection,
+  refreshNewsFeed
 ) {
   setSubmittingNews(true);
   const newsItemRef = db.doc(`${newsCollection}/${item.id}`);
   if (isOnNewsPage) {
     return newsItemRef
       .delete()
-      .then(() => setSubmittingNews(false))
+      .then(() => {
+        if (refreshNewsFeed) refreshNewsFeed();
+        setSubmittingNews(false);
+      })
       .catch((err) => {
         console.error('unable to add item to news' + err);
         alert(
@@ -309,7 +323,10 @@ async function addPostToNews(
   }
   return newsItemRef
     .set(getPostListItemFromPost(newsItem))
-    .then(() => setSubmittingNews(false))
+    .then(() => {
+      if (refreshNewsFeed) refreshNewsFeed();
+      setSubmittingNews(false);
+    })
     .catch((err) => {
       console.error(err);
       alert(
