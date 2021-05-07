@@ -158,10 +158,12 @@ export default function PublicationPage() {
         tabs={relationshipFilter}
         refreshFeed={refreshFeedToggle}
         getCustomComponentAboveFeed={() => (
-          <QuickCreatePublicationPost
-            publication={publicationDetails}
-            publicationID={publicationID}
+          <QuickCreatePostWithResourceAndOrTopic
+            preSelectedResource={publicationDetails}
+            preSelectedResourceID={publicationID}
+            preSelectedResourceType={PUBLICATION}
             setRefreshFeedToggle={setRefreshFeedToggle}
+            createPostAbout={PUBLICATION}
           />
         )}
       >
@@ -243,10 +245,14 @@ function RetrieveMoreReferences({publicationID, publication}) {
   );
 }
 
-function QuickCreatePublicationPost({
-  publication,
-  publicationID,
+export function QuickCreatePostWithResourceAndOrTopic({
   setRefreshFeedToggle,
+  preSelectedResource,
+  preSelectedResourceID,
+  preSelectedResourceType,
+  preSelectedTopic,
+  createPostAbout,
+  onSuccess,
 }) {
   const [isCreating, setIsCreating] = useState(false);
   const [postSuccess, setPostSuccess] = useState(false);
@@ -267,7 +273,7 @@ function QuickCreatePublicationPost({
           </SuccessMessage>
         )}
         <CreateButton
-          text="Create a post about this publication"
+          text={`Create a post about this ${createPostAbout}`}
           buttonAction={() => setIsCreating(true)}
         />
       </div>
@@ -275,10 +281,11 @@ function QuickCreatePublicationPost({
 
   return (
     <CreatePost
-      preTaggedResourceType={PUBLICATION}
-      preTaggedResourceID={publicationID}
-      preTaggedResourceDetails={publication}
-      onSuccess={() => {
+      preTaggedResourceType={preSelectedResourceType}
+      preTaggedResourceID={preSelectedResourceID}
+      preTaggedResourceDetails={preSelectedResource}
+      onSuccess={(postDataAndID) => {
+        if (onSuccess) onSuccess(postDataAndID);
         setIsCreating(false);
         setPostSuccess(true);
       }}
@@ -288,6 +295,7 @@ function QuickCreatePublicationPost({
         setPostSuccess(true);
         setRefreshFeedToggle((currentState) => !currentState);
       }}
+      preSelectedTopic={preSelectedTopic}
     />
   );
 }

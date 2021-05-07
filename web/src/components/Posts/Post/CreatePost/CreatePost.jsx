@@ -41,9 +41,12 @@ export default function CreatePost({
   preTaggedResourceID,
   cancelAction,
   refreshFeed,
+  preSelectedTopic,
 }) {
   const {user, userProfile} = useContext(AuthContext);
-  const [selectedTopics, setSelectedTopics] = useState([]);
+  const [selectedTopics, setSelectedTopics] = useState(
+    preSelectedTopic ? [preSelectedTopic] : []
+  );
   const [postSuccess, setPostSuccess] = useState(false);
   const [postType, setPostType] = useState(null);
   const [submittingPost, setSubmittingPost] = useState(false);
@@ -74,14 +77,13 @@ export default function CreatePost({
 
   useEffect(() => {
     if (!postSuccess) return;
-    if (onSuccess) onSuccess();
+    if (onSuccess) onSuccess(postCreateDataResp);
     if (shouldRedirect) {
       if (selectedTopics.length > 0)
         return history.push({
           pathname: `/topic/${selectedTopics[0].id}`,
           state: {createdPost: postCreateDataResp},
         });
-      return history.push(`/user/${userProfile.id}`);
     }
     resetPost();
     const successTimeout = setTimeout(() => setPostSuccess(false), 3000);

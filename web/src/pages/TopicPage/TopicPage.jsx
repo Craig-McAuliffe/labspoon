@@ -16,6 +16,7 @@ import {
   RESEARCHFOCUSES,
   TECHNIQUE,
   TECHNIQUES,
+  TOPIC,
   USERS,
 } from '../../helpers/resourceTypeDefinitions';
 import {getPaginatedResourcesFromCollectionRef} from '../../helpers/resources';
@@ -29,6 +30,7 @@ import {
   filterFeedData,
   getFiltersFromFilterCollection,
 } from '../../components/Filter/Filter';
+import {QuickCreatePostWithResourceAndOrTopic} from '../ResourcePages/PublicationPage/PublicationPage';
 
 async function fetchTopicDetailsFromDB(topicID) {
   return db
@@ -184,24 +186,38 @@ export default function TopicPage() {
     setTopicID(topicIDParam);
   }
   const locationState = useLocation().state;
-  const createdPost = locationState ? locationState.createdPost : null;
-  const [createdPostFulfilled, setCreatedPostFulfilled] = useState(false);
+  const [createdPostIDAndFulfilled, setCreatedPostIDAndFulfilled] = useState(
+    locationState
+      ? {
+          createdPost: locationState.createdPost,
+          createdPostFulfilled: false,
+        }
+      : null
+  );
 
   const fetchTopicDetails = () => fetchTopicDetailsFromDB(topicID);
 
   // listen for just created post
   useEffect(() => {
-    if (!createdPost || !topicID || createdPostFulfilled) return;
+    if (
+      !topicID ||
+      !createdPostIDAndFulfilled ||
+      createdPostIDAndFulfilled.createdPostFulfilled
+    )
+      return;
     const topicPostDocObserver = db
-      .doc(`topics/${topicID}/posts/${createdPost.postID}`)
+      .doc(`topics/${topicID}/posts/${createdPostIDAndFulfilled.createdPost}`)
       .onSnapshot((docSnapshot) => {
         if (docSnapshot.exists) {
-          setCreatedPostFulfilled(true);
+          setCreatedPostIDAndFulfilled({
+            createdPost: locationState,
+            createdPostFulfilled: true,
+          });
           setRefreshFeedToggle((currentState) => !currentState);
         }
       });
     return () => topicPostDocObserver();
-  }, [topicID, createdPost, createdPostFulfilled]);
+  }, [topicID, locationState, createdPostIDAndFulfilled]);
 
   useEffect(() => {
     Promise.resolve(fetchTopicDetails())
@@ -313,6 +329,18 @@ export default function TopicPage() {
         tabsLoading={tabsLoading}
         refreshFeed={refreshFeedToggle}
         getDefaultFilter={getDefaultFilter}
+        getCustomComponentAboveFeed={() => (
+          <QuickCreatePostWithResourceAndOrTopic
+            preSelectedTopic={topicDetails}
+            createPostAbout={TOPIC}
+            onSuccess={(postDataAndID) =>
+              setCreatedPostIDAndFulfilled({
+                createdPost: postDataAndID.postID,
+                createdPostFulfilled: false,
+              })
+            }
+          />
+        )}
       >
         <PaddedContent>
           <TopicListItem topic={topicDetails} dedicatedPage={true}>
