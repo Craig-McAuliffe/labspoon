@@ -202,15 +202,18 @@ export default function TopicPage() {
     if (
       !topicID ||
       !createdPostIDAndFulfilled ||
+      !createdPostIDAndFulfilled.createdPost ||
       createdPostIDAndFulfilled.createdPostFulfilled
     )
       return;
     const topicPostDocObserver = db
-      .doc(`topics/${topicID}/posts/${createdPostIDAndFulfilled.createdPost}`)
+      .doc(
+        `topics/${topicID}/posts/${createdPostIDAndFulfilled.createdPost.postID}`
+      )
       .onSnapshot((docSnapshot) => {
         if (docSnapshot.exists) {
           setCreatedPostIDAndFulfilled({
-            createdPost: locationState,
+            createdPost: null,
             createdPostFulfilled: true,
           });
           setRefreshFeedToggle((currentState) => !currentState);
@@ -335,7 +338,7 @@ export default function TopicPage() {
             createPostAbout={TOPIC}
             onSuccess={(postDataAndID) =>
               setCreatedPostIDAndFulfilled({
-                createdPost: postDataAndID.postID,
+                createdPost: postDataAndID,
                 createdPostFulfilled: false,
               })
             }
