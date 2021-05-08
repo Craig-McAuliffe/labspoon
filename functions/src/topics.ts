@@ -12,7 +12,6 @@ import {
   doFollowPreferencesBlockPost,
   FollowPostTypePreferences,
 } from './helpers';
-import {UserRef} from './users';
 import Axios from 'axios';
 
 const db = admin.firestore();
@@ -422,6 +421,7 @@ export const addTopicPostToFollowersFeeds = functions.firestore
           if (postIsBlockedByFollowPreferences) return;
           topicFollowersIDs.push(doc.id);
         });
+        if (topicFollowersIDs.length === 0) return;
         const topicFollowersPromisesArray = topicFollowersIDs.map(
           async (topicFollowerID) => {
             const userPostsDocRef = db.doc(
@@ -451,47 +451,6 @@ export const addTopicPostToFollowersFeeds = functions.firestore
         return Promise.all(topicFollowersPromisesArray);
       })
       .catch((err) => console.log(err, 'could not fetch followers of topic'));
-  });
-
-export const addTopicPostsToFollowingFeeds = functions.firestore
-  .document(`topics/{topicID}/posts/{postID}`)
-  .onCreate(async (change, context) => {
-    const topicID = context.params.topicID;
-    const postID = context.params.postID;
-    const post = change.data() as Post;
-    const topicFollowersCollectionRef = db.collection(
-      `topics/${topicID}/followedByUsers`
-    );
-
-    const updateFollowersOfTopic = async () => {
-      return topicFollowersCollectionRef
-        .get()
-        .then((qs) => {
-          const topicFollowers = [] as UserRef[];
-          qs.forEach((doc) => {
-            topicFollowers.push(doc.data() as UserRef);
-          });
-          const topicFollowersPromisesArray = topicFollowers.map(
-            async (topicFollower) => {
-              const userID = topicFollower.id;
-              const userPostsDocRef = db.doc(
-                `users/${userID}/feeds/followingFeed/posts/${postID}`
-              );
-              return userPostsDocRef
-                .set(post)
-                .catch((err) =>
-                  console.log(
-                    err,
-                    'failed to add posts from topic to user following feed'
-                  )
-                );
-            }
-          );
-          return Promise.all(topicFollowersPromisesArray);
-        })
-        .catch((err) => console.log(err, 'could not fetch followers of topic'));
-    };
-    return updateFollowersOfTopic();
   });
 
 export const updateTopicFilterOnNewPost = functions.firestore

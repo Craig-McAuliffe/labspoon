@@ -9,7 +9,6 @@ import {
   openTwitterWithPopulatedTweet,
   SwitchTagMethod,
   OptionalTagResource,
-  OPEN_POSITION_POST,
 } from './CreatePost';
 
 import './CreatePost.css';
@@ -43,6 +42,7 @@ import {
 } from '../../../Forms/Articles/HeaderAndBodyArticleInput';
 import SelectGroup from '../../../Group/SelectGroup';
 import {env} from '../../../../config';
+import {OPENPOSITION} from '../../../../helpers/resourceTypeDefinitions';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 const createOpenPosition = firebase
@@ -138,7 +138,7 @@ export default function OpenPositionPostForm() {
         ) : (
           <OptionalTagResource
             onTag={() => setIsTaggingOpenPosition(true)}
-            resourceType={OPEN_POSITION_POST}
+            resourceType={OPENPOSITION}
           />
         )}
       </PostForm>

@@ -30,3 +30,14 @@ export enum ResourceTypesCollections {
   RESEARCH_FOCUSES = 'researchFocuses',
   TECHNIQUES = 'techniques',
 }
+
+export enum PostTypesIDs {
+  DEFAULT_POST = 'defaultPost',
+  PUBLICATION_POST = 'publicationPost',
+  OPEN_POSITION_POST = 'openPositionPost',
+  EVENT_POST = 'eventPost',
+  PROJECT_GRANT_POST = 'projectGrantPost',
+  QUESTION_POST = 'questionPost',
+  IDEA_POST = 'ideaPost',
+  SUB_TOPIC_POST = 'subTopicPost',
+}

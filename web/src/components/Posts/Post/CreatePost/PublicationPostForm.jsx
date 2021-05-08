@@ -10,7 +10,6 @@ import {
   openTwitterWithPopulatedTweet,
   SwitchTagMethod,
   OptionalTagResource,
-  PUBLICATION_POST,
 } from './CreatePost';
 import PublicationListItem, {
   SmallPublicationListItem,
@@ -32,6 +31,7 @@ import './CreatePost.css';
 import {algoliaPublicationToDBPublicationListItem} from '../../../../helpers/publications';
 import {Alert} from 'react-bootstrap';
 import {initialValueNoTitle} from '../../../Forms/Articles/HeaderAndBodyArticleInput';
+import {PUBLICATION} from '../../../../helpers/resourceTypeDefinitions';
 
 const createPost = firebase.functions().httpsCallable('posts-createPost');
 
@@ -135,7 +135,7 @@ export default function PublicationPostForm() {
         ) : (
           <OptionalTagResource
             onTag={() => setIsTaggingPublication(true)}
-            resourceType={PUBLICATION_POST}
+            resourceType={PUBLICATION}
           />
         )}
       </PostForm>

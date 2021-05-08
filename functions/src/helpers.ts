@@ -1,5 +1,5 @@
 import {Post} from './posts';
-import {admin, ResourceTypes, ResourceTypesCollections} from './config';
+import {admin, PostTypesIDs, ResourceTypesCollections} from './config';
 import {TaggedTopic} from './topics';
 
 const db = admin.firestore();
@@ -44,33 +44,104 @@ export function doFollowPreferencesBlockPost(
     return postIsBlocked;
   }
   if (comparisonType === 'postTypes') {
-    if (postData[ResourceTypes.PUBLICATION]) {
+    if (
+      postData.postType &&
+      postData.postType.id === PostTypesIDs.PUBLICATION_POST
+    ) {
       if (
         followerPreferencesOmissions.some(
           (followerPreference) =>
-            followerPreference.id === ResourceTypesCollections.PUBLICATIONS
-        )
-      )
-        return true;
-      return false;
-    }
-    if (postData[ResourceTypes.OPEN_POSITION]) {
-      if (
-        followerPreferencesOmissions.some(
-          (followerPreference) =>
-            followerPreference.id === ResourceTypesCollections.OPEN_POSITIONS
+            followerPreference.id === PostTypesIDs.PUBLICATION_POST
         )
       )
         return true;
       return false;
     }
     if (
-      followerPreferencesOmissions.some(
-        (followerPreference) => followerPreference.id === 'general'
+      postData.postType &&
+      postData.postType.id === PostTypesIDs.OPEN_POSITION_POST
+    ) {
+      if (
+        followerPreferencesOmissions.some(
+          (followerPreference) =>
+            followerPreference.id === PostTypesIDs.OPEN_POSITION_POST
+        )
       )
-    )
-      return true;
-    return false;
+        return true;
+      return false;
+    }
+    if (postData.postType && postData.postType.id === PostTypesIDs.EVENT_POST) {
+      if (
+        followerPreferencesOmissions.some(
+          (followerPreference) =>
+            followerPreference.id === PostTypesIDs.EVENT_POST
+        )
+      )
+        return true;
+      return false;
+    }
+    if (postData.postType && postData.postType.id === PostTypesIDs.IDEA_POST) {
+      if (
+        followerPreferencesOmissions.some(
+          (followerPreference) =>
+            followerPreference.id === PostTypesIDs.IDEA_POST
+        )
+      )
+        return true;
+      return false;
+    }
+    if (
+      postData.postType &&
+      postData.postType.id === PostTypesIDs.PROJECT_GRANT_POST
+    ) {
+      if (
+        followerPreferencesOmissions.some(
+          (followerPreference) =>
+            followerPreference.id === PostTypesIDs.PROJECT_GRANT_POST
+        )
+      )
+        return true;
+      return false;
+    }
+    if (
+      postData.postType &&
+      postData.postType.id === PostTypesIDs.QUESTION_POST
+    ) {
+      if (
+        followerPreferencesOmissions.some(
+          (followerPreference) =>
+            followerPreference.id === PostTypesIDs.QUESTION_POST
+        )
+      )
+        return true;
+      return false;
+    }
+    if (
+      postData.postType &&
+      postData.postType.id === PostTypesIDs.SUB_TOPIC_POST
+    ) {
+      if (
+        followerPreferencesOmissions.some(
+          (followerPreference) =>
+            followerPreference.id === PostTypesIDs.SUB_TOPIC_POST
+        )
+      )
+        return true;
+      return false;
+    }
+    if (
+      postData.postType &&
+      postData.postType.id === PostTypesIDs.DEFAULT_POST
+    ) {
+      if (
+        followerPreferencesOmissions.some(
+          (followerPreference) =>
+            followerPreference.id === PostTypesIDs.DEFAULT_POST
+        )
+      )
+        return true;
+      return false;
+    }
   }
   return false;
 }

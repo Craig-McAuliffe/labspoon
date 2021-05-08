@@ -7,6 +7,11 @@
   overflow-y: auto;
 }
 
+.follow-options-topics-container .topic-list-item-container-light-no-divider,
+.follow-options-topics-container .topic-list-item-container-dark-no-divider {
+  padding: 10px 0px;
+}
+
 .follow-options-topics-container .end-result {
   color: #5d5d65;
 }
@@ -133,6 +138,7 @@
   grid-template-columns: 1fr 20px;
   margin: 5px 0px;
 }
+
 .follow-options-option-container-light {
   color: #00507c;
 }
@@ -142,10 +148,12 @@
 }
 .follow-options-topics-note-light {
   color: #5d5d65;
+  margin-bottom: 5px;
 }
 
 .follow-options-topics-note-dark {
   color: #ccd6da;
+  margin-bottom: 5px;
 }
 
 .follow-options-actions-container-light,

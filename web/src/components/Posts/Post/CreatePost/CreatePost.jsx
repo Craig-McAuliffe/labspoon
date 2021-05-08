@@ -21,15 +21,16 @@ import {TagResourceIcon} from '../../../../assets/ResourceTypeIcons';
 import SecondaryButton from '../../../Buttons/SecondaryButton';
 
 import './CreatePost.css';
+import {postTypeNameToNameAndID} from '../../../../helpers/posts';
 
-export const DEFAULT_POST = 'Other';
-export const PUBLICATION_POST = 'Publication';
-export const OPEN_POSITION_POST = 'Open Position';
-export const EVENT_POST = 'Event';
-export const PROJECT_GRANT_POST = 'Project / Grant';
-export const QUESTION_POST = 'Question';
-export const IDEA_POST = 'Idea';
-export const SUB_TOPIC_POST = 'Sub Topic';
+export const DEFAULT_POST_NAME = 'Other';
+export const PUBLICATION_POST_NAME = 'Publication';
+export const OPEN_POSITION_POST_NAME = 'Open Position';
+export const EVENT_POST_NAME = 'Event';
+export const PROJECT_GRANT_POST_NAME = 'Project / Grant';
+export const QUESTION_POST_NAME = 'Question';
+export const IDEA_POST_NAME = 'Idea';
+export const SUB_TOPIC_POST_NAME = 'Sub Topic';
 
 export const CreatingPostContext = createContext();
 export const MAX_POST_CHARACTERS = 800;
@@ -49,7 +50,7 @@ export default function CreatePost({
     preSelectedTopic ? [preSelectedTopic] : []
   );
   const [postSuccess, setPostSuccess] = useState(false);
-  const [postType, setPostType] = useState(null);
+  const [postTypeName, setPostTypeName] = useState(null);
   const [submittingPost, setSubmittingPost] = useState(false);
   const [savedTitleText, setSavedTitleText] = useState(null);
   const [
@@ -71,7 +72,7 @@ export default function CreatePost({
   const resetPost = () => {
     setSelectedTopics([]);
     setSavedTitleText(null);
-    setPostType(null);
+    setPostTypeName(null);
     setSuperCachedTopicSearchAndResults([]);
     setPostCreateDataResp(null);
   };
@@ -104,8 +105,8 @@ export default function CreatePost({
         cancelPost: cancelAction ? cancelPost : null,
         savedTitleText: savedTitleText,
         setSavedTitleText: setSavedTitleText,
-        postType: postType,
-        setPostType: setPostType,
+        postTypeName: postTypeName,
+        setPostTypeName: setPostTypeName,
         superCachedTopicSearchAndResults: superCachedTopicSearchAndResults,
         setSuperCachedTopicSearchAndResults: setSuperCachedTopicSearchAndResults,
         setPostCreateDataResp: setPostCreateDataResp,
@@ -120,7 +121,10 @@ export default function CreatePost({
           refreshFeed={refreshFeed}
         />
       ) : (
-        <GenericCreatePost postType={postType} setPostType={setPostType} />
+        <GenericCreatePost
+          postTypeName={postTypeName}
+          setPostTypeName={setPostTypeName}
+        />
       )}
     </CreatingPostContext.Provider>
   );
@@ -256,8 +260,8 @@ function GenericCreatePost() {
     submittingPost,
     setSelectedTopics,
     selectedTopics,
-    postType,
-    setPostType,
+    postTypeName,
+    setPostTypeName,
     superCachedTopicSearchAndResults,
     setSuperCachedTopicSearchAndResults,
   } = useContext(CreatingPostContext);
@@ -293,20 +297,20 @@ function GenericCreatePost() {
         {selectedTopics.length > 0 && (
           <>
             <div className="create-post-type-section">
-              {!postType && (
+              {!postTypeName && (
                 <h2 className="create-post-section-title-2">
                   What type of post is this?
                 </h2>
               )}
               <TypeOfTaggedResourceDropDown
-                setTaggedResourceType={setPostType}
-                taggedResourceType={postType}
+                setTaggedResourceType={setPostTypeName}
+                taggedResourceType={postTypeName}
               />
             </div>
             <div className="create-post-type-section-height-match"></div>
           </>
         )}
-        {postType ? (
+        {postTypeName ? (
           <div className="create-post-form-section">
             {submittingPost ? (
               <div className="create-post-loading-spinner">
@@ -318,7 +322,7 @@ function GenericCreatePost() {
                 submittingPost ? 'create-post-loading-greyed-out' : null
               }
             >
-              <PostTypeSpecificForm postType={postType} />
+              <PostTypeSpecificForm postTypeName={postTypeName} />
             </div>
           </div>
         ) : (
@@ -366,56 +370,19 @@ export function PostSectionSelectedTypeTopic({title, removeAction}) {
     </h2>
   );
 }
-function PostTypeSpecificForm({postType}) {
-  const postTypeNameToNameAndID = (postTypeName) => {
-    switch (postTypeName) {
-      case DEFAULT_POST:
-        return {
-          name: 'Default',
-          id: 'defaultPost',
-        };
-      case EVENT_POST:
-        return {
-          name: 'Event',
-          id: 'eventPost',
-        };
-      case PROJECT_GRANT_POST:
-        return {
-          name: 'Project / Grant',
-          id: 'projectGrantPost',
-        };
-      case QUESTION_POST:
-        return {
-          name: 'Question',
-          id: 'questionPost',
-        };
-      case IDEA_POST:
-        return {
-          name: 'Idea',
-          id: 'ideaPost',
-        };
-      case SUB_TOPIC_POST:
-        return {
-          name: 'Sub Topic',
-          id: 'subTopicPost',
-        };
-      default:
-        return {
-          name: 'Default',
-          id: 'defaultPost',
-        };
-    }
-  };
-  switch (postType) {
-    case PUBLICATION_POST: {
+function PostTypeSpecificForm({postTypeName}) {
+  switch (postTypeName) {
+    case PUBLICATION_POST_NAME: {
       return <PublicationPostForm />;
     }
-    case OPEN_POSITION_POST: {
+    case OPEN_POSITION_POST_NAME: {
       return <OpenPositionPostForm />;
     }
     default: {
       return (
-        <DefaultPost postTypeNameAndID={postTypeNameToNameAndID(postType)} />
+        <DefaultPost
+          postTypeNameAndID={postTypeNameToNameAndID(postTypeName)}
+        />
       );
     }
   }

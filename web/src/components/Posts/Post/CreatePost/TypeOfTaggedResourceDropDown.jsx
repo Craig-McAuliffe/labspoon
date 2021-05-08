@@ -1,13 +1,13 @@
 import React from 'react';
 import {
-  PUBLICATION_POST,
-  DEFAULT_POST,
-  OPEN_POSITION_POST,
-  EVENT_POST,
-  PROJECT_GRANT_POST,
-  QUESTION_POST,
-  IDEA_POST,
-  SUB_TOPIC_POST,
+  PUBLICATION_POST_NAME,
+  DEFAULT_POST_NAME,
+  OPEN_POSITION_POST_NAME,
+  EVENT_POST_NAME,
+  PROJECT_GRANT_POST_NAME,
+  QUESTION_POST_NAME,
+  IDEA_POST_NAME,
+  SUB_TOPIC_POST_NAME,
   PostSectionSelectedTypeTopic,
 } from './CreatePost';
 
@@ -18,14 +18,14 @@ export default function TypeOfTaggedResourceDropDown({
   setTaggedResourceType,
 }) {
   const resourceTypeOptions = [
-    PUBLICATION_POST,
-    OPEN_POSITION_POST,
-    PROJECT_GRANT_POST,
-    EVENT_POST,
-    QUESTION_POST,
-    IDEA_POST,
-    SUB_TOPIC_POST,
-    DEFAULT_POST,
+    PUBLICATION_POST_NAME,
+    OPEN_POSITION_POST_NAME,
+    PROJECT_GRANT_POST_NAME,
+    EVENT_POST_NAME,
+    QUESTION_POST_NAME,
+    IDEA_POST_NAME,
+    SUB_TOPIC_POST_NAME,
+    DEFAULT_POST_NAME,
   ];
   if (taggedResourceType)
     return (

@@ -1,9 +1,8 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {AuthContext} from '../../App';
 import {db} from '../../firebase';
+import {postTypeNameToNameAndID} from '../../helpers/posts';
 import {
-  OPENPOSITIONS,
-  PUBLICATIONS,
   resourceTypeToCollection,
   TOPIC,
 } from '../../helpers/resourceTypeDefinitions';
@@ -15,17 +14,21 @@ import SelectCheckBox, {setItemSelectedState} from '../Buttons/SelectCheckBox';
 import {SimpleErrorText} from '../Forms/ErrorMessage';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import {SelectablePaginatedResourceFetchAndResults} from '../PaginatedResourceFetch/PaginatedResourceFetchAndResults';
-
-import './FollowOptionsPopover.css';
+import {
+  DEFAULT_POST_NAME,
+  EVENT_POST_NAME,
+  IDEA_POST_NAME,
+  OPEN_POSITION_POST_NAME,
+  PUBLICATION_POST_NAME,
+  QUESTION_POST_NAME,
+  SUB_TOPIC_POST_NAME,
+  PROJECT_GRANT_POST_NAME,
+} from '../Posts/Post/CreatePost/CreatePost';
 import Popover from './Popover';
 
+import './FollowOptionsPopover.css';
+
 const INFINITE_SCROLL_TARGET_ID = 'scrollableFollowOptions';
-const postTypesOptions = [
-  {id: 'all', name: 'All posts'},
-  {id: 'general', name: 'General posts'},
-  {id: PUBLICATIONS, name: 'Publication posts'},
-  {id: OPENPOSITIONS, name: 'Open position posts'},
-];
 
 const initialTopicResults = (backgroundShade) => [
   {
@@ -53,13 +56,23 @@ export default function FollowOptionsPopover({
   bottom,
   backgroundShade,
 }) {
+  const postTypesOptions = [
+    {id: 'allOptions', name: 'All'},
+    postTypeNameToNameAndID(DEFAULT_POST_NAME),
+    postTypeNameToNameAndID(PUBLICATION_POST_NAME),
+    postTypeNameToNameAndID(OPEN_POSITION_POST_NAME),
+    postTypeNameToNameAndID(EVENT_POST_NAME),
+    postTypeNameToNameAndID(QUESTION_POST_NAME),
+    postTypeNameToNameAndID(IDEA_POST_NAME),
+    postTypeNameToNameAndID(SUB_TOPIC_POST_NAME),
+    postTypeNameToNameAndID(PROJECT_GRANT_POST_NAME),
+  ];
+
   const [expanded, setExpanded] = useState(isPreSelected ? true : false);
   const [selectedTopics, setSelectedTopics] = useState([
     initialTopicResults(backgroundShade)[0].id,
   ]);
-  const [selectedPostTypes, setSelectedPostTypes] = useState([
-    postTypesOptions[0].id,
-  ]);
+  const [selectedPostTypes, setSelectedPostTypes] = useState(postTypesOptions);
   const [isSubmittingOptions, setIsSubmittingOptions] = useState(false);
   const [noPostOptionsSelectedError, setNoPostOptionsSelectedError] = useState(
     false
@@ -99,13 +112,14 @@ export default function FollowOptionsPopover({
     const existingOmittedPostTypes = existingUserFollowOptions.omittedPostTypes;
     if (existingOmittedPostTypes && existingOmittedPostTypes.length > 0)
       setSelectedPostTypes((currentSelectedPostTypes) =>
-        currentSelectedPostTypes.filter(
-          (currentSelectedPostType) =>
-            !existingOmittedPostTypes.some(
-              (existingOmittedPostType) =>
-                existingOmittedPostType.id === currentSelectedPostType.id
-            )
-        )
+        currentSelectedPostTypes.filter((currentSelectedPostType) => {
+          if (currentSelectedPostType.id === postTypesOptions[0].id)
+            return false;
+          return !existingOmittedPostTypes.some(
+            (existingOmittedPostType) =>
+              existingOmittedPostType.id === currentSelectedPostType.id
+          );
+        })
       );
 
     const existingOmittedTopics = existingUserFollowOptions.omittedTopics;
@@ -224,6 +238,7 @@ export default function FollowOptionsPopover({
         noPostOptionsSelectedError={noPostOptionsSelectedError}
         isSubmittingOptions={isSubmittingOptions}
         backgroundShade={backgroundShade}
+        postTypesOptions={postTypesOptions}
       />
       {!noTopicOptions && (
         <ResourceFollowTopicsOptions
@@ -290,6 +305,7 @@ function ResourceFollowPostTypesOptions({
   noPostOptionsSelectedError,
   isSubmittingOptions,
   backgroundShade,
+  postTypesOptions,
 }) {
   const isPostTypeSelected = (postType) =>
     selectedPostTypes.some(
@@ -324,7 +340,7 @@ function ResourceFollowPostTypesOptions({
           }`}
           key={postType.id}
         >
-          <div>{postType.name}</div>
+          <div>{postType.id === 'defaultPost' ? 'Other' : postType.name}</div>
           <SelectCheckBox
             selected={isPostTypeSelected(postType)}
             selectAction={() =>
