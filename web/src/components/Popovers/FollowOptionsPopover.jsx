@@ -183,7 +183,7 @@ export default function FollowOptionsPopover({
         ),
         selectedPostTypes
       ).forEach((unselectedItem) => blockedPostTypes.push(unselectedItem));
-    if (blockedPostTypes.length === 3) {
+    if (blockedPostTypes.length >= postTypesOptions.length - 1) {
       setNoPostOptionsSelectedError(true);
       setIsSubmittingOptions(false);
       return;
