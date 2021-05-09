@@ -104,3 +104,16 @@
   flex-grow: 1;
   align-items: center;
 }
+
+.create-post-skip-topics-button-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.create-post-skip-topics-button-container button {
+  color: #00507c;
+}
+
+.create-post-skip-topics-button-container button:hover {
+  text-decoration: underline;
+}

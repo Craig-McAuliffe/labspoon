@@ -86,6 +86,10 @@ export default function CreatePost({
           pathname: `/topic/${selectedTopics[0].id}`,
           state: {createdPost: postCreateDataResp},
         });
+      history.push({
+        pathname: `/user/${user.uid}`,
+        state: {createdPost: postCreateDataResp},
+      });
     }
     resetPost();
     const successTimeout = setTimeout(() => setPostSuccess(false), 3000);
@@ -266,7 +270,7 @@ function GenericCreatePost() {
     setSuperCachedTopicSearchAndResults,
   } = useContext(CreatingPostContext);
   const [minimiseTagTopics, setMinimiseTagTopics] = useState(true);
-
+  const [skippedTopics, setSkippedTopics] = useState(false);
   return (
     <>
       <div className="create-post-topic-section">
@@ -276,7 +280,7 @@ function GenericCreatePost() {
           </h2>
         )}
 
-        {minimiseTagTopics && selectedTopics.length > 0 ? (
+        {minimiseTagTopics && (selectedTopics.length || skippedTopics) > 0 ? (
           <MainTopicAndTagMoreTopics
             selectedTopics={selectedTopics}
             setMinimiseTagTopics={setMinimiseTagTopics}
@@ -290,11 +294,13 @@ function GenericCreatePost() {
             largeDesign={true}
             superCachedSearchAndResults={superCachedTopicSearchAndResults}
             setSuperCachedSearchAndResults={setSuperCachedTopicSearchAndResults}
+            setSkippedTopics={setSkippedTopics}
+            skippedTopics={skippedTopics}
           />
         )}
       </div>
       <div className="create-post-hidden-overlap">
-        {selectedTopics.length > 0 && (
+        {(selectedTopics.length > 0 || skippedTopics) && (
           <>
             <div className="create-post-type-section">
               {!postTypeName && (
@@ -344,10 +350,12 @@ function MainTopicAndTagMoreTopics({
 }) {
   return (
     <>
-      <PostSectionSelectedTypeTopic
-        removeAction={() => setSelectedTopics([])}
-        title={selectedTopics[0].name}
-      />
+      {selectedTopics.length === 1 && (
+        <PostSectionSelectedTypeTopic
+          removeAction={() => setSelectedTopics([])}
+          title={selectedTopics[0].name}
+        />
+      )}
       <div className="create-post-tag-more-topics-button-container">
         <TertiaryButton onClick={() => setMinimiseTagTopics(false)}>
           Tag additional topics

@@ -18,6 +18,8 @@ export default function TagTopics({
   largeDesign,
   superCachedSearchAndResults,
   setSuperCachedSearchAndResults,
+  skippedTopics,
+  setSkippedTopics,
 }) {
   const [displayedTopics, setDisplayedTopics] = useState([]);
   const [duplicateTopic, setDuplicateTopic] = useState(false);
@@ -68,6 +70,11 @@ export default function TagTopics({
             selectedTopics={selectedTopics}
             setSelectedTopics={setSelectedTopics}
           />
+          <div className="create-post-skip-topics-button-container">
+            {!skippedTopics && selectedTopics.length === 0 && (
+              <button onClick={() => setSkippedTopics(true)}>Skip</button>
+            )}
+          </div>
           <TopicsList
             topics={displayedTopics}
             setSelectedTopics={setSelectedTopics}

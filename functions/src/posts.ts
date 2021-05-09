@@ -88,8 +88,10 @@ export const createPost = functions.https.onCall(async (data, context) => {
   }
   if (data.openPosition && data.openPosition.id)
     post.openPosition = data.openPosition;
+  const authorPostsRef = db.doc(`users/${author.id}/posts/${postID}`);
   const batch = db.batch();
   batch.set(postDocRef, post);
+  batch.set(authorPostsRef, postToPostRef(post));
   if (post.openPosition)
     batch.set(
       db.doc(`openPositions/${post.openPosition.id}/posts/${postID}`),
@@ -192,21 +194,6 @@ export const addPostActivity = functions.firestore
         {merge: true}
       )
     );
-  });
-
-export const addPostToAuthorPosts = functions.firestore
-  .document(`posts/{postID}`)
-  .onCreate(async (change, context) => {
-    const post = change.data() as Post;
-    const postID = change.id;
-    const authorID = post.author.id;
-    await db
-      .collection('users')
-      .doc(authorID)
-      .collection('posts')
-      .doc(postID)
-      .set(postToPostRef(post));
-    return null;
   });
 
 export const updatePostOnAuthors = functions.firestore
