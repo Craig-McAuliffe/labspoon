@@ -23,6 +23,7 @@ import {
   QUESTION_POST_NAME,
   SUB_TOPIC_POST_NAME,
   PROJECT_GRANT_POST_NAME,
+  FUNDING_OPPORTUNITY,
 } from '../Posts/Post/CreatePost/CreatePost';
 import Popover from './Popover';
 
@@ -66,6 +67,7 @@ export default function FollowOptionsPopover({
     postTypeNameToNameAndID(IDEA_POST_NAME),
     postTypeNameToNameAndID(SUB_TOPIC_POST_NAME),
     postTypeNameToNameAndID(PROJECT_GRANT_POST_NAME),
+    postTypeNameToNameAndID(FUNDING_OPPORTUNITY),
   ];
 
   const [expanded, setExpanded] = useState(isPreSelected ? true : false);

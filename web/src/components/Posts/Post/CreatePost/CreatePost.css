@@ -198,6 +198,7 @@
   border: 1px solid #dcdce0;
   padding: 9px 19px;
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+  background-color: #ffffff;
 }
 
 .create-post-post-tagged-resource-type-button {

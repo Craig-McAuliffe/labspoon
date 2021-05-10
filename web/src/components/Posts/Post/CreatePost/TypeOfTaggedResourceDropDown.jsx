@@ -9,6 +9,7 @@ import {
   IDEA_POST_NAME,
   SUB_TOPIC_POST_NAME,
   PostSectionSelectedTypeTopic,
+  FUNDING_OPPORTUNITY,
 } from './CreatePost';
 
 import './CreatePost.css';
@@ -25,6 +26,7 @@ export default function TypeOfTaggedResourceDropDown({
     QUESTION_POST_NAME,
     IDEA_POST_NAME,
     SUB_TOPIC_POST_NAME,
+    FUNDING_OPPORTUNITY,
     DEFAULT_POST_NAME,
   ];
   if (taggedResourceType)
@@ -83,6 +85,12 @@ export default function TypeOfTaggedResourceDropDown({
         className="create-post-type-button"
       >
         <h3>{resourceTypeOptions[7]}</h3>
+      </button>
+      <button
+        onClick={() => setTaggedResourceType(resourceTypeOptions[8])}
+        className="create-post-type-button"
+      >
+        <h3>{resourceTypeOptions[8]}</h3>
       </button>
     </div>
   );

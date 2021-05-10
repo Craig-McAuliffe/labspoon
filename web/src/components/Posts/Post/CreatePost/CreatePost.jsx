@@ -31,6 +31,7 @@ export const PROJECT_GRANT_POST_NAME = 'Project / Grant';
 export const QUESTION_POST_NAME = 'Question';
 export const IDEA_POST_NAME = 'Idea';
 export const SUB_TOPIC_POST_NAME = 'Sub Topic';
+export const FUNDING_OPPORTUNITY = 'Funding Opportunity';
 
 export const CreatingPostContext = createContext();
 export const MAX_POST_CHARACTERS = 800;

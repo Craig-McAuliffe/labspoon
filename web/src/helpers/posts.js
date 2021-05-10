@@ -5,6 +5,7 @@
 import {
   DEFAULT_POST_NAME,
   EVENT_POST_NAME,
+  FUNDING_OPPORTUNITY,
   IDEA_POST_NAME,
   OPEN_POSITION_POST_NAME,
   PROJECT_GRANT_POST_NAME,
@@ -112,6 +113,11 @@ export function postTypeNameToNameAndID(postTypeName) {
       return {
         name: 'Sub Topic',
         id: 'subTopicPost',
+      };
+    case FUNDING_OPPORTUNITY:
+      return {
+        name: 'Funding Opportunity',
+        id: 'fundingOpportunityPost',
       };
     default:
       return {

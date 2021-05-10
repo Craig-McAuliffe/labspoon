@@ -131,6 +131,19 @@ export function doFollowPreferencesBlockPost(
     }
     if (
       postData.postType &&
+      postData.postType.id === PostTypesIDs.FUNDING_OPPORTUNITY
+    ) {
+      if (
+        followerPreferencesOmissions.some(
+          (followerPreference) =>
+            followerPreference.id === PostTypesIDs.FUNDING_OPPORTUNITY
+        )
+      )
+        return true;
+      return false;
+    }
+    if (
+      postData.postType &&
       postData.postType.id === PostTypesIDs.DEFAULT_POST
     ) {
       if (

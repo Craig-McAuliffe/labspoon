@@ -40,4 +40,5 @@ export enum PostTypesIDs {
   QUESTION_POST = 'questionPost',
   IDEA_POST = 'ideaPost',
   SUB_TOPIC_POST = 'subTopicPost',
+  FUNDING_OPPORTUNITY = 'fundingOpportunityPost',
 }
