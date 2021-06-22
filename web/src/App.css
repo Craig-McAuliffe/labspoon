@@ -137,6 +137,11 @@
   z-index: 99999;
 }
 
+.offline-notice-page {
+  grid-column: 2;
+  margin-top: 20px;
+}
+
 @-webkit-keyframes pulse {
   0% {
     background-color: rgba(243, 243, 243);
